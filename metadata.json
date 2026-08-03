@@ -1,0 +1,6 @@
+{
+  "name": "Gia sư Hóa học 11 AI",
+  "description": "Hệ thống hỗ trợ tự học Hóa học lớp 11 với gia sư trí tuệ nhân tạo AI hướng dẫn phương pháp và tư duy giải bài.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

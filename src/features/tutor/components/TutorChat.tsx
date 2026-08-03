@@ -1,0 +1,504 @@
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  Box,
+  Paper,
+  Typography,
+  TextField,
+  Button,
+  Divider,
+  Chip,
+  Avatar,
+  Alert,
+  CircularProgress,
+} from '@mui/material';
+import { Send, Trash2, Sparkles, CheckCircle, Award, Lightbulb, HelpCircle, Clock, ShieldAlert } from 'lucide-react';
+import { useApp } from '../../../core/hooks/useApp';
+import { Lesson } from '../../lessons/types';
+import { KnowledgeTheoryCard } from './KnowledgeTheoryCard';
+import { SuggestedQuestionsCard } from './SuggestedQuestionsCard';
+import { getRemainingCooldown, getCooldownState, checkRateLimit, recordMessageSent } from '../services/cooldownService';
+
+interface TutorChatProps {
+  lesson: Lesson;
+}
+
+export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
+  const {
+    currentUser,
+    chats,
+    guestChatCount,
+    addMessage,
+    clearLessonHistory,
+    isLessonCompleted,
+    toggleLessonCompletion,
+  } = useApp();
+
+  const [inputMessage, setInputMessage] = useState('');
+  const [isSending, setIsSending] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  const [remainingCooldown, setRemainingCooldown] = useState(0);
+  const [offTopicStrikes, setOffTopicStrikes] = useState(0);
+
+  // Lọc tin nhắn của bài học hiện tại và user hiện tại
+  const email = currentUser ? currentUser.email : 'guest';
+  const lessonChats = chats.filter((c) => c.userEmail === email && c.lessonId === lesson.id);
+
+  // Cuộn xuống đáy khi có tin nhắn mới
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [lessonChats, isSending]);
+
+  useEffect(() => {
+    const emailStr = currentUser ? currentUser.email : 'guest';
+    const cooldown = getRemainingCooldown(emailStr);
+    const state = getCooldownState(emailStr);
+    setRemainingCooldown(cooldown);
+    setOffTopicStrikes(state.offTopicStrikeCount);
+
+    let interval: ReturnType<typeof setInterval>;
+    if (cooldown > 0) {
+      interval = setInterval(() => {
+        const cd = getRemainingCooldown(emailStr);
+        setRemainingCooldown(cd);
+        if (cd <= 0) {
+          clearInterval(interval);
+          setOffTopicStrikes(0);
+        }
+      }, 1000);
+    }
+    
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [currentUser, chats, isSending]);
+
+  const handleSend = async (textToSend?: string) => {
+    const text = (textToSend || inputMessage).trim();
+    if (!text) return;
+
+    const emailStr = currentUser ? currentUser.email : 'guest';
+    const rateLimit = checkRateLimit(emailStr);
+    
+    if (!rateLimit.allowed) {
+      if (rateLimit.reason === 'fast') {
+        setErrorMsg(`Bạn đang hỏi quá nhanh. Vui lòng đợi thêm ${Math.ceil((rateLimit.waitMs || 0)/1000)} giây.`);
+      } else {
+        setErrorMsg(`Bạn đã hỏi tối đa 3 câu trong 1 phút. Vui lòng đợi thêm ${Math.ceil((rateLimit.waitMs || 0)/1000)} giây.`);
+      }
+      return;
+    }
+
+    recordMessageSent(emailStr);
+
+    setInputMessage('');
+    setIsSending(true);
+    setErrorMsg(null);
+
+    try {
+      await addMessage(lesson.id, text);
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Có lỗi xảy ra khi kết nối với Gia sư AI.');
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
+
+  const handleClearHistory = () => {
+    if (window.confirm('Bạn có chắc chắn muốn xóa toàn bộ lịch sử trò chuyện của bài học này?')) {
+      clearLessonHistory(lesson.id);
+    }
+  };
+
+  // Tính số lượt dùng thử còn lại
+  const guestLimitReached = !currentUser && guestChatCount >= 25;
+  const guestRemainingCount = !currentUser ? Math.max(0, 25 - guestChatCount) : 0;
+
+  return (
+    <Box
+      id="tutor-chat-container"
+      sx={{
+        display: 'flex',
+        flexDirection: { xs: 'column', md: 'row' },
+        gap: 3,
+        height: 'calc(100vh - 180px)',
+        minHeight: 500,
+      }}
+    >
+      {/* CỘT TRÁI: KIẾN THỨC BÀI HỌC VÀ CÂU HỎI MẪU */}
+      <Box
+        sx={{
+          width: { xs: '100%', md: '35%' },
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 2,
+          height: '100%',
+          overflowY: 'auto',
+          pr: { md: 1 },
+        }}
+      >
+        {/* Thẻ Lý thuyết tóm tắt */}
+        <KnowledgeTheoryCard lesson={lesson} />
+
+        {/* Nút Hoàn thành bài học và Tiến độ */}
+        {currentUser && (
+          <Paper
+            id="completion-paper"
+            sx={{
+              p: 2,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+              border: '1px solid #e2e8f0',
+              backgroundColor: '#ffffff',
+              borderRadius: 3,
+            }}
+          >
+            <Box>
+              <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>
+                Trạng thái tự học
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                {isLessonCompleted(lesson.id) ? 'Đã nắm vững bài này' : 'Chưa hoàn thành bài học'}
+              </Typography>
+            </Box>
+            <Button
+              id="toggle-completion-btn"
+              variant={isLessonCompleted(lesson.id) ? 'contained' : 'outlined'}
+              color={isLessonCompleted(lesson.id) ? 'secondary' : 'primary'}
+              size="small"
+              startIcon={<CheckCircle size={16} />}
+              onClick={() => toggleLessonCompletion(lesson.id)}
+              sx={{ textTransform: 'none', borderRadius: 2, fontWeight: 'bold' }}
+            >
+              {isLessonCompleted(lesson.id) ? 'Đã Xong!' : 'Đánh dấu Xong'}
+            </Button>
+          </Paper>
+        )}
+
+        {/* Thẻ câu hỏi tự học gợi ý */}
+        <SuggestedQuestionsCard
+          lesson={lesson}
+          guestLimitReached={guestLimitReached}
+          isSending={isSending}
+          onQuestionClick={(q) => {
+            if (!guestLimitReached) {
+              setInputMessage(q);
+              handleSend(q);
+            } else {
+              setErrorMsg('Bạn đã dùng hết 25 lượt chat thử. Hãy đăng ký tài khoản để hỏi Gia sư câu này nhé!');
+            }
+          }}
+        />
+      </Box>
+
+      {/* CỘT PHẢI: KHUNG CHAT GIA SƯ AI */}
+      <Paper
+        id="chat-frame-paper"
+        sx={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100%',
+          borderRadius: 3,
+          overflow: 'hidden',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+          border: '1px solid #e2e8f0',
+          backgroundColor: '#ffffff',
+        }}
+      >
+        {/* Chat Header */}
+        <Box
+          id="chat-header"
+          sx={{
+            p: 2,
+            backgroundColor: '#f8fafc',
+            borderBottom: '1px solid #e2e8f0',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <Avatar sx={{ bgcolor: '#ea580c', color: '#ffffff' }}>
+              <Sparkles size={20} />
+            </Avatar>
+            <Box>
+              <Typography variant="subtitle1" color="text.primary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, fontWeight: 'bold' }}>
+                Gia sư AI Hóa học 11
+                <Chip label="ONLINE" size="small" color="secondary" sx={{ height: 16, fontSize: '0.65rem', fontWeight: 'bold' }} />
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                Định hướng tư duy - Không cho sẵn đáp án trực tiếp
+              </Typography>
+            </Box>
+          </Box>
+
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            {remainingCooldown > 0 ? (
+              <Chip 
+                icon={<Clock size={14} color="#d32f2f" />} 
+                label={`Tạm dừng: ${Math.ceil(remainingCooldown / 60000)} phút`} 
+                color="error" 
+                size="small" 
+                variant="outlined"
+                sx={{ fontWeight: 'bold' }}
+              />
+            ) : offTopicStrikes > 0 ? (
+              <Chip 
+                icon={<ShieldAlert size={14} color="#ed6c02" />} 
+                label={`Cảnh báo lạc đề: ${offTopicStrikes}/5`} 
+                color="warning" 
+                size="small" 
+                variant="outlined"
+              />
+            ) : null}
+
+            {lessonChats.length > 0 && (
+              <Button
+                id="clear-history-btn"
+                size="small"
+                color="error"
+                startIcon={<Trash2 size={14} />}
+                onClick={handleClearHistory}
+                sx={{ textTransform: 'none' }}
+              >
+                Xóa lịch sử chat
+              </Button>
+            )}
+          </Box>
+        </Box>
+
+        {/* Cảnh báo khách vãng lai hoặc tài khoản */}
+        {!currentUser && (
+          <Alert
+            id="guest-alert"
+            severity={guestRemainingCount === 0 ? 'error' : 'warning'}
+            sx={{ py: 0.5, px: 2, borderRadius: 0, '.MuiAlert-message': { fontSize: '0.8rem' } }}
+          >
+            {guestRemainingCount === 0 ? (
+              <strong>Bạn đã hết lượt dùng thử miễn phí.</strong>
+            ) : (
+              <span>
+                Bạn đang dùng bản trải nghiệm miễn phí. Còn lại:{' '}
+                <strong>{guestRemainingCount}/25 câu hỏi</strong>.
+              </span>
+            )}
+            {' Đăng ký tài khoản học sinh để học tập không giới hạn!'}
+          </Alert>
+        )}
+
+        {/* Khung chứa các tin nhắn */}
+        <Box
+          id="chat-messages-box"
+          sx={{
+            flex: 1,
+            p: 3,
+            overflowY: 'auto',
+            backgroundColor: '#ffffff',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2,
+          }}
+        >
+          {lessonChats.length === 0 ? (
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: '100%',
+                gap: 2,
+                p: 4,
+                textAlign: 'center',
+              }}
+            >
+              <Avatar sx={{ width: 64, height: 64, bgcolor: 'rgba(234, 88, 12, 0.08)', color: '#ea580c' }}>
+                <Sparkles size={32} />
+              </Avatar>
+              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                Trò chuyện với Gia sư AI của bài học này
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 450, mb: 1 }}>
+                Nhập câu hỏi của em ở phía dưới, hoặc nhấp vào một trong các{' '}
+                <strong>Câu hỏi tự luyện mẫu</strong> ở cột trái để bắt đầu buổi thảo luận nhé!
+              </Typography>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'center' }}>
+                <Chip icon={<Award size={14} color="#ea580c" />} label="Hỗ trợ lý thuyết" variant="outlined" size="small" />
+                <Chip icon={<Lightbulb size={14} color="#ea580c" />} label="Gợi mở phương pháp" variant="outlined" size="small" />
+                <Chip icon={<HelpCircle size={14} color="#ea580c" />} label="Giải đáp thắc mắc 24/7" variant="outlined" size="small" />
+              </Box>
+            </Box>
+          ) : (
+            lessonChats.map((msg) => {
+              const isAi = msg.sender === 'ai';
+              return (
+                <Box
+                  key={msg.id}
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    gap: 1.5,
+                    alignSelf: isAi ? 'flex-start' : 'flex-end',
+                    maxWidth: { xs: '90%', sm: '80%' },
+                    textAlign: 'left',
+                  }}
+                >
+                  {isAi && (
+                    <Avatar
+                      sx={{
+                        width: 32,
+                        height: 32,
+                        bgcolor: 'rgba(234, 88, 12, 0.08)',
+                        color: '#ea580c',
+                        border: '1px solid rgba(234, 88, 12, 0.15)',
+                      }}
+                    >
+                      <Sparkles size={16} />
+                    </Avatar>
+                  )}
+
+                  <Box>
+                    <Paper
+                      sx={{
+                        p: 2,
+                        borderRadius: isAi ? '0 16px 16px 16px' : '16px 0 16px 16px',
+                        backgroundColor: isAi ? '#f1f5f9' : '#0f766e',
+                        color: isAi ? 'text.primary' : '#ffffff',
+                        border: isAi ? '1px solid #e2e8f0' : 'none',
+                        boxShadow: 'none',
+                      }}
+                    >
+                      <Typography variant="body2" sx={{ whiteSpace: 'pre-line', lineHeight: 1.6, fontSize: '0.9rem' }}>
+                        {msg.content}
+                      </Typography>
+                    </Paper>
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ display: 'block', mt: 0.5, ml: 1, mr: 1, textAlign: isAi ? 'left' : 'right' }}
+                    >
+                      {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </Typography>
+                  </Box>
+                </Box>
+              );
+            })
+          )}
+
+          {/* Hiệu ứng đang gửi / AI phản hồi */}
+          {isSending && (
+            <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1.5, alignSelf: 'flex-start', maxWidth: '80%' }}>
+              <Avatar
+                sx={{
+                  width: 32,
+                  height: 32,
+                  bgcolor: 'rgba(234, 88, 12, 0.08)',
+                  color: '#ea580c',
+                  border: '1px solid rgba(234, 88, 12, 0.15)',
+                }}
+              >
+                <Sparkles size={16} />
+              </Avatar>
+              <Paper
+                sx={{
+                  p: 1.5,
+                  borderRadius: '0 16px 16px 16px',
+                  backgroundColor: '#f1f5f9',
+                  border: '1px solid #e2e8f0',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                }}
+              >
+                <CircularProgress size={16} thickness={5} color="primary" />
+                <Typography variant="caption" color="text.secondary">
+                  Gia sư AI đang chuẩn bị gợi ý...
+                </Typography>
+              </Paper>
+            </Box>
+          )}
+
+          <div ref={messagesEndRef} />
+        </Box>
+
+        {/* Hiển thị lỗi nếu có */}
+        {errorMsg && (
+          <Alert id="chat-error-alert" severity="error" onClose={() => setErrorMsg(null)} sx={{ borderRadius: 0 }}>
+            {errorMsg}
+          </Alert>
+        )}
+
+        {/* Khung nhập tin nhắn */}
+        <Box
+          id="chat-input-box"
+          sx={{
+            p: 2,
+            backgroundColor: '#f8fafc',
+            borderTop: '1px solid #e2e8f0',
+            display: 'flex',
+            gap: 1.5,
+            alignItems: 'center',
+          }}
+        >
+          <TextField
+            id="chat-input-field"
+            fullWidth
+            placeholder={
+              guestLimitReached
+                ? 'Đã hết lượt chat thử! Đăng ký tài khoản học sinh ngay.'
+                : remainingCooldown > 0
+                ? `Đang tạm dừng (${Math.ceil(remainingCooldown / 60000)} phút)`
+                : 'Hỏi Gia sư AI về phương pháp giải bài...'
+            }
+            variant="outlined"
+            size="small"
+            value={inputMessage}
+            onChange={(e) => setInputMessage(e.target.value)}
+            onKeyDown={handleKeyPress}
+            disabled={guestLimitReached || isSending || remainingCooldown > 0}
+            sx={{
+              backgroundColor: '#ffffff',
+              '& .MuiOutlinedInput-root': {
+                borderRadius: 2.5,
+              },
+            }}
+          />
+          <Button
+            id="chat-send-btn"
+            variant="contained"
+            color="primary"
+            onClick={() => handleSend()}
+            disabled={guestLimitReached || isSending || remainingCooldown > 0 || !inputMessage.trim()}
+            sx={{
+              borderRadius: 2.5,
+              minWidth: 48,
+              height: 40,
+              p: 0,
+              boxShadow: 'none',
+              '&:hover': {
+                boxShadow: 'none',
+              },
+            }}
+          >
+            {isSending ? <CircularProgress size={20} color="inherit" /> : <Send size={18} />}
+          </Button>
+        </Box>
+      </Paper>
+    </Box>
+  );
+};

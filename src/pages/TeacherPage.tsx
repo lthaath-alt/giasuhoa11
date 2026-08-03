@@ -1,0 +1,621 @@
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import {
+  Box, AppBar, Toolbar, Typography, Button, Container, Avatar, Chip,
+  Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
+  Dialog, DialogTitle, DialogContent, DialogActions, TextField, IconButton,
+  Alert, Snackbar, Tooltip, Divider, Badge, Tab, Tabs
+} from '@mui/material';
+import {
+  GraduationCap, LogOut, Users, UserPlus, Copy, Eye, EyeOff,
+  BookOpen, CheckCircle, Clock, RefreshCw, Key, ShieldAlert
+} from 'lucide-react';
+import { useApp } from '../core/hooks/useApp';
+import { CreateStudentData } from '../core/contexts/AppContext';
+import { TeacherClassManager } from '../features/teacher/components/TeacherClassManager';
+import { QuizProgressTab } from '../features/teacher/components/QuizProgressTab';
+import { getCooldownLogsByStudents, CooldownLogEntry } from '../features/tutor/services/cooldownService';
+
+// ─── Credential Display Dialog ────────────────────────────────────────────────
+
+interface CredentialDialogProps {
+  open: boolean;
+  onClose: () => void;
+  credentials: { identifier: string; password: string; name: string } | null;
+}
+
+const CredentialDialog: React.FC<CredentialDialogProps> = ({ open, onClose, credentials }) => {
+  const [showPassword, setShowPassword] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const copyAll = () => {
+    if (!credentials) return;
+    const text = `Thông tin đăng nhập:\n` +
+      `Họ tên: ${credentials.name}\n` +
+      `Tài khoản: ${credentials.identifier}\n` +
+      `Mật khẩu: ${credentials.password}`;
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+      <DialogTitle sx={{ bgcolor: '#0f766e', color: '#fff', fontWeight: 'bold' }}>
+        ✅ Tài khoản đã được tạo thành công!
+      </DialogTitle>
+      <DialogContent sx={{ pt: 3 }}>
+        <Alert severity="warning" sx={{ mb: 2, borderRadius: 2 }}>
+          Sao chép và cấp thông tin này cho học sinh ngay bây giờ. Mật khẩu sẽ không hiển thị lại!
+        </Alert>
+
+        {credentials && (
+          <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 3, bgcolor: '#f8fafc' }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+              <Box>
+                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'bold' }}>HỌ TÊN</Typography>
+                <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{credentials.name}</Typography>
+              </Box>
+              <Divider />
+              <Box>
+                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'bold' }}>TÀI KHOẢN ĐĂNG NHẬP</Typography>
+                <Typography variant="body1" sx={{ fontWeight: 'bold', fontFamily: 'monospace', color: '#0f766e' }}>
+                  {credentials.identifier}
+                </Typography>
+              </Box>
+              <Divider />
+              <Box>
+                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'bold' }}>MẬT KHẨU</Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Typography variant="body1" sx={{ fontWeight: 'bold', fontFamily: 'monospace', color: '#ea580c', letterSpacing: showPassword ? 0 : 4 }}>
+                    {showPassword ? credentials.password : '••••••••••'}
+                  </Typography>
+                  <IconButton size="small" onClick={() => setShowPassword(v => !v)}>
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </IconButton>
+                </Box>
+              </Box>
+            </Box>
+          </Paper>
+        )}
+      </DialogContent>
+      <DialogActions sx={{ px: 3, pb: 2.5, gap: 1 }}>
+        <Button
+          variant="outlined"
+          startIcon={<Copy size={16} />}
+          onClick={copyAll}
+          sx={{ borderRadius: 2, textTransform: 'none' }}
+        >
+          {copied ? '✓ Đã sao chép!' : 'Sao chép tất cả'}
+        </Button>
+        <Button variant="contained" color="primary" onClick={onClose} sx={{ borderRadius: 2, textTransform: 'none' }}>
+          Đóng
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+};
+
+// ─── Create Student Dialog ────────────────────────────────────────────────────
+
+interface CreateStudentDialogProps {
+  open: boolean;
+  onClose: () => void;
+  classId: string;
+  schoolId: string;
+  onCreated: (creds: { identifier: string; password: string; name: string }) => void;
+}
+
+const CreateStudentDialog: React.FC<CreateStudentDialogProps> = ({
+  open, onClose, classId, schoolId, onCreated
+}) => {
+  const { createStudent } = useApp();
+  const [name, setName] = useState('');
+  const [useEmail, setUseEmail] = useState(true);
+  const [identifier, setIdentifier] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const handleCreate = async () => {
+    setError(null);
+    if (!name.trim()) { setError('Vui lòng nhập họ tên học sinh.'); return; }
+    if (!identifier.trim()) { setError('Vui lòng nhập email hoặc username.'); return; }
+
+    setLoading(true);
+    const data: CreateStudentData = {
+      name: name.trim(),
+      classId,
+      schoolId,
+      ...(useEmail ? { email: identifier.trim() } : { username: identifier.trim() }),
+      ...(password.trim() ? { password: password.trim() } : {}),
+    };
+
+    const res = await createStudent(data);
+    setLoading(false);
+
+    if (res.success && res.credentials) {
+      setName(''); setIdentifier(''); setPassword(''); setError(null);
+      onCreated(res.credentials);
+      onClose();
+    } else {
+      setError(res.message);
+    }
+  };
+
+  const handleClose = () => {
+    setName(''); setIdentifier(''); setPassword(''); setError(null);
+    onClose();
+  };
+
+  return (
+    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+      <DialogTitle sx={{ fontWeight: 'bold' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <UserPlus size={20} color="#0f766e" />
+          Thêm học sinh vào lớp
+        </Box>
+      </DialogTitle>
+      <DialogContent>
+        {error && <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>{error}</Alert>}
+
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
+          <TextField
+            label="Họ và tên học sinh *"
+            fullWidth
+            value={name}
+            onChange={e => setName(e.target.value)}
+            disabled={loading}
+            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
+          />
+
+          <Box>
+            <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
+              <Chip
+                label="Dùng Email"
+                size="small"
+                color={useEmail ? 'primary' : 'default'}
+                onClick={() => setUseEmail(true)}
+                sx={{ cursor: 'pointer' }}
+              />
+              <Chip
+                label="Dùng Username nội bộ"
+                size="small"
+                color={!useEmail ? 'secondary' : 'default'}
+                onClick={() => setUseEmail(false)}
+                sx={{ cursor: 'pointer' }}
+              />
+            </Box>
+            <TextField
+              label={useEmail ? 'Email học sinh' : 'Username nội bộ (VD: hs_nguyenan_11a1)'}
+              fullWidth
+              value={identifier}
+              onChange={e => setIdentifier(e.target.value)}
+              disabled={loading}
+              type={useEmail ? 'email' : 'text'}
+              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
+            />
+          </Box>
+
+          <TextField
+            label="Mật khẩu (để trống để tạo tự động)"
+            fullWidth
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            disabled={loading}
+            type="password"
+            helperText="Nếu để trống, hệ thống sẽ tạo mật khẩu ngẫu nhiên mạnh."
+            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
+          />
+        </Box>
+      </DialogContent>
+      <DialogActions sx={{ px: 3, pb: 2.5, gap: 1 }}>
+        <Button onClick={handleClose} disabled={loading} sx={{ textTransform: 'none', borderRadius: 2 }}>Hủy</Button>
+        <Button
+          variant="contained"
+          color="secondary"
+          onClick={handleCreate}
+          disabled={loading}
+          startIcon={<UserPlus size={16} />}
+          sx={{ textTransform: 'none', borderRadius: 2, boxShadow: 'none' }}
+        >
+          {loading ? 'Đang tạo...' : 'Tạo tài khoản'}
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+};
+
+// ─── TeacherPage ──────────────────────────────────────────────────────────────
+
+export const TeacherPage: React.FC = () => {
+  const navigate = useNavigate();
+  const { currentUser, users, logout, getMyClass } = useApp();
+
+  const [createOpen, setCreateOpen] = useState(false);
+  const [credentialDialog, setCredentialDialog] = useState<{
+    identifier: string; password: string; name: string
+  } | null>(null);
+  const [snackbar, setSnackbar] = useState<string | null>(null);
+  const [codeCopied, setCodeCopied] = useState(false);
+  const [activeTab, setActiveTab] = useState(0);
+  const [cooldownLogs, setCooldownLogs] = useState<CooldownLogEntry[]>([]);
+
+  const myClass = getMyClass();
+  const studentIdentifiers = myClass?.studentIdentifiers || [];
+
+  // Lấy danh sách User object của học sinh trong lớp
+  const myStudents = users.filter(u =>
+    studentIdentifiers.some(id =>
+      id.toLowerCase() === u.email.toLowerCase() ||
+      (u.username && id.toLowerCase() === u.username.toLowerCase())
+    )
+  );
+
+  React.useEffect(() => {
+    if (activeTab === 2) {
+      const studentEmails = myStudents.map(s => s.email);
+      setCooldownLogs(getCooldownLogsByStudents(studentEmails));
+    }
+  }, [activeTab, myStudents]);
+
+  const copyInviteCode = () => {
+    if (!myClass?.inviteCode) return;
+    navigator.clipboard.writeText(myClass.inviteCode);
+    setCodeCopied(true);
+    setTimeout(() => setCodeCopied(false), 2000);
+  };
+
+  const handleLogout = () => { logout(); navigate('/login'); };
+
+  const handleStudentCreated = (creds: { identifier: string; password: string; name: string }) => {
+    setCredentialDialog(creds);
+  };
+
+  return (
+    <Box id="teacher-page" sx={{ minHeight: '100vh', backgroundColor: '#f1f5f9', display: 'flex', flexDirection: 'column' }}>
+
+      {/* NAVBAR */}
+      <AppBar id="teacher-app-bar" position="static" color="inherit" elevation={0}
+        sx={{ backgroundColor: '#ffffff', borderBottom: '1px solid #e2e8f0' }}>
+        <Container maxWidth="xl">
+          <Toolbar sx={{ justifyContent: 'space-between', py: 1, px: { xs: 0 } }}>
+
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+              <Box sx={{ p: 1, backgroundColor: 'rgba(15, 118, 110, 0.1)', borderRadius: 2, display: 'flex' }}>
+                <GraduationCap size={22} color="#0f766e" />
+              </Box>
+              <Box>
+                <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#0f172a', lineHeight: 1.2 }}>
+                  {myClass ? `Lớp ${myClass.name}` : 'Không gian Giáo viên'}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  Gia sư Hóa học 11 AI
+                </Typography>
+              </Box>
+            </Box>
+
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center', gap: 1.5 }}>
+                <Avatar sx={{ bgcolor: 'rgba(15, 118, 110, 0.1)', color: '#0f766e', width: 36, height: 36, fontWeight: 'bold' }}>
+                  {currentUser?.name.charAt(0).toUpperCase()}
+                </Avatar>
+                <Box>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: '#0f172a' }}>
+                    {currentUser?.name}
+                  </Typography>
+                  <Chip label="GIÁO VIÊN" size="small" sx={{ height: 16, fontSize: '0.6rem', fontWeight: 'bold', bgcolor: '#0f766e', color: '#fff' }} />
+                </Box>
+              </Box>
+
+              <Button
+                id="teacher-view-study-btn"
+                variant="outlined"
+                size="small"
+                startIcon={<BookOpen size={14} />}
+                onClick={() => navigate('/dashboard')}
+                sx={{ textTransform: 'none', borderRadius: 2, fontWeight: 'bold', color: '#0f766e', borderColor: '#0f766e', '&:hover': { bgcolor: 'rgba(15,118,110,0.05)' } }}
+              >
+                Vào học tập
+              </Button>
+
+              <Button
+                id="teacher-logout-btn"
+                variant="contained"
+                color="error"
+                size="small"
+                startIcon={<LogOut size={14} />}
+                onClick={handleLogout}
+                sx={{ textTransform: 'none', borderRadius: 2, fontWeight: 'bold', boxShadow: 'none' }}
+              >
+                Đăng xuất
+              </Button>
+            </Box>
+          </Toolbar>
+        </Container>
+      </AppBar>
+
+      {/* MAIN CONTENT */}
+      <Box sx={{ flex: 1, py: 4 }}>
+        <Container maxWidth="lg">
+
+          {/* Header stats */}
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, 1fr)' }, gap: 3, mb: 4 }}>
+            <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid #e2e8f0' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Box sx={{ p: 1.5, bgcolor: 'rgba(15,118,110,0.08)', borderRadius: 2 }}>
+                  <Users size={20} color="#0f766e" />
+                </Box>
+                <Box>
+                  <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#0f172a' }}>{myStudents.length}</Typography>
+                  <Typography variant="caption" color="text.secondary">Học sinh trong lớp</Typography>
+                </Box>
+              </Box>
+            </Paper>
+
+            <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid #e2e8f0' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Box sx={{ p: 1.5, bgcolor: 'rgba(15,118,110,0.08)', borderRadius: 2 }}>
+                  <CheckCircle size={20} color="#0f766e" />
+                </Box>
+                <Box>
+                  <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#0f172a' }}>
+                    {myStudents.filter(s => s.status === 'active').length}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">Tài khoản hoạt động</Typography>
+                </Box>
+              </Box>
+            </Paper>
+
+            <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid #e2e8f0' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Box sx={{ p: 1.5, bgcolor: 'rgba(245,158,11,0.08)', borderRadius: 2 }}>
+                  <Clock size={20} color="#f59e0b" />
+                </Box>
+                <Box>
+                  <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#0f172a' }}>
+                    {myStudents.filter(s => s.status === 'pending').length}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">Chờ kích hoạt</Typography>
+                </Box>
+              </Box>
+            </Paper>
+          </Box>
+
+          {/* Mã mời lớp — chỉ hiển thị khi có lớp và có inviteCode */}
+          {myClass?.inviteCode && (
+            <Paper sx={{ p: 2.5, mb: 3, borderRadius: 3, border: '1px solid rgba(15,118,110,0.3)', bgcolor: 'rgba(15,118,110,0.03)' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
+                <Box sx={{ p: 1, bgcolor: 'rgba(15,118,110,0.1)', borderRadius: 2, display: 'flex' }}>
+                  <Key size={18} color="#0f766e" />
+                </Box>
+                <Box sx={{ flex: 1 }}>
+                  <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'bold', display: 'block' }}>MÃ MỜI VÀO LỚP</Typography>
+                  <Typography variant="h5" sx={{ fontFamily: 'monospace', fontWeight: 900, color: '#0f766e', letterSpacing: '0.25em' }}>
+                    {myClass.inviteCode}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    Chia sẻ mã này để học sinh tự tham gia lớp khi đăng ký hoặc trong trang học tập.
+                  </Typography>
+                </Box>
+                <Button
+                  id="teacher-copy-invite-code-btn"
+                  variant="outlined"
+                  size="small"
+                  startIcon={<Copy size={14} />}
+                  onClick={copyInviteCode}
+                  sx={{ textTransform: 'none', borderRadius: 2, borderColor: '#0f766e', color: '#0f766e', fontWeight: 'bold' }}
+                >
+                  {codeCopied ? '✓ Đã sao chép!' : 'Sao chép mã'}
+                </Button>
+              </Box>
+            </Paper>
+          )}
+
+          {/* Tabs chuyển đổi giữa DS học sinh và Tiến độ/Chấm điểm */}
+          {myClass && (
+            <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3, mt: 1 }}>
+              <Tabs
+                value={activeTab}
+                onChange={(_, val) => setActiveTab(val)}
+                textColor="secondary"
+                indicatorColor="secondary"
+              >
+                <Tab label="Danh sách học sinh" sx={{ textTransform: 'none', fontWeight: 'bold' }} />
+                <Tab label="🚩 Tiến độ & Chấm điểm bài thi" sx={{ textTransform: 'none', fontWeight: 'bold' }} />
+                <Tab label="⚠️ Cảnh báo & Cooldown" sx={{ textTransform: 'none', fontWeight: 'bold' }} />
+              </Tabs>
+            </Box>
+          )}
+
+          {/* Danh sách học sinh */}
+          {(!myClass || activeTab === 0) && (
+            <Paper sx={{ borderRadius: 3, border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+            <Box sx={{ p: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e2e8f0' }}>
+              <Box>
+                <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#0f172a' }}>
+                  {myClass ? `Lớp ${myClass.name} – Danh sách học sinh` : 'Chưa có lớp'}
+                </Typography>
+                {!myClass && (
+                  <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                    Tạo lớp của riêng bạn bên dưới, hoặc chờ Admin gán lớp.
+                  </Typography>
+                )}
+              </Box>
+
+              {myClass && (
+                <Button
+                  id="teacher-add-student-btn"
+                  variant="contained"
+                  color="secondary"
+                  startIcon={<UserPlus size={16} />}
+                  onClick={() => setCreateOpen(true)}
+                  sx={{ textTransform: 'none', borderRadius: 2, fontWeight: 'bold', boxShadow: 'none' }}
+                >
+                  Thêm học sinh
+                </Button>
+              )}
+            </Box>
+
+            {myClass && (
+              <TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow sx={{ bgcolor: '#f8fafc' }}>
+                      <TableCell sx={{ fontWeight: 'bold', color: '#475569' }}>STT</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', color: '#475569' }}>Họ tên</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', color: '#475569' }}>Tài khoản đăng nhập</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', color: '#475569' }}>Trạng thái</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', color: '#475569' }}>Ngày tạo</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {myStudents.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={5} align="center" sx={{ py: 6, color: 'text.secondary' }}>
+                          Chưa có học sinh nào trong lớp. Nhấn "Thêm học sinh" để bắt đầu.
+                        </TableCell>
+                      </TableRow>
+                    ) : myStudents.map((student, idx) => (
+                      <TableRow key={student.id} sx={{ '&:hover': { bgcolor: '#f8fafc' } }}>
+                        <TableCell>{idx + 1}</TableCell>
+                        <TableCell>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Avatar sx={{ width: 32, height: 32, bgcolor: 'rgba(15,118,110,0.1)', color: '#0f766e', fontSize: '0.85rem', fontWeight: 'bold' }}>
+                              {student.name.charAt(0)}
+                            </Avatar>
+                            <Typography variant="body2" sx={{ fontWeight: 600 }}>{student.name}</Typography>
+                          </Box>
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant="body2" sx={{ fontFamily: 'monospace', color: '#0f766e' }}>
+                            {student.username || student.email}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Chip
+                            label={student.status === 'active' ? 'Hoạt động' : student.status === 'pending' ? 'Chờ duyệt' : 'Bị từ chối'}
+                            size="small"
+                            sx={{
+                              fontWeight: 'bold', fontSize: '0.7rem',
+                              bgcolor: student.status === 'active' ? 'rgba(15,118,110,0.08)' : student.status === 'pending' ? 'rgba(245,158,11,0.08)' : 'rgba(239,68,68,0.08)',
+                              color: student.status === 'active' ? '#0f766e' : student.status === 'pending' ? '#d97706' : '#dc2626',
+                            }}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant="caption" color="text.secondary">
+                            {new Date(student.createdAt).toLocaleDateString('vi-VN')}
+                          </Typography>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
+          </Paper>
+          )}
+
+          {/* Tab Tiến độ và chấm điểm bài thi */}
+          {myClass && activeTab === 1 && (
+            <Box sx={{ mt: 1 }}>
+              <QuizProgressTab students={myStudents} />
+            </Box>
+          )}
+
+          {/* Tab Cooldown Logs */}
+          {myClass && activeTab === 2 && (
+            <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid #e2e8f0', overflow: 'hidden', mt: 1 }}>
+              <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#0f172a', mb: 2 }}>
+                Lịch sử cảnh báo lạc đề (Cooldown)
+              </Typography>
+              <TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow sx={{ bgcolor: '#f8fafc' }}>
+                      <TableCell sx={{ fontWeight: 'bold', color: '#475569' }}>Thời điểm</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', color: '#475569' }}>Học sinh</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', color: '#475569' }}>Lý do</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', color: '#475569' }}>Nội dung chat lạc đề</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', color: '#475569' }}>Thời lượng</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {cooldownLogs.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={5} align="center" sx={{ py: 6, color: 'text.secondary' }}>
+                          Chưa có cảnh báo lạc đề nào được ghi nhận.
+                        </TableCell>
+                      </TableRow>
+                    ) : cooldownLogs.map((log, idx) => (
+                      <TableRow key={idx} sx={{ '&:hover': { bgcolor: '#f8fafc' } }}>
+                        <TableCell>
+                          <Typography variant="body2">{new Date(log.triggeredAt).toLocaleString('vi-VN')}</Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant="body2" sx={{ fontWeight: 600 }}>{log.studentName || 'Không rõ'}</Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant="body2" color="error.main">{log.reason}</Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Box sx={{ maxHeight: 100, overflowY: 'auto' }}>
+                            {log.offTopicMessages.map((msg, i) => (
+                              <Typography key={i} variant="caption" component="div" sx={{ fontStyle: 'italic', color: '#64748b' }}>
+                                - {msg}
+                              </Typography>
+                            ))}
+                          </Box>
+                        </TableCell>
+                        <TableCell>
+                          <Chip label={`${log.durationMinutes} phút`} size="small" color="error" />
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Paper>
+          )}
+
+          {/* Tạo lớp khi GV chưa có lớp nào */}
+          {!myClass && (
+            <Box sx={{ mt: 3 }}>
+              <TeacherClassManager
+                onClassCreated={() => { /* state sẽ refresh qua getMyClass() */ }}
+              />
+            </Box>
+          )}
+
+        </Container>
+      </Box>
+
+      {/* Dialogs */}
+      {myClass && (
+        <CreateStudentDialog
+          open={createOpen}
+          onClose={() => setCreateOpen(false)}
+          classId={myClass.id}
+          schoolId={myClass.schoolId}
+          onCreated={handleStudentCreated}
+        />
+      )}
+
+      <CredentialDialog
+        open={Boolean(credentialDialog)}
+        onClose={() => setCredentialDialog(null)}
+        credentials={credentialDialog}
+      />
+
+      <Snackbar
+        open={Boolean(snackbar)}
+        autoHideDuration={3000}
+        onClose={() => setSnackbar(null)}
+        message={snackbar}
+      />
+    </Box>
+  );
+};
+
+export default TeacherPage;
