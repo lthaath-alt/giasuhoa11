@@ -4,17 +4,16 @@ import {
   Box, AppBar, Toolbar, Typography, Button, Container, Avatar, Chip,
   Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
   Dialog, DialogTitle, DialogContent, DialogActions, TextField, IconButton,
-  Alert, Snackbar, Tooltip, Divider, Badge, Tab, Tabs
+  Alert, Snackbar, Tooltip, Divider, Badge,
 } from '@mui/material';
 import {
   GraduationCap, LogOut, Users, UserPlus, Copy, Eye, EyeOff,
-  BookOpen, CheckCircle, Clock, RefreshCw, Key, ShieldAlert
+  BookOpen, CheckCircle, Clock, Key,
 } from 'lucide-react';
 import { useApp } from '../core/hooks/useApp';
 import { CreateStudentData } from '../core/contexts/AppContext';
 import { TeacherClassManager } from '../features/teacher/components/TeacherClassManager';
-import { QuizProgressTab } from '../features/teacher/components/QuizProgressTab';
-import { getCooldownLogsByStudents, CooldownLogEntry } from '../features/tutor/services/cooldownService';
+import { ManagementLayout } from '../core/components/ManagementLayout';
 
 // ─── Credential Display Dialog ────────────────────────────────────────────────
 
@@ -238,8 +237,6 @@ export const TeacherPage: React.FC = () => {
   } | null>(null);
   const [snackbar, setSnackbar] = useState<string | null>(null);
   const [codeCopied, setCodeCopied] = useState(false);
-  const [activeTab, setActiveTab] = useState(0);
-  const [cooldownLogs, setCooldownLogs] = useState<CooldownLogEntry[]>([]);
 
   const myClass = getMyClass();
   const studentIdentifiers = myClass?.studentIdentifiers || [];
@@ -251,13 +248,6 @@ export const TeacherPage: React.FC = () => {
       (u.username && id.toLowerCase() === u.username.toLowerCase())
     )
   );
-
-  React.useEffect(() => {
-    if (activeTab === 2) {
-      const studentEmails = myStudents.map(s => s.email);
-      setCooldownLogs(getCooldownLogsByStudents(studentEmails));
-    }
-  }, [activeTab, myStudents]);
 
   const copyInviteCode = () => {
     if (!myClass?.inviteCode) return;
@@ -272,10 +262,142 @@ export const TeacherPage: React.FC = () => {
     setCredentialDialog(creds);
   };
 
+  // ── Nội dung cho mục "Quản lý Lớp học" trong sidebar ──────────────────────
+
+  const classContent = (
+    <Box>
+      {/* Mã mời lớp */}
+      {myClass?.inviteCode && (
+        <Paper sx={{ p: 2.5, mb: 3, borderRadius: 3, border: '1px solid rgba(15,118,110,0.3)', bgcolor: 'rgba(15,118,110,0.03)' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
+            <Box sx={{ p: 1, bgcolor: 'rgba(15,118,110,0.1)', borderRadius: 2, display: 'flex' }}>
+              <Key size={18} color="#0f766e" />
+            </Box>
+            <Box sx={{ flex: 1 }}>
+              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'bold', display: 'block' }}>MÃ MỜI VÀO LỚP</Typography>
+              <Typography variant="h5" sx={{ fontFamily: 'monospace', fontWeight: 900, color: '#0f766e', letterSpacing: '0.25em' }}>
+                {myClass.inviteCode}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                Chia sẻ mã này để học sinh tự tham gia lớp khi đăng ký hoặc trong trang học tập.
+              </Typography>
+            </Box>
+            <Button
+              id="teacher-copy-invite-code-btn"
+              variant="outlined"
+              size="small"
+              startIcon={<Copy size={14} />}
+              onClick={copyInviteCode}
+              sx={{ textTransform: 'none', borderRadius: 2, borderColor: '#0f766e', color: '#0f766e', fontWeight: 'bold' }}
+            >
+              {codeCopied ? '✓ Đã sao chép!' : 'Sao chép mã'}
+            </Button>
+          </Box>
+        </Paper>
+      )}
+
+      {/* Danh sách học sinh */}
+      <Paper sx={{ borderRadius: 3, border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+        <Box sx={{ p: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e2e8f0' }}>
+          <Box>
+            <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#0f172a' }}>
+              {myClass ? `Lớp ${myClass.name} – Danh sách học sinh` : 'Chưa có lớp'}
+            </Typography>
+            {!myClass && (
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                Tạo lớp của riêng bạn bên dưới, hoặc chờ Admin gán lớp.
+              </Typography>
+            )}
+          </Box>
+
+          {myClass && (
+            <Button
+              id="teacher-add-student-btn"
+              variant="contained"
+              color="secondary"
+              startIcon={<UserPlus size={16} />}
+              onClick={() => setCreateOpen(true)}
+              sx={{ textTransform: 'none', borderRadius: 2, fontWeight: 'bold', boxShadow: 'none' }}
+            >
+              Thêm học sinh
+            </Button>
+          )}
+        </Box>
+
+        {myClass && (
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow sx={{ bgcolor: '#f8fafc' }}>
+                  <TableCell sx={{ fontWeight: 'bold', color: '#475569' }}>STT</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold', color: '#475569' }}>Họ tên</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold', color: '#475569' }}>Tài khoản đăng nhập</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold', color: '#475569' }}>Trạng thái</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold', color: '#475569' }}>Ngày tạo</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {myStudents.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={5} align="center" sx={{ py: 6, color: 'text.secondary' }}>
+                      Chưa có học sinh nào trong lớp. Nhấn "Thêm học sinh" để bắt đầu.
+                    </TableCell>
+                  </TableRow>
+                ) : myStudents.map((student, idx) => (
+                  <TableRow key={student.id} sx={{ '&:hover': { bgcolor: '#f8fafc' } }}>
+                    <TableCell>{idx + 1}</TableCell>
+                    <TableCell>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Avatar sx={{ width: 32, height: 32, bgcolor: 'rgba(15,118,110,0.1)', color: '#0f766e', fontSize: '0.85rem', fontWeight: 'bold' }}>
+                          {student.name.charAt(0)}
+                        </Avatar>
+                        <Typography variant="body2" sx={{ fontWeight: 600 }}>{student.name}</Typography>
+                      </Box>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" sx={{ fontFamily: 'monospace', color: '#0f766e' }}>
+                        {student.username || student.email}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Chip
+                        label={student.status === 'active' ? 'Hoạt động' : student.status === 'pending' ? 'Chờ duyệt' : 'Bị từ chối'}
+                        size="small"
+                        sx={{
+                          fontWeight: 'bold', fontSize: '0.7rem',
+                          bgcolor: student.status === 'active' ? 'rgba(15,118,110,0.08)' : student.status === 'pending' ? 'rgba(245,158,11,0.08)' : 'rgba(239,68,68,0.08)',
+                          color: student.status === 'active' ? '#0f766e' : student.status === 'pending' ? '#d97706' : '#dc2626',
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="caption" color="text.secondary">
+                        {new Date(student.createdAt).toLocaleDateString('vi-VN')}
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+      </Paper>
+
+      {/* Tạo lớp khi GV chưa có lớp nào */}
+      {!myClass && (
+        <Box sx={{ mt: 3 }}>
+          <TeacherClassManager
+            onClassCreated={() => { /* state sẽ refresh qua getMyClass() */ }}
+          />
+        </Box>
+      )}
+    </Box>
+  );
+
   return (
     <Box id="teacher-page" sx={{ minHeight: '100vh', backgroundColor: '#f1f5f9', display: 'flex', flexDirection: 'column' }}>
 
-      {/* NAVBAR */}
+      {/* NAVBAR — giữ nguyên */}
       <AppBar id="teacher-app-bar" position="static" color="inherit" elevation={0}
         sx={{ backgroundColor: '#ffffff', borderBottom: '1px solid #e2e8f0' }}>
         <Container maxWidth="xl">
@@ -335,263 +457,17 @@ export const TeacherPage: React.FC = () => {
         </Container>
       </AppBar>
 
-      {/* MAIN CONTENT */}
-      <Box sx={{ flex: 1, py: 4 }}>
-        <Container maxWidth="lg">
+      {/* MAIN CONTENT — ManagementLayout */}
+      <ManagementLayout
+        roleName="Giáo viên"
+        classCount={myClass ? 1 : 0}
+        accountCount={myStudents.length}
+        questionCount={0}
+        examCount={0}
+        classContent={classContent}
+      />
 
-          {/* Header stats */}
-          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, 1fr)' }, gap: 3, mb: 4 }}>
-            <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid #e2e8f0' }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                <Box sx={{ p: 1.5, bgcolor: 'rgba(15,118,110,0.08)', borderRadius: 2 }}>
-                  <Users size={20} color="#0f766e" />
-                </Box>
-                <Box>
-                  <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#0f172a' }}>{myStudents.length}</Typography>
-                  <Typography variant="caption" color="text.secondary">Học sinh trong lớp</Typography>
-                </Box>
-              </Box>
-            </Paper>
-
-            <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid #e2e8f0' }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                <Box sx={{ p: 1.5, bgcolor: 'rgba(15,118,110,0.08)', borderRadius: 2 }}>
-                  <CheckCircle size={20} color="#0f766e" />
-                </Box>
-                <Box>
-                  <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#0f172a' }}>
-                    {myStudents.filter(s => s.status === 'active').length}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">Tài khoản hoạt động</Typography>
-                </Box>
-              </Box>
-            </Paper>
-
-            <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid #e2e8f0' }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                <Box sx={{ p: 1.5, bgcolor: 'rgba(245,158,11,0.08)', borderRadius: 2 }}>
-                  <Clock size={20} color="#f59e0b" />
-                </Box>
-                <Box>
-                  <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#0f172a' }}>
-                    {myStudents.filter(s => s.status === 'pending').length}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">Chờ kích hoạt</Typography>
-                </Box>
-              </Box>
-            </Paper>
-          </Box>
-
-          {/* Mã mời lớp — chỉ hiển thị khi có lớp và có inviteCode */}
-          {myClass?.inviteCode && (
-            <Paper sx={{ p: 2.5, mb: 3, borderRadius: 3, border: '1px solid rgba(15,118,110,0.3)', bgcolor: 'rgba(15,118,110,0.03)' }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
-                <Box sx={{ p: 1, bgcolor: 'rgba(15,118,110,0.1)', borderRadius: 2, display: 'flex' }}>
-                  <Key size={18} color="#0f766e" />
-                </Box>
-                <Box sx={{ flex: 1 }}>
-                  <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'bold', display: 'block' }}>MÃ MỜI VÀO LỚP</Typography>
-                  <Typography variant="h5" sx={{ fontFamily: 'monospace', fontWeight: 900, color: '#0f766e', letterSpacing: '0.25em' }}>
-                    {myClass.inviteCode}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    Chia sẻ mã này để học sinh tự tham gia lớp khi đăng ký hoặc trong trang học tập.
-                  </Typography>
-                </Box>
-                <Button
-                  id="teacher-copy-invite-code-btn"
-                  variant="outlined"
-                  size="small"
-                  startIcon={<Copy size={14} />}
-                  onClick={copyInviteCode}
-                  sx={{ textTransform: 'none', borderRadius: 2, borderColor: '#0f766e', color: '#0f766e', fontWeight: 'bold' }}
-                >
-                  {codeCopied ? '✓ Đã sao chép!' : 'Sao chép mã'}
-                </Button>
-              </Box>
-            </Paper>
-          )}
-
-          {/* Tabs chuyển đổi giữa DS học sinh và Tiến độ/Chấm điểm */}
-          {myClass && (
-            <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3, mt: 1 }}>
-              <Tabs
-                value={activeTab}
-                onChange={(_, val) => setActiveTab(val)}
-                textColor="secondary"
-                indicatorColor="secondary"
-              >
-                <Tab label="Danh sách học sinh" sx={{ textTransform: 'none', fontWeight: 'bold' }} />
-                <Tab label="🚩 Tiến độ & Chấm điểm bài thi" sx={{ textTransform: 'none', fontWeight: 'bold' }} />
-                <Tab label="⚠️ Cảnh báo & Cooldown" sx={{ textTransform: 'none', fontWeight: 'bold' }} />
-              </Tabs>
-            </Box>
-          )}
-
-          {/* Danh sách học sinh */}
-          {(!myClass || activeTab === 0) && (
-            <Paper sx={{ borderRadius: 3, border: '1px solid #e2e8f0', overflow: 'hidden' }}>
-            <Box sx={{ p: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e2e8f0' }}>
-              <Box>
-                <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#0f172a' }}>
-                  {myClass ? `Lớp ${myClass.name} – Danh sách học sinh` : 'Chưa có lớp'}
-                </Typography>
-                {!myClass && (
-                  <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-                    Tạo lớp của riêng bạn bên dưới, hoặc chờ Admin gán lớp.
-                  </Typography>
-                )}
-              </Box>
-
-              {myClass && (
-                <Button
-                  id="teacher-add-student-btn"
-                  variant="contained"
-                  color="secondary"
-                  startIcon={<UserPlus size={16} />}
-                  onClick={() => setCreateOpen(true)}
-                  sx={{ textTransform: 'none', borderRadius: 2, fontWeight: 'bold', boxShadow: 'none' }}
-                >
-                  Thêm học sinh
-                </Button>
-              )}
-            </Box>
-
-            {myClass && (
-              <TableContainer>
-                <Table>
-                  <TableHead>
-                    <TableRow sx={{ bgcolor: '#f8fafc' }}>
-                      <TableCell sx={{ fontWeight: 'bold', color: '#475569' }}>STT</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', color: '#475569' }}>Họ tên</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', color: '#475569' }}>Tài khoản đăng nhập</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', color: '#475569' }}>Trạng thái</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', color: '#475569' }}>Ngày tạo</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {myStudents.length === 0 ? (
-                      <TableRow>
-                        <TableCell colSpan={5} align="center" sx={{ py: 6, color: 'text.secondary' }}>
-                          Chưa có học sinh nào trong lớp. Nhấn "Thêm học sinh" để bắt đầu.
-                        </TableCell>
-                      </TableRow>
-                    ) : myStudents.map((student, idx) => (
-                      <TableRow key={student.id} sx={{ '&:hover': { bgcolor: '#f8fafc' } }}>
-                        <TableCell>{idx + 1}</TableCell>
-                        <TableCell>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <Avatar sx={{ width: 32, height: 32, bgcolor: 'rgba(15,118,110,0.1)', color: '#0f766e', fontSize: '0.85rem', fontWeight: 'bold' }}>
-                              {student.name.charAt(0)}
-                            </Avatar>
-                            <Typography variant="body2" sx={{ fontWeight: 600 }}>{student.name}</Typography>
-                          </Box>
-                        </TableCell>
-                        <TableCell>
-                          <Typography variant="body2" sx={{ fontFamily: 'monospace', color: '#0f766e' }}>
-                            {student.username || student.email}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Chip
-                            label={student.status === 'active' ? 'Hoạt động' : student.status === 'pending' ? 'Chờ duyệt' : 'Bị từ chối'}
-                            size="small"
-                            sx={{
-                              fontWeight: 'bold', fontSize: '0.7rem',
-                              bgcolor: student.status === 'active' ? 'rgba(15,118,110,0.08)' : student.status === 'pending' ? 'rgba(245,158,11,0.08)' : 'rgba(239,68,68,0.08)',
-                              color: student.status === 'active' ? '#0f766e' : student.status === 'pending' ? '#d97706' : '#dc2626',
-                            }}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <Typography variant="caption" color="text.secondary">
-                            {new Date(student.createdAt).toLocaleDateString('vi-VN')}
-                          </Typography>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            )}
-          </Paper>
-          )}
-
-          {/* Tab Tiến độ và chấm điểm bài thi */}
-          {myClass && activeTab === 1 && (
-            <Box sx={{ mt: 1 }}>
-              <QuizProgressTab students={myStudents} />
-            </Box>
-          )}
-
-          {/* Tab Cooldown Logs */}
-          {myClass && activeTab === 2 && (
-            <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid #e2e8f0', overflow: 'hidden', mt: 1 }}>
-              <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#0f172a', mb: 2 }}>
-                Lịch sử cảnh báo lạc đề (Cooldown)
-              </Typography>
-              <TableContainer>
-                <Table>
-                  <TableHead>
-                    <TableRow sx={{ bgcolor: '#f8fafc' }}>
-                      <TableCell sx={{ fontWeight: 'bold', color: '#475569' }}>Thời điểm</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', color: '#475569' }}>Học sinh</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', color: '#475569' }}>Lý do</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', color: '#475569' }}>Nội dung chat lạc đề</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', color: '#475569' }}>Thời lượng</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {cooldownLogs.length === 0 ? (
-                      <TableRow>
-                        <TableCell colSpan={5} align="center" sx={{ py: 6, color: 'text.secondary' }}>
-                          Chưa có cảnh báo lạc đề nào được ghi nhận.
-                        </TableCell>
-                      </TableRow>
-                    ) : cooldownLogs.map((log, idx) => (
-                      <TableRow key={idx} sx={{ '&:hover': { bgcolor: '#f8fafc' } }}>
-                        <TableCell>
-                          <Typography variant="body2">{new Date(log.triggeredAt).toLocaleString('vi-VN')}</Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography variant="body2" sx={{ fontWeight: 600 }}>{log.studentName || 'Không rõ'}</Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography variant="body2" color="error.main">{log.reason}</Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Box sx={{ maxHeight: 100, overflowY: 'auto' }}>
-                            {log.offTopicMessages.map((msg, i) => (
-                              <Typography key={i} variant="caption" component="div" sx={{ fontStyle: 'italic', color: '#64748b' }}>
-                                - {msg}
-                              </Typography>
-                            ))}
-                          </Box>
-                        </TableCell>
-                        <TableCell>
-                          <Chip label={`${log.durationMinutes} phút`} size="small" color="error" />
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Paper>
-          )}
-
-          {/* Tạo lớp khi GV chưa có lớp nào */}
-          {!myClass && (
-            <Box sx={{ mt: 3 }}>
-              <TeacherClassManager
-                onClassCreated={() => { /* state sẽ refresh qua getMyClass() */ }}
-              />
-            </Box>
-          )}
-
-        </Container>
-      </Box>
-
-      {/* Dialogs */}
+      {/* Dialogs — giữ nguyên */}
       {myClass && (
         <CreateStudentDialog
           open={createOpen}

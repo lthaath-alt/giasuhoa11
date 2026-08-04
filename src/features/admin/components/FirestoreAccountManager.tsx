@@ -36,7 +36,7 @@ import {
 
 /**
  * Component Quản lý Tài khoản Firestore dành cho Giáo viên / Admin:
- * 1. Cho phép Tạo tài khoản mới (Username, Password plain text, Full Name, Role) trực tiếp trên Firestore.
+ * 1. Cho phép Tạo tài khoản mới (Username, Password, Full Name, Role) trực tiếp trên Firestore.
  * 2. Cho phép Reset/Cập nhật mật khẩu mới cho tài khoản đã chọn trực tiếp qua updateDoc.
  * 3. Hiển thị danh sách các tài khoản trong collection "users".
  */
@@ -176,8 +176,8 @@ export const FirestoreAccountManager: React.FC = () => {
                   />
 
                   <TextField
-                    label="Mật khẩu (Plain text)"
-                    type="text"
+                    label="Mật khẩu"
+                    type="password"
                     size="small"
                     fullWidth
                     value={newPassword}
@@ -259,7 +259,6 @@ export const FirestoreAccountManager: React.FC = () => {
                         <TableCell sx={{ fontWeight: 'bold' }}>Username</TableCell>
                         <TableCell sx={{ fontWeight: 'bold' }}>Họ tên</TableCell>
                         <TableCell sx={{ fontWeight: 'bold' }}>Role</TableCell>
-                        <TableCell sx={{ fontWeight: 'bold' }}>Password</TableCell>
                         <TableCell sx={{ fontWeight: 'bold', textAlign: 'center' }}>Thao tác</TableCell>
                       </TableRow>
                     </TableHead>
@@ -276,7 +275,6 @@ export const FirestoreAccountManager: React.FC = () => {
                               sx={{ fontWeight: 'bold', fontSize: '0.7rem' }}
                             />
                           </TableCell>
-                          <TableCell sx={{ fontFamily: 'monospace', color: '#64748b', letterSpacing: 2 }}>••••••••</TableCell>
                           <TableCell align="center">
                             <Button
                               size="small"
@@ -323,7 +321,8 @@ export const FirestoreAccountManager: React.FC = () => {
               )}
 
               <TextField
-                label="Mật khẩu mới (Plain text)"
+                label="Mật khẩu mới"
+                type="password"
                 fullWidth
                 size="small"
                 value={resetPasswordVal}

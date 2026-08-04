@@ -12,11 +12,11 @@ import {
 } from '@mui/material';
 import { LogOut, GraduationCap, ArrowLeft } from 'lucide-react';
 import { useApp } from '../core/hooks/useApp';
-import AdminDashboard from '../features/admin/components/AdminDashboard';
+import { ManagementLayout } from '../core/components/ManagementLayout';
 
 export const AdminPage: React.FC = () => {
   const navigate = useNavigate();
-  const { currentUser, logout } = useApp();
+  const { currentUser, logout, users, classes } = useApp();
 
   const handleLogout = () => {
     logout();
@@ -108,11 +108,15 @@ export const AdminPage: React.FC = () => {
       </AppBar>
 
       {/* DASHBOARD NỘI DUNG CHÍNH */}
-      <Box sx={{ flex: 1, py: 4 }}>
-        <Container maxWidth="xl">
-          <AdminDashboard />
-        </Container>
-      </Box>
+      <Container maxWidth="xl" sx={{ display: 'flex', flexDirection: 'column', flex: 1, py: { xs: 2, md: 3 } }}>
+        <ManagementLayout
+          roleName="Quản trị Website"
+          classCount={classes.length}
+          accountCount={users.length}
+          questionCount={0}
+          examCount={0}
+        />
+      </Container>
 
     </Box>
   );

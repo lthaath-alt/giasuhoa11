@@ -12,11 +12,11 @@ import {
 } from '@mui/material';
 import { LogOut, GraduationCap, ArrowLeft } from 'lucide-react';
 import { useApp } from '../core/hooks/useApp';
-import SchoolAdminDashboard from '../features/admin/components/SchoolAdminDashboard';
+import { ManagementLayout } from '../core/components/ManagementLayout';
 
 export const SchoolAdminPage: React.FC = () => {
   const navigate = useNavigate();
-  const { currentUser, logout } = useApp();
+  const { currentUser, logout, users, classes } = useApp();
 
   const handleLogout = () => {
     logout();
@@ -26,6 +26,10 @@ export const SchoolAdminPage: React.FC = () => {
   const handleBackToStudy = () => {
     navigate('/dashboard');
   };
+
+  // Lọc dữ liệu theo phạm vi trường học của School Admin
+  const schoolClasses = classes.filter(c => c.schoolId === currentUser?.schoolId);
+  const schoolUsers = users.filter(u => u.schoolId === currentUser?.schoolId);
 
   return (
     <Box id="school-admin-page-layout" sx={{ minHeight: '100vh', backgroundColor: '#f8fafc', display: 'flex', flexDirection: 'column' }}>
@@ -108,11 +112,15 @@ export const SchoolAdminPage: React.FC = () => {
       </AppBar>
 
       {/* DASHBOARD NỘI DUNG CHÍNH */}
-      <Box sx={{ flex: 1, py: 4 }}>
-        <Container maxWidth="xl">
-          <SchoolAdminDashboard />
-        </Container>
-      </Box>
+      <Container maxWidth="xl" sx={{ display: 'flex', flexDirection: 'column', flex: 1, py: { xs: 2, md: 3 } }}>
+        <ManagementLayout
+          roleName="Quản trị Trường học"
+          classCount={schoolClasses.length}
+          accountCount={schoolUsers.length}
+          questionCount={0}
+          examCount={0}
+        />
+      </Container>
 
     </Box>
   );
