@@ -171,6 +171,8 @@ export interface ManagementLayoutProps {
   examCount: number;
   /** Nội dung tùy chỉnh cho mục "Quản lý Lớp học" — gắn component có sẵn */
   classContent?: ReactNode;
+  /** Nội dung tùy chỉnh cho mục "Quản lý Tài khoản" */
+  accountContent?: ReactNode;
 }
 
 export const ManagementLayout: React.FC<ManagementLayoutProps> = ({
@@ -180,6 +182,7 @@ export const ManagementLayout: React.FC<ManagementLayoutProps> = ({
   questionCount,
   examCount,
   classContent,
+  accountContent,
 }) => {
   const [activeItem, setActiveItem] = useState('accounts');
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -198,7 +201,7 @@ export const ManagementLayout: React.FC<ManagementLayoutProps> = ({
       case 'classes':
         return classContent || <PlaceholderContent title="Quản lý Lớp học" />;
       case 'accounts':
-        return <PlaceholderContent title="Quản lý Tài khoản" />;
+        return accountContent || <PlaceholderContent title="Quản lý Tài khoản" />;
       case 'library':
         return <PlaceholderContent title="Quản lý Kho bài tập chung" />;
       case 'databank':

@@ -13,10 +13,17 @@ import {
 import { LogOut, GraduationCap, ArrowLeft } from 'lucide-react';
 import { useApp } from '../core/hooks/useApp';
 import { ManagementLayout } from '../core/components/ManagementLayout';
+import AccountManagement from '../core/components/AccountManagement';
+import ClassManagement from '../core/components/ClassManagement';
+import { CreateTeacherDialog, CreateClassDialog, CredentialInfo, CredentialDialog } from '../features/admin/components/shared/SchoolDialogs';
 
 export const AdminPage: React.FC = () => {
   const navigate = useNavigate();
-  const { currentUser, logout, users, classes } = useApp();
+  const { currentUser, logout, users, classes, schools } = useApp();
+
+  const [createTeacherOpen, setCreateTeacherOpen] = useState(false);
+  const [createClassOpen, setCreateClassOpen] = useState(false);
+  const [credentialDialog, setCredentialDialog] = useState<CredentialInfo | null>(null);
 
   const handleLogout = () => {
     logout();
@@ -115,9 +122,52 @@ export const AdminPage: React.FC = () => {
           accountCount={users.length}
           questionCount={0}
           examCount={0}
+          accountContent={
+            <AccountManagement
+              users={users}
+              classes={classes}
+              canCreateTeacher={true}
+              canCreateClass={true}
+              canCreateStudent={false} // Thường Admin chỉ tạo trường/lớp/GV
+              onCreateTeacherClick={() => setCreateTeacherOpen(true)}
+              onCreateClassClick={() => setCreateClassOpen(true)}
+            />
+          }
+          classContent={
+            <ClassManagement
+              classes={classes}
+              users={users}
+              canCreate={true}
+              onCreateClick={() => setCreateClassOpen(true)}
+              onEditClick={(cls) => console.log('Edit', cls)}
+              onDeleteClass={(id) => console.log('Delete', id)}
+            />
+          }
         />
       </Container>
 
+      {/* DIALOGS */}
+      {schools.length > 0 && (
+        <>
+          <CreateTeacherDialog
+            open={createTeacherOpen}
+            onClose={() => setCreateTeacherOpen(false)}
+            schoolId={schools[0].id} // Tạm lấy trường đầu tiên cho Super Admin
+            onCreated={creds => { setCredentialDialog(creds); setCreateTeacherOpen(false); }}
+          />
+          <CreateClassDialog
+            open={createClassOpen}
+            onClose={() => setCreateClassOpen(false)}
+            schoolId={schools[0].id} // Tạm lấy trường đầu tiên
+          />
+        </>
+      )}
+
+      <CredentialDialog
+        open={Boolean(credentialDialog)}
+        onClose={() => setCredentialDialog(null)}
+        credentials={credentialDialog}
+      />
     </Box>
   );
 };

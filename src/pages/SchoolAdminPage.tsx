@@ -13,10 +13,17 @@ import {
 import { LogOut, GraduationCap, ArrowLeft } from 'lucide-react';
 import { useApp } from '../core/hooks/useApp';
 import { ManagementLayout } from '../core/components/ManagementLayout';
+import AccountManagement from '../core/components/AccountManagement';
+import ClassManagement from '../core/components/ClassManagement';
+import { CreateTeacherDialog, CreateClassDialog, CredentialInfo, CredentialDialog } from '../features/admin/components/shared/SchoolDialogs';
 
 export const SchoolAdminPage: React.FC = () => {
   const navigate = useNavigate();
   const { currentUser, logout, users, classes } = useApp();
+
+  const [createTeacherOpen, setCreateTeacherOpen] = useState(false);
+  const [createClassOpen, setCreateClassOpen] = useState(false);
+  const [credentialDialog, setCredentialDialog] = useState<CredentialInfo | null>(null);
 
   const handleLogout = () => {
     logout();
@@ -119,9 +126,52 @@ export const SchoolAdminPage: React.FC = () => {
           accountCount={schoolUsers.length}
           questionCount={0}
           examCount={0}
+          accountContent={
+            <AccountManagement
+              users={schoolUsers}
+              classes={schoolClasses}
+              canCreateTeacher={true}
+              canCreateClass={true}
+              canCreateStudent={false}
+              onCreateTeacherClick={() => setCreateTeacherOpen(true)}
+              onCreateClassClick={() => setCreateClassOpen(true)}
+            />
+          }
+          classContent={
+            <ClassManagement
+              classes={schoolClasses}
+              users={schoolUsers}
+              canCreate={true}
+              onCreateClick={() => setCreateClassOpen(true)}
+              onEditClick={(cls) => console.log('Edit', cls)}
+              onDeleteClass={(id) => console.log('Delete', id)}
+            />
+          }
         />
       </Container>
 
+      {/* DIALOGS */}
+      {currentUser?.schoolId && (
+        <>
+          <CreateTeacherDialog
+            open={createTeacherOpen}
+            onClose={() => setCreateTeacherOpen(false)}
+            schoolId={currentUser.schoolId}
+            onCreated={creds => { setCredentialDialog(creds); setCreateTeacherOpen(false); }}
+          />
+          <CreateClassDialog
+            open={createClassOpen}
+            onClose={() => setCreateClassOpen(false)}
+            schoolId={currentUser.schoolId}
+          />
+        </>
+      )}
+
+      <CredentialDialog
+        open={Boolean(credentialDialog)}
+        onClose={() => setCredentialDialog(null)}
+        credentials={credentialDialog}
+      />
     </Box>
   );
 };
