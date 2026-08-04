@@ -3,7 +3,7 @@ import {
   Box, Typography, Button, Paper, Grid, Chip, IconButton, Tooltip,
   Dialog, DialogTitle, DialogContent, DialogActions, TextField, Alert,
   Tabs, Tab, TableContainer, Table, TableHead, TableRow, TableCell, TableBody,
-  Select, MenuItem, FormControl, InputLabel
+  Select, MenuItem, FormControl, InputLabel, RadioGroup, Radio, FormControlLabel, FormLabel, Divider
 } from '@mui/material';
 import { Database, Plus, Search, Trash2, Edit, ExternalLink, Link2, FileText, FlaskConical } from 'lucide-react';
 import { useApp } from '../hooks/useApp';
@@ -52,7 +52,26 @@ export const DatabankManagement: React.FC = () => {
   const [qSearch, setQSearch] = useState('');
   const [qLevel, setQLevel] = useState('all');
   const [isQDialogOpen, setIsQDialogOpen] = useState(false);
-  const [qForm, setQForm] = useState({ content: '', topic: '', difficulty: 'Nhận biết', type: 'Trắc nghiệm', correctAnswer: 'A' });
+  const [qError, setQError] = useState('');
+  const [qForm, setQForm] = useState({
+    content: '',
+    topic: '',
+    difficulty: 'Nhận biết',
+    type: 'Trắc nghiệm',
+    correctAnswer: '',
+    optionA: '',
+    optionB: '',
+    optionC: '',
+    optionD: '',
+    essayAnswer: '',
+    theory: '',
+  });
+
+  const resetQForm = () => setQForm({
+    content: '', topic: '', difficulty: 'Nhận biết', type: 'Trắc nghiệm',
+    correctAnswer: '', optionA: '', optionB: '', optionC: '', optionD: '',
+    essayAnswer: '', theory: '',
+  });
 
   const filteredQuestions = libraryQuestions.filter(q => {
     const matchSearch = q.content.toLowerCase().includes(qSearch.toLowerCase()) || (q.topic && q.topic.toLowerCase().includes(qSearch.toLowerCase()));
@@ -71,16 +90,38 @@ export const DatabankManagement: React.FC = () => {
   };
 
   const handleQSubmit = () => {
+    setQError('');
+    if (!qForm.content.trim()) { setQError('Vui lòng nhập nội dung câu hỏi.'); return; }
+    if (qForm.type === 'Trắc nghiệm') {
+      if (!qForm.optionA.trim() || !qForm.optionB.trim() || !qForm.optionC.trim() || !qForm.optionD.trim()) {
+        setQError('Vui lòng nhập đủ 4 phương án A, B, C, D.'); return;
+      }
+      if (!qForm.correctAnswer) { setQError('Vui lòng chọn đáp án đúng.'); return; }
+    }
+
+    const options = qForm.type === 'Trắc nghiệm' ? [
+      { key: 'A' as const, text: qForm.optionA },
+      { key: 'B' as const, text: qForm.optionB },
+      { key: 'C' as const, text: qForm.optionC },
+      { key: 'D' as const, text: qForm.optionD },
+    ] : undefined;
+
     addLibraryQuestion({
-      content: qForm.content,
-      topic: qForm.topic,
+      content: qForm.content.trim(),
+      topic: qForm.topic.trim(),
       difficulty: qForm.difficulty as any,
       type: qForm.type as any,
-      correctAnswer: qForm.correctAnswer,
+      correctAnswer: qForm.type === 'Trắc nghiệm' ? qForm.correctAnswer : undefined,
+      essayPoints: qForm.type === 'Tự luận' && qForm.essayAnswer.trim()
+        ? [{ label: 'Hướng dẫn chấm', content: qForm.essayAnswer.trim() }]
+        : undefined,
+      options,
       points: 10,
       images: [],
-      createdBy: currentUser?.email
-    });
+      createdBy: currentUser?.email,
+      theory: qForm.theory.trim() || undefined,
+    } as any);
+    resetQForm();
     setIsQDialogOpen(false);
   };
 
@@ -225,24 +266,45 @@ export const DatabankManagement: React.FC = () => {
                       <Chip size="small" label={q.difficulty} sx={{ bgcolor: colors.bg, color: colors.color, fontWeight: 'bold' }} />
                     </TableCell>
                     <TableCell>
-                      <Typography variant="body2" sx={{ mb: 1 }}>{q.content}</Typography>
-                      {/* Lựa chọn mô phỏng */}
-                      <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-                        {['A', 'B', 'C', 'D'].map(opt => (
-                          <Box key={opt} sx={{
-                            px: 1, py: 0.5, borderRadius: 1, fontSize: '0.8rem',
-                            bgcolor: q.correctAnswer === opt ? '#dcfce7' : '#f1f5f9',
-                            color: q.correctAnswer === opt ? '#16a34a' : '#64748b',
-                            fontWeight: q.correctAnswer === opt ? 'bold' : 'normal',
-                            border: `1px solid ${q.correctAnswer === opt ? '#bbf7d0' : 'transparent'}`
-                          }}>
-                            {opt}. Lựa chọn {opt}
-                          </Box>
-                        ))}
-                      </Box>
+                      <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>{q.content}</Typography>
+                      {q.type === 'Trắc nghiệm' ? (
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                          {q.options && q.options.length > 0 ? q.options.map(opt => (
+                            <Box key={opt.key} sx={{
+                              px: 1.5, py: 0.5, borderRadius: 1.5, fontSize: '0.8rem',
+                              bgcolor: q.correctAnswer === opt.key ? '#dcfce7' : '#f8fafc',
+                              color: q.correctAnswer === opt.key ? '#16a34a' : '#64748b',
+                              fontWeight: q.correctAnswer === opt.key ? 'bold' : 'normal',
+                              border: `1px solid ${q.correctAnswer === opt.key ? '#86efac' : '#e2e8f0'}`,
+                              display: 'flex', alignItems: 'center', gap: 1
+                            }}>
+                              <span style={{ fontWeight: 'bold' }}>{opt.key}.</span> {opt.text}
+                              {q.correctAnswer === opt.key && <span style={{ marginLeft: 'auto', fontSize: '0.75rem' }}>✓ Đúng</span>}
+                            </Box>
+                          )) : ['A','B','C','D'].map(opt => (
+                            <Box key={opt} sx={{ px: 1.5, py: 0.5, borderRadius: 1.5, fontSize: '0.8rem',
+                              bgcolor: q.correctAnswer === opt ? '#dcfce7' : '#f8fafc',
+                              color: q.correctAnswer === opt ? '#16a34a' : '#64748b',
+                              border: `1px solid ${q.correctAnswer === opt ? '#86efac' : '#e2e8f0'}` }}>
+                              <strong>{opt}.</strong> (chưa có nội dung)
+                            </Box>
+                          ))}
+                        </Box>
+                      ) : (
+                        <Box sx={{ p: 1.5, bgcolor: '#fffbeb', border: '1px solid #fde68a', borderRadius: 1.5 }}>
+                          <Typography variant="caption" sx={{ fontWeight: 'bold', color: '#92400e', display: 'block', mb: 0.5 }}>Hướng dẫn chấm:</Typography>
+                          <Typography variant="body2" sx={{ color: '#78350f', fontSize: '0.8rem' }}>
+                            {q.essayPoints?.[0]?.content || '(Chưa có hướng dẫn)'}
+                          </Typography>
+                        </Box>
+                      )}
                     </TableCell>
                     <TableCell>
-                      <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem' }}>Đang cập nhật AI gợi ý...</Typography>
+                      {(q as any).theory ? (
+                        <Typography variant="body2" sx={{ fontSize: '0.8rem', color: '#475569' }}>{(q as any).theory}</Typography>
+                      ) : (
+                        <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem', fontStyle: 'italic' }}>Chưa có lý thuyết</Typography>
+                      )}
                     </TableCell>
                     <TableCell align="right">
                       {canEditOrDelete(q.createdBy) && (
@@ -337,24 +399,104 @@ export const DatabankManagement: React.FC = () => {
 
       {/* DIALOGS */}
       {/* Dialog Thêm Câu hỏi */}
-      <Dialog open={isQDialogOpen} onClose={() => setIsQDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Thêm Câu Hỏi Mới</DialogTitle>
+      <Dialog open={isQDialogOpen} onClose={() => { setIsQDialogOpen(false); resetQForm(); setQError(''); }} maxWidth="md" fullWidth>
+        <DialogTitle sx={{ fontWeight: 'bold' }}>Thêm Câu Hỏi Mới</DialogTitle>
         <DialogContent>
+          {qError && <Alert severity="error" sx={{ mb: 2, mt: 1 }}>{qError}</Alert>}
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
-            <TextField label="Nội dung câu hỏi" fullWidth multiline rows={3} value={qForm.content} onChange={e => setQForm({...qForm, content: e.target.value})} />
-            <TextField label="Chủ đề" fullWidth value={qForm.topic} onChange={e => setQForm({...qForm, topic: e.target.value})} />
-            <FormControl fullWidth>
-              <InputLabel>Cấp độ</InputLabel>
-              <Select value={qForm.difficulty} label="Cấp độ" onChange={e => setQForm({...qForm, difficulty: e.target.value})}>
-                <MenuItem value="Nhận biết">Nhận biết</MenuItem>
-                <MenuItem value="Thông hiểu">Thông hiểu</MenuItem>
-                <MenuItem value="Vận dụng">Vận dụng</MenuItem>
-                <MenuItem value="Vận dụng cao">Vận dụng cao</MenuItem>
-              </Select>
+            <TextField label="Nội dung câu hỏi" fullWidth multiline rows={3} value={qForm.content} onChange={e => setQForm({...qForm, content: e.target.value})} required />
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <TextField label="Chủ đề" fullWidth value={qForm.topic} onChange={e => setQForm({...qForm, topic: e.target.value})} />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth>
+                  <InputLabel>Cấp độ</InputLabel>
+                  <Select value={qForm.difficulty} label="Cấp độ" onChange={e => setQForm({...qForm, difficulty: e.target.value})}>
+                    <MenuItem value="Nhận biết">Nhận biết</MenuItem>
+                    <MenuItem value="Thông hiểu">Thông hiểu</MenuItem>
+                    <MenuItem value="Vận dụng">Vận dụng</MenuItem>
+                    <MenuItem value="Vận dụng cao">Vận dụng cao</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+            </Grid>
+
+            <FormControl>
+              <FormLabel sx={{ fontWeight: 'bold', color: '#0f172a', mb: 1 }}>Loại câu hỏi</FormLabel>
+              <RadioGroup row value={qForm.type} onChange={e => setQForm({...qForm, type: e.target.value, correctAnswer: '', optionA: '', optionB: '', optionC: '', optionD: '', essayAnswer: ''})}>
+                <FormControlLabel value="Trắc nghiệm" control={<Radio />} label="Trắc nghiệm" />
+                <FormControlLabel value="Tự luận" control={<Radio />} label="Tự luận" />
+              </RadioGroup>
             </FormControl>
+
+            <Divider />
+
+            {qForm.type === 'Trắc nghiệm' ? (
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: '#475569' }}>
+                  Nhập 4 phương án — chọn đáp án đúng bằng nút radio
+                </Typography>
+                {(['A','B','C','D'] as const).map(opt => (
+                  <Box key={opt} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Radio
+                      checked={qForm.correctAnswer === opt}
+                      onChange={() => setQForm({...qForm, correctAnswer: opt})}
+                      sx={{ p: 0.5 }}
+                    />
+                    <Chip
+                      label={opt}
+                      size="small"
+                      sx={{
+                        minWidth: 32,
+                        fontWeight: 'bold',
+                        bgcolor: qForm.correctAnswer === opt ? '#dcfce7' : '#f1f5f9',
+                        color: qForm.correctAnswer === opt ? '#16a34a' : '#475569',
+                        border: `1px solid ${qForm.correctAnswer === opt ? '#86efac' : '#e2e8f0'}`,
+                      }}
+                    />
+                    <TextField
+                      size="small"
+                      fullWidth
+                      placeholder={`Đáp án ${opt}...`}
+                      value={opt === 'A' ? qForm.optionA : opt === 'B' ? qForm.optionB : opt === 'C' ? qForm.optionC : qForm.optionD}
+                      onChange={e => setQForm({...qForm,
+                        [opt === 'A' ? 'optionA' : opt === 'B' ? 'optionB' : opt === 'C' ? 'optionC' : 'optionD']: e.target.value
+                      })}
+                      sx={{ '& .MuiOutlinedInput-root': { bgcolor: qForm.correctAnswer === opt ? '#f0fdf4' : 'white' } }}
+                    />
+                  </Box>
+                ))}
+              </Box>
+            ) : (
+              <TextField
+                label="Đáp án / Hướng dẫn chấm"
+                fullWidth
+                multiline
+                rows={4}
+                value={qForm.essayAnswer}
+                onChange={e => setQForm({...qForm, essayAnswer: e.target.value})}
+                helperText="Nhập hướng dẫn chấm chi tiết cho giáo viên"
+              />
+            )}
+
+            <Divider />
+
+            <TextField
+              label="Lý thuyết & Gợi ý AI (không bắt buộc)"
+              fullWidth
+              multiline
+              rows={2}
+              value={qForm.theory}
+              onChange={e => setQForm({...qForm, theory: e.target.value})}
+              helperText="Tóm tắt lý thuyết liên quan, hiển thị trong cột 'Lý thuyết & Gợi ý AI'"
+            />
           </Box>
         </DialogContent>
-        <DialogActions><Button onClick={() => setIsQDialogOpen(false)}>Hủy</Button><Button onClick={handleQSubmit} variant="contained">Lưu</Button></DialogActions>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button onClick={() => { setIsQDialogOpen(false); resetQForm(); setQError(''); }} sx={{ textTransform: 'none' }}>Hủy</Button>
+          <Button onClick={handleQSubmit} variant="contained" sx={{ textTransform: 'none', boxShadow: 'none' }}>Lưu câu hỏi</Button>
+        </DialogActions>
       </Dialog>
 
       {/* Dialog Thêm Phương trình */}
