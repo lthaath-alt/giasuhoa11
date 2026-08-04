@@ -117,7 +117,8 @@ export interface AppContextType {
 
   approveUser: (email: string) => void;
   rejectUser: (email: string) => void;
-  deleteUser: (email: string) => void;
+  deleteUser: (id: string) => void;
+  updateUserInfo: (id: string, updates: Partial<User>) => void;
 
   // ── Quản lý Trường học ──────────────────────────────────────────────────────
 
@@ -544,12 +545,14 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     }
   };
 
-  const deleteUser = (email: string) => {
-    const filtered = StorageService.getUsers().filter(
-      u => u.email.toLowerCase() !== email.toLowerCase()
-    );
-    StorageService.saveUsers(filtered);
-    setUsers(filtered);
+  const deleteUser = (id: string) => {
+    StorageService.deleteUserById(id);
+    setUsers(StorageService.getUsers());
+  };
+
+  const updateUserInfo = (id: string, updates: Partial<User>) => {
+    StorageService.updateUserById(id, updates);
+    setUsers(StorageService.getUsers());
   };
 
   // ── Quản lý Trường học ────────────────────────────────────────────────────
@@ -1152,6 +1155,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         approveUser,
         rejectUser,
         deleteUser,
+        updateUserInfo,
         createSchool,
         createSchoolAdmin,
         createTeacher,

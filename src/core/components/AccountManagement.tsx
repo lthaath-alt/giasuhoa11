@@ -3,7 +3,7 @@ import {
   Box, Typography, Button, Paper, Table, TableBody, TableCell,
   TableContainer, TableHead, TableRow, Chip, IconButton, Tooltip,
   Dialog, DialogTitle, DialogContent, DialogActions, DialogContentText,
-  Divider, Alert
+  Divider, Alert, TextField, FormControl, InputLabel, Select, MenuItem
 } from '@mui/material';
 import { User, Copy, Eye, EyeOff, Trash2, Shield, ShieldCheck, UserPlus, Users, GraduationCap, Edit, KeyRound } from 'lucide-react';
 import { User as UserType, SchoolClass, School } from '../../features/auth/types';
@@ -122,15 +122,20 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({
   onCreateClassClick,
   onCreateSchoolAdminClick,
 }) => {
-  const { forgotPassword, deleteUser } = useApp();
+  const { forgotPassword, deleteUser, updateUserInfo, currentUser } = useApp();
 
   // Khối 1: Danh sách yêu cầu khôi phục mật khẩu (mock state để hiển thị UI)
   const [resetRequests, setResetRequests] = useState<UserType[]>([]);
   // Trạng thái dialog cấp lại mật khẩu
   const [credentialDialog, setCredentialDialog] = useState<{ identifier: string; password: string; name: string } | null>(null);
 
-  // Khối 2: Trạng thái xóa người dùng
+  // Khối 2: Trạng thái xóa và sửa người dùng
   const [userToDelete, setUserToDelete] = useState<UserType | null>(null);
+  
+  const [userToEdit, setUserToEdit] = useState<UserType | null>(null);
+  const [editForm, setEditForm] = useState<{ name: string; email: string; username: string; classId: string }>({
+    name: '', email: '', username: '', classId: ''
+  });
 
   // Mock lấy 1-2 học sinh để làm mẫu "Yêu cầu khôi phục mật khẩu" nếu là Admin
   useEffect(() => {
@@ -163,9 +168,43 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({
 
   const confirmDeleteUser = () => {
     if (userToDelete) {
-      deleteUser(userToDelete.email);
+      deleteUser(userToDelete.id);
       setUserToDelete(null);
     }
+  };
+
+  const handleEditOpen = (user: UserType) => {
+    setUserToEdit(user);
+    setEditForm({
+      name: user.name || '',
+      email: user.email || '',
+      username: user.username || '',
+      classId: user.classId || '',
+    });
+  };
+
+  const handleEditSubmit = () => {
+    if (userToEdit) {
+      updateUserInfo(userToEdit.id, {
+        name: editForm.name,
+        email: editForm.email,
+        username: editForm.username,
+        classId: editForm.classId || undefined,
+      });
+      setUserToEdit(null);
+    }
+  };
+
+  const canEditOrDelete = (targetUser: UserType) => {
+    if (!currentUser) return false;
+    if (currentUser.id === targetUser.id) return false; // Không tự xoá/sửa mình
+    if (currentUser.role === 'super_admin') return true;
+    if (currentUser.role === 'school_admin') {
+      if (targetUser.role === 'super_admin' || targetUser.role === 'school_admin') return false;
+      if (targetUser.schoolId !== currentUser.schoolId) return false;
+      return true;
+    }
+    return false;
   };
 
   const getRoleChip = (role: string) => {
@@ -322,16 +361,20 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({
                     </Typography>
                   </TableCell>
                   <TableCell align="right">
-                    <Tooltip title="Sửa thông tin">
-                      <IconButton size="small" sx={{ color: '#64748b' }}>
-                        <Edit size={16} />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Xóa tài khoản">
-                      <IconButton size="small" onClick={() => setUserToDelete(user)} sx={{ color: '#ef4444' }}>
-                        <Trash2 size={16} />
-                      </IconButton>
-                    </Tooltip>
+                    {canEditOrDelete(user) && (
+                      <>
+                        <Tooltip title="Sửa thông tin">
+                          <IconButton size="small" onClick={() => handleEditOpen(user)} sx={{ color: '#64748b' }}>
+                            <Edit size={16} />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Xóa tài khoản">
+                          <IconButton size="small" onClick={() => setUserToDelete(user)} sx={{ color: '#ef4444' }}>
+                            <Trash2 size={16} />
+                          </IconButton>
+                        </Tooltip>
+                      </>
+                    )}
                   </TableCell>
                 </TableRow>
               ))}
@@ -422,11 +465,13 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({
                             />
                           </TableCell>
                           <TableCell align="right">
-                            <Tooltip title="Xóa admin">
-                              <IconButton size="small" onClick={() => setUserToDelete(admin)} sx={{ color: '#ef4444' }}>
-                                <Trash2 size={15} />
-                              </IconButton>
-                            </Tooltip>
+                            {canEditOrDelete(admin) && (
+                              <Tooltip title="Xóa admin">
+                                <IconButton size="small" onClick={() => setUserToDelete(admin)} sx={{ color: '#ef4444' }}>
+                                  <Trash2 size={15} />
+                                </IconButton>
+                              </Tooltip>
+                            )}
                           </TableCell>
                         </TableRow>
                       ))}
@@ -463,6 +508,64 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({
           </Button>
           <Button onClick={confirmDeleteUser} color="error" variant="contained" sx={{ textTransform: 'none', borderRadius: 2, boxShadow: 'none' }}>
             Xóa tài khoản
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Dialog Sửa người dùng */}
+      <Dialog open={Boolean(userToEdit)} onClose={() => setUserToEdit(null)} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ fontWeight: 'bold' }}>Sửa thông tin tài khoản</DialogTitle>
+        <DialogContent>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
+            <TextField
+              label="Họ và tên"
+              fullWidth
+              value={editForm.name}
+              onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+            />
+            <TextField
+              label="Email"
+              fullWidth
+              value={editForm.email}
+              onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+            />
+            <TextField
+              label="Tên đăng nhập"
+              fullWidth
+              value={editForm.username}
+              onChange={(e) => setEditForm({ ...editForm, username: e.target.value })}
+              helperText="Học sinh thường dùng Tên đăng nhập"
+            />
+            {userToEdit?.role === 'student' && (
+              <FormControl fullWidth>
+                <InputLabel>Lớp học</InputLabel>
+                <Select
+                  value={editForm.classId}
+                  label="Lớp học"
+                  onChange={(e) => setEditForm({ ...editForm, classId: e.target.value })}
+                >
+                  <MenuItem value=""><em>(Không có lớp)</em></MenuItem>
+                  {classes.map(cls => (
+                    <MenuItem key={cls.id} value={cls.id}>{cls.name}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            )}
+            <TextField
+              label="Vai trò"
+              fullWidth
+              value={userToEdit?.role || ''}
+              disabled
+              helperText="Không thể thay đổi vai trò của tài khoản sau khi tạo."
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button onClick={() => setUserToEdit(null)} sx={{ textTransform: 'none', borderRadius: 2 }}>
+            Hủy
+          </Button>
+          <Button onClick={handleEditSubmit} variant="contained" color="primary" sx={{ textTransform: 'none', borderRadius: 2, boxShadow: 'none' }}>
+            Lưu thay đổi
           </Button>
         </DialogActions>
       </Dialog>

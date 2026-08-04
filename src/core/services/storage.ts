@@ -180,6 +180,25 @@ export const StorageService = {
     return true;
   },
 
+  /** Cập nhật toàn bộ thông tin của một user theo id */
+  updateUserById(id: string, updates: Partial<User>): boolean {
+    const users = this.getUsers();
+    const index = users.findIndex(u => u.id === id);
+    if (index === -1) return false;
+    users[index] = { ...users[index], ...updates };
+    this.saveUsers(users);
+    return true;
+  },
+
+  /** Xoá người dùng theo id */
+  deleteUserById(id: string): boolean {
+    const users = this.getUsers();
+    const filtered = users.filter(u => u.id !== id);
+    if (filtered.length === users.length) return false;
+    this.saveUsers(filtered);
+    return true;
+  },
+
   /** Cập nhật trạng thái tài khoản (Admin duyệt/từ chối) */
   updateUserStatus(email: string, status: 'active' | 'rejected'): boolean {
     return this.updateUser(email, { status });
