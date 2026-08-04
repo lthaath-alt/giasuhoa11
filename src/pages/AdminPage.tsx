@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Box, 
@@ -15,7 +15,7 @@ import { useApp } from '../core/hooks/useApp';
 import { ManagementLayout } from '../core/components/ManagementLayout';
 import AccountManagement from '../core/components/AccountManagement';
 import ClassManagement from '../core/components/ClassManagement';
-import { CreateTeacherDialog, CreateClassDialog, CredentialInfo, CredentialDialog } from '../features/admin/components/shared/SchoolDialogs';
+import { CreateTeacherDialog, CreateClassDialog, CreateSchoolAdminDialog, CredentialInfo, CredentialDialog } from '../features/admin/components/shared/SchoolDialogs';
 
 export const AdminPage: React.FC = () => {
   const navigate = useNavigate();
@@ -23,7 +23,14 @@ export const AdminPage: React.FC = () => {
 
   const [createTeacherOpen, setCreateTeacherOpen] = useState(false);
   const [createClassOpen, setCreateClassOpen] = useState(false);
+  const [createSchoolAdminOpen, setCreateSchoolAdminOpen] = useState(false);
+  const [selectedSchoolId, setSelectedSchoolId] = useState('');
   const [credentialDialog, setCredentialDialog] = useState<CredentialInfo | null>(null);
+
+  const handleCreateSchoolAdmin = (schoolId: string) => {
+    setSelectedSchoolId(schoolId);
+    setCreateSchoolAdminOpen(true);
+  };
 
   const handleLogout = () => {
     logout();
@@ -126,11 +133,14 @@ export const AdminPage: React.FC = () => {
             <AccountManagement
               users={users}
               classes={classes}
+              schools={schools}
               canCreateTeacher={true}
               canCreateClass={true}
-              canCreateStudent={false} // Thường Admin chỉ tạo trường/lớp/GV
+              canCreateStudent={false}
+              canCreateSchoolAdmin={true}
               onCreateTeacherClick={() => setCreateTeacherOpen(true)}
               onCreateClassClick={() => setCreateClassOpen(true)}
+              onCreateSchoolAdminClick={handleCreateSchoolAdmin}
             />
           }
           classContent={
@@ -152,13 +162,19 @@ export const AdminPage: React.FC = () => {
           <CreateTeacherDialog
             open={createTeacherOpen}
             onClose={() => setCreateTeacherOpen(false)}
-            schoolId={schools[0].id} // Tạm lấy trường đầu tiên cho Super Admin
+            schoolId={schools[0].id}
             onCreated={creds => { setCredentialDialog(creds); setCreateTeacherOpen(false); }}
           />
           <CreateClassDialog
             open={createClassOpen}
             onClose={() => setCreateClassOpen(false)}
-            schoolId={schools[0].id} // Tạm lấy trường đầu tiên
+            schoolId={schools[0].id}
+          />
+          <CreateSchoolAdminDialog
+            open={createSchoolAdminOpen}
+            onClose={() => setCreateSchoolAdminOpen(false)}
+            schoolId={selectedSchoolId || schools[0].id}
+            onCreated={creds => { setCredentialDialog(creds); setCreateSchoolAdminOpen(false); }}
           />
         </>
       )}

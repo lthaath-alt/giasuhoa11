@@ -5,19 +5,24 @@ import {
   Dialog, DialogTitle, DialogContent, DialogActions, DialogContentText,
   Divider, Alert
 } from '@mui/material';
-import { User, Copy, Eye, EyeOff, Trash2, Shield, UserPlus, Users, GraduationCap, Edit, KeyRound } from 'lucide-react';
-import { User as UserType, SchoolClass } from '../../features/auth/types';
+import { User, Copy, Eye, EyeOff, Trash2, Shield, ShieldCheck, UserPlus, Users, GraduationCap, Edit, KeyRound } from 'lucide-react';
+import { User as UserType, SchoolClass, School } from '../../features/auth/types';
 import { useApp } from '../hooks/useApp';
 
 export interface AccountManagementProps {
   users: UserType[];
   classes: SchoolClass[];
+  /** Danh sách trường học (dùng để hiển thị Admin của từng trường) */
+  schools?: School[];
   canCreateTeacher?: boolean;
   canCreateStudent?: boolean;
   canCreateClass?: boolean;
+  /** Chỉ hiển thị với super_admin */
+  canCreateSchoolAdmin?: boolean;
   onCreateTeacherClick?: () => void;
   onCreateStudentClick?: () => void;
   onCreateClassClick?: () => void;
+  onCreateSchoolAdminClick?: (schoolId: string) => void;
 }
 
 // ─── CredentialDialog (shared inline) ─────────────────────────────────────────
@@ -107,12 +112,15 @@ const CredentialDialog: React.FC<CredentialDialogProps> = ({ open, onClose, cred
 export const AccountManagement: React.FC<AccountManagementProps> = ({
   users,
   classes,
+  schools = [],
   canCreateTeacher,
   canCreateStudent,
   canCreateClass,
+  canCreateSchoolAdmin,
   onCreateTeacherClick,
   onCreateStudentClick,
   onCreateClassClick,
+  onCreateSchoolAdminClick,
 }) => {
   const { forgotPassword, deleteUser } = useApp();
 
@@ -254,6 +262,19 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+            {canCreateSchoolAdmin && (
+              <Button
+                variant="contained"
+                startIcon={<ShieldCheck size={16} />}
+                onClick={() => onCreateSchoolAdminClick?.(schools[0]?.id || '')}
+                sx={{
+                  textTransform: 'none', borderRadius: 2, fontWeight: 'bold', boxShadow: 'none',
+                  bgcolor: '#4f46e5', '&:hover': { bgcolor: '#4338ca' }
+                }}
+              >
+                Thêm Admin Trường
+              </Button>
+            )}
             {canCreateClass && (
               <Button variant="outlined" color="primary" startIcon={<GraduationCap size={16} />} onClick={onCreateClassClick} sx={{ textTransform: 'none', borderRadius: 2, fontWeight: 'bold' }}>
                 Tạo Lớp Mới
@@ -318,6 +339,105 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({
           </Table>
         </TableContainer>
       </Box>
+
+      {/* ─── KHỐI 3: DANH SÁCH ADMIN TRƯỜNG HỌC (chỉ hiển thị với super_admin có schools) ─── */}
+      {canCreateSchoolAdmin && schools.length > 0 && (
+        <Box sx={{ mt: 4 }}>
+          <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#0f172a', display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+            <ShieldCheck size={20} color="#4f46e5" />
+            Quản trị viên Trường học
+          </Typography>
+
+          {schools.map(school => {
+            const admins = users.filter(u => u.role === 'school_admin' && u.schoolId === school.id);
+            return (
+              <Paper key={school.id} elevation={0} sx={{ border: '1px solid #e0e7ff', borderRadius: 3, mb: 2, overflow: 'hidden' }}>
+                {/* Header của từng trường */}
+                <Box sx={{ px: 3, py: 2, bgcolor: '#f5f3ff', borderBottom: '1px solid #e0e7ff', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                    <Box sx={{ p: 0.8, bgcolor: '#e0e7ff', borderRadius: 1.5, display: 'flex' }}>
+                      <ShieldCheck size={16} color="#4f46e5" />
+                    </Box>
+                    <Box>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: '#1e1b4b' }}>
+                        {school.name}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {admins.length > 0 ? `${admins.length} admin` : 'Chưa có admin'}
+                      </Typography>
+                    </Box>
+                  </Box>
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    startIcon={<UserPlus size={14} />}
+                    onClick={() => onCreateSchoolAdminClick?.(school.id)}
+                    sx={{
+                      textTransform: 'none', borderRadius: 2, fontWeight: 'bold', fontSize: '0.78rem',
+                      borderColor: '#6366f1', color: '#4f46e5',
+                      '&:hover': { bgcolor: 'rgba(99,102,241,0.08)' }
+                    }}
+                  >
+                    Thêm Admin
+                  </Button>
+                </Box>
+
+                {/* Danh sách admin của trường */}
+                {admins.length === 0 ? (
+                  <Box sx={{ px: 3, py: 2.5, color: 'text.secondary' }}>
+                    <Typography variant="body2" sx={{ fontStyle: 'italic', color: '#94a3b8' }}>
+                      ⚠️ Trường này chưa có Admin. Hãy thêm ít nhất một Admin để quản lý trường.
+                    </Typography>
+                  </Box>
+                ) : (
+                  <Table size="small">
+                    <TableHead>
+                      <TableRow sx={{ bgcolor: '#f8f7ff' }}>
+                        <TableCell sx={{ fontWeight: 'bold', color: '#4f46e5', fontSize: '0.78rem' }}>Họ Tên</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold', color: '#4f46e5', fontSize: '0.78rem' }}>Email Đăng Nhập</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold', color: '#4f46e5', fontSize: '0.78rem' }}>Trạng Thái</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold', color: '#4f46e5', fontSize: '0.78rem', align: 'right' }}>Hành Động</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {admins.map(admin => (
+                        <TableRow key={admin.id} sx={{ '&:hover': { bgcolor: '#f5f3ff' } }}>
+                          <TableCell>
+                            <Typography variant="body2" sx={{ fontWeight: 600 }}>{admin.name}</Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="body2" sx={{ fontFamily: 'monospace', color: '#4f46e5', fontSize: '0.82rem' }}>
+                              {admin.username || admin.email}
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Chip
+                              size="small"
+                              label={admin.status === 'active' ? 'Hoạt động' : 'Khóa'}
+                              sx={{
+                                fontWeight: 'bold', fontSize: '0.7rem',
+                                bgcolor: admin.status === 'active' ? 'rgba(79,70,229,0.1)' : 'rgba(239,68,68,0.1)',
+                                color: admin.status === 'active' ? '#4f46e5' : '#dc2626',
+                              }}
+                            />
+                          </TableCell>
+                          <TableCell align="right">
+                            <Tooltip title="Xóa admin">
+                              <IconButton size="small" onClick={() => setUserToDelete(admin)} sx={{ color: '#ef4444' }}>
+                                <Trash2 size={15} />
+                              </IconButton>
+                            </Tooltip>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
+              </Paper>
+            );
+          })}
+        </Box>
+      )}
 
       {/* ─── Dialogs ──────────────────────────────────────────────────────── */}
       
