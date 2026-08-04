@@ -16,6 +16,8 @@ import { TeacherClassManager } from '../features/teacher/components/TeacherClass
 import { ManagementLayout } from '../core/components/ManagementLayout';
 import AccountManagement from '../core/components/AccountManagement';
 import ClassManagement from '../core/components/ClassManagement';
+import LibraryManagement from '../core/components/LibraryManagement';
+import DatabankManagement from '../core/components/DatabankManagement';
 
 // ─── Credential Display Dialog ────────────────────────────────────────────────
 
@@ -348,7 +350,7 @@ export const TeacherPage: React.FC = () => {
             <ClassManagement
               classes={[myClass]}
               users={users}
-              canCreate={false} // GV không tự tạo thêm lớp qua màn hình này, chỉ tạo lúc đầu
+              canCreate={false}
               onCreateClick={() => {}}
               onEditClick={() => {}}
               onDeleteClass={() => {}}
@@ -359,6 +361,8 @@ export const TeacherPage: React.FC = () => {
             </Box>
           )
         }
+        libraryContent={<LibraryManagement />}
+        databankContent={<DatabankManagement />}
       />
 
       {/* Dialogs — giữ nguyên */}

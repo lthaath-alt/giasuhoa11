@@ -1,6 +1,7 @@
 import { User, ChatMessage, LearningProgress, School, SchoolClass } from '../../features/auth/types';
 import { Chapter, Lesson } from '../../features/lessons/types';
 import { CHEMISTRY_11_CURRICULUM } from '../../features/lessons/constants';
+import { LibraryExam, Equation, MatrixResource, Question } from '../../features/library/types';
 
 // ─── localStorage Keys ────────────────────────────────────────────────────────
 
@@ -11,6 +12,10 @@ const GUEST_CHAT_COUNT_KEY= 'h11_tutor_guest_chat_count';
 const CURRICULUM_KEY      = 'h11_tutor_curriculum';
 const SCHOOLS_KEY         = 'h11_tutor_schools';
 const CLASSES_KEY         = 'h11_tutor_classes';
+const EXAMS_KEY           = 'h11_tutor_exams';
+const EQUATIONS_KEY       = 'h11_tutor_equations';
+const MATRIX_KEY          = 'h11_tutor_matrix';
+const QUESTIONS_KEY       = 'h11_tutor_questions';
 
 // ─── Utilities ────────────────────────────────────────────────────────────────
 
@@ -515,5 +520,38 @@ export const StorageService = {
     );
     this.saveClasses(classes);
   },
-};
 
+  // ── Library & Databank ──────────────────────────────────────────────────────
+
+  getExams(): LibraryExam[] {
+    const data = localStorage.getItem(EXAMS_KEY);
+    return data ? JSON.parse(data) : [];
+  },
+  saveExams(exams: LibraryExam[]): void {
+    localStorage.setItem(EXAMS_KEY, JSON.stringify(exams));
+  },
+
+  getEquations(): Equation[] {
+    const data = localStorage.getItem(EQUATIONS_KEY);
+    return data ? JSON.parse(data) : [];
+  },
+  saveEquations(equations: Equation[]): void {
+    localStorage.setItem(EQUATIONS_KEY, JSON.stringify(equations));
+  },
+
+  getMatrixResources(): MatrixResource[] {
+    const data = localStorage.getItem(MATRIX_KEY);
+    return data ? JSON.parse(data) : [];
+  },
+  saveMatrixResources(resources: MatrixResource[]): void {
+    localStorage.setItem(MATRIX_KEY, JSON.stringify(resources));
+  },
+
+  getQuestions(): Question[] {
+    const data = localStorage.getItem(QUESTIONS_KEY);
+    return data ? JSON.parse(data) : [];
+  },
+  saveQuestions(questions: Question[]): void {
+    localStorage.setItem(QUESTIONS_KEY, JSON.stringify(questions));
+  }
+};

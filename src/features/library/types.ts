@@ -45,6 +45,9 @@ export interface Question {
   /** Ảnh nhúng gắn kèm câu hỏi (nếu có) */
   images: QuestionImage[];
 
+  /** Chủ đề câu hỏi (VD: Cân bằng hóa học, v.v.) */
+  topic?: string;
+
   /** Chỉ dùng cho Trắc nghiệm */
   options?: QuestionOption[];
 
@@ -61,6 +64,41 @@ export interface Question {
    */
   essayPoints?: EssayPoint[];
 
+  createdBy?: string;
+  createdAt: string;
+}
+
+// ─── Đề thi, Phương trình, Ma trận ──────────────────────────────────────────
+
+export interface LibraryExam {
+  id: string;
+  title: string;
+  description: string;
+  topic: string;
+  type: 'Kho chung' | 'Do GV tự tải';
+  questionCount?: number;
+  driveLink?: string;
+  createdBy?: string;
+  createdAt: string;
+}
+
+export interface Equation {
+  id: string;
+  equation: string;
+  condition: string;
+  type: string;
+  notes: string;
+  createdBy?: string;
+  createdAt: string;
+}
+
+export interface MatrixResource {
+  id: string;
+  title: string;
+  description: string;
+  questionCount: number;
+  driveLink: string;
+  createdBy?: string;
   createdAt: string;
 }
 

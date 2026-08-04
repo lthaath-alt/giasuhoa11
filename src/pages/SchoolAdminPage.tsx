@@ -15,11 +15,13 @@ import { useApp } from '../core/hooks/useApp';
 import { ManagementLayout } from '../core/components/ManagementLayout';
 import AccountManagement from '../core/components/AccountManagement';
 import ClassManagement from '../core/components/ClassManagement';
+import LibraryManagement from '../core/components/LibraryManagement';
+import DatabankManagement from '../core/components/DatabankManagement';
 import { CreateTeacherDialog, CreateClassDialog, CredentialInfo, CredentialDialog } from '../features/admin/components/shared/SchoolDialogs';
 
 export const SchoolAdminPage: React.FC = () => {
   const navigate = useNavigate();
-  const { currentUser, logout, users, classes } = useApp();
+  const { currentUser, logout, users, classes, exams, libraryQuestions } = useApp();
 
   const [createTeacherOpen, setCreateTeacherOpen] = useState(false);
   const [createClassOpen, setCreateClassOpen] = useState(false);
@@ -124,8 +126,8 @@ export const SchoolAdminPage: React.FC = () => {
           roleName="Quản trị Trường học"
           classCount={schoolClasses.length}
           accountCount={schoolUsers.length}
-          questionCount={0}
-          examCount={0}
+          questionCount={libraryQuestions.length}
+          examCount={exams.length}
           accountContent={
             <AccountManagement
               users={schoolUsers}
@@ -147,6 +149,8 @@ export const SchoolAdminPage: React.FC = () => {
               onDeleteClass={(id) => console.log('Delete', id)}
             />
           }
+          libraryContent={<LibraryManagement />}
+          databankContent={<DatabankManagement />}
         />
       </Container>
 

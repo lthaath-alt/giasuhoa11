@@ -173,6 +173,10 @@ export interface ManagementLayoutProps {
   classContent?: ReactNode;
   /** Nội dung tùy chỉnh cho mục "Quản lý Tài khoản" */
   accountContent?: ReactNode;
+  /** Nội dung tùy chỉnh cho mục "Kho bài tập chung" */
+  libraryContent?: ReactNode;
+  /** Nội dung tùy chỉnh cho mục "Ngân hàng dữ liệu" */
+  databankContent?: ReactNode;
 }
 
 export const ManagementLayout: React.FC<ManagementLayoutProps> = ({
@@ -183,6 +187,8 @@ export const ManagementLayout: React.FC<ManagementLayoutProps> = ({
   examCount,
   classContent,
   accountContent,
+  libraryContent,
+  databankContent,
 }) => {
   const [activeItem, setActiveItem] = useState('accounts');
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -203,9 +209,9 @@ export const ManagementLayout: React.FC<ManagementLayoutProps> = ({
       case 'accounts':
         return accountContent || <PlaceholderContent title="Quản lý Tài khoản" />;
       case 'library':
-        return <PlaceholderContent title="Quản lý Kho bài tập chung" />;
+        return libraryContent || <PlaceholderContent title="Quản lý Kho bài tập chung" />;
       case 'databank':
-        return <PlaceholderContent title="Ngân hàng dữ liệu" />;
+        return databankContent || <PlaceholderContent title="Ngân hàng dữ liệu" />;
       case 'password':
         return <PlaceholderContent title="Quản lý Mật khẩu" />;
       case 'errors':

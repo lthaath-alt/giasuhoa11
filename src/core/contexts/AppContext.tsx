@@ -14,6 +14,7 @@ import { QuizService } from '../../features/quiz/quizService';
 import { QuizStorage } from '../../features/quiz/quizStorage';
 import { loginWithFirestore, createAccountWithFirestore } from '../services/firestoreAuth';
 import { UserRole } from '../../features/auth/types';
+import { LibraryExam, Equation, MatrixResource, Question } from '../../features/library/types';
 
 // ─── Shared Data Types ────────────────────────────────────────────────────────
 
@@ -112,6 +113,23 @@ export interface AppContextType {
     newPassword?: string;
     email?: string;
   }>;
+
+  // ── Library & Databank ──────────────────────────────────────────────────────
+  exams: LibraryExam[];
+  addExam: (exam: Omit<LibraryExam, 'id' | 'createdAt'>) => void;
+  deleteExam: (id: string) => void;
+
+  equations: Equation[];
+  addEquation: (eq: Omit<Equation, 'id' | 'createdAt'>) => void;
+  deleteEquation: (id: string) => void;
+
+  matrixResources: MatrixResource[];
+  addMatrixResource: (res: Omit<MatrixResource, 'id' | 'createdAt'>) => void;
+  deleteMatrixResource: (id: string) => void;
+
+  libraryQuestions: Question[];
+  addLibraryQuestion: (q: Omit<Question, 'id' | 'createdAt'>) => void;
+  deleteLibraryQuestion: (id: string) => void;
 
   // ── Quản lý người dùng (Admin hệ thống) ────────────────────────────────────
 
@@ -249,6 +267,10 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [curriculum, setCurriculum] = useState<Chapter[]>([]);
   const [schools, setSchools] = useState<School[]>([]);
   const [classes, setClasses] = useState<SchoolClass[]>([]);
+  const [exams, setExams] = useState<LibraryExam[]>([]);
+  const [equations, setEquations] = useState<Equation[]>([]);
+  const [matrixResources, setMatrixResources] = useState<MatrixResource[]>([]);
+  const [libraryQuestions, setLibraryQuestions] = useState<Question[]>([]);
 
   // Nạp dữ liệu khi khởi động
   useEffect(() => {
@@ -258,6 +280,10 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     const curr       = StorageService.getCurriculum();
     const allSchools = StorageService.getSchools();
     const allClasses = StorageService.getClasses();
+    const allExams = StorageService.getExams();
+    const allEqs = StorageService.getEquations();
+    const allMatrix = StorageService.getMatrixResources();
+    const allQs = StorageService.getQuestions();
 
     // ── Migrate: đổi role 'admin' cũ thành 'super_admin' ────────────────
     const migratedUsers = allUsers.map(u =>
@@ -274,6 +300,10 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     setCurriculum(curr);
     setSchools(allSchools);
     setClasses(allClasses);
+    setExams(allExams);
+    setEquations(allEqs);
+    setMatrixResources(allMatrix);
+    setLibraryQuestions(allQs);
 
     // Không tự động khôi phục session cũ từ cache localStorage
     localStorage.removeItem('h11_current_user_data');
@@ -523,6 +553,76 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       newPassword,
       email: user.email,
     };
+  };
+
+  // ── Library & Databank Methods ──────────────────────────────────────────────
+
+  const addExam = (exam: Omit<LibraryExam, 'id' | 'createdAt'>) => {
+    const newExam: LibraryExam = {
+      ...exam,
+      id: `exam_${Date.now()}`,
+      createdAt: new Date().toISOString(),
+    };
+    const updated = [...exams, newExam];
+    StorageService.saveExams(updated);
+    setExams(updated);
+  };
+
+  const deleteExam = (id: string) => {
+    const updated = exams.filter(e => e.id !== id);
+    StorageService.saveExams(updated);
+    setExams(updated);
+  };
+
+  const addEquation = (eq: Omit<Equation, 'id' | 'createdAt'>) => {
+    const newEq: Equation = {
+      ...eq,
+      id: `eq_${Date.now()}`,
+      createdAt: new Date().toISOString(),
+    };
+    const updated = [...equations, newEq];
+    StorageService.saveEquations(updated);
+    setEquations(updated);
+  };
+
+  const deleteEquation = (id: string) => {
+    const updated = equations.filter(e => e.id !== id);
+    StorageService.saveEquations(updated);
+    setEquations(updated);
+  };
+
+  const addMatrixResource = (res: Omit<MatrixResource, 'id' | 'createdAt'>) => {
+    const newRes: MatrixResource = {
+      ...res,
+      id: `matrix_${Date.now()}`,
+      createdAt: new Date().toISOString(),
+    };
+    const updated = [...matrixResources, newRes];
+    StorageService.saveMatrixResources(updated);
+    setMatrixResources(updated);
+  };
+
+  const deleteMatrixResource = (id: string) => {
+    const updated = matrixResources.filter(r => r.id !== id);
+    StorageService.saveMatrixResources(updated);
+    setMatrixResources(updated);
+  };
+
+  const addLibraryQuestion = (q: Omit<Question, 'id' | 'createdAt'>) => {
+    const newQ: Question = {
+      ...q,
+      id: `q_${Date.now()}`,
+      createdAt: new Date().toISOString(),
+    };
+    const updated = [...libraryQuestions, newQ];
+    StorageService.saveQuestions(updated);
+    setLibraryQuestions(updated);
+  };
+
+  const deleteLibraryQuestion = (id: string) => {
+    const updated = libraryQuestions.filter(q => q.id !== id);
+    StorageService.saveQuestions(updated);
+    setLibraryQuestions(updated);
   };
 
   // ── Admin: duyệt / từ chối / xóa tài khoản ──────────────────────────────
@@ -1146,6 +1246,18 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         curriculum,
         schools,
         classes,
+        exams,
+        addExam,
+        deleteExam,
+        equations,
+        addEquation,
+        deleteEquation,
+        matrixResources,
+        addMatrixResource,
+        deleteMatrixResource,
+        libraryQuestions,
+        addLibraryQuestion,
+        deleteLibraryQuestion,
         login,
         loginWithGoogle,
         completeGoogleRegistration,
