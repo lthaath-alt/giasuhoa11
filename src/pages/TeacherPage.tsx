@@ -18,6 +18,8 @@ import AccountManagement from '../core/components/AccountManagement';
 import ClassManagement from '../core/components/ClassManagement';
 import LibraryManagement from '../core/components/LibraryManagement';
 import DatabankManagement from '../core/components/DatabankManagement';
+import PasswordManagement from '../core/components/PasswordManagement';
+import ErrorManagement from '../core/components/ErrorManagement';
 
 // ─── Credential Display Dialog ────────────────────────────────────────────────
 
@@ -363,6 +365,8 @@ export const TeacherPage: React.FC = () => {
         }
         libraryContent={<LibraryManagement />}
         databankContent={<DatabankManagement />}
+        passwordContent={<PasswordManagement users={myStudents} />}
+        errorContent={<ErrorManagement />}
       />
 
       {/* Dialogs — giữ nguyên */}

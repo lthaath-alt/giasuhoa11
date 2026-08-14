@@ -1,6 +1,7 @@
 import { GoogleGenAI } from '@google/genai';
 import { ChatMessage } from '../../auth/types';
 import { getSession } from './aiMockService';
+import { ErrorLogService } from '../../../core/services/errorLog';
 
 // Initialize Gemini SDK
 // Lấy key từ VITE_GEMINI_API_KEY hoặc GEMINI_API_KEY nếu có
@@ -131,8 +132,16 @@ export const generateAIResponse = async (
     
     return 'Xin lỗi em, thầy/cô đang gặp chút sự cố kỹ thuật. Em có thể nhắc lại câu hỏi được không?';
     
-  } catch (error) {
+  } catch (error: any) {
     console.error('Lỗi khi gọi Gemini API:', error);
+    
+    ErrorLogService.logError({
+      level: 'Lỗi API/AI Service',
+      component: 'geminiTutorService',
+      message: error?.message || 'Lỗi gọi API Google GenAI',
+      userEmail: userEmail
+    });
+
     // Fallback sang mock service nếu gọi thật bị lỗi
     const { generateAIResponse: mockGenerate } = await import('./aiMockService');
     return mockGenerate(lessonId, userQuestion, history, userEmail);

@@ -58,8 +58,15 @@ export const DashboardPage: React.FC = () => {
     guestChatCount,
     addMessage,
     chats,
-    curriculum
+    curriculum,
+    loadLessonChats,
   } = useApp();
+
+  // Load lịch sử chat tư vấn toàn cục khi vào Dashboard
+  useEffect(() => {
+    loadLessonChats('global-advisor');
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUser?.email]);
 
   const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
   const [activeTab, setActiveTab] = useState<string>('hocmai');

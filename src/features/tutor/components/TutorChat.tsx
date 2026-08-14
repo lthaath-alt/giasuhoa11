@@ -31,6 +31,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
     clearLessonHistory,
     isLessonCompleted,
     toggleLessonCompletion,
+    loadLessonChats,
   } = useApp();
 
   const [inputMessage, setInputMessage] = useState('');
@@ -40,6 +41,12 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
   
   const [remainingCooldown, setRemainingCooldown] = useState(0);
   const [offTopicStrikes, setOffTopicStrikes] = useState(0);
+
+  // Load lịch sử chat từ Firestore khi vào bài học
+  useEffect(() => {
+    loadLessonChats(lesson.id);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lesson.id, currentUser?.email]);
 
   // Lọc tin nhắn của bài học hiện tại và user hiện tại
   const email = currentUser ? currentUser.email : 'guest';

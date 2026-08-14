@@ -85,7 +85,7 @@ export const LibraryManagement: React.FC = () => {
       ) : (
         <Grid container spacing={3}>
           {exams.map(exam => (
-            <Grid item xs={12} md={6} key={exam.id}>
+            <Grid size={{ xs: 12, md: 6 }} key={exam.id}>
               <Paper elevation={0} sx={{ p: 3, border: '1px solid #e2e8f0', borderRadius: 3, height: '100%', position: 'relative' }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
                   <Chip size="small" label={exam.topic} sx={{ bgcolor: '#f1f5f9', color: '#475569', fontWeight: 'bold' }} />

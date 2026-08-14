@@ -177,6 +177,10 @@ export interface ManagementLayoutProps {
   libraryContent?: ReactNode;
   /** Nội dung tùy chỉnh cho mục "Ngân hàng dữ liệu" */
   databankContent?: ReactNode;
+  /** Nội dung tùy chỉnh cho mục "Quản lý Mật khẩu" */
+  passwordContent?: ReactNode;
+  /** Nội dung tùy chỉnh cho mục "Chỉ số Lỗi Hệ thống" */
+  errorContent?: ReactNode;
 }
 
 export const ManagementLayout: React.FC<ManagementLayoutProps> = ({
@@ -189,6 +193,8 @@ export const ManagementLayout: React.FC<ManagementLayoutProps> = ({
   accountContent,
   libraryContent,
   databankContent,
+  passwordContent,
+  errorContent,
 }) => {
   const [activeItem, setActiveItem] = useState('accounts');
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -213,9 +219,9 @@ export const ManagementLayout: React.FC<ManagementLayoutProps> = ({
       case 'databank':
         return databankContent || <PlaceholderContent title="Ngân hàng dữ liệu" />;
       case 'password':
-        return <PlaceholderContent title="Quản lý Mật khẩu" />;
+        return passwordContent || <PlaceholderContent title="Quản lý Mật khẩu" />;
       case 'errors':
-        return <PlaceholderContent title="Chỉ số Lỗi Hệ thống" />;
+        return errorContent || <PlaceholderContent title="Chỉ số Lỗi Hệ thống" />;
       default:
         return <PlaceholderContent title="Quản lý Tài khoản" />;
     }
@@ -367,8 +373,8 @@ export const ManagementLayout: React.FC<ManagementLayoutProps> = ({
             anchor="left"
             open={mobileOpen}
             onClose={() => setMobileOpen(false)}
-            PaperProps={{
-              sx: { width: 260, borderRadius: '0 16px 16px 0' },
+            sx={{
+              '& .MuiDrawer-paper': { width: 260, borderRadius: '0 16px 16px 0' }
             }}
           >
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', p: 1 }}>

@@ -10,6 +10,7 @@ import {
   Timestamp
 } from 'firebase/firestore';
 import { db } from './firebase';
+import { ErrorLogService } from './errorLog';
 
 // ─── Data Interface cho User trên Firestore ─────────────────────────────────
 export interface FirestoreUser {
@@ -82,6 +83,11 @@ export const loginWithFirestore = async (
     };
   } catch (error: any) {
     console.error('Lỗi khi đăng nhập Firestore:', error);
+    ErrorLogService.logError({
+      level: 'Lỗi Cơ Sở Dữ Liệu',
+      component: 'firestoreAuth.login',
+      message: error?.message || 'Lỗi khi đăng nhập Firestore'
+    });
     return {
       success: false,
       message: error?.message || 'Có lỗi xảy ra khi kết nối tới Firestore. Vui lòng kiểm tra lại cấu hình Firebase!',
@@ -112,7 +118,7 @@ export const createAccountWithFirestore = async (data: {
     const email    = (data.email || username).trim().toLowerCase();
     const status   = data.status || 'active';
 
-    if (role !== 'student' && role !== 'teacher') {
+    if (role === 'admin' || role === 'super_admin' || role === 'school_admin') {
       return { success: false, message: 'Chỉ được phép tạo tài khoản với vai trò học sinh hoặc giáo viên qua chức năng này.' };
     }
 
@@ -167,6 +173,11 @@ export const createAccountWithFirestore = async (data: {
     };
   } catch (error: any) {
     console.error('Lỗi khi tạo tài khoản Firestore:', error);
+    ErrorLogService.logError({
+      level: 'Lỗi Cơ Sở Dữ Liệu',
+      component: 'firestoreAuth.createAccount',
+      message: error?.message || 'Lỗi khi tạo tài khoản trên Firestore'
+    });
     return {
       success: false,
       message: error?.message || 'Không thể tạo tài khoản trên Firestore. Vui lòng kiểm tra lại kết nối/config!',
@@ -204,6 +215,11 @@ export const resetPasswordWithFirestore = async (
     };
   } catch (error: any) {
     console.error('Lỗi khi reset mật khẩu Firestore:', error);
+    ErrorLogService.logError({
+      level: 'Lỗi Cơ Sở Dữ Liệu',
+      component: 'firestoreAuth.resetPassword',
+      message: error?.message || 'Lỗi khi cập nhật mật khẩu trên Firestore'
+    });
     return {
       success: false,
       message: error?.message || 'Không thể cập nhật mật khẩu trên Firestore!',
@@ -231,8 +247,13 @@ export const getFirestoreUsers = async (): Promise<FirestoreUser[]> => {
         createdAt: data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : data.createdAt || '',
       };
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Lỗi khi lấy danh sách user từ Firestore:', error);
+    ErrorLogService.logError({
+      level: 'Lỗi Cơ Sở Dữ Liệu',
+      component: 'firestoreAuth.getUsers',
+      message: error?.message || 'Lỗi khi lấy danh sách người dùng'
+    });
     return [];
   }
 };

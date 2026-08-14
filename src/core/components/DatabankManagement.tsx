@@ -179,7 +179,7 @@ export const DatabankManagement: React.FC = () => {
 
       {/* 3 Stat Cards */}
       <Grid container spacing={2} sx={{ mb: 4 }}>
-        <Grid item xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <Paper elevation={0} sx={{ p: 2, border: '1px solid #e2e8f0', borderRadius: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
             <Box sx={{ p: 1.5, bgcolor: '#e0e7ff', borderRadius: 2 }}>
               <FileText size={24} color="#4f46e5" />
@@ -190,7 +190,7 @@ export const DatabankManagement: React.FC = () => {
             </Box>
           </Paper>
         </Grid>
-        <Grid item xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <Paper elevation={0} sx={{ p: 2, border: '1px solid #e2e8f0', borderRadius: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
             <Box sx={{ p: 1.5, bgcolor: '#dcfce7', borderRadius: 2 }}>
               <FlaskConical size={24} color="#16a34a" />
@@ -201,7 +201,7 @@ export const DatabankManagement: React.FC = () => {
             </Box>
           </Paper>
         </Grid>
-        <Grid item xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <Paper elevation={0} sx={{ p: 2, border: '1px solid #e2e8f0', borderRadius: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
             <Box sx={{ p: 1.5, bgcolor: '#fef3c7', borderRadius: 2 }}>
               <Database size={24} color="#d97706" />
@@ -231,7 +231,7 @@ export const DatabankManagement: React.FC = () => {
             value={qSearch}
             onChange={e => setQSearch(e.target.value)}
             sx={{ flex: 1 }}
-            InputProps={{ startAdornment: <Search size={18} color="#94a3b8" style={{ marginRight: 8 }} /> }}
+            slotProps={{ input: { startAdornment: <Search size={18} color="#94a3b8" style={{ marginRight: 8 }} /> } }}
           />
           <FormControl size="small" sx={{ width: 200 }}>
             <InputLabel>Bộ lọc Cấp độ</InputLabel>
@@ -377,7 +377,7 @@ export const DatabankManagement: React.FC = () => {
         ) : (
           <Grid container spacing={3}>
             {matrixResources.map(res => (
-              <Grid item xs={12} md={6} key={res.id}>
+              <Grid size={{ xs: 12, md: 6 }} key={res.id}>
                 <Paper elevation={0} sx={{ p: 3, border: '1px solid #e2e8f0', borderRadius: 3 }}>
                   <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>{res.title}</Typography>
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>{res.description}</Typography>
@@ -406,10 +406,10 @@ export const DatabankManagement: React.FC = () => {
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
             <TextField label="Nội dung câu hỏi" fullWidth multiline rows={3} value={qForm.content} onChange={e => setQForm({...qForm, content: e.target.value})} required />
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField label="Chủ đề" fullWidth value={qForm.topic} onChange={e => setQForm({...qForm, topic: e.target.value})} />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <FormControl fullWidth>
                   <InputLabel>Cấp độ</InputLabel>
                   <Select value={qForm.difficulty} label="Cấp độ" onChange={e => setQForm({...qForm, difficulty: e.target.value})}>
