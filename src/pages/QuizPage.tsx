@@ -4,11 +4,11 @@ import {
   Box, Container, Typography, Paper, Button, Radio, RadioGroup,
   FormControlLabel, FormControl, TextField, Divider, Alert, AlertTitle,
   Grid, Chip, Card, CardContent, CircularProgress, Dialog, DialogTitle,
-  DialogContent, DialogActions, Link, Tooltip,
+  DialogContent, DialogActions, Link, Tooltip, DialogContentText
 } from '@mui/material';
 import {
   Award, HelpCircle, CheckCircle, XCircle, AlertTriangle, Clock,
-  ArrowLeft, BookOpen, Send, GraduationCap, Eye, ChevronRight
+  ArrowLeft, BookOpen, Send, GraduationCap, Eye, ChevronRight, Lock
 } from 'lucide-react';
 import { useApp } from '../core/hooks/useApp';
 import { QuizStorage } from '../features/quiz/quizStorage';
@@ -23,7 +23,7 @@ function ChemicalText({ html }: { html: string }) {
 export const QuizPage: React.FC = () => {
   const { quizId } = useParams<{ quizId: string }>();
   const navigate = useNavigate();
-  const { currentUser } = useApp();
+  const { currentUser, updateLessonProgress, getLessonProgress, curriculum } = useApp();
 
   const [quiz, setQuiz] = useState<Quiz | null>(null);
   const [answers, setAnswers] = useState<Record<string, string>>({});
@@ -31,6 +31,10 @@ export const QuizPage: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const [submitConfirmOpen, setSubmitConfirmOpen] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  
+  // States for progression flow
+  const [showRetryDialog, setShowRetryDialog] = useState(false);
+  const [showUnlockDialog, setShowUnlockDialog] = useState(false);
 
   // 1. Tải thông tin bài kiểm tra
   useEffect(() => {
@@ -79,6 +83,38 @@ export const QuizPage: React.FC = () => {
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
             Đường dẫn bài kiểm tra không tồn tại hoặc đã bị xóa khỏi hệ thống.
+          </Typography>
+          <Button variant="contained" onClick={() => navigate('/dashboard')} sx={{ textTransform: 'none', borderRadius: 2 }}>
+            Quay lại trang học tập
+          </Button>
+        </Paper>
+      </Container>
+    );
+  }
+
+  // 2b. Bảo vệ: Nếu bài học chưa mở khóa thì không cho vào
+  const allLessons = curriculum.flatMap(c => c.lessons);
+  const lessonIndex = allLessons.findIndex(l => l.id === quiz.lessonId);
+  
+  let isLocked = false;
+  if (currentUser && (currentUser.role === 'student' || currentUser.role === 'free_user') && lessonIndex > 0) {
+    const prevLesson = allLessons[lessonIndex - 1];
+    const prevProgress = getLessonProgress(prevLesson.id);
+    if (!prevProgress || !prevProgress.basicCompleted || (!prevProgress.advancedCompleted && !prevProgress.skippedAdvanced)) {
+      isLocked = true;
+    }
+  }
+
+  if (isLocked) {
+    return (
+      <Container maxWidth="sm" sx={{ py: 8, textAlign: 'center' }}>
+        <Paper variant="outlined" sx={{ p: 5, borderRadius: 4 }}>
+          <Lock size={48} color="#94a3b8" style={{ margin: '0 auto 16px' }} />
+          <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 1, color: '#ef4444' }}>
+            Bài học đang bị khóa
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+            Hoàn thành bài {lessonIndex} (Bài học trước đó) để mở khóa bài kiểm tra này.
           </Typography>
           <Button variant="contained" onClick={() => navigate('/dashboard')} sx={{ textTransform: 'none', borderRadius: 2 }}>
             Quay lại trang học tập
@@ -174,15 +210,60 @@ export const QuizPage: React.FC = () => {
     setSubmitConfirmOpen(false);
     setSubmitting(true);
     setTimeout(() => {
-      const updated = QuizService.submitQuiz(quiz.id, answers);
+      const updated = QuizService.submitQuiz(quiz!.id, answers);
       if (updated) {
         setQuiz(updated);
+        
+        const percent = Math.round((updated.score / updated.maxScore) * 100);
+        const attempt = {
+          quizId: updated.id,
+          score: percent / 10, // Lưu điểm hệ 10
+          timestamp: new Date().toISOString()
+        };
+
+        const currentProgress = getLessonProgress(updated.lessonId) || { bestScore: 0, quizAttempts: [] };
+        const newBestScore = Math.max(currentProgress.bestScore || 0, attempt.score);
+        
+        const updates: any = {
+          quizAttempts: [...(currentProgress.quizAttempts || []), attempt],
+          bestScore: newBestScore,
+        };
+
+        if (percent >= 70) {
+          updates.advancedUnlocked = true;
+          setShowUnlockDialog(true);
+        } else {
+          setShowRetryDialog(true);
+        }
+
+        updateLessonProgress(updated.lessonId, updates);
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
         setErrorMsg('Nộp bài thất bại. Vui lòng thử lại.');
       }
       setSubmitting(false);
     }, 1200);
+  };
+
+  const handleRetry = () => {
+    if (!quiz) return;
+    const retryQuiz = QuizService.createRetryQuiz(quiz.chapterId, quiz.lessonId, currentUser!.email, quiz.questions.map(q => q.id));
+    if (!retryQuiz) {
+      setErrorMsg('Không đủ câu hỏi mới trong ngân hàng để tạo đề làm lại. Vui lòng quay lại màn hình học tập và liên hệ giáo viên.');
+      setShowRetryDialog(false);
+      return;
+    }
+    setShowRetryDialog(false);
+    setQuiz(retryQuiz);
+    setAnswers({});
+    navigate(`/quiz/${retryQuiz.id}`, { replace: true });
+  };
+
+  const handleSkip = () => {
+    if (!quiz) return;
+    updateLessonProgress(quiz.lessonId, { skippedAdvanced: true });
+    setShowRetryDialog(false);
+    navigate('/dashboard'); // Trở về dashboard để vào bài tiếp theo
   };
 
   // ── RENDER 1: GIAO DIỆN KẾT QUẢ (SAU KHI NỘP BÀI) ──────────────────────────
@@ -358,6 +439,45 @@ export const QuizPage: React.FC = () => {
             </Button>
           </Box>
         </Container>
+
+        {/* Dialog báo chưa đạt (dưới 7 điểm) */}
+        <Dialog open={showRetryDialog} onClose={() => {}} maxWidth="sm" fullWidth>
+          <DialogTitle sx={{ fontWeight: 'bold', color: '#ea580c' }}>
+            Chưa đạt yêu cầu phần Cơ bản
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Điểm số của bạn dưới 7 điểm. Phần <strong>Nâng cao</strong> của bài này vẫn bị khóa.
+              Bạn muốn làm lại đề kiểm tra khác (cùng chủ đề) để cải thiện điểm số và mở khóa phần Nâng cao, hay bỏ qua để chuyển sang bài học tiếp theo?
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions sx={{ px: 3, pb: 3, justifyContent: 'space-between' }}>
+            <Button onClick={handleSkip} color="inherit" sx={{ textTransform: 'none', borderRadius: 2 }}>
+              Bỏ qua, học tiếp Bài sau
+            </Button>
+            <Button onClick={handleRetry} color="primary" variant="contained" sx={{ textTransform: 'none', borderRadius: 2, boxShadow: 'none' }}>
+              Làm lại bài kiểm tra
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Dialog báo đạt (>= 7 điểm) */}
+        <Dialog open={showUnlockDialog} onClose={() => setShowUnlockDialog(false)} maxWidth="sm" fullWidth>
+          <DialogTitle sx={{ fontWeight: 'bold', color: '#10b981' }}>
+            🎉 Chúc mừng! Mở khoá thành công
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Tuyệt vời! Bạn đã vượt qua bài kiểm tra với điểm số xuất sắc. 
+              Phần <strong>Nâng cao</strong> của bài học này đã được mở khóa dành riêng cho bạn!
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions sx={{ px: 3, pb: 3, justifyContent: 'center' }}>
+            <Button onClick={() => { setShowUnlockDialog(false); navigate('/dashboard'); }} color="primary" variant="contained" sx={{ textTransform: 'none', borderRadius: 2, boxShadow: 'none' }}>
+              Vào phần Nâng cao ngay
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Box>
     );
   }

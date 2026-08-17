@@ -28,7 +28,10 @@ import {
   HelpCircle,
   Info,
   Layers,
-  ChevronDown
+  ChevronDown,
+  User as UserIcon,
+  GraduationCap,
+  Building2,
 } from 'lucide-react';
 import { User } from '../../auth/types';
 import { useApp } from '../../../core/hooks/useApp';
@@ -53,7 +56,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   setActiveTab,
   onSelectLesson,
 }) => {
-  const { curriculum } = useApp();
+  const { curriculum, hasAdvancedStudentTitle } = useApp();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchAnchorEl, setSearchAnchorEl] = useState<null | HTMLElement>(null);
@@ -291,46 +294,74 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
 
             {/* Auth section */}
             {currentUser ? (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Avatar
-                  sx={{
-                    bgcolor: '#0062b8',
-                    color: '#ffffff',
-                    width: 32,
-                    height: 32,
-                    fontWeight: 'bold',
-                    fontSize: '0.85rem',
-                  }}
-                >
+              // ── Đã đăng nhập: Avatar + Tên + Chip vai trò + Đăng xuất
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                <Avatar sx={{ bgcolor: '#0062b8', color: '#ffffff', width: 34, height: 34, fontWeight: 'bold', fontSize: '0.9rem' }}>
                   {currentUser.name.charAt(0).toUpperCase()}
                 </Avatar>
                 <Box sx={{ display: { xs: 'none', sm: 'block' }, textAlign: 'left' }}>
-                  <Typography variant="caption" sx={{ fontWeight: 'bold', display: 'block', lineHeight: 1 }} color="text.primary">
+                  <Typography variant="caption" sx={{ fontWeight: 'bold', display: 'block', lineHeight: 1.3 }} color="text.primary">
                     {currentUser.name}
                   </Typography>
-                  <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem' }}>
-                    {currentUser.role === 'super_admin' ? 'Super Admin' : currentUser.role === 'school_admin' ? 'Admin Trường' : 'Thành viên'}
-                  </Typography>
-                </Box>
-
-                {(currentUser.role === 'super_admin' || currentUser.role === 'school_admin') && (
-                  <Button
-                    id="admin-link-btn"
-                    variant="outlined"
-                    color="primary"
+                  <Chip
                     size="small"
-                    onClick={() => navigate(currentUser.role === 'school_admin' ? '/school-admin' : '/admin')}
-                    sx={{ textTransform: 'none', py: 0.3, borderRadius: 20, fontSize: '0.7rem', fontWeight: 'bold' }}
-                  >
-                    {currentUser.role === 'school_admin' ? 'Admin Trường' : 'Admin'}
-                  </Button>
-                )}
-
-                <IconButton size="small" onClick={handleLogout} color="error" title="Đăng xuất">
-                  <LogOut size={16} />
-                </IconButton>
+                    label={
+                      currentUser.role === 'super_admin' ? 'Quản trị Web'
+                      : currentUser.role === 'school_admin' ? 'Admin Trường'
+                      : currentUser.role === 'teacher' ? 'Giáo viên'
+                      : currentUser.role === 'student' ? 'Học sinh'
+                      : 'Học sinh tự do'
+                    }
+                    sx={{
+                      height: 18,
+                      fontSize: '0.6rem',
+                      fontWeight: 'bold',
+                      bgcolor:
+                        currentUser.role === 'super_admin' ? '#7c3aed'
+                        : currentUser.role === 'school_admin' ? '#0369a1'
+                        : currentUser.role === 'teacher' ? '#059669'
+                        : '#ea580c',
+                      color: '#fff',
+                    }}
+                  />
+                  {(currentUser.role === 'student' || currentUser.role === 'free_user') && hasAdvancedStudentTitle(currentUser.email) && (
+                    <Chip
+                      size="small"
+                      label="HS Nâng cao 🎓"
+                      sx={{
+                        height: 18,
+                        fontSize: '0.6rem',
+                        fontWeight: 'bold',
+                        bgcolor: 'linear-gradient(135deg, #f59e0b 0%, #ea580c 100%)',
+                        color: '#fff',
+                        ml: 0.5,
+                        boxShadow: '0 2px 4px rgba(234,88,12,0.3)',
+                      }}
+                    />
+                  )}
+                </Box>
+                <Button
+                  id="header-logout-btn"
+                  variant="outlined"
+                  size="small"
+                  startIcon={<LogOut size={14} />}
+                  onClick={handleLogout}
+                  sx={{
+                    textTransform: 'none',
+                    borderRadius: 20,
+                    fontSize: '0.72rem',
+                    fontWeight: 'bold',
+                    borderColor: '#dc2626',
+                    color: '#dc2626',
+                    '&:hover': { bgcolor: '#fef2f2' },
+                  }}
+                >
+                  Đăng xuất
+                </Button>
               </Box>
+
             ) : (
+              // ── Chưa đăng nhập: Đăng nhập | Đăng Ký | Dùng Thử
               <Box sx={{ display: 'flex', gap: 1 }}>
                 <Button
                   id="header-login-btn"
@@ -364,10 +395,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                   variant="contained"
                   color="secondary"
                   size="small"
-                  onClick={() => {
-                    // Tự động vào vai guest
-                    navigate('/dashboard');
-                  }}
+                  onClick={() => navigate('/dashboard')}
                   sx={{
                     textTransform: 'none',
                     borderRadius: 20,
@@ -469,9 +497,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             {/* Mục Hỗ Trợ */}
             <Button
               id="nav-support-btn"
-              onClick={() => {
-                setActiveTab('hotro');
-              }}
+              onClick={() => setActiveTab('hotro')}
               startIcon={<HelpCircle size={16} />}
               sx={{
                 color: '#ffffff',
@@ -487,6 +513,93 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             >
               Hỗ trợ
             </Button>
+
+            {/* ── Mục điều hướng theo VAI TRÒ ── Chỉ hiện khi đăng nhập ── */}
+
+            {/* student, free_user → Khu vực Học sinh */}
+            {currentUser && (currentUser.role === 'student' || currentUser.role === 'free_user') && (
+              <Button
+                id="nav-student-area-btn"
+                onClick={() => setActiveTab('hocsinh')}
+                startIcon={<UserIcon size={16} />}
+                sx={{
+                  color: '#ffffff',
+                  textTransform: 'none',
+                  fontWeight: 'bold',
+                  px: 2,
+                  py: 1,
+                  borderRadius: 0,
+                  borderBottom: activeTab === 'hocsinh' ? '3px solid #ff9900' : '3px solid transparent',
+                  backgroundColor: activeTab === 'hocsinh' ? 'rgba(255,255,255,0.1)' : 'transparent',
+                  '&:hover': { backgroundColor: 'rgba(255,255,255,0.15)' },
+                }}
+              >
+                Học sinh
+              </Button>
+            )}
+
+            {/* teacher → Trang Giáo viên */}
+            {currentUser && currentUser.role === 'teacher' && (
+              <Button
+                id="nav-teacher-area-btn"
+                onClick={() => navigate('/teacher')}
+                startIcon={<GraduationCap size={16} />}
+                sx={{
+                  color: '#ff9900',
+                  textTransform: 'none',
+                  fontWeight: 'bold',
+                  px: 2,
+                  py: 1,
+                  border: '1px solid rgba(255,153,0,0.4)',
+                  borderRadius: 2,
+                  '&:hover': { backgroundColor: 'rgba(255,153,0,0.15)' },
+                }}
+              >
+                Giáo viên
+              </Button>
+            )}
+
+            {/* school_admin → Quản trị Trường */}
+            {currentUser && currentUser.role === 'school_admin' && (
+              <Button
+                id="nav-school-admin-area-btn"
+                onClick={() => navigate('/school-admin')}
+                startIcon={<Building2 size={16} />}
+                sx={{
+                  color: '#ff9900',
+                  textTransform: 'none',
+                  fontWeight: 'bold',
+                  px: 2,
+                  py: 1,
+                  border: '1px solid rgba(255,153,0,0.4)',
+                  borderRadius: 2,
+                  '&:hover': { backgroundColor: 'rgba(255,153,0,0.15)' },
+                }}
+              >
+                Quản trị Trường
+              </Button>
+            )}
+
+            {/* super_admin → Quản trị Website */}
+            {currentUser && currentUser.role === 'super_admin' && (
+              <Button
+                id="nav-admin-area-btn"
+                onClick={() => navigate('/admin')}
+                startIcon={<ShieldCheck size={16} />}
+                sx={{
+                  color: '#ff9900',
+                  textTransform: 'none',
+                  fontWeight: 'bold',
+                  px: 2,
+                  py: 1,
+                  border: '1px solid rgba(255,153,0,0.4)',
+                  borderRadius: 2,
+                  '&:hover': { backgroundColor: 'rgba(255,153,0,0.15)' },
+                }}
+              >
+                Quản trị Website
+              </Button>
+            )}
           </Box>
         </Container>
       </Box>

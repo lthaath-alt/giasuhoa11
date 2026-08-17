@@ -1,0 +1,333 @@
+import React, { useState } from 'react';
+import {
+  Box,
+  Typography,
+  Paper,
+  Tabs,
+  Tab,
+  Card,
+  CardContent,
+  Chip,
+  Button,
+  Grid,
+  Divider,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
+  Avatar,
+  LinearProgress,
+} from '@mui/material';
+import {
+  ClipboardCheck,
+  BookOpen,
+  Sparkles,
+  Award,
+  Clock,
+  Calendar,
+  CheckCircle,
+  Lock,
+  ArrowRight
+} from 'lucide-react';
+import { useApp } from '../../../core/hooks/useApp';
+import { TutorChat } from '../../tutor/components/TutorChat';
+import { QuizStorage } from '../../quiz/quizStorage';
+
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
+function TabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`student-tabpanel-${index}`}
+      aria-labelledby={`student-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box sx={{ py: 3 }}>
+          {children}
+        </Box>
+      )}
+    </div>
+  );
+}
+
+export const StudentArea: React.FC = () => {
+  const { currentUser, exams, classes, libraryQuestions, getUserProgress, curriculum } = useApp();
+  const [tabValue, setTabValue] = useState(0);
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setTabValue(newValue);
+  };
+
+  if (!currentUser) return null;
+
+  // Lấy lớp học hiện tại của học sinh
+  const myClass = currentUser.classId ? classes.find(c => c.id === currentUser.classId) : undefined;
+  
+  // Tab 1: Bài tập GV giao
+  // Lọc exam do GVCN tải lên
+  const teacherEmail = myClass?.teacherEmail;
+  const assignedExams = teacherEmail ? exams.filter(e => e.createdBy === teacherEmail) : [];
+
+  // Fake history submissions
+  const getSubmissions = (examId: string) => {
+    // Để demo, giả sử quizId = examId
+    return QuizStorage.getUserQuizHistory(currentUser.email, examId);
+  };
+
+  // Tab 2: Luyện tập tự do
+  const topics = Array.from(new Set(libraryQuestions.map(q => q.topic).filter(Boolean) as string[]));
+
+  // Tab 4: Học bạ thông minh
+  const progress = getUserProgress(currentUser.email);
+  const allLessonsCount = curriculum.flatMap(c => c.lessons).length;
+  const completedCount = progress?.completedLessons.length || 0;
+  const progressPercent = allLessonsCount > 0 ? Math.round((completedCount / allLessonsCount) * 100) : 0;
+
+  return (
+    <Box>
+      <Paper sx={{ mb: 4, px: 3, py: 2, borderRadius: 3, display: 'flex', alignItems: 'center', gap: 2, background: 'linear-gradient(to right, #0062b8, #007bf2)', color: '#fff' }}>
+        <Avatar sx={{ width: 56, height: 56, bgcolor: 'rgba(255,255,255,0.2)' }}>
+          {currentUser.name.charAt(0).toUpperCase()}
+        </Avatar>
+        <Box>
+          <Typography variant="h5" sx={{ fontWeight: 'bold' }}>Xin chào, {currentUser.name}!</Typography>
+          <Typography variant="body2" sx={{ opacity: 0.9 }}>
+            {myClass ? `Lớp: ${myClass.name}` : 'Học sinh tự do (Chưa vào lớp)'}
+          </Typography>
+        </Box>
+      </Paper>
+
+      <Paper sx={{ width: '100%', borderRadius: 3, overflow: 'hidden', border: '1px solid #e2e8f0', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+        <Box sx={{ borderBottom: 1, borderColor: 'divider', bgcolor: '#f8fafc' }}>
+          <Tabs
+            value={tabValue}
+            onChange={handleTabChange}
+            variant="scrollable"
+            scrollButtons="auto"
+            sx={{
+              '& .MuiTab-root': { textTransform: 'none', fontWeight: 'bold', fontSize: '0.9rem', minHeight: 60 },
+              '& .Mui-selected': { color: '#0062b8' },
+              '& .MuiTabs-indicator': { backgroundColor: '#ff9900', height: 3 }
+            }}
+          >
+            <Tab icon={<ClipboardCheck size={18} />} iconPosition="start" label="Bài tập GV giao" />
+            <Tab icon={<BookOpen size={18} />} iconPosition="start" label="Luyện tập tự do" />
+            <Tab icon={<Sparkles size={18} />} iconPosition="start" label="Gia sư Hóa học AI" />
+            <Tab icon={<Award size={18} />} iconPosition="start" label="Học bạ thông minh" />
+          </Tabs>
+        </Box>
+
+        <Box sx={{ px: { xs: 2, md: 4 } }}>
+          {/* TAB 1: Bài tập GV giao */}
+          <TabPanel value={tabValue} index={0}>
+            <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
+              Bài tập bắt buộc được giao từ Thầy/Cô
+            </Typography>
+
+            {!myClass ? (
+              <Paper sx={{ p: 4, textAlign: 'center', bgcolor: '#fff7ed', borderRadius: 3, border: '1px dashed #fdba74' }}>
+                <Typography variant="body1" sx={{ color: '#ea580c', fontWeight: 'bold', mb: 1 }}>
+                  Chưa tham gia lớp học nào.
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Hãy vào mục "Các khóa học" và nhập Mã mời để vào lớp nhé.
+                </Typography>
+              </Paper>
+            ) : assignedExams.length === 0 ? (
+              <Paper sx={{ p: 4, textAlign: 'center', bgcolor: '#f8fafc', borderRadius: 3, border: '1px dashed #cbd5e1' }}>
+                <Typography variant="body1" color="text.secondary">
+                  Hiện chưa có bài tập nào được giao.
+                </Typography>
+              </Paper>
+            ) : (
+              <Grid container spacing={3}>
+                {assignedExams.map((exam, idx) => {
+                  // Fake data
+                  const isOverdue = idx % 2 !== 0; // Giả lập đan xen quá hạn
+                  const maxAttempts = 3;
+                  const submissions = getSubmissions(exam.id).length;
+                  const submitted = submissions > 0;
+                  
+                  return (
+                    <Grid size={{ xs: 12, md: 6 }} key={exam.id}>
+                      <Card sx={{ borderRadius: 3, border: '1px solid #e2e8f0', boxShadow: 'none', '&:hover': { boxShadow: '0 4px 12px rgba(0,0,0,0.05)', borderColor: '#cbd5e1' } }}>
+                        <CardContent>
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                            <Chip size="small" label={exam.topic || 'Hóa học 11'} sx={{ bgcolor: '#eff6ff', color: '#1d4ed8', fontWeight: 'bold', fontSize: '0.7rem' }} />
+                            <Chip 
+                              size="small" 
+                              label={submitted ? 'Đã nộp' : (isOverdue ? 'Quá hạn nộp' : 'Chưa nộp')} 
+                              sx={{ 
+                                fontWeight: 'bold', fontSize: '0.7rem',
+                                bgcolor: submitted ? '#dcfce7' : (isOverdue ? '#fee2e2' : '#f1f5f9'),
+                                color: submitted ? '#166534' : (isOverdue ? '#991b1b' : '#475569')
+                              }} 
+                            />
+                          </Box>
+                          
+                          <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1, minHeight: 48 }}>
+                            {exam.title}
+                          </Typography>
+                          
+                          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 3 }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              <Calendar size={14} color="#64748b" />
+                              <Typography variant="caption" color="text.secondary">
+                                Ngày giao: {new Date(exam.createdAt).toLocaleDateString('vi-VN')}
+                              </Typography>
+                            </Box>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              <Clock size={14} color={isOverdue ? "#ef4444" : "#64748b"} />
+                              <Typography variant="caption" sx={{ color: isOverdue ? '#ef4444' : 'text.secondary', fontWeight: isOverdue ? 'bold' : 'normal' }}>
+                                Hạn nộp: {new Date(new Date(exam.createdAt).getTime() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString('vi-VN')}
+                              </Typography>
+                            </Box>
+                          </Box>
+
+                          <Divider sx={{ mb: 2 }} />
+
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <Box>
+                              <Typography variant="caption" sx={{ display: 'block', color: 'text.secondary' }}>
+                                Lượt làm bài tối đa: {maxAttempts} lần
+                              </Typography>
+                              <Typography variant="caption" sx={{ display: 'block', color: 'text.secondary' }}>
+                                Đã nộp: {submissions} lần
+                              </Typography>
+                            </Box>
+                            
+                            <Button 
+                              variant={submitted ? "outlined" : "contained"} 
+                              color="primary" 
+                              size="small"
+                              disabled={isOverdue || submissions >= maxAttempts}
+                              endIcon={isOverdue || submissions >= maxAttempts ? <Lock size={14} /> : <ArrowRight size={14} />}
+                              sx={{ textTransform: 'none', borderRadius: 2, fontWeight: 'bold' }}
+                            >
+                              {submitted ? 'Làm lại' : 'Vào làm bài'}
+                            </Button>
+                          </Box>
+                        </CardContent>
+                      </Card>
+                    </Grid>
+                  );
+                })}
+              </Grid>
+            )}
+          </TabPanel>
+
+          {/* TAB 2: Luyện tập tự do */}
+          <TabPanel value={tabValue} index={1}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                Ngân hàng câu hỏi theo chủ đề
+              </Typography>
+              <Chip icon={<Award size={14} />} label="Không giới hạn" color="warning" size="small" sx={{ fontWeight: 'bold' }} />
+            </Box>
+
+            {topics.length === 0 ? (
+              <Typography color="text.secondary">Chưa có câu hỏi nào trong ngân hàng.</Typography>
+            ) : (
+              <Grid container spacing={2}>
+                {topics.map((topic, idx) => (
+                  <Grid size={{ xs: 12, sm: 6, md: 4 }} key={idx}>
+                    <Card sx={{ borderRadius: 3, border: '1px solid #e2e8f0', cursor: 'pointer', '&:hover': { borderColor: '#0062b8', bgcolor: '#f0f9ff' } }}>
+                      <CardContent sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: '#0f172a' }}>{topic}</Typography>
+                        <ArrowRight size={16} color="#94a3b8" />
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                ))}
+              </Grid>
+            )}
+          </TabPanel>
+
+          {/* TAB 3: Gia sư Hóa học AI */}
+          <TabPanel value={tabValue} index={2}>
+            <Box sx={{ height: '70vh', borderRadius: 4, overflow: 'hidden', border: '1px solid #e2e8f0' }}>
+              <TutorChat 
+                lesson={{
+                  id: 'student-free-chat',
+                  title: 'Gia sư Hóa học AI',
+                  summary: 'Trợ lý học tập 24/7',
+                  formulae: [],
+                  commonQuestions: []
+                }} 
+              />
+            </Box>
+          </TabPanel>
+
+          {/* TAB 4: Học bạ thông minh */}
+          <TabPanel value={tabValue} index={3}>
+            <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 3 }}>
+              Kết quả học tập cá nhân
+            </Typography>
+
+            <Grid container spacing={4}>
+              <Grid size={{ xs: 12, md: 4 }}>
+                <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid #e2e8f0', bgcolor: '#f8fafc', textAlign: 'center' }}>
+                  <Avatar sx={{ width: 80, height: 80, bgcolor: '#0062b8', margin: '0 auto', mb: 2, fontSize: '2rem' }}>
+                    <Award size={40} />
+                  </Avatar>
+                  <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#0062b8' }}>{completedCount}</Typography>
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>Bài học đã hoàn thành</Typography>
+                  
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                    <Typography variant="caption" sx={{ fontWeight: 'bold', minWidth: 40 }}>{progressPercent}%</Typography>
+                    <LinearProgress variant="determinate" value={progressPercent} sx={{ flexGrow: 1, height: 8, borderRadius: 4, bgcolor: '#e2e8f0', '& .MuiLinearProgress-bar': { bgcolor: '#0062b8' } }} />
+                  </Box>
+                  <Typography variant="caption" color="text.secondary">Tiến độ chương trình Hóa 11</Typography>
+                </Paper>
+              </Grid>
+
+              <Grid size={{ xs: 12, md: 8 }}>
+                <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <CheckCircle size={18} color="#16a34a" /> Lịch sử làm bài
+                </Typography>
+                <Paper sx={{ borderRadius: 3, border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+                  <List disablePadding>
+                    {/* Fake data for demo */}
+                    <ListItem divider sx={{ py: 2 }}>
+                      <ListItemIcon>
+                        <Avatar sx={{ bgcolor: '#dcfce7', color: '#166534', width: 40, height: 40 }}>
+                          <Typography variant="caption" sx={{ fontWeight: 'bold' }}>9.5</Typography>
+                        </Avatar>
+                      </ListItemIcon>
+                      <ListItemText 
+                        primary={<Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>Đề kiểm tra 15 phút - Chương 1</Typography>}
+                        secondary="Nộp lúc: Hôm nay, 08:30"
+                      />
+                      <Chip size="small" label="Giỏi" color="success" />
+                    </ListItem>
+                    <ListItem sx={{ py: 2 }}>
+                      <ListItemIcon>
+                        <Avatar sx={{ bgcolor: '#fef3c7', color: '#b45309', width: 40, height: 40 }}>
+                          <Typography variant="caption" sx={{ fontWeight: 'bold' }}>7.0</Typography>
+                        </Avatar>
+                      </ListItemIcon>
+                      <ListItemText 
+                        primary={<Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>Bài tập về nhà - Cân bằng hóa học</Typography>}
+                        secondary="Nộp lúc: Hôm qua, 19:45"
+                      />
+                      <Chip size="small" label="Khá" color="warning" />
+                    </ListItem>
+                  </List>
+                </Paper>
+              </Grid>
+            </Grid>
+          </TabPanel>
+        </Box>
+      </Paper>
+    </Box>
+  );
+};

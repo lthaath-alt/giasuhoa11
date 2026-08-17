@@ -48,6 +48,7 @@ import { StudyProgressBar } from '../features/lessons/components/StudyProgressBa
 import { LessonSidebar } from '../features/lessons/components/LessonSidebar';
 import { TextbookViewer } from '../features/lessons/components/TextbookViewer';
 import { JoinClassForm } from '../features/auth/components/JoinClassForm';
+import { StudentArea } from '../features/student/components/StudentArea';
 
 export const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
@@ -1077,6 +1078,11 @@ export const DashboardPage: React.FC = () => {
                 </Box>
               </Paper>
             </Box>
+          )}
+
+          {/* ================= TAB 5: HỌC SINH (KHU VỰC CÁ NHÂN HÓA) ================= */}
+          {activeTab === 'hocsinh' && (
+            <StudentArea />
           )}
 
         </Container>

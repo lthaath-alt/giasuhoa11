@@ -192,6 +192,66 @@ const DEFAULT_FALLBACK_QUESTIONS: any[] = [
 
 export const QuizService = {
   /**
+   * Tạo bài kiểm tra làm lại (chọn câu mới, loại bỏ các câu hỏi cũ đã làm ở lần gần nhất)
+   * Trả về Quiz nếu thành công, trả về null nếu không đủ câu hỏi hợp lệ.
+   */
+  createRetryQuiz(chapterId: string, lessonId: string, userEmail: string, excludeIds: string[]): Quiz | null {
+    let rawQuestions = LibraryStorage.getQuestions(chapterId, lessonId);
+    if (rawQuestions.length === 0) {
+      rawQuestions = (BACKUP_QUESTIONS[lessonId] || DEFAULT_FALLBACK_QUESTIONS) as any;
+    }
+
+    const bankQuestions: Question[] = rawQuestions.map(q => ({
+      id: q.id,
+      type: q.type,
+      difficulty: q.difficulty,
+      points: q.points,
+      content: q.content,
+      images: q.images || [],
+      options: q.options,
+      correctAnswer: q.correctAnswer,
+      essayPoints: q.essayPoints,
+      createdAt: q.createdAt || new Date().toISOString()
+    }));
+
+    // Lọc bỏ những câu đã xuất hiện trong đề cũ (excludeIds)
+    const availableQuestions = bankQuestions.filter(q => !excludeIds.includes(q.id));
+
+    // Cần tối thiểu 5 câu để tạo đề mới
+    const targetCount = 5; 
+    if (availableQuestions.length < targetCount) {
+      return null; // Không đủ câu hỏi mới
+    }
+
+    // Lấy câu hỏi ngẫu nhiên từ kho câu hỏi hợp lệ (có thể ưu tiên chưa làm bao giờ, nhưng ở đây cứ random)
+    const finalSelection = this.shuffleArray(availableQuestions).slice(0, Math.min(8, availableQuestions.length));
+
+    const difficultyWeight = { 'Thấp': 1, 'Trung bình': 2, 'Cao': 3 };
+    finalSelection.sort((a, b) => difficultyWeight[a.difficulty] - difficultyWeight[b.difficulty]);
+
+    const maxScore = finalSelection.reduce((sum, q) => sum + (q.points || 1), 0);
+    const createdAt = new Date().toISOString();
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+
+    const quiz: Quiz = {
+      id: `quiz_retry_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+      lessonId,
+      chapterId,
+      userEmail,
+      questions: finalSelection,
+      answers: {},
+      status: 'pending',
+      score: 0,
+      maxScore,
+      createdAt,
+      expiresAt
+    };
+
+    QuizStorage.addQuiz(quiz);
+    return quiz;
+  },
+
+  /**
    * Tạo bài kiểm tra cho học sinh
    */
   createQuiz(chapterId: string, lessonId: string, userEmail: string): Quiz {

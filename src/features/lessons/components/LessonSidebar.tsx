@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Paper, Typography, Divider, List, ListItem, ListItemText, Chip, IconButton, Tooltip } from '@mui/material';
-import { BookOpen, ChevronLeft, Trash2 } from 'lucide-react';
+import { BookOpen, ChevronLeft, Trash2, Lock } from 'lucide-react';
 import { Lesson } from '../types';
 import { User, LearningProgress } from '../../auth/types';
 import { useApp } from '../../../core/hooks/useApp';
@@ -18,11 +18,14 @@ export const LessonSidebar: React.FC<LessonSidebarProps> = ({
   currentUser,
   getUserProgress,
 }) => {
-  const { curriculum, deleteChapter, deleteLesson } = useApp();
+  const { curriculum, deleteChapter, deleteLesson, getLessonProgress } = useApp();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   // Fallback nếu curriculum chưa được tải hoặc rỗng
   const displayCurriculum = curriculum && curriculum.length > 0 ? curriculum : [];
+  
+  // Dàn phẳng danh sách bài học để kiểm tra thứ tự
+  const allLessons = displayCurriculum.flatMap(c => c.lessons);
 
   if (isCollapsed) {
     return (
@@ -138,18 +141,33 @@ export const LessonSidebar: React.FC<LessonSidebarProps> = ({
               <List sx={{ p: 0, display: 'flex', flexDirection: 'column', gap: 0.5 }}>
                 {chapter.lessons.map((les) => {
                   const isSelected = selectedLesson?.id === les.id;
-                  const isDone = currentUser
-                    ? getUserProgress(currentUser.email)?.completedLessons.includes(les.id)
-                    : false;
+                  const lessonIndex = allLessons.findIndex(l => l.id === les.id);
+                  
+                  let isLocked = false;
+                  if (currentUser && (currentUser.role === 'student' || currentUser.role === 'free_user')) {
+                    if (lessonIndex > 0) {
+                      const prevLesson = allLessons[lessonIndex - 1];
+                      const prevProgress = getLessonProgress(prevLesson.id);
+                      if (!prevProgress || !prevProgress.basicCompleted || (!prevProgress.advancedCompleted && !prevProgress.skippedAdvanced)) {
+                        isLocked = true;
+                      }
+                    }
+                  }
+
+                  const progress = getLessonProgress(les.id);
+                  const isBasicDone = progress?.basicCompleted;
+                  const isAdvUnlocked = progress?.advancedUnlocked;
+                  const isAdvDone = progress?.advancedCompleted;
 
                   return (
-                    <ListItem
-                      key={les.id}
-                      id={`lesson-item-${les.id}`}
-                      onClick={() => setSelectedLesson(les)}
-                      sx={{
-                        borderRadius: 2,
-                        cursor: 'pointer',
+                    <Tooltip key={les.id} title={isLocked ? `Hoàn thành bài trước đó để mở khóa` : ''} placement="right">
+                      <ListItem
+                        id={`lesson-item-${les.id}`}
+                        onClick={() => !isLocked && setSelectedLesson(les)}
+                        sx={{
+                          borderRadius: 2,
+                          cursor: isLocked ? 'not-allowed' : 'pointer',
+                          opacity: isLocked ? 0.6 : 1,
                         transition: 'all 0.2s',
                         border: '1px solid',
                         borderColor: isSelected ? 'rgba(234, 88, 12, 0.25)' : 'transparent',
@@ -174,14 +192,40 @@ export const LessonSidebar: React.FC<LessonSidebarProps> = ({
                                 : les.title}
                             </Typography>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                              {isDone && (
-                                <Chip
-                                  label="Xong"
-                                  size="small"
-                                  color="success"
-                                  variant="filled"
-                                  sx={{ height: 16, fontSize: '0.6rem', fontWeight: 'bold', minWidth: 'auto', px: 0.5 }}
-                                />
+                              {isLocked ? (
+                                <Box sx={{ p: 0.5, bgcolor: 'rgba(100, 116, 139, 0.1)', borderRadius: 1, display: 'flex' }}>
+                                  <Lock size={14} color="#64748b" />
+                                </Box>
+                              ) : (
+                                <>
+                                  {isBasicDone && (
+                                    <Chip
+                                      label="CB"
+                                      size="small"
+                                      color="success"
+                                      variant="filled"
+                                      sx={{ height: 16, fontSize: '0.6rem', fontWeight: 'bold', minWidth: 'auto', px: 0.5 }}
+                                    />
+                                  )}
+                                  {isAdvDone && (
+                                    <Chip
+                                      label="NC"
+                                      size="small"
+                                      color="secondary"
+                                      variant="filled"
+                                      sx={{ height: 16, fontSize: '0.6rem', fontWeight: 'bold', minWidth: 'auto', px: 0.5 }}
+                                    />
+                                  )}
+                                  {isAdvUnlocked && !isAdvDone && (
+                                    <Chip
+                                      label="NC 🔓"
+                                      size="small"
+                                      variant="outlined"
+                                      color="secondary"
+                                      sx={{ height: 16, fontSize: '0.6rem', fontWeight: 'bold', minWidth: 'auto', px: 0.5 }}
+                                    />
+                                  )}
+                                </>
                               )}
                               {(currentUser?.role === 'super_admin' || currentUser?.role === 'school_admin') && (
                                 <IconButton
@@ -210,8 +254,9 @@ export const LessonSidebar: React.FC<LessonSidebarProps> = ({
                             {les.title.includes(':') ? les.title.split(':')[0] : 'Bài học'}
                           </Typography>
                         }
-                      />
+                        />
                     </ListItem>
+                    </Tooltip>
                   );
                 })}
               </List>

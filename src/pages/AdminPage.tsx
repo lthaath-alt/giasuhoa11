@@ -153,8 +153,7 @@ export const AdminPage: React.FC = () => {
               users={users}
               canCreate={true}
               onCreateClick={() => setCreateClassOpen(true)}
-              onEditClick={(cls) => console.log('Edit', cls)}
-              onDeleteClass={(id) => console.log('Delete', id)}
+              currentUserRole="super_admin"
             />
           }
           libraryContent={<LibraryManagement />}

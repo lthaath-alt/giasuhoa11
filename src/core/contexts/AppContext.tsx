@@ -178,6 +178,18 @@ export interface AppContextType {
     schoolClass?: SchoolClass;
   }>;
 
+  /** Sửa thông tin lớp */
+  updateClass: (classId: string, className: string, teacherEmail: string) => Promise<{
+    success: boolean;
+    message: string;
+  }>;
+
+  /** Xoá lớp */
+  deleteClass: (classId: string) => Promise<{
+    success: boolean;
+    message: string;
+  }>;
+
   /**
    * Giáo viên tạo tài khoản học sinh trong lớp mình.
    * Trả về credentials để hiển thị / in ra.
@@ -200,9 +212,12 @@ export interface AppContextType {
    */
   loadLessonChats: (lessonId: string) => Promise<void>;
   toggleLessonCompletion: (lessonId: string) => void;
+  updateLessonProgress: (lessonId: string, updates: Partial<import('../../features/auth/types').LessonProgress>) => Promise<void>;
   clearLessonHistory: (lessonId: string) => void;
   getUserProgress: (email: string) => LearningProgress | null;
+  getLessonProgress: (lessonId: string) => import('../../features/auth/types').LessonProgress | null;
   isLessonCompleted: (lessonId: string) => boolean;
+  hasAdvancedStudentTitle: (email: string) => boolean;
   resetGuestChats: () => void;
 
   // ── Chương trình học ──────────────────────────────────────────────────────────
@@ -835,6 +850,55 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     return { success: true, message: `Đã tạo lớp "${className.trim()}" thành công.`, schoolClass };
   };
 
+  const updateClass = async (classId: string, className: string, teacherEmail: string) => {
+    if (!className.trim()) return { success: false, message: 'Tên lớp không được để trống.' };
+
+    const lower = teacherEmail.toLowerCase();
+    const teacher = users.find(u => u.email.toLowerCase() === lower);
+    if (!teacher || teacher.role !== 'teacher') {
+      return { success: false, message: 'Giáo viên không tồn tại hoặc email không hợp lệ.' };
+    }
+
+    const targetClass = classes.find(c => c.id === classId);
+    if (!targetClass) return { success: false, message: 'Lớp học không tồn tại.' };
+
+    // Kiểm tra xem GV mới có đang quản lý lớp khác không (trừ lớp hiện tại)
+    const existingClass = classes.find(c => c.teacherEmail.toLowerCase() === lower && c.id !== classId);
+    if (existingClass) {
+      return {
+        success: false,
+        message: `${teacher.name} đang quản lý lớp "${existingClass.name}". Mỗi giáo viên chỉ quản lý 1 lớp.`,
+      };
+    }
+
+    const updates = { name: className.trim(), teacherEmail: lower };
+    const ok = await FirestoreService.updateClass(classId, updates);
+    if (!ok) return { success: false, message: 'Lỗi khi cập nhật lớp.' };
+
+    setClasses(prev => prev.map(c => c.id === classId ? { ...c, ...updates } : c));
+    return { success: true, message: 'Cập nhật thông tin lớp thành công.' };
+  };
+
+  const deleteClass = async (classId: string) => {
+    const targetClass = classes.find(c => c.id === classId);
+    if (!targetClass) return { success: false, message: 'Lớp học không tồn tại.' };
+
+    await FirestoreService.deleteClass(classId);
+
+    // Gỡ học sinh khỏi lớp (chuyển về học sinh tự do hoặc xoá classId)
+    // Để an toàn, cập nhật tất cả học sinh trong lớp thành free_user và classId = null
+    const studentUsers = users.filter(u => targetClass.studentIdentifiers.includes(u.email) || targetClass.studentIdentifiers.includes(u.username!));
+    for (const student of studentUsers) {
+      await FirestoreService.updateUserById(student.id, { classId: null, role: 'free_user' });
+    }
+    
+    // Cập nhật local state users
+    setUsers(prev => prev.map(u => studentUsers.some(su => su.id === u.id) ? { ...u, classId: undefined, role: 'free_user' } : u));
+    setClasses(prev => prev.filter(c => c.id !== classId));
+    
+    return { success: true, message: `Đã xóa lớp "${targetClass.name}" thành công.` };
+  };
+
   // ── Quản lý Học sinh ─────────────────────────────────────────────────────
 
   const createStudent = async (data: CreateStudentData) => {
@@ -1033,7 +1097,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     const email = currentUser.email;
 
     // Lấy progress hiện tại từ cache hoặc Firestore
-    const currentProgress = progressCache[email] || await FirestoreService.getUserProgress(email);
+    const currentProgress = progressCache[email] || await FirestoreService.getUserProgress(email) || { userEmail: email, completedLessons: [], details: {} };
     let completedLessons: string[];
 
     if (currentProgress.completedLessons.includes(lessonId)) {
@@ -1042,13 +1106,63 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       completedLessons = [...currentProgress.completedLessons, lessonId];
     }
 
-    const updated: LearningProgress = { userEmail: email, completedLessons };
+    const updated: LearningProgress = { ...currentProgress, userEmail: email, completedLessons };
     setProgressCache(prev => ({ ...prev, [email]: updated }));
 
     // Ghi Firestore background
     FirestoreService.saveUserProgress(updated);
 
-    // Trigger re-render (cập nhật currentUser để isLessonCompleted cập nhật)
+    // Trigger re-render
+    setCurrentUser(prev => prev ? { ...prev } : prev);
+  };
+
+  const updateLessonProgress = async (lessonId: string, updates: Partial<import('../../features/auth/types').LessonProgress>) => {
+    if (!currentUser) return;
+    const email = currentUser.email;
+
+    const currentProgress = progressCache[email] || await FirestoreService.getUserProgress(email) || { userEmail: email, completedLessons: [], details: {} };
+    
+    // Tự động map dữ liệu cũ sang mới
+    const details = currentProgress.details || {};
+    
+    // Nếu chưa có chi tiết mà lại có trong completedLessons, map sang
+    if (!details[lessonId] && currentProgress.completedLessons.includes(lessonId)) {
+      details[lessonId] = {
+        lessonId,
+        basicCompleted: true,
+        quizAttempts: [],
+        bestScore: 0,
+        advancedUnlocked: false,
+        advancedCompleted: false,
+        skippedAdvanced: true // Cũ mặc định coi như bỏ qua nâng cao
+      };
+    }
+
+    const currentLesson = details[lessonId] || {
+      lessonId,
+      basicCompleted: false,
+      quizAttempts: [],
+      bestScore: 0,
+      advancedUnlocked: false,
+      advancedCompleted: false,
+      skippedAdvanced: false
+    };
+
+    const newLessonProgress = { ...currentLesson, ...updates };
+    details[lessonId] = newLessonProgress;
+
+    // Cập nhật mảng legacy completedLessons để tương thích ngược
+    const completedLessons = [...currentProgress.completedLessons];
+    if (newLessonProgress.basicCompleted && !completedLessons.includes(lessonId)) {
+      completedLessons.push(lessonId);
+    } else if (!newLessonProgress.basicCompleted && completedLessons.includes(lessonId)) {
+      const idx = completedLessons.indexOf(lessonId);
+      if (idx > -1) completedLessons.splice(idx, 1);
+    }
+
+    const updated: LearningProgress = { ...currentProgress, userEmail: email, completedLessons, details };
+    setProgressCache(prev => ({ ...prev, [email]: updated }));
+    FirestoreService.saveUserProgress(updated);
     setCurrentUser(prev => prev ? { ...prev } : prev);
   };
 
@@ -1064,11 +1178,39 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     return progressCache[email] || null;
   };
 
-  const isLessonCompleted = (lessonId: string): boolean => {
-    if (!currentUser) return false;
+  const getLessonProgress = (lessonId: string) => {
+    if (!currentUser) return null;
     const progress = progressCache[currentUser.email];
-    if (!progress) return false;
-    return progress.completedLessons.includes(lessonId);
+    if (!progress) return null;
+    
+    if (progress.details && progress.details[lessonId]) {
+      return progress.details[lessonId];
+    }
+    
+    // Legacy fallback
+    if (progress.completedLessons.includes(lessonId)) {
+      return {
+        lessonId,
+        basicCompleted: true,
+        quizAttempts: [],
+        bestScore: 0,
+        advancedUnlocked: false,
+        advancedCompleted: false,
+        skippedAdvanced: true
+      };
+    }
+    return null;
+  };
+
+  const isLessonCompleted = (lessonId: string): boolean => {
+    const lp = getLessonProgress(lessonId);
+    return lp ? lp.basicCompleted : false;
+  };
+
+  const hasAdvancedStudentTitle = (email: string): boolean => {
+    const progress = progressCache[email];
+    if (!progress || !progress.details) return false;
+    return Object.values(progress.details).some(lp => lp.advancedUnlocked);
   };
 
   const resetGuestChats = () => {
@@ -1377,14 +1519,19 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         createSchoolAdmin,
         createTeacher,
         createClass,
+        updateClass,
+        deleteClass,
         createStudent,
         getMyClass,
         addMessage,
         loadLessonChats,
         toggleLessonCompletion,
+        updateLessonProgress,
         clearLessonHistory,
         getUserProgress,
+        getLessonProgress,
         isLessonCompleted,
+        hasAdvancedStudentTitle,
         resetGuestChats,
         deleteChapter,
         deleteLesson,

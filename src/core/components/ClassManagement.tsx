@@ -2,18 +2,20 @@ import React, { useState } from 'react';
 import {
   Box, Typography, Button, Paper, Table, TableBody, TableCell,
   TableContainer, TableHead, TableRow, Chip, IconButton, Tooltip,
-  Dialog, DialogTitle, DialogContent, DialogActions, DialogContentText
+  Dialog, DialogTitle, DialogContent, DialogActions, DialogContentText,
+  TextField, Select, MenuItem, FormControl, InputLabel
 } from '@mui/material';
 import { GraduationCap, Copy, Edit, Trash2, Plus } from 'lucide-react';
 import { SchoolClass, User } from '../../features/auth/types';
+
+import { useApp } from '../../core/hooks/useApp';
 
 export interface ClassManagementProps {
   classes: SchoolClass[];
   users: User[];
   canCreate: boolean;
   onCreateClick: () => void;
-  onEditClick: (cls: SchoolClass) => void;
-  onDeleteClass: (classId: string) => void;
+  currentUserRole?: 'super_admin' | 'school_admin' | 'teacher';
 }
 
 export const ClassManagement: React.FC<ClassManagementProps> = ({
@@ -21,10 +23,13 @@ export const ClassManagement: React.FC<ClassManagementProps> = ({
   users,
   canCreate,
   onCreateClick,
-  onEditClick,
-  onDeleteClass,
+  currentUserRole = 'super_admin',
 }) => {
+  const { updateClass, deleteClass } = useApp();
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [editClass, setEditClass] = useState<SchoolClass | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editTeacherEmail, setEditTeacherEmail] = useState('');
   const [codeCopied, setCodeCopied] = useState<string | null>(null);
 
   const getTeacherName = (email: string) => {
@@ -38,11 +43,28 @@ export const ClassManagement: React.FC<ClassManagementProps> = ({
     setTimeout(() => setCodeCopied(null), 2000);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (deleteId) {
-      onDeleteClass(deleteId);
+      await deleteClass(deleteId);
       setDeleteId(null);
     }
+  };
+
+  const openEdit = (cls: SchoolClass) => {
+    setEditClass(cls);
+    setEditName(cls.name);
+    setEditTeacherEmail(cls.teacherEmail);
+  };
+
+  const handleUpdate = async () => {
+    if (editClass) {
+      await updateClass(editClass.id, editName, editTeacherEmail);
+      setEditClass(null);
+    }
+  };
+
+  const getTeachers = () => {
+    return users.filter(u => u.role === 'teacher');
   };
 
   return (
@@ -128,15 +150,17 @@ export const ClassManagement: React.FC<ClassManagementProps> = ({
                   </TableCell>
                   <TableCell align="right">
                     <Tooltip title="Sửa thông tin">
-                      <IconButton size="small" onClick={() => onEditClick(cls)} sx={{ color: '#64748b' }}>
+                      <IconButton size="small" onClick={() => openEdit(cls)} sx={{ color: '#64748b' }}>
                         <Edit size={16} />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="Xóa lớp học">
-                      <IconButton size="small" onClick={() => setDeleteId(cls.id)} sx={{ color: '#ef4444' }}>
-                        <Trash2 size={16} />
-                      </IconButton>
-                    </Tooltip>
+                    {currentUserRole !== 'teacher' && (
+                      <Tooltip title="Xóa lớp học">
+                        <IconButton size="small" onClick={() => setDeleteId(cls.id)} sx={{ color: '#ef4444' }}>
+                          <Trash2 size={16} />
+                        </IconButton>
+                      </Tooltip>
+                    )}
                   </TableCell>
                 </TableRow>
               ))
@@ -150,8 +174,18 @@ export const ClassManagement: React.FC<ClassManagementProps> = ({
         <DialogTitle sx={{ fontWeight: 'bold' }}>Xác nhận xóa lớp học</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Bạn có chắc chắn muốn xóa lớp học này không? 
-            Hành động này không thể hoàn tác và học sinh sẽ bị mất liên kết với lớp.
+            {(() => {
+              const cls = classes.find(c => c.id === deleteId);
+              if (!cls) return 'Bạn có chắc chắn muốn xóa lớp học này không?';
+              return (
+                <>
+                  Bạn có chắc chắn muốn xóa lớp <strong>{cls.name}</strong> không?<br /><br />
+                  <span style={{ color: '#ef4444', fontWeight: 'bold' }}>Cảnh báo:</span> Lớp này hiện có <strong>{cls.studentIdentifiers.length} học sinh</strong>. 
+                  Nếu xóa, tất cả học sinh này sẽ bị gỡ khỏi lớp và trở thành học sinh tự do.
+                  Hành động này không thể hoàn tác.
+                </>
+              );
+            })()}
           </DialogContentText>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
@@ -160,6 +194,58 @@ export const ClassManagement: React.FC<ClassManagementProps> = ({
           </Button>
           <Button onClick={confirmDelete} color="error" variant="contained" sx={{ textTransform: 'none', borderRadius: 2, boxShadow: 'none' }}>
             Xóa lớp
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Dialog sửa lớp */}
+      <Dialog open={Boolean(editClass)} onClose={() => setEditClass(null)} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ fontWeight: 'bold' }}>Sửa thông tin lớp học</DialogTitle>
+        <DialogContent>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 1 }}>
+            <TextField
+              label="Tên lớp học"
+              fullWidth
+              value={editName}
+              onChange={(e) => setEditName(e.target.value)}
+              placeholder="VD: 11A1, 11 Toán..."
+            />
+            {currentUserRole !== 'teacher' ? (
+              <FormControl fullWidth>
+                <InputLabel>Giáo viên phụ trách</InputLabel>
+                <Select
+                  value={editTeacherEmail}
+                  label="Giáo viên phụ trách"
+                  onChange={(e) => setEditTeacherEmail(e.target.value)}
+                >
+                  {getTeachers().map(t => (
+                    <MenuItem key={t.email} value={t.email}>{t.name} ({t.email})</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            ) : (
+              <TextField
+                label="Giáo viên phụ trách"
+                fullWidth
+                value={getTeacherName(editTeacherEmail)}
+                disabled
+                helperText="Giáo viên chỉ có thể sửa tên lớp của mình."
+              />
+            )}
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button onClick={() => setEditClass(null)} sx={{ textTransform: 'none', borderRadius: 2 }}>
+            Hủy
+          </Button>
+          <Button 
+            onClick={handleUpdate} 
+            color="primary" 
+            variant="contained" 
+            disabled={!editName.trim() || !editTeacherEmail}
+            sx={{ textTransform: 'none', borderRadius: 2, boxShadow: 'none' }}
+          >
+            Lưu thay đổi
           </Button>
         </DialogActions>
       </Dialog>

@@ -354,8 +354,7 @@ export const TeacherPage: React.FC = () => {
               users={users}
               canCreate={false}
               onCreateClick={() => {}}
-              onEditClick={() => {}}
-              onDeleteClass={() => {}}
+              currentUserRole="teacher"
             />
           ) : (
             <Box sx={{ mt: 3 }}>

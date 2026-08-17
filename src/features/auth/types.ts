@@ -141,7 +141,24 @@ export interface ChatMessage {
   timestamp: string;
 }
 
+export interface QuizAttempt {
+  quizId: string;
+  score: number;
+  timestamp: string;
+}
+
+export interface LessonProgress {
+  lessonId: string;
+  basicCompleted: boolean;
+  quizAttempts: QuizAttempt[];
+  bestScore: number;
+  advancedUnlocked: boolean;
+  advancedCompleted: boolean;
+  skippedAdvanced: boolean;
+}
+
 export interface LearningProgress {
   userEmail: string;
-  completedLessons: string[]; // Danh sách các lessonId đã hoàn thành
+  completedLessons: string[]; // Danh sách các lessonId đã hoàn thành (legacy, fallback)
+  details?: Record<string, LessonProgress>; // Map lessonId -> LessonProgress
 }
