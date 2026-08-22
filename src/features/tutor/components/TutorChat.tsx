@@ -11,11 +11,12 @@ import {
   Alert,
   CircularProgress,
 } from '@mui/material';
-import { Send, Trash2, Sparkles, CheckCircle, Award, Lightbulb, HelpCircle, Clock, ShieldAlert } from 'lucide-react';
+import { Send, Trash2, Sparkles, CheckCircle, Award, Lightbulb, HelpCircle, Clock, ShieldAlert, Settings, Key } from 'lucide-react';
 import { useApp } from '../../../core/hooks/useApp';
 import { Lesson } from '../../lessons/types';
 import { KnowledgeTheoryCard } from './KnowledgeTheoryCard';
 import { SuggestedQuestionsCard } from './SuggestedQuestionsCard';
+import { ApiKeyDialog } from './ApiKeyDialog';
 import { getRemainingCooldown, getCooldownState, checkRateLimit, recordMessageSent } from '../services/cooldownService';
 
 interface TutorChatProps {
@@ -41,6 +42,9 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
   
   const [remainingCooldown, setRemainingCooldown] = useState(0);
   const [offTopicStrikes, setOffTopicStrikes] = useState(0);
+  const [apiKeyDialogOpen, setApiKeyDialogOpen] = useState(false);
+  const [hasApiKey, setHasApiKey] = useState(() => !!localStorage.getItem('gemini_api_key_user'));
+  const { systemSettings } = useApp();
 
   // Load lịch sử chat từ Firestore khi vào bài học
   useEffect(() => {
@@ -86,6 +90,11 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
   }, [currentUser, chats, isSending]);
 
   const handleSend = async (textToSend?: string) => {
+    if (systemSettings?.allowUserApiKey && !hasApiKey) {
+      setApiKeyDialogOpen(true);
+      return;
+    }
+
     const text = (textToSend || inputMessage).trim();
     if (!text) return;
 
@@ -286,8 +295,29 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
                 Xóa lịch sử chat
               </Button>
             )}
+
+            {systemSettings?.allowUserApiKey && (
+              <Button
+                size="small"
+                variant="outlined"
+                color="primary"
+                onClick={() => setApiKeyDialogOpen(true)}
+                sx={{ minWidth: 0, p: 0.5, borderRadius: 2 }}
+              >
+                <Settings size={18} />
+              </Button>
+            )}
           </Box>
         </Box>
+
+        {/* Api Key Dialog */}
+        <ApiKeyDialog 
+          open={apiKeyDialogOpen} 
+          onClose={() => {
+            setApiKeyDialogOpen(false);
+            setHasApiKey(!!localStorage.getItem('gemini_api_key_user'));
+          }} 
+        />
 
         {/* Cảnh báo khách vãng lai hoặc tài khoản */}
         {!currentUser && (
@@ -321,7 +351,39 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
             gap: 2,
           }}
         >
-          {lessonChats.length === 0 ? (
+          {systemSettings?.allowUserApiKey && !hasApiKey ? (
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: '100%',
+                gap: 2,
+                p: 4,
+                textAlign: 'center',
+              }}
+            >
+              <Avatar sx={{ width: 64, height: 64, bgcolor: 'rgba(15, 118, 110, 0.08)', color: '#0f766e' }}>
+                <Key size={32} />
+              </Avatar>
+              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                Mời cài đặt API Key
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 450, mb: 1 }}>
+                Hệ thống yêu cầu bạn tự cung cấp Gemini API Key để tiếp tục trò chuyện. API Key của bạn chỉ được lưu trên trình duyệt này.
+              </Typography>
+              <Button
+                variant="contained"
+                color="primary"
+                startIcon={<Settings size={18} />}
+                onClick={() => setApiKeyDialogOpen(true)}
+                sx={{ borderRadius: 2, textTransform: 'none', boxShadow: 'none' }}
+              >
+                Cài đặt Key ngay
+              </Button>
+            </Box>
+          ) : lessonChats.length === 0 ? (
             <Box
               sx={{
                 display: 'flex',

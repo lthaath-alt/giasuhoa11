@@ -56,6 +56,39 @@ export function generateInviteCode(): string {
   return Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
 }
 
+/**
+ * Sinh mật khẩu có cấu trúc cho học sinh trong lớp.
+ * Format: {TÊN_LỚP}_{SBD_2_CHỮ_SỐ}_{4_KÝ_TỰ_NGẪU_NHIÊN}
+ * Ví dụ: 11A1_08_K7m2
+ *
+ * Bộ ký tự 4 ký tự ngẫu nhiên: chữ HOA + chữ thường + số.
+ * Loại bỏ các ký tự dễ nhầm: 0 O o 1 l I.
+ */
+export function generateClassPassword(className: string, studentNumber: number): string {
+  const lower  = 'abcdefghjkmnpqrstuvwxyz';   // loại o
+  const upper  = 'ABCDEFGHJKMNPQRSTUVWXYZ';   // loại O, I
+  const digits = '23456789';                   // loại 0, 1
+  const all    = lower + upper + digits;
+
+  const pick = (src: string) => src[Math.floor(Math.random() * src.length)];
+
+  // Đảm bảo 4 ký tự có ít nhất 1 loại mỗi nhóm
+  const required = [pick(upper), pick(lower), pick(digits)];
+  const extra    = [pick(all)];
+  const chars    = [...required, ...extra];
+
+  // Shuffle 4 ký tự
+  for (let i = chars.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [chars[i], chars[j]] = [chars[j], chars[i]];
+  }
+
+  const sbd = String(studentNumber).padStart(2, '0');
+  // Làm sạch tên lớp (bỏ khoảng trắng, ký tự đặc biệt)
+  const cleanClassName = className.replace(/\s+/g, '').replace(/[^A-Za-z0-9]/g, '');
+  return `${cleanClassName}_${sbd}_${chars.join('')}`;
+}
+
 // ─── Guest Chat Count (localStorage — thuộc máy cá nhân, không sync) ─────────
 
 export const GuestChatStorage = {

@@ -5,10 +5,11 @@ import {
   Dialog, DialogTitle, DialogContent, DialogActions, DialogContentText,
   TextField, Select, MenuItem, FormControl, InputLabel
 } from '@mui/material';
-import { GraduationCap, Copy, Edit, Trash2, Plus } from 'lucide-react';
+import { GraduationCap, Copy, Edit, Trash2, Plus, Download } from 'lucide-react';
 import { SchoolClass, User } from '../../features/auth/types';
-
 import { useApp } from '../../core/hooks/useApp';
+import { generateClassPassword } from '../../core/services/storage';
+import { FirestoreService } from '../../core/services/firestoreService';
 
 export interface ClassManagementProps {
   classes: SchoolClass[];
@@ -31,6 +32,8 @@ export const ClassManagement: React.FC<ClassManagementProps> = ({
   const [editName, setEditName] = useState('');
   const [editTeacherEmail, setEditTeacherEmail] = useState('');
   const [codeCopied, setCodeCopied] = useState<string | null>(null);
+  const [exportClassId, setExportClassId] = useState<string | null>(null);
+  const [exporting, setExporting] = useState(false);
 
   const getTeacherName = (email: string) => {
     const teacher = users.find(u => u.email.toLowerCase() === email.toLowerCase());
@@ -65,6 +68,40 @@ export const ClassManagement: React.FC<ClassManagementProps> = ({
 
   const getTeachers = () => {
     return users.filter(u => u.role === 'teacher');
+  };
+
+  const handleExportCSV = async (cls: SchoolClass) => {
+    setExporting(true);
+    const classStudents = users
+      .filter(u => cls.studentIdentifiers.some(id =>
+        id.toLowerCase() === u.email.toLowerCase() ||
+        (u.username && id.toLowerCase() === u.username.toLowerCase())
+      ))
+      .sort((a, b) => (a.studentNumber ?? 999) - (b.studentNumber ?? 999));
+
+    // Sinh mật khẩu mới cho từng học sinh và cập nhật Firestore
+    const rows: string[] = ['Số báo danh,Họ tên,Tên đăng nhập,Mật khẩu mới'];
+
+    for (const student of classStudents) {
+      const sbd = student.studentNumber ?? 0;
+      const newPassword = generateClassPassword(cls.name, sbd);
+      // Cập nhập mật khẩu lên Firestore
+      await FirestoreService.updateUserById(student.id, { password: newPassword });
+      const loginId = student.username || student.email;
+      rows.push(`${sbd},"${student.name}","${loginId}","${newPassword}"`);
+    }
+
+    const csvContent = '\uFEFF' + rows.join('\n'); // BOM cho Excel
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `danhsach_taikhoan_${cls.name.replace(/\s/g, '_')}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+
+    setExporting(false);
+    setExportClassId(null);
   };
 
   return (
@@ -152,6 +189,11 @@ export const ClassManagement: React.FC<ClassManagementProps> = ({
                     <Tooltip title="Sửa thông tin">
                       <IconButton size="small" onClick={() => openEdit(cls)} sx={{ color: '#64748b' }}>
                         <Edit size={16} />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Xuất danh sách tài khoản lớp (reset mật khẩu)">
+                      <IconButton size="small" onClick={() => setExportClassId(cls.id)} sx={{ color: '#0f766e' }}>
+                        <Download size={16} />
                       </IconButton>
                     </Tooltip>
                     {currentUserRole !== 'teacher' && (
@@ -246,6 +288,56 @@ export const ClassManagement: React.FC<ClassManagementProps> = ({
             sx={{ textTransform: 'none', borderRadius: 2, boxShadow: 'none' }}
           >
             Lưu thay đổi
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Dialog xác nhận xuất danh sách (reset mật khẩu) */}
+      <Dialog open={Boolean(exportClassId)} onClose={() => !exporting && setExportClassId(null)} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ fontWeight: 'bold', color: '#ea580c' }}>
+          ⚠️ Xác nhận xuất danh sách tài khoản lớp
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            {(() => {
+              const cls = classes.find(c => c.id === exportClassId);
+              if (!cls) return '';
+              const count = users.filter(u => cls.studentIdentifiers.some(id =>
+                id.toLowerCase() === u.email.toLowerCase() ||
+                (u.username && id.toLowerCase() === u.username.toLowerCase())
+              )).length;
+              return (
+                <>
+                  Thao tác này sẽ đặt lại mật khẩu của <strong>{count} học sinh</strong> trong lớp <strong>{cls.name}</strong>.<br /><br />
+                  <span style={{ color: '#ef4444', fontWeight: 'bold' }}>Mật khẩu cũ sẽ không dùng được nữa.</span> Hệ thống sẽ sinh mật khẩu mới theo format:<br />
+                  <code style={{ background: '#f1f5f9', padding: '2px 6px', borderRadius: 4 }}>{cls.name.replace(/\s/g, '')}_SBD_4ký_tự</code><br /><br />
+                  Bạn sẽ tải xuống file CSV chứa thông tin đăng nhập mới để phát cho học sinh.
+                  Hãy chắc rằng bạn đã in/gửi cho tất cả học sinh ngay sau khi xuất.
+                </>
+              );
+            })()}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button
+            onClick={() => setExportClassId(null)}
+            disabled={exporting}
+            sx={{ textTransform: 'none', borderRadius: 2 }}
+          >
+            Hủy
+          </Button>
+          <Button
+            onClick={() => {
+              const cls = classes.find(c => c.id === exportClassId);
+              if (cls) handleExportCSV(cls);
+            }}
+            color="warning"
+            variant="contained"
+            disabled={exporting}
+            startIcon={<Download size={16} />}
+            sx={{ textTransform: 'none', borderRadius: 2, boxShadow: 'none' }}
+          >
+            {exporting ? 'Đang xuất...' : 'Đặt lại mật khẩu & Xuất CSV'}
           </Button>
         </DialogActions>
       </Dialog>

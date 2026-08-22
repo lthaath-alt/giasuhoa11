@@ -43,6 +43,7 @@ const COL_MATRIX       = 'matrix_resources';
 const COL_PROGRESS     = 'progress';
 const COL_CHATS        = 'chats';
 const COL_CURRICULUM   = 'curriculum_chapters';
+const COL_SETTINGS     = 'system_settings';
 
 // ─── Helper ───────────────────────────────────────────────────────────────────
 
@@ -593,6 +594,33 @@ export const FirestoreService = {
       handleError('deleteCurriculumChapter', err);
     }
   },
+
+  // ─── System Settings ──────────────────────────────────────────────────────────
+
+  async getSystemSettings(): Promise<{ allowUserApiKey?: boolean }> {
+    try {
+      const docRef = doc(db, COL_SETTINGS, 'global');
+      const snap = await getDoc(docRef);
+      if (snap.exists()) {
+        return snap.data() as { allowUserApiKey?: boolean };
+      }
+      return { allowUserApiKey: true };
+    } catch (e) {
+      handleError('getSystemSettings', e);
+      return { allowUserApiKey: true };
+    }
+  },
+
+  async updateSystemSettings(settings: { allowUserApiKey?: boolean }): Promise<boolean> {
+    try {
+      const docRef = doc(db, COL_SETTINGS, 'global');
+      await setDoc(docRef, cleanForFirestore(settings), { merge: true });
+      return true;
+    } catch (e) {
+      handleError('updateSystemSettings', e);
+      return false;
+    }
+  }
 };
 
 export default FirestoreService;

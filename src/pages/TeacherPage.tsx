@@ -118,7 +118,7 @@ const CreateStudentDialog: React.FC<CreateStudentDialogProps> = ({
   const [name, setName] = useState('');
   const [useEmail, setUseEmail] = useState(true);
   const [identifier, setIdentifier] = useState('');
-  const [password, setPassword] = useState('');
+  const [studentNumber, setStudentNumber] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -127,20 +127,31 @@ const CreateStudentDialog: React.FC<CreateStudentDialogProps> = ({
     if (!name.trim()) { setError('Vui lòng nhập họ tên học sinh.'); return; }
     if (!identifier.trim()) { setError('Vui lòng nhập email hoặc username.'); return; }
 
+    // Validate số báo danh nếu có nhập
+    let parsedStudentNumber: number | undefined;
+    if (studentNumber.trim()) {
+      const n = parseInt(studentNumber.trim(), 10);
+      if (isNaN(n) || n < 1 || n > 99) {
+        setError('Số báo danh phải là số từ 1 đến 99.');
+        return;
+      }
+      parsedStudentNumber = n;
+    }
+
     setLoading(true);
     const data: CreateStudentData = {
       name: name.trim(),
       classId,
       schoolId,
+      studentNumber: parsedStudentNumber,
       ...(useEmail ? { email: identifier.trim() } : { username: identifier.trim() }),
-      ...(password.trim() ? { password: password.trim() } : {}),
     };
 
     const res = await createStudent(data);
     setLoading(false);
 
     if (res.success && res.credentials) {
-      setName(''); setIdentifier(''); setPassword(''); setError(null);
+      setName(''); setIdentifier(''); setStudentNumber(''); setError(null);
       onCreated(res.credentials);
       onClose();
     } else {
@@ -149,7 +160,7 @@ const CreateStudentDialog: React.FC<CreateStudentDialogProps> = ({
   };
 
   const handleClose = () => {
-    setName(''); setIdentifier(''); setPassword(''); setError(null);
+    setName(''); setIdentifier(''); setStudentNumber(''); setError(null);
     onClose();
   };
 
@@ -203,13 +214,15 @@ const CreateStudentDialog: React.FC<CreateStudentDialogProps> = ({
           </Box>
 
           <TextField
-            label="Mật khẩu (để trống để tạo tự động)"
+            variant="outlined"
+            label="Số báo danh (để trống để tự lấy số tiếp theo)"
             fullWidth
-            value={password}
-            onChange={e => setPassword(e.target.value)}
+            value={studentNumber}
+            onChange={e => setStudentNumber(e.target.value)}
             disabled={loading}
-            type="password"
-            helperText="Nếu để trống, hệ thống sẽ tạo mật khẩu ngẫu nhiên mạnh."
+            type="number"
+            {...({ inputProps: { min: 1, max: 99 } } as any)}
+            helperText="Mật khẩu sẽ được tạo tự động theo format: {TÊN_LỚP}_{SBD}_{4 ký tự ngẫu nhiên}"
             sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
           />
         </Box>

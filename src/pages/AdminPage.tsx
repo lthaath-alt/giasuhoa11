@@ -19,6 +19,7 @@ import LibraryManagement from '../core/components/LibraryManagement';
 import DatabankManagement from '../core/components/DatabankManagement';
 import PasswordManagement from '../core/components/PasswordManagement';
 import ErrorManagement from '../core/components/ErrorManagement';
+import SystemSettingsManagement from '../core/components/SystemSettingsManagement';
 import { CreateTeacherDialog, CreateClassDialog, CreateSchoolAdminDialog, CredentialInfo, CredentialDialog } from '../features/admin/components/shared/SchoolDialogs';
 
 export const AdminPage: React.FC = () => {
@@ -160,6 +161,7 @@ export const AdminPage: React.FC = () => {
           databankContent={<DatabankManagement />}
           passwordContent={<PasswordManagement users={users} />}
           errorContent={<ErrorManagement />}
+          settingsContent={<SystemSettingsManagement />}
         />
       </Container>
 

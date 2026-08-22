@@ -3,13 +3,21 @@ import { ChatMessage } from '../../auth/types';
 import { getSession } from './aiMockService';
 import { ErrorLogService } from '../../../core/services/errorLog';
 
-// Initialize Gemini SDK
-// Lấy key từ VITE_GEMINI_API_KEY hoặc GEMINI_API_KEY nếu có
-const apiKey = import.meta.env.VITE_GEMINI_API_KEY || import.meta.env.GEMINI_API_KEY || 'MISSING_API_KEY';
-const ai = new GoogleGenAI({ apiKey: apiKey });
-
 // Model version
 const MODEL_NAME = 'gemini-2.5-flash';
+
+// Get effective API key from localStorage or env
+export const getEffectiveApiKey = (): string => {
+  const userKey = localStorage.getItem('gemini_api_key_user');
+  if (userKey) return userKey;
+  return import.meta.env.VITE_GEMINI_API_KEY || import.meta.env.GEMINI_API_KEY || 'MISSING_API_KEY';
+};
+
+// Create a new instance dynamically
+const getAiInstance = () => {
+  return new GoogleGenAI({ apiKey: getEffectiveApiKey() });
+};
+
 
 const SYSTEM_PROMPT = `VAI TRÒ
 Bạn là "Gia sư Hóa học Thông minh", một chuyên gia sư phạm Hóa học 11 theo phương pháp Socratic. Nhiệm vụ của bạn là dẫn dắt học sinh tự tìm ra câu trả lời, tuyệt đối không bao giờ cung cấp đáp án trực tiếp cho bài tập hoặc câu hỏi của học sinh.
@@ -103,7 +111,7 @@ export const generateAIResponse = async (
   history: ChatMessage[],
   userEmail: string = 'guest'
 ): Promise<string> => {
-  if (apiKey === 'MISSING_API_KEY' || !apiKey) {
+  if (getEffectiveApiKey() === 'MISSING_API_KEY' || !getEffectiveApiKey()) {
     console.warn('Thiếu GEMINI_API_KEY. Fallback sang mock service.');
     // Lazy load mock service để tránh import circular hoặc phụ thuộc cứng
     const { generateAIResponse: mockGenerate } = await import('./aiMockService');
@@ -116,7 +124,7 @@ export const generateAIResponse = async (
     // Rút trích user message cuối ra khỏi history để truyền vào tham số message riêng
     const latestMessage = formattedHistory.pop()?.parts[0].text || '';
 
-    const response = await ai.models.generateContent({
+    const response = await getAiInstance().models.generateContent({
       model: MODEL_NAME,
       contents: formattedHistory.concat({ role: 'user', parts: [{ text: latestMessage }] }),
       config: {
@@ -142,7 +150,18 @@ export const generateAIResponse = async (
       userEmail: userEmail
     });
 
-    // Fallback sang mock service nếu gọi thật bị lỗi
+    // Check for 429 quota exceeded error
+    const msg = error?.message?.toLowerCase() || '';
+    if (msg.includes('429') || msg.includes('quota') || msg.includes('rate limit')) {
+      return 'Hệ thống AI đang quá tải hoặc hết lượt sử dụng. Vui lòng cập nhật API key mới trong cài đặt ⚙️ hoặc thử lại sau ít phút nhé!';
+    }
+
+    // Check for 400 bad request / Invalid API Key
+    if (msg.includes('api_key_invalid') || msg.includes('api key not valid')) {
+      return 'API key không hợp lệ. Vui lòng kiểm tra lại API key trong cài đặt ⚙️ nhé!';
+    }
+
+    // Fallback sang mock service nếu gọi thật bị lỗi (nhưng không phải do quota/key)
     const { generateAIResponse: mockGenerate } = await import('./aiMockService');
     return mockGenerate(lessonId, userQuestion, history, userEmail);
   }

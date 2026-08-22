@@ -74,6 +74,12 @@ export interface User {
    * Học sinh có thể chuyển từ 'free_user' sang 'student' khi join.
    */
   joinedClassId?: string;
+
+  /**
+   * Số báo danh trong lớp (chỉ áp dụng cho học sinh được GV tạo tài khoản).
+   * Dùng để sinh mật khẩu có cấu trúc: {TÊN_LỚP}_{SBD:02d}_{4random}.
+   */
+  studentNumber?: number;
 }
 
 // ─── School ──────────────────────────────────────────────────────────────────

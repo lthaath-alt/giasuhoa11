@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
 import { User, ChatMessage, LearningProgress, School, SchoolClass } from '../../features/auth/types';
 import { Chapter, Lesson } from '../../features/lessons/types';
-import { generateRandomPassword, generateInviteCode, GuestChatStorage, mergeCurriculumWithConstants } from '../services/storage';
+import { generateRandomPassword, generateInviteCode, generateClassPassword, GuestChatStorage, mergeCurriculumWithConstants } from '../services/storage';
 import { generateAIResponse } from '../../features/tutor/services/geminiTutorService';
 import {
   getRemainingCooldown,
@@ -42,10 +42,12 @@ export interface CreateStudentData {
   email?: string;
   /** Username nội bộ (nếu không có email). Ít nhất 1 trong 2 phải có. */
   username?: string;
-  /** Nếu không truyền, hệ thống tự tạo mật khẩu ngẫu nhiên */
+  /** Nếu không truyền, hệ thống tự tạo mật khẩu theo cấu trúc lớp */
   password?: string;
   classId: string;
   schoolId: string;
+  /** Số báo danh trong lớp. Nếu không truyền, tự lấy số tiếp theo. */
+  studentNumber?: number;
 }
 
 /** Thông tin đăng nhập hiển thị cho Admin/GV sau khi tạo tài khoản */
@@ -270,6 +272,10 @@ export interface AppContextType {
     questionId: string,
     newScore: number
   ) => Promise<{ success: boolean; message: string }>;
+
+  // ── Cài đặt hệ thống ─────────────────────────────────────────────────────────
+  systemSettings: { allowUserApiKey?: boolean };
+  updateSystemSettings: (settings: { allowUserApiKey?: boolean }) => Promise<boolean>;
 }
 
 // ─── Context & Provider ───────────────────────────────────────────────────────
@@ -293,6 +299,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [equations, setEquations] = useState<Equation[]>([]);
   const [matrixResources, setMatrixResources] = useState<MatrixResource[]>([]);
   const [libraryQuestions, setLibraryQuestions] = useState<Question[]>([]);
+  const [systemSettings, setSystemSettings] = useState<{ allowUserApiKey?: boolean }>({ allowUserApiKey: true });
 
   // ── Progress cache (load theo user khi đăng nhập) ─────────────────────────
   const [progressCache, setProgressCache] = useState<Record<string, LearningProgress>>({});
@@ -315,6 +322,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         allEqs,
         allMatrix,
         curriculumOverrides,
+        settings,
       ] = await Promise.all([
         FirestoreService.getUsers(),
         FirestoreService.getSchools(),
@@ -324,6 +332,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         FirestoreService.getEquations(),
         FirestoreService.getMatrixResources(),
         FirestoreService.getCurriculumOverrides(),
+        FirestoreService.getSystemSettings(),
       ]);
 
       // 3. Migrate role cũ 'admin' → 'super_admin' (nếu còn sót)
@@ -339,6 +348,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       setExams(allExams);
       setEquations(allEqs);
       setMatrixResources(allMatrix);
+      setSystemSettings(settings);
 
       // 5. Merge curriculum với constants
       setCurriculum(mergeCurriculumWithConstants(curriculumOverrides));
@@ -916,7 +926,32 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       if (existing) return { success: false, message: `Username "${data.username}" đã được sử dụng.` };
     }
 
-    const password = data.password || generateRandomPassword();
+    // Xác định số báo danh
+    const targetClass = classes.find(c => c.id === data.classId);
+    const classStudents = users.filter(u =>
+      u.classId === data.classId && u.role === 'student' && u.studentNumber !== undefined
+    );
+
+    let studentNumber: number;
+    if (data.studentNumber !== undefined) {
+      // Kiểm tra không trùng
+      const duplicate = classStudents.find(u => u.studentNumber === data.studentNumber);
+      if (duplicate) {
+        return { success: false, message: `Số báo danh ${data.studentNumber} đã được sử dụng bởi học sinh "${duplicate.name}".` };
+      }
+      studentNumber = data.studentNumber;
+    } else {
+      // Tự động lấy số tiếp theo
+      const maxNum = classStudents.reduce((max, u) => Math.max(max, u.studentNumber ?? 0), 0);
+      studentNumber = maxNum + 1;
+    }
+
+    // Sinh mật khẩu có cấu trúc nếu thuộc lớp
+    const password = data.password || (
+      targetClass
+        ? generateClassPassword(targetClass.name, studentNumber)
+        : generateRandomPassword()
+    );
     const identifier = data.email || data.username!;
     const id = `uid_student_${Date.now()}`;
 
@@ -931,6 +966,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       authProvider: 'local',
       schoolId: data.schoolId,
       classId: data.classId,
+      studentNumber,
       canChangePassword: false,
       createdAt: new Date().toISOString(),
     };
@@ -1482,6 +1518,14 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
   // ── Provider ──────────────────────────────────────────────────────────────
 
+  const updateSystemSettings = async (settings: { allowUserApiKey?: boolean }) => {
+    const success = await FirestoreService.updateSystemSettings(settings);
+    if (success) {
+      setSystemSettings(prev => ({ ...prev, ...settings }));
+    }
+    return success;
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -1543,6 +1587,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         createClassSelf,
         joinClassByCode,
         updateQuizEssayScore,
+        systemSettings,
+        updateSystemSettings,
       }}
     >
       {children}

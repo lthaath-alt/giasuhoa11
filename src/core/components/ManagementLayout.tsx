@@ -19,6 +19,7 @@ import {
   Menu,
   X,
   Construction,
+  Settings,
 } from 'lucide-react';
 
 // ─── Sidebar menu items ───────────────────────────────────────────────────────
@@ -36,6 +37,7 @@ const SIDEBAR_ITEMS: SidebarItem[] = [
   { id: 'databank',   label: 'Ngân hàng dữ liệu',          icon: <Database size={18} /> },
   { id: 'password',   label: 'Quản lý Mật khẩu',           icon: <Key size={18} /> },
   { id: 'errors',     label: 'Chỉ số Lỗi Hệ thống',        icon: <AlertTriangle size={18} /> },
+  { id: 'settings',   label: 'Cài đặt hệ thống',           icon: <Settings size={18} /> },
 ];
 
 // ─── Stat Card ────────────────────────────────────────────────────────────────
@@ -181,6 +183,8 @@ export interface ManagementLayoutProps {
   passwordContent?: ReactNode;
   /** Nội dung tùy chỉnh cho mục "Chỉ số Lỗi Hệ thống" */
   errorContent?: ReactNode;
+  /** Nội dung tùy chỉnh cho mục "Cài đặt Hệ thống" */
+  settingsContent?: ReactNode;
 }
 
 export const ManagementLayout: React.FC<ManagementLayoutProps> = ({
@@ -195,6 +199,7 @@ export const ManagementLayout: React.FC<ManagementLayoutProps> = ({
   databankContent,
   passwordContent,
   errorContent,
+  settingsContent,
 }) => {
   const [activeItem, setActiveItem] = useState('accounts');
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -222,6 +227,8 @@ export const ManagementLayout: React.FC<ManagementLayoutProps> = ({
         return passwordContent || <PlaceholderContent title="Quản lý Mật khẩu" />;
       case 'errors':
         return errorContent || <PlaceholderContent title="Chỉ số Lỗi Hệ thống" />;
+      case 'settings':
+        return settingsContent || <PlaceholderContent title="Cài đặt hệ thống" />;
       default:
         return <PlaceholderContent title="Quản lý Tài khoản" />;
     }
