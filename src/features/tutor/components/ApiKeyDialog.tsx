@@ -6,6 +6,7 @@ import {
 } from '@mui/material';
 import { Eye, EyeOff, Key, CheckCircle, ExternalLink, Save, Trash2 } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
+import { GEMINI_MODEL_NAME } from '../../../core/constants';
 
 interface ApiKeyDialogProps {
   open: boolean;
@@ -40,7 +41,7 @@ export const ApiKeyDialog: React.FC<ApiKeyDialogProps> = ({ open, onClose }) => 
     try {
       const ai = new GoogleGenAI({ apiKey: apiKey.trim() });
       const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: GEMINI_MODEL_NAME,
         contents: 'Say "hello" in Vietnamese, just that word.',
         config: { maxOutputTokens: 10 }
       });

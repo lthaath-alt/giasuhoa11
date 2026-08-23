@@ -2,9 +2,7 @@ import { GoogleGenAI } from '@google/genai';
 import { ChatMessage } from '../../auth/types';
 import { getSession } from './aiMockService';
 import { ErrorLogService } from '../../../core/services/errorLog';
-
-// Model version
-const MODEL_NAME = 'gemini-2.5-flash';
+import { GEMINI_MODEL_NAME } from '../../../core/constants';
 
 // Get effective API key from localStorage or env
 export const getEffectiveApiKey = (): string => {
@@ -125,7 +123,7 @@ export const generateAIResponse = async (
     const latestMessage = formattedHistory.pop()?.parts[0].text || '';
 
     const response = await getAiInstance().models.generateContent({
-      model: MODEL_NAME,
+      model: GEMINI_MODEL_NAME,
       contents: formattedHistory.concat({ role: 'user', parts: [{ text: latestMessage }] }),
       config: {
         systemInstruction: SYSTEM_PROMPT,
