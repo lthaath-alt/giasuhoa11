@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Box, Typography, Card, Chip, Button, Dialog, IconButton, Grid } from '@mui/material';
-import { Gamepad2, Play, Lock, X } from 'lucide-react';
+import { Box, Typography, Card, Chip, Button, Dialog, IconButton } from '@mui/material';
+import { Gamepad2, Play, X } from 'lucide-react';
+import { DetectiveArt, PipelineArt, IUPACArt, BalanceArt, TowerArt } from './GameArt';
 
 interface GameData {
   id: string;
@@ -9,7 +10,7 @@ interface GameData {
   description: string;
   status: 'active' | 'soon';
   path?: string;
-  icon?: React.ReactNode;
+  art: React.ReactNode;
 }
 
 const GAMES: GameData[] = [
@@ -20,7 +21,7 @@ const GAMES: GameData[] = [
     description: 'Nhận biết 4 dung dịch mất nhãn bằng thuốc thử và suy luận loại trừ. Chiến dịch 5 vụ án.',
     status: 'active',
     path: '/games/tham-tu-hoa-chat.html',
-    icon: <Gamepad2 size={24} />,
+    art: <DetectiveArt />,
   },
   {
     id: 'duong-ong',
@@ -28,7 +29,7 @@ const GAMES: GameData[] = [
     chapter: 'Chương 2 — Nitrogen & Phosphorus',
     description: 'Kéo thả điều kiện phản ứng để hoàn thành sơ đồ chuyển hóa.',
     status: 'soon',
-    icon: <Lock size={24} />,
+    art: <PipelineArt />,
   },
   {
     id: 'ghep-ten',
@@ -36,7 +37,7 @@ const GAMES: GameData[] = [
     chapter: 'Chương 3 — Đại cương hữu cơ',
     description: 'Lật thẻ ghép công thức cấu tạo với tên gọi đúng.',
     status: 'soon',
-    icon: <Lock size={24} />,
+    art: <IUPACArt />,
   },
   {
     id: 'can-bang',
@@ -44,7 +45,7 @@ const GAMES: GameData[] = [
     chapter: 'Chương 4 — Hydrocarbon',
     description: 'Cân bằng phương trình trước khi hết giờ, có combo điểm.',
     status: 'soon',
-    icon: <Lock size={24} />,
+    art: <BalanceArt />,
   },
   {
     id: 'leo-thap',
@@ -52,7 +53,7 @@ const GAMES: GameData[] = [
     chapter: 'Ôn tổng hợp 6 chương',
     description: '15 câu tăng dần độ khó, có mốc an toàn và quyền trợ giúp hỏi gia sư AI.',
     status: 'soon',
-    icon: <Lock size={24} />,
+    art: <TowerArt />,
   },
 ];
 
@@ -70,16 +71,38 @@ export const GameHubSection: React.FC = () => {
   };
 
   return (
-    <Box sx={{ width: '100%', mb: 4 }}>
+    <Box
+      sx={{
+        width: '100%',
+        bgcolor: '#f7f9fc',
+        borderRadius: 3,
+        p: 3,
+        mb: 0,
+      }}
+    >
+      {/* Header */}
       <Box sx={{ mb: 3 }}>
-        <Typography variant="h5" sx={{ fontWeight: 900, color: '#0056a3', mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Gamepad2 size={28} /> Học Hóa 11 Qua Trò Chơi
+        <Typography
+          variant="h4"
+          sx={{
+            fontWeight: 900,
+            color: '#1e50a2',
+            mb: 0.5,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1.5,
+          }}
+        >
+          <Gamepad2 size={32} /> Học Hóa 11 Qua Trò Chơi
         </Typography>
+        {/* Gạch ngang cam */}
+        <Box sx={{ width: 56, height: 4, bgcolor: '#f5a623', borderRadius: 2, mb: 1 }} />
         <Typography variant="body1" sx={{ color: '#64748b' }}>
           Chơi để hiểu bản chất, không phải để học thuộc đáp án.
         </Typography>
       </Box>
 
+      {/* Grid thẻ game */}
       <Box
         sx={{
           display: 'grid',
@@ -92,20 +115,29 @@ export const GameHubSection: React.FC = () => {
             key={game.id}
             sx={{
               position: 'relative',
-              p: 3,
-              borderRadius: 3,
+              borderRadius: '16px',
               display: 'flex',
               flexDirection: 'column',
               bgcolor: '#ffffff',
-              border: game.status === 'active' ? '2px solid #007bf2' : '1px solid #e2e8f0',
+              border: game.status === 'active' ? '2px solid #1e50a2' : '1px solid #e2e8f0',
               opacity: game.status === 'soon' ? 0.55 : 1,
-              boxShadow: game.status === 'active' ? '0 8px 24px rgba(0, 123, 242, 0.15)' : 'none',
-              transition: 'transform 0.2s',
-              '&:hover': {
-                transform: game.status === 'active' ? 'translateY(-4px)' : 'none',
-              },
+              boxShadow:
+                game.status === 'active'
+                  ? '0 4px 16px rgba(30, 80, 162, 0.12)'
+                  : '0 2px 8px rgba(0,0,0,0.06)',
+              transition: 'transform 0.2s, box-shadow 0.2s',
+              overflow: 'hidden',
+              cursor: game.status === 'active' ? 'pointer' : 'default',
+              '&:hover':
+                game.status === 'active'
+                  ? {
+                      transform: 'translateY(-4px)',
+                      boxShadow: '0 12px 32px rgba(30, 80, 162, 0.2)',
+                    }
+                  : {},
             }}
           >
+            {/* Chip sắp ra mắt */}
             {game.status === 'soon' && (
               <Chip
                 label="Sắp ra mắt"
@@ -114,45 +146,43 @@ export const GameHubSection: React.FC = () => {
                   position: 'absolute',
                   top: 12,
                   right: 12,
-                  bgcolor: '#ea580c',
+                  bgcolor: '#f5a623',
                   color: '#ffffff',
                   fontWeight: 'bold',
+                  zIndex: 2,
                 }}
               />
             )}
-            
-            <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1.5 }}>
-              <Box
-                sx={{
-                  p: 1.5,
-                  borderRadius: 2,
-                  bgcolor: game.status === 'active' ? 'rgba(0, 123, 242, 0.1)' : '#f1f5f9',
-                  color: game.status === 'active' ? '#007bf2' : '#94a3b8',
-                  flexShrink: 0,
-                }}
-              >
-                {game.icon}
-              </Box>
-              <Box sx={{ minWidth: 0, overflow: 'hidden', pr: game.status === 'soon' ? 7 : 0 }}>
-                <Typography 
-                  variant="caption" 
-                  sx={{ 
-                    color: '#ea580c', 
+
+            {/* Hình minh họa SVG */}
+            <Box sx={{ overflow: 'hidden', flexShrink: 0 }}>
+              {game.art}
+            </Box>
+
+            {/* Nội dung thẻ */}
+            <Box sx={{ p: 2.5, display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+              {/* Tên chương + tên game */}
+              <Box sx={{ mb: 1.5, minWidth: 0 }}>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: '#f5a623',
                     fontWeight: 'bold',
                     display: 'block',
                     whiteSpace: 'nowrap',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
+                    pr: game.status === 'soon' ? 0 : 0,
                   }}
                 >
                   {game.chapter}
                 </Typography>
-                <Typography 
-                  variant="subtitle1" 
-                  sx={{ 
-                    fontWeight: 'bold', 
-                    color: '#0f172a', 
-                    lineHeight: 1.2,
+                <Typography
+                  variant="subtitle1"
+                  sx={{
+                    fontWeight: 800,
+                    color: '#0f172a',
+                    lineHeight: 1.25,
                     display: 'block',
                     whiteSpace: 'nowrap',
                     overflow: 'hidden',
@@ -162,39 +192,43 @@ export const GameHubSection: React.FC = () => {
                   {game.title}
                 </Typography>
               </Box>
-            </Box>
-            
-            <Typography variant="body2" sx={{ color: '#475569', mb: 3, flexGrow: 1 }}>
-              {game.description}
-            </Typography>
 
-            <Button
-              variant={game.status === 'active' ? 'contained' : 'outlined'}
-              disabled={game.status === 'soon'}
-              onClick={() => handleOpenGame(game)}
-              startIcon={game.status === 'active' ? <Play size={18} /> : null}
-              sx={{
-                textTransform: 'none',
-                fontWeight: 'bold',
-                borderRadius: 2,
-                bgcolor: game.status === 'active' ? '#007bf2' : 'transparent',
-                '&:hover': {
-                  bgcolor: game.status === 'active' ? '#0056a3' : 'transparent',
-                },
-              }}
-            >
-              {game.status === 'active' ? 'Chơi ngay' : 'Đang phát triển'}
-            </Button>
+              <Typography variant="body2" sx={{ color: '#475569', mb: 2.5, flexGrow: 1, lineHeight: 1.6 }}>
+                {game.description}
+              </Typography>
+
+              {/* Nút */}
+              <Button
+                variant={game.status === 'active' ? 'contained' : 'outlined'}
+                disabled={game.status === 'soon'}
+                onClick={() => handleOpenGame(game)}
+                startIcon={game.status === 'active' ? <Play size={18} /> : null}
+                sx={{
+                  textTransform: 'none',
+                  fontWeight: 'bold',
+                  borderRadius: 5,
+                  background:
+                    game.status === 'active'
+                      ? 'linear-gradient(90deg, #1e50a2 0%, #007bf2 100%)'
+                      : 'transparent',
+                  color: game.status === 'active' ? '#ffffff' : undefined,
+                  '&:hover':
+                    game.status === 'active'
+                      ? {
+                          background: 'linear-gradient(90deg, #16407e 0%, #0056a3 100%)',
+                        }
+                      : {},
+                }}
+              >
+                {game.status === 'active' ? 'Chơi ngay' : 'Đang phát triển'}
+              </Button>
+            </Box>
           </Card>
         ))}
       </Box>
 
       {/* Game Modal */}
-      <Dialog
-        fullScreen
-        open={Boolean(activeGame)}
-        onClose={handleCloseGame}
-      >
+      <Dialog fullScreen open={Boolean(activeGame)} onClose={handleCloseGame}>
         {activeGame && (
           <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
             <Box
@@ -204,7 +238,7 @@ export const GameHubSection: React.FC = () => {
                 justifyContent: 'space-between',
                 px: 2,
                 py: 1,
-                bgcolor: '#0056a3',
+                bgcolor: '#1e50a2',
                 color: '#ffffff',
                 boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
               }}

@@ -323,33 +323,6 @@ export const DashboardPage: React.FC = () => {
                 /* NẾU CHƯA CHỌN BÀI HỌC -> RENDER TRANG CHỦ QUẢNG BÁ CHUẨN HOCMAI.VN */
                 <Box id="hocmai-homepage-content">
                   
-                  {/* QUẢNG CÁO ĐẶC BIỆT CHẠY CHỮ TRÊN CÙNG */}
-                  <Paper
-                    sx={{
-                      p: 1.5,
-                      mb: 3,
-                      bgcolor: '#fff7ed',
-                      border: '1px solid #ffedd5',
-                      borderRadius: 2,
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 1.5,
-                    }}
-                  >
-                    <Box sx={{ px: 1.5, py: 0.3, bgcolor: '#ea580c', color: '#ffffff', borderRadius: 1.5, fontSize: '0.75rem', fontWeight: 'bold' }}>
-                      BÙNG NỔ
-                    </Box>
-                    <Typography variant="body2" sx={{ fontWeight: 'bold', color: '#ea580c' }}>
-                      🔥 HỆ THỐNG CHÍNH THỨC MỞ ĐĂNG KÝ KHÓA HỌC XUẤT PHÁT SỚM - GIẢM NGAY 30% HỌC PHÍ {'>>'}{' '}
-                      <span 
-                        style={{ textDecoration: 'underline', cursor: 'pointer' }}
-                        onClick={() => navigate('/login')}
-                      >
-                        Đăng ký ngay hôm nay!
-                      </span>
-                    </Typography>
-                  </Paper>
-
                   <Box
                     sx={{
                       display: 'grid',
@@ -369,80 +342,38 @@ export const DashboardPage: React.FC = () => {
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                       
                       {/* KHU VỰC TRÒ CHƠI HÓA HỌC */}
-                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                        <GameHubSection />
-                      </Box>
+                      <GameHubSection />
 
-
-                      {/* QUẢNG CÁO NGƯỜI DÙNG & ĐÁNH GIÁ (USER TESTIMONIALS) */}
-                      <Box>
-                        <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 3, textAlign: 'center', color: '#0f172a' }}>
-                          Ý Kiến Học Viên & Phụ Huynh Tin Tưởng Sử Dụng
-                        </Typography>
-                        <Box
-                          sx={{
-                            display: 'grid',
-                            gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
-                            gap: 2,
-                          }}
-                        >
-                          <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid #e2e8f0', bgcolor: '#ffffff' }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                              <Avatar sx={{ bgcolor: '#0f766e', color: '#ffffff', fontWeight: 'bold' }}>LA</Avatar>
-                              <Box>
-                                <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>Trần Lan Anh</Typography>
-                                <Typography variant="caption" color="text.secondary">Học sinh lớp 11A1 THPT Chu Văn An</Typography>
-                              </Box>
-                              <Box sx={{ ml: 'auto' }}>
-                                <Rating value={5} readOnly size="small" />
-                              </Box>
-                            </Box>
-                            <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
-                              "Gia sư AI của hệ thống rất đặc biệt! Thầy xưng là thầy và gọi em rất ấm áp. Khi em bí bài tập tính pH, thầy không cho ngay kết quả mà chỉ ra cho em bản chất điện li là gì, rồi hỏi em tính nồng độ OH- thế nào. Nhờ thầy gợi ý từng bước mà em tự làm được bài và hiểu bài cực kì sâu sắc."
-                            </Typography>
-                          </Paper>
-
-                          <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid #e2e8f0', bgcolor: '#ffffff' }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                              <Avatar sx={{ bgcolor: '#ea580c', color: '#ffffff', fontWeight: 'bold' }}>MĐ</Avatar>
-                              <Box>
-                                <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>Nguyễn Minh Đức</Typography>
-                                <Typography variant="caption" color="text.secondary">Học sinh lớp 11 Lý THPT Chuyên Hà Nội-Amsterdam</Typography>
-                              </Box>
-                              <Box sx={{ ml: 'auto' }}>
-                                <Rating value={5} readOnly size="small" />
-                              </Box>
-                            </Box>
-                            <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
-                              "Em từng học qua nhiều chatbot nhưng chỉ có gia sư AI ở đây là kiên nhẫn nhất. Thầy hướng dẫn từng bước, gỡ rối lý thuyết trơ của khí Nitrogen hay quy luật nhiệt phân muối Nitrate rất dễ hiểu. Điểm thi giữa kì Hóa của em đạt 9.5 nhờ tự luyện cùng thầy hàng ngày!"
-                            </Typography>
-                          </Paper>
-                        </Box>
-                      </Box>
-
-                      {/* FOOTER QUẢNG CÁO GHI DANH */}
+                      {/* KHỐI ĐĂNG KÝ — NẰM NGAY DƯỚI LƯỚI GAME */}
                       <Paper
                         sx={{
-                          p: 4,
-                          borderRadius: 4,
+                          px: 4,
+                          py: 3,
+                          borderRadius: 3,
                           background: 'radial-gradient(circle, #fff7ed 0%, #ffedd5 100%)',
                           border: '1px solid #fed7aa',
-                          textAlign: 'center',
+                          display: 'flex',
+                          flexDirection: { xs: 'column', sm: 'row' },
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          gap: 2,
                           boxShadow: '0 4px 20px rgba(234, 88, 12, 0.04)',
                         }}
                       >
-                        <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#c2410c', mb: 1 }}>
-                          Em Đã Sẵn Sàng Trở Thành Thủ Khoa Hóa Học Tiếp Theo?
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary" sx={{ maxW: 600, mx: 'auto', mb: 3 }}>
-                          Hãy tạo ngay một tài khoản học sinh miễn phí để được lưu trữ tiến trình tự học, lưu lại lịch sử chat với Thầy Gia sư và nhận thêm nhiều đề thi tự luyện độc quyền!
-                        </Typography>
+                        <Box sx={{ flex: 1 }}>
+                          <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#c2410c', mb: 0.5 }}>
+                            Chơi Xong Rồi, Học Tiếp Thôi!
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            Tạo tài khoản miễn phí để lưu tiến trình chơi, mở khóa đầy đủ 6 chương Hóa 11 và hỏi Thầy Gia sư AI bất cứ lúc nào.
+                          </Typography>
+                        </Box>
                         <Button
                           variant="contained"
                           color="warning"
                           size="large"
                           onClick={() => navigate('/login')}
-                          sx={{ px: 4, py: 1.5, borderRadius: 20, fontWeight: 'bold', fontSize: '1rem' }}
+                          sx={{ px: 3, py: 1.2, borderRadius: 20, fontWeight: 'bold', fontSize: '0.9rem', flexShrink: 0 }}
                         >
                           ĐĂNG KÝ HỌC THỬ MIỄN PHÍ NGAY
                         </Button>
