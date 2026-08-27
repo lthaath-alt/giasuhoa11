@@ -1,135 +1,136 @@
 import React from 'react';
 
-// 1. Thám Tử Hóa Chất: 4 ống nghiệm đứng trên giá gỗ, mực dung dịch khác nhau, ống thứ 2 đang sủi bọt (3-4 vòng tròn nhỏ nổi lên). Bên phải có kính lúp lớn nghiêng 45 độ soi vào.
+type FrameProps = { bg: string; children: React.ReactNode };
+
+const ArtFrame: React.FC<FrameProps> = ({ bg, children }) => (
+  <svg
+    viewBox="0 0 320 150"
+    width="100%"
+    height="100%"
+    preserveAspectRatio="xMidYMid slice"
+    xmlns="http://www.w3.org/2000/svg"
+    style={{ display: 'block' }}
+  >
+    <rect x="-100" y="-80" width="520" height="310" fill={bg} />
+    {children}
+  </svg>
+);
+
+const BLUE = '#1e50a2';
+const SKY = '#6aa8e8';
+const ORANGE = '#f5a623';
+const WHITE = '#ffffff';
+
+const tube = (cx: number, level: number, fill: string) => (
+  <g key={cx}>
+    <path d={`M ${cx - 11} 38 V 101 A 11 11 0 0 0 ${cx + 11} 101 V 38 Z`} fill={WHITE} stroke={BLUE} strokeWidth="3.5" />
+    <path d={`M ${cx - 8.5} ${level} V 101 A 8.5 8.5 0 0 0 ${cx + 8.5} 101 V ${level} Z`} fill={fill} />
+    <ellipse cx={cx} cy="38" rx="11" ry="3" fill={WHITE} stroke={BLUE} strokeWidth="3.5" />
+  </g>
+);
+
 export const DetectiveArt = () => (
-  <svg viewBox="0 0 320 180" width="100%" height="auto" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect width="320" height="180" fill="#6aa8e8" opacity="0.2"/>
-    {/* Giá gỗ (màu cam sậm) */}
-    <rect x="60" y="130" width="140" height="20" rx="4" fill="#f5a623" />
-    {/* Ống nghiệm 1 */}
-    <path d="M 80 70 L 80 140 A 10 10 0 0 0 100 140 L 100 70 Z" stroke="#1e50a2" strokeWidth="4" fill="#ffffff" />
-    <path d="M 82 100 L 82 140 A 8 8 0 0 0 98 140 L 98 100 Z" fill="#6aa8e8" />
-    {/* Ống nghiệm 2 (sủi bọt) */}
-    <path d="M 110 70 L 110 140 A 10 10 0 0 0 130 140 L 130 70 Z" stroke="#1e50a2" strokeWidth="4" fill="#ffffff" />
-    <path d="M 112 110 L 112 140 A 8 8 0 0 0 128 140 L 128 110 Z" fill="#6aa8e8" />
-    <circle cx="120" cy="100" r="3" fill="#ffffff" stroke="#1e50a2" strokeWidth="2"/>
-    <circle cx="116" cy="90" r="2" fill="#ffffff" stroke="#1e50a2" strokeWidth="1"/>
-    <circle cx="124" cy="82" r="2" fill="#ffffff" stroke="#1e50a2" strokeWidth="1"/>
-    {/* Ống nghiệm 3 */}
-    <path d="M 140 70 L 140 140 A 10 10 0 0 0 160 140 L 160 70 Z" stroke="#1e50a2" strokeWidth="4" fill="#ffffff" />
-    <path d="M 142 90 L 142 140 A 8 8 0 0 0 158 140 L 158 90 Z" fill="#f5a623" />
-    {/* Ống nghiệm 4 */}
-    <path d="M 170 70 L 170 140 A 10 10 0 0 0 190 140 L 190 70 Z" stroke="#1e50a2" strokeWidth="4" fill="#ffffff" />
-    <path d="M 172 120 L 172 140 A 8 8 0 0 0 188 140 L 188 120 Z" fill="#1e50a2" />
-    {/* Kính lúp */}
-    <g transform="translate(190, 40) rotate(45)">
-      <circle cx="40" cy="40" r="30" fill="#ffffff" stroke="#1e50a2" strokeWidth="6"/>
-      <circle cx="40" cy="40" r="24" fill="#6aa8e8" opacity="0.3"/>
-      <rect x="36" y="70" width="8" height="40" rx="4" fill="#f5a623" stroke="#1e50a2" strokeWidth="4"/>
-    </g>
-  </svg>
+  <ArtFrame bg="#e8f0fb">
+    <rect x="60" y="110" width="128" height="13" rx="5" fill={ORANGE} />
+    <rect x="66" y="123" width="10" height="8" rx="2" fill={ORANGE} />
+    <rect x="172" y="123" width="10" height="8" rx="2" fill={ORANGE} />
+    {tube(80, 68, SKY)}
+    {tube(112, 79, SKY)}
+    {tube(144, 58, ORANGE)}
+    {tube(176, 88, BLUE)}
+    <circle cx="112" cy="70" r="3.6" fill={WHITE} stroke={BLUE} strokeWidth="1.8" />
+    <circle cx="107" cy="59" r="2.6" fill={WHITE} stroke={BLUE} strokeWidth="1.5" />
+    <circle cx="117" cy="50" r="2" fill={WHITE} stroke={BLUE} strokeWidth="1.3" />
+    <line x1="234" y1="80" x2="256" y2="106" stroke={ORANGE} strokeWidth="10" strokeLinecap="round" />
+    <line x1="234" y1="80" x2="256" y2="106" stroke={BLUE} strokeWidth="4" strokeLinecap="round" opacity="0.35" />
+    <circle cx="217" cy="61" r="26" fill={WHITE} opacity="0.9" />
+    <circle cx="217" cy="61" r="26" fill="none" stroke={BLUE} strokeWidth="7" />
+    <path d="M 203 51 Q 209 44 219 44" stroke={SKY} strokeWidth="4" fill="none" strokeLinecap="round" />
+  </ArtFrame>
 );
 
-// 2. Đường Ống Chuyển Hóa: 4 vòng tròn nối nhau bằng mũi tên cong. Vòng tròn 3 nét đứt.
+const node = (cx: number, fill: string) => (
+  <g key={cx}>
+    <circle cx={cx} cy="75" r="22" fill={fill} />
+    <circle cx={cx} cy="75" r="8.5" fill={WHITE} />
+  </g>
+);
+
+const arrow = (x: number) => (
+  <path key={x} d={`M ${x - 4} 67 L ${x + 4} 75 L ${x - 4} 83`} fill="none" stroke={BLUE} strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+);
+
 export const PipelineArt = () => (
-  <svg viewBox="0 0 320 180" width="100%" height="auto" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect width="320" height="180" fill="#6aa8e8" opacity="0.1"/>
-    {/* Mũi tên */}
-    <path d="M 60 90 Q 95 50 130 90" stroke="#1e50a2" strokeWidth="4" fill="none" markerEnd="url(#arrow)"/>
-    <path d="M 130 90 Q 165 130 200 90" stroke="#1e50a2" strokeWidth="4" fill="none" markerEnd="url(#arrow)"/>
-    <path d="M 200 90 Q 235 50 270 90" stroke="#1e50a2" strokeWidth="4" fill="none" markerEnd="url(#arrow)"/>
-    <defs>
-      <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-        <path d="M 0 0 L 10 5 L 0 10 z" fill="#1e50a2" />
-      </marker>
-    </defs>
-    {/* Vòng tròn 1 */}
-    <circle cx="50" cy="90" r="20" fill="#1e50a2" />
-    <circle cx="50" cy="90" r="10" fill="#ffffff" />
-    {/* Vòng tròn 2 */}
-    <circle cx="120" cy="90" r="20" fill="#f5a623" />
-    <circle cx="120" cy="90" r="10" fill="#ffffff" />
-    {/* Vòng tròn 3 (nét đứt) */}
-    <circle cx="190" cy="90" r="18" fill="#ffffff" stroke="#1e50a2" strokeWidth="4" strokeDasharray="6 6" />
-    {/* Vòng tròn 4 */}
-    <circle cx="260" cy="90" r="20" fill="#6aa8e8" />
-    <circle cx="260" cy="90" r="10" fill="#ffffff" />
-  </svg>
+  <ArtFrame bg="#e6f4f1">
+    <rect x="44" y="53" width="232" height="44" rx="22" fill={WHITE} opacity="0.75" />
+    <rect x="44" y="53" width="232" height="44" rx="22" fill="none" stroke={SKY} strokeWidth="3" />
+    {node(70, BLUE)}
+    {node(128, ORANGE)}
+    {node(244, SKY)}
+    <circle cx="186" cy="75" r="20" fill={WHITE} stroke={BLUE} strokeWidth="3.5" strokeDasharray="7 6" />
+    {arrow(99)}
+    {arrow(157)}
+    {arrow(215)}
+  </ArtFrame>
 );
 
-// 3. Ghép Tên Gọi IUPAC: 4 thẻ bài so le, 2 úp, 2 lật hiện mạch zigzag.
+const card = (cx: number, cy: number, rot: number, fill: string, inner: React.ReactNode) => (
+  <g key={cx} transform={`translate(${cx} ${cy}) rotate(${rot})`}>
+    <rect x="-27" y="-39" width="54" height="78" rx="8" fill={fill} stroke={BLUE} strokeWidth="3.5" />
+    {inner}
+  </g>
+);
+
 export const IUPACArt = () => (
-  <svg viewBox="0 0 320 180" width="100%" height="auto" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect width="320" height="180" fill="#1e50a2" opacity="0.05"/>
-    {/* Thẻ 1 (lật) */}
-    <g transform="translate(40, 50) rotate(-10)">
-      <rect width="50" height="70" rx="6" fill="#ffffff" stroke="#1e50a2" strokeWidth="3"/>
-      <path d="M 10 40 L 25 25 L 40 40" stroke="#f5a623" strokeWidth="3" strokeLinejoin="round" fill="none"/>
-    </g>
-    {/* Thẻ 2 (úp) */}
-    <g transform="translate(100, 70) rotate(5)">
-      <rect width="50" height="70" rx="6" fill="#6aa8e8" stroke="#1e50a2" strokeWidth="3"/>
-      <circle cx="25" cy="35" r="12" fill="#ffffff" opacity="0.5"/>
-    </g>
-    {/* Thẻ 3 (lật) */}
-    <g transform="translate(170, 45) rotate(15)">
-      <rect width="50" height="70" rx="6" fill="#ffffff" stroke="#1e50a2" strokeWidth="3"/>
-      <path d="M 10 45 L 20 30 L 30 45 L 40 30" stroke="#1e50a2" strokeWidth="3" strokeLinejoin="round" fill="none"/>
-    </g>
-    {/* Thẻ 4 (úp) */}
-    <g transform="translate(230, 60) rotate(-5)">
-      <rect width="50" height="70" rx="6" fill="#f5a623" stroke="#1e50a2" strokeWidth="3"/>
-      <rect x="15" y="25" width="20" height="20" fill="#ffffff" opacity="0.5" rx="2"/>
-    </g>
-  </svg>
+  <ArtFrame bg="#fdf0e0">
+    {card(92, 72, -12, WHITE,
+      <path d="M -16 8 L -5 -9 L 6 8 L 17 -9" fill="none" stroke={ORANGE} strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+    )}
+    {card(138, 78, -4, SKY,
+      <>
+        <circle cx="0" cy="0" r="14" fill={WHITE} opacity="0.5" />
+        <circle cx="0" cy="0" r="6" fill={WHITE} opacity="0.7" />
+      </>
+    )}
+    {card(184, 74, 6, WHITE,
+      <path d="M -16 6 L -5 -11 L 6 6 L 17 -11" fill="none" stroke={BLUE} strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+    )}
+    {card(230, 68, 14, ORANGE,
+      <rect x="-12" y="-12" width="24" height="24" rx="5" fill={WHITE} opacity="0.55" />
+    )}
+  </ArtFrame>
 );
 
-// 4. Cân Bằng Thần Tốc: cân hai đĩa thăng bằng, mỗi đĩa 2 khối vuông, phía trên có đồng hồ.
 export const BalanceArt = () => (
-  <svg viewBox="0 0 320 180" width="100%" height="auto" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect width="320" height="180" fill="#f5a623" opacity="0.1"/>
-    {/* Đồng hồ */}
-    <circle cx="160" cy="40" r="20" fill="#ffffff" stroke="#1e50a2" strokeWidth="4"/>
-    <path d="M 160 40 L 160 25 M 160 40 L 170 45" stroke="#f5a623" strokeWidth="3" strokeLinecap="round"/>
-    <path d="M 150 15 L 170 15" stroke="#1e50a2" strokeWidth="4" strokeLinecap="round"/>
-    
-    {/* Chân cân */}
-    <path d="M 160 80 L 160 150 M 130 150 L 190 150" stroke="#1e50a2" strokeWidth="6" strokeLinecap="round"/>
-    {/* Đòn cân */}
-    <path d="M 80 80 L 240 80" stroke="#1e50a2" strokeWidth="6" strokeLinecap="round"/>
-    {/* Đĩa trái */}
-    <path d="M 80 80 L 60 120 L 100 120 Z" fill="#6aa8e8" stroke="#1e50a2" strokeWidth="3" strokeLinejoin="round"/>
-    {/* Khối vuông trái */}
-    <rect x="65" y="100" width="15" height="15" fill="#f5a623" stroke="#1e50a2" strokeWidth="2"/>
-    <rect x="80" y="100" width="15" height="15" fill="#ffffff" stroke="#1e50a2" strokeWidth="2"/>
-    
-    {/* Đĩa phải */}
-    <path d="M 240 80 L 220 120 L 260 120 Z" fill="#6aa8e8" stroke="#1e50a2" strokeWidth="3" strokeLinejoin="round"/>
-    {/* Khối vuông phải */}
-    <rect x="225" y="100" width="15" height="15" fill="#ffffff" stroke="#1e50a2" strokeWidth="2"/>
-    <rect x="240" y="100" width="15" height="15" fill="#f5a623" stroke="#1e50a2" strokeWidth="2"/>
-  </svg>
+  <ArtFrame bg="#eef0f7">
+    <rect x="152" y="21" width="16" height="6" rx="2.5" fill={BLUE} />
+    <circle cx="160" cy="45" r="17" fill={WHITE} stroke={BLUE} strokeWidth="4.5" />
+    <path d="M 160 45 V 34 M 160 45 L 168 50" stroke={ORANGE} strokeWidth="3.5" strokeLinecap="round" />
+    <rect x="156" y="74" width="9" height="46" fill={BLUE} />
+    <path d="M 136 120 H 185 L 192 130 H 129 Z" fill={BLUE} />
+    <path d="M 160 64 L 171 76 H 149 Z" fill={BLUE} />
+    <line x1="66" y1="72" x2="254" y2="72" stroke={BLUE} strokeWidth="7.5" strokeLinecap="round" />
+    <line x1="66" y1="72" x2="44" y2="95" stroke={BLUE} strokeWidth="2.5" />
+    <line x1="66" y1="72" x2="88" y2="95" stroke={BLUE} strokeWidth="2.5" />
+    <path d="M 42 95 H 90 Q 66 116 42 95 Z" fill={SKY} stroke={BLUE} strokeWidth="3.5" strokeLinejoin="round" />
+    <rect x="49" y="77" width="17" height="17" rx="2" fill={ORANGE} stroke={BLUE} strokeWidth="2.5" />
+    <rect x="66" y="77" width="17" height="17" rx="2" fill={WHITE} stroke={BLUE} strokeWidth="2.5" />
+    <line x1="254" y1="72" x2="232" y2="95" stroke={BLUE} strokeWidth="2.5" />
+    <line x1="254" y1="72" x2="276" y2="95" stroke={BLUE} strokeWidth="2.5" />
+    <path d="M 230 95 H 278 Q 254 116 230 95 Z" fill={SKY} stroke={BLUE} strokeWidth="3.5" strokeLinejoin="round" />
+    <rect x="237" y="77" width="17" height="17" rx="2" fill={WHITE} stroke={BLUE} strokeWidth="2.5" />
+    <rect x="254" y="77" width="17" height="17" rx="2" fill={ORANGE} stroke={BLUE} strokeWidth="2.5" />
+  </ArtFrame>
 );
 
-// 5. Leo Tháp Hóa Học: tháp bậc thang 5 tầng đi lên, tầng 5 có ngôi sao, 2 tầng tô cam.
 export const TowerArt = () => (
-  <svg viewBox="0 0 320 180" width="100%" height="auto" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect width="320" height="180" fill="#6aa8e8" opacity="0.1"/>
-    {/* Bậc 1 */}
-    <rect x="40" y="140" width="40" height="20" fill="#1e50a2" />
-    {/* Bậc 2 (cam) */}
-    <rect x="80" y="120" width="40" height="40" fill="#f5a623" />
-    {/* Bậc 3 */}
-    <rect x="120" y="100" width="40" height="60" fill="#6aa8e8" />
-    {/* Bậc 4 (cam) */}
-    <rect x="160" y="80" width="40" height="80" fill="#f5a623" />
-    {/* Bậc 5 */}
-    <rect x="200" y="60" width="40" height="100" fill="#1e50a2" />
-    
-    {/* Viền bậc */}
-    <path d="M 40 140 L 80 140 L 80 120 L 120 120 L 120 100 L 160 100 L 160 80 L 200 80 L 200 60 L 240 60 L 240 160 L 40 160 Z" stroke="#1e50a2" strokeWidth="4" strokeLinejoin="round"/>
-    
-    {/* Ngôi sao trên đỉnh */}
-    <path d="M 220 30 L 225 45 L 240 45 L 228 55 L 232 70 L 220 60 L 208 70 L 212 55 L 200 45 L 215 45 Z" fill="#f5a623" stroke="#1e50a2" strokeWidth="2" strokeLinejoin="round"/>
-  </svg>
+  <ArtFrame bg="#fbeceb">
+    <rect x="52" y="108" width="42" height="20" fill={BLUE} />
+    <rect x="94" y="93" width="42" height="35" fill={ORANGE} />
+    <rect x="136" y="78" width="42" height="50" fill={SKY} />
+    <rect x="178" y="63" width="42" height="65" fill={ORANGE} />
+    <rect x="220" y="48" width="42" height="80" fill={BLUE} />
+    <path d="M 52 128 V 108 H 94 V 93 H 136 V 78 H 178 V 63 H 220 V 48 H 262 V 128 Z" fill="none" stroke={BLUE} strokeWidth="4" strokeLinejoin="round" />
+    <path d="M 241 21 L 244.2 29.6 L 253.4 30 L 246.2 35.7 L 248.6 44.5 L 241 39.5 L 233.4 44.5 L 235.8 35.7 L 228.6 30 L 237.8 29.6 Z" fill={ORANGE} stroke={BLUE} strokeWidth="3" strokeLinejoin="round" />
+  </ArtFrame>
 );
