@@ -227,7 +227,45 @@ export const resetPasswordWithFirestore = async (
   }
 };
 
-// ─── 4. TRUY VẤN DANH SÁCH TÀI KHOẢN (Hiển thị cho Admin/GV) ───────────────
+// ─── 4. CẬP NHẬT QUYỀN (ROLE) TÀI KHOẢN (Dành cho Super Admin) ─────────────
+/**
+ * Cập nhật vai trò (role) của một tài khoản dựa trên document ID.
+ * Chỉ nên được gọi từ giao diện Super Admin.
+ */
+export const updateUserRole = async (
+  docId: string,
+  newRole: string
+): Promise<{ success: boolean; message: string }> => {
+  try {
+    if (!docId) {
+      return { success: false, message: 'Không xác định được ID tài khoản!' };
+    }
+    if (!newRole || !newRole.trim()) {
+      return { success: false, message: 'Vui lòng chọn quyền hạn mới!' };
+    }
+
+    const userDocRef = doc(db, 'users', docId);
+    await updateDoc(userDocRef, { role: newRole.trim() });
+
+    return {
+      success: true,
+      message: `Đã cập nhật quyền thành "${newRole}" thành công!`,
+    };
+  } catch (error: any) {
+    console.error('Lỗi khi cập nhật role Firestore:', error);
+    ErrorLogService.logError({
+      level: 'Lỗi Cơ Sở Dữ Liệu',
+      component: 'firestoreAuth.updateUserRole',
+      message: error?.message || 'Lỗi khi cập nhật quyền người dùng',
+    });
+    return {
+      success: false,
+      message: error?.message || 'Không thể cập nhật quyền trên Firestore!',
+    };
+  }
+};
+
+// ─── 5. TRUY VẤN DANH SÁCH TÀI KHOẢN (Hiển thị cho Admin/GV) ───────────────
 /**
  * Lấy tất cả tài khoản từ collection "users" để hiển thị trong giao diện quản lý.
  */
