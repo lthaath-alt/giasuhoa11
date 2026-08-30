@@ -72,7 +72,9 @@ export const DashboardPage: React.FC = () => {
   }, [currentUser?.email]);
 
   const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
-  const [activeTab, setActiveTab] = useState<string>('hocmai');
+  // Tab mặc định khi vào web. Nếu bật lại mục "Các khóa học"
+  // (cờ HIEN_MUC_KHOA_HOC trong DashboardHeader) thì đổi về 'hocmai'.
+  const [activeTab, setActiveTab] = useState<string>('baigiang');
   const [searchQuery, setSearchQuery] = useState<string>('');
   // 'sgk' = xem trang sách, 'chat' = hỏi gia sư AI
   const [studyMode, setStudyMode] = useState<'sgk' | 'chat'>('sgk');
@@ -158,8 +160,9 @@ export const DashboardPage: React.FC = () => {
         logout={logout}
         guestChatCount={guestChatCount}
         onLogoClick={() => {
+          // Chỉ thoát bài đang đọc; tab do DashboardHeader tự quyết định,
+          // nếu đặt tab ở đây sẽ ghi đè lựa chọn của header.
           setSelectedLesson(null);
-          setActiveTab('hocmai');
         }}
         activeTab={activeTab}
         setActiveTab={setActiveTab}

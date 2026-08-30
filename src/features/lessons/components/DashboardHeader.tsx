@@ -38,6 +38,18 @@ import { User } from '../../auth/types';
 import { useApp } from '../../../core/hooks/useApp';
 import { Lesson } from '../types';
 
+/**
+ * Bật/tắt mục "Các khóa học (Hóa 11)" trên thanh menu.
+ *
+ * Đang để false: nút bị ẩn, "Bài giảng" là mục đầu tiên và là tab mặc định.
+ * Toàn bộ nội dung tab đó (đọc SGK, Hỏi AI theo bài, khu trò chơi, thanh tiến
+ * độ) VẪN CÒN NGUYÊN trong code — đổi dòng này thành true là hiện lại ngay.
+ *
+ * Lưu ý: tìm kiếm bài học ở ô trên cùng vẫn mở được phần đọc SGK, kể cả khi
+ * nút menu đang ẩn.
+ */
+const HIEN_MUC_KHOA_HOC = false;
+
 interface DashboardHeaderProps {
   currentUser: User | null;
   logout: () => void;
@@ -118,7 +130,8 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           <Box
             sx={{ display: 'flex', alignItems: 'center', gap: 1, cursor: 'pointer' }}
             onClick={() => {
-              setActiveTab('hocmai');
+              // Bấm logo về mục đầu tiên đang hiện trên menu
+              setActiveTab(HIEN_MUC_KHOA_HOC ? 'hocmai' : 'baigiang');
               onLogoClick();
             }}
           >
@@ -428,7 +441,8 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               '&::-webkit-scrollbar': { display: 'none' },
             }}
           >
-            {/* Mục Các Khóa Học */}
+            {/* Mục Các Khóa Học — ẩn qua cờ HIEN_MUC_KHOA_HOC ở đầu file */}
+            {HIEN_MUC_KHOA_HOC && (
             <Button
               id="nav-courses-btn"
               onClick={() => {
@@ -450,6 +464,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             >
               Các khóa học (Hóa 11)
             </Button>
+            )}
 
             {/* Mục Bài Giảng Slide */}
             <Button
