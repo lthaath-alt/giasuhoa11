@@ -18,6 +18,7 @@ import { KnowledgeTheoryCard } from './KnowledgeTheoryCard';
 import { SuggestedQuestionsCard } from './SuggestedQuestionsCard';
 import { ApiKeyDialog } from './ApiKeyDialog';
 import { getRemainingCooldown, getCooldownState, checkRateLimit, recordMessageSent } from '../services/cooldownService';
+import { RichText } from '../../../core/components/RichText';
 
 interface TutorChatProps {
   lesson: Lesson;
@@ -453,7 +454,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
                       }}
                     >
                       <Typography variant="body2" sx={{ whiteSpace: 'pre-line', lineHeight: 1.6, fontSize: '0.9rem' }}>
-                        {msg.content}
+                        <RichText text={msg.content} linkColor={isAi ? '#0062b8' : '#ffffff'} />
                       </Typography>
                     </Paper>
                     <Typography

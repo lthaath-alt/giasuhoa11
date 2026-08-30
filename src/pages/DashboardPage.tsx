@@ -51,6 +51,7 @@ import { JoinClassForm } from '../features/auth/components/JoinClassForm';
 import { StudentArea } from '../features/student/components/StudentArea';
 import { GameHubSection } from '../features/games/GameHubSection';
 import { SlidesSection } from '../features/lessons/components/SlidesSection';
+import { RichText } from '../core/components/RichText';
 
 export const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
@@ -652,7 +653,7 @@ export const DashboardPage: React.FC = () => {
                                 }}
                               >
                                 <Typography variant="body2" sx={{ whiteSpace: 'pre-line', lineHeight: 1.6, fontSize: '0.9rem' }}>
-                                  {msg.content}
+                                  <RichText text={msg.content} linkColor={isAi ? '#0062b8' : '#ffffff'} />
                                 </Typography>
                               </Paper>
                               <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5, textAlign: isAi ? 'left' : 'right' }}>
