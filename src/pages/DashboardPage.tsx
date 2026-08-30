@@ -72,9 +72,9 @@ export const DashboardPage: React.FC = () => {
   }, [currentUser?.email]);
 
   const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
-  // Tab mặc định khi vào web. Nếu bật lại mục "Các khóa học"
-  // (cờ HIEN_MUC_KHOA_HOC trong DashboardHeader) thì đổi về 'hocmai'.
-  const [activeTab, setActiveTab] = useState<string>('baigiang');
+  // Tab mặc định khi vào web: Giới thiệu, để khách mới đọc trước khi vào học.
+  // Đổi sang 'baigiang' nếu muốn mở thẳng vào lưới bài giảng.
+  const [activeTab, setActiveTab] = useState<string>('gioithieu');
   const [searchQuery, setSearchQuery] = useState<string>('');
   // 'sgk' = xem trang sách, 'chat' = hỏi gia sư AI
   const [studyMode, setStudyMode] = useState<'sgk' | 'chat'>('sgk');

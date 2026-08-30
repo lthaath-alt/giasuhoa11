@@ -131,7 +131,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             sx={{ display: 'flex', alignItems: 'center', gap: 1, cursor: 'pointer' }}
             onClick={() => {
               // Bấm logo về mục đầu tiên đang hiện trên menu
-              setActiveTab(HIEN_MUC_KHOA_HOC ? 'hocmai' : 'baigiang');
+              setActiveTab(HIEN_MUC_KHOA_HOC ? 'hocmai' : 'gioithieu');
               onLogoClick();
             }}
           >
@@ -466,6 +466,28 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             </Button>
             )}
 
+            {/* Mục Giới Thiệu */}
+            <Button
+              id="nav-about-btn"
+              onClick={() => {
+                setActiveTab('gioithieu');
+              }}
+              startIcon={<Info size={16} />}
+              sx={{
+                color: '#ffffff',
+                textTransform: 'none',
+                fontWeight: 'bold',
+                px: 2,
+                py: 1,
+                borderRadius: 0,
+                borderBottom: activeTab === 'gioithieu' ? '3px solid #ff9900' : '3px solid transparent',
+                backgroundColor: activeTab === 'gioithieu' ? 'rgba(255,255,255,0.1)' : 'transparent',
+                '&:hover': { backgroundColor: 'rgba(255,255,255,0.15)' },
+              }}
+            >
+              Giới thiệu
+            </Button>
+
             {/* Mục Bài Giảng Slide */}
             <Button
               id="nav-slides-btn"
@@ -487,28 +509,6 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               }}
             >
               Bài giảng
-            </Button>
-
-            {/* Mục Giới Thiệu */}
-            <Button
-              id="nav-about-btn"
-              onClick={() => {
-                setActiveTab('gioithieu');
-              }}
-              startIcon={<Info size={16} />}
-              sx={{
-                color: '#ffffff',
-                textTransform: 'none',
-                fontWeight: 'bold',
-                px: 2,
-                py: 1,
-                borderRadius: 0,
-                borderBottom: activeTab === 'gioithieu' ? '3px solid #ff9900' : '3px solid transparent',
-                backgroundColor: activeTab === 'gioithieu' ? 'rgba(255,255,255,0.1)' : 'transparent',
-                '&:hover': { backgroundColor: 'rgba(255,255,255,0.15)' },
-              }}
-            >
-              Giới thiệu
             </Button>
 
             {/* Mục iChat - Hỏi đáp với AI */}
