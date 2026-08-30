@@ -1,0 +1,22 @@
+# Cache cho ảnh bài giảng tĩnh (public/hoa11).
+#
+# Mặc định Netlify đặt max-age=0, must-revalidate cho file tĩnh, nghĩa là mỗi
+# lần học sinh mở lại một bài, trình duyệt phải hỏi server lại từng ảnh
+# (~49 lượt hỏi cho một bài 12 slide). Bandwidth thì gần như bằng 0 vì server
+# trả 304, nhưng độ trễ cộng dồn rất rõ trên mạng chậm.
+#
+# max-age=3600 -> trong 1 giờ dùng thẳng bản trong máy, không hỏi lại.
+# stale-while-revalidate -> sau 1 giờ vẫn hiện ngay bản cũ rồi âm thầm tải bản mới.
+#
+# Hệ quả cần biết: sau khi bạn cập nhật bài giảng và deploy, học sinh đang mở
+# sẵn có thể còn thấy ảnh cũ tối đa 1 giờ. Muốn hiện ngay lập tức thì giảm
+# max-age xuống, ví dụ max-age=60.
+
+/hoa11/slides/*
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+
+/hoa11/mini/*
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+
+/hoa11/thumbs/*
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400

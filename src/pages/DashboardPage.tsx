@@ -50,6 +50,7 @@ import { TextbookViewer } from '../features/lessons/components/TextbookViewer';
 import { JoinClassForm } from '../features/auth/components/JoinClassForm';
 import { StudentArea } from '../features/student/components/StudentArea';
 import { GameHubSection } from '../features/games/GameHubSection';
+import { SlidesSection } from '../features/lessons/components/SlidesSection';
 
 export const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
@@ -384,6 +385,13 @@ export const DashboardPage: React.FC = () => {
 
                 </Box>
               )}
+            </Box>
+          )}
+
+          {/* ================= TAB: BÀI GIẢNG SLIDE ================= */}
+          {activeTab === 'baigiang' && (
+            <Box id="tab-content-slides">
+              <SlidesSection />
             </Box>
           )}
 

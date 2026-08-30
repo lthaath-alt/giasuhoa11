@@ -32,6 +32,7 @@ import {
   User as UserIcon,
   GraduationCap,
   Building2,
+  Presentation,
 } from 'lucide-react';
 import { User } from '../../auth/types';
 import { useApp } from '../../../core/hooks/useApp';
@@ -448,6 +449,29 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               }}
             >
               Các khóa học (Hóa 11)
+            </Button>
+
+            {/* Mục Bài Giảng Slide */}
+            <Button
+              id="nav-slides-btn"
+              onClick={() => {
+                setActiveTab('baigiang');
+              }}
+              startIcon={<Presentation size={16} />}
+              sx={{
+                color: '#ffffff',
+                textTransform: 'none',
+                fontWeight: 'bold',
+                px: 2,
+                py: 1,
+                borderRadius: 0,
+                whiteSpace: 'nowrap',
+                borderBottom: activeTab === 'baigiang' ? '3px solid #ff9900' : '3px solid transparent',
+                backgroundColor: activeTab === 'baigiang' ? 'rgba(255,255,255,0.1)' : 'transparent',
+                '&:hover': { backgroundColor: 'rgba(255,255,255,0.15)' },
+              }}
+            >
+              Bài giảng
             </Button>
 
             {/* Mục Giới Thiệu */}
