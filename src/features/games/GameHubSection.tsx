@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Box, Typography, Card, Chip, Button, Dialog, IconButton } from '@mui/material';
 import { Gamepad2, Play, X } from 'lucide-react';
-import { DetectiveArt, PipelineArt, IUPACArt, BalanceArt, TowerArt } from './GameArt';
+import { DetectiveArt, PipelineArt, IUPACArt, BalanceArt, TowerArt, BoardGameArt } from './GameArt';
 
 interface GameData {
   id: string;
@@ -22,6 +22,16 @@ const GAMES: GameData[] = [
     status: 'active',
     path: '/games/tham-tu-hoa-chat.html',
     art: <DetectiveArt />,
+  },
+  {
+    id: 'vong-quanh-hoa-11',
+    title: 'Vòng Quanh Hóa 11',
+    chapter: 'Ôn tổng hợp 6 chương',
+    description:
+      'Chia 2–4 đội, tung xúc xắc đi quanh 28 ô. Ngân hàng 160 câu theo 3 mức nhận biết – thông hiểu – vận dụng, thêm câu hỏi riêng được.',
+    status: 'active',
+    path: '/games/hoa11-boardgame.html',
+    art: <BoardGameArt />,
   },
   {
     id: 'duong-ong',

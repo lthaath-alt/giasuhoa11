@@ -134,3 +134,45 @@ export const TowerArt = () => (
     <path d="M 241 21 L 244.2 29.6 L 253.4 30 L 246.2 35.7 L 248.6 44.5 L 241 39.5 L 233.4 44.5 L 235.8 35.7 L 228.6 30 L 237.8 29.6 Z" fill={ORANGE} stroke={BLUE} strokeWidth="3" strokeLinejoin="round" />
   </ArtFrame>
 );
+export const BoardGameArt = () => (
+  <ArtFrame bg="#eaf3ec">
+    {/* Đường đi bàn cờ: các ô vuông uốn lượn từ trái sang phải */}
+    {[
+      [46, 104], [74, 104], [102, 104],
+      [102, 76], [102, 48],
+      [130, 48], [158, 48],
+      [158, 76], [158, 104],
+      [186, 104], [214, 104],
+      [214, 76], [242, 76],
+    ].map(([x, y], i) => (
+      <rect
+        key={i}
+        x={x}
+        y={y}
+        width="24"
+        height="24"
+        rx="5"
+        fill={i === 12 ? ORANGE : i % 3 === 0 ? SKY : WHITE}
+        stroke={BLUE}
+        strokeWidth="3"
+      />
+    ))}
+
+    {/* Quân cờ đang đứng trên ô thứ tư */}
+    <ellipse cx="114" cy="74" rx="9" ry="3.5" fill={BLUE} opacity="0.25" />
+    <path d="M 108 70 Q 108 58 114 58 Q 120 58 120 70 Z" fill={ORANGE} stroke={BLUE} strokeWidth="3" strokeLinejoin="round" />
+    <circle cx="114" cy="54" r="6" fill={ORANGE} stroke={BLUE} strokeWidth="3" />
+
+    {/* Xúc xắc mặt 5 */}
+    <rect x="252" y="24" width="42" height="42" rx="9" fill={WHITE} stroke={BLUE} strokeWidth="3.5" />
+    <circle cx="263" cy="35" r="3.6" fill={BLUE} />
+    <circle cx="283" cy="35" r="3.6" fill={BLUE} />
+    <circle cx="273" cy="45" r="3.6" fill={ORANGE} />
+    <circle cx="263" cy="55" r="3.6" fill={BLUE} />
+    <circle cx="283" cy="55" r="3.6" fill={BLUE} />
+
+    {/* Lá cờ đích */}
+    <line x1="254" y1="76" x2="254" y2="104" stroke={BLUE} strokeWidth="3.5" strokeLinecap="round" />
+    <path d="M 254 78 H 276 L 270 85 L 276 92 H 254 Z" fill={ORANGE} stroke={BLUE} strokeWidth="3" strokeLinejoin="round" />
+  </ArtFrame>
+);

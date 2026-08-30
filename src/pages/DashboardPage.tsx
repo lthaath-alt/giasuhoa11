@@ -398,6 +398,15 @@ export const DashboardPage: React.FC = () => {
             </Box>
           )}
 
+          {/* ================= TAB: TRÒ CHƠI ================= */}
+          {/* Khu game vốn nằm trong tab "Các khóa học"; tab đó đang ẩn nên
+              tách ra thành mục menu riêng để vẫn vào chơi được. */}
+          {activeTab === 'trochoi' && (
+            <Box id="tab-content-games">
+              <GameHubSection />
+            </Box>
+          )}
+
           {/* ================= TAB 2: GIỚI THIỆU ================= */}
           {activeTab === 'gioithieu' && (
             <Box id="tab-content-about" sx={{ maxWidth: 900, mx: 'auto' }}>

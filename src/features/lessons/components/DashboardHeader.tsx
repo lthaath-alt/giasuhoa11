@@ -33,6 +33,7 @@ import {
   GraduationCap,
   Building2,
   Presentation,
+  Gamepad2,
 } from 'lucide-react';
 import { User } from '../../auth/types';
 import { useApp } from '../../../core/hooks/useApp';
@@ -509,6 +510,29 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               }}
             >
               Bài giảng
+            </Button>
+
+            {/* Mục Trò Chơi — khu game truoc day nam trong tab "Các khóa học" */}
+            <Button
+              id="nav-games-btn"
+              onClick={() => {
+                setActiveTab('trochoi');
+              }}
+              startIcon={<Gamepad2 size={16} />}
+              sx={{
+                color: '#ffffff',
+                textTransform: 'none',
+                fontWeight: 'bold',
+                px: 2,
+                py: 1,
+                borderRadius: 0,
+                whiteSpace: 'nowrap',
+                borderBottom: activeTab === 'trochoi' ? '3px solid #ff9900' : '3px solid transparent',
+                backgroundColor: activeTab === 'trochoi' ? 'rgba(255,255,255,0.1)' : 'transparent',
+                '&:hover': { backgroundColor: 'rgba(255,255,255,0.15)' },
+              }}
+            >
+              Trò chơi
             </Button>
 
             {/* Mục iChat - Hỏi đáp với AI */}
