@@ -35,7 +35,7 @@ export const WelcomeWorkspace: React.FC<WelcomeWorkspaceProps> = ({ setSelectedL
       </Typography>
 
       <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 600, mb: 4, lineHeight: 1.8 }}>
-        Để bắt đầu nâng cao tư duy giải bài tập, em hãy lựa chọn một bài học bất kỳ thuộc chương trình Hóa học 11 ở **Danh mục bài học** bên trái nhé.
+        Để bắt đầu nâng cao tư duy giải bài tập, em hãy lựa chọn một bài học bất kỳ thuộc chương trình Hóa học 11 ở <strong>Danh mục bài học</strong> bên trái nhé.
         Gia sư AI sẽ tóm tắt kiến thức, chỉ ra công thức cốt lõi và hướng dẫn em cách tư duy giải các bài tập mẫu một cách cặn kẽ!
       </Typography>
 

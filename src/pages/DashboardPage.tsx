@@ -422,10 +422,10 @@ export const DashboardPage: React.FC = () => {
                 </Box>
 
                 <Typography variant="body1" sx={{ mb: 3, lineHeight: 1.8, color: '#334155' }}>
-                  Chào mừng các em học sinh đến với **Gia Sư Hóa Học 11 AI**! Đây là dự án học tập thông minh tiên phong tại Việt Nam, mang đến giải pháp hỗ trợ tự học Hóa học lớp 11 vượt trội theo chương trình phổ thông mới. 
+                  Chào mừng các em học sinh đến với <strong>Gia Sư Hóa Học 11 AI</strong>! Đây là dự án học tập thông minh tiên phong tại Việt Nam, mang đến giải pháp hỗ trợ tự học Hóa học lớp 11 vượt trội theo chương trình phổ thông mới.
                 </Typography>
                 <Typography variant="body1" sx={{ mb: 4, lineHeight: 1.8, color: '#334155' }}>
-                  Với mong muốn giúp mọi học sinh đều có thể tự tin làm chủ môn Hóa mà không cần đi học thêm tốn kém, chúng tôi đã tích hợp công nghệ trí tuệ nhân tạo (AI) thông minh để tạo ra một **Người Thầy Gia Sư Đồng Hành 24/7**. Gia sư AI không làm thay bài tập cho học sinh, mà đóng vai trò người hướng dẫn tận tình, khơi gợi suy nghĩ và dìu dắt các em giải quyết bài tập qua từng bước tư duy.
+                  Với mong muốn giúp mọi học sinh đều có thể tự tin làm chủ môn Hóa mà không cần đi học thêm tốn kém, chúng tôi đã tích hợp công nghệ trí tuệ nhân tạo (AI) thông minh để tạo ra một <strong>Người Thầy Gia Sư Đồng Hành 24/7</strong>. Gia sư AI không làm thay bài tập cho học sinh, mà đóng vai trò người hướng dẫn tận tình, khơi gợi suy nghĩ và dìu dắt các em giải quyết bài tập qua từng bước tư duy.
                 </Typography>
 
                 {/* THÔNG SỐ ĐÁNG TIN CẬY */}
@@ -470,7 +470,7 @@ export const DashboardPage: React.FC = () => {
                     <ShieldCheck size={20} /> Triết lý giảng dạy của Gia sư AI
                   </Typography>
                   <Typography variant="body2" sx={{ lineHeight: 1.7, color: '#1e3a8a' }}>
-                    **"Cho con cá không bằng cho cần câu"** – Gia sư AI của chúng tôi được thiết kế theo chuẩn sư phạm nghiêm ngặt. Khi học sinh gõ một câu hỏi hoặc bài tập, thầy sẽ không bao giờ đưa thẳng đáp số cuối cùng để học sinh chép. Thay vào đó, thầy sẽ phân tích đề, gợi ý lý thuyết nền tảng và dẫn dắt học sinh đặt bút tính toán từng bước. Điều này giúp học sinh phát triển tư duy logic tự chủ, tự mình tìm ra đáp số để nhớ kiến thức bền vững nhất!
+                    <strong>“Cho con cá không bằng cho cần câu”</strong> – Gia sư AI của chúng tôi được thiết kế theo chuẩn sư phạm nghiêm ngặt. Khi học sinh gõ một câu hỏi hoặc bài tập, thầy sẽ không bao giờ đưa thẳng đáp số cuối cùng để học sinh chép. Thay vào đó, thầy sẽ phân tích đề, gợi ý lý thuyết nền tảng và dẫn dắt học sinh đặt bút tính toán từng bước. Điều này giúp học sinh phát triển tư duy logic tự chủ, tự mình tìm ra đáp số để nhớ kiến thức bền vững nhất!
                   </Typography>
                 </Box>
 
@@ -505,7 +505,7 @@ export const DashboardPage: React.FC = () => {
                       <Sparkles size={20} color="#ea580c" /> Thầy Hùng Trợ Giảng AI
                     </Typography>
                     <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.7 }}>
-                      Thầy là Trợ lý học tập cá nhân của em. Thầy sẵn sàng giải đáp mọi thắc mắc lý thuyết liên quan đến **Hóa học lớp 11**!
+                      Thầy là Trợ lý học tập cá nhân của em. Thầy sẵn sàng giải đáp mọi thắc mắc lý thuyết liên quan đến <strong>Hóa học lớp 11</strong>!
                     </Typography>
                     <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.7 }}>
                       Thầy chỉ dẫn từng bước khơi gợi tư duy giúp em tự học tốt nhất, không làm bài tập hộ đâu nhé!
