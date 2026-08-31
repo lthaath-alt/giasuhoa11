@@ -107,8 +107,8 @@ export const ApiKeyDialog: React.FC<ApiKeyDialogProps> = ({ open, onClose }) => 
                 setApiKey(e.target.value);
                 setTestResult(null);
               }}
-              {...({
-                InputProps: {
+              slotProps={{
+                input: {
                   endAdornment: (
                     <InputAdornment position="end">
                       <IconButton onClick={() => setShowKey(!showKey)} edge="end">
@@ -116,9 +116,9 @@ export const ApiKeyDialog: React.FC<ApiKeyDialogProps> = ({ open, onClose }) => 
                       </IconButton>
                     </InputAdornment>
                   ),
-                  sx: { borderRadius: 2 }
-                }
-              } as any)}
+                  sx: { borderRadius: 2 },
+                },
+              }}
             />
             
             <Box sx={{ display: 'flex', gap: 1, mt: 1.5, justifyContent: 'space-between' }}>
@@ -166,17 +166,10 @@ export const ApiKeyDialog: React.FC<ApiKeyDialogProps> = ({ open, onClose }) => 
               <li>Sao chép key và dán vào ô bên trên.</li>
             </ol>
             
-            <Box sx={{ mt: 2, borderRadius: 2, overflow: 'hidden', border: '1px solid #e2e8f0', bgcolor: '#f8fafc', aspectRatio: '16/9' }}>
-              <iframe
-                width="100%"
-                height="100%"
-                src=""
-                title="Hướng dẫn lấy API Key"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
-            </Box>
+            {/* Khung video hướng dẫn đã gỡ: iframe để src rỗng khiến trình duyệt
+                tải lại TOÀN BỘ ứng dụng vào bên trong khung, mỗi lần mở hộp thoại
+                lại chạy thêm một bản web nữa. Khi nào có link video thật thì
+                thêm iframe lại kèm src cụ thể. */}
           </Box>
 
         </Box>
