@@ -1,0 +1,1347 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- ===== MÔ TẢ DỰ ÁN CHO TRỢ LÝ LẬP TRÌNH =====
+     Đọc hết phần này trước khi sửa bất cứ thứ gì trong file.
+
+# Đường Ống Chuyển Hóa — mô tả dự án
+
+Trò chơi ôn tập **Chương 2 (Nitrogen và Sulfur)** — Hóa học 11, chương trình
+Kết nối tri thức với cuộc sống (2018). Người chơi vào vai kỹ sư vận hành một tổ hợp
+hóa chất: mỗi ca trực nhận một sơ đồ chuyển hóa còn thiếu điều kiện phản ứng, phải
+kéo/thả (hoặc bấm chọn) các thẻ điều kiện vào đúng từng đoạn ống rồi bơm thử.
+
+Toàn bộ sản phẩm nằm trong **một file duy nhất**. Không thư viện ngoài, không bước
+build, không phụ thuộc mạng — trừ phông Google Fonts, thiếu phông vẫn chạy bình thường.
+Mở trực tiếp bằng `file://` cũng chạy (không dùng IndexedDB/localStorage).
+
+## Bố cục file
+CSS trong thẻ `style` → HTML ba màn hình → JavaScript trong một IIFE ở cuối,
+không xuất biến toàn cục nào.
+
+Ba màn hình: `#screen-intro`, `#screen-play`, `#screen-done`.
+
+## Mốc mã quan trọng — tra bằng chuỗi tìm kiếm, đừng dựa vào số dòng
+| Tìm chuỗi | Vai trò |
+|---|---|
+| `const COND = {`   | Kho thẻ điều kiện phản ứng, dùng chung cho mọi sơ đồ |
+| `const CHAINS = [` | 10 sơ đồ chuyển hóa: `nodes` (chất) + `steps` (điều kiện, phương trình, giải thích) |
+| `const TIERS = [`  | Thứ tự độ khó 5 ca của một lượt chơi |
+| `const LURES_BY_TIER` | Số thẻ nhiễu thêm vào giá theo độ khó |
+| `let CAMP = {`     | Trạng thái cả lượt chơi: ca hiện tại, tổng điểm, số van gợi ý |
+| `let S = {`        | Trạng thái ca đang chơi: sơ đồ, giá thẻ, ô đã khóa |
+| `function pickChain(` | Bốc sơ đồ theo độ khó, tránh trùng "họ" phản ứng trong cùng lượt |
+| `function buildTray(`  | Trộn thẻ đúng với thẻ nhiễu |
+| `function renderLine(` | Vẽ đường ống: bồn chứa – đoạn ống – ô đặt điều kiện |
+| `function startDrag(`  | Kéo thả bằng pointer event (chuột + cảm ứng) |
+| `function place(`      | Đặt thẻ vào ô, hoán đổi nếu ô đã có thẻ |
+| `function pump(`       | Bơm thử: chấm bài, khóa ô đúng, trả thẻ sai về giá |
+| `function flow(`       | Hoạt cảnh dòng chảy khi hoàn thành sơ đồ |
+| `const Snd = `         | Bộ âm thanh tổng hợp bằng Web Audio, không dùng file |
+
+## Quy ước nội dung hóa học
+- Công thức viết bằng ký tự Unicode chỉ số dưới (₂, ₃, ₄…), không dùng thẻ `<sub>`.
+- Mỗi bước có `eq` (phương trình đã cân bằng) và `why` (giải thích ngắn, nêu **lý do**
+  chọn điều kiện đó chứ không chỉ mô tả hiện tượng). Thêm sơ đồ mới thì giữ đúng nếp này.
+- `nodes.length` luôn bằng `steps.length + 1`.
+- Trong một sơ đồ có thể lặp lại cùng một thẻ điều kiện — giá thẻ tự sinh đủ số bản.
+============================================== -->
+<title>Đường Ống Chuyển Hóa — Nitrogen & Sulfur (Hóa 11)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Be+Vietnam+Pro:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --steel:#0d1418;
+  --steel-2:#131d23;
+  --steel-3:#1a262e;
+  --steel-4:#22323c;
+  --edge:rgba(178,206,216,.16);
+  --edge-2:rgba(178,206,216,.3);
+  --paper:#d6e4ea;
+  --paper-dim:rgba(214,228,234,.58);
+  --paper-faint:rgba(214,228,234,.36);
+  --cyan:#3fc9d8;
+  --cyan-dim:#1d7f8b;
+  --amber:#f0a836;
+  --amber-dim:#a06f16;
+  --ok:#4dbd82;
+  --bad:#e2604e;
+  --pipe:#33454f;
+  --pipe-hi:#4a616e;
+
+  --f-display:'Oswald', 'Arial Narrow', sans-serif;
+  --f-body:'Be Vietnam Pro', system-ui, sans-serif;
+  --f-mono:'IBM Plex Mono', ui-monospace, monospace;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:
+    radial-gradient(1200px 620px at 50% -10%, rgba(63,201,216,.09), transparent 60%),
+    radial-gradient(760px 420px at 92% 104%, rgba(240,168,54,.06), transparent 62%),
+    var(--steel);
+  font-family:var(--f-body);
+  color:var(--paper);
+  min-height:100vh;
+  padding:20px 15px 60px;
+  -webkit-font-smoothing:antialiased;
+}
+.shell{max-width:1120px;margin:0 auto}
+.hide{display:none !important}
+
+/* ---------- Chữ & nút ---------- */
+/* Không dùng text-transform:uppercase với phông Oswald: bản subset của nó
+   thiếu glyph nguyên âm có dấu viết hoa, chữ Việt sẽ bị rụng dấu. */
+h1{
+  font-family:var(--f-display);font-weight:700;letter-spacing:.01em;
+  font-size:clamp(29px,5.4vw,46px);line-height:1.06;margin:0;color:#eaf6fa;
+}
+h2{font-family:var(--f-display);font-weight:600;font-size:23px;margin:0 0 8px;letter-spacing:.02em}
+.eyebrow{
+  font-family:var(--f-mono);font-size:10.5px;letter-spacing:.26em;
+  text-transform:uppercase;color:var(--cyan);margin:0 0 8px;
+}
+button{font-family:inherit;cursor:pointer;border:none;color:inherit}
+button:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+button[disabled]{cursor:not-allowed;opacity:.42}
+.btn{
+  border-radius:3px;padding:12px 22px;font-weight:600;font-size:14.5px;
+  transition:filter .12s ease, transform .1s ease, background .15s ease;
+  letter-spacing:.01em;
+}
+.btn:hover:not([disabled]){filter:brightness(1.12)}
+.btn:active:not([disabled]){transform:translateY(1px)}
+.btn-primary{background:linear-gradient(180deg,var(--cyan),#1f93a2);color:#04222a;box-shadow:0 3px 0 #12626d}
+.btn-primary:active:not([disabled]){box-shadow:0 1px 0 #12626d}
+.btn-amber{background:linear-gradient(180deg,var(--amber),#c8811d);color:#2a1a02;box-shadow:0 3px 0 #7d5511}
+.btn-amber:active:not([disabled]){box-shadow:0 1px 0 #7d5511}
+.btn-ghost{background:rgba(214,228,234,.05);border:1px solid var(--edge-2);color:var(--paper)}
+.btn-ghost:hover:not([disabled]){background:rgba(214,228,234,.11)}
+
+/* ---------- Bảng tên nhà máy ---------- */
+.plate{
+  display:flex;align-items:center;gap:19px;flex-wrap:wrap;
+  padding-bottom:19px;margin-bottom:20px;border-bottom:1px solid var(--edge);
+}
+.plate .mark{flex:0 0 auto;color:var(--cyan);filter:drop-shadow(0 3px 9px rgba(0,0,0,.55))}
+.plate .txt{flex:1 1 300px;min-width:250px}
+.plate .sub{margin:9px 0 0;color:var(--paper-dim);font-size:14.5px;line-height:1.55;max-width:52ch}
+.plate .code{
+  font-family:var(--f-mono);font-size:11px;color:var(--paper-faint);
+  border:1px dashed var(--edge-2);border-radius:3px;padding:9px 13px;
+  white-space:nowrap;letter-spacing:.09em;line-height:1.7;
+}
+.mark .ln{fill:none;stroke:currentColor;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}
+.mark .ln2{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;opacity:.6}
+
+/* ---------- Tấm thép (khung nội dung) ---------- */
+.panel{
+  background:linear-gradient(180deg,var(--steel-3),var(--steel-2));
+  border:1px solid var(--edge);border-radius:6px;
+  box-shadow:0 16px 40px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,255,255,.045);
+  position:relative;
+}
+.panel::before{ /* đinh tán góc */
+  content:'';position:absolute;inset:7px;border-radius:4px;
+  border:1px solid rgba(214,228,234,.05);pointer-events:none;
+}
+.rivet{position:absolute;width:7px;height:7px;border-radius:50%;
+  background:radial-gradient(circle at 32% 30%, #6d8794, #24343d);
+  box-shadow:0 1px 2px rgba(0,0,0,.6)}
+
+/* ---------- Màn giới thiệu ---------- */
+.intro{padding:30px 30px 32px}
+.intro > p{margin:0 0 20px;font-size:15px;line-height:1.68;color:var(--paper-dim);max-width:62ch}
+.rules{list-style:none;padding:0;margin:0 0 26px;max-width:66ch}
+.rules li{
+  display:flex;gap:14px;align-items:flex-start;padding:11px 0;
+  border-bottom:1px solid rgba(214,228,234,.09);font-size:14.5px;line-height:1.6;
+  color:var(--paper-dim);
+}
+.rules li:last-child{border-bottom:none}
+.rules b{color:var(--paper);font-weight:600}
+.rules .n{
+  font-family:var(--f-mono);font-size:10.5px;color:var(--amber);
+  border:1px solid var(--amber-dim);border-radius:2px;
+  width:22px;height:22px;display:grid;place-items:center;flex:0 0 22px;margin-top:2px;
+}
+.scope{
+  font-family:var(--f-mono);font-size:12px;color:var(--paper-faint);
+  border-top:1px solid var(--edge);padding-top:15px;margin-top:22px;line-height:1.85;
+}
+.scope b{color:var(--cyan);font-weight:500}
+
+/* ---------- Thanh trạng thái ---------- */
+.hud{display:flex;gap:10px;flex-wrap:wrap;align-items:stretch;margin-bottom:15px}
+.gauge{
+  display:flex;align-items:center;gap:11px;
+  background:var(--steel-2);border:1px solid var(--edge);
+  border-radius:3px;padding:8px 14px;
+}
+.gauge .lab{
+  font-family:var(--f-mono);font-size:9.5px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--paper-faint);
+}
+.gauge .val{font-family:var(--f-mono);font-size:16px;font-weight:600;color:var(--cyan);letter-spacing:.04em}
+.gauge .val.amber{color:var(--amber)}
+.hud .spacer{flex:1 1 auto}
+.pips{display:flex;gap:4px}
+.pip{width:8px;height:16px;border-radius:1px;background:linear-gradient(180deg,var(--amber),#a97114)}
+.pip.spent{background:rgba(214,228,234,.12)}
+.sound{
+  background:var(--steel-2);border:1px solid var(--edge);border-radius:3px;
+  padding:8px 13px;display:flex;align-items:center;gap:8px;
+  font-family:var(--f-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--paper-faint);transition:color .15s ease,border-color .15s ease;
+}
+.sound:hover{color:var(--paper);border-color:var(--edge-2)}
+.sound svg{flex:0 0 auto}
+
+/* ---------- Phiếu lệnh ca ---------- */
+.order{padding:20px 24px;margin-bottom:15px}
+.order .tag{
+  font-family:var(--f-mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--amber);margin:0 0 7px;
+}
+.order h2{color:#eaf6fa;margin-bottom:9px}
+.order p{margin:0;font-size:14.5px;line-height:1.65;color:var(--paper-dim);max-width:68ch}
+
+/* ---------- Đường ống ---------- */
+.board{
+  padding:28px 20px 26px;margin-bottom:15px;overflow-x:auto;
+  background:
+    radial-gradient(680px 260px at 50% 0%, rgba(63,201,216,.07), transparent 70%),
+    linear-gradient(180deg,var(--steel-3),#111a20);
+}
+.line{display:flex;align-items:flex-start;justify-content:center;gap:0;flex-wrap:nowrap;min-width:min-content}
+
+.node{display:flex;flex-direction:column;align-items:center;gap:9px;flex:0 0 auto;padding-top:64px}
+.tank{
+  position:relative;width:62px;height:76px;flex:0 0 auto;
+  border:2px solid var(--pipe-hi);border-radius:9px 9px 12px 12px;
+  background:linear-gradient(100deg, rgba(255,255,255,.07) 0 12%, transparent 12% 76%, rgba(255,255,255,.04) 76% 88%, transparent 88%), #0f181e;
+  box-shadow:0 7px 18px rgba(0,0,0,.5), inset 0 0 16px rgba(0,0,0,.5);
+  overflow:hidden;transition:border-color .3s ease, box-shadow .3s ease;
+}
+.tank::after{ /* nắp bồn */
+  content:'';position:absolute;top:4px;left:9px;right:9px;height:3px;border-radius:2px;
+  background:rgba(214,228,234,.14);
+}
+.tank .lv{
+  position:absolute;left:0;right:0;bottom:0;height:0;
+  background:linear-gradient(180deg,var(--cyan),var(--cyan-dim));
+  opacity:.5;transition:height .55s cubic-bezier(.4,0,.3,1);
+}
+.node.on .tank{border-color:var(--cyan);box-shadow:0 7px 18px rgba(0,0,0,.5), 0 0 0 3px rgba(63,201,216,.16)}
+.node.on .tank .lv{height:66%}
+.node .lab{
+  font-family:var(--f-mono);font-size:14.5px;font-weight:600;color:var(--paper);
+  letter-spacing:.02em;white-space:nowrap;
+}
+.node.on .lab{color:#8fe8f2}
+.node .idx{
+  font-family:var(--f-mono);font-size:9px;letter-spacing:.16em;color:var(--paper-faint);
+  text-transform:uppercase;
+}
+
+.seg{display:flex;flex-direction:column-reverse;align-items:center;gap:11px;flex:0 0 auto;width:clamp(178px,20vw,232px);padding-top:0}
+.pipe{
+  position:relative;width:100%;height:16px;margin-top:64px;
+  background:linear-gradient(180deg,var(--pipe-hi),var(--pipe) 42%,#1b262d);
+  border-top:1px solid rgba(214,228,234,.13);border-radius:2px;
+}
+.pipe::after{ /* mũi tên hướng dòng */
+  content:'';position:absolute;right:-9px;top:50%;transform:translateY(-50%);
+  border:9px solid transparent;border-left-color:var(--pipe-hi);border-right:none;
+}
+.pipe .flow{
+  position:absolute;inset:1px;border-radius:2px;
+  background:linear-gradient(90deg,var(--cyan-dim),var(--cyan));
+  transform:scaleX(0);transform-origin:left center;opacity:.85;
+}
+.seg.locked .flow{transform:scaleX(1);background:linear-gradient(90deg,rgba(77,189,130,.45),rgba(77,189,130,.7))}
+.seg.on .flow{transform:scaleX(1);background:linear-gradient(90deg,var(--cyan-dim),var(--cyan));transition:transform .5s linear}
+.seg.on .pipe::after{border-left-color:var(--cyan)}
+.valve{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:26px;height:26px;color:var(--pipe-hi);transition:color .3s ease,transform .6s ease;
+}
+.seg.on .valve{color:var(--cyan);transform:translate(-50%,-50%) rotate(180deg)}
+.seg.locked .valve{color:var(--ok)}
+.valve .ln{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round}
+
+.ctl{display:flex;flex-direction:column;align-items:stretch;gap:6px;width:100%}
+.slot{
+  width:100%;min-height:56px;padding:9px 10px;
+  background:rgba(214,228,234,.03);
+  border:1.5px dashed var(--edge-2);border-radius:4px;
+  font-family:var(--f-mono);font-size:11.5px;line-height:1.45;color:var(--paper-faint);
+  display:flex;align-items:center;justify-content:center;text-align:center;
+  transition:border-color .15s ease, background .15s ease, color .15s ease;
+  touch-action:none;
+}
+.slot:hover:not([disabled]){border-color:var(--cyan);color:var(--paper-dim)}
+.slot.filled{
+  border-style:solid;border-color:var(--amber-dim);
+  background:linear-gradient(180deg,rgba(240,168,54,.13),rgba(240,168,54,.05));
+  color:#ffd894;font-size:12px;
+}
+.slot.over{border-color:var(--cyan);background:rgba(63,201,216,.12);color:var(--paper)}
+.slot.locked{
+  border-style:solid;border-color:var(--ok);cursor:default;
+  background:linear-gradient(180deg,rgba(77,189,130,.16),rgba(77,189,130,.05));
+  color:#a5eec6;
+}
+.slot.leak{border-color:var(--bad);background:rgba(226,96,78,.14);color:#ffb3a8;animation:shake .42s ease}
+@keyframes shake{0%,100%{transform:translateX(0)}18%{transform:translateX(-6px)}38%{transform:translateX(5px)}62%{transform:translateX(-3px)}82%{transform:translateX(2px)}}
+.eq{
+  font-family:var(--f-mono);font-size:10.5px;line-height:1.5;color:#8fe8f2;
+  text-align:center;min-height:0;opacity:0;transition:opacity .4s ease;
+  word-break:break-word;
+}
+.seg.locked .eq{opacity:1}
+
+/* Xếp dọc trên màn hẹp */
+@media (max-width:900px){
+  .board{padding:24px 14px}
+  .line{flex-direction:column;align-items:center}
+  .node{padding-top:0;flex-direction:row;gap:13px;width:100%;max-width:430px;justify-content:flex-start}
+  .node .tank{width:48px;height:58px}
+  .node .meta{display:flex;flex-direction:column;gap:2px}
+  .seg{flex-direction:row;align-items:center;gap:14px;width:100%;max-width:430px}
+  .pipe{width:16px;height:78px;margin-top:0;margin-left:16px;flex:0 0 16px;
+    background:linear-gradient(90deg,var(--pipe-hi),var(--pipe) 42%,#1b262d);
+    border-top:none;border-left:1px solid rgba(214,228,234,.13)}
+  .pipe::after{right:auto;left:50%;top:auto;bottom:-9px;transform:translateX(-50%);
+    border:9px solid transparent;border-top-color:var(--pipe-hi);border-bottom:none}
+  .seg.on .pipe::after{border-left-color:transparent;border-top-color:var(--cyan)}
+  .pipe .flow{transform:scaleY(0);transform-origin:center top}
+  .seg.locked .flow{transform:scaleY(1);background:linear-gradient(180deg,rgba(77,189,130,.45),rgba(77,189,130,.7))}
+  .seg.on .flow{transform:scaleY(1);background:linear-gradient(180deg,var(--cyan-dim),var(--cyan))}
+  .eq{text-align:left}
+  .slot{justify-content:flex-start;text-align:left}
+}
+@media (min-width:901px){
+  .node .meta{display:contents}
+}
+
+/* ---------- Giá thẻ điều kiện ---------- */
+.tray{padding:18px 20px 20px;margin-bottom:15px}
+.tray .head{
+  display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:14px;
+  padding-bottom:11px;border-bottom:1px solid var(--edge);
+}
+.tray .head .t{font-family:var(--f-display);font-size:17px;letter-spacing:.03em;color:var(--paper)}
+.tray .head .h{font-size:12.5px;color:var(--paper-faint);line-height:1.5}
+.tiles{display:flex;flex-wrap:wrap;gap:9px;min-height:58px;align-content:flex-start}
+.tile{
+  padding:11px 14px;border-radius:4px;
+  background:linear-gradient(180deg,var(--steel-4),#182229);
+  border:1px solid var(--edge-2);border-left:3px solid var(--amber);
+  font-family:var(--f-mono);font-size:12px;line-height:1.4;color:#f6e5c6;
+  box-shadow:0 3px 9px rgba(0,0,0,.4);
+  transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+  touch-action:none;text-align:left;max-width:100%;
+}
+.tile:hover{transform:translateY(-2px);box-shadow:0 7px 16px rgba(0,0,0,.5);border-color:var(--amber)}
+.tile.sel{border-color:var(--cyan);border-left-color:var(--cyan);box-shadow:0 0 0 2px rgba(63,201,216,.28), 0 7px 16px rgba(0,0,0,.5);color:#cdf3f8}
+.tile.dragging{opacity:.28}
+.tray .empty{font-size:13px;color:var(--paper-faint);font-style:italic;padding:14px 0}
+#ghost{
+  position:fixed;z-index:99;pointer-events:none;
+  transform:translate(-50%,-50%) rotate(-2deg);
+  box-shadow:0 14px 30px rgba(0,0,0,.6);
+}
+
+/* ---------- Bảng điều khiển & thông báo ---------- */
+.deck{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:15px}
+.deck .spacer{flex:1 1 auto}
+.msg{
+  padding:14px 18px;border-radius:4px;font-size:14px;line-height:1.6;
+  border-left:3px solid var(--edge-2);background:var(--steel-2);color:var(--paper-dim);
+  transition:border-color .2s ease,color .2s ease;
+}
+.msg.good{border-left-color:var(--ok);color:#b6efd1}
+.msg.warn{border-left-color:var(--amber);color:#ffdda2}
+.msg.bad{border-left-color:var(--bad);color:#ffb9ae}
+.msg b{color:inherit;font-weight:600}
+
+/* ---------- Sổ tay giải thích ---------- */
+.note{padding:20px 24px 22px;margin-top:15px}
+.note h2{color:#eaf6fa;font-size:19px;margin-bottom:14px}
+.note ol{margin:0;padding-left:20px}
+.note li{margin-bottom:15px;font-size:14px;line-height:1.62;color:var(--paper-dim)}
+.note li:last-child{margin-bottom:0}
+.note .e{
+  display:block;font-family:var(--f-mono);font-size:12.5px;color:#8fe8f2;
+  margin-bottom:5px;word-break:break-word;
+}
+.note .c{
+  display:inline-block;font-family:var(--f-mono);font-size:11px;color:var(--amber);
+  border:1px solid var(--amber-dim);border-radius:2px;padding:1px 7px;margin-bottom:6px;
+}
+
+/* ---------- Màn tổng kết ---------- */
+.done{padding:32px 30px}
+.score-row{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:8px}
+.score-big{font-family:var(--f-display);font-size:56px;line-height:.9;color:var(--cyan)}
+.rank{font-family:var(--f-display);font-size:25px;letter-spacing:.03em;color:var(--amber)}
+.done > p{margin:12px 0 24px;font-size:15px;line-height:1.65;color:var(--paper-dim);max-width:62ch}
+.recap{list-style:none;padding:0;margin:0 0 26px}
+.recap li{
+  padding:13px 0;border-bottom:1px solid rgba(214,228,234,.09);
+  display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;
+}
+.recap li:last-child{border-bottom:none}
+.recap .no{font-family:var(--f-mono);font-size:10.5px;color:var(--amber);flex:0 0 46px;padding-top:3px;letter-spacing:.1em}
+.recap .body{flex:1 1 260px;min-width:0}
+.recap .nm{font-weight:600;font-size:14.5px;color:var(--paper);margin-bottom:4px}
+.recap .path{font-family:var(--f-mono);font-size:12px;color:#8fe8f2;line-height:1.5;word-break:break-word}
+.recap .pt{font-family:var(--f-mono);font-size:13px;color:var(--paper-dim);flex:0 0 auto;padding-top:2px}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- ============ BẢNG TÊN ============ -->
+  <header class="plate">
+    <svg class="mark" width="58" height="58" viewBox="0 0 58 58" aria-hidden="true">
+      <circle class="ln2" cx="29" cy="29" r="26"/>
+      <path class="ln" d="M9 38 H21 A6 6 0 0 0 27 32 V26 A6 6 0 0 1 33 20 H49"/>
+      <circle class="ln" cx="27" cy="29" r="4.6"/>
+      <path class="ln2" d="M27 22 V19 M27 39 V36 M20 29 H17 M37 29 H34" transform="translate(0 0)"/>
+      <path class="ln" d="M45 16 V24 M41 20 H49"/>
+    </svg>
+    <div class="txt">
+      <p class="eyebrow">Tổ hợp hóa chất · Trạm chuyển hóa</p>
+      <h1>Đường Ống Chuyển Hóa</h1>
+      <p class="sub">Ghép đúng điều kiện phản ứng cho từng đoạn ống để dòng chất chạy hết dây chuyền. Nitrogen và Sulfur — Hóa học 11.</p>
+    </div>
+    <div class="code" id="plate-code">HỒ SƠ CA<br>ĐANG CHỜ LỆNH</div>
+  </header>
+
+  <!-- ============ MÀN GIỚI THIỆU ============ -->
+  <section id="screen-intro" class="panel intro">
+    <span class="rivet" style="top:14px;left:14px"></span>
+    <span class="rivet" style="top:14px;right:14px"></span>
+    <span class="rivet" style="bottom:14px;left:14px"></span>
+    <span class="rivet" style="bottom:14px;right:14px"></span>
+    <h2>Nhận ca trực</h2>
+    <p>Mỗi ca, phòng điều khiển gửi xuống một sơ đồ chuyển hóa còn trống các đoạn ống. Việc của bạn là chọn đúng <b style="color:var(--paper)">chất tham gia và điều kiện</b> cho từng bước, rồi bơm thử. Ống nào ghép sai sẽ rò — sửa lại và bơm tiếp.</p>
+    <ol class="rules">
+      <li><span class="n">1</span><span><b>Đặt thẻ:</b> kéo thẻ điều kiện từ giá thả vào ô trên đoạn ống. Trên điện thoại hoặc khi chiếu máy chiếu, có thể bấm chọn thẻ rồi bấm vào ô.</span></li>
+      <li><span class="n">2</span><span><b>Giá thẻ luôn thừa:</b> có vài thẻ nhiễu trông rất hợp lý. Thẻ sai thường sai ở xúc tác, nhiệt độ hoặc nồng độ acid.</span></li>
+      <li><span class="n">3</span><span><b>Bơm thử:</b> đoạn nào đúng sẽ khóa lại và hiện phương trình. Đoạn sai trả thẻ về giá và <b>trừ 15 điểm</b>.</span></li>
+      <li><span class="n">4</span><span><b>Van gợi ý:</b> mở một van sẽ tự điền đúng một đoạn, <b>trừ 20 điểm</b>. Cả lượt chỉ có 3 van.</span></li>
+      <li><span class="n">5</span><span><b>Hoàn thành:</b> đọc phần giải thích cuối mỗi ca — đó mới là chỗ lấy điểm cho bài kiểm tra.</span></li>
+    </ol>
+    <div class="deck">
+      <button class="btn btn-primary" id="btn-start">Vào ca 1</button>
+      <button class="sound" id="btn-snd-intro" type="button"><span id="snd-lab-intro">Âm thanh: đầy đủ</span></button>
+    </div>
+    <p class="scope">Phạm vi kiến thức · <b>Nitrogen</b> N₂, NH₃, muối ammonium, HNO₃ và muối nitrate · <b>Sulfur</b> S, SO₂, SO₃, H₂SO₄ và muối sulfate · <b>Ứng dụng</b> dây chuyền Haber–Bosch, Ostwald, tiếp xúc, khử SO₂ trong khói thải.</p>
+  </section>
+
+  <!-- ============ MÀN CHƠI ============ -->
+  <section id="screen-play" class="hide">
+    <div class="hud">
+      <div class="gauge"><span class="lab">Ca</span><span class="val" id="g-shift">1/5</span></div>
+      <div class="gauge"><span class="lab">Điểm ca</span><span class="val" id="g-score">100</span></div>
+      <div class="gauge"><span class="lab">Tổng</span><span class="val amber" id="g-total">0</span></div>
+      <div class="gauge"><span class="lab">Van gợi ý</span><span class="pips" id="g-pips"></span></div>
+      <span class="spacer"></span>
+      <button class="sound" id="btn-snd" type="button"><span id="snd-lab">Âm thanh: đầy đủ</span></button>
+    </div>
+
+    <div class="panel order">
+      <p class="tag" id="o-tag">Lệnh sản xuất</p>
+      <h2 id="o-name">—</h2>
+      <p id="o-brief">—</p>
+    </div>
+
+    <div class="panel board">
+      <div class="line" id="line"></div>
+    </div>
+
+    <div class="panel tray">
+      <div class="head">
+        <span class="t">Giá thẻ điều kiện</span>
+        <span class="h" id="tray-hint">Kéo thẻ vào ô trống trên đường ống, hoặc bấm chọn thẻ rồi bấm vào ô.</span>
+      </div>
+      <div class="tiles" id="tiles"></div>
+    </div>
+
+    <div class="deck">
+      <button class="btn btn-primary" id="btn-pump">Bơm thử</button>
+      <button class="btn btn-ghost" id="btn-hint">Mở van gợi ý</button>
+      <button class="btn btn-ghost" id="btn-clear">Xả hết ống</button>
+      <span class="spacer"></span>
+      <button class="btn btn-amber hide" id="btn-next">Ca tiếp theo</button>
+    </div>
+
+    <div class="msg" id="msg">Đặt đủ điều kiện cho mọi đoạn ống rồi bấm “Bơm thử”.</div>
+
+    <div class="panel note hide" id="note">
+      <h2>Sổ tay ca trực</h2>
+      <ol id="note-list"></ol>
+    </div>
+  </section>
+
+  <!-- ============ MÀN TỔNG KẾT ============ -->
+  <section id="screen-done" class="panel done hide">
+    <span class="rivet" style="top:14px;left:14px"></span>
+    <span class="rivet" style="top:14px;right:14px"></span>
+    <p class="eyebrow">Kết ca · Biên bản bàn giao</p>
+    <div class="score-row">
+      <span class="score-big" id="d-score">0</span>
+      <span class="rank" id="d-rank">—</span>
+    </div>
+    <p id="d-note">—</p>
+    <ol class="recap" id="d-recap"></ol>
+    <button class="btn btn-primary" id="btn-again">Nhận ca mới</button>
+  </section>
+
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ==================== KHO THẺ ĐIỀU KIỆN ==================== */
+/* Dùng chung cho mọi sơ đồ; thẻ không dùng trong sơ đồ hiện tại sẽ thành thẻ nhiễu. */
+const COND = {
+  h2_fe:     '+ H₂ · 450 °C · 200 bar · xt Fe',
+  hcl:       '+ dd HCl',
+  naoh_t:    '+ dd NaOH · t°',
+  naoh:      '+ dd NaOH',
+  naoh_11:   '+ dd NaOH (tỉ lệ mol 1 : 1)',
+  caoh2_r_t: '+ Ca(OH)₂ rắn · t°',
+  caoh2_dd:  '+ dd Ca(OH)₂',
+  o2_t:      '+ O₂ · t°',
+  o2:        '+ O₂',
+  o2_v2o5:   '+ O₂ · 450 °C · xt V₂O₅',
+  o2_pt:     '+ O₂ · 850 °C · xt Pt',
+  o2_h2o:    '+ O₂ + H₂O',
+  h2o:       '+ H₂O',
+  nhiet:     't° (nhiệt phân)',
+  h2_t:      '+ H₂ · t°',
+  c_t:       '+ C · t°',
+  nh3:       '+ NH₃',
+  cu:        '+ Cu (dd HNO₃ loãng dư)',
+  hno3_l:    '+ dd HNO₃ loãng',
+  h2so4_l:   '+ dd H₂SO₄ loãng',
+  h2so4_d:   '+ H₂SO₄ đặc',
+  h2so4_2nh3:'+ NH₃ (dư)',
+  bacl2:     '+ dd BaCl₂',
+  agno3:     '+ dd AgNO₃',
+  kmno4:     '+ dd KMnO₄',
+  cuo_t:     '+ CuO · t°',
+  ba_oh2:    '+ dd Ba(OH)₂'
+};
+
+/* ==================== SƠ ĐỒ CHUYỂN HÓA ==================== */
+/* nodes.length === steps.length + 1. family dùng để tránh bốc trùng dạng trong một lượt. */
+const CHAINS = [
+
+  /* ---------- Độ khó 1: 3 bước ---------- */
+  {
+    id:'nh3-cycle', family:'ammonia', tier:1,
+    name:'Vòng tuần hoàn ammonia',
+    brief:'Phân xưởng tổng hợp đạm cần chạy thử vòng khép kín: lấy nitrogen từ không khí, giữ lại dưới dạng muối, rồi tái sinh khí ammonia để nạp bồn.',
+    nodes:['N₂','NH₃','NH₄Cl','NH₃'],
+    steps:[
+      {c:'h2_fe', eq:'N₂ + 3H₂ ⇌ 2NH₃',
+       why:'Phản ứng thuận nghịch và tỏa nhiệt. Áp suất cao đẩy cân bằng về phía tạo NH₃ vì bên đó ít mol khí hơn; nhiệt độ 450 °C và xúc tác Fe chỉ để phản ứng đủ nhanh, bản thân chúng không làm tăng hiệu suất.'},
+      {c:'hcl', eq:'NH₃ + HCl → NH₄Cl',
+       why:'NH₃ nhận proton nên thể hiện tính base. Cho khí NH₃ gặp khí HCl sẽ thấy khói trắng NH₄Cl — dấu hiệu nhận biết quen thuộc của ammonia.'},
+      {c:'naoh_t', eq:'NH₄Cl + NaOH →(t°) NaCl + NH₃↑ + H₂O',
+       why:'Ion NH₄⁺ nhường proton cho OH⁻. Phải đun nóng để đẩy NH₃ ra khỏi dung dịch; mùi khai bay lên chính là cách nhận biết muối ammonium.'}
+    ],
+    lures:['o2_pt','h2so4_d','agno3']
+  },
+  {
+    id:'sulfur-burn', family:'sulfur-contact', tier:1,
+    name:'Lò đốt lưu huỳnh',
+    brief:'Dây chuyền tiếp xúc sản xuất sulfuric acid đang khởi động lại sau bảo dưỡng. Ba đoạn ống từ kho lưu huỳnh tới tháp hấp thụ đều chưa được cài điều kiện.',
+    nodes:['S','SO₂','SO₃','H₂SO₄'],
+    steps:[
+      {c:'o2_t', eq:'S + O₂ →(t°) SO₂',
+       why:'Sulfur cháy trong không khí cho ngọn lửa xanh mờ và khí SO₂ mùi hắc. Đây là bước đơn giản nhất nhưng cũng là nguồn phát thải chính nếu rò ra ngoài.'},
+      {c:'o2_v2o5', eq:'2SO₂ + O₂ ⇌ 2SO₃',
+       why:'Phản ứng thuận nghịch, tỏa nhiệt, cần xúc tác V₂O₅. Chọn 450–500 °C là một thỏa hiệp: thấp hơn thì tốc độ quá chậm, cao hơn thì cân bằng chuyển ngược làm tụt hiệu suất.'},
+      {c:'h2o', eq:'SO₃ + H₂O → H₂SO₄',
+       why:'Về bản chất SO₃ là oxide acid nên hợp nước cho sulfuric acid. Trong nhà máy người ta không hấp thụ trực tiếp vào nước (sinh mù acid rất khó thu) mà cho SO₃ vào H₂SO₄ đặc thành oleum rồi mới pha loãng.'}
+    ],
+    lures:['o2_pt','h2so4_d','naoh']
+  },
+  {
+    id:'flue-gas', family:'flue-gas', tier:1,
+    name:'Tháp khử khí thải',
+    brief:'Trạm quan trắc báo nồng độ SO₂ ở ống khói vượt ngưỡng. Phải cho khói đi qua tháp hấp thụ và chuyển phần sulfur thu được thành sản phẩm bán được.',
+    nodes:['S','SO₂','CaSO₃','CaSO₄'],
+    steps:[
+      {c:'o2_t', eq:'S + O₂ →(t°) SO₂',
+       why:'Lưu huỳnh lẫn trong nhiên liệu cháy cùng than dầu và thoát ra theo khói. Đây là nguồn gốc của mưa acid nếu không xử lý.'},
+      {c:'caoh2_dd', eq:'SO₂ + Ca(OH)₂ → CaSO₃↓ + H₂O',
+       why:'SO₂ là oxide acid nên bị dung dịch base giữ lại. Phun sữa vôi vào dòng khói chính là nguyên tắc khử SO₂ đang dùng ở các nhà máy nhiệt điện.'},
+      {c:'o2', eq:'2CaSO₃ + O₂ → 2CaSO₄',
+       why:'Sulfur trong CaSO₃ mới ở số oxi hóa +4 nên còn bị O₂ oxi hóa tiếp lên +6. Sản phẩm CaSO₄ là thạch cao, bán lại cho ngành xây dựng thay vì đem chôn lấp.'}
+    ],
+    lures:['o2_v2o5','h2so4_l','naoh_11']
+  },
+  {
+    id:'so2-lab', family:'so2-lab', tier:1,
+    name:'Bình điều chế SO₂',
+    brief:'Phòng thí nghiệm của nhà máy cần một bình SO₂ để hiệu chuẩn máy đo, sau đó phải hấp thụ hết khí dư trước khi tan ca.',
+    nodes:['Na₂SO₃','SO₂','NaHSO₃','Na₂SO₃'],
+    steps:[
+      {c:'h2so4_l', eq:'Na₂SO₃ + H₂SO₄ → Na₂SO₄ + SO₂↑ + H₂O',
+       why:'Acid mạnh đẩy acid yếu ra khỏi muối. Đây là cách điều chế SO₂ trong phòng thí nghiệm; dùng acid loãng là đủ, acid đặc chỉ gây thêm phản ứng phụ.'},
+      {c:'naoh_11', eq:'SO₂ + NaOH → NaHSO₃',
+       why:'Tỉ lệ mol quyết định sản phẩm. Khi n(NaOH)/n(SO₂) ≤ 1, tức SO₂ còn dư, sản phẩm chỉ là muối acid NaHSO₃.'},
+      {c:'naoh', eq:'NaHSO₃ + NaOH → Na₂SO₃ + H₂O',
+       why:'Thêm base, ion HSO₃⁻ nhường nốt proton còn lại thành SO₃²⁻. Nắm được cặp NaHSO₃ / Na₂SO₃ là nắm được dạng bài "SO₂ tác dụng với kiềm".'}
+    ],
+    lures:['caoh2_dd','h2so4_d','bacl2']
+  },
+
+  /* ---------- Độ khó 2: 4 bước ---------- */
+  {
+    id:'ostwald', family:'nitric', tier:2,
+    name:'Dây chuyền Ostwald',
+    brief:'Xưởng nitric acid nhận lệnh chạy hết công suất để kịp đơn hàng phân đạm. Bốn đoạn ống từ bồn ammonia tới tháp hấp thụ đang chờ cài điều kiện.',
+    nodes:['NH₃','NO','NO₂','HNO₃','NH₄NO₃'],
+    steps:[
+      {c:'o2_pt', eq:'4NH₃ + 5O₂ →(850 °C, Pt) 4NO + 6H₂O',
+       why:'Điểm mấu chốt của cả dây chuyền. Có xúc tác Pt và nhiệt độ cao, NH₃ bị oxi hóa dừng lại ở NO; nếu đốt NH₃ không xúc tác thì sản phẩm là N₂ và coi như mất trắng nguyên liệu.'},
+      {c:'o2', eq:'2NO + O₂ → 2NO₂',
+       why:'NO không màu gặp oxygen của không khí hóa nâu ngay ở điều kiện thường, không cần đun. Chính hiện tượng "hóa nâu trong không khí" này dùng để nhận ra khí NO.'},
+      {c:'o2_h2o', eq:'4NO₂ + O₂ + 2H₂O → 4HNO₃',
+       why:'Phải hấp thụ NO₂ cùng O₂ dư thì toàn bộ nitrogen mới thành HNO₃. Nếu chỉ có nước, một phần quay lại thành NO: 3NO₂ + H₂O → 2HNO₃ + NO.'},
+      {c:'nh3', eq:'NH₃ + HNO₃ → NH₄NO₃',
+       why:'Phản ứng acid–base cho đạm hai lá NH₄NO₃, loại phân vừa có đạm ammonium vừa có đạm nitrate nên hàm lượng nitrogen cao.'}
+    ],
+    lures:['o2_v2o5','h2o','h2_fe','naoh']
+  },
+  {
+    id:'pyrite', family:'sulfur-contact', tier:2,
+    name:'Từ quặng pyrite tới acid',
+    brief:'Nhà máy chuyển sang dùng quặng pyrite thay lưu huỳnh nguyên chất. Cuối dây chuyền, phòng KCS cần một phép thử để xác nhận sản phẩm đúng là sulfuric acid.',
+    nodes:['FeS₂','SO₂','SO₃','H₂SO₄','BaSO₄'],
+    steps:[
+      {c:'o2_t', eq:'4FeS₂ + 11O₂ →(t°) 2Fe₂O₃ + 8SO₂',
+       why:'Đốt quặng trong lò tầng sôi. Sản phẩm rắn Fe₂O₃ được thu lại làm nguyên liệu luyện gang, còn khí SO₂ đi tiếp vào tháp tiếp xúc.'},
+      {c:'o2_v2o5', eq:'2SO₂ + O₂ ⇌ 2SO₃',
+       why:'Vẫn là bước tiếp xúc quen thuộc, nhưng khí từ lò quặng phải làm sạch bụi và hơi nước trước, vì tạp chất làm ngộ độc xúc tác V₂O₅.'},
+      {c:'h2o', eq:'SO₃ + H₂O → H₂SO₄',
+       why:'Bước hấp thụ. SO₃ là oxide acid tương ứng của H₂SO₄, hợp nước theo đúng tỉ lệ 1 : 1.'},
+      {c:'bacl2', eq:'H₂SO₄ + BaCl₂ → BaSO₄↓ + 2HCl',
+       why:'Kết tủa trắng BaSO₄ không tan cả trong acid mạnh — đó là lý do dung dịch chứa Ba²⁺ được chọn làm thuốc thử đặc trưng của ion sulfate.'}
+    ],
+    lures:['o2_pt','h2so4_d','agno3','naoh_t']
+  },
+  {
+    id:'copper', family:'copper', tier:2,
+    name:'Thu hồi đồng phế liệu',
+    brief:'Xưởng cơ khí gom được một mẻ dây đồng vụn. Kế hoạch: hòa tan bằng acid, kết tủa, nung rồi khử về đồng kim loại sạch.',
+    nodes:['Cu','Cu(NO₃)₂','Cu(OH)₂','CuO','Cu'],
+    steps:[
+      {c:'hno3_l', eq:'3Cu + 8HNO₃(loãng) → 3Cu(NO₃)₂ + 2NO↑ + 4H₂O',
+       why:'Cu đứng sau H trong dãy hoạt động nên không đẩy được H⁺. Ở đây chất oxi hóa là N⁺⁵ của gốc nitrate chứ không phải H⁺, nên không có khí H₂; với acid loãng, sản phẩm khử chính là NO.'},
+      {c:'naoh', eq:'Cu(NO₃)₂ + 2NaOH → Cu(OH)₂↓ + 2NaNO₃',
+       why:'Phản ứng trao đổi tạo kết tủa xanh lam Cu(OH)₂, tách đồng ra khỏi dung dịch muối.'},
+      {c:'nhiet', eq:'Cu(OH)₂ →(t°) CuO + H₂O',
+       why:'Hydroxide của kim loại không tan bị nhiệt phân thành oxide. Quan sát được rõ: kết tủa xanh lam chuyển dần sang chất rắn màu đen.'},
+      {c:'h2_t', eq:'CuO + H₂ →(t°) Cu + H₂O',
+       why:'H₂ khử ion Cu²⁺ về kim loại. Chất rắn đen chuyển sang màu đỏ gạch — dấu hiệu cho biết phản ứng đã hoàn tất.'}
+    ],
+    lures:['h2so4_l','o2_t','cuo_t','agno3']
+  },
+
+  /* ---------- Độ khó 3: 5 bước ---------- */
+  {
+    id:'air-to-fertilizer', family:'nitric', tier:3,
+    name:'Từ không khí đến bao đạm',
+    brief:'Ca cuối tuần chạy trọn tuyến: lấy nitrogen từ không khí và ra bao phân đạm hai lá. Năm đoạn ống, không được sai đoạn nào ở khâu xúc tác.',
+    nodes:['N₂','NH₃','NO','NO₂','HNO₃','NH₄NO₃'],
+    steps:[
+      {c:'h2_fe', eq:'N₂ + 3H₂ ⇌ 2NH₃',
+       why:'Quá trình Haber–Bosch. Nhiệt độ cao làm giảm hiệu suất vì phản ứng tỏa nhiệt, nhưng vẫn phải dùng để tốc độ đủ lớn; bù lại bằng áp suất cao và tuần hoàn khí chưa phản ứng.'},
+      {c:'o2_pt', eq:'4NH₃ + 5O₂ →(850 °C, Pt) 4NO + 6H₂O',
+       why:'Xúc tác Pt giữ cho quá trình oxi hóa dừng ở NO. Đây là chỗ dễ nhầm nhất: V₂O₅ là xúc tác của dây chuyền sulfuric acid, không dùng ở đây.'},
+      {c:'o2', eq:'2NO + O₂ → 2NO₂',
+       why:'Xảy ra ngay ở điều kiện thường, khí không màu hóa nâu đỏ. Đây cũng là phản ứng làm khói thải động cơ có màu nâu.'},
+      {c:'o2_h2o', eq:'4NO₂ + O₂ + 2H₂O → 4HNO₃',
+       why:'Cấp thêm O₂ khi hấp thụ để không sinh NO quay ngược lại, nhờ đó hiệu suất chuyển hóa nitrogen của cả dây chuyền mới cao.'},
+      {c:'nh3', eq:'NH₃ + HNO₃ → NH₄NO₃',
+       why:'Trung hòa HNO₃ bằng chính NH₃ của phân xưởng bên cạnh. Lưu ý NH₄NO₃ kém bền nhiệt, kho chứa phải tránh nóng và tránh va đập.'}
+    ],
+    lures:['o2_v2o5','h2o','naoh_t','h2so4_d']
+  },
+  {
+    id:'sa-fertilizer', family:'sulfur-contact', tier:3,
+    name:'Xưởng phân đạm SA',
+    brief:'Đơn hàng phân SA cho vụ đông. Tuyến chạy từ kho lưu huỳnh qua tháp tiếp xúc, sang khâu trung hòa, và kết thúc bằng phép thử kiểm tra ion sulfate.',
+    nodes:['S','SO₂','SO₃','H₂SO₄','(NH₄)₂SO₄','BaSO₄'],
+    steps:[
+      {c:'o2_t', eq:'S + O₂ →(t°) SO₂',
+       why:'Đốt lưu huỳnh nóng chảy bằng không khí khô. Không khí phải sấy trước, vì hơi ẩm sẽ tạo acid ăn mòn thiết bị ngay từ đoạn ống này.'},
+      {c:'o2_v2o5', eq:'2SO₂ + O₂ ⇌ 2SO₃',
+       why:'Bước quyết định hiệu suất. Vì tỏa nhiệt nên khí phải được làm nguội giữa các lớp xúc tác, giữ nhiệt độ quanh 450 °C.'},
+      {c:'h2o', eq:'SO₃ + H₂O → H₂SO₄',
+       why:'Hợp nước tạo sulfuric acid. Trong thực tế đi vòng qua oleum để tránh tạo mù acid, nhưng phương trình tổng vẫn là SO₃ + H₂O.'},
+      {c:'h2so4_2nh3', eq:'2NH₃ + H₂SO₄ → (NH₄)₂SO₄',
+       why:'Dùng dư NH₃ để trung hòa cả hai nấc, thu muối trung hòa (NH₄)₂SO₄ — phân SA. Nếu thiếu NH₃ thì chỉ được muối acid NH₄HSO₄.'},
+      {c:'bacl2', eq:'(NH₄)₂SO₄ + BaCl₂ → BaSO₄↓ + 2NH₄Cl',
+       why:'Phép thử xuất xưởng: kết tủa trắng không tan trong acid xác nhận ion SO₄²⁻ trong sản phẩm.'}
+    ],
+    lures:['o2_pt','naoh','nh3','h2so4_d']
+  },
+  {
+    id:'nitrate-lab', family:'nitric', tier:3,
+    name:'Tuyến kiểm định muối nitrate',
+    brief:'Đoàn kiểm tra yêu cầu chứng minh cả tuyến: từ một mẫu muối ammonium trong kho, tái tạo được nitric acid và tạo ra muối nitrate của đồng.',
+    nodes:['NH₄Cl','NH₃','NO','NO₂','HNO₃','Cu(NO₃)₂'],
+    steps:[
+      {c:'caoh2_r_t', eq:'2NH₄Cl + Ca(OH)₂ →(t°) CaCl₂ + 2NH₃↑ + 2H₂O',
+       why:'Cách điều chế NH₃ trong phòng thí nghiệm: trộn muối ammonium với base rắn rồi nung, thu khí bằng phương pháp đẩy không khí úp ngược ống vì NH₃ nhẹ hơn không khí.'},
+      {c:'o2_pt', eq:'4NH₃ + 5O₂ →(850 °C, Pt) 4NO + 6H₂O',
+       why:'Oxi hóa có xúc tác dừng ở NO. Không xúc tác thì NH₃ chỉ cháy cho N₂ và nước, không tạo được NO.'},
+      {c:'o2', eq:'2NO + O₂ → 2NO₂',
+       why:'Phản ứng tự xảy ra khi mở nắp bình chứa NO ra không khí, khí lập tức hóa nâu.'},
+      {c:'o2_h2o', eq:'4NO₂ + O₂ + 2H₂O → 4HNO₃',
+       why:'Hấp thụ có mặt O₂ dư để chuyển toàn bộ nitrogen thành nitric acid, không để sót NO thoát ra ngoài.'},
+      {c:'cu', eq:'3Cu + 8HNO₃(loãng) → 3Cu(NO₃)₂ + 2NO↑ + 4H₂O',
+       why:'HNO₃ loãng hòa tan cả kim loại đứng sau hydrogen nhờ tính oxi hóa mạnh của N⁺⁵. Dung dịch chuyển xanh lam và có khí không màu hóa nâu ngoài không khí.'}
+    ],
+    lures:['h2_fe','o2_v2o5','h2o','h2so4_l']
+  }
+];
+
+const TIERS = [1,1,2,2,3];
+const LURES_BY_TIER = {1:2, 2:3, 3:4};
+const BASE_POINT = 100, PEN_PUMP = 15, PEN_HINT = 20, MIN_POINT = 20;
+
+/* ==================== TRẠNG THÁI ==================== */
+let CAMP = {shift:0, total:0, hints:3, used:[], fams:[], log:[]};
+let S = null;
+
+const $ = id => document.getElementById(id);
+const shuffle = a => { a = a.slice(); for(let i=a.length-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]] = [a[j],a[i]]; } return a; };
+const pick = a => a[Math.floor(Math.random()*a.length)];
+let uidN = 0;
+const uid = () => 'k' + (++uidN);
+
+/* ==================== ÂM THANH (Web Audio, không dùng file) ==================== */
+const Snd = (function(){
+  let ctx = null, master = null, humGain = null, sfxGain = null;
+  let mode = 2;               // 2 = đầy đủ, 1 = chỉ hiệu ứng, 0 = tắt
+  let hum = [], started = false;
+
+  function ac(){
+    if(ctx) return ctx;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if(!AC) return null;
+    ctx = new AC();
+    const comp = ctx.createDynamicsCompressor();
+    comp.threshold.value = -16; comp.knee.value = 20; comp.ratio.value = 3.5;
+    comp.attack.value = .005; comp.release.value = .25;
+    comp.connect(ctx.destination);
+    master = ctx.createGain(); master.gain.value = .9; master.connect(comp);
+    humGain = ctx.createGain(); humGain.gain.value = 0; humGain.connect(master);
+    sfxGain = ctx.createGain(); sfxGain.gain.value = 1; sfxGain.connect(master);
+    return ctx;
+  }
+  const now = () => ctx ? ctx.currentTime : 0;
+
+  function tone(o){
+    if(!ctx || mode === 0) return;
+    const t = now() + (o.delay || 0);
+    const osc = ctx.createOscillator(), g = ctx.createGain();
+    osc.type = o.type || 'sine';
+    osc.frequency.setValueAtTime(o.freq, t);
+    if(o.to) osc.frequency.exponentialRampToValueAtTime(Math.max(30, o.to), t + (o.dur || .2));
+    g.gain.setValueAtTime(.0001, t);
+    g.gain.exponentialRampToValueAtTime(o.vol || .1, t + .006);
+    g.gain.exponentialRampToValueAtTime(.0001, t + (o.dur || .2));
+    osc.connect(g); g.connect(sfxGain);
+    osc.start(t); osc.stop(t + (o.dur || .2) + .05);
+  }
+
+  function noise(o){
+    if(!ctx || mode === 0) return;
+    const t = now() + (o.delay || 0), dur = o.dur || .3;
+    const len = Math.ceil(ctx.sampleRate * dur);
+    const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+    const d = buf.getChannelData(0);
+    for(let i=0;i<len;i++) d[i] = (Math.random()*2-1) * (1 - i/len);
+    const src = ctx.createBufferSource(); src.buffer = buf;
+    const f = ctx.createBiquadFilter();
+    f.type = o.type || 'bandpass'; f.frequency.value = o.freq || 1000; f.Q.value = o.q || 1;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(o.vol || .07, t);
+    g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+    src.connect(f); f.connect(g); g.connect(sfxGain);
+    src.start(t); src.stop(t + dur);
+  }
+
+  /* Nền: tiếng máy chạy trầm, hai dao động lệch nhau tạo nhịp đập nhẹ */
+  function startHum(){
+    if(!ctx || started) return;
+    started = true;
+    [55, 55.7, 110].forEach((f, i) => {
+      const o = ctx.createOscillator(), g = ctx.createGain(), lp = ctx.createBiquadFilter();
+      o.type = i === 2 ? 'triangle' : 'sawtooth';
+      o.frequency.value = f;
+      lp.type = 'lowpass'; lp.frequency.value = 260;
+      g.gain.value = i === 2 ? .05 : .11;
+      o.connect(lp); lp.connect(g); g.connect(humGain);
+      o.start();
+      hum.push(o);
+    });
+    fadeHum();
+  }
+  function fadeHum(){
+    if(!humGain) return;
+    humGain.gain.setTargetAtTime(mode === 2 ? .34 : 0, now(), .4);
+  }
+
+  return {
+    kick(){ if(ac()){ if(ctx.state === 'suspended') ctx.resume(); startHum(); } },
+    setMode(m){ mode = m; if(ctx){ fadeHum(); } },
+    getMode(){ return mode; },
+    pick(){ tone({freq:520, to:700, type:'triangle', dur:.07, vol:.06}); },
+    drop(){ tone({freq:180, to:110, type:'square', dur:.09, vol:.07}); noise({freq:2400, dur:.06, vol:.03}); },
+    deny(){ tone({freq:150, to:110, type:'sawtooth', dur:.16, vol:.06}); },
+    lock(i){ tone({freq:440 + i*70, type:'sine', dur:.16, vol:.09, delay:i*.07});
+             tone({freq:660 + i*70, type:'sine', dur:.2, vol:.05, delay:i*.07 + .04}); },
+    leak(){ noise({freq:900, q:.7, dur:.45, vol:.08});
+            tone({freq:240, to:120, type:'sawtooth', dur:.32, vol:.07}); },
+    flowStep(i){ noise({freq:600 + i*90, q:2.4, dur:.3, vol:.045, delay:i*.34}); },
+    win(){ [523.25, 659.25, 783.99, 1046.5].forEach((f,i) =>
+             tone({freq:f, type:'sine', dur:.42, vol:.09, delay:i*.11})); },
+    finish(){ [392, 523.25, 659.25, 783.99, 1046.5].forEach((f,i) =>
+             tone({freq:f, type:'triangle', dur:.6, vol:.09, delay:i*.14})); }
+  };
+})();
+
+const SND_LABEL = ['Âm thanh: tắt', 'Âm thanh: chỉ hiệu ứng', 'Âm thanh: đầy đủ'];
+function syncSound(){
+  const t = SND_LABEL[Snd.getMode()];
+  $('snd-lab').textContent = t;
+  $('snd-lab-intro').textContent = t;
+}
+function cycleSound(){
+  Snd.kick();
+  Snd.setMode((Snd.getMode() + 2) % 3);
+  syncSound();
+}
+
+/* ==================== BỐC SƠ ĐỒ & DỰNG GIÁ THẺ ==================== */
+function pickChain(tier){
+  const free = CHAINS.filter(c => c.tier === tier && CAMP.used.indexOf(c.id) < 0);
+  const fresh = free.filter(c => CAMP.fams.indexOf(c.family) < 0);
+  const pool = fresh.length ? fresh : (free.length ? free : CHAINS.filter(c => CAMP.used.indexOf(c.id) < 0));
+  return pick(pool.length ? pool : CHAINS);
+}
+
+function buildTray(chain){
+  const need = chain.steps.map(s => ({uid:uid(), c:s.c}));
+  const usedIds = chain.steps.map(s => s.c);
+  const want = LURES_BY_TIER[chain.tier] || 2;
+  const lures = [];
+  (chain.lures || []).forEach(id => {
+    if(COND[id] && usedIds.indexOf(id) < 0 && lures.indexOf(id) < 0 && lures.length < want) lures.push(id);
+  });
+  const rest = shuffle(Object.keys(COND).filter(id => usedIds.indexOf(id) < 0 && lures.indexOf(id) < 0));
+  while(lures.length < want && rest.length) lures.push(rest.pop());
+  return shuffle(need.concat(lures.map(id => ({uid:uid(), c:id}))));
+}
+
+/* ==================== BẮT ĐẦU MỘT CA ==================== */
+function newShift(){
+  const chain = pickChain(TIERS[CAMP.shift]);
+  CAMP.used.push(chain.id);
+  CAMP.fams.push(chain.family);
+
+  S = {
+    chain,
+    tray: buildTray(chain),
+    slots: chain.steps.map(() => null),   // uid của thẻ đang nằm trong ô
+    locked: chain.steps.map(() => false),
+    sel: null,
+    score: BASE_POINT,
+    solved: false
+  };
+
+  $('o-tag').textContent = 'Lệnh sản xuất · Ca ' + (CAMP.shift + 1) + '/' + TIERS.length +
+                           ' · ' + chain.steps.length + ' đoạn ống';
+  $('o-name').textContent = chain.name;
+  $('o-brief').textContent = chain.brief;
+  $('plate-code').innerHTML = 'CA ' + (CAMP.shift + 1) + '/' + TIERS.length + '<br>' + chain.id.toUpperCase();
+
+  $('note').classList.add('hide');
+  $('note-list').innerHTML = '';
+  $('btn-next').classList.add('hide');
+  $('btn-pump').disabled = false;
+  $('btn-clear').disabled = false;
+  setMsg('Đặt đủ điều kiện cho mọi đoạn ống rồi bấm “Bơm thử”.', '');
+  renderAll();
+}
+
+/* ==================== VẼ GIAO DIỆN ==================== */
+function renderAll(){ renderLine(); renderTray(); renderHud(); }
+
+function renderHud(){
+  $('g-shift').textContent = (CAMP.shift + 1) + '/' + TIERS.length;
+  $('g-score').textContent = S ? S.score : BASE_POINT;
+  $('g-total').textContent = CAMP.total;
+  const pips = $('g-pips');
+  pips.innerHTML = '';
+  for(let i=0;i<3;i++){
+    const p = document.createElement('span');
+    p.className = 'pip' + (i < CAMP.hints ? '' : ' spent');
+    pips.appendChild(p);
+  }
+  $('btn-hint').disabled = !S || S.solved || CAMP.hints <= 0;
+}
+
+const VALVE_SVG =
+  '<svg class="valve" viewBox="0 0 26 26" aria-hidden="true">' +
+  '<circle class="ln" cx="13" cy="13" r="8"/>' +
+  '<path class="ln" d="M13 5 V13 M13 13 L19.9 17 M13 13 L6.1 17"/>' +
+  '</svg>';
+
+function renderLine(){
+  const line = $('line');
+  line.innerHTML = '';
+  const ch = S.chain;
+
+  // Dòng chảy chỉ tới được đoạn khóa liên tiếp tính từ đầu tuyến
+  let reach = 0;
+  while(reach < S.locked.length && S.locked[reach]) reach++;
+
+  ch.nodes.forEach((name, i) => {
+    const node = document.createElement('div');
+    node.className = 'node';
+    node.dataset.i = i;
+    node.innerHTML =
+      '<div class="tank"><span class="lv"></span></div>' +
+      '<div class="meta"><div class="lab"></div><div class="idx">' +
+      (i === 0 ? 'nguyên liệu' : (i === ch.nodes.length - 1 ? 'sản phẩm' : 'trung gian')) +
+      '</div></div>';
+    node.querySelector('.lab').textContent = name;
+    line.appendChild(node);
+
+    if(i >= ch.steps.length) return;
+
+    const seg = document.createElement('div');
+    seg.className = 'seg' + (S.locked[i] ? ' locked' : '') + (i < reach ? ' on' : '');
+    seg.dataset.i = i;
+
+    const pipe = document.createElement('div');
+    pipe.className = 'pipe';
+    pipe.innerHTML = '<i class="flow"></i>' + VALVE_SVG;
+
+    const ctl = document.createElement('div');
+    ctl.className = 'ctl';
+
+    const slot = document.createElement('button');
+    slot.type = 'button';
+    slot.className = 'slot';
+    slot.dataset.i = i;
+    const held = S.slots[i];
+    if(held){
+      const item = S.tray.find(t => t.uid === held);
+      slot.textContent = item ? COND[item.c] : '';
+      slot.classList.add(S.locked[i] ? 'locked' : 'filled');
+    }else{
+      slot.textContent = 'Đoạn ' + (i + 1) + ' — chưa có điều kiện';
+    }
+    if(S.locked[i]) slot.disabled = true;
+
+    const eq = document.createElement('div');
+    eq.className = 'eq';
+    if(S.locked[i]) eq.textContent = ch.steps[i].eq;
+
+    ctl.appendChild(slot); ctl.appendChild(eq);
+    seg.appendChild(pipe); seg.appendChild(ctl);
+    line.appendChild(seg);
+  });
+
+  markFlow(S.solved ? ch.nodes.length : reach + 1);
+}
+
+function markFlow(nNodes){
+  const line = $('line');
+  line.querySelectorAll('.node').forEach(n => {
+    n.classList.toggle('on', Number(n.dataset.i) < nNodes);
+  });
+}
+
+function renderTray(){
+  const box = $('tiles');
+  box.innerHTML = '';
+  const free = S.tray.filter(t => S.slots.indexOf(t.uid) < 0);
+  if(!free.length){
+    const p = document.createElement('div');
+    p.className = 'empty';
+    p.textContent = 'Giá trống — mọi thẻ đã nằm trên đường ống.';
+    box.appendChild(p);
+    return;
+  }
+  free.forEach(t => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'tile' + (S.sel === t.uid ? ' sel' : '');
+    b.dataset.uid = t.uid;
+    b.textContent = COND[t.c];
+    box.appendChild(b);
+  });
+}
+
+function setMsg(text, kind){
+  const m = $('msg');
+  m.className = 'msg' + (kind ? ' ' + kind : '');
+  m.innerHTML = text;
+}
+
+/* ==================== ĐẶT / GỠ THẺ ==================== */
+function place(slotIdx, tileUid){
+  if(S.locked[slotIdx]) { Snd.deny(); return false; }
+  const from = S.slots.indexOf(tileUid);          // thẻ đang ở ô khác?
+  const prev = S.slots[slotIdx];
+  if(from >= 0) S.slots[from] = prev;             // hoán đổi hai ô
+  S.slots[slotIdx] = tileUid;
+  S.sel = null;
+  Snd.drop();
+  renderAll();
+  return true;
+}
+
+function takeBack(slotIdx){
+  if(S.locked[slotIdx] || S.slots[slotIdx] == null) return;
+  S.sel = S.slots[slotIdx];
+  S.slots[slotIdx] = null;
+  Snd.pick();
+  renderAll();
+}
+
+function clearAll(){
+  if(S.solved) return;
+  let any = false;
+  S.slots = S.slots.map((v, i) => { if(!S.locked[i] && v != null){ any = true; return null; } return v; });
+  S.sel = null;
+  if(any) Snd.deny();
+  renderAll();
+  setMsg('Đã xả các đoạn chưa khóa. Thẻ quay về giá.', '');
+}
+
+/* ==================== KÉO THẢ ==================== */
+let drag = null, suppressClick = false;
+
+function startDrag(e, uid, srcEl){
+  if(e.button != null && e.button !== 0) return;
+  drag = {uid, x:e.clientX, y:e.clientY, moved:false, ghost:null, src:srcEl, over:null};
+  window.addEventListener('pointermove', onDragMove);
+  window.addEventListener('pointerup', onDragEnd);
+  window.addEventListener('pointercancel', onDragEnd);
+}
+
+function onDragMove(e){
+  if(!drag) return;
+  if(!drag.moved){
+    if(Math.abs(e.clientX - drag.x) + Math.abs(e.clientY - drag.y) < 7) return;
+    drag.moved = true;
+    const item = S.tray.find(t => t.uid === drag.uid);
+    const g = document.createElement('div');
+    g.id = 'ghost';
+    g.className = 'tile';
+    g.textContent = item ? COND[item.c] : '';
+    document.body.appendChild(g);
+    drag.ghost = g;
+    if(drag.src) drag.src.classList.add('dragging');
+    Snd.pick();
+  }
+  drag.ghost.style.left = e.clientX + 'px';
+  drag.ghost.style.top = e.clientY + 'px';
+
+  const el = document.elementFromPoint(e.clientX, e.clientY);
+  const slot = el && el.closest ? el.closest('.slot') : null;
+  const target = (slot && !slot.disabled) ? slot : null;
+  if(drag.over !== target){
+    if(drag.over) drag.over.classList.remove('over');
+    if(target) target.classList.add('over');
+    drag.over = target;
+  }
+}
+
+function onDragEnd(e){
+  window.removeEventListener('pointermove', onDragMove);
+  window.removeEventListener('pointerup', onDragEnd);
+  window.removeEventListener('pointercancel', onDragEnd);
+  if(!drag) return;
+  const d = drag; drag = null;
+
+  if(d.over) d.over.classList.remove('over');
+  if(d.ghost) d.ghost.remove();
+  if(d.src) d.src.classList.remove('dragging');
+  if(!d.moved) return;                            // coi như một cú bấm thường
+
+  suppressClick = true;
+  setTimeout(() => { suppressClick = false; }, 0);
+
+  const el = document.elementFromPoint(e.clientX, e.clientY);
+  const slot = el && el.closest ? el.closest('.slot') : null;
+  if(slot && !slot.disabled){
+    place(Number(slot.dataset.i), d.uid);
+  }else{
+    const idx = S.slots.indexOf(d.uid);            // thả ra ngoài → trả về giá
+    if(idx >= 0 && !S.locked[idx]){ S.slots[idx] = null; Snd.drop(); }
+    S.sel = null;
+    renderAll();
+  }
+}
+
+/* ==================== BƠM THỬ ==================== */
+function pump(){
+  Snd.kick();
+  const ch = S.chain;
+  const empty = S.slots.filter(v => v == null).length;
+  if(empty){
+    Snd.deny();
+    setMsg('Còn <b>' + empty + ' đoạn ống</b> chưa có điều kiện. Bơm bây giờ chỉ làm áp suất tụt.', 'warn');
+    return;
+  }
+
+  const wrong = [];
+  S.slots.forEach((held, i) => {
+    if(S.locked[i]) return;
+    const item = S.tray.find(t => t.uid === held);
+    if(item && item.c === ch.steps[i].c) S.locked[i] = true;
+    else wrong.push(i);
+  });
+
+  if(!wrong.length){
+    S.solved = true;
+    S.score = Math.max(MIN_POINT, S.score);
+    finishShift();
+    return;
+  }
+
+  // Đánh dấu rò rồi trả thẻ sai về giá
+  const line = $('line');
+  wrong.forEach(i => {
+    const slot = line.querySelector('.slot[data-i="' + i + '"]');
+    if(slot) slot.classList.add('leak');
+  });
+  Snd.leak();
+  S.score = Math.max(MIN_POINT, S.score - PEN_PUMP);
+
+  const okCount = S.locked.filter(Boolean).length;
+  setMsg('Rò ở <b>đoạn ' + wrong.map(i => i + 1).join(', ') + '</b>. ' +
+         (okCount ? 'Đã khóa ' + okCount + ' đoạn đúng. ' : '') +
+         'Trừ ' + PEN_PUMP + ' điểm — kiểm tra lại xúc tác, nhiệt độ và nồng độ acid.', 'bad');
+
+  setTimeout(() => {
+    wrong.forEach(i => { S.slots[i] = null; });
+    renderAll();
+  }, 480);
+  renderHud();
+}
+
+/* ==================== HOÀN THÀNH CA ==================== */
+function finishShift(){
+  CAMP.total += S.score;
+  CAMP.log.push({name:S.chain.name, path:S.chain.nodes.join(' → '), score:S.score});
+
+  $('btn-pump').disabled = true;
+  $('btn-clear').disabled = true;
+  $('btn-hint').disabled = true;
+  renderLine();
+  renderTray();
+  renderHud();
+  flow();
+
+  setMsg('Dây chuyền thông suốt. Ca này được <b>' + S.score + ' điểm</b>. ' +
+         'Đọc sổ tay bên dưới trước khi sang ca mới.', 'good');
+
+  const list = $('note-list');
+  list.innerHTML = '';
+  S.chain.steps.forEach((st, i) => {
+    const li = document.createElement('li');
+    const c = document.createElement('span'); c.className = 'c'; c.textContent = COND[st.c];
+    const e = document.createElement('span'); e.className = 'e'; e.textContent = st.eq;
+    const w = document.createElement('span'); w.textContent = st.why;
+    li.appendChild(c); li.appendChild(e); li.appendChild(w);
+    list.appendChild(li);
+  });
+  $('note').classList.remove('hide');
+
+  const last = CAMP.shift >= TIERS.length - 1;
+  const btn = $('btn-next');
+  btn.textContent = last ? 'Xem biên bản bàn giao' : 'Ca tiếp theo';
+  btn.classList.remove('hide');
+}
+
+function flow(){
+  const line = $('line');
+  const segs = line.querySelectorAll('.seg');
+  const nodes = line.querySelectorAll('.node');
+  nodes.forEach(n => n.classList.remove('on'));
+  if(nodes[0]) nodes[0].classList.add('on');
+  segs.forEach((seg, i) => {
+    setTimeout(() => {
+      seg.classList.add('on');
+      Snd.flowStep(0);
+      if(nodes[i + 1]) setTimeout(() => nodes[i + 1].classList.add('on'), 420);
+    }, 260 + i * 460);
+  });
+  setTimeout(() => Snd.win(), 260 + segs.length * 460);
+}
+
+/* ==================== VAN GỢI Ý ==================== */
+function hint(){
+  Snd.kick();
+  if(!CAMP.hints || S.solved) return;
+  const open = [];
+  S.locked.forEach((lk, i) => { if(!lk) open.push(i); });
+  if(!open.length) return;
+
+  const i = pick(open);
+  const wantId = S.chain.steps[i].c;
+  // Tìm một thẻ đúng đang rảnh, nếu không có thì gỡ nó khỏi ô khác
+  let item = S.tray.find(t => t.c === wantId && S.slots.indexOf(t.uid) < 0);
+  if(!item){
+    item = S.tray.find(t => t.c === wantId && !S.locked[S.slots.indexOf(t.uid)]);
+    if(item) S.slots[S.slots.indexOf(item.uid)] = null;
+  }
+  if(!item) return;
+
+  const old = S.slots[i];
+  if(old != null) S.slots[i] = null;
+  S.slots[i] = item.uid;
+  S.locked[i] = true;
+  CAMP.hints--;
+  S.score = Math.max(MIN_POINT, S.score - PEN_HINT);
+  Snd.lock(0);
+  renderAll();
+  setMsg('Mở van gợi ý cho <b>đoạn ' + (i + 1) + '</b>: ' + COND[wantId] +
+         '. Trừ ' + PEN_HINT + ' điểm.', 'warn');
+
+  if(S.slots.every((v, k) => v != null && S.locked[k])){
+    S.solved = true;
+    finishShift();
+  }
+}
+
+/* ==================== KẾT THÚC LƯỢT ==================== */
+const RANKS = [
+  {min:440, name:'Kỹ sư trưởng vận hành', note:'Cả năm ca không có sự cố đáng kể. Bạn đọc sơ đồ chuyển hóa như đọc bản đồ quen — nhớ chắc xúc tác của từng dây chuyền và phân biệt được các điều kiện dễ nhầm.'},
+  {min:340, name:'Kỹ sư vận hành',        note:'Dây chuyền chạy tốt, chỉ vài đoạn phải bơm lại. Xem kỹ những bước bạn từng ghép sai — thường là xúc tác Pt/V₂O₅ hoặc tỉ lệ mol khi SO₂ gặp kiềm.'},
+  {min:240, name:'Kỹ thuật viên',         note:'Bạn đã đi hết tuyến nhưng còn dựa nhiều vào việc thử lại. Hãy đọc lại sổ tay từng ca: mỗi điều kiện đều có lý do, nhớ lý do thì không phải đoán.'},
+  {min:0,   name:'Thợ vận hành học việc', note:'Còn nhiều đoạn phải mở van gợi ý. Cách nhanh nhất để tiến bộ là học thuộc bốn dây chuyền lớn: Haber–Bosch, Ostwald, tiếp xúc và khử SO₂ trong khói thải.'}
+];
+
+function endCampaign(){
+  $('screen-play').classList.add('hide');
+  $('screen-done').classList.remove('hide');
+  $('plate-code').innerHTML = 'KẾT CA<br>' + CAMP.total + ' ĐIỂM';
+
+  const r = RANKS.find(x => CAMP.total >= x.min) || RANKS[RANKS.length - 1];
+  $('d-score').textContent = CAMP.total;
+  $('d-rank').textContent = r.name;
+  $('d-note').textContent = r.note;
+
+  const list = $('d-recap');
+  list.innerHTML = '';
+  CAMP.log.forEach((it, i) => {
+    const li = document.createElement('li');
+    const no = document.createElement('span'); no.className = 'no'; no.textContent = 'CA ' + (i + 1);
+    const body = document.createElement('div'); body.className = 'body';
+    const nm = document.createElement('div'); nm.className = 'nm'; nm.textContent = it.name;
+    const pa = document.createElement('div'); pa.className = 'path'; pa.textContent = it.path;
+    body.appendChild(nm); body.appendChild(pa);
+    const pt = document.createElement('span'); pt.className = 'pt'; pt.textContent = it.score + ' đ';
+    li.appendChild(no); li.appendChild(body); li.appendChild(pt);
+    list.appendChild(li);
+  });
+  Snd.finish();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+/* ==================== NỐI SỰ KIỆN ==================== */
+$('tiles').addEventListener('pointerdown', e => {
+  const t = e.target.closest('.tile');
+  if(!t) return;
+  Snd.kick();
+  startDrag(e, t.dataset.uid, t);
+});
+
+$('tiles').addEventListener('click', e => {
+  const t = e.target.closest('.tile');
+  if(!t || suppressClick) return;
+  const id = t.dataset.uid;
+  S.sel = (S.sel === id) ? null : id;
+  Snd.pick();
+  renderTray();
+});
+
+$('line').addEventListener('pointerdown', e => {
+  const slot = e.target.closest('.slot');
+  if(!slot || slot.disabled) return;
+  const i = Number(slot.dataset.i);
+  const held = S.slots[i];
+  if(held == null) return;
+  Snd.kick();
+  startDrag(e, held, slot);
+});
+
+$('line').addEventListener('click', e => {
+  const slot = e.target.closest('.slot');
+  if(!slot || slot.disabled || suppressClick) return;
+  const i = Number(slot.dataset.i);
+  if(S.sel != null) place(i, S.sel);
+  else takeBack(i);
+});
+
+$('btn-start').addEventListener('click', () => {
+  Snd.kick();
+  $('screen-intro').classList.add('hide');
+  $('screen-play').classList.remove('hide');
+  newShift();
+});
+
+$('btn-pump').addEventListener('click', pump);
+$('btn-hint').addEventListener('click', hint);
+$('btn-clear').addEventListener('click', () => { Snd.kick(); clearAll(); });
+
+$('btn-next').addEventListener('click', () => {
+  Snd.kick();
+  if(CAMP.shift >= TIERS.length - 1){ endCampaign(); return; }
+  CAMP.shift++;
+  newShift();
+  window.scrollTo({top:0, behavior:'smooth'});
+});
+
+$('btn-again').addEventListener('click', () => {
+  Snd.kick();
+  CAMP = {shift:0, total:0, hints:3, used:[], fams:[], log:[]};
+  $('screen-done').classList.add('hide');
+  $('screen-play').classList.remove('hide');
+  newShift();
+  window.scrollTo({top:0, behavior:'smooth'});
+});
+
+$('btn-snd').addEventListener('click', cycleSound);
+$('btn-snd-intro').addEventListener('click', cycleSound);
+
+syncSound();
+})();
+</script>
+</body>
+</html>
