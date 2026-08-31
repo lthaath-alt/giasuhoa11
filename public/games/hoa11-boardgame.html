@@ -45,7 +45,8 @@ Mốc mã quan trọng — **tra bằng chuỗi tìm kiếm**, đừng dựa và
 | `var CH = [` | 6 chương, mỗi chương có `id`, `name`, `short`, `color` |
 | `var BANK = {` | 160 câu mẫu, lồng theo `BANK[chương][mức]` |
 | `var LEVELS = [` | 4 mức: nb 10đ, th 20đ, vd 30đ, vdc 40đ |
-| `var PENALTIES = {` | 4 mức phạt khi trả lời sai |
+| `var PENALTIES = {` | 4 mức phạt khi sai, mỗi mức kèm hệ số thưởng `bonus` |
+| `function ptsOf(` | Điểm thật của một mức sau khi nhân hệ số — dùng thay `lv.pts` khi hiện cho người chơi |
 | `var TRACK = [` | 28 ô bàn cờ, chỉ có loại ô, không gắn chương |
 | `var CARDS = [` | 12 thẻ Cơ hội |
 | `function idbOpen(` | Mở IndexedDB, **luôn gọi lại bất đồng bộ** |
@@ -281,6 +282,13 @@ sau khi thử nghiệm. Muốn đổi thì hỏi giáo viên trước.
   trong toàn bộ câu thì dạng nào nhiều câu sẽ át hết các dạng khác.
 - **Trả lời sai bị trừ điểm và lùi ô, điểm được phép xuống dưới 0.** Không chặn ở 0, vì đội đang 0 điểm
   sẽ mất hết ý nghĩa của hình phạt.
+- **Phạt càng nặng thì đúng càng được nhiều điểm.** Mỗi mức phạt mang một hệ số thưởng `bonus`:
+  không phạt ×1, nhẹ ×1,2, vừa ×1,5, nặng ×2. Hệ số chọn sao cho ra số tròn trên thang
+  10 · 20 · 30 · 40 để giáo viên nhẩm nhanh khi chiếu. Điểm trừ khi sai **không** nhân hệ số,
+  giữ nguyên theo mô tả của mức phạt — nhờ vậy chọn mức nặng là đánh đổi thật, không phải
+  chỉ đổi đơn vị đo.
+  Mọi chỗ hiện điểm cho người chơi phải gọi `ptsOf(lv)` chứ không dùng thẳng `lv.pts`,
+  nếu không màn hình báo một đằng mà cộng một nẻo.
 - **Câu đúng/sai chấm điểm theo tỉ lệ ý đúng.** Đúng hết được trọn điểm, đúng một phần được điểm theo
   tỉ lệ và **không bị phạt**, chỉ khi sai toàn bộ mới bị trừ điểm và lùi ô.
 - **Không dùng `confirm()`, `alert()`, `prompt()`.** Khung iframe của bản xuất bản chặn chúng, và khi bị
@@ -905,10 +913,10 @@ table.bank tr.picked td{background:var(--accent-soft)}
       <div class="field">
         <label>Phạt khi trả lời sai</label>
         <div class="seg" id="penaltySeg">
-          <button data-v="none" aria-pressed="false">Không phạt</button>
-          <button data-v="light" aria-pressed="false">Nhẹ · −5đ, lùi 1 ô</button>
-          <button data-v="mid" aria-pressed="true">Vừa · −½ điểm, lùi 2 ô</button>
-          <button data-v="hard" aria-pressed="false">Nặng · −trọn điểm, lùi 3 ô</button>
+          <button data-v="none" aria-pressed="false">Không phạt · ×1</button>
+          <button data-v="light" aria-pressed="false">Nhẹ · ×1,2 · −5đ, lùi 1 ô</button>
+          <button data-v="mid" aria-pressed="true">Vừa · ×1,5 · −½ điểm, lùi 2 ô</button>
+          <button data-v="hard" aria-pressed="false">Nặng · ×2 · −trọn điểm, lùi 3 ô</button>
         </div>
         <p class="hint" id="penaltyHint"></p>
       </div>
@@ -1322,16 +1330,27 @@ var LEVELS = [
 ];
 
 /* Mức phạt khi trả lời sai hoặc hết giờ: trừ điểm và lùi ô */
+/* Mức phạt càng nặng thì điểm thưởng mỗi câu đúng càng cao — chấp nhận rủi ro
+   lớn hơn thì được trả công nhiều hơn.
+
+   Hệ số chọn sao cho ra số tròn trên thang điểm 10 · 20 · 30 · 40 của LEVELS,
+   để giáo viên nhẩm nhanh khi chiếu trên lớp. */
 var PENALTIES = {
-  none:  {label:"không phạt khi sai", back:0, calc:function(){ return 0; },
-          hint:"Trả lời sai chỉ mất lượt, không trừ điểm. Hợp với lớp mới làm quen hoặc học sinh còn ngại phát biểu."},
-  light: {label:"sai −5 điểm, lùi 1 ô", back:1, calc:function(){ return 5; },
-          hint:"Sai hoặc hết giờ: trừ 5 điểm và lùi lại 1 ô, không phụ thuộc mức độ câu hỏi."},
-  mid:   {label:"sai −½ điểm mức, lùi 2 ô", back:2, calc:function(lv){ return Math.round(lv.pts / 2); },
-          hint:"Sai hoặc hết giờ: trừ nửa số điểm của mức đã chọn (5 · 10 · 15) và lùi lại 2 ô. Chọn mức khó được nhiều điểm nhưng cũng mất nhiều hơn."},
-  hard:  {label:"sai −trọn điểm mức, lùi 3 ô", back:3, calc:function(lv){ return lv.pts; },
-          hint:"Sai hoặc hết giờ: trừ trọn số điểm của mức đã chọn (10 · 20 · 30) và lùi lại 3 ô. Điểm có thể xuống dưới 0."}
+  none:  {label:"không phạt khi sai", back:0, bonus:1, calc:function(){ return 0; },
+          hint:"Trả lời đúng được trọn điểm mức (10 · 20 · 30 · 40). Sai chỉ mất lượt, không trừ điểm. Hợp với lớp mới làm quen hoặc học sinh còn ngại phát biểu."},
+  light: {label:"sai −5 điểm, lùi 1 ô", back:1, bonus:1.2, calc:function(){ return 5; },
+          hint:"Đúng được ×1,2 điểm (12 · 24 · 36 · 48). Sai hoặc hết giờ: trừ 5 điểm và lùi lại 1 ô, không phụ thuộc mức độ câu hỏi."},
+  mid:   {label:"sai −½ điểm mức, lùi 2 ô", back:2, bonus:1.5, calc:function(lv){ return Math.round(lv.pts / 2); },
+          hint:"Đúng được ×1,5 điểm (15 · 30 · 45 · 60). Sai hoặc hết giờ: trừ nửa số điểm của mức đã chọn (5 · 10 · 15 · 20) và lùi lại 2 ô."},
+  hard:  {label:"sai −trọn điểm mức, lùi 3 ô", back:3, bonus:2, calc:function(lv){ return lv.pts; },
+          hint:"Đúng được ×2 điểm (20 · 40 · 60 · 80). Sai hoặc hết giờ: trừ trọn số điểm của mức đã chọn (10 · 20 · 30 · 40) và lùi lại 3 ô. Điểm có thể xuống dưới 0."}
 };
+/* Hệ số thưởng của mức phạt đang chọn; mặc định 1 để ván cũ không vỡ. */
+function bonusOf(){ var p = penaltyOf(); return p && p.bonus ? p.bonus : 1; }
+/* Điểm THẬT của một mức sau khi nhân hệ số thưởng. Mọi chỗ hiện điểm cho người
+   chơi phải dùng hàm này, không dùng thẳng lv.pts, nếu không màn hình báo một
+   đằng mà cộng một nẻo. */
+function ptsOf(lv){ return Math.round(lv.pts * bonusOf()); }
 function penaltyOf(){ return PENALTIES[S.penalty] || PENALTIES.none; }
 
 /* 28 ô quanh bàn cờ */
@@ -2352,7 +2371,7 @@ function openLevelPicker(tileIdx){
               (d && pen.back ? ", " : "") + (pen.back ? "lùi " + pen.back + " ô" : "") + '</span>'
             : '<span>sai: không bị phạt</span>';
           return '<button class="level-btn" data-lv="' + l.key + '" style="--c:' + chap.color + '">' +
-            '<strong>' + l.name + '</strong><span>đúng: +' + l.pts + ' điểm · ' + l.note + '</span>' +
+            '<strong>' + l.name + '</strong><span>đúng: +' + ptsOf(l) + ' điểm · ' + l.note + '</span>' +
             risk + '</button>';
         }).join("") +
       '</div>' +
@@ -2400,7 +2419,7 @@ function askQuestion(lvKey){
 
   var html =
     '<div class="modal-head">' +
-      '<span class="badge" style="--c:' + chap.color + '">' + lv.name + ' · ' + lv.pts + ' điểm' +
+      '<span class="badge" style="--c:' + chap.color + '">' + lv.name + ' · ' + ptsOf(lv) + ' điểm' +
         (isTL ? ' · tự luận' : isTF ? ' · đúng sai' : isTN ? ' · trả lời ngắn' : '') + '</span>' +
       timerHTML +
     '</div><div class="modal-body">' +
@@ -2418,7 +2437,7 @@ function askQuestion(lvKey){
           '</div>'
         : isTF
         ? '<p class="hint" style="margin-bottom:10px">Với mỗi ý, chọn Đúng hoặc Sai. Đúng hết được trọn ' +
-            lv.pts + ' điểm, đúng một phần được điểm theo tỉ lệ.</p>' +
+            ptsOf(lv) + ' điểm, đúng một phần được điểm theo tỉ lệ.</p>' +
           '<div class="tf-list" id="tfList">' +
             sts.map(function(st, i){
               return '<div class="tf-row" data-i="' + i + '">' +
@@ -2506,7 +2525,7 @@ function askQuestion(lvKey){
       '<div class="tl-model"><h4>Đáp án tham khảo</h4><p>' + esc(q.ans || "Chưa nhập đáp án mẫu.") + '</p></div>' +
       (timedOut ? '<p class="hint" style="margin-top:10px">Đã hết giờ. Vẫn chấm được nếu học sinh đã kịp trả lời.</p>' : '') +
       '<div class="grade-row">' +
-        '<button class="btn btn-good" id="gOk">' + (solo ? "Em làm đúng" : "Chấm đúng · +" + lv.pts) + '</button>' +
+        '<button class="btn btn-good" id="gOk">' + (solo ? "Em làm đúng" : "Chấm đúng · +" + ptsOf(lv)) + '</button>' +
         '<button class="btn btn-danger" id="gNo">' + (solo ? "Em làm chưa đúng" : "Chấm chưa đúng") + '</button>' +
       '</div>';
     $("#gOk").addEventListener("click", function(){ conclude(true, false); });
@@ -2568,7 +2587,9 @@ function askQuestion(lvKey){
     if(timerHandle) clearInterval(timerHandle);
 
     var pen = penaltyOf();
-    var gain = ok ? lv.pts : (partialGain || 0);
+    /* Điểm thưởng nhân theo mức phạt đang chọn: phạt càng nặng, đúng càng lời.
+       Nhân sau khi đã tính phần đúng của câu đúng/sai nên chấm từng ý vẫn đúng tỉ lệ. */
+    var gain = Math.round((ok ? lv.pts : (partialGain || 0)) * bonusOf());
     var ded = 0, back = 0;
     if(!ok && gain === 0){ ded = pen.calc(lv); back = pen.back; }
 
@@ -2584,7 +2605,7 @@ function askQuestion(lvKey){
       : "không được điểm";
     var note = detail ? " (" + detail + ")" : "";
     var head = ok
-      ? "Chính xác — cộng " + lv.pts + " điểm"
+      ? "Chính xác — cộng " + gain + " điểm"
       : gain > 0
         ? "Đúng một phần" + note + " — cộng " + gain + " điểm, không bị phạt"
         : (timedOut ? "Hết giờ — " : "Chưa đúng — ") + penText + note;
@@ -2616,11 +2637,11 @@ function askQuestion(lvKey){
       var kind = isTL ? " (tự luận)" : isTF ? " (đúng sai)" : isTN ? " (trả lời ngắn)" : "";
       log('<strong>' + esc(p.name) + '</strong>' + (member ? ' (' + esc(member) + ')' : '') +
           ' · ' + chap.short + ' · ' + lv.name + kind + ': ' +
-          (ok ? '<span style="color:var(--good)">đúng, +' + lv.pts + ' điểm</span>'
+          (ok ? '<span style="color:var(--good)">đúng, +' + gain + ' điểm</span>'
               : gain > 0
                 ? '<span style="color:var(--warn)">đúng một phần' + note + ', +' + gain + ' điểm</span>'
                 : '<span style="color:var(--bad)">' + (timedOut ? "hết giờ" : "sai") + note + ', ' + penText + '</span>'));
-      setStatus(ok ? "Trả lời đúng, +" + lv.pts + " điểm."
+      setStatus(ok ? "Trả lời đúng, +" + gain + " điểm."
                    : gain > 0 ? "Đúng một phần, +" + gain + " điểm."
                    : "Chưa chính xác — " + penText + ".");
       renderScores();
