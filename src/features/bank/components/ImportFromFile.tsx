@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import {
   Alert, Box, Button, Card, Checkbox, Chip, Dialog, DialogActions, DialogContent,
   DialogTitle, FormControl, FormControlLabel, IconButton, InputLabel, MenuItem,
@@ -29,17 +29,30 @@ interface Props {
   duyet: (rows: BankQuestion[]) => Promise<void>;
 }
 
+const o_chon = {
+  font: 'inherit', fontSize: '0.85rem', padding: '6px 8px',
+  border: '1px solid #cbd5e1', borderRadius: '6px', background: '#fff', minWidth: 120,
+};
+
 export const ImportFromFile: React.FC<Props> = ({ mo, dong, daCo, duyet }) => {
   const [opt, setOpt] = useState<PromptOptions>({
     chunk: 40, variants: false, scopeCh: 'auto', scopeLv: 'auto',
   });
   const [daChep, setDaChep] = useState(false);
-  const [json, setJson] = useState('');
+  /* Ô JSON KHÔNG dùng state: dán 130 KB vào một ô controlled khiến React dựng
+     lại cả hộp thoại sau mỗi lần gõ, đo được hơn 300ms cho một lần dán. Đọc
+     thẳng từ ref lúc bấm nút là đủ. */
+  const jsonRef = useRef<HTMLTextAreaElement>(null);
   const [loi, setLoi] = useState<string[]>([]);
   const [nghiemTrong, setNghiemTrong] = useState<string | null>(null);
   const [cho, setCho] = useState<BankQuestion[]>(() => docChoDuyet());
   const [chon, setChon] = useState<Set<string>>(new Set());
   const [dangGhi, setDangGhi] = useState(false);
+  /* Dựng hết mọi câu chờ duyệt cùng lúc là nguyên nhân treo trang: 400 câu
+     tương đương 800 ô Select của MUI, đo được 30 giây và hỏng cả hộp thoại.
+     Chỉ dựng một trang mỗi lần. */
+  const [trang, setTrang] = useState(0);
+  const MOI_TRANG = 20;
 
   const cauLenh = useMemo(() => buildPrompt(opt), [opt]);
 
@@ -54,6 +67,8 @@ export const ImportFromFile: React.FC<Props> = ({ mo, dong, daCo, duyet }) => {
   };
 
   const docJson = () => {
+    const json = jsonRef.current?.value || '';
+    if (!json.trim()) { setNghiemTrong('Chưa dán gì vào ô JSON.'); return; }
     const kq = parseAIJson(json, [...daCo, ...cho]);
     setNghiemTrong(kq.fatal);
     setLoi(kq.errs);
@@ -64,7 +79,8 @@ export const ImportFromFile: React.FC<Props> = ({ mo, dong, daCo, duyet }) => {
     if (!ghiChoDuyet(moi)) {
       setLoi(e => [...e, 'Không lưu được khu chờ duyệt vào trình duyệt — đừng đóng trang trước khi duyệt xong.']);
     }
-    setJson('');
+    if (jsonRef.current) jsonRef.current.value = '';
+    setTrang(0);
   };
 
   const capNhat = (id: string, thay: Partial<BankQuestion>) => {
@@ -95,6 +111,8 @@ export const ImportFromFile: React.FC<Props> = ({ mo, dong, daCo, duyet }) => {
     };
     r.readAsDataURL(f);
   };
+
+  const soTrang = Math.max(1, Math.ceil(cho.length / MOI_TRANG));
 
   const nhomAnh = useMemo(() => {
     const m = new Map<string, number>();
@@ -170,9 +188,10 @@ export const ImportFromFile: React.FC<Props> = ({ mo, dong, daCo, duyet }) => {
 
         {/* BƯỚC 2 */}
         <Typography sx={{ fontWeight: 700, mb: 1 }}>Bước 2 · Dán JSON của AI vào đây</Typography>
-        <TextField fullWidth multiline rows={5} placeholder="Dán nguyên văn phần AI trả về, kể cả lời dẫn — hệ thống tự nhặt các khối JSON."
-          value={json} onChange={e => setJson(e.target.value)} sx={{ mb: 1.5 }} />
-        <Button variant="contained" onClick={docJson} disabled={!json.trim()}>
+        <TextField fullWidth multiline rows={5} inputRef={jsonRef}
+          placeholder="Dán nguyên văn phần AI trả về, kể cả lời dẫn — hệ thống tự nhặt các khối JSON."
+          sx={{ mb: 1.5 }} />
+        <Button variant="contained" onClick={docJson}>
           Đọc JSON, đưa vào khu chờ duyệt
         </Button>
 
@@ -190,17 +209,26 @@ export const ImportFromFile: React.FC<Props> = ({ mo, dong, daCo, duyet }) => {
             <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 1.5, flexWrap: 'wrap', gap: 1 }}>
               <Typography sx={{ fontWeight: 700 }}>
                 Bước 3 · Khu chờ duyệt ({cho.length} câu)
+                {soTrang > 1 && ` · trang ${trang + 1}/${soTrang}`}
               </Typography>
               <Box sx={{ flex: 1 }} />
               <Button size="small" onClick={() => setChon(new Set(cho.map(q => q.id)))}>Chọn hết</Button>
               <Button size="small" onClick={() => setChon(new Set())}>Bỏ chọn</Button>
+              {soTrang > 1 && (
+                <>
+                  <Button size="small" variant="outlined" disabled={trang === 0}
+                    onClick={() => setTrang(t => Math.max(0, t - 1))}>← Trước</Button>
+                  <Button size="small" variant="outlined" disabled={trang >= soTrang - 1}
+                    onClick={() => setTrang(t => Math.min(soTrang - 1, t + 1))}>Sau →</Button>
+                </>
+              )}
             </Stack>
             <Alert severity="warning" sx={{ mb: 2 }}>
               AI hay đoán sai chương và mức độ. Hãy soát lại hai cột đó trước khi duyệt.
             </Alert>
 
             <Stack spacing={1.5}>
-              {cho.map(q => {
+              {cho.slice(trang * MOI_TRANG, trang * MOI_TRANG + MOI_TRANG).map(q => {
                 const key = imgKeyOf(q);
                 const chung = key ? (nhomAnh.get(key) || 1) : 0;
                 return (
@@ -212,17 +240,19 @@ export const ImportFromFile: React.FC<Props> = ({ mo, dong, daCo, duyet }) => {
                           if (e.target.checked) c.add(q.id); else c.delete(q.id);
                           setChon(c);
                         }} />
-                      <FormControl size="small" sx={{ minWidth: 130 }}>
-                        <Select value={q.ch}
-                          onChange={e => capNhat(q.id, { ch: Number(e.target.value) as Chapter })}>
-                          {CHAPTERS.map(c => <MenuItem key={c.id} value={c.id}>{`Chương ${c.id}`}</MenuItem>)}
-                        </Select>
-                      </FormControl>
-                      <FormControl size="small" sx={{ minWidth: 140 }}>
-                        <Select value={q.lv} onChange={e => capNhat(q.id, { lv: e.target.value as Level })}>
-                          {LEVELS.map(l => <MenuItem key={l.key} value={l.key}>{l.name}</MenuItem>)}
-                        </Select>
-                      </FormControl>
+                      {/* select thuần của trình duyệt, KHÔNG dùng Select của MUI:
+                          mỗi Select là một popover riêng, nhân với số câu chờ duyệt
+                          là đủ làm treo trang. */}
+                      <Box component="select" value={q.ch} sx={o_chon}
+                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                          capNhat(q.id, { ch: Number(e.target.value) as Chapter })}>
+                        {CHAPTERS.map(c => <option key={c.id} value={c.id}>{`Chương ${c.id}`}</option>)}
+                      </Box>
+                      <Box component="select" value={q.lv} sx={o_chon}
+                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                          capNhat(q.id, { lv: e.target.value as Level })}>
+                        {LEVELS.map(l => <option key={l.key} value={l.key}>{l.name}</option>)}
+                      </Box>
                       <Chip size="small" variant="outlined" label={QTYPE_NAME[q.t]} />
                       {q.topic && <Chip size="small" variant="outlined" label={q.topic} />}
                       <Box sx={{ flex: 1 }} />
@@ -255,6 +285,17 @@ export const ImportFromFile: React.FC<Props> = ({ mo, dong, daCo, duyet }) => {
                 );
               })}
             </Stack>
+            {soTrang > 1 && (
+              <Stack direction="row" spacing={1} sx={{ mt: 2, justifyContent: 'center', alignItems: 'center' }}>
+                <Button size="small" variant="outlined" disabled={trang === 0}
+                  onClick={() => setTrang(t => Math.max(0, t - 1))}>← Trước</Button>
+                <Typography variant="body2" color="text.secondary">
+                  Trang {trang + 1} / {soTrang}
+                </Typography>
+                <Button size="small" variant="outlined" disabled={trang >= soTrang - 1}
+                  onClick={() => setTrang(t => Math.min(soTrang - 1, t + 1))}>Sau →</Button>
+              </Stack>
+            )}
           </>
         )}
       </DialogContent>
