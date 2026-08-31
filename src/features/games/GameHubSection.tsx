@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Card, Chip, Button, Dialog, IconButton } from '@mui/material';
+import { Box, Typography, Card, Button, Dialog, IconButton } from '@mui/material';
 import { Gamepad2, Play, X } from 'lucide-react';
-import { DetectiveArt, PipelineArt, IUPACArt, BalanceArt, TowerArt, BoardGameArt } from './GameArt';
+import { DetectiveArt, BoardGameArt, RescueArt } from './GameArt';
 import { BankFirestore, pushToGame } from '../bank/bankStore';
 
 interface GameData {
@@ -9,8 +9,7 @@ interface GameData {
   title: string;
   chapter: string;
   description: string;
-  status: 'active' | 'soon';
-  path?: string;
+  path: string;
   art: React.ReactNode;
 }
 
@@ -20,9 +19,17 @@ const GAMES: GameData[] = [
     title: 'Thám Tử Hóa Chất',
     chapter: 'Chương 1 — Bài 2: Sự điện li',
     description: 'Nhận biết 4 dung dịch mất nhãn bằng thuốc thử và suy luận loại trừ. Chiến dịch 5 vụ án.',
-    status: 'active',
     path: '/games/tham-tu-hoa-chat.html',
     art: <DetectiveArt />,
+  },
+  {
+    id: 'giai-cuu-phong-thi-nghiem',
+    title: 'Giải Cứu Phòng Thí Nghiệm',
+    chapter: 'Chương 2 — Nitrogen & Sulfur',
+    description:
+      'Game chạy nhảy 4 màn: đập ô ? trả lời câu hỏi, dùng khăn tẩm kiềm băng qua khói SO₂, ghép ion mở cửa lọc, rồi cân bằng phương trình để khóa van lò và cứu cô giáo.',
+    path: '/games/giai-cuu-phong-thi-nghiem.html',
+    art: <RescueArt />,
   },
   {
     id: 'vong-quanh-hoa-11',
@@ -30,41 +37,8 @@ const GAMES: GameData[] = [
     chapter: 'Ôn tổng hợp 6 chương',
     description:
       'Chia 2–4 đội, tung xúc xắc đi quanh 28 ô. Câu hỏi lấy thẳng từ Ngân hàng dữ liệu của web, 4 mức từ nhận biết đến vận dụng cao.',
-    status: 'active',
     path: '/games/hoa11-boardgame.html',
     art: <BoardGameArt />,
-  },
-  {
-    id: 'duong-ong',
-    title: 'Đường Ống Chuyển Hóa',
-    chapter: 'Chương 2 — Nitrogen & Phosphorus',
-    description: 'Kéo thả điều kiện phản ứng để hoàn thành sơ đồ chuyển hóa.',
-    status: 'soon',
-    art: <PipelineArt />,
-  },
-  {
-    id: 'ghep-ten',
-    title: 'Ghép Tên Gọi IUPAC',
-    chapter: 'Chương 3 — Đại cương hữu cơ',
-    description: 'Lật thẻ ghép công thức cấu tạo với tên gọi đúng.',
-    status: 'soon',
-    art: <IUPACArt />,
-  },
-  {
-    id: 'can-bang',
-    title: 'Cân Bằng Thần Tốc',
-    chapter: 'Chương 4 — Hydrocarbon',
-    description: 'Cân bằng phương trình trước khi hết giờ, có combo điểm.',
-    status: 'soon',
-    art: <BalanceArt />,
-  },
-  {
-    id: 'leo-thap',
-    title: 'Leo Tháp Hóa Học',
-    chapter: 'Ôn tổng hợp 6 chương',
-    description: '15 câu tăng dần độ khó, có mốc an toàn và quyền trợ giúp hỏi gia sư AI.',
-    status: 'soon',
-    art: <TowerArt />,
   },
 ];
 
@@ -95,9 +69,7 @@ export const GameHubSection: React.FC = () => {
   }, []);
 
   const handleOpenGame = (game: GameData) => {
-    if (game.status === 'active') {
-      setActiveGame(game);
-    }
+    setActiveGame(game);
   };
 
   const handleCloseGame = () => {
@@ -157,42 +129,18 @@ export const GameHubSection: React.FC = () => {
               display: 'flex',
               flexDirection: 'column',
               height: '100%',
-              bgcolor: game.status === 'active' ? '#ffffff' : '#f4f6f9',
-              border: game.status === 'active' ? '2px solid #1e50a2' : '1px solid #e2e8f0',
-              boxShadow:
-                game.status === 'active'
-                  ? '0 4px 16px rgba(30, 80, 162, 0.12)'
-                  : '0 2px 8px rgba(0,0,0,0.04)',
+              bgcolor: '#ffffff',
+              border: '2px solid #1e50a2',
+              boxShadow: '0 4px 16px rgba(30, 80, 162, 0.12)',
               transition: 'transform 0.2s, box-shadow 0.2s',
               overflow: 'hidden',
-              cursor: game.status === 'active' ? 'pointer' : 'default',
-              '&:hover':
-                game.status === 'active'
-                  ? {
-                      transform: 'translateY(-4px)',
-                      boxShadow: '0 12px 32px rgba(30, 80, 162, 0.2)',
-                    }
-                  : {},
+              cursor: 'pointer',
+              '&:hover': {
+                transform: 'translateY(-4px)',
+                boxShadow: '0 12px 32px rgba(30, 80, 162, 0.2)',
+              },
             }}
           >
-            {/* Chip sắp ra mắt — góc trên phải, z-index cao */}
-            {game.status === 'soon' && (
-              <Chip
-                label="Sắp ra mắt"
-                size="small"
-                sx={{
-                  position: 'absolute',
-                  top: 12,
-                  right: 12,
-                  bgcolor: '#f5a623',
-                  color: '#ffffff',
-                  fontWeight: 'bold',
-                  zIndex: 2,
-                  fontSize: '11px',
-                }}
-              />
-            )}
-
             {/* Hình minh họa SVG — lấp đầy khung, cao 150px */}
             <Box
               sx={{
@@ -201,7 +149,6 @@ export const GameHubSection: React.FC = () => {
                 flexShrink: 0,
                 overflow: 'hidden',
                 borderRadius: '16px 16px 0 0',
-                opacity: game.status === 'soon' ? 0.5 : 1,
                 '& svg': {
                   width: '100%',
                   height: '100%',
@@ -244,7 +191,7 @@ export const GameHubSection: React.FC = () => {
                 sx={{
                   fontSize: '19px',
                   fontWeight: 700,
-                  color: game.status === 'active' ? '#0f172a' : '#5a6472',
+                  color: '#0f172a',
                   lineHeight: 1.25,
                   mb: '10px',
                   display: 'block',
@@ -268,38 +215,24 @@ export const GameHubSection: React.FC = () => {
                 {game.description}
               </Typography>
 
-              {/* Nút chơi (active) hoặc dòng chữ nhỏ (soon) */}
-              {game.status === 'active' ? (
-                <Button
-                  variant="contained"
-                  onClick={() => handleOpenGame(game)}
-                  startIcon={<Play size={18} />}
-                  sx={{
-                    mt: 2,
-                    textTransform: 'none',
-                    fontWeight: 'bold',
-                    borderRadius: 5,
-                    background: 'linear-gradient(90deg, #1e50a2 0%, #007bf2 100%)',
-                    color: '#ffffff',
-                    '&:hover': {
-                      background: 'linear-gradient(90deg, #16407e 0%, #0056a3 100%)',
-                    },
-                  }}
-                >
-                  Chơi ngay
-                </Button>
-              ) : (
-                <Typography
-                  sx={{
-                    mt: 2,
-                    fontSize: '13px',
-                    color: '#94a3b8',
-                    fontStyle: 'italic',
-                  }}
-                >
-                  Đang phát triển...
-                </Typography>
-              )}
+              <Button
+                variant="contained"
+                onClick={() => handleOpenGame(game)}
+                startIcon={<Play size={18} />}
+                sx={{
+                  mt: 2,
+                  textTransform: 'none',
+                  fontWeight: 'bold',
+                  borderRadius: 5,
+                  background: 'linear-gradient(90deg, #1e50a2 0%, #007bf2 100%)',
+                  color: '#ffffff',
+                  '&:hover': {
+                    background: 'linear-gradient(90deg, #16407e 0%, #0056a3 100%)',
+                  },
+                }}
+              >
+                Chơi ngay
+              </Button>
             </Box>
           </Card>
         ))}

@@ -1,0 +1,2099 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- ===== MÔ TẢ DỰ ÁN CHO TRỢ LÝ LẬP TRÌNH =====
+     Đọc hết phần này trước khi sửa bất cứ thứ gì trong file.
+
+# Giải Cứu Phòng Thí Nghiệm — mô tả dự án
+
+Game đi cảnh (platformer) ôn tập Hóa học 11 — Kết nối tri thức với cuộc sống (2018).
+Bản hiện tại làm **Thế giới 2: Nitrogen và Sulfur**.
+
+Ý đồ sư phạm: KHÔNG chỉ là quiz khoác áo game. Ba lớp kiến thức lồng vào lối chơi:
+  1. Ô `?` chứa câu hỏi trắc nghiệm (lấy từ ngân hàng chương 2 của game bàn cờ).
+  2. Vật phẩm mang đúng tính chất hóa học thật (NH₃ nhẹ hơn không khí → nhảy cao).
+  3. Chướng ngại là hiện tượng hóa học (hố acid, khói SO₂, tường đá vôi).
+
+Một file duy nhất, không thư viện ngoài, không bước build. Vẽ toàn bộ bằng canvas 2D,
+không dùng file ảnh. Mở bằng `file://` cũng chạy.
+
+## Bố cục file
+CSS → HTML (canvas + các lớp phủ) → JavaScript trong một IIFE ở cuối.
+
+## Mốc mã quan trọng — tra bằng chuỗi tìm kiếm, đừng dựa vào số dòng
+| Tìm chuỗi | Vai trò |
+|---|---|
+| `const QUESTIONS = [` | Ngân hàng câu hỏi chương 2 |
+| `const LEVELS = [`    | Mô tả các màn bằng toạ độ, KHÔNG vẽ bản đồ bằng chuỗi ký tự |
+| `function buildLevel(`| Dựng lưới ô từ mô tả màn |
+| `const T = {`         | Mã các loại ô (rỗng, đất, gạch, ô ?, acid…) |
+| `const P = {`         | Hằng số vật lí: trọng lực, lực nhảy, tốc độ |
+| `function step(`      | Một bước cập nhật vật lí, chạy ở bước thời gian cố định |
+| `function moveX(`     | Va chạm theo trục ngang, tách riêng khỏi trục dọc |
+| `function hitBlock(`  | Đội đầu vào ô `?` → mở câu hỏi |
+| `function askQuestion(`| Lớp phủ câu hỏi, tạm dừng vòng lặp game |
+| `function draw(`      | Vẽ toàn cảnh: nền, ô, nhân vật, quái |
+| `const Snd =`         | Âm thanh tổng hợp bằng Web Audio |
+
+## Quy ước khi thêm màn mới
+- Thêm một object vào `LEVELS`; mọi thứ mô tả bằng toạ độ ô (cột, hàng), gốc ở góc trên trái.
+- `ground` là các đoạn nền: `[cột bắt đầu, độ rộng]`. Chỗ nào không có nền thì là vực.
+- Đừng vẽ bản đồ bằng chuỗi ký tự — đếm cột bằng tay rất dễ sai.
+============================================== -->
+<title>Giải Cứu Phòng Thí Nghiệm — Thế giới 2: Nitrogen &amp; Sulfur (Hóa 11)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Baloo 2 cho tiêu đề (tròn trịa, chất game), Nunito cho đoạn văn. Cả hai đều có
+     dấu tiếng Việt đầy đủ — đừng đổi sang phông chỉ có Latin, chữ sẽ rụng dấu. -->
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sky:#5aa9e6;
+  --ink:#0e1726;
+  --ink-2:#17233a;
+  --gold:#f5c542;
+  --acid:#7fd94a;
+  --danger:#e2604e;
+  --brick:#c0703c;
+  /* Bảng màu sáng cho các lớp phủ — cùng tông trời xanh với trong game */
+  --ui-bg:#ffffff;
+  --ui-bg-2:#eef7ff;
+  --ui-line:#c6dcf2;
+  --ui-line-soft:#e3eefa;
+  --ui-text:#14273e;
+  --ui-text-dim:#4e6b8a;
+  --ui-accent:#1e6fc4;
+  --f-display:'Baloo 2', 'Nunito', system-ui, sans-serif;
+  --f-body:'Nunito', system-ui, sans-serif;
+  --f-mono:'IBM Plex Mono', ui-monospace, monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;height:100%}
+body{
+  background:radial-gradient(circle at 50% 12%, #2b4a6b 0%, #101c2e 62%, #0b1422 100%);
+  font-family:var(--f-body);color:var(--ui-text);
+  display:flex;align-items:center;justify-content:center;
+  padding:12px;overflow:hidden;
+}
+.hide{display:none !important}
+
+.stage{
+  position:relative;width:100%;max-width:1000px;
+  aspect-ratio:16/9;max-height:calc(100vh - 24px);
+  border-radius:8px;overflow:hidden;
+  box-shadow:0 20px 50px rgba(0,0,0,.55);
+  background:#5aa9e6;
+}
+canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
+
+/* ---------- Lớp phủ chung ---------- */
+.veil{
+  position:absolute;inset:0;z-index:5;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(122,182,232,.55);backdrop-filter:blur(4px);
+  padding:20px;overflow-y:auto;
+  animation:veilIn .18s ease-out;
+}
+@keyframes veilIn{from{opacity:0}to{opacity:1}}
+.card{
+  background:linear-gradient(180deg,var(--ui-bg) 0%,var(--ui-bg-2) 100%);
+  border:3px solid #fff;border-radius:20px;
+  padding:clamp(16px,3vw,30px);max-width:660px;width:100%;
+  box-shadow:0 0 0 3px var(--ui-line), 0 22px 50px rgba(8,26,48,.4);
+  animation:cardPop .26s cubic-bezier(.2,1.5,.5,1);
+}
+@keyframes cardPop{from{transform:translateY(14px) scale(.94);opacity:0}to{transform:none;opacity:1}}
+.card h1{
+  font-family:var(--f-display);
+  font-size:clamp(24px,4.2vw,38px);margin:0 0 4px;font-weight:800;line-height:1.1;
+  color:var(--ui-accent);
+  text-shadow:0 2px 0 #fff, 0 3px 0 var(--ui-line);
+}
+.card h2{
+  font-family:var(--f-display);
+  font-size:clamp(19px,2.9vw,25px);margin:0 0 10px;font-weight:700;color:var(--ui-text);
+}
+.card .kicker{
+  font-family:var(--f-mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  color:#c8881a;margin:0 0 8px;font-weight:600;
+}
+.card p{margin:0 0 14px;font-size:clamp(13px,1.7vw,15.5px);line-height:1.65;color:var(--ui-text-dim)}
+.card p b{color:var(--ui-text);font-weight:800}
+
+button{font-family:inherit;cursor:pointer;border:none;color:inherit}
+button:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.btn{
+  font-family:var(--f-display);
+  border-radius:12px;padding:12px 26px;font-weight:700;font-size:17px;
+  background:linear-gradient(180deg,#ffd75e,#eab01c);color:#3a2703;
+  box-shadow:0 4px 0 #b8801a, 0 6px 14px rgba(184,128,26,.35);
+  transition:filter .12s ease,transform .1s ease;
+}
+.btn:hover{filter:brightness(1.07)}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #b8801a}
+.btn.ghost{
+  background:#fff;border:2px solid var(--ui-line);color:var(--ui-accent);
+  box-shadow:0 4px 0 var(--ui-line);
+}
+.btn.ghost:hover{background:var(--ui-bg-2)}
+.btn.ghost:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ui-line)}
+
+/* ---------- Hướng dẫn phím ---------- */
+.keys{display:flex;gap:18px;flex-wrap:wrap;margin:0 0 18px}
+.keyrow{display:flex;align-items:center;gap:9px;font-size:13.5px;color:var(--ui-text-dim)}
+.kbd{
+  font-family:var(--f-mono);font-size:12px;font-weight:600;color:var(--ui-text);
+  background:#fff;border:2px solid var(--ui-line);border-bottom-width:4px;
+  border-radius:7px;padding:4px 9px;
+}
+.legend{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:11px;
+  margin:0 0 18px;padding:15px 0;
+  border-top:2px dashed var(--ui-line);border-bottom:2px dashed var(--ui-line);
+}
+.leg{display:flex;align-items:center;gap:10px;font-size:13px;line-height:1.45;color:var(--ui-text-dim)}
+.leg canvas{
+  width:32px;height:32px;flex:0 0 32px;border-radius:7px;
+  border:2px solid var(--ui-line);background:#fff;
+}
+.leg b{color:var(--ui-text);font-weight:800}
+
+/* ---------- Câu hỏi ---------- */
+.qwrap .stem{
+  font-size:clamp(14.5px,2.1vw,17px);line-height:1.6;margin:0 0 16px;
+  color:var(--ui-text);font-weight:700;
+}
+.opts{display:grid;gap:10px;margin:0 0 6px}
+.opt{
+  display:flex;gap:12px;align-items:flex-start;text-align:left;
+  background:#fff;border:2px solid var(--ui-line);
+  border-radius:12px;padding:12px 15px;font-size:14.5px;line-height:1.5;
+  color:var(--ui-text);font-weight:600;
+  box-shadow:0 3px 0 var(--ui-line-soft);
+  transition:background .12s ease,border-color .12s ease,transform .1s ease;
+}
+.opt:hover:not([disabled]){background:var(--ui-bg-2);border-color:var(--ui-accent);transform:translateY(-1px)}
+.opt[disabled]{box-shadow:none}
+.opt .ltr{
+  font-family:var(--f-mono);font-weight:600;font-size:12.5px;color:#fff;
+  background:var(--ui-accent);border-radius:7px;
+  width:25px;height:25px;display:grid;place-items:center;flex:0 0 25px;
+}
+.opt.right{background:#e2f8ec;border-color:#2fa96b;animation:pop .3s ease}
+.opt.right .ltr{background:#2fa96b}
+.opt.wrong{background:#fdeae7;border-color:var(--danger);animation:shake .3s ease}
+.opt.wrong .ltr{background:var(--danger)}
+@keyframes pop{0%{transform:scale(1)}45%{transform:scale(1.035)}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.explain{
+  margin:16px 0 0;padding:15px 17px;border-radius:12px;font-size:13.5px;line-height:1.65;
+  background:#fff8e3;border:2px solid #f2d489;border-left-width:6px;
+  color:#5c4a1c;
+}
+.explain b{color:#3d2f08;font-weight:800}
+
+/* ---------- Nút cảm ứng ---------- */
+/* Bảng nút xếp dưới khung chơi, không phủ lên dải mặt đất nơi nhân vật đi */
+.shell{
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  width:100%;max-width:1000px;
+}
+.pad{
+  width:100%;
+  display:none;justify-content:space-between;
+}
+.pad .side{display:flex;gap:12px}
+.pad button{
+  width:62px;height:62px;border-radius:50%;
+  background:#fff;border:3px solid var(--ui-line);
+  color:var(--ui-accent);font-size:22px;font-weight:700;
+  box-shadow:0 4px 0 var(--ui-line);
+  display:grid;place-items:center;touch-action:none;user-select:none;
+}
+.pad button:active{background:var(--ui-bg-2);transform:translateY(3px);box-shadow:0 1px 0 var(--ui-line)}
+/* Nút XẢ mang chữ, không phải mũi tên, nên phải hạ cỡ chữ cho vừa vòng tròn */
+#p-dump{font-size:15px;letter-spacing:.5px}
+body.touch .pad{display:flex}
+/* Chừa chỗ cho bảng nút bên dưới, khỏi phải cuộn trang */
+body.touch .stage{max-height:calc(100vh - 104px)}
+@media (max-width:560px){
+  .pad .side{gap:9px}
+  .pad button{width:52px;height:52px;font-size:18px}
+  #p-dump{font-size:12px}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+<div class="stage" id="stage">
+  <canvas id="cv" width="960" height="540"></canvas>
+
+  <!-- Màn giới thiệu -->
+  <div class="veil" id="v-intro">
+    <div class="card">
+      <p class="kicker">Thế giới 2 · Nitrogen &amp; Sulfur</p>
+      <h1>Giải Cứu Phòng Thí Nghiệm</h1>
+      <p>Bạn là học sinh trực phòng thí nghiệm. Một sự cố làm cả khu xưởng hóa chất rò rỉ, và <b>cô giáo bị kẹt trong kho cuối dãy</b>. Muốn tới được đó, bạn phải đi qua bốn khu — và ở đâu cũng cần biết hóa mới sống sót.</p>
+      <div class="keys">
+        <div class="keyrow"><span class="kbd">←</span><span class="kbd">→</span> di chuyển</div>
+        <div class="keyrow"><span class="kbd">Space</span> hoặc <span class="kbd">↑</span> nhảy</div>
+        <div class="keyrow"><span class="kbd">↓</span> xả giỏ ion (màn Bể lắng)</div>
+        <div class="keyrow"><span class="kbd">M</span> bật / tắt nhạc</div>
+        <div class="keyrow"><span class="kbd">P</span> tạm dừng</div>
+      </div>
+      <div class="legend" id="legend"></div>
+      <button class="btn" id="btn-play">Vào màn 2‑1</button>
+    </div>
+  </div>
+
+  <!-- Lớp phủ câu hỏi -->
+  <div class="veil hide" id="v-quiz">
+    <div class="card qwrap">
+      <p class="kicker" id="q-kicker">Ô câu hỏi</p>
+      <p class="stem" id="q-stem"></p>
+      <div class="opts" id="q-opts"></div>
+      <div class="explain hide" id="q-explain"></div>
+      <button class="btn hide" id="q-next" style="margin-top:16px">Chơi tiếp</button>
+    </div>
+  </div>
+
+  <!-- Lớp phủ thông báo (qua màn / thua / tạm dừng) -->
+  <div class="veil hide" id="v-msg">
+    <div class="card">
+      <p class="kicker" id="m-kicker">Thông báo</p>
+      <h2 id="m-title"></h2>
+      <p id="m-body"></p>
+      <button class="btn" id="m-btn">Tiếp tục</button>
+      <button class="btn ghost" id="m-btn2" style="margin-left:8px">Chơi lại màn</button>
+    </div>
+  </div>
+</div>
+
+<!-- Nút bấm cho điện thoại: nằm DƯỚI khung chơi, không phủ lên dải mặt đất -->
+<div class="pad" id="pad">
+  <div class="side">
+    <button id="p-left" aria-label="Sang trái">◀</button>
+    <button id="p-right" aria-label="Sang phải">▶</button>
+  </div>
+  <div class="side">
+    <button id="p-dump" aria-label="Xả giỏ ion">XẢ</button>
+    <button id="p-jump" aria-label="Nhảy">▲</button>
+  </div>
+</div>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ==================== NGÂN HÀNG CÂU HỎI — CHƯƠNG 2 ====================
+   Lấy lại từ game bàn cờ "Vòng Quanh Hóa 11" để không phải soạn trùng.
+   a = chỉ số đáp án đúng (đếm từ 0), e = lời giải thích.                   */
+const QUESTIONS = [
+  /* --- nhận biết --- */
+  {lv:'nb', q:'Liên kết trong phân tử N₂ là', o:['liên kết đơn','liên kết đôi','liên kết ba, rất bền','liên kết ion'], a:2,
+   e:'N≡N có năng lượng liên kết rất lớn (khoảng 945 kJ/mol) nên N₂ khá trơ ở nhiệt độ thường.'},
+  {lv:'nb', q:'Nitrogen chiếm khoảng bao nhiêu phần trăm thể tích không khí?', o:['21%','50%','78%','0,03%'], a:2,
+   e:'Không khí gồm khoảng 78% N₂, 21% O₂ về thể tích, phần còn lại là argon, CO₂ và hơi nước.'},
+  {lv:'nb', q:'Để nhận biết muối ammonium, người ta cho muối tác dụng với dung dịch kiềm rồi đun nóng. Hiện tượng là', o:['có kết tủa trắng','có khí mùi khai làm quỳ tím ẩm hóa xanh','dung dịch hóa đỏ','có khí không màu hóa nâu trong không khí'], a:1,
+   e:'NH₄⁺ + OH⁻ → NH₃↑ + H₂O. Khí NH₃ mùi khai, làm giấy quỳ tím ẩm chuyển xanh.'},
+  {lv:'nb', q:'Ở điều kiện thường, sulfur là', o:['chất khí không màu','chất lỏng màu nâu đỏ','chất rắn màu vàng','chất rắn màu đen'], a:2,
+   e:'Sulfur đơn chất là chất rắn màu vàng, không tan trong nước, tan trong một số dung môi hữu cơ.'},
+  {lv:'nb', q:'Thuốc thử dùng nhận biết ion sulfate SO₄²⁻ trong dung dịch là', o:['dung dịch BaCl₂','dung dịch NaOH','quỳ tím','dung dịch AgNO₃'], a:0,
+   e:'Ba²⁺ + SO₄²⁻ → BaSO₄↓ trắng, không tan trong acid mạnh — dấu hiệu đặc trưng của ion sulfate.'},
+  {lv:'nb', q:'Sulfuric acid đặc có tính chất đặc trưng nào?', o:['tính khử mạnh','tính háo nước và tính oxi hóa mạnh','tính base mạnh','dễ bay hơi'], a:1,
+   e:'H₂SO₄ đặc hút mạnh nước (than hóa đường, giấy) và oxi hóa được nhiều kim loại kém hoạt động như Cu.'},
+  {lv:'nb', q:'Khí nào sau đây là nguyên nhân chính gây mưa acid?', o:['CO₂ và CH₄','SO₂ và NO₂','N₂ và O₂','He và Ar'], a:1,
+   e:'SO₂ và các oxide của nitrogen bị oxi hóa và hòa tan trong nước mưa tạo H₂SO₄, HNO₃ làm pH nước mưa xuống dưới 5,6.'},
+  {lv:'nb', q:'Ammonia NH₃ có tính chất vật lí nào sau đây?', o:['khí không mùi, không tan trong nước','khí mùi khai, tan rất nhiều trong nước','chất lỏng màu vàng','chất rắn thăng hoa'], a:1,
+   e:'NH₃ là khí không màu, mùi khai xốc, nhẹ hơn không khí và tan rất nhiều trong nước tạo dung dịch có tính base.'},
+  /* --- thông hiểu --- */
+  {lv:'th', q:'Đưa hai đũa thủy tinh, một tẩm dung dịch NH₃ đặc, một tẩm dung dịch HCl đặc, lại gần nhau. Hiện tượng quan sát được là', o:['có khói trắng xuất hiện','có khí màu nâu','có kết tủa vàng','không hiện tượng'], a:0,
+   e:'NH₃ + HCl → NH₄Cl. Tinh thể NH₄Cl rất mịn lơ lửng tạo hiện tượng khói trắng.'},
+  {lv:'th', q:'Khí NO không màu nhưng hóa nâu ngay trong không khí vì', o:['NO tan trong hơi nước','2NO + O₂ → 2NO₂ màu nâu đỏ','NO bị phân hủy thành N₂','NO tác dụng với N₂'], a:1,
+   e:'NO rất dễ bị oxygen của không khí oxi hóa thành NO₂ có màu nâu đỏ, đây là dấu hiệu nhận biết khí NO.'},
+  {lv:'th', q:'Trong phản ứng SO₂ + Br₂ + 2H₂O → 2HBr + H₂SO₄, SO₂ đóng vai trò', o:['chất oxi hóa','chất khử','vừa oxi hóa vừa khử','môi trường'], a:1,
+   e:'Số oxi hóa của S tăng từ +4 lên +6 nên SO₂ nhường electron, là chất khử; đây là phản ứng làm mất màu nước bromine.'},
+  {lv:'th', q:'Trong phản ứng SO₂ + 2H₂S → 3S + 2H₂O, SO₂ đóng vai trò', o:['chất oxi hóa','chất khử','chất xúc tác','chất môi trường'], a:0,
+   e:'S trong SO₂ giảm số oxi hóa từ +4 xuống 0 nên SO₂ nhận electron, là chất oxi hóa. S ở mức +4 nên có cả hai khả năng.'},
+  {lv:'th', q:'Cách pha loãng dung dịch H₂SO₄ đặc đúng kỹ thuật là', o:['rót nước vào acid đặc','rót từ từ acid đặc vào nước, khuấy đều','đổ nhanh cả hai vào nhau','đun nóng acid rồi thêm nước'], a:1,
+   e:'H₂SO₄ tan trong nước tỏa nhiệt rất mạnh. Rót nước vào acid sẽ làm nước sôi bắn acid ra ngoài gây bỏng.'},
+  {lv:'th', q:'Kim loại nào sau đây bị thụ động hóa trong H₂SO₄ đặc, nguội?', o:['Cu','Zn','Al và Fe','Mg'], a:2,
+   e:'Al, Fe (và Cr) tạo lớp oxide bền, đặc khít trên bề mặt nên không phản ứng tiếp, nhờ đó dùng thùng thép chở acid đặc nguội.'},
+  {lv:'th', q:'Cho lá đồng vào H₂SO₄ đặc, đun nóng. Hiện tượng là', o:['không có phản ứng','có khí không màu, mùi hắc thoát ra và dung dịch chuyển màu xanh lam','có kết tủa đen','có khí màu vàng lục'], a:1,
+   e:'Cu + 2H₂SO₄(đặc) → CuSO₄ + SO₂↑ + 2H₂O. SO₂ mùi hắc, dung dịch CuSO₄ có màu xanh lam.'},
+  {lv:'th', q:'Trong NH₃, nitrogen có số oxi hóa −3 là mức thấp nhất, do đó khi tham gia phản ứng oxi hóa – khử, NH₃', o:['chỉ thể hiện tính oxi hóa','chỉ thể hiện tính khử','không tham gia phản ứng oxi hóa – khử','luôn là chất môi trường'], a:1,
+   e:'Ở mức số oxi hóa thấp nhất, N chỉ có thể tăng số oxi hóa, tức NH₃ chỉ nhường electron nên chỉ thể hiện tính khử.'},
+  /* --- vận dụng --- */
+  {lv:'vd', q:'Đốt cháy hoàn toàn 3,2 gam sulfur trong khí oxygen dư. Khối lượng SO₂ thu được là', o:['3,2 gam','6,4 gam','8,0 gam','12,8 gam'], a:1,
+   e:'n(S) = 3,2/32 = 0,1 mol. S + O₂ → SO₂ nên n(SO₂) = 0,1 mol → m = 0,1 × 64 = 6,4 gam.'},
+  {lv:'vd', q:'Cho 100 mL dung dịch H₂SO₄ 0,5 M tác dụng với dung dịch BaCl₂ dư. Khối lượng kết tủa thu được là', o:['9,32 gam','11,65 gam','23,30 gam','5,83 gam'], a:1,
+   e:'n(H₂SO₄) = 0,05 mol → n(BaSO₄) = 0,05 mol → m = 0,05 × 233 = 11,65 gam.'},
+  {lv:'vd', q:'Dẫn 0,1 mol SO₂ vào 100 mL dung dịch NaOH 1,5 M. Sản phẩm muối thu được là', o:['chỉ NaHSO₃','chỉ Na₂SO₃','hỗn hợp NaHSO₃ và Na₂SO₃','Na₂SO₄'], a:2,
+   e:'Tỉ lệ n(NaOH)/n(SO₂) = 0,15/0,1 = 1,5, nằm giữa 1 và 2 nên tạo đồng thời hai muối, mỗi muối 0,05 mol.'},
+  {lv:'vd', q:'Tổng hợp ammonia từ 1 mol N₂ và 3 mol H₂ với hiệu suất 25%. Số mol NH₃ thu được là', o:['0,25 mol','0,50 mol','0,75 mol','2,00 mol'], a:1,
+   e:'Nếu hiệu suất 100% thu 2 mol NH₃; với H = 25% thì n(NH₃) = 2 × 0,25 = 0,5 mol.'},
+  {lv:'vd', q:'Hòa tan hết 6,4 gam Cu bằng dung dịch H₂SO₄ đặc, nóng, dư. Thể tích khí SO₂ (đkc, 24,79 L/mol) thu được là', o:['1,2395 L','2,479 L','4,958 L','3,7185 L'], a:1,
+   e:'n(Cu) = 0,1 mol. Theo Cu + 2H₂SO₄ → CuSO₄ + SO₂ + 2H₂O thì n(SO₂) = 0,1 mol → V = 0,1 × 24,79 = 2,479 L.'},
+  {lv:'vd', q:'Hệ số của H₂SO₄ trong phương trình Cu + H₂SO₄(đặc, nóng) → CuSO₄ + SO₂ + H₂O là', o:['1','2','3','4'], a:1,
+   e:'Cu + 2H₂SO₄ → CuSO₄ + SO₂ + 2H₂O. Một phân tử H₂SO₄ bị khử thành SO₂, một phân tử đóng vai trò tạo muối.'},
+  {lv:'vd', q:'Cho 200 mL dung dịch NH₃ tác dụng vừa đủ với 100 mL dung dịch HCl 0,2 M. Nồng độ mol của dung dịch NH₃ là', o:['0,05 M','0,10 M','0,20 M','0,40 M'], a:1,
+   e:'n(HCl) = 0,02 mol; NH₃ + HCl → NH₄Cl nên n(NH₃) = 0,02 mol → C = 0,02/0,2 = 0,1 M.'}
+];
+
+/* ==================== CÂU HỎI VAN LÒ (TRẬN BOSS) ====================
+   Mỗi van đòi một phương trình đã cân bằng. Đáp án là dãy hệ số theo đúng
+   thứ tự chất trong phương trình. */
+const VALVE_Q = [
+  {eq:'Cu + H₂SO₄(đặc, nóng) → CuSO₄ + SO₂ + H₂O',
+   o:['1 – 1 – 1 – 1 – 1','1 – 2 – 1 – 1 – 2','2 – 2 – 2 – 1 – 2','1 – 4 – 1 – 2 – 4'], a:1,
+   e:'Cu nhường 2 electron, S⁺⁶ nhận 2 electron xuống S⁺⁴. Một phân tử H₂SO₄ bị khử thành SO₂, một phân tử tạo muối nên cần 2H₂SO₄ và sinh 2H₂O.'},
+  {eq:'FeS₂ + O₂ → Fe₂O₃ + SO₂',
+   o:['2 – 5 – 1 – 4','4 – 11 – 2 – 8','1 – 3 – 1 – 2','2 – 7 – 1 – 4'], a:1,
+   e:'Cân sulfur trước: 4FeS₂ cho 8SO₂. Fe cho 2Fe₂O₃. Đếm oxygen bên phải: 2×3 + 8×2 = 22 nguyên tử, tức 11O₂. Đây là phản ứng đốt quặng pyrite mở đầu dây chuyền sản xuất H₂SO₄.'},
+  {eq:'NH₃ + O₂ → NO + H₂O   (850 °C, xt Pt)',
+   o:['2 – 3 – 2 – 3','4 – 5 – 4 – 6','4 – 3 – 4 – 6','2 – 5 – 2 – 3'], a:1,
+   e:'N từ −3 lên +2 nhường 5 electron, mỗi O₂ nhận 4 electron. Bội chung 20 nên 4NH₃ và 5O₂, sinh 4NO và 6H₂O. Đây là bước đầu của quá trình Ostwald.'},
+  {eq:'H₂S + O₂ → SO₂ + H₂O   (oxygen dư)',
+   o:['2 – 3 – 2 – 2','1 – 1 – 1 – 1','2 – 1 – 2 – 2','1 – 2 – 1 – 2'], a:0,
+   e:'Đốt trong oxygen dư thì sulfur lên +4 tạo SO₂. Cân hydrogen và sulfur được 2H₂S → 2SO₂ + 2H₂O, đếm oxygen bên phải 4 + 2 = 6 nguyên tử nên cần 3O₂.'},
+  {eq:'Fe + H₂SO₄(đặc, nóng) → Fe₂(SO₄)₃ + SO₂ + H₂O',
+   o:['1 – 3 – 1 – 1 – 3','2 – 6 – 1 – 3 – 6','2 – 4 – 1 – 1 – 4','2 – 3 – 1 – 3 – 3'], a:1,
+   e:'Fe lên +3 nhường 3 electron, hai Fe cho 6 electron; S⁺⁶ nhận 2 electron nên có 3SO₂. Ba gốc sulfate vào muối, cộng 3 phân tử bị khử là 6H₂SO₄, sinh 6H₂O.'},
+  {eq:'Cu + HNO₃(loãng) → Cu(NO₃)₂ + NO + H₂O',
+   o:['1 – 4 – 1 – 2 – 2','3 – 8 – 3 – 2 – 4','1 – 2 – 1 – 1 – 1','3 – 6 – 3 – 2 – 3'], a:1,
+   e:'Cu nhường 2 electron, N⁺⁵ nhận 3 electron xuống NO. Bội chung 6 nên 3Cu và 2NO; thêm 6 gốc nitrate vào muối thành 8HNO₃, sinh 4H₂O.'},
+  {eq:'S + HNO₃(đặc) → H₂SO₄ + NO₂ + H₂O',
+   o:['1 – 2 – 1 – 2 – 1','1 – 6 – 1 – 6 – 2','1 – 4 – 1 – 4 – 2','2 – 6 – 2 – 6 – 1'], a:1,
+   e:'S từ 0 lên +6 nhường 6 electron, mỗi N⁺⁵ chỉ nhận 1 electron xuống NO₂ nên cần 6HNO₃ và sinh 6NO₂. Kiểm lại hydrogen: bên trái 6, bên phải 2 + 2×2 = 6.'}
+];
+
+/* ==================== MÃ Ô ==================== */
+const T = {
+  EMPTY:0,
+  DIRT:1,     // nền đất
+  BRICK:2,    // gạch, đội đầu vỡ được
+  QBLOCK:3,   // ô ? có câu hỏi
+  QUSED:4,    // ô ? đã dùng
+  ACID:5,     // hố acid — chạm là mất máu
+  FLAG:6,     // cột cờ về đích
+  STONE:7,    // đá cứng, không phá được
+  GATE:8,     // cửa lọc, chỉ mở khi giỏ ion đúng công thức
+  VALVE:9,    // van lò, đội đầu vào để cân bằng phương trình
+  VUSED:10    // van đã khóa
+};
+const SOLID = {1:true, 2:true, 3:true, 4:true, 7:true, 8:true, 9:true, 10:true};
+
+/* ==================== HẰNG SỐ VẬT LÍ ==================== */
+const TS = 36;                 // cạnh một ô, tính bằng pixel
+const P = {
+  grav:0.78, jump:-13.8, jumpNH3:-16.8,
+  accel:0.72, maxRun:5.0, fric:0.78, airFric:0.92,
+  maxFall:15, coyote:6, buffer:7
+};
+/* Tầm nhảy suy ra từ các số trên — bám theo đây khi thiết kế màn, đừng đặt ước chừng:
+   · độ cao nhảy ≈ 122 px ≈ 3,4 ô; tầm xa ≈ 175 px ≈ 4,8 ô (giữ khe hở ≤ 4 ô cho chắc)
+   · đứng ở hàng R: đội đầu tới được ô ở hàng R−4 và R−5; đặt CHÂN lên được bệ ở hàng R−3
+   · nền ở hàng 13 → bệ đặt ở hàng 10, rồi từ hàng 10 lên tiếp hàng 7
+   · ô `?` treo ở hàng 9 (đội từ mặt đất) hoặc hàng 5 (đội từ bệ hàng 10) */
+
+/* ==================== MÔ TẢ CÁC MÀN ====================
+   Toàn bộ dùng toạ độ ô. ground: [cột bắt đầu, độ rộng] — chỗ trống là vực/hố acid. */
+const LEVELS = [
+  {
+    id:'2-1',
+    name:'Kho hóa chất',
+    brief:'Kho bị đổ mấy can acid, sàn loang lổ. Đội đầu vào ô ? để lấy vật tư — nhưng chỉ khi trả lời đúng.',
+    w:132, h:15,
+    ground:[[0,24],[27,20],[50,15],[68,22],[93,17],[113,19]],
+    acid:[[24,3],[47,3],[65,3],[90,3],[110,3]],
+    plats:[                       // [cột, hàng, độ rộng] — chỉ dùng hàng 10 và hàng 7
+      [17,10,3],[31,10,4],[36,7,3],[43,10,3],
+      [54,10,4],[59,7,3],[70,10,3],[76,10,4],[81,7,3],
+      [95,10,4],[100,7,3],[120,10,3]
+    ],
+    stone:[],
+    qblocks:[[12,9],[20,9],[28,9],[52,9],[68,9],[87,9],[106,9],[126,9]],
+    bricks:[[13,9],[21,9],[29,9],[53,9],[69,9],[88,9],[107,9],[127,9]],
+    coins:[
+      [17,9],[18,9],[19,9],[31,9],[32,9],[36,6],[37,6],
+      [54,9],[55,9],[59,6],[76,9],[77,9],[81,6],[82,6],
+      [95,9],[96,9],[100,6],[120,9],[121,9],
+      [24,11],[25,10],[26,11],[47,11],[48,10],[49,11],
+      [65,11],[66,10],[67,11],[90,11],[91,10],[92,11],
+      [110,11],[111,10],[112,11]
+    ],
+    foes:[[21,12],[35,12],[57,12],[74,12],[86,12],[104,12],[128,12]],
+    items:[{x:60,y:6,kind:'nh3'},{x:101,y:6,kind:'shield'}],
+    start:[2,12], flag:[129,12]
+  },
+  {
+    id:'2-2',
+    name:'Ống khói nhà máy',
+    theme:'factory',
+    brief:'Trạm quan trắc báo SO₂ vượt ngưỡng, khói mù đọng thành lớp dưới thấp. Lấy khăn tẩm dung dịch kiềm để đi xuyên qua, hoặc leo bệ cao mà tránh.',
+    w:150, h:15,
+    ground:[[0,20],[23,18],[44,16],[63,20],[86,14],[103,22],[128,22]],
+    acid:[[20,3],[41,3],[60,3],[83,3],[100,3],[125,3]],
+    plats:[
+      // Đừng đặt bệ hàng 10 ở đúng cột lấy đà trước hố — đội đầu vào bệ là cắt đà, rơi xuống hố
+      [14,10,3],[25,10,5],[31,7,3],[34,10,3],
+      [46,10,6],[53,7,4],
+      [65,10,5],[73,7,3],[78,10,4],
+      [90,10,3],[95,7,3],[105,10,7],[113,7,3],[117,7,3],[120,10,3],
+      [130,10,6],[139,7,3],[144,10,3]
+    ],
+    stone:[],
+    // [cột, hàng, rộng, cao] — lớp khói nằm sát mặt đất, đi bộ qua là dính
+    gas:[[25,11,5,2],[46,11,6,2],[65,11,5,2],[105,11,7,2],[130,11,6,2]],
+    // Ô ? phải nằm ở cột KHÔNG có bệ hàng 10 phía trên, nếu không sẽ bị chắn
+    qblocks:[[9,9],[28,5],[54,9],[70,9],[86,9],[110,5],[137,9],[142,9]],
+    bricks:[[10,9],[29,5],[55,9],[71,9],[87,9],[111,5],[138,9],[143,9]],
+    coins:[
+      [14,9],[15,9],[16,9],[31,6],[32,6],[34,9],[35,9],
+      [53,6],[54,6],[55,6],[58,9],[59,9],[73,6],[74,6],[78,9],[79,9],
+      [90,9],[91,9],[95,6],[96,6],[113,6],[114,6],
+      [117,6],[118,6],[119,6],[120,9],[121,9],[139,6],[140,6],[144,9],[145,9],
+      [20,11],[21,10],[22,11],[41,11],[42,10],[43,11],
+      [60,11],[61,10],[62,11],[83,11],[84,10],[85,11],
+      [100,11],[101,10],[102,11],[125,11],[126,10],[127,11]
+    ],
+    foes:[[16,12],[33,12],[55,12],[74,12],[96,12],[118,12],[140,12]],
+    items:[
+      {x:6,y:12,kind:'mask'},{x:54,y:6,kind:'nh3'},{x:74,y:6,kind:'shield'},
+      {x:95,y:6,kind:'mask'},{x:113,y:6,kind:'nh3'}
+    ],
+    start:[2,12], flag:[148,12]
+  },
+  {
+    id:'2-3',
+    name:'Bể lắng',
+    theme:'tank',
+    brief:'Ba cửa lọc chắn đường, mỗi cửa chỉ mở khi bạn mang đúng các ion tạo nên hợp chất ghi trên biển. Ion nằm rải trên đường đi — ion nào không cần thì nhảy qua, đừng ăn.',
+    w:160, h:15,
+    ground:[[0,26],[29,29],[61,34],[98,30],[131,29]],
+    acid:[[26,3],[58,3],[95,3],[128,3]],
+    plats:[
+      [10,10,3],[31,10,3],[36,7,3],[50,10,4],[67,10,3],
+      [70,10,3],[75,7,3],[86,10,3],[104,10,3],[109,7,3],
+      [118,10,3],[131,10,4],[144,10,4],[150,7,3]
+    ],
+    stone:[],
+    // Cửa lọc: cột chắn cao 4 ô, need là số ion cần mang tới
+    gates:[
+      {col:46, formula:'BaSO₄', need:{'Ba²⁺':1, 'SO₄²⁻':1},
+       e:'Ba²⁺ + SO₄²⁻ → BaSO₄↓ trắng, không tan cả trong acid mạnh — đây là phản ứng dùng để nhận biết ion sulfate.'},
+      {col:90, formula:'(NH₄)₂SO₄', need:{'NH₄⁺':2, 'SO₄²⁻':1},
+       e:'Điện tích phải cân: hai NH₄⁺ mang +2 mới bù đủ cho một SO₄²⁻ mang −2. Đây là phân đạm SA quen thuộc.'},
+      {col:140, formula:'NH₄NO₃', need:{'NH₄⁺':1, 'NO₃⁻':1},
+       e:'NH₄⁺ mang +1, NO₃⁻ mang −1 nên tỉ lệ 1 : 1. Đây là phân đạm ammonium nitrate.'}
+    ],
+    // Ion nằm ở hàng 12, ngay trên đường chạy — muốn bỏ qua thì phải nhảy vượt
+    ions:[
+      [8,'Ba²⁺'],[13,'Cl⁻'],[18,'SO₄²⁻'],[23,'Na⁺'],[33,'OH⁻'],[38,'Ba²⁺'],[42,'SO₄²⁻'],
+      [50,'NH₄⁺'],[54,'Cl⁻'],[63,'NH₄⁺'],[67,'SO₄²⁻'],[71,'OH⁻'],[76,'NH₄⁺'],[80,'NO₃⁻'],[85,'SO₄²⁻'],
+      [101,'NO₃⁻'],[106,'Ba²⁺'],[111,'NH₄⁺'],[116,'SO₄²⁻'],[121,'NO₃⁻'],[125,'Cl⁻'],[134,'NH₄⁺'],[137,'NO₃⁻']
+    ],
+    qblocks:[[16,9],[65,9],[113,9],[149,9]],
+    bricks:[[17,9],[66,9],[114,9],[150,9]],
+    coins:[
+      [10,9],[11,9],[12,9],[36,6],[37,6],[50,9],[51,9],
+      [70,9],[71,9],[75,6],[76,6],[86,9],[87,9],
+      [104,9],[105,9],[109,6],[110,6],[118,9],[119,9],
+      [131,9],[132,9],[144,9],[145,9],[150,6],[151,6],
+      [26,11],[27,10],[28,11],[58,11],[59,10],[60,11],
+      [95,11],[96,10],[97,11],[128,11],[129,10],[130,11]
+    ],
+    foes:[[30,12],[73,12],[104,12],[123,12]],
+    items:[{x:20,y:12,kind:'shield'},{x:76,y:6,kind:'nh3'},{x:110,y:6,kind:'mask'}],
+    start:[2,12], flag:[157,12]
+  },
+  {
+    id:'2-4',
+    name:'Lò đốt',
+    theme:'boss',
+    rescue:true,
+    brief:'Lò đốt quá tải, khói SO₂ phun ra không ngừng và cô giáo bị kẹt trong lồng phía sau. Ba van lò chỉ khóa được khi bạn cân bằng đúng phương trình ghi trên van.',
+    w:52, h:15,
+    ground:[[0,18],[21,31]],
+    acid:[[18,3]],
+    // Không đặt bệ ở hàng 10 trên đầu cột van, nếu không sẽ chắn mất đường đội đầu
+    plats:[[8,10,3],[13,7,3],[24,10,4],[31,7,3],[33,10,3]],
+    stone:[],
+    // Tường chắn cuối, chỉ mở khi lò đã tắt
+    wall:44,
+    boss:{hp:3, col:47, spawnEvery:60*5},
+    valves:[[6,9],[26,5],[38,9]],
+    qblocks:[],
+    bricks:[[7,9],[27,5],[39,9]],
+    coins:[
+      [8,9],[9,9],[10,9],[13,6],[14,6],[24,9],[25,9],
+      [31,6],[32,6],[33,9],[34,9],
+      [18,11],[19,10],[20,11]
+    ],
+    foes:[[16,12],[30,12]],
+    items:[{x:15,y:6,kind:'shield'},{x:33,y:6,kind:'mask'}],
+    start:[2,12], flag:[50,12]
+  }
+];
+
+/* ==================== TRẠNG THÁI ==================== */
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+const W = cv.width, H = cv.height;
+
+let G = null;           // trạng thái màn đang chơi
+let running = false;    // vòng lặp có đang chạy không
+let paused = false;
+let askedIdx = [];      // các câu đã hỏi trong phiên, để không lặp lại
+let TOTAL = {score:0, coins:0, lives:3, level:0};
+
+const $ = id => document.getElementById(id);
+const clamp = (v,a,b) => v < a ? a : (v > b ? b : v);
+
+/* ==================== HIỆU ỨNG ====================
+   Hạt bay, chữ điểm nổi lên và rung màn hình. Toạ độ tính bằng pixel thế giới,
+   nên phải vẽ bên trong phép dịch camera. */
+const FX = {
+  parts:[], pops:[], rings:[], shake:0, flash:0, flashColor:'#fff',
+  reset(){ this.parts.length = 0; this.pops.length = 0; this.rings.length = 0; this.shake = 0; this.flash = 0; }
+};
+
+function burst(x, y, n, colors, opt){
+  opt = opt || {};
+  const spread = opt.spread == null ? 3.2 : opt.spread;
+  for(let i=0; i<n; i++){
+    const a = opt.up ? (-Math.PI/2 + (Math.random()-.5)*1.7) : Math.random()*Math.PI*2;
+    const sp = spread * (.45 + Math.random());
+    FX.parts.push({
+      x, y,
+      vx:Math.cos(a)*sp, vy:Math.sin(a)*sp - (opt.up ? 1.6 : 0),
+      life:opt.life || 34, max:opt.life || 34,
+      size:opt.size || (2.4 + Math.random()*2.6),
+      grav:opt.grav == null ? .17 : opt.grav,
+      color:colors[(Math.random()*colors.length)|0],
+      square:!!opt.square
+    });
+  }
+}
+
+function popText(x, y, text, color){
+  FX.pops.push({x, y, text, color:color || '#ffd75e', life:56, max:56});
+}
+
+/* Vòng sáng lan ra — dùng khi mở cửa lọc, khóa van */
+function ring(x, y, color){
+  FX.rings.push({x, y, r:6, life:30, max:30, color:color || '#ffd75e'});
+}
+
+function shakeScreen(a){ FX.shake = Math.max(FX.shake, a); }
+function flashScreen(color, frames){ FX.flash = frames || 12; FX.flashColor = color || '#fff'; }
+
+function stepFX(){
+  for(let i=FX.parts.length-1; i>=0; i--){
+    const p = FX.parts[i];
+    p.x += p.vx; p.y += p.vy;
+    p.vy += p.grav; p.vx *= .985;
+    if(--p.life <= 0) FX.parts.splice(i, 1);
+  }
+  for(let i=FX.pops.length-1; i>=0; i--){
+    const q = FX.pops[i];
+    q.y -= 1.15;
+    if(--q.life <= 0) FX.pops.splice(i, 1);
+  }
+  for(let i=FX.rings.length-1; i>=0; i--){
+    const r = FX.rings[i];
+    r.r += 5.5;
+    if(--r.life <= 0) FX.rings.splice(i, 1);
+  }
+  if(FX.shake > 0) FX.shake *= .86;
+  if(FX.shake < .3) FX.shake = 0;
+  if(FX.flash > 0) FX.flash--;
+}
+
+function drawFX(){
+  FX.rings.forEach(r => {
+    const a = r.life / r.max;
+    ctx.strokeStyle = r.color;
+    ctx.globalAlpha = a * .8;
+    ctx.lineWidth = 3.5 * a + 1;
+    ctx.beginPath(); ctx.arc(r.x, r.y, r.r, 0, 7); ctx.stroke();
+    ctx.globalAlpha = 1;
+  });
+  FX.parts.forEach(p => {
+    const a = p.life / p.max;
+    ctx.globalAlpha = a;
+    ctx.fillStyle = p.color;
+    if(p.square) ctx.fillRect(p.x - p.size, p.y - p.size, p.size*2, p.size*2);
+    else { ctx.beginPath(); ctx.arc(p.x, p.y, p.size * (.4 + a*.6), 0, 7); ctx.fill(); }
+    ctx.globalAlpha = 1;
+  });
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.font = 'bold 19px ' + "'Baloo 2', sans-serif";
+  FX.pops.forEach(q => {
+    const a = Math.min(1, q.life / 22);
+    ctx.globalAlpha = a;
+    ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(12,20,34,.85)';
+    ctx.strokeText(q.text, q.x, q.y);
+    ctx.fillStyle = q.color;
+    ctx.fillText(q.text, q.x, q.y);
+    ctx.globalAlpha = 1;
+  });
+}
+
+/* ==================== ÂM THANH ==================== */
+/* Bảng tần số nốt: NOTE['A4'] = 440 Hz */
+const NOTE = (function(){
+  const m = {}, names = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+  for(let o=1; o<=6; o++) names.forEach((n, i) => {
+    m[n + o] = 440 * Math.pow(2, (i - 9)/12 + (o - 4));
+  });
+  return m;
+})();
+
+/* Nhạc nền: mỗi màn một bản, viết bằng nốt móc đơn. 0 = nghỉ.
+   lead = giai điệu (sóng vuông), bass = nền (sóng tam giác). */
+const TUNES = {
+  day:{ bpm:132,
+    lead:['C5','E5','G5','E5','C5','E5','G5','B5','A5','F5','A5','F5','D5','F5','A5',0,
+          'C5','E5','G5','C6','B5','G5','E5','C5','D5','F5','A5','D6','C6','A5','F5',0],
+    bass:['C3',0,'C3',0,'G2',0,'G2',0,'F2',0,'F2',0,'G2',0,'G2',0] },
+  factory:{ bpm:112,
+    lead:['A4','C5','E5','C5','A4',0,'G4','A4','F4','A4','C5','A4','F4',0,'E4',0,
+          'A4','C5','E5','A5','G5','E5','C5','A4','D5','F5','A5','F5','E5',0,0,0],
+    bass:['A2',0,'A2',0,'F2',0,'F2',0,'D2',0,'D2',0,'E2',0,'E2',0] },
+  tank:{ bpm:100,
+    lead:['D5',0,'F5',0,'A5',0,'G5',0,'F5',0,'D5',0,'E5',0,'F5',0,
+          'A5',0,'D6',0,'C6',0,'A5',0,'G5',0,'F5',0,'D5',0,0,0],
+    bass:['D3',0,0,0,'A2',0,0,0,'B2',0,0,0,'F2',0,0,0] },
+  boss:{ bpm:150,
+    lead:['E4','F4','E4','D#4','E4','B4','E5','D#5','E5','B4','G4','E4','C5','B4','A#4',0,
+          'E4','F4','E4','D#4','E4','C5','E5','D#5','E5','C5','A4','E4','D5','C5','B4',0],
+    bass:['E2','E2','E2','E2','E2','E2','E2','E2','C2','C2','C2','C2','D2','D2','D2','D2'] }
+};
+
+const Snd = (function(){
+  let ctxA = null, sfx = null, mus = null, on = true;
+  let musOn = true, tune = null, mStep = 0, nextT = 0, timer = null;
+
+  function ac(){
+    if(ctxA) return ctxA;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if(!AC) return null;
+    ctxA = new AC();
+    sfx = ctxA.createGain(); sfx.gain.value = .5; sfx.connect(ctxA.destination);
+    // Nhạc nền to hơn tiếng động một chút; chỉnh ở đây chứ đừng tăng biên độ từng nốt (dễ rè)
+    mus = ctxA.createGain(); mus.gain.value = .58; mus.connect(ctxA.destination);
+    return ctxA;
+  }
+
+  /* Một nốt nhạc, hẹn giờ tuyệt đối để nhịp không lệch theo tốc độ khung hình */
+  function mtone(freq, dur, vol, type, at){
+    const osc = ctxA.createOscillator(), g = ctxA.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, at);
+    g.gain.setValueAtTime(.0001, at);
+    g.gain.exponentialRampToValueAtTime(vol, at + .012);
+    g.gain.exponentialRampToValueAtTime(.0001, at + dur);
+    osc.connect(g); g.connect(mus);
+    osc.start(at); osc.stop(at + dur + .03);
+  }
+
+  /* Hẹn trước 0,6 giây: nhạc chạy bằng setInterval nên không lệ thuộc khung hình,
+     và bộ đệm này đủ dài để không ngắt tiếng cả khi máy tụt khung nặng. */
+  function pump(){
+    if(!ctxA || !tune || !musOn) return;
+    const spb = 60 / tune.bpm / 2;
+    while(nextT < ctxA.currentTime + .6){
+      const L = tune.lead[mStep % tune.lead.length];
+      const B = tune.bass[mStep % tune.bass.length];
+      if(L && NOTE[L]) mtone(NOTE[L], spb*.88, .05, 'square', nextT);
+      if(B && NOTE[B]) mtone(NOTE[B], spb*1.7, .06, 'triangle', nextT);
+      nextT += spb;
+      mStep++;
+    }
+  }
+  function tone(o){
+    if(!ctxA || !on) return;
+    const t = ctxA.currentTime + (o.delay || 0);
+    const osc = ctxA.createOscillator(), g = ctxA.createGain();
+    osc.type = o.type || 'square';
+    osc.frequency.setValueAtTime(o.freq, t);
+    if(o.to) osc.frequency.exponentialRampToValueAtTime(Math.max(40, o.to), t + (o.dur || .12));
+    g.gain.setValueAtTime(.0001, t);
+    g.gain.exponentialRampToValueAtTime(o.vol || .12, t + .005);
+    g.gain.exponentialRampToValueAtTime(.0001, t + (o.dur || .12));
+    osc.connect(g); g.connect(sfx);
+    osc.start(t); osc.stop(t + (o.dur || .12) + .04);
+  }
+  return {
+    kick(){ if(ac() && ctxA.state === 'suspended') ctxA.resume(); },
+
+    /* Bật bản nhạc theo tên chủ đề màn; gọi lại cùng tên thì không khởi động lại */
+    music(name){
+      if(!ac()) return;
+      const t = TUNES[name] || TUNES.day;
+      if(tune === t && timer) return;
+      tune = t; mStep = 0; nextT = ctxA.currentTime + .08;
+      if(!timer) timer = setInterval(pump, 90);
+      pump();
+    },
+    musicStop(){
+      if(timer){ clearInterval(timer); timer = null; }
+      tune = null;
+    },
+    musicToggle(){
+      musOn = !musOn;
+      if(musOn && ctxA){ mStep = 0; nextT = ctxA.currentTime + .08; }
+      return musOn;
+    },
+    musicOn(){ return musOn; },
+    /* Để kiểm tra: trình duyệt chỉ cho phát tiếng sau khi người dùng bấm thật */
+    trangThai(){ return ctxA ? ctxA.state : 'chưa tạo' + (timer ? ' (có nhịp)' : ''); },
+    jump(){ tone({freq:330, to:640, dur:.13, vol:.09, type:'square'}); },
+    coin(){ tone({freq:988, dur:.07, vol:.09, type:'square'}); tone({freq:1319, dur:.13, vol:.08, delay:.06, type:'square'}); },
+    bump(){ tone({freq:180, to:110, dur:.1, vol:.1, type:'triangle'}); },
+    stomp(){ tone({freq:520, to:150, dur:.14, vol:.1, type:'sawtooth'}); },
+    hurt(){ tone({freq:300, to:90, dur:.42, vol:.12, type:'sawtooth'}); },
+    right(){ [660, 880, 1175].forEach((f,i) => tone({freq:f, dur:.16, vol:.1, delay:i*.09, type:'square'})); },
+    wrong(){ tone({freq:220, to:110, dur:.36, vol:.11, type:'square'}); },
+    power(){ [523, 659, 784, 1047].forEach((f,i) => tone({freq:f, dur:.14, vol:.09, delay:i*.07, type:'square'})); },
+    win(){ [523, 659, 784, 1047, 1319].forEach((f,i) => tone({freq:f, dur:.3, vol:.1, delay:i*.13, type:'square'})); }
+  };
+})();
+
+/* ==================== DỰNG MÀN ==================== */
+function buildLevel(def){
+  const grid = [];
+  for(let y=0; y<def.h; y++) grid.push(new Array(def.w).fill(T.EMPTY));
+
+  const set = (x, y, v) => { if(y >= 0 && y < def.h && x >= 0 && x < def.w) grid[y][x] = v; };
+
+  // Nền: hai hàng dưới cùng
+  (def.ground || []).forEach(([x, w]) => {
+    for(let i=0; i<w; i++){ set(x+i, def.h-1, T.DIRT); set(x+i, def.h-2, T.DIRT); }
+  });
+  // Hố acid: đổ đầy cả hai hàng nền cho thành một vũng, nhìn ra ngay là chất lỏng
+  (def.acid || []).forEach(([x, w]) => {
+    for(let i=0; i<w; i++){ set(x+i, def.h-1, T.ACID); set(x+i, def.h-2, T.ACID); }
+  });
+  (def.plats || []).forEach(([x, y, w]) => { for(let i=0; i<w; i++) set(x+i, y, T.BRICK); });
+  (def.stone || []).forEach(([x, y, w]) => { for(let i=0; i<w; i++) set(x+i, y, T.STONE); });
+  (def.bricks || []).forEach(([x, y]) => set(x, y, T.BRICK));
+  (def.qblocks || []).forEach(([x, y]) => set(x, y, T.QBLOCK));
+  // Cửa lọc: cột chắn từ hàng 5 xuống hàng 12. Phải cao tới hàng 5, vì đứng trên
+  // bệ hàng 10 là nhảy được tới hàng 6 — thấp hơn thì vượt cửa được, khỏi cần ion.
+  (def.gates || []).forEach(g => { for(let y=5; y<=12; y++) set(g.col, y, T.GATE); });
+  (def.valves || []).forEach(([x, y]) => set(x, y, T.VALVE));
+  if(def.wall != null) for(let y=8; y<=12; y++) set(def.wall, y, T.STONE);
+  set(def.flag[0], def.flag[1], T.EMPTY);
+
+  return {
+    def, grid, w:def.w, h:def.h,
+    gas:(def.gas || []).map(([x,y,w,h]) => ({x, y, w, h})),
+    gates:(def.gates || []).map(g => ({...g, open:false, cool:0})),
+    boss:def.boss ? {...def.boss, spawnT:def.boss.spawnEvery, dead:false, shake:0} : null,
+    ions:(def.ions || []).map(([x, ion]) => ({x, y:12, ion, wait:0})),
+    coins:(def.coins || []).map(([x,y]) => ({x, y, got:false})),
+    items:(def.items || []).map(o => ({x:o.x, y:o.y, kind:o.kind, got:false})),
+    foes:(def.foes || []).map(([x,y]) => ({
+      x:x*TS, y:y*TS, w:28, h:26, vx:-1.15, alive:true, t:Math.random()*6
+    })),
+    player:{
+      x:def.start[0]*TS, y:def.start[1]*TS, w:24, h:32,
+      vx:0, vy:0, onGround:false, face:1,
+      coyote:0, buffer:0, inv:0, nh3:0, mask:0, shield:false, dead:false, t:0,
+      bag:[],                                // giỏ ion đang mang
+      squash:0                               // âm = dẹt xuống, dương = kéo dài
+    },
+    cam:0, done:false, bump:[]
+  };
+}
+
+/* ==================== VÒNG LẶP ==================== */
+let acc = 0, last = 0;
+const STEP = 1000/60;
+
+function loop(ts){
+  if(!running) return;
+  if(!last) last = ts;
+  acc += Math.min(ts - last, 200);
+  last = ts;
+  while(acc >= STEP){ if(!paused) step(); acc -= STEP; }
+  draw();
+  requestAnimationFrame(loop);
+}
+function startLoop(){
+  if(running) return;
+  running = true; last = 0; acc = 0;
+  requestAnimationFrame(loop);
+}
+
+/* ==================== ĐIỀU KHIỂN ==================== */
+const keys = {left:false, right:false, jump:false};
+function bindKey(e, down){
+  const k = e.key;
+  if(k === 'ArrowLeft' || k === 'a' || k === 'A'){ keys.left = down; e.preventDefault(); }
+  else if(k === 'ArrowRight' || k === 'd' || k === 'D'){ keys.right = down; e.preventDefault(); }
+  else if(k === ' ' || k === 'ArrowUp' || k === 'w' || k === 'W'){ keys.jump = down; e.preventDefault(); }
+  else if(k === 'ArrowDown' || k === 's' || k === 'S'){ if(down) dumpBag(); e.preventDefault(); }
+  else if(down && (k === 'm' || k === 'M')){
+    toast(Snd.musicToggle() ? 'Đã bật nhạc' : 'Đã tắt nhạc');
+  }
+  else if(down && (k === 'p' || k === 'P')) togglePause();
+}
+window.addEventListener('keydown', e => { Snd.kick(); bindKey(e, true); });
+window.addEventListener('keyup', e => bindKey(e, false));
+
+function padBtn(id, key){
+  const el = $(id);
+  const on = e => { e.preventDefault(); Snd.kick(); keys[key] = true; };
+  const off = e => { e.preventDefault(); keys[key] = false; };
+  el.addEventListener('pointerdown', on);
+  el.addEventListener('pointerup', off);
+  el.addEventListener('pointercancel', off);
+  el.addEventListener('pointerleave', off);
+}
+padBtn('p-left', 'left'); padBtn('p-right', 'right'); padBtn('p-jump', 'jump');
+$('p-dump').addEventListener('pointerdown', e => { e.preventDefault(); Snd.kick(); dumpBag(); });
+if(window.matchMedia('(pointer:coarse)').matches) document.body.classList.add('touch');
+
+function togglePause(){
+  if(!G || G.done || G.player.dead) return;
+  paused = !paused;
+  if(paused) showMsg('Tạm dừng', 'Đã dừng', 'Bấm P hoặc nút bên dưới để chơi tiếp.', 'Chơi tiếp', () => { hideMsg(); paused = false; });
+  else hideMsg();
+}
+
+/* ==================== VA CHẠM ==================== */
+function tileAt(x, y){
+  const cx = Math.floor(x / TS), cy = Math.floor(y / TS);
+  if(cy < 0 || cy >= G.h) return T.EMPTY;
+  if(cx < 0 || cx >= G.w) return T.STONE;   // chặn mép màn
+  return G.grid[cy][cx];
+}
+function solidAt(x, y){ return !!SOLID[tileAt(x, y)]; }
+
+/* Quét các ô mà hình chữ nhật đè lên, gọi fn(cx, cy, tile) */
+function eachTile(bx, by, bw, bh, fn){
+  const x0 = Math.floor(bx / TS), x1 = Math.floor((bx + bw - 1) / TS);
+  const y0 = Math.floor(by / TS), y1 = Math.floor((by + bh - 1) / TS);
+  for(let cy=y0; cy<=y1; cy++){
+    for(let cx=x0; cx<=x1; cx++){
+      if(cy < 0 || cy >= G.h || cx < 0 || cx >= G.w) continue;
+      fn(cx, cy, G.grid[cy][cx]);
+    }
+  }
+}
+
+function moveX(o, dx){
+  o.x += dx;
+  if(dx === 0) return;
+  const lead = dx > 0 ? o.x + o.w : o.x;
+  if(solidAt(lead, o.y) || solidAt(lead, o.y + o.h/2) || solidAt(lead, o.y + o.h - 1)){
+    const cx = Math.floor(lead / TS);
+    o.x = dx > 0 ? cx*TS - o.w - .01 : (cx+1)*TS + .01;
+    o.vx = 0;
+    return true;
+  }
+  return false;
+}
+
+function moveY(o, dy){
+  o.y += dy;
+  if(dy === 0) return null;
+  const lead = dy > 0 ? o.y + o.h : o.y;
+  if(solidAt(o.x + 1, lead) || solidAt(o.x + o.w/2, lead) || solidAt(o.x + o.w - 1, lead)){
+    const cy = Math.floor(lead / TS);
+    if(dy > 0){ o.y = cy*TS - o.h - .01; o.vy = 0; o.onGround = true; }
+    else{
+      o.y = (cy+1)*TS + .01; o.vy = 0;
+      return cy;                                  // trả về hàng vừa đội đầu
+    }
+  }
+  return null;
+}
+
+/* ==================== MỘT BƯỚC CẬP NHẬT ==================== */
+function step(){
+  const p = G.player;
+  p.t++;
+  if(p.inv > 0) p.inv--;
+  if(p.nh3 > 0) p.nh3--;
+  if(p.mask > 0) p.mask--;
+  if(p.dead){ deadStep(); return; }
+
+  // chạy ngang
+  if(keys.left){ p.vx -= P.accel; p.face = -1; }
+  if(keys.right){ p.vx += P.accel; p.face = 1; }
+  if(!keys.left && !keys.right) p.vx *= (p.onGround ? P.fric : P.airFric);
+  p.vx = clamp(p.vx, -P.maxRun, P.maxRun);
+  if(Math.abs(p.vx) < .05) p.vx = 0;
+
+  // nhảy: có coyote time và đệm phím cho đỡ hụt
+  if(keys.jump) p.buffer = P.buffer; else if(p.buffer > 0) p.buffer--;
+  if(p.onGround) p.coyote = P.coyote; else if(p.coyote > 0) p.coyote--;
+  if(p.buffer > 0 && p.coyote > 0){
+    p.vy = p.nh3 > 0 ? P.jumpNH3 : P.jump;
+    p.onGround = false; p.buffer = 0; p.coyote = 0;
+    Snd.jump();
+    p.squash = .3;                                 // kéo dài người khi bật lên
+    burst(p.x + p.w/2, p.y + p.h, 6, ['#ffffff','#dbe6f2'], {spread:1.7, grav:.06, life:20, size:2});
+  }
+  if(!keys.jump && p.vy < -4) p.vy *= .86;        // thả phím sớm thì nhảy thấp
+
+  p.vy = clamp(p.vy + P.grav, -30, P.maxFall);
+  const vyTruoc = p.vy;
+  const dangBay = !p.onGround;
+  p.onGround = false;
+  moveX(p, p.vx);
+  const hitRow = moveY(p, p.vy);
+  if(hitRow !== null) hitBlock(p, hitRow);
+
+  // vừa chạm đất sau khi rơi nhanh: nhún người và tung bụi
+  if(p.onGround && dangBay && vyTruoc > 7){
+    p.squash = -Math.min(.38, vyTruoc/44);
+    burst(p.x + p.w/2, p.y + p.h, 7, ['#ffffff','#d8c9a8'], {spread:2.1, grav:.05, life:18, size:2.2});
+  }
+  p.squash *= .84;
+  if(Math.abs(p.squash) < .01) p.squash = 0;
+
+  // rơi khỏi màn
+  if(p.y > G.h * TS + 60){ hurt(true); return; }
+
+  checkTiles(p);
+  checkGas(p);
+  checkPickups(p);
+  if(G.ions.length) checkIons(p);
+  if(G.gates.length) checkGates(p);
+  stepBoss();
+  stepFoes();
+  stepFX();
+
+  // camera bám nhân vật
+  const target = clamp(p.x + p.w/2 - W/2, 0, G.w*TS - W);
+  G.cam += (target - G.cam) * .16;
+
+  // về đích
+  if(!G.done && Math.abs(p.x - G.def.flag[0]*TS) < TS){
+    G.done = true; Snd.win();
+    // pháo giấy rơi từ trên xuống quanh chỗ về đích
+    const fx = G.def.flag[0]*TS;
+    for(let k=0; k<70; k++)
+      FX.parts.push({
+        x:fx + (Math.random()-.5)*W*.8, y:-20 - Math.random()*160,
+        vx:(Math.random()-.5)*1.8, vy:1.4 + Math.random()*2.4,
+        life:150, max:150, size:2.6 + Math.random()*2.4, grav:.014,
+        color:['#ffd75e','#e2604e','#8fd0a0','#7fe0ff','#fff'][(Math.random()*5)|0],
+        square:true
+      });
+    flashScreen('#ffffff', 14);
+    setTimeout(levelClear, 700);
+  }
+
+  // hiệu ứng ô bị đội
+  for(let i=G.bump.length-1; i>=0; i--){ if(--G.bump[i].t <= 0) G.bump.splice(i,1); }
+}
+
+function deadStep(){
+  const p = G.player;
+  p.vy = clamp(p.vy + P.grav, -30, P.maxFall);
+  p.y += p.vy;
+}
+
+/* Đội đầu vào ô ? hoặc gạch */
+function hitBlock(p, cy){
+  const cxs = [Math.floor((p.x + 2)/TS), Math.floor((p.x + p.w - 2)/TS)];
+  for(const cx of cxs){
+    if(cx < 0 || cx >= G.w) continue;
+    const t = G.grid[cy][cx];
+    if(t === T.QBLOCK){
+      G.bump.push({x:cx, y:cy, t:10});
+      askQuestion(cx, cy, false);
+      return;
+    }
+    if(t === T.VALVE){
+      G.bump.push({x:cx, y:cy, t:10});
+      askQuestion(cx, cy, true);
+      return;
+    }
+    if(t === T.BRICK){
+      G.bump.push({x:cx, y:cy, t:10});
+      Snd.bump();
+      return;
+    }
+  }
+  Snd.bump();
+}
+
+/* Chạm acid */
+function checkTiles(p){
+  let acid = false;
+  eachTile(p.x + 4, p.y + 6, p.w - 8, p.h - 6, (cx, cy, t) => { if(t === T.ACID) acid = true; });
+  if(acid) hurt(false);
+}
+
+/* Vùng khói SO₂ — khăn tẩm kiềm hấp thụ hết nên đi qua được */
+function checkGas(p){
+  if(p.mask > 0 || !G.gas.length) return;
+  for(const z of G.gas){
+    if(p.x + p.w - 6 > z.x*TS && p.x + 6 < (z.x + z.w)*TS &&
+       p.y + p.h - 4 > z.y*TS && p.y + 4 < (z.y + z.h)*TS){
+      if(p.inv <= 0) toast('Hít phải SO₂! Cần khăn tẩm dung dịch kiềm, hoặc đi đường trên');
+      hurt(false);
+      return;
+    }
+  }
+}
+
+function checkPickups(p){
+  G.coins.forEach(c => {
+    if(c.got) return;
+    if(p.x < c.x*TS + TS && p.x + p.w > c.x*TS && p.y < c.y*TS + TS && p.y + p.h > c.y*TS){
+      c.got = true; TOTAL.coins++; TOTAL.score += 50; Snd.coin();
+      burst(c.x*TS + TS/2, c.y*TS + TS/2, 7, ['#ffd75e','#f5c542','#fff3c4'], {spread:2.4, life:26, size:2.2});
+    }
+  });
+  G.items.forEach(it => {
+    if(it.got) return;
+    if(p.x < it.x*TS + TS && p.x + p.w > it.x*TS && p.y < it.y*TS + TS && p.y + p.h > it.y*TS){
+      it.got = true; grantItem(it.kind);
+    }
+  });
+}
+
+/* ==================== ION VÀ CỬA LỌC ==================== */
+const CATION = {'Ba²⁺':true, 'Na⁺':true, 'NH₄⁺':true, 'Cu²⁺':true};
+
+function checkIons(p){
+  G.ions.forEach(io => {
+    if(io.wait > 0){ io.wait--; return; }         // đã bị ăn, đang chờ dòng chất mang tới cái mới
+    if(p.x < io.x*TS + TS && p.x + p.w > io.x*TS &&
+       p.y < io.y*TS + TS && p.y + p.h > io.y*TS){
+      io.wait = 60*5;
+      p.bag.push(io.ion);
+      Snd.coin();
+      const mau = CATION[io.ion] ? ['#e2604e','#ff9c8a','#fff'] : ['#2e86c1','#7fc4ef','#fff'];
+      burst(io.x*TS + TS/2, io.y*TS + TS/2, 12, mau, {spread:2.8});
+      popText(io.x*TS + TS/2, io.y*TS - 4, io.ion, CATION[io.ion] ? '#ffb3a5' : '#9ed6f7');
+      toast('Đã lấy ' + io.ion + ' — giỏ: ' + (p.bag.join(' + ') || 'trống') + '   (bấm ↓ để xả giỏ)');
+    }
+  });
+}
+
+/* Đếm số lượng từng ion trong giỏ */
+function tally(list){
+  const m = {};
+  list.forEach(s => { m[s] = (m[s] || 0) + 1; });
+  return m;
+}
+
+function bagMatches(g){
+  const have = tally(G.player.bag), need = g.need;
+  const keys = new Set([...Object.keys(have), ...Object.keys(need)]);
+  for(const k of keys) if((have[k] || 0) !== (need[k] || 0)) return false;
+  return true;
+}
+
+/* Câu nhắc khi giỏ chưa đúng: nói thiếu gì, thừa gì */
+function gateHint(g){
+  const have = tally(G.player.bag), need = g.need;
+  const thieu = [], thua = [];
+  new Set([...Object.keys(have), ...Object.keys(need)]).forEach(k => {
+    const d = (need[k] || 0) - (have[k] || 0);
+    if(d > 0) thieu.push(d > 1 ? d + '×' + k : k);
+    else if(d < 0) thua.push(-d > 1 ? (-d) + '×' + k : k);
+  });
+  let s = 'Cửa ' + g.formula + ' chưa mở —';
+  if(thieu.length) s += ' còn thiếu ' + thieu.join(' và ');
+  if(thua.length) s += (thieu.length ? ',' : '') + ' đang thừa ' + thua.join(' và ');
+  return s + '. Bấm ↓ để xả giỏ.';
+}
+
+function checkGates(p){
+  G.gates.forEach(g => {
+    if(g.cool > 0) g.cool--;
+    if(g.open) return;
+    const gx = g.col*TS;
+    if(p.x + p.w > gx - TS*1.1 && p.x < gx + TS*2){
+      if(bagMatches(g)){
+        g.open = true;
+        for(let y=5; y<=12; y++) G.grid[y][g.col] = T.EMPTY;
+        p.bag = [];
+        TOTAL.score += 400;
+        Snd.win();
+        // cửa vỡ ra thành mảnh, vòng sáng lan từ giữa cột
+        for(let y=5; y<=12; y++)
+          burst(gx + TS/2, y*TS + TS/2, 5, ['#8fa3bb','#ffd75e','#3f4c5e'], {spread:3.6, square:true, size:3});
+        ring(gx + TS/2, 9*TS, '#ffd75e');
+        popText(gx + TS/2, 7*TS, '+400', '#ffd75e');
+        flashScreen('#ffffff', 12);
+        shakeScreen(9);
+        paused = true;
+        showMsg('Cửa lọc đã mở', g.formula, g.e + '<br><br>Được <b>400 điểm</b>.',
+          'Đi tiếp', () => { hideMsg(); paused = false; });
+      }else if(g.cool <= 0){
+        g.cool = 110;
+        toast(gateHint(g));
+      }
+    }
+  });
+}
+
+function dumpBag(){
+  const p = G.player;
+  if(!p.bag.length) return;
+  p.bag = [];
+  Snd.bump();
+  toast('Đã xả giỏ. Ion sẽ theo dòng chất chảy tới, chờ vài giây rồi lấy lại.');
+}
+
+function grantItem(kind){
+  const p = G.player;
+  Snd.power();
+  const mau = kind === 'nh3' ? ['#9fe8f5','#e8f4ff','#fff'] :
+              kind === 'mask' ? ['#8fd0a0','#e8eef6','#fff'] : ['#7fe0ff','#e8f4ff','#fff'];
+  burst(p.x + p.w/2, p.y + p.h/2, 20, mau, {spread:3.4, up:true});
+  ring(p.x + p.w/2, p.y + p.h/2, mau[0]);
+  flashScreen(mau[0], 8);
+  if(kind === 'nh3'){
+    p.nh3 = 60*20;
+    toast('Bình NH₃ — nhẹ hơn không khí, nhảy cao hơn trong 20 giây');
+  }else if(kind === 'mask'){
+    p.mask = 60*22;
+    toast('Khăn tẩm kiềm — SO₂ + 2NaOH → Na₂SO₃ + H₂O, qua khói an toàn 22 giây');
+  }else if(kind === 'shield'){
+    p.shield = true;
+    toast('Kính bảo hộ — đỡ được một lần trúng đòn');
+  }
+}
+
+/* ==================== QUÁI: PHÂN TỬ SO₂ ==================== */
+function stepFoes(){
+  const p = G.player;
+  G.foes.forEach(f => {
+    if(!f.alive) return;
+    f.t++;
+    if(Math.abs(f.x - p.x) > W) return;           // ngoài khung hình thì đứng yên
+    f.vy = (f.vy || 0) + P.grav;
+    f.vy = clamp(f.vy, -20, P.maxFall);
+    const dir = f.vx;                              // moveX đặt vx = 0 khi chạm tường,
+    if(moveX(f, f.vx)) f.vx = -dir;                // nên phải nhớ hướng cũ rồi mới đảo
+    // quay đầu ở mép bệ
+    const ahead = f.vx > 0 ? f.x + f.w + 2 : f.x - 2;
+    if(!solidAt(ahead, f.y + f.h + 4)) f.vx = -f.vx;
+    f.onGround = false;
+    moveY(f, f.vy);
+
+    // va chạm với nhân vật
+    if(p.dead || p.inv > 0) return;
+    if(p.x < f.x + f.w && p.x + p.w > f.x && p.y < f.y + f.h && p.y + p.h > f.y){
+      if(p.vy > 1.5 && p.y + p.h - f.y < 22){     // giẫm từ trên
+        f.alive = false; p.vy = -9.4;
+        TOTAL.score += 150; Snd.stomp();
+        burst(f.x + f.w/2, f.y + f.h/2, 14, ['#e8c33a','#e2604e','#fff0b8'], {spread:3.6});
+        popText(f.x + f.w/2, f.y - 6, '+150', '#ffe89a');
+        shakeScreen(5);
+        p.squash = -.34;
+      }else hurt(false);
+    }
+  });
+}
+
+/* ==================== MẤT MÁU ==================== */
+function hurt(fell){
+  const p = G.player;
+  if(p.dead) return;
+  if(!fell && p.inv > 0) return;
+  if(!fell && p.shield){
+    p.shield = false; p.inv = 90; Snd.bump();
+    toast('Kính bảo hộ đã chịu thay bạn một đòn');
+    return;
+  }
+  TOTAL.lives--;
+  Snd.hurt();
+  shakeScreen(14);
+  flashScreen('#e2604e', 10);
+  burst(p.x + p.w/2, p.y + p.h/2, 16, ['#e2604e','#ffb0a0','#fff'], {spread:3.4});
+  if(TOTAL.lives <= 0){ p.dead = true; p.vy = -9; setTimeout(gameOver, 900); return; }
+  if(fell){ p.dead = true; p.vy = -9; setTimeout(respawn, 900); }
+  else{ p.inv = 110; p.vy = -7; p.vx = -p.face * 4; }
+}
+
+function respawn(){
+  const d = G.def;
+  const p = G.player;
+  p.x = d.start[0]*TS; p.y = d.start[1]*TS;
+  p.vx = 0; p.vy = 0; p.dead = false; p.inv = 90; p.nh3 = 0; p.mask = 0; p.bag = [];
+  G.cam = 0;
+}
+
+/* ==================== LỚP PHỦ CÂU HỎI ==================== */
+function pickQuestion(){
+  if(askedIdx.length >= QUESTIONS.length) askedIdx = [];
+  let i;
+  do { i = Math.floor(Math.random()*QUESTIONS.length); } while(askedIdx.indexOf(i) >= 0);
+  askedIdx.push(i);
+  return QUESTIONS[i];
+}
+
+let valveAsked = [];
+function pickValveQuestion(){
+  if(valveAsked.length >= VALVE_Q.length) valveAsked = [];
+  let i;
+  do { i = Math.floor(Math.random()*VALVE_Q.length); } while(valveAsked.indexOf(i) >= 0);
+  valveAsked.push(i);
+  return VALVE_Q[i];
+}
+
+function askQuestion(cx, cy, isValve){
+  paused = true;
+  const q = isValve ? pickValveQuestion() : pickQuestion();
+  const LV = {nb:'Nhận biết', th:'Thông hiểu', vd:'Vận dụng'};
+  if(isValve){
+    $('q-kicker').textContent = 'Van lò · cân bằng phương trình';
+    $('q-stem').textContent = 'Chọn dãy hệ số đúng:  ' + q.eq;
+  }else{
+    $('q-kicker').textContent = 'Ô câu hỏi · ' + (LV[q.lv] || '');
+    $('q-stem').textContent = q.q;
+  }
+  const box = $('q-opts');
+  box.innerHTML = '';
+  $('q-explain').classList.add('hide');
+  $('q-next').classList.add('hide');
+
+  q.o.forEach((text, i) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'opt';
+    const l = document.createElement('span'); l.className = 'ltr'; l.textContent = 'ABCD'[i];
+    const s = document.createElement('span'); s.textContent = text;
+    b.appendChild(l); b.appendChild(s);
+    b.addEventListener('click', () => answer(i, q, cx, cy, isValve));
+    box.appendChild(b);
+  });
+  $('v-quiz').classList.remove('hide');
+}
+
+function answer(i, q, cx, cy, isValve){
+  const btns = [...$('q-opts').querySelectorAll('.opt')];
+  btns.forEach((b, k) => {
+    b.disabled = true;
+    if(k === q.a) b.classList.add('right');
+    else if(k === i) b.classList.add('wrong');
+  });
+  const ok = i === q.a;
+  $('q-explain').innerHTML = (ok ? '<b>Chính xác. </b>' : '<b>Chưa đúng. </b>') + q.e;
+  $('q-explain').classList.remove('hide');
+  $('q-next').classList.remove('hide');
+  $('q-next').textContent = ok ? 'Nhận thưởng và chơi tiếp' : 'Chơi tiếp';
+
+  if(isValve){
+    // Van chỉ khóa được khi trả lời đúng; sai thì để nguyên cho thử lại
+    if(ok){
+      G.grid[cy][cx] = T.VUSED;
+      $('q-next').textContent = 'Khóa van';
+    }else{
+      $('q-next').textContent = 'Thử lại van khác';
+    }
+  }else{
+    G.grid[cy][cx] = T.QUSED;
+  }
+
+  if(ok){
+    Snd.right();
+    TOTAL.score += isValve ? 500 : 300;
+    burst(cx*TS + TS/2, cy*TS + TS/2, 18, ['#ffd75e','#fff3c4','#8fd0a0'], {spread:3.8, up:true});
+    ring(cx*TS + TS/2, cy*TS + TS/2, '#8fd0a0');
+    popText(cx*TS + TS/2, cy*TS - 10, '+' + (isValve ? 500 : 300), '#ffe89a');
+    if(isValve) damageBoss();
+    else for(let k=-1; k<=1; k++) G.coins.push({x:cx+k, y:cy-2, got:false});
+  }else{
+    Snd.wrong();
+    burst(cx*TS + TS/2, cy*TS + TS/2, 10, ['#e2604e','#ffb0a0'], {spread:2.6});
+  }
+  $('q-next').onclick = () => {
+    $('v-quiz').classList.add('hide');
+    paused = false;
+    if(!ok) hurt(false);
+  };
+}
+
+/* ==================== TRẬN BOSS: LÒ ĐỐT ==================== */
+function damageBoss(){
+  const b = G.boss;
+  if(!b || b.dead) return;
+  b.hp--;
+  b.shake = 40;
+  shakeScreen(16);
+  const bx = b.col*TS, by = 9*TS;
+  burst(bx, by, 26, ['#e2604e','#ffd75e','#8a8a92'], {spread:4.6});
+  ring(bx, by, '#ffa07a');
+  if(b.hp > 0){
+    toast('Khóa được một van! Còn ' + b.hp + ' van nữa thì lò tắt.');
+    return;
+  }
+  b.dead = true;
+  // lò tắt: nổ lớn, nháy trắng, mảnh bay khắp thân lò
+  flashScreen('#ffffff', 22);
+  shakeScreen(30);
+  for(let k=0; k<5; k++)
+    burst(bx + (Math.random()-.5)*4*TS, (7 + Math.random()*5)*TS, 14,
+      ['#ffd75e','#e2604e','#8fd0a0','#fff'], {spread:5.2, square:true, size:3.4, life:52});
+  popText(bx, 6*TS, 'LÒ ĐÃ TẮT!', '#8fd0a0');
+  // hạ tường chắn để đi tới lồng giam
+  if(G.def.wall != null) for(let y=8; y<=12; y++) G.grid[y][G.def.wall] = T.EMPTY;
+  G.foes.forEach(f => { f.alive = false; });
+  Snd.win();
+  toast('Lò đã tắt! Tường chắn hạ xuống — chạy tới cứu cô giáo.');
+}
+
+/* Lò nhả phân tử SO₂ theo chu kì cho tới khi bị khóa hết van */
+function stepBoss(){
+  const b = G.boss;
+  if(!b) return;
+  if(b.shake > 0) b.shake--;
+  if(b.dead) return;
+  if(--b.spawnT > 0) return;
+  b.spawnT = b.spawnEvery;
+  const live = G.foes.filter(f => f.alive).length;
+  if(live >= 6) return;                       // đừng để màn hình ngập quái
+  G.foes.push({
+    x:(b.col - 3)*TS, y:11*TS, w:28, h:26, vx:-1.35, alive:true, t:0
+  });
+  Snd.bump();
+}
+
+/* ==================== LỚP PHỦ THÔNG BÁO ==================== */
+function showMsg(kicker, title, body, btnText, onBtn, btn2Text, onBtn2){
+  $('m-kicker').textContent = kicker;
+  $('m-title').textContent = title;
+  $('m-body').innerHTML = body;
+  $('m-btn').textContent = btnText;
+  $('m-btn').onclick = onBtn;
+  const b2 = $('m-btn2');
+  if(btn2Text){ b2.classList.remove('hide'); b2.textContent = btn2Text; b2.onclick = onBtn2; }
+  else b2.classList.add('hide');
+  $('v-msg').classList.remove('hide');
+}
+function hideMsg(){ $('v-msg').classList.add('hide'); }
+
+let toastText = '', toastT = 0;
+function toast(s){ toastText = s; toastT = 170; }
+
+/* Đi hết 4 màn, ăn gần đủ xu và trả lời đúng hết thì rơi vào khoảng 13–16 nghìn điểm */
+function rank(score){
+  if(score >= 13000) return 'Trưởng phòng thí nghiệm';
+  if(score >= 9500) return 'Trợ lí phòng thí nghiệm';
+  if(score >= 6000) return 'Học sinh trực giỏi';
+  return 'Học sinh trực tập sự';
+}
+
+function finale(){
+  paused = true;
+  showMsg('Hoàn thành thế giới 2', 'Đã cứu được cô giáo!',
+    'Bạn về đích với <b>' + TOTAL.score + ' điểm</b> · <b>' + TOTAL.coins + ' xu</b> · còn <b>' +
+    TOTAL.lives + ' mạng</b>.<br>Danh hiệu: <b>' + rank(TOTAL.score) + '</b>.' +
+    '<br><br>Bốn khu vừa đi qua ứng với bốn phần của chương Nitrogen &amp; Sulfur: kho hóa chất ' +
+    '(tính chất acid – base, nhận biết ion), ống khói nhà máy (SO₂ và cách hấp thụ bằng kiềm), ' +
+    'bể lắng (ion và công thức hợp chất) và lò đốt (cân bằng phương trình oxi hóa – khử).',
+    'Chơi lại từ đầu', () => { hideMsg(); restartAll(); });
+}
+
+function levelClear(){
+  paused = true;
+  const nxt = TOTAL.level + 1;
+  const more = nxt < LEVELS.length;
+  if(!more && G.def.rescue){ finale(); return; }
+  showMsg('Qua màn ' + G.def.id, 'Thoát khỏi ' + G.def.name,
+    'Điểm hiện tại <b>' + TOTAL.score + '</b> · xu <b>' + TOTAL.coins + '</b> · mạng còn <b>' + TOTAL.lives + '</b>.',
+    more ? 'Vào màn tiếp theo' : 'Chơi lại từ đầu',
+    () => { hideMsg(); if(more){ TOTAL.level = nxt; loadLevel(nxt); } else restartAll(); });
+}
+
+function gameOver(){
+  paused = true;
+  showMsg('Hết mạng', 'Chưa cứu được cô giáo',
+    'Bạn đạt <b>' + TOTAL.score + ' điểm</b>. Đọc kỹ phần giải thích ở mỗi ô câu hỏi rồi thử lại nhé.',
+    'Chơi lại từ đầu', () => { hideMsg(); restartAll(); });
+}
+
+/* Mở kèm ?man=2 để vào thẳng màn 2-2 — tiện khi chiếu đúng một màn trên lớp */
+const startAt = (function(){
+  const m = parseInt(new URLSearchParams(location.search).get('man'), 10);
+  return (m >= 1 && m <= LEVELS.length) ? m - 1 : 0;
+})();
+
+function restartAll(){
+  TOTAL = {score:0, coins:0, lives:3, level:startAt};
+  askedIdx = [];
+  loadLevel(startAt);
+}
+
+function loadLevel(i){
+  G = buildLevel(LEVELS[i]);
+  paused = false;
+  FX.reset();
+  Snd.music(LEVELS[i].theme || 'day');
+  toast(LEVELS[i].id + ' · ' + LEVELS[i].name);
+  startLoop();
+}
+
+/* ==================== VẼ ==================== */
+function draw(){
+  if(!G) return;
+  const cam = Math.round(G.cam);
+
+  // trời và núi xa
+  const sky = ctx.createLinearGradient(0, 0, 0, H);
+  if(G.def.theme === 'factory'){
+    sky.addColorStop(0, '#6b6f7d'); sky.addColorStop(.55, '#a89a86'); sky.addColorStop(1, '#d8c9a8');
+  }else if(G.def.theme === 'tank'){
+    sky.addColorStop(0, '#1f5f6b'); sky.addColorStop(.6, '#3f93a0'); sky.addColorStop(1, '#8fc9cf');
+  }else if(G.def.theme === 'boss'){
+    const cooled = G.boss && G.boss.dead;
+    if(cooled){ sky.addColorStop(0, '#2b4a6b'); sky.addColorStop(.6, '#5f86ad'); sky.addColorStop(1, '#a8c6e0'); }
+    else{ sky.addColorStop(0, '#2b1c24'); sky.addColorStop(.55, '#6e3a2e'); sky.addColorStop(1, '#b8603c'); }
+  }else{
+    sky.addColorStop(0, '#4a97dc'); sky.addColorStop(.62, '#7cc0ec'); sky.addColorStop(1, '#b6e0f5');
+  }
+  ctx.fillStyle = sky; ctx.fillRect(0, 0, W, H);
+  drawBackdrop(cam);
+
+  ctx.save();
+  // rung màn hình: lệch cả thế giới, HUD vẽ sau nên không bị rung theo
+  const sx = FX.shake ? (Math.random()-.5)*FX.shake : 0;
+  const sy = FX.shake ? (Math.random()-.5)*FX.shake : 0;
+  ctx.translate(-cam + sx, sy);
+
+  const c0 = Math.max(0, Math.floor(cam/TS) - 1);
+  const c1 = Math.min(G.w - 1, Math.ceil((cam + W)/TS) + 1);
+  for(let cy=0; cy<G.h; cy++){
+    for(let cx=c0; cx<=c1; cx++) drawTile(cx, cy, G.grid[cy][cx]);
+  }
+
+  drawBoss();
+  drawFlag();
+  G.gas.forEach(drawGas);
+  G.gates.forEach(drawGateSign);
+  G.ions.forEach(drawIon);
+  G.coins.forEach(c => { if(!c.got) drawCoin(c.x*TS + TS/2, c.y*TS + TS/2); });
+  G.items.forEach(it => { if(!it.got) drawItem(it); });
+  G.foes.forEach(f => { if(f.alive) drawFoe(f); });
+  drawPlayer();
+  drawFX();
+
+  ctx.restore();
+
+  if(FX.flash > 0){                       // nháy sáng cả khung khi có việc lớn
+    ctx.globalAlpha = FX.flash / 24;
+    ctx.fillStyle = FX.flashColor;
+    ctx.fillRect(0, 0, W, H);
+    ctx.globalAlpha = 1;
+  }
+  drawHud();
+}
+
+/* Mây trôi ở lớp xa nhất — dịch chậm nhất nên tạo cảm giác sâu */
+function drawClouds(cam){
+  const off = -cam * .12 + Date.now()/9000 * -14;
+  ctx.save();
+  ctx.translate(off % 480, 0);
+  ctx.fillStyle = G.def.theme === 'boss' ? 'rgba(255,220,200,.16)' : 'rgba(255,255,255,.55)';
+  for(let k=0; k<Math.ceil(W/480)+2; k++){
+    const bx = k*480;
+    [[40, 62, 26], [150, 40, 18], [268, 78, 32], [372, 50, 22]].forEach(([dx, dy, r]) => {
+      ctx.beginPath();
+      ctx.arc(bx + dx, dy, r, 0, 7);
+      ctx.arc(bx + dx + r*.85, dy + r*.22, r*.72, 0, 7);
+      ctx.arc(bx + dx - r*.8, dy + r*.28, r*.6, 0, 7);
+      ctx.fill();
+    });
+  }
+  ctx.restore();
+}
+
+function drawBackdrop(cam){
+  drawClouds(cam);
+  // dãy bồn chứa và ống khói ở xa, trôi chậm hơn để tạo chiều sâu
+  const off = -cam * .28;
+  ctx.save();
+  ctx.translate(off % 620, 0);
+  for(let k=0; k<Math.ceil(W/620)+2; k++){
+    const bx = k*620;
+    ctx.fillStyle = 'rgba(255,255,255,.5)';
+    ctx.fillRect(bx + 60, H - 250, 74, 250);
+    ctx.fillRect(bx + 150, H - 200, 54, 200);
+    ctx.fillRect(bx + 330, H - 300, 42, 300);
+    ctx.fillRect(bx + 420, H - 220, 96, 220);
+    ctx.fillStyle = 'rgba(255,255,255,.66)';
+    ctx.beginPath(); ctx.ellipse(bx + 97, H - 250, 37, 15, 0, 0, 7); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(bx + 468, H - 220, 48, 17, 0, 0, 7); ctx.fill();
+    // khói bay lên từ ống khói
+    ctx.fillStyle = 'rgba(255,255,255,.34)';
+    for(let s=0; s<3; s++){
+      const t = (Date.now()/1000 + s*1.3) % 4;
+      ctx.beginPath(); ctx.arc(bx + 351 + Math.sin(t*2)*13, H - 300 - t*34, 12 + t*5, 0, 7); ctx.fill();
+    }
+  }
+  ctx.restore();
+}
+
+function bumpOff(cx, cy){
+  const b = G.bump.find(o => o.x === cx && o.y === cy);
+  return b ? -Math.sin((10 - b.t)/10 * Math.PI) * 9 : 0;
+}
+
+function drawTile(cx, cy, t){
+  if(t === T.EMPTY) return;
+  const x = cx*TS, y = cy*TS + bumpOff(cx, cy);
+
+  if(t === T.DIRT){
+    ctx.fillStyle = '#8b5a2b'; ctx.fillRect(x, y, TS, TS);
+    ctx.fillStyle = '#7a4d22';
+    ctx.fillRect(x + 4, y + 8, 8, 6); ctx.fillRect(x + 20, y + 18, 9, 6);
+    if(cy === 0 || G.grid[cy-1][cx] === T.EMPTY || G.grid[cy-1][cx] === T.ACID){
+      ctx.fillStyle = '#4e9c3e'; ctx.fillRect(x, y, TS, 8);
+      ctx.fillStyle = '#5fb84c'; ctx.fillRect(x, y, TS, 4);
+    }
+  }
+  else if(t === T.STONE){
+    ctx.fillStyle = '#7c8794'; ctx.fillRect(x, y, TS, TS);
+    ctx.fillStyle = '#68727e'; ctx.fillRect(x + 2, y + 2, TS - 4, TS - 4);
+    ctx.fillStyle = '#8d99a6'; ctx.fillRect(x + 4, y + 4, TS - 8, 4);
+  }
+  else if(t === T.GATE){                         // cửa lọc: lưới thép chắn ngang
+    ctx.fillStyle = '#3f4c5e'; ctx.fillRect(x, y, TS, TS);
+    ctx.strokeStyle = '#8fa3bb'; ctx.lineWidth = 2;
+    for(let i=6; i<TS; i+=9){
+      ctx.beginPath(); ctx.moveTo(x + i, y); ctx.lineTo(x + i, y + TS); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(x, y + i); ctx.lineTo(x + TS, y + i); ctx.stroke();
+    }
+    ctx.strokeStyle = '#ffd75e'; ctx.lineWidth = 3;
+    ctx.strokeRect(x + 1.5, y + 1.5, TS - 3, TS - 3);
+  }
+  else if(t === T.BRICK){
+    ctx.fillStyle = '#b2673a'; ctx.fillRect(x, y, TS, TS);
+    ctx.strokeStyle = 'rgba(0,0,0,.28)'; ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(x, y + TS/2); ctx.lineTo(x + TS, y + TS/2);
+    ctx.moveTo(x + TS/2, y); ctx.lineTo(x + TS/2, y + TS/2);
+    ctx.moveTo(x + TS/4, y + TS/2); ctx.lineTo(x + TS/4, y + TS);
+    ctx.moveTo(x + TS*.75, y + TS/2); ctx.lineTo(x + TS*.75, y + TS);
+    ctx.stroke();
+  }
+  else if(t === T.QBLOCK){
+    const g = ctx.createLinearGradient(x, y, x, y + TS);
+    g.addColorStop(0, '#ffd75e'); g.addColorStop(1, '#e0a418');
+    ctx.fillStyle = g; ctx.fillRect(x, y, TS, TS);
+    ctx.strokeStyle = '#8a5f08'; ctx.lineWidth = 2; ctx.strokeRect(x + 1, y + 1, TS - 2, TS - 2);
+    ctx.fillStyle = '#7a5206';
+    ctx.font = 'bold 24px ' + "'Baloo 2', sans-serif";
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('?', x + TS/2, y + TS/2 + 1);
+  }
+  else if(t === T.QUSED){
+    ctx.fillStyle = '#8a7a5c'; ctx.fillRect(x, y, TS, TS);
+    ctx.strokeStyle = '#6a5c44'; ctx.lineWidth = 2; ctx.strokeRect(x + 1, y + 1, TS - 2, TS - 2);
+  }
+  else if(t === T.VALVE || t === T.VUSED){        // van lò: vô lăng tròn trên nền thép
+    const shut = t === T.VUSED;
+    ctx.fillStyle = shut ? '#4a5560' : '#b4382c'; ctx.fillRect(x, y, TS, TS);
+    ctx.strokeStyle = shut ? '#333c45' : '#7d2318'; ctx.lineWidth = 2;
+    ctx.strokeRect(x + 1, y + 1, TS - 2, TS - 2);
+    const cxm = x + TS/2, cym = y + TS/2;
+    const spin = shut ? .8 : Date.now()/600;
+    ctx.strokeStyle = shut ? '#8d99a6' : '#ffd75e'; ctx.lineWidth = 3.5;
+    ctx.beginPath(); ctx.arc(cxm, cym, 10, 0, 7); ctx.stroke();
+    for(let k=0; k<4; k++){
+      const a = spin + k*Math.PI/2;
+      ctx.beginPath();
+      ctx.moveTo(cxm + Math.cos(a)*3, cym + Math.sin(a)*3);
+      ctx.lineTo(cxm + Math.cos(a)*13, cym + Math.sin(a)*13);
+      ctx.stroke();
+    }
+    if(shut){
+      ctx.fillStyle = '#8fd0a0';
+      ctx.font = 'bold 11px ' + "'IBM Plex Mono', monospace";
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('OK', cxm, cym);
+    }
+  }
+  else if(t === T.ACID){
+    // Màu vàng chanh độc, cố ý khác hẳn màu cỏ để không ai tưởng là nền đi được
+    const surface = cy === 0 || G.grid[cy-1][cx] !== T.ACID;
+    ctx.fillStyle = '#7d9c05'; ctx.fillRect(x, y, TS, TS);
+    if(surface){
+      const wob = Math.sin(Date.now()/240 + cx) * 3;
+      ctx.fillStyle = '#c3e81c';
+      ctx.beginPath();
+      ctx.moveTo(x, y + 7 + wob);
+      ctx.quadraticCurveTo(x + TS/2, y + 1 + wob, x + TS, y + 7 - wob);
+      ctx.lineTo(x + TS, y + TS); ctx.lineTo(x, y + TS); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,.55)';
+      ctx.fillRect(x, y + 6 + wob, TS, 2);
+    }else{
+      ctx.fillStyle = '#a8c910'; ctx.fillRect(x, y, TS, TS);
+    }
+    ctx.fillStyle = 'rgba(255,255,255,.45)';
+    const b = (Date.now()/420 + cx*.7) % 1;
+    ctx.beginPath(); ctx.arc(x + 9 + (cx%3)*8, y + TS - b*TS, 2.6, 0, 7); ctx.fill();
+  }
+}
+
+/* Lò đốt: thân lò to, cửa lò đỏ rực khi còn cháy, rung khi vừa bị khóa van */
+function drawBoss(){
+  const b = G.boss;
+  if(!b) return;
+  const sh = b.shake > 0 ? Math.sin(b.shake*1.7)*b.shake*.18 : 0;
+  const x = b.col*TS + sh, base = 13*TS;
+  const bw = 4*TS, bh = 7*TS;
+  const bx = x - bw/2;
+
+  ctx.fillStyle = '#4d4a52'; ctx.fillRect(bx, base - bh, bw, bh);
+  ctx.fillStyle = '#5d5a63'; ctx.fillRect(bx + 6, base - bh + 6, bw - 12, bh - 12);
+  ctx.fillStyle = '#3a383f';                                  // ống khói
+  ctx.fillRect(bx + bw/2 - 16, base - bh - 54, 32, 56);
+
+  if(!b.dead){
+    const glow = .6 + Math.sin(Date.now()/180)*.25;           // cửa lò còn cháy
+    ctx.fillStyle = 'rgba(226,96,78,' + glow.toFixed(2) + ')';
+    ctx.fillRect(bx + 18, base - 92, bw - 36, 64);
+    ctx.fillStyle = 'rgba(255,215,94,' + (glow*.8).toFixed(2) + ')';
+    ctx.fillRect(bx + 30, base - 78, bw - 60, 38);
+    ctx.fillStyle = 'rgba(226,214,120,.5)';                   // khói tuôn khỏi ống
+    for(let s=0; s<4; s++){
+      const t = (Date.now()/900 + s*.25) % 1;
+      ctx.beginPath();
+      ctx.arc(bx + bw/2 + Math.sin(t*6 + s)*16, base - bh - 54 - t*80, 10 + t*16, 0, 7);
+      ctx.fill();
+    }
+  }else{
+    ctx.fillStyle = '#2b2a30';                                 // đã tắt, cửa lò nguội
+    ctx.fillRect(bx + 18, base - 92, bw - 36, 64);
+    ctx.fillStyle = '#8fd0a0';
+    ctx.font = 'bold 15px ' + "'IBM Plex Mono', monospace";
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('ĐÃ TẮT', x, base - 60);
+  }
+
+  // bảng đếm van còn lại
+  ctx.fillStyle = 'rgba(14,23,38,.9)';
+  ctx.fillRect(bx + 8, base - bh + 14, bw - 16, 30);
+  ctx.fillStyle = b.dead ? '#8fd0a0' : '#ffd75e';
+  ctx.font = 'bold 14px ' + "'IBM Plex Mono', monospace";
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(b.dead ? 'LÒ NGUỘI' : 'VAN MỞ: ' + b.hp, x, base - bh + 29);
+}
+
+/* Cô giáo trong lồng giam ở cuối màn boss */
+function drawTeacher(){
+  const [fx, fy] = G.def.flag;
+  const x = fx*TS, base = (fy + 1)*TS;
+  const freed = G.boss && G.boss.dead;
+
+  ctx.fillStyle = '#f2f6fb';                        // áo blouse
+  ctx.fillRect(x + 3, base - 30, 22, 18);
+  ctx.fillStyle = '#f6cba3';                        // đầu
+  ctx.fillRect(x + 6, base - 44, 16, 13);
+  ctx.fillStyle = '#2b2118';                        // tóc
+  ctx.fillRect(x + 5, base - 46, 18, 6);
+  ctx.fillRect(x + 3, base - 44, 4, 10);
+  ctx.fillRect(x + 21, base - 44, 4, 10);
+  ctx.fillStyle = '#1a2233';                        // mắt
+  ctx.beginPath(); ctx.arc(x + 10, base - 37, 1.8, 0, 7); ctx.fill();
+  ctx.beginPath(); ctx.arc(x + 18, base - 37, 1.8, 0, 7); ctx.fill();
+  ctx.fillStyle = '#2b3f63';                        // chân
+  ctx.fillRect(x + 6, base - 12, 6, 12);
+  ctx.fillRect(x + 16, base - 12, 6, 12);
+
+  if(!freed){                                       // thanh lồng
+    ctx.strokeStyle = '#8d99a6'; ctx.lineWidth = 4;
+    for(let i=0; i<=4; i++){
+      const gx = x - 12 + i*13;
+      ctx.beginPath(); ctx.moveTo(gx, base - 66); ctx.lineTo(gx, base); ctx.stroke();
+    }
+    ctx.beginPath(); ctx.moveTo(x - 12, base - 66); ctx.lineTo(x + 40, base - 66); ctx.stroke();
+  }else{
+    ctx.fillStyle = '#ffd75e';                      // reo mừng
+    ctx.font = 'bold 15px ' + "'Baloo 2', sans-serif";
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('Cảm ơn em!', x + 14, base - 76 + Math.sin(Date.now()/300)*4);
+  }
+}
+
+function drawFlag(){
+  if(G.def.rescue){ drawTeacher(); return; }
+  const [fx, fy] = G.def.flag;
+  const x = fx*TS + TS/2, base = (fy + 1)*TS;
+  ctx.fillStyle = '#d8dee6'; ctx.fillRect(x - 3, base - 250, 6, 250);
+  ctx.fillStyle = '#e2604e';
+  ctx.beginPath();
+  ctx.moveTo(x + 3, base - 246); ctx.lineTo(x + 66, base - 226); ctx.lineTo(x + 3, base - 206);
+  ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 13px ' + "'Baloo 2', sans-serif";
+  ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+  ctx.fillText('CỨU', x + 12, base - 226);
+}
+
+function drawCoin(cx, cy){
+  const t = Math.sin(Date.now()/220 + cx*.05);
+  const rx = Math.abs(t) * 9 + 2.5;
+  ctx.fillStyle = '#f5c542';
+  ctx.beginPath(); ctx.ellipse(cx, cy, rx, 12, 0, 0, 7); ctx.fill();
+  ctx.fillStyle = '#c9990f';
+  ctx.beginPath(); ctx.ellipse(cx, cy, rx*.5, 7, 0, 0, 7); ctx.fill();
+}
+
+/* Lớp khói SO₂: nhiều bọt khí vàng nhạt cuộn tại chỗ, viền trên rõ để thấy mép an toàn */
+function drawGas(z){
+  const x = z.x*TS, y = z.y*TS, w = z.w*TS, h = z.h*TS;
+  const now = Date.now()/1000;
+  ctx.save();
+  ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
+  ctx.fillStyle = 'rgba(226,214,120,.5)';
+  ctx.fillRect(x, y, w, h);
+  ctx.fillStyle = 'rgba(244,236,170,.55)';
+  for(let i=0; i<z.w*3; i++){
+    const px = x + (i*37 % w);
+    const py = y + h*.55 + Math.sin(now*1.4 + i)*h*.3;
+    ctx.beginPath(); ctx.arc(px, py, 13 + Math.sin(now*2 + i*1.7)*5, 0, 7); ctx.fill();
+  }
+  ctx.restore();
+  ctx.strokeStyle = 'rgba(180,160,40,.75)';
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  for(let i=0; i<=w; i+=6){
+    const yy = y + Math.sin(now*1.8 + i*.06)*2.5;
+    if(i === 0) ctx.moveTo(x, yy); else ctx.lineTo(x + i, yy);
+  }
+  ctx.stroke();
+  ctx.fillStyle = 'rgba(90,74,10,.7)';
+  ctx.font = 'bold 13px ' + "'IBM Plex Mono', monospace";
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('SO₂', x + w/2, y + h/2);
+}
+
+/* Ion: cation nền ấm, anion nền lạnh — nhìn màu là biết dấu điện tích */
+function drawIon(io){
+  if(io.wait > 0) return;
+  const cx = io.x*TS + TS/2;
+  const cy = io.y*TS + TS/2 + Math.sin(Date.now()/320 + io.x)*3;
+  const cat = CATION[io.ion];
+  ctx.fillStyle = cat ? 'rgba(226,96,78,.92)' : 'rgba(46,134,193,.92)';
+  ctx.beginPath(); ctx.arc(cx, cy, 15, 0, 7); ctx.fill();
+  ctx.strokeStyle = 'rgba(255,255,255,.85)'; ctx.lineWidth = 2.5;
+  ctx.beginPath(); ctx.arc(cx, cy, 15, 0, 7); ctx.stroke();
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 11px ' + "'IBM Plex Mono', monospace";
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(io.ion, cx, cy);
+}
+
+/* Biển ghi công thức trên đầu cửa lọc */
+function drawGateSign(g){
+  if(g.open) return;
+  const x = g.col*TS, y = 5*TS;
+  ctx.fillStyle = 'rgba(14,23,38,.9)';
+  const label = g.formula;
+  ctx.font = 'bold 17px ' + "'IBM Plex Mono', monospace";
+  const tw = ctx.measureText(label).width;
+  ctx.fillRect(x + TS/2 - tw/2 - 12, y - 46, tw + 24, 34);
+  ctx.fillStyle = '#ffd75e';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(label, x + TS/2, y - 29);
+  ctx.fillStyle = 'rgba(14,23,38,.9)';
+  ctx.beginPath(); ctx.moveTo(x + TS/2 - 6, y - 12); ctx.lineTo(x + TS/2 + 6, y - 12);
+  ctx.lineTo(x + TS/2, y - 4); ctx.closePath(); ctx.fill();
+}
+
+function drawItem(it){
+  const x = it.x*TS, y = it.y*TS + Math.sin(Date.now()/300)*3;
+  if(it.kind === 'mask'){
+    ctx.fillStyle = '#e8eef6';                                  // khăn gấp
+    ctx.beginPath();
+    ctx.moveTo(x + 5, y + 11); ctx.lineTo(x + 31, y + 11);
+    ctx.lineTo(x + 26, y + 29); ctx.lineTo(x + 10, y + 29);
+    ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = '#5a6b7d'; ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.moveTo(x + 5, y + 13); ctx.lineTo(x - 1, y + 8); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x + 31, y + 13); ctx.lineTo(x + 37, y + 8); ctx.stroke();
+    ctx.fillStyle = '#8fd0a0';                                  // vệt dung dịch kiềm
+    ctx.fillRect(x + 9, y + 20, 18, 5);
+    ctx.fillStyle = '#1a3d24';
+    ctx.font = 'bold 9px ' + "'IBM Plex Mono', monospace";
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('OH⁻', x + 18, y + 16);
+  }else if(it.kind === 'nh3'){
+    ctx.fillStyle = '#e8f4ff'; ctx.fillRect(x + 7, y + 9, 22, 24);
+    ctx.fillStyle = '#9fd3ff'; ctx.fillRect(x + 7, y + 20, 22, 13);
+    ctx.fillStyle = '#5a6b7d'; ctx.fillRect(x + 13, y + 3, 10, 8);
+    ctx.fillStyle = '#0e1726';
+    ctx.font = 'bold 10px ' + "'IBM Plex Mono', monospace";
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('NH₃', x + 18, y + 26);
+  }else{
+    ctx.fillStyle = 'rgba(180,225,255,.85)';
+    ctx.beginPath(); ctx.ellipse(x + 18, y + 18, 15, 10, 0, 0, 7); ctx.fill();
+    ctx.strokeStyle = '#3d4a5c'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.ellipse(x + 18, y + 18, 15, 10, 0, 0, 7); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x + 3, y + 14); ctx.lineTo(x - 1, y + 10); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x + 33, y + 14); ctx.lineTo(x + 37, y + 10); ctx.stroke();
+  }
+}
+
+/* Quái: phân tử SO₂ — một nguyên tử S ở giữa, hai O hai bên */
+function drawFoe(f){
+  const x = f.x, y = f.y, wob = Math.sin(f.t/9)*2;
+  ctx.fillStyle = '#e8c33a';
+  ctx.beginPath(); ctx.arc(x + 14, y + 14 + wob, 11, 0, 7); ctx.fill();
+  ctx.fillStyle = '#e2604e';
+  ctx.beginPath(); ctx.arc(x + 2, y + 20 + wob, 7, 0, 7); ctx.fill();
+  ctx.beginPath(); ctx.arc(x + 26, y + 20 + wob, 7, 0, 7); ctx.fill();
+  ctx.fillStyle = '#1a2233';
+  ctx.beginPath(); ctx.arc(x + 10, y + 12 + wob, 2.2, 0, 7); ctx.fill();
+  ctx.beginPath(); ctx.arc(x + 18, y + 12 + wob, 2.2, 0, 7); ctx.fill();
+  ctx.fillStyle = '#7a5206';
+  ctx.font = 'bold 8px ' + "'IBM Plex Mono', monospace";
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('S', x + 14, y + 19 + wob);
+}
+
+/* Nhân vật: học sinh mặc áo blouse, đeo kính bảo hộ */
+function drawPlayer(){
+  const p = G.player;
+  if(p.inv > 0 && Math.floor(p.t/4) % 2) return;   // nhấp nháy khi bất tử tạm thời
+  const x = Math.round(p.x), y = Math.round(p.y);
+  const run = p.onGround && Math.abs(p.vx) > .6;
+  const leg = run ? Math.sin(p.t/4)*5 : 0;
+
+  // nhún / kéo dài: co giãn quanh điểm giữa hai bàn chân
+  const s = p.squash || 0;
+  const co = s !== 0;
+  if(co){
+    ctx.save();
+    ctx.translate(x + p.w/2, y + p.h);
+    ctx.scale(1 - s*.55, 1 + s);
+    ctx.translate(-(x + p.w/2), -(y + p.h));
+  }
+
+  ctx.fillStyle = '#2b3f63';                        // chân
+  ctx.fillRect(x + 3, y + 22 + Math.max(0, leg), 7, 10 - Math.abs(leg)*.4);
+  ctx.fillRect(x + 14, y + 22 + Math.max(0, -leg), 7, 10 - Math.abs(leg)*.4);
+  ctx.fillStyle = '#f2f6fb';                        // áo blouse
+  ctx.fillRect(x + 1, y + 11, 22, 13);
+  ctx.fillStyle = '#dbe6f2';
+  ctx.fillRect(x + (p.face > 0 ? 18 : 0), y + 13, 6, 9);
+  ctx.fillStyle = p.nh3 > 0 ? '#9fe8f5' : '#f6cba3'; // đầu
+  ctx.fillRect(x + 4, y + 1, 16, 11);
+  ctx.fillStyle = '#3a2a1c';                        // tóc
+  ctx.fillRect(x + 3, y, 18, 4);
+  ctx.fillStyle = p.shield ? '#7fe0ff' : '#5ec8e0'; // kính bảo hộ
+  ctx.fillRect(x + 4 + (p.face > 0 ? 2 : 0), y + 4, 14, 5);
+  ctx.fillStyle = 'rgba(255,255,255,.75)';
+  ctx.fillRect(x + 6 + (p.face > 0 ? 2 : 0), y + 5, 4, 2);
+  if(p.mask > 0){                                   // khăn bịt mũi miệng
+    ctx.fillStyle = '#e8eef6';
+    ctx.fillRect(x + 4, y + 8, 16, 5);
+    ctx.fillStyle = '#8fd0a0';
+    ctx.fillRect(x + 4, y + 10, 16, 2);
+  }
+  if(p.nh3 > 0){                                    // bong bóng khí khi đang có NH₃
+    ctx.fillStyle = 'rgba(159,232,245,.55)';
+    for(let i=0; i<3; i++){
+      const t = (Date.now()/700 + i*.33) % 1;
+      ctx.beginPath(); ctx.arc(x + 12 + Math.sin(t*7 + i)*10, y - t*26, 3.5 - t*2, 0, 7); ctx.fill();
+    }
+  }
+  if(co) ctx.restore();
+}
+
+/* ==================== HUD ==================== */
+function drawHud(){
+  ctx.save();
+  ctx.fillStyle = 'rgba(8,14,24,.55)';
+  ctx.fillRect(0, 0, W, 46);
+  ctx.textBaseline = 'middle';
+
+  ctx.font = '600 15px ' + "'IBM Plex Mono', monospace";
+  ctx.fillStyle = '#fff';
+  ctx.textAlign = 'left';
+  ctx.fillText('MÀN ' + G.def.id, 16, 24);
+  ctx.fillText('ĐIỂM ' + String(TOTAL.score).padStart(5, '0'), 110, 24);
+
+  ctx.fillStyle = '#f5c542';
+  ctx.beginPath(); ctx.ellipse(250, 23, 6, 9, 0, 0, 7); ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.fillText('× ' + TOTAL.coins, 264, 24);
+
+  for(let i=0; i<3; i++){                            // trái tim = mạng
+    const hx = 340 + i*26;
+    ctx.fillStyle = i < TOTAL.lives ? '#e2604e' : 'rgba(255,255,255,.22)';
+    ctx.beginPath();
+    ctx.arc(hx - 4, 20, 4.6, 0, 7); ctx.arc(hx + 4, 20, 4.6, 0, 7);
+    ctx.moveTo(hx - 8.6, 22); ctx.lineTo(hx, 32); ctx.lineTo(hx + 8.6, 22);
+    ctx.closePath(); ctx.fill();
+  }
+
+  const p = G.player;
+  let bx = 440;
+  if(p.nh3 > 0){
+    ctx.fillStyle = '#9fe8f5';
+    ctx.fillText('NH₃ ' + Math.ceil(p.nh3/60) + 's', bx, 24);
+    bx += 100;
+  }
+  if(p.mask > 0){
+    ctx.fillStyle = '#8fd0a0';
+    ctx.fillText('KHĂN ' + Math.ceil(p.mask/60) + 's', bx, 24);
+    bx += 105;
+  }
+  if(p.shield){ ctx.fillStyle = '#7fe0ff'; ctx.fillText('KÍNH BẢO HỘ', bx, 24); }
+
+  ctx.textAlign = 'right';
+  ctx.fillStyle = 'rgba(255,255,255,.7)';
+  ctx.fillText(G.def.name, W - 16, 24);
+  if(!Snd.musicOn()){                                // nhắc là nhạc đang tắt
+    ctx.font = '600 12px ' + "'IBM Plex Mono', monospace";
+    ctx.fillStyle = 'rgba(255,255,255,.5)';
+    ctx.fillText('NHẠC TẮT · M', W - 16, 40);
+  }
+
+  // Hai dải dưới đây đặt ở y ≈ 120, thấp hơn khung thông báo (y 60–98) để không đè nhau
+  if(G.boss){                                        // đếm van lò còn mở
+    ctx.textAlign = 'left';
+    ctx.font = '600 15px ' + "'IBM Plex Mono', monospace";
+    ctx.fillStyle = G.boss.dead ? '#8fd0a0' : '#ffa07a';
+    ctx.fillText(G.boss.dead ? 'LÒ ĐÃ TẮT' : 'VAN LÒ CÒN MỞ: ' + G.boss.hp, 16, 120);
+  }
+
+  if(G.ions.length){                                 // giỏ ion, hiện thành dải dưới HUD
+    const txt = p.bag.length ? p.bag.join('  +  ') : 'trống';
+    ctx.font = '600 15px ' + "'IBM Plex Mono', monospace";
+    const tw = ctx.measureText(txt).width;
+    ctx.textAlign = 'left';
+    ctx.fillStyle = 'rgba(8,14,24,.6)';
+    ctx.fillRect(12, 105, tw + 92, 30);
+    ctx.fillStyle = 'rgba(255,255,255,.6)';
+    ctx.fillText('GIỎ', 22, 120);
+    ctx.fillStyle = p.bag.length ? '#ffd75e' : 'rgba(255,255,255,.45)';
+    ctx.fillText(txt, 76, 120);
+  }
+
+  if(toastT > 0){
+    toastT--;
+    const a = Math.min(1, toastT/40);
+    ctx.globalAlpha = a;
+    ctx.textAlign = 'center';
+    ctx.fillStyle = 'rgba(8,14,24,.8)';
+    const tw = ctx.measureText(toastText).width;
+    ctx.fillRect(W/2 - tw/2 - 18, 60, tw + 36, 38);
+    ctx.fillStyle = '#fff';
+    ctx.font = '600 15px ' + "'Baloo 2', sans-serif";
+    ctx.fillText(toastText, W/2, 79);
+    ctx.globalAlpha = 1;
+  }
+  ctx.restore();
+}
+
+/* ==================== CHÚ GIẢI Ở MÀN GIỚI THIỆU ==================== */
+function legendIcon(fn){
+  const c = document.createElement('canvas');
+  c.width = 60; c.height = 60;
+  const g = c.getContext('2d');
+  g.scale(60/TS, 60/TS);
+  fn(g);
+  return c;
+}
+function buildLegend(){
+  const box = $('legend');
+  const items = [
+    ['<b>Ô ?</b> — trả lời đúng thì được thưởng xu', g => {
+      const grad = g.createLinearGradient(0,0,0,TS);
+      grad.addColorStop(0,'#ffd75e'); grad.addColorStop(1,'#e0a418');
+      g.fillStyle = grad; g.fillRect(0,0,TS,TS);
+      g.fillStyle = '#7a5206'; g.font = 'bold 24px sans-serif';
+      g.textAlign='center'; g.textBaseline='middle'; g.fillText('?', TS/2, TS/2);
+    }],
+    ['<b>Vũng acid</b> — chạm vào là mất máu', g => {
+      g.fillStyle = '#7d9c05'; g.fillRect(0,0,TS,TS);
+      g.fillStyle = '#c3e81c'; g.fillRect(0,6,TS,TS-6);
+      g.fillStyle = 'rgba(255,255,255,.55)'; g.fillRect(0,6,TS,2);
+    }],
+    ['<b>Phân tử SO₂</b> — giẫm lên đầu để hạ', g => {
+      g.fillStyle = '#e8c33a'; g.beginPath(); g.arc(TS/2, TS/2, 11, 0, 7); g.fill();
+      g.fillStyle = '#e2604e';
+      g.beginPath(); g.arc(6, TS/2+5, 7, 0, 7); g.fill();
+      g.beginPath(); g.arc(TS-6, TS/2+5, 7, 0, 7); g.fill();
+    }],
+    ['<b>Bình NH₃</b> — nhẹ hơn không khí, nhảy cao hơn', g => {
+      g.fillStyle = '#e8f4ff'; g.fillRect(7,9,22,24);
+      g.fillStyle = '#9fd3ff'; g.fillRect(7,20,22,13);
+      g.fillStyle = '#5a6b7d'; g.fillRect(13,3,10,8);
+    }],
+    ['<b>Lớp khói SO₂</b> — hít vào là mất máu, trừ khi có khăn', g => {
+      g.fillStyle = 'rgba(226,214,120,.85)'; g.fillRect(0,0,TS,TS);
+      g.fillStyle = 'rgba(244,236,170,.9)';
+      g.beginPath(); g.arc(10,22,11,0,7); g.fill();
+      g.beginPath(); g.arc(27,20,9,0,7); g.fill();
+      g.strokeStyle = 'rgba(180,160,40,.9)'; g.lineWidth = 2.5;
+      g.beginPath(); g.moveTo(0,3); g.lineTo(TS,3); g.stroke();
+    }],
+    ['<b>Ion</b> — đỏ là cation, xanh là anion; ion không cần thì nhảy qua', g => {
+      g.fillStyle = 'rgba(226,96,78,.95)';
+      g.beginPath(); g.arc(13, TS/2, 12, 0, 7); g.fill();
+      g.fillStyle = 'rgba(46,134,193,.95)';
+      g.beginPath(); g.arc(28, TS/2 + 4, 10, 0, 7); g.fill();
+    }],
+    ['<b>Cửa lọc</b> — mang đúng ion tạo nên công thức trên biển thì cửa mở', g => {
+      g.fillStyle = '#3f4c5e'; g.fillRect(0,0,TS,TS);
+      g.strokeStyle = '#8fa3bb'; g.lineWidth = 2;
+      for(let i=6; i<TS; i+=9){
+        g.beginPath(); g.moveTo(i,0); g.lineTo(i,TS); g.stroke();
+        g.beginPath(); g.moveTo(0,i); g.lineTo(TS,i); g.stroke();
+      }
+      g.strokeStyle = '#ffd75e'; g.lineWidth = 3; g.strokeRect(1.5,1.5,TS-3,TS-3);
+    }],
+    ['<b>Khăn tẩm kiềm</b> — hấp thụ SO₂, đi qua khói được', g => {
+      g.fillStyle = '#e8eef6';
+      g.beginPath(); g.moveTo(5,11); g.lineTo(31,11); g.lineTo(26,29); g.lineTo(10,29);
+      g.closePath(); g.fill();
+      g.fillStyle = '#8fd0a0'; g.fillRect(9,20,18,5);
+    }]
+  ];
+  items.forEach(([html, fn]) => {
+    const d = document.createElement('div');
+    d.className = 'leg';
+    d.appendChild(legendIcon(fn));
+    const s = document.createElement('span');
+    s.innerHTML = html;
+    d.appendChild(s);
+    box.appendChild(d);
+  });
+}
+buildLegend();
+
+/* ==================== KHỞI ĐỘNG ==================== */
+/* Móc kiểm thử màn: mở kèm ?dev=1 rồi dùng window.__dev trong console.
+   __dev.run(n) chạy n bước vật lí không phụ thuộc tốc độ khung hình — dùng để
+   kiểm tra một màn mới có đi hết được không mà không phải ngồi chơi tay. */
+if(new URLSearchParams(location.search).get('dev') === '1'){
+  window.__dev = {
+    keys, step, draw, loadLevel, QUESTIONS, VALVE_Q, FX, Snd,
+    get G(){ return G; },
+    get TOTAL(){ return TOTAL; },
+    run(n){ for(let i=0; i<n; i++) step(); }
+  };
+}
+
+$('btn-play').textContent = 'Vào màn ' + LEVELS[startAt].id;
+$('btn-play').addEventListener('click', () => {
+  Snd.kick();
+  $('v-intro').classList.add('hide');
+  restartAll();
+});
+})();
+</script>
+</body>
+</html>

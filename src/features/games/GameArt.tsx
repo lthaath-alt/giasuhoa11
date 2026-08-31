@@ -49,91 +49,77 @@ export const DetectiveArt = () => (
   </ArtFrame>
 );
 
-const node = (cx: number, fill: string) => (
-  <g key={cx}>
-    <circle cx={cx} cy="75" r="22" fill={fill} />
-    <circle cx={cx} cy="75" r="8.5" fill={WHITE} />
-  </g>
-);
+/* Giải Cứu Phòng Thí Nghiệm: một khung màn platformer — nền đất, bệ gạch,
+   ô ?, đồng xu, nhân vật đang nhảy và cái lồng giam ở cuối màn. */
+export const RescueArt = () => {
+  const brick = (x: number, y: number, w: number) => (
+    <g key={`${x}-${y}`}>
+      <rect x={x} y={y} width={w} height="14" rx="2" fill="#b5622f" stroke={BLUE} strokeWidth="2.5" />
+      <line x1={x + w / 2} y1={y} x2={x + w / 2} y2={y + 14} stroke={BLUE} strokeWidth="1.6" opacity="0.5" />
+    </g>
+  );
+  return (
+    <ArtFrame bg="#dcecfa">
+      {/* ống khói nhà máy ở xa */}
+      <rect x="18" y="34" width="20" height="80" fill={WHITE} opacity="0.85" />
+      <rect x="44" y="52" width="14" height="62" fill={WHITE} opacity="0.7" />
+      <circle cx="28" cy="26" r="8" fill={WHITE} opacity="0.6" />
+      <circle cx="38" cy="14" r="6" fill={WHITE} opacity="0.45" />
 
-const arrow = (x: number) => (
-  <path key={x} d={`M ${x - 4} 67 L ${x + 4} 75 L ${x - 4} 83`} fill="none" stroke={BLUE} strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
-);
+      {/* nền đất */}
+      <rect x="-10" y="114" width="340" height="46" fill="#b5622f" />
+      <rect x="-10" y="114" width="340" height="7" fill="#5fb84c" />
 
-export const PipelineArt = () => (
-  <ArtFrame bg="#e6f4f1">
-    <rect x="44" y="53" width="232" height="44" rx="22" fill={WHITE} opacity="0.75" />
-    <rect x="44" y="53" width="232" height="44" rx="22" fill="none" stroke={SKY} strokeWidth="3" />
-    {node(70, BLUE)}
-    {node(128, ORANGE)}
-    {node(244, SKY)}
-    <circle cx="186" cy="75" r="20" fill={WHITE} stroke={BLUE} strokeWidth="3.5" strokeDasharray="7 6" />
-    {arrow(99)}
-    {arrow(157)}
-    {arrow(215)}
-  </ArtFrame>
-);
+      {/* ô ? và bệ gạch */}
+      <rect x="96" y="46" width="26" height="26" rx="3" fill={ORANGE} stroke={BLUE} strokeWidth="3" />
+      <text
+        x="109"
+        y="64"
+        fontSize="19"
+        fontWeight="bold"
+        fill={BLUE}
+        textAnchor="middle"
+        fontFamily="sans-serif"
+      >
+        ?
+      </text>
+      {brick(122, 52, 26)}
+      {brick(168, 78, 52)}
 
-const card = (cx: number, cy: number, rot: number, fill: string, inner: React.ReactNode) => (
-  <g key={cx} transform={`translate(${cx} ${cy}) rotate(${rot})`}>
-    <rect x="-27" y="-39" width="54" height="78" rx="8" fill={fill} stroke={BLUE} strokeWidth="3.5" />
-    {inner}
-  </g>
-);
+      {/* đồng xu */}
+      <ellipse cx="140" cy="30" rx="7" ry="10" fill={ORANGE} stroke={BLUE} strokeWidth="2.5" />
+      <ellipse cx="160" cy="24" rx="5" ry="8" fill={ORANGE} stroke={BLUE} strokeWidth="2" opacity="0.75" />
 
-export const IUPACArt = () => (
-  <ArtFrame bg="#fdf0e0">
-    {card(92, 72, -12, WHITE,
-      <path d="M -16 8 L -5 -9 L 6 8 L 17 -9" fill="none" stroke={ORANGE} strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
-    )}
-    {card(138, 78, -4, SKY,
-      <>
-        <circle cx="0" cy="0" r="14" fill={WHITE} opacity="0.5" />
-        <circle cx="0" cy="0" r="6" fill={WHITE} opacity="0.7" />
-      </>
-    )}
-    {card(184, 74, 6, WHITE,
-      <path d="M -16 6 L -5 -11 L 6 6 L 17 -11" fill="none" stroke={BLUE} strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
-    )}
-    {card(230, 68, 14, ORANGE,
-      <rect x="-12" y="-12" width="24" height="24" rx="5" fill={WHITE} opacity="0.55" />
-    )}
-  </ArtFrame>
-);
+      {/* nhân vật đang nhảy, mặc áo blouse */}
+      <g>
+        <rect x="66" y="86" width="7" height="12" rx="2" fill={BLUE} />
+        <rect x="76" y="88" width="7" height="10" rx="2" fill={BLUE} />
+        <rect x="63" y="70" width="23" height="18" rx="4" fill={WHITE} stroke={BLUE} strokeWidth="2.5" />
+        <circle cx="74" cy="58" r="10" fill="#f6cba3" stroke={BLUE} strokeWidth="2.5" />
+        <rect x="65" y="49" width="18" height="5" rx="2" fill="#3a2a1c" />
+        <rect x="66" y="56" width="15" height="5" rx="2" fill={SKY} />
+      </g>
 
-export const BalanceArt = () => (
-  <ArtFrame bg="#eef0f7">
-    <rect x="152" y="21" width="16" height="6" rx="2.5" fill={BLUE} />
-    <circle cx="160" cy="45" r="17" fill={WHITE} stroke={BLUE} strokeWidth="4.5" />
-    <path d="M 160 45 V 34 M 160 45 L 168 50" stroke={ORANGE} strokeWidth="3.5" strokeLinecap="round" />
-    <rect x="156" y="74" width="9" height="46" fill={BLUE} />
-    <path d="M 136 120 H 185 L 192 130 H 129 Z" fill={BLUE} />
-    <path d="M 160 64 L 171 76 H 149 Z" fill={BLUE} />
-    <line x1="66" y1="72" x2="254" y2="72" stroke={BLUE} strokeWidth="7.5" strokeLinecap="round" />
-    <line x1="66" y1="72" x2="44" y2="95" stroke={BLUE} strokeWidth="2.5" />
-    <line x1="66" y1="72" x2="88" y2="95" stroke={BLUE} strokeWidth="2.5" />
-    <path d="M 42 95 H 90 Q 66 116 42 95 Z" fill={SKY} stroke={BLUE} strokeWidth="3.5" strokeLinejoin="round" />
-    <rect x="49" y="77" width="17" height="17" rx="2" fill={ORANGE} stroke={BLUE} strokeWidth="2.5" />
-    <rect x="66" y="77" width="17" height="17" rx="2" fill={WHITE} stroke={BLUE} strokeWidth="2.5" />
-    <line x1="254" y1="72" x2="232" y2="95" stroke={BLUE} strokeWidth="2.5" />
-    <line x1="254" y1="72" x2="276" y2="95" stroke={BLUE} strokeWidth="2.5" />
-    <path d="M 230 95 H 278 Q 254 116 230 95 Z" fill={SKY} stroke={BLUE} strokeWidth="3.5" strokeLinejoin="round" />
-    <rect x="237" y="77" width="17" height="17" rx="2" fill={WHITE} stroke={BLUE} strokeWidth="2.5" />
-    <rect x="254" y="77" width="17" height="17" rx="2" fill={ORANGE} stroke={BLUE} strokeWidth="2.5" />
-  </ArtFrame>
-);
+      {/* lồng giam ở cuối màn */}
+      <rect x="252" y="66" width="46" height="48" fill={WHITE} opacity="0.55" />
+      <rect x="258" y="80" width="16" height="34" rx="3" fill={WHITE} stroke={BLUE} strokeWidth="2" />
+      <circle cx="266" cy="72" r="8" fill="#f6cba3" stroke={BLUE} strokeWidth="2" />
+      {[0, 1, 2, 3, 4].map((i) => (
+        <line
+          key={i}
+          x1={252 + i * 11.5}
+          y1="64"
+          x2={252 + i * 11.5}
+          y2="114"
+          stroke={BLUE}
+          strokeWidth="3"
+        />
+      ))}
+      <line x1="252" y1="64" x2="298" y2="64" stroke={BLUE} strokeWidth="3.5" />
+    </ArtFrame>
+  );
+};
 
-export const TowerArt = () => (
-  <ArtFrame bg="#fbeceb">
-    <rect x="52" y="108" width="42" height="20" fill={BLUE} />
-    <rect x="94" y="93" width="42" height="35" fill={ORANGE} />
-    <rect x="136" y="78" width="42" height="50" fill={SKY} />
-    <rect x="178" y="63" width="42" height="65" fill={ORANGE} />
-    <rect x="220" y="48" width="42" height="80" fill={BLUE} />
-    <path d="M 52 128 V 108 H 94 V 93 H 136 V 78 H 178 V 63 H 220 V 48 H 262 V 128 Z" fill="none" stroke={BLUE} strokeWidth="4" strokeLinejoin="round" />
-    <path d="M 241 21 L 244.2 29.6 L 253.4 30 L 246.2 35.7 L 248.6 44.5 L 241 39.5 L 233.4 44.5 L 235.8 35.7 L 228.6 30 L 237.8 29.6 Z" fill={ORANGE} stroke={BLUE} strokeWidth="3" strokeLinejoin="round" />
-  </ArtFrame>
-);
 export const BoardGameArt = () => (
   <ArtFrame bg="#eaf3ec">
     {/* Đường đi bàn cờ: các ô vuông uốn lượn từ trái sang phải */}
