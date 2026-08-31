@@ -281,9 +281,11 @@ sau khi thử nghiệm. Muốn đổi thì hỏi giáo viên trước.
 - **Ô đặc biệt có đánh dấu `?`, ô câu hỏi thì không.** Người chơi biết sắp có chuyện gì đó nhưng không
   biết là Cơ hội, Phòng thí nghiệm hay Phản ứng phụ. Trước đây mọi ô đều chỉ hiện số; đổi ngày
   31/08/2026 theo yêu cầu, vì giấu hoàn toàn thì ô đặc biệt mất hết sức hút. Vẫn **không** lộ chương.
-- **Ô Cơ hội mở ra hai bước.** Bước một hiện sấp bài úp kèm chữ "Ấn để rút lá cơ hội"; bấm nút thì lá
-  bài lật 180° rồi mới hiện nội dung, sau đó cùng nút đó đổi thành "Nhận thẻ". Thẻ được bốc ngay lúc
-  mở hộp thoại nên mặt trước đã sẵn sàng, người chơi không phải chờ thêm sau khi lật.
+- **Ô Cơ hội tự rút bài, không bắt bấm thêm nút.** Hộp thoại mở ra hiện sấp bài úp kèm chữ "Đang rút
+  lá cơ hội…", chờ 320 ms cho người chơi kịp nhìn thấy sấp bài rồi lá bài tự lật 180° trong 600 ms,
+  xong mới mở nút "Nhận thẻ". **Đừng bỏ nhịp chờ 320 ms**: lật ngay lập tức thì hiệu ứng thành vô
+  nghĩa, người chơi chỉ thấy nội dung hiện ra đột ngột.
+  Thẻ được bốc ngay lúc mở hộp thoại nên mặt trước đã sẵn sàng, không phải chờ thêm sau khi lật.
   Sấp bài phụ (`.draw-pile`) phải nằm NGOÀI `.draw-card`, nếu để bên trong nó sẽ lật theo lá đang rút.
 - **Bốc dạng câu trước rồi mới bốc chương**, để bốn dạng xuất hiện với tỉ lệ bằng nhau. Nếu bốc phẳng
   trong toàn bộ câu thì dạng nào nhiều câu sẽ át hết các dạng khác.
@@ -2740,13 +2742,11 @@ function openChanceCard(){
           '</div>' +
         '</div>' +
       '</div></div>' +
-      '<p class="draw-hint" id="drawHint">Ấn để rút lá cơ hội</p>' +
+      '<p class="draw-hint" id="drawHint">Đang rút lá cơ hội…</p>' +
     '</div>' +
-    '<div class="modal-foot"><button class="btn btn-primary" id="drawBtn">Rút lá cơ hội</button></div>';
+    '<div class="modal-foot"><button class="btn btn-primary" id="drawBtn" disabled>Nhận thẻ</button></div>';
   openModal(html);
-  $("#drawBtn").focus();
 
-  var daRut = false;
   function nhanThe(){
     closeModal();
     if(card.score){ p.score += card.score; }
@@ -2758,19 +2758,20 @@ function openChanceCard(){
     if(card.move){ stepMove(card.move, function(){ finishTurn(); }); }
     else finishTurn();
   }
-  $("#drawBtn").addEventListener("click", function(){
-    if(daRut){ nhanThe(); return; }   /* cùng một nút, bấm lần hai là nhận thẻ */
-    daRut = true;
+  $("#drawBtn").addEventListener("click", nhanThe);
+
+  /* Bài tự rút, không bắt người chơi bấm thêm một nút nữa. Vẫn chờ một nhịp
+     ngắn để kịp nhìn thấy sấp bài úp — lật ngay lập tức thì hiệu ứng thành vô
+     nghĩa, người chơi chỉ thấy nội dung hiện ra đột ngột. */
+  setTimeout(function(){
     sndChance();
     var c = $("#drawCard"); if(c) c.classList.add("lat");
-    var hint = $("#drawHint"); if(hint) hint.textContent = "";
-    var b = $("#drawBtn");
-    b.disabled = true;
     setTimeout(function(){
-      var b2 = $("#drawBtn");
-      if(b2){ b2.disabled = false; b2.textContent = "Nhận thẻ"; b2.focus(); }
+      var hint = $("#drawHint"); if(hint) hint.textContent = "";
+      var b = $("#drawBtn");
+      if(b){ b.disabled = false; b.focus(); }
     }, 620);
-  });
+  }, 320);
 }
 
 /* ================= results ================= */
