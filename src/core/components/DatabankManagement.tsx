@@ -7,6 +7,7 @@ import {
 } from '@mui/material';
 import { Database, Plus, Search, Trash2, Edit, ExternalLink, Link2, FileText, FlaskConical } from 'lucide-react';
 import { useApp } from '../hooks/useApp';
+import { BankManager } from '../../features/bank/components/BankManager';
 import { Question, Equation, MatrixResource } from '../../features/library/types';
 
 interface TabPanelProps {
@@ -224,108 +225,8 @@ export const DatabankManagement: React.FC = () => {
 
       {/* TAB 1 */}
       <CustomTabPanel value={tabValue} index={0}>
-        <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
-          <TextField
-            size="small"
-            placeholder="Tìm kiếm nội dung câu hỏi hoặc từ khóa chủ đề..."
-            value={qSearch}
-            onChange={e => setQSearch(e.target.value)}
-            sx={{ flex: 1 }}
-            slotProps={{ input: { startAdornment: <Search size={18} color="#94a3b8" style={{ marginRight: 8 }} /> } }}
-          />
-          <FormControl size="small" sx={{ width: 200 }}>
-            <InputLabel>Bộ lọc Cấp độ</InputLabel>
-            <Select value={qLevel} label="Bộ lọc Cấp độ" onChange={e => setQLevel(e.target.value)}>
-              <MenuItem value="all">Tất cả cấp độ</MenuItem>
-              <MenuItem value="Nhận biết">Nhận biết</MenuItem>
-              <MenuItem value="Thông hiểu">Thông hiểu</MenuItem>
-              <MenuItem value="Vận dụng">Vận dụng</MenuItem>
-              <MenuItem value="Vận dụng cao">Vận dụng cao</MenuItem>
-            </Select>
-          </FormControl>
-        </Box>
-
-        <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid #e2e8f0', borderRadius: 3 }}>
-          <Table>
-            <TableHead>
-              <TableRow sx={{ bgcolor: '#f8fafc' }}>
-                <TableCell sx={{ fontWeight: 'bold', width: '15%' }}>Chủ đề</TableCell>
-                <TableCell sx={{ fontWeight: 'bold', width: '12%' }}>Cấp độ</TableCell>
-                <TableCell sx={{ fontWeight: 'bold', width: '40%' }}>Nội dung câu hỏi & Các lựa chọn</TableCell>
-                <TableCell sx={{ fontWeight: 'bold', width: '23%' }}>Lý thuyết & Gợi ý AI</TableCell>
-                <TableCell sx={{ fontWeight: 'bold', width: '10%', align: 'right' }}>Thao tác</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredQuestions.map(q => {
-                const colors = getLevelColor(q.difficulty);
-                return (
-                  <TableRow key={q.id}>
-                    <TableCell><Typography variant="body2" sx={{ fontWeight: 'bold', color: '#475569' }}>{q.topic || 'Chung'}</Typography></TableCell>
-                    <TableCell>
-                      <Chip size="small" label={q.difficulty} sx={{ bgcolor: colors.bg, color: colors.color, fontWeight: 'bold' }} />
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>{q.content}</Typography>
-                      {q.type === 'Trắc nghiệm' ? (
-                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                          {q.options && q.options.length > 0 ? q.options.map(opt => (
-                            <Box key={opt.key} sx={{
-                              px: 1.5, py: 0.5, borderRadius: 1.5, fontSize: '0.8rem',
-                              bgcolor: q.correctAnswer === opt.key ? '#dcfce7' : '#f8fafc',
-                              color: q.correctAnswer === opt.key ? '#16a34a' : '#64748b',
-                              fontWeight: q.correctAnswer === opt.key ? 'bold' : 'normal',
-                              border: `1px solid ${q.correctAnswer === opt.key ? '#86efac' : '#e2e8f0'}`,
-                              display: 'flex', alignItems: 'center', gap: 1
-                            }}>
-                              <span style={{ fontWeight: 'bold' }}>{opt.key}.</span> {opt.text}
-                              {q.correctAnswer === opt.key && <span style={{ marginLeft: 'auto', fontSize: '0.75rem' }}>✓ Đúng</span>}
-                            </Box>
-                          )) : ['A','B','C','D'].map(opt => (
-                            <Box key={opt} sx={{ px: 1.5, py: 0.5, borderRadius: 1.5, fontSize: '0.8rem',
-                              bgcolor: q.correctAnswer === opt ? '#dcfce7' : '#f8fafc',
-                              color: q.correctAnswer === opt ? '#16a34a' : '#64748b',
-                              border: `1px solid ${q.correctAnswer === opt ? '#86efac' : '#e2e8f0'}` }}>
-                              <strong>{opt}.</strong> (chưa có nội dung)
-                            </Box>
-                          ))}
-                        </Box>
-                      ) : (
-                        <Box sx={{ p: 1.5, bgcolor: '#fffbeb', border: '1px solid #fde68a', borderRadius: 1.5 }}>
-                          <Typography variant="caption" sx={{ fontWeight: 'bold', color: '#92400e', display: 'block', mb: 0.5 }}>Hướng dẫn chấm:</Typography>
-                          <Typography variant="body2" sx={{ color: '#78350f', fontSize: '0.8rem' }}>
-                            {q.essayPoints?.[0]?.content || '(Chưa có hướng dẫn)'}
-                          </Typography>
-                        </Box>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {(q as any).theory ? (
-                        <Typography variant="body2" sx={{ fontSize: '0.8rem', color: '#475569' }}>{(q as any).theory}</Typography>
-                      ) : (
-                        <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem', fontStyle: 'italic' }}>Chưa có lý thuyết</Typography>
-                      )}
-                    </TableCell>
-                    <TableCell align="right">
-                      {canEditOrDelete(q.createdBy) && (
-                        <Tooltip title="Xóa">
-                          <IconButton size="small" color="error" onClick={() => deleteLibraryQuestion(q.id)}>
-                            <Trash2 size={16} />
-                          </IconButton>
-                        </Tooltip>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-              {filteredQuestions.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={5} align="center" sx={{ py: 3, color: 'text.secondary' }}>Không tìm thấy câu hỏi nào.</TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        {/* Ngân hàng câu hỏi hợp nhất — cấu trúc chương × mức × dạng, dùng chung với trò chơi */}
+        <BankManager />
       </CustomTabPanel>
 
       {/* TAB 2 */}

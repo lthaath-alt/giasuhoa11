@@ -50,6 +50,7 @@ Mốc mã quan trọng — **tra bằng chuỗi tìm kiếm**, đừng dựa và
 | `var CARDS = [` | 12 thẻ Cơ hội |
 | `function idbOpen(` | Mở IndexedDB, **luôn gọi lại bất đồng bộ** |
 | `function saveLocal(` | Ghi hai lớp, báo lỗi ra giao diện thay vì nuốt |
+| `function keepWeb(` | Giữ các trường riêng của web khi sửa câu, cần cho đồng bộ hai chiều |
 | `function buildBank(` | Gộp câu mẫu với câu tự nhập thành `ACTIVE[ch][lv][dạng]` |
 | `var S = {` | Toàn bộ trạng thái ván chơi |
 | `function drawQuestion(` | Bốc câu: chọn **dạng** trước rồi mới chọn chương |
@@ -126,7 +127,27 @@ Khi ghi hỏng, `saveLocal` hiện thông báo đỏ và gọi `renderStoreWarni
 
 ---
 
-## 5. Ràng buộc môi trường — đọc kỹ trước khi sửa
+## 5. Đồng bộ hai chiều với web Gia sư Hóa 11
+
+Trang này được nhúng vào dự án React `giasuhoa11` tại `public/games/hoa11-boardgame.html`,
+chạy trong iframe ở mục menu "Trò chơi". Vì **cùng origin**, hai bên dùng chung
+IndexedDB — đó chính là kênh đồng bộ, không cần máy chủ.
+
+- Kênh truyền: kho `hoa11`, store `kv`, khoá `bank`. Web ghi vào đúng khoá này,
+  game đọc lên như ngân hàng tự nhập của mình. **Không dùng localStorage làm kênh**:
+  ngân hàng của web có ảnh base64, chắc chắn vượt trần 5 MB đã từng gây mất dữ liệu.
+- Web bổ sung một số trường mà form của game không có ô nhập:
+  `imgs`, `essayPoints`, `points`, `lessonId`, `chapterId`, `topic`, `createdBy`, `createdAt`.
+- `readForm()` dựng lại câu hỏi **chỉ từ các ô trên form**, nên khi sửa một câu do
+  web tạo, mọi trường trên sẽ biến mất. `keepWeb(rec, old)` chép lại chúng trước
+  khi ghi, ở cả nhánh `overrides` lẫn nhánh `questions`. Danh sách khoá nằm ở
+  `WEB_KEYS`. **Thêm trường mới bên web thì phải thêm vào `WEB_KEYS`**, nếu không
+  trường đó sẽ bị mất im lặng mỗi lần giáo viên sửa câu trong game.
+- Lệch nghĩa cần biết: "Đúng/Sai" bên web là **một** mệnh đề, bên game là **nhiều**
+  ý chấm điểm từng phần. Câu chuyển từ web sang chỉ có 1 ý, trong khi form thêm câu
+  của game đòi tối thiểu 2 ý — loại câu này cần bổ sung ý khi sửa trong game.
+
+## 6. Ràng buộc môi trường — đọc kỹ trước khi sửa
 
 Trang này còn được xuất bản lên một khung iframe bị giới hạn (Claude Artifact). Ở đó:
 
@@ -149,7 +170,7 @@ không thêm thư viện, không thêm bước build. Giao diện **toàn bộ b
 
 ---
 
-## 6. Các màn hình
+## 7. Các màn hình
 
 **Cài đặt** — chọn chế độ lớp học 2–4 đội hoặc cá nhân, tên đội và tên từng thành viên,
 mốc điểm, thời gian mỗi câu, mức phạt khi sai, nguồn câu hỏi, phạm vi chương.
@@ -193,7 +214,7 @@ có BOM và dòng `sep=;` để Excel tiếng Việt mở đúng cột.
 
 ---
 
-## 7. Nạp đề từ file
+## 8. Nạp đề từ file
 
 Trang không tự đọc được PDF hay ảnh. Thay vào đó `buildPrompt()` sinh sẵn câu lệnh để giáo viên
 nhờ một AI bên ngoài đọc hộ, rồi dán JSON kết quả trở lại. `parseAIJson()` chịu được nhiều khối JSON
@@ -208,7 +229,7 @@ trong cùng tệp là vị trí riêng, không bị gắn lây.
 
 ---
 
-## 8. Đã kiểm tới đâu
+## 9. Đã kiểm tới đâu
 
 Đã rà soát toàn hệ thống trên `http://localhost`, không lỗi console: màn hình cài đặt, cổng PIN,
 cả bốn dạng câu trong biểu mẫu kèm chặn lỗi, dán hàng loạt, nạp đề từ AI, gom ảnh theo vị trí,
@@ -221,7 +242,7 @@ không kiểm được ở môi trường phát triển.
 
 ---
 
-## 9. Quyết định đã chốt — đừng tự ý đảo ngược
+## 10. Quyết định đã chốt — đừng tự ý đảo ngược
 
 Những điểm dưới đây trông như thiếu sót hoặc như chỗ có thể cải tiến, nhưng đều là lựa chọn có chủ đích
 sau khi thử nghiệm. Muốn đổi thì hỏi giáo viên trước.
@@ -250,7 +271,7 @@ sau khi thử nghiệm. Muốn đổi thì hỏi giáo viên trước.
 
 ---
 
-## 10. Việc còn lại
+## 11. Việc còn lại
 
 1. **Ngân hàng mẫu chưa có câu tự luận nào.** 160 câu hiện có gồm 148 trắc nghiệm, 6 đúng/sai,
    6 trả lời ngắn. Nên soạn thêm khoảng 10–15 câu tự luận rải đều 6 chương để dạng này xuất hiện
@@ -1348,6 +1369,18 @@ function merge(base, extra){
   for(k in base) if(Object.prototype.hasOwnProperty.call(base,k)) o[k] = base[k];
   for(k in extra) if(Object.prototype.hasOwnProperty.call(extra,k) && extra[k] !== undefined) o[k] = extra[k];
   return o;
+}
+/* Các trường do web "Gia sư Hóa 11" dùng mà form của game không có ô nhập.
+   Form dựng lại câu hỏi từ các ô nhập nên nếu không chép lại những khoá này,
+   mỗi lần sửa một câu trong game sẽ xoá mất ý tự luận, ảnh phụ, điểm riêng
+   và liên kết bài học của bên web. Đồng bộ hai chiều phụ thuộc vào đây. */
+var WEB_KEYS = ["imgs","essayPoints","points","lessonId","chapterId","topic","createdBy","createdAt"];
+function keepWeb(rec, old){
+  if(!old) return rec;
+  WEB_KEYS.forEach(function(k){
+    if(rec[k] === undefined && old[k] !== undefined) rec[k] = old[k];
+  });
+  return rec;
 }
 function readShared(){
   try{
@@ -2983,10 +3016,12 @@ function tabAdd(){
     if(!rec.img) delete rec.img;
 
     if(editingId && editingId.indexOf("b:") === 0){
-      LOCAL.overrides[editingId] = rec;
+      LOCAL.overrides[editingId] = keepWeb(rec, LOCAL.overrides[editingId]);
     } else if(editingId){
       for(var i=0;i<LOCAL.questions.length;i++){
-        if(LOCAL.questions[i].id === editingId){ LOCAL.questions[i] = merge(rec, {id:editingId}); break; }
+        if(LOCAL.questions[i].id === editingId){
+          LOCAL.questions[i] = merge(keepWeb(rec, LOCAL.questions[i]), {id:editingId}); break;
+        }
       }
     } else {
       LOCAL.questions.push(merge(rec, {id:newId()}));
