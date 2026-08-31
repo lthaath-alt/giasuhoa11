@@ -24,3 +24,6 @@ firebase-*.json
 # Secret / credential directories
 secrets/
 credentials/
+
+# Cấu hình cục bộ của công cụ lập trình (Claude Code), không liên quan tới dự án
+.claude/
