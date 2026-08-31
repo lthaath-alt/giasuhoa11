@@ -1,10 +1,47 @@
-# Bộ kiểm tra
+# Soạn nội dung và kiểm tra
 
-Ba script kiểm tra những thứ mà `tsc` và `vite build` không bắt được: nội dung
-bài học có đúng không, gia sư AI có trả lời sai kiến thức không, và web có báo
-lỗi hết lượt cho đúng không.
+Hai nhóm script: một nhóm **sinh** nội dung 25 bài học từ tệp `.docx` của giáo
+viên, một nhóm **kiểm tra** những thứ mà `tsc` và `vite build` không bắt được.
 
-## Chạy
+## Sửa nội dung bài học
+
+Đừng sửa tay `src/features/lessons/constants.ts` — tệp đó do máy sinh ra, lần
+chạy sau sẽ ghi đè. Sửa tệp `.docx` gốc rồi chạy lại:
+
+```bash
+npm run soan:trich -- "D:\đường dẫn\thư mục docx"
+```
+
+```bash
+npm run soan:sinh
+```
+
+Hoặc đặt biến môi trường `HOA11_DOCX` một lần rồi chỉ cần `npm run soan` (chạy
+cả hai bước và kiểm tra luôn).
+
+| Bước | Việc | Đọc | Ghi |
+|---|---|---|---|
+| `soan:trich` | Trích lý thuyết từ `.docx`, cắt theo đề mục La Mã có sẵn | 25 tệp `.docx` | `du-lieu/trich-tu-docx.json` |
+| `soan:sinh` | Ghép với ngân hàng câu hỏi và phần soạn tay | `du-lieu/*.json`, `public/bank/seed-160.json` | `src/features/lessons/constants.ts` |
+
+Vài điểm hai script này xử lý sẵn, đừng gỡ bỏ:
+
+- **Tên tệp không thống nhất** — có tệp viết `BAI 22 HOA 11`, có tệp viết
+  `bài 22 hóa 11` có dấu. Đã bỏ dấu trước khi đối chiếu số bài.
+- **Word xuất mỗi ô bảng thành một đoạn riêng**, nên hàng tiêu đề của bảng ra
+  thành mấy dòng cụt ("Chưng cất", "Chiết", "Kết tinh"). Đã bỏ qua khi lấy tóm
+  tắt, nếu không tóm tắt đọc như một mớ từ rời rạc.
+- **Tên gọi chương trình 2006** còn lẫn trong tài liệu (`ancol`, `axit`,
+  `cacbonat`…) được đổi sang tên KNTT 2018. Danh sách từ nằm trong
+  `2-sinh-bai-hoc.py`, kèm ghi chú vì sao **giữ nguyên** "oxi hoá", "đồng phân",
+  "tráng bạc", "butan-1-ol".
+- **Sáu bài giáo viên soạn tay** trước đây đánh số 1–6 trong khi bài THẬT là
+  1, 2, 4, 6, 10, 15. Bảng `CHUYEN` giữ ánh xạ đó; phần soạn tay được giữ
+  nguyên từng chữ và bài kiểm tra bên dưới canh điều này.
+
+Chạy xong luôn kiểm lại bằng `npm run kiem-tra:chuong-trinh`.
+
+## Chạy kiểm tra
 
 ```bash
 npm run kiem-tra          # hai bài kiểm tra không cần mạng
