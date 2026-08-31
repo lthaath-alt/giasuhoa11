@@ -52,6 +52,7 @@ import { StudentArea } from '../features/student/components/StudentArea';
 import { GameHubSection } from '../features/games/GameHubSection';
 import { SlidesSection } from '../features/lessons/components/SlidesSection';
 import { RichText } from '../core/components/RichText';
+import { ApiKeyDialog } from '../features/tutor/components/ApiKeyDialog';
 
 export const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
@@ -86,6 +87,12 @@ export const DashboardPage: React.FC = () => {
   const [ichatError, setIchatError] = useState<string | null>(null);
   const [isSgkCached, setIsSgkCached] = useState(false);
 
+  /* Tab iChat trước đây KHÔNG có lối nhập API key nào. Chưa có key thì
+     geminiTutorService âm thầm rơi sang kịch bản mẫu, học sinh tưởng đang nói
+     chuyện với AI. TutorChat trong bài học đã chặn đúng cách; iChat thì chưa. */
+  const [apiKeyDialogOpen, setApiKeyDialogOpen] = useState(false);
+  const [hasApiKey, setHasApiKey] = useState(() => !!localStorage.getItem('gemini_api_key_user'));
+
   // Kiểm tra trạng thái cache SGK HOA11.pdf từ localStorage
   useEffect(() => {
     const cached = localStorage.getItem('sgk_hoa11_cached') === 'true';
@@ -108,6 +115,12 @@ export const DashboardPage: React.FC = () => {
   const handleSendGlobalIchat = async (textToSend?: string) => {
     const text = (textToSend || ichatInput).trim();
     if (!text) return;
+
+    // Chưa có key thì mời nhập, đừng để rơi sang kịch bản mẫu mà không báo gì
+    if (!hasApiKey) {
+      setApiKeyDialogOpen(true);
+      return;
+    }
 
     setIchatInput('');
     setIsIchatSending(true);
@@ -587,7 +600,24 @@ export const DashboardPage: React.FC = () => {
                         Gia sư tận tình • Hướng dẫn giải bài tập từng bước • Giải đáp Hóa 11
                       </Typography>
                     </Box>
+                    <Box sx={{ flex: 1 }} />
+                    <Tooltip title={hasApiKey ? 'Đổi API key Gemini' : 'Chưa có API key — bấm để nhập'}>
+                      <Button size="small" variant={hasApiKey ? 'text' : 'contained'}
+                        color={hasApiKey ? 'inherit' : 'warning'}
+                        onClick={() => setApiKeyDialogOpen(true)}
+                        sx={{ minWidth: 0, whiteSpace: 'nowrap' }}>
+                        {hasApiKey ? '⚙️' : '⚙️ Nhập API key'}
+                      </Button>
+                    </Tooltip>
                   </Box>
+
+                  {/* Chưa có key thì nói thẳng, đừng để học sinh tưởng đang chat với AI */}
+                  {!hasApiKey && (
+                    <Alert severity="warning" sx={{ borderRadius: 0, py: 0.5, px: 2, '.MuiAlert-message': { fontSize: '0.8rem' } }}>
+                      Chưa có API key nên thầy chưa trả lời được. Bấm <strong>⚙️ Nhập API key</strong> ở
+                      trên, làm theo hướng dẫn lấy key miễn phí từ Google AI Studio.
+                    </Alert>
+                  )}
 
                   {/* Lượt dùng thử */}
                   {!currentUser && (
@@ -696,6 +726,14 @@ export const DashboardPage: React.FC = () => {
                     </Button>
                   </Box>
                 </Paper>
+
+                <ApiKeyDialog
+                  open={apiKeyDialogOpen}
+                  onClose={() => {
+                    setApiKeyDialogOpen(false);
+                    setHasApiKey(!!localStorage.getItem('gemini_api_key_user'));
+                  }}
+                />
 
               </Box>
             </Box>
