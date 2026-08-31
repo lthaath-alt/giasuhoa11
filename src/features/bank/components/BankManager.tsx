@@ -10,7 +10,7 @@ import {
   BankQuestion, Chapter, Level, QType, LEVELS, QTYPE_NAME, CHAPTERS, pointsOf,
 } from '../types';
 import { BankFirestore, pushToGame, syncBackFromGame } from '../bankStore';
-import { chuyenDoiNganHang, daChuyenDoi, MigrateReport } from '../migrate';
+import { chuyenDoiNganHang, MigrateReport } from '../migrate';
 import { ImportFromFile } from './ImportFromFile';
 
 /**
@@ -218,14 +218,16 @@ export const BankManager: React.FC = () => {
           ở màn hình hẹp hoặc khi trình duyệt phóng to, hàng này không đủ chỗ. */}
       <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5}
         sx={{ alignItems: 'stretch', mb: 2, flexWrap: 'wrap', rowGap: 1.5 }}>
-        {!daChuyenDoi() && (
-          <Tooltip title="Gom câu hỏi từ Ngân hàng dữ liệu cũ, Thư viện câu hỏi và 160 câu mẫu của trò chơi về đây">
-            <Button variant="contained" color="warning" startIcon={<Download size={18} />}
-              onClick={chuyenDoi} disabled={dangChuyen} sx={{ whiteSpace: 'nowrap' }}>
-              {dangChuyen ? 'Đang đưa về…' : 'Đưa dữ liệu cũ về'}
-            </Button>
-          </Tooltip>
-        )}
+        {/* LUÔN hiện. Trước đây nút này bị ẩn khi cờ h11_bank_migrated_v1 được
+            đặt, nhưng cờ đó bị đánh dấu "xong" cả khi chuyển được 0 câu — thế là
+            nút biến mất vĩnh viễn và không còn đường chạy lại, kể cả sau khi
+            thêm nguồn mới. Thao tác này bỏ qua câu đã có nên chạy lại vô hại. */}
+        <Tooltip title="Gom câu hỏi từ Ngân hàng dữ liệu cũ, Thư viện câu hỏi và 160 câu mẫu của trò chơi về đây. Chạy lại nhiều lần không tạo bản trùng.">
+          <Button variant="contained" color="warning" startIcon={<Download size={18} />}
+            onClick={chuyenDoi} disabled={dangChuyen} sx={{ whiteSpace: 'nowrap' }}>
+            {dangChuyen ? 'Đang đưa về…' : 'Đưa dữ liệu cũ về'}
+          </Button>
+        </Tooltip>
         <Button variant="contained" startIcon={<Plus size={18} />}
           onClick={() => { setForm(blank()); setMo(true); }}>
           Thêm câu hỏi
@@ -251,7 +253,7 @@ export const BankManager: React.FC = () => {
 
       {/* Việc cần làm đầu tiên của người dùng mới. Để hẳn thành khối riêng chứ
           không nhét vào cuối thanh công cụ — ở đó nó bị đẩy khuất khỏi màn hình. */}
-      {!daChuyenDoi() && (
+      {!items.length && !dangTai && (
         <Alert severity="warning" sx={{ mb: 2 }}>
           Bấm <strong>Đưa dữ liệu cũ về</strong> ở đầu thanh trên để gom câu hỏi từ
           Ngân hàng dữ liệu cũ, Thư viện câu hỏi và 160 câu mẫu của trò chơi vào đây.

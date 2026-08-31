@@ -9,6 +9,10 @@
 //  - KHÔNG xoá, KHÔNG sửa dữ liệu nguồn. Chạy sai vẫn còn đường lùi.
 //  - Chạy lại nhiều lần cho cùng kết quả: id giữ nguyên nên chỉ ghi đè chính nó.
 //  - Câu đã có trong ngân hàng mới thì bỏ qua, tránh đè mất chỉnh sửa về sau.
+//
+// CỐ Ý không ghi cờ "đã chuyển xong" nữa. Trước đây có cờ đó và giao diện ẩn nút
+// khi thấy cờ, nhưng cờ được đặt cả khi chuyển được 0 câu — nút biến mất vĩnh
+// viễn và không còn đường chạy lại, kể cả sau khi thêm nguồn dữ liệu mới.
 
 import { Question } from '../library/types';
 import { LibraryStorage } from '../library/libraryStorage';
@@ -16,8 +20,6 @@ import { FirestoreService } from '../../core/services/firestoreService';
 import { BankQuestion } from './types';
 import { fromLegacy } from './convert';
 import { BankFirestore } from './bankStore';
-
-const DONE_KEY = 'h11_bank_migrated_v1';
 
 /** 160 câu mẫu vốn nằm trong hằng số BANK của trò chơi, nay dọn về ngân hàng web */
 const SEED_URL = '/bank/seed-160.json';
@@ -35,23 +37,6 @@ export interface MigrateReport {
   daGhi: number;
   /** Có gặp lỗi ghi không */
   thieuSot: boolean;
-}
-
-/** Đã chạy chuyển đổi trên trình duyệt này chưa */
-export function daChuyenDoi(): boolean {
-  try {
-    return localStorage.getItem(DONE_KEY) === '1';
-  } catch {
-    return false;
-  }
-}
-
-function danhDauXong(): void {
-  try {
-    localStorage.setItem(DONE_KEY, '1');
-  } catch {
-    /* chặn localStorage thì lần sau chạy lại, không sao vì thao tác lặp được */
-  }
 }
 
 /**
@@ -143,6 +128,5 @@ export async function chuyenDoiNganHang(): Promise<MigrateReport> {
     if (rp.daGhi < canGhi.length) rp.thieuSot = true;
   }
 
-  if (!rp.thieuSot) danhDauXong();
   return rp;
 }
