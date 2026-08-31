@@ -4,13 +4,14 @@ import {
   Divider, FormControl, IconButton, InputLabel, MenuItem, Radio, Select,
   Stack, TextField, Tooltip, Typography, Alert, CircularProgress,
 } from '@mui/material';
-import { Plus, Pencil, Trash2, RefreshCw, Upload, Download, Image as ImageIcon, X } from 'lucide-react';
+import { Plus, Pencil, Trash2, RefreshCw, Upload, Download, Image as ImageIcon, X, FileUp } from 'lucide-react';
 import { useApp } from '../../../core/hooks/useApp';
 import {
   BankQuestion, Chapter, Level, QType, LEVELS, QTYPE_NAME, CHAPTERS, pointsOf,
 } from '../types';
 import { BankFirestore, pushToGame, syncBackFromGame } from '../bankStore';
 import { chuyenDoiNganHang, daChuyenDoi, MigrateReport } from '../migrate';
+import { ImportFromFile } from './ImportFromFile';
 
 /**
  * Quản lý ngân hàng câu hỏi theo đúng cấu trúc của trò chơi Vòng Quanh Hóa 11:
@@ -186,9 +187,20 @@ export const BankManager: React.FC = () => {
     setBao({
       loai: rp.thieuSot ? 'loi' : 'ok',
       chu: `Chuyển xong: ${rp.tuNganHangDuLieu} câu từ Ngân hàng dữ liệu, ${rp.tuThuVien} câu từ Thư viện, `
-        + `bỏ qua ${rp.boQuaVìDaCo} câu đã có. Ghi được ${rp.daGhi} câu.`
+        + `${rp.tuCauMauGame} câu mẫu từ trò chơi, bỏ qua ${rp.boQuaVìDaCo} câu đã có. `
+        + `Ghi được ${rp.daGhi} câu.`
         + (rp.thieuSot ? ' CÓ PHẦN CHƯA XONG — chạy lại để bù.' : ''),
     });
+  };
+
+  // ── Nạp đề từ file ──
+  const [moNap, setMoNap] = useState(false);
+  const duyetTuFile = async (rows: BankQuestion[]) => {
+    const so = await BankFirestore.saveMany(rows);
+    await nap();
+    setBao(so === rows.length
+      ? { loai: 'ok', chu: `Đã duyệt ${so} câu từ file vào ngân hàng.` }
+      : { loai: 'loi', chu: `Chỉ ghi được ${so}/${rows.length} câu. Số còn lại vẫn nằm ở khu chờ duyệt.` });
   };
 
   // ── Ảnh ──
@@ -215,6 +227,11 @@ export const BankManager: React.FC = () => {
         <Tooltip title="Nhận các câu giáo viên đã sửa hoặc thêm bên trong trò chơi">
           <Button variant="outlined" startIcon={<Download size={18} />} onClick={hutVeTuGame}>
             Nhận về từ trò chơi
+          </Button>
+        </Tooltip>
+        <Tooltip title="Nhờ AI đọc tệp PDF hoặc ảnh chụp đề, rồi dán JSON kết quả vào">
+          <Button variant="outlined" startIcon={<FileUp size={18} />} onClick={() => setMoNap(true)}>
+            Nạp đề từ file
           </Button>
         </Tooltip>
         <Box sx={{ flex: 1 }} />
@@ -336,6 +353,8 @@ export const BankManager: React.FC = () => {
           ))}
         </Stack>
       )}
+
+      <ImportFromFile mo={moNap} dong={() => setMoNap(false)} daCo={items} duyet={duyetTuFile} />
 
       {/* Biểu mẫu thêm/sửa */}
       <Dialog open={mo} onClose={() => setMo(false)} maxWidth="md" fullWidth>

@@ -147,6 +147,32 @@ IndexedDB — đó chính là kênh đồng bộ, không cần máy chủ.
   ý chấm điểm từng phần. Câu chuyển từ web sang chỉ có 1 ý, trong khi form thêm câu
   của game đòi tối thiểu 2 ý — loại câu này cần bổ sung ý khi sửa trong game.
 
+
+### Web là nguồn duy nhất — cờ `WEB_MODE`
+
+Từ 31/08/2026 trang chạy ở chế độ `WEB_MODE = true`:
+
+- **Khoá khu giáo viên.** Nút "Khu vực giáo viên" bị gỡ khỏi màn hình mở đầu. Mọi việc
+  thêm, sửa, xoá câu hỏi làm ở mục Ngân hàng dữ liệu bên web. Nút vẫn nằm nguyên trong
+  HTML, đặt `WEB_MODE = false` là dùng lại được ngay.
+- **`activeStore()` ép trả về `LOCAL`.** Đây là chỗ dễ sai nhất: mặc định `S.source` là
+  `"shared"`, nên nếu không ép, trang sẽ đọc khối `sharedBank` nằm sẵn trong file và bỏ
+  qua sạch ngân hàng web đưa sang qua IndexedDB.
+- **160 câu mẫu chỉ còn là phao dự phòng.** Chúng đã được chuyển hết vào ngân hàng web
+  (`public/bank/seed-160.json`, giữ nguyên id `b:<chương>:<mức>:<idx>`).
+  `activeIncludeBuiltin()` chỉ bật chúng khi `LOCAL.questions` rỗng — IndexedDB riêng
+  từng trình duyệt nên máy chiếu ở lớp rất dễ chưa có dữ liệu, không thể để trắng màn hình.
+- **Số câu trên nhãn đầu trang được đếm thật** qua `#plateCount`, cập nhật trong
+  `rebuildActive()` và ngay sau khi nạp xong IndexedDB. Trước đây là chữ tĩnh "160 CÂU HỎI".
+- Web tự bơm ngân hàng sang mỗi khi mở mục Trò chơi (`GameHubSection`), giáo viên không
+  phải nhớ bấm nút.
+
+### Nạp đề từ file đã được chuyển sang web
+
+Toàn bộ `buildPrompt`, `extractJsonBlocks`, `parseAIJson`, khu chờ duyệt và cách gom ảnh
+theo `imgNote` nay có bản TypeScript ở `src/features/bank/importAI.ts` của dự án web.
+Sửa logic bên nào thì cân nhắc sửa cả bên kia cho khớp.
+
 ## 6. Ràng buộc môi trường — đọc kỹ trước khi sửa
 
 Trang này còn được xuất bản lên một khung iframe bị giới hạn (Claude Artifact). Ở đó:
@@ -806,7 +832,7 @@ table.bank tr.picked td{background:var(--accent-soft)}
   <div class="label-plate">
     <div class="plate-top">
       <span class="plate-code">HÓA HỌC 11 · KẾT NỐI TRI THỨC VỚI CUỘC SỐNG</span>
-      <span class="plate-code">28 Ô · 6 CHƯƠNG · 160 CÂU HỎI</span>
+      <span class="plate-code" id="plateCount">28 Ô · 6 CHƯƠNG · 160 CÂU HỎI</span>
     </div>
     <h1 class="title">Vòng Quanh<br>Hóa 11<span class="sub">Trò chơi bàn cờ ôn tập</span></h1>
     <p class="lede" style="margin-top:16px">
@@ -1374,7 +1400,7 @@ function merge(base, extra){
    Form dựng lại câu hỏi từ các ô nhập nên nếu không chép lại những khoá này,
    mỗi lần sửa một câu trong game sẽ xoá mất ý tự luận, ảnh phụ, điểm riêng
    và liên kết bài học của bên web. Đồng bộ hai chiều phụ thuộc vào đây. */
-var WEB_KEYS = ["imgs","essayPoints","points","lessonId","chapterId","topic","createdBy","createdAt"];
+var WEB_KEYS = ["imgs","essayPoints","points","lessonId","chapterId","topic","imgNote","g","createdBy","createdAt"];
 function keepWeb(rec, old){
   if(!old) return rec;
   WEB_KEYS.forEach(function(k){
@@ -1517,6 +1543,9 @@ idbOpen(function(db, err){
     STORE_OK = true; STORE_MODE = "IndexedDB"; STORE_ERR = "";
     flushSave();                       // đồng bộ hai kho ngay từ đầu
     if(typeof refreshBankCount === "function") refreshBankCount();
+    /* Ngân hàng do web đưa sang nạp xong ở đây mới có, phải cập nhật lại số câu
+       trên màn hình mở đầu — nếu không nó cứ đứng ở con số 160 cũ. */
+    rebuildActive();
     /* Không vẽ lại khu giáo viên ở đây: nếu giáo viên đang gõ mã PIN hoặc đang
        nhập dở một câu, việc vẽ lại sẽ xoá sạch những gì họ vừa gõ. */
     var t = document.getElementById("screen-teacher");
@@ -1587,9 +1616,33 @@ function parseNum(x){
   if(!v) return NaN;
   return parseFloat(v);
 }
-function activeStore(){ return S.source === "local" ? LOCAL : SHARED; }
-function activeIncludeBuiltin(){ return S.source === "local" ? S.includeBuiltin : true; }
-function rebuildActive(){ ACTIVE = buildBank(activeStore(), activeIncludeBuiltin()); return ACTIVE; }
+/* Trang này đã được nhúng vào web "Gia sư Hóa 11" và ngân hàng câu hỏi do web
+   quản lý. Xem mục 5 của tài liệu. Đặt false để trả trang về chạy độc lập. */
+var WEB_MODE = true;
+
+function activeStore(){
+  /* WEB_MODE: web ghi ngân hàng vào IndexedDB, tức là kho LOCAL. Mặc định
+     S.source là "shared" nên nếu không ép ở đây, trang sẽ đọc khối sharedBank
+     nằm sẵn trong file và bỏ qua sạch ngân hàng do web đưa sang. */
+  if(WEB_MODE) return LOCAL;
+  return S.source === "local" ? LOCAL : SHARED;
+}
+function activeIncludeBuiltin(){
+  if(WEB_MODE){
+    /* Web là nguồn chính. 160 câu mẫu trong file chỉ dùng làm phao khi máy này
+       chưa được bơm ngân hàng sang — IndexedDB riêng từng trình duyệt nên máy
+       chiếu ở lớp rất dễ rơi vào cảnh đó, không thể để trắng màn hình. */
+    return !((LOCAL.questions || []).length);
+  }
+  return S.source === "local" ? S.includeBuiltin : true;
+}
+function rebuildActive(){
+  ACTIVE = buildBank(activeStore(), activeIncludeBuiltin());
+  /* Số câu không còn cố định 160 vì ngân hàng do web đưa sang, phải đếm thật */
+  var el = document.getElementById("plateCount");
+  if(el) el.textContent = "28 Ô · 6 CHƯƠNG · " + countBank(ACTIVE) + " CÂU HỎI";
+  return ACTIVE;
+}
 
 /* ---------- khả năng của trang đã xuất bản ---------- */
 var artifactApi = null, dlApi = null, capsChecked = false;
@@ -2738,7 +2791,15 @@ function lvOptionsShort(sel){
   }).join("");
 }
 
-$("#teacherBtn").addEventListener("click", function(){
+/* WEB_MODE: mọi việc thêm/sửa câu hỏi làm bên web, khoá lối vào khu giáo viên
+   để hai bên không thể lệch dữ liệu. Nút vẫn nằm trong HTML để tắt WEB_MODE là
+   dùng lại được ngay. */
+if(WEB_MODE){
+  var tb = $("#teacherBtn");
+  if(tb) tb.remove();
+}
+
+$("#teacherBtn") && $("#teacherBtn").addEventListener("click", function(){
   $("#screen-setup").classList.add("hidden");
   $("#screen-game").classList.add("hidden");
   $("#screen-results").classList.add("hidden");

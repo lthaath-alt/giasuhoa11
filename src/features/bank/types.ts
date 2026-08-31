@@ -116,6 +116,16 @@ export interface BankQuestion {
   /** Chủ đề tự do */
   topic?: string;
 
+  // ── Vết tích lúc nạp đề từ file ──
+  /**
+   * Vị trí hình trong tài liệu gốc, ví dụ "tệp de-1.pdf, trang 2, hình bên phải
+   * câu 5". Nhiều câu dùng chung một hình sẽ có chuỗi giống hệt nhau, nhờ vậy
+   * chỉ cần cắt và dán ảnh một lần cho cả nhóm.
+   */
+  imgNote?: string;
+  /** Số nhóm câu gốc — ba biến thể mc/tf/tn của cùng một câu dùng chung số này */
+  g?: number | string;
+
   createdBy?: string;
   createdAt?: string;
 }

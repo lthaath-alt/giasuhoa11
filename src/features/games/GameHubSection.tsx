@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Typography, Card, Chip, Button, Dialog, IconButton } from '@mui/material';
 import { Gamepad2, Play, X } from 'lucide-react';
 import { DetectiveArt, PipelineArt, IUPACArt, BalanceArt, TowerArt, BoardGameArt } from './GameArt';
+import { BankFirestore, pushToGame } from '../bank/bankStore';
 
 interface GameData {
   id: string;
@@ -28,7 +29,7 @@ const GAMES: GameData[] = [
     title: 'Vòng Quanh Hóa 11',
     chapter: 'Ôn tổng hợp 6 chương',
     description:
-      'Chia 2–4 đội, tung xúc xắc đi quanh 28 ô. Ngân hàng 160 câu theo 3 mức nhận biết – thông hiểu – vận dụng, thêm câu hỏi riêng được.',
+      'Chia 2–4 đội, tung xúc xắc đi quanh 28 ô. Câu hỏi lấy thẳng từ Ngân hàng dữ liệu của web, 4 mức từ nhận biết đến vận dụng cao.',
     status: 'active',
     path: '/games/hoa11-boardgame.html',
     art: <BoardGameArt />,
@@ -69,6 +70,29 @@ const GAMES: GameData[] = [
 
 export const GameHubSection: React.FC = () => {
   const [activeGame, setActiveGame] = useState<GameData | null>(null);
+
+  /**
+   * Đưa ngân hàng câu hỏi từ web sang trò chơi ngay khi mở mục này.
+   *
+   * Trò chơi đọc ngân hàng trong IndexedDB, mà IndexedDB thì riêng từng trình
+   * duyệt — mở trên máy chiếu ở lớp là một kho trống. Bơm sẵn ở đây để giáo
+   * viên không phải nhớ bấm nút bên trang quản trị.
+   *
+   * CHỈ bơm khi đọc được Firestore. Nếu mất mạng mà vẫn bơm, ngân hàng rỗng sẽ
+   * ghi đè mất phần đang có trong máy.
+   */
+  useEffect(() => {
+    let huy = false;
+    (async () => {
+      try {
+        const dsach = await BankFirestore.getAll();
+        if (!huy && dsach.length) await pushToGame(dsach);
+      } catch {
+        /* không đọc được thì thôi, trò chơi tự dùng ngân hàng đang có trong máy */
+      }
+    })();
+    return () => { huy = true; };
+  }, []);
 
   const handleOpenGame = (game: GameData) => {
     if (game.status === 'active') {

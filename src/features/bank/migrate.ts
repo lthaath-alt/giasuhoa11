@@ -19,11 +19,16 @@ import { BankFirestore } from './bankStore';
 
 const DONE_KEY = 'h11_bank_migrated_v1';
 
+/** 160 câu mẫu vốn nằm trong hằng số BANK của trò chơi, nay dọn về ngân hàng web */
+const SEED_URL = '/bank/seed-160.json';
+
 export interface MigrateReport {
   /** Đã chuyển từ Firestore `questions` */
   tuNganHangDuLieu: number;
   /** Đã chuyển từ localStorage `h11_library` */
   tuThuVien: number;
+  /** Đã nạp từ 160 câu mẫu của trò chơi */
+  tuCauMauGame: number;
   /** Bỏ qua vì ngân hàng mới đã có id đó */
   boQuaVìDaCo: number;
   /** Số câu ghi thành công lên Firestore */
@@ -58,6 +63,7 @@ export async function chuyenDoiNganHang(): Promise<MigrateReport> {
   const rp: MigrateReport = {
     tuNganHangDuLieu: 0,
     tuThuVien: 0,
+    tuCauMauGame: 0,
     boQuaVìDaCo: 0,
     daGhi: 0,
     thieuSot: false,
@@ -106,6 +112,27 @@ export async function chuyenDoiNganHang(): Promise<MigrateReport> {
         daCo.add(q.id);
         rp.tuThuVien++;
       }
+    }
+  } catch {
+    rp.thieuSot = true;
+  }
+
+  // ── Nguồn 3: 160 câu mẫu vốn dựng sẵn trong trò chơi ──
+  // Trò chơi nay không giữ ngân hàng riêng nữa, nên số câu này phải nằm ở web.
+  // Giữ nguyên id dạng "b:<chương>:<mức>:<idx>" để các bản ghi `overrides`
+  // và `deleted` cũ bên game vẫn trỏ đúng câu.
+  try {
+    const res = await fetch(SEED_URL, { cache: 'no-store' });
+    if (res.ok) {
+      const seed = (await res.json()) as BankQuestion[];
+      for (const q of seed) {
+        if (daCo.has(q.id)) { rp.boQuaVìDaCo++; continue; }
+        canGhi.push(q);
+        daCo.add(q.id);
+        rp.tuCauMauGame++;
+      }
+    } else {
+      rp.thieuSot = true;
     }
   } catch {
     rp.thieuSot = true;
