@@ -53,6 +53,7 @@ import { GameHubSection } from '../features/games/GameHubSection';
 import { SlidesSection } from '../features/lessons/components/SlidesSection';
 import { RichText } from '../core/components/RichText';
 import { ApiKeyDialog } from '../features/tutor/components/ApiKeyDialog';
+import { getEffectiveApiKey } from '../features/tutor/services/geminiTutorService';
 
 export const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
@@ -91,7 +92,11 @@ export const DashboardPage: React.FC = () => {
      geminiTutorService âm thầm rơi sang kịch bản mẫu, học sinh tưởng đang nói
      chuyện với AI. TutorChat trong bài học đã chặn đúng cách; iChat thì chưa. */
   const [apiKeyDialogOpen, setApiKeyDialogOpen] = useState(false);
-  const [hasApiKey, setHasApiKey] = useState(() => !!localStorage.getItem('gemini_api_key_user'));
+  /* Hỏi getEffectiveApiKey chứ KHÔNG đọc thẳng localStorage: key có thể đến từ
+     biến môi trường VITE_GEMINI_API_KEY. Đọc mỗi localStorage sẽ chặn nhầm
+     người dùng dù app thừa sức gọi Gemini. */
+  const coKey = () => getEffectiveApiKey() !== 'MISSING_API_KEY' && !!getEffectiveApiKey();
+  const [hasApiKey, setHasApiKey] = useState(coKey);
 
   // Kiểm tra trạng thái cache SGK HOA11.pdf từ localStorage
   useEffect(() => {
@@ -731,7 +736,7 @@ export const DashboardPage: React.FC = () => {
                   open={apiKeyDialogOpen}
                   onClose={() => {
                     setApiKeyDialogOpen(false);
-                    setHasApiKey(!!localStorage.getItem('gemini_api_key_user'));
+                    setHasApiKey(coKey());
                   }}
                 />
 

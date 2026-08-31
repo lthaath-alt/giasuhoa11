@@ -81,6 +81,10 @@ export function buildLessonContext(lessonId: string): string {
   L.push('\nDùng phần trên làm chuẩn. Nếu học sinh hỏi ngoài phạm vi bài này, cứ trả lời '
     + 'nhưng nhắc các em rằng nội dung đó thuộc bài khác.');
 
+  // Đã biết chắc bài và chương thì hỏi lại chỉ làm học sinh thấy máy móc.
+  L.push('QUAN TRỌNG: học sinh đang mở sẵn bài này nên BỎ QUA bước bắt các em xác định '
+    + 'chương. Hãy tự xác nhận một câu ngắn rồi đi thẳng vào bước tiếp theo.');
+
   const s = L.join('\n');
   return s.length > TRAN_KY_TU
     ? s.slice(0, TRAN_KY_TU) + '\n… (đã lược bớt phần còn lại)'

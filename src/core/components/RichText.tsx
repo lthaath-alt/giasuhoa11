@@ -1,4 +1,5 @@
 import React from 'react';
+import { doiCongThuc } from './mathText';
 
 /**
  * Hiển thị văn bản có markdown đơn giản của gia sư AI.
@@ -35,8 +36,10 @@ interface RichTextProps {
   linkColor?: string;
 }
 
-export const RichText: React.FC<RichTextProps> = ({ text, linkColor = '#0062b8' }) => {
-  if (!text) return null;
+export const RichText: React.FC<RichTextProps> = ({ text: raw, linkColor = '#0062b8' }) => {
+  if (!raw) return null;
+  // Đổi LaTeX của AI thành chữ đọc được TRƯỚC khi tách đậm/nghiêng/link
+  const text = doiCongThuc(raw);
 
   const nodes: React.ReactNode[] = [];
   const re = new RegExp(MARKUP.source, 'g');
