@@ -386,7 +386,7 @@ export const CHEMISTRY_11_CURRICULUM: Chapter[] = [
       {
         "id": "bai-5",
         "title": "Bài 5: Ammonia và muối ammonium",
-        "summary": "BÀI 5: MUỐI AMMONIUM I. Ammonia (NH3)\n- Phân tử ammonia được tạo bởi một nguyên tử nitrogen liên kết với ba nguyên tử hydrogen và có dạng hình học là chóp tam giác.",
+        "summary": "- Phân tử ammonia được tạo bởi một nguyên tử nitrogen liên kết với ba nguyên tử hydrogen và có dạng hình học là chóp tam giác. - Đặc điểm cấu tạo của phân tử ammonia:\n+ Nguyên tử nitrogen còn một cặp electron không liên kết, tạo ra vùng có mật độ điện tích âm trên nguyên tử nitrogen.",
         "formulae": [
           "NH4Cl→ NH4 +"
         ],
@@ -537,7 +537,7 @@ export const CHEMISTRY_11_CURRICULUM: Chapter[] = [
       {
         "id": "bai-7",
         "title": "Bài 7: Sulfur và sulfur dioxide",
-        "summary": "BÀI 7:Sulfur và sulfur dioxide",
+        "summary": "- Sulfur (lưu huỳnh) là nguyên tố phổ biến thứ 17 trên vỏ Trái Đất, chiếm khoảng 0,03 – 0,1% khối lượng, tồn tại ở bốn dạng đồng vị bền: 32S (94,98%), 33S (0,76%), 34S (4,22%) và 36S (0,02%). Trong tự nhiên, sulfur tồn tại ở cả dạng đơn chất và dạng hợp chất.",
         "formulae": [
           "H2(g) + S(s) to→ H2S (g) ΔrHo=−20,6kJ",
           "Hg + S → HgS",
@@ -621,7 +621,7 @@ export const CHEMISTRY_11_CURRICULUM: Chapter[] = [
       {
         "id": "bai-8",
         "title": "Bài 8: Sulfuric acid và muối sulfate",
-        "summary": "BÀI 8:Sulfuric acid và muối sulfate",
+        "summary": "Phân tử sulfuric acid (H2SO4) có công thức cấu tạo:\nVới cấu tạo gồm các nguyên tử hydrogen linh động và các nguyên tử oxygen có độ âm điện lớn, giữa các phân tử sulfuric acid hình thành nhiều liên kết hydrogen:\nỞ điều kiện thường, sulfuric acid là chất lỏng sánh như dầu, không màu, không bay hơi, có tính hút ẩm mạnh. Dung dịch sulfuric acid 98% có khối lượng riêng 1,84 g/cm3, nặng gần gấp hai lần nước.",
         "formulae": [
           "·       H2SO4 (loãng) + Mg → MgSO4 + H2",
           "·       3H2SO4 (loãng) + 2Al → Al2(SO4)3 + 3H2",
@@ -706,7 +706,7 @@ export const CHEMISTRY_11_CURRICULUM: Chapter[] = [
       {
         "id": "bai-9",
         "title": "Bài 9: Hệ thống hoá kiến thức về nitrogen và sulfur",
-        "summary": "HỆ THỐNG  HOÁ KIẾN THỨC\nNITROGEN\nSULFUR. SULFUR DIOXIDE\n• Nitrogen là nguyên tố phổ biến, góp phần tạo nên sự sống trên Trái Đất.",
+        "summary": "• Nitrogen là nguyên tố phổ biến, góp phần tạo nên sự sống trên Trái Đất. • Cấu hình electron lớp ngoài cùng của nguyên tử: 2s22p3.",
         "formulae": [],
         "commonQuestions": [
           {
@@ -1094,7 +1094,7 @@ export const CHEMISTRY_11_CURRICULUM: Chapter[] = [
       {
         "id": "bai-14",
         "title": "Bài 14: Ôn tập công thức và cấu tạo phân tử hợp chất hữu cơ",
-        "summary": "HỆ THỐNG  HOÁ KIẾN THỨC",
+        "summary": "Chưng cất là phương pháp tách chất dựa vào sự khác nhau về nhiệt độ sôi của các chất trong hỗn hợp ở một áp suất nhất định. Chiết là phương pháp dùng tách biệt và tinh chế hỗn hợp các chất dựa vào sự hoà tan khác nhau của chúng trong hai dung môi không trộn lẫn vào nhau.",
         "formulae": [
           "CpHqOr",
           "CxHyOz = (CpHqOr)n"
@@ -1449,7 +1449,7 @@ export const CHEMISTRY_11_CURRICULUM: Chapter[] = [
       {
         "id": "bai-18",
         "title": "Bài 18: Ôn tập hệ thống kiến thức về hydrocarbon",
-        "summary": "HỆ THỐNG  HOÁ KIẾN THỨC\nHYDROCARBON\nAlkane\nAlkene\nAlkyne\nArene\nCông thức tổng quát\nCnH2n + 2 (n ≥ 1)\nCnH2n (n ≥ 2)\nCnH2n - 2 (n ≥ 2)\nDãy đồng đẳng của benzene CnH2n - 6 (n ≥ 6)\nĐặc điểm cấu tạo phân tử\n- Mạch hở, chỉ có liên kết đơn. - Có đồng phân mạch carbon.",
+        "summary": "Dãy đồng đẳng của benzene CnH2n - 6 (n ≥ 6)\nĐặc điểm cấu tạo phân tử\n- Mạch hở, chỉ có liên kết đơn. - Có đồng phân mạch carbon.",
         "formulae": [],
         "commonQuestions": [
           {
@@ -1796,8 +1796,10 @@ export const CHEMISTRY_11_CURRICULUM: Chapter[] = [
       {
         "id": "bai-22",
         "title": "Bài 22: Hệ thống hoá kiến thức về dẫn xuất halogen, alcohol và phenol",
-        "summary": "",
-        "formulae": [],
+        "summary": "Liên kết C−X phân cực về phía nguyên tử halogen nên phản ứng đặc trưng của dẫn xuất halogen là phản ứng thế nguyên tử halogen. Ngoài ra, dẫn xuất halogen còn tham gia phản ứng tách HX.",
+        "formulae": [
+          "2R – OH + 2Na → 2RONa + H2"
+        ],
         "commonQuestions": [
           {
             "question": "So sánh ethanol và phenol.",
@@ -1814,7 +1816,68 @@ export const CHEMISTRY_11_CURRICULUM: Chapter[] = [
             "hint": "Phenol cho kết tủa trắng với nước bromine, ethanol không phản ứng. Na thì cả hai đều phản ứng cho H₂ nên không phân biệt được.",
             "sampleAnswer": "nước bromine"
           }
-        ]
+        ],
+        "textbook": {
+          "pageRange": "",
+          "objectives": [],
+          "sections": [
+            {
+              "id": "b22-m1",
+              "sectionTitle": "Mở đầu",
+              "content": "HỆ THỐNG HOÁ KIẾN THỨC"
+            },
+            {
+              "id": "b22-m2",
+              "sectionTitle": "I. Tính chất hoá học của dẫn xuất halogen",
+              "content": "Liên kết C−X phân cực về phía nguyên tử halogen nên phản ứng đặc trưng của dẫn xuất halogen là phản ứng thế nguyên tử halogen. Ngoài ra, dẫn xuất halogen còn tham gia phản ứng tách HX.\nCác dẫn xuất halogen có thể tham gia phản ứng với dung dịch kiềm, nguyên tử halogen bị thay thế bởi nhóm OH−, tạo thành alcohol.\nPhương trình hóa học chung:\nR – X + NaOH R – OH + NaX\n(X: Cl, Br, I; X liên kết với nguyên tử carbon no).\nCác dẫn xuất monohalogen của alkane có thể bị tách hydrogen halide để tạo thành alkene theo sơ đồ sau:\nPhản ứng này xảy ra khi đun nóng dẫn xuất halogen với base mạnh như NaOH, RONa trong dung môi alcohol.\nChú ý:\nPhản ứng tách xảy ra theo quy tắc tách Zaitsev: Trong phản ứng tách hydrogen halide, nguyên tử halogen bị tách ưu tiên cùng với nguyên tử hydrogen ở carbon bên cạnh có bậc cao hơn.\nVí dụ:",
+              "keyPoints": [
+                "1. Phản ứng thế nguyên tử halogen",
+                "2. Phản ứng tách hydrogen halide"
+              ]
+            },
+            {
+              "id": "b22-m3",
+              "sectionTitle": "II. Tính chất hoá học của ancol",
+              "content": "Liên kết O – H phân cực nên trong một số phản ứng, nguyên tử hydrogen trong nhóm hydroxy có thể bị thay thế.\nAlcohol phản ứng với các kim loại mạnh như sodium, potassium giải phóng khí hydrogen:\n2R – OH + 2Na → 2RONa + H2\nKhi đun nóng alcohol với H2SO4 đặc ở nhiệt độ thích hợp thì thu được ether.\nVí dụ:\n2C2H5OH C2H5OC2H5 + H2O\n⇒ Công thức tính số ether tạo thành từ n alcohol khác nhau là\nnung nóng hoặc đun alcohol với H2SO4 đặc, H3PO4 đặc, alcohol bị tách nước tạo thành alkene:\nChú ý:\nPhản ứng tách nước của alcohol tạo alkene ưu tiên theo quy tắc tách Zaitsev: Trong phản ứng tách nước của alcohol, nhóm – OH bị tách ưu tiên cùng với nguyên tử hydrogen ở carbon bên cạnh có bậc cao hơn.\nVí dụ:\na) Oxi hoá không hoàn toàn\n+ Các alcohol bậc I bị oxi hóa không hoàn toàn tạo thành aldehyde.\nTổng quát:\nR – CH2 – OH + CuO R – CHO + Cu + H2O\n+ Các alcohol bậc II bị oxi hóa không hoàn toàn tạo thành ketone.\nTổng quát:\nR – CH(OH) – R’ + CuO R – CO – R’ + Cu + H2O\n+ Trong điều kiện trên, alcohol bậc III không phản ứng.\nb) Phản ứng cháy của alcohol\nCác alcohol có thể bị đốt cháy trong không khí tạo thành carbon dioxide, hơi nước và toả nhiệt:\nCnH2n + 2O + nCO2 + (n + 1)H2O\nCác polyalcohol có các nhóm – OH liền kề như ethylene glycol, glycerol có thể tác dụng với copper(II) hydroxide tạo thành dung dịch màu xanh lam đậm.\nVí dụ:\nVì vậy, phản ứng này có thể dùng để nhận biết các polyalcohol có các nhóm – OH liền kề.",
+              "keyPoints": [
+                "1. Phản ứng thế nguyên tử H của nhóm – OH.",
+                "2. Phản ứng tạo ether",
+                "4. Phản ứng oxi hoá",
+                "5. Phản ứng riêng của polyalcohol với Cu(OH)2"
+              ]
+            },
+            {
+              "id": "b22-m4",
+              "sectionTitle": "III. Tính chất hoá học của phenol",
+              "content": "Trong dung dịch nước, phenol phân li theo cân bằng sau:\nPhenol là một acid yếu, dung dịch phenol không làm đổi màu quỳ tím.\nPhenol có thể phản ứng được với kim loại kiềm, dung dịch base, muối sodium carbonate … 2. Phản ứng thế ở vòng thơm\nPhenol có thể tham gia phản ứng thế nguyên tử hydrogen của vòng benzene. Phản ứng thế ưu tiên vào vị trí 2, 4 và 6 (ortho và para).\na) Phản ứng bromine hoá\nPhenol phản ứng với nước bromine tạo sản phẩm thế 2,4,6 – tribromophenol ở dạng kết tủa màu trắng:\nDo ảnh hưởng của nhóm – OH, phản ứng thế nguyên tử hydrogen ở vòng benzene của phenol xảy ra dễ dàng hơn so với benzene.\nb) Phản ứng nitro hoá\nPhenol phản ứng với dung dịch nitric acid đặc trong dung dịch sulfuric acid đặc tạo thành sản phẩm 2,4,6 – trinitrophenol (picric acid):",
+              "keyPoints": [
+                "1. Phản ứng thế nguyên tử H của nhóm – OH (tính acid của phenol)"
+              ]
+            }
+          ],
+          "practiceQuestions": [
+            {
+              "id": "b22-lt1",
+              "question": "Nhóm chức của alcohol là",
+              "hint": "Alcohol có nhóm hydroxy −OH gắn trực tiếp vào nguyên tử carbon no. Nếu −OH gắn vào vòng benzene thì là phenol."
+            },
+            {
+              "id": "b22-lt2",
+              "question": "Công thức phân tử của phenol là",
+              "hint": "Phenol là C₆H₅OH, tức C₆H₆O, gồm nhóm −OH gắn trực tiếp vào vòng benzene."
+            },
+            {
+              "id": "b22-lt3",
+              "question": "Công thức chung của alcohol no, đơn chức, mạch hở là",
+              "hint": "Thay một H của alkane CₙH₂ₙ₊₂ bằng nhóm −OH ta được CₙH₂ₙ₊₁OH hay CₙH₂ₙ₊₂O với n ≥ 1."
+            },
+            {
+              "id": "b22-lt4",
+              "question": "Glycerol thuộc loại",
+              "hint": "Glycerol C₃H₅(OH)₃ có ba nhóm −OH nên là alcohol đa chức, được dùng nhiều trong mỹ phẩm."
+            }
+          ]
+        }
       }
     ]
   },
@@ -2018,7 +2081,7 @@ export const CHEMISTRY_11_CURRICULUM: Chapter[] = [
       {
         "id": "bai-25",
         "title": "Bài 25: Ôn tập hợp chất carbonyl và carboxylic acid",
-        "summary": "HỆ THỐNG KIẾN THỨC",
+        "summary": "Các hợp chất carbonyl bị khử bởi các tác nhân khử như NaBH4, LiAlH4, … (kí hiệu: [H]) tạo thành các alcohol tương ứng: aldehyde bị khử thành alcohol bậc I, ketone bị khử thành alcohol bậc II. Ví dụ:\nAldehyde dễ bị oxi hoá bởi các tác nhân oxi hoá thông thường như: Br2/H2O, [Ag(NH3)2]OH, Cu(OH)2/OH- ….",
         "formulae": [
           "CH3CHO + Br2 + H2O → CH3COOH + 2HBr",
           "RCHO + 2[Ag(NH3)2]OH to→ RCOONH4 + 2Ag + 3NH3 + H2O",
