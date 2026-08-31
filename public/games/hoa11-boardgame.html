@@ -47,8 +47,8 @@ Mốc mã quan trọng — **tra bằng chuỗi tìm kiếm**, đừng dựa và
 | `var LEVELS = [` | 4 mức: nb 10đ, th 20đ, vd 30đ, vdc 40đ |
 | `var PENALTIES = {` | 4 mức phạt khi sai, mỗi mức kèm hệ số thưởng `bonus` |
 | `function ptsOf(` | Điểm thật của một mức sau khi nhân hệ số — dùng thay `lv.pts` khi hiện cho người chơi |
-| `var TRACK = [` | 28 ô bàn cờ, chỉ có loại ô, không gắn chương |
-| `var CARDS = [` | 12 thẻ Cơ hội |
+| `var TRACK = [` | 28 ô: 1 xuất phát, 18 câu hỏi, 9 Cơ hội. Không gắn chương |
+| `var CARDS = [` | 15 thẻ Cơ hội, gồm cả hiệu ứng của ba loại ô đã bỏ |
 | `function idbOpen(` | Mở IndexedDB, **luôn gọi lại bất đồng bộ** |
 | `function saveLocal(` | Ghi hai lớp, báo lỗi ra giao diện thay vì nuốt |
 | `function keepWeb(` | Giữ các trường riêng của web khi sửa câu, cần cho đồng bộ hai chiều |
@@ -279,8 +279,14 @@ sau khi thử nghiệm. Muốn đổi thì hỏi giáo viên trước.
 - **Chương được bốc ngẫu nhiên lúc chơi, không gắn cứng vào ô.** Nếu gắn cứng, học sinh chơi vài vòng
   là thuộc lòng ô nào thuộc chương nào.
 - **Ô đặc biệt có đánh dấu `?`, ô câu hỏi thì không.** Người chơi biết sắp có chuyện gì đó nhưng không
-  biết là Cơ hội, Phòng thí nghiệm hay Phản ứng phụ. Trước đây mọi ô đều chỉ hiện số; đổi ngày
-  31/08/2026 theo yêu cầu, vì giấu hoàn toàn thì ô đặc biệt mất hết sức hút. Vẫn **không** lộ chương.
+  biết thẻ rút được sẽ là gì. Trước đây mọi ô đều chỉ hiện số; đổi ngày 31/08/2026 theo yêu cầu,
+  vì giấu hoàn toàn thì ô đặc biệt mất hết sức hút. Vẫn **không** lộ chương.
+- **Chỉ còn một loại ô đặc biệt duy nhất là Cơ hội.** Phòng thí nghiệm, Phản ứng phụ và Chất xúc tác
+  không còn là loại ô riêng mà đã thành ba thẻ trong sấp bài, giữ nguyên hiệu ứng cũ (+15 điểm,
+  lùi 2 ô, tung thêm một lượt) nên cân bằng ván chơi không đổi. Nhờ vậy dừng ở ô `?` nào cũng là
+  rút bài, người chơi không đoán trước được điều gì sẽ tới.
+  Ba nhánh `lab` / `side` / `cat` trong `landOn()` **được giữ lại dù không ô nào chạm tới**: xoá đi
+  thì loại ô lạ sẽ rơi vào nhánh cuối và im lặng chạy như ô Xuất phát thay vì lộ ra là thiếu xử lý.
 - **Ô Cơ hội tự rút bài, không bắt bấm thêm nút.** Hộp thoại mở ra hiện sấp bài úp kèm chữ "Đang rút
   lá cơ hội…", chờ 320 ms cho người chơi kịp nhìn thấy sấp bài rồi lá bài tự lật 180° trong 600 ms,
   xong mới mở nút "Nhận thẻ". **Đừng bỏ nhịp chờ 320 ms**: lật ngay lập tức thì hiệu ứng thành vô
@@ -1413,24 +1419,27 @@ function ptsOf(lv){ return Math.round(lv.pts * bonusOf()); }
 function penaltyOf(){ return PENALTIES[S.penalty] || PENALTIES.none; }
 
 /* 28 ô quanh bàn cờ */
+/* Chín ô đặc biệt nay đều là ô Cơ hội. Phòng thí nghiệm, Phản ứng phụ và Chất
+   xúc tác không còn là loại ô riêng mà đã thành thẻ trong sấp bài — người chơi
+   dừng ở ô "?" nào cũng rút bài, không đoán trước được điều gì sẽ tới. */
 var TRACK = [
   {t:"start"},
   {t:"q"},{t:"q"},
   {t:"chance"},
   {t:"q"},{t:"q"},
-  {t:"lab"},
-  {t:"q"},{t:"q"},
-  {t:"side"},
-  {t:"q"},{t:"q"},
-  {t:"cat"},
+  {t:"chance"},
   {t:"q"},{t:"q"},
   {t:"chance"},
   {t:"q"},{t:"q"},
-  {t:"lab"},
+  {t:"chance"},
   {t:"q"},{t:"q"},
-  {t:"cat"},
+  {t:"chance"},
   {t:"q"},{t:"q"},
-  {t:"side"},
+  {t:"chance"},
+  {t:"q"},{t:"q"},
+  {t:"chance"},
+  {t:"q"},{t:"q"},
+  {t:"chance"},
   {t:"q"},{t:"q"},
   {t:"chance"}
 ];
@@ -1448,7 +1457,13 @@ var CARDS = [
   {t:"Cân bằng chuyển dịch theo chiều nghịch do nhiệt độ tăng.", e:"Lùi 3 ô", move:-3},
   {t:"Mẫu thử bị lẫn tạp chất, phải tinh chế lại bằng phương pháp kết tinh.", e:"Lùi 2 ô", move:-2},
   {t:"Tìm thấy sổ tay tra cứu phổ IR của thầy cô.", e:"+15 điểm và tung xúc xắc thêm lượt", score:15, extra:true},
-  {t:"Tủ hút hoạt động tốt, cả nhóm làm việc an toàn và nhanh gọn.", e:"Được tung xúc xắc thêm một lượt", extra:true}
+  {t:"Tủ hút hoạt động tốt, cả nhóm làm việc an toàn và nhanh gọn.", e:"Được tung xúc xắc thêm một lượt", extra:true},
+
+  /* Ba thẻ dưới đây thay cho ba loại ô đã bỏ: Phòng thí nghiệm, Phản ứng phụ,
+     Chất xúc tác. Giữ nguyên hiệu ứng cũ để cân bằng ván chơi không đổi. */
+  {t:"Vào Phòng thí nghiệm, thí nghiệm cho kết quả đúng như dự đoán.", e:"+15 điểm", score:15},
+  {t:"Phản ứng phụ tạo sản phẩm không mong muốn, phải tách bỏ.", e:"Lùi 2 ô", move:-2},
+  {t:"Chất xúc tác làm phản ứng xảy ra nhanh hơn hẳn.", e:"Được tung xúc xắc thêm một lượt", extra:true}
 ];
 
 /* =========================================================
@@ -2343,6 +2358,10 @@ function landOn(i){
   var tile = TRACK[i], p = currentPlayer();
   if(tile.t === "q"){
     openLevelPicker(i);
+  /* Ba nhánh lab / side / cat bên dưới hiện KHÔNG ô nào chạm tới: chúng đã thành
+     thẻ trong sấp bài Cơ hội. Giữ lại vì rẻ và an toàn — nếu xoá đi mà sau này có
+     ai thêm lại một ô loại đó, nó sẽ rơi vào nhánh cuối và im lặng chạy như ô
+     Xuất phát thay vì báo lỗi. */
   } else if(tile.t === "lab"){
     p.score += 15;
     sndLab();
