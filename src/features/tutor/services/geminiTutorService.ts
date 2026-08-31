@@ -112,6 +112,33 @@ function buildGeminiHistory(history: ChatMessage[], currentUserMessage: string) 
 }
 
 /**
+ * Đọc lỗi 429 của Gemini và nói cho học sinh biết phải làm gì.
+ *
+ * Bậc miễn phí có HAI hạn mức khác hẳn nhau, và cách xử lý cũng khác hẳn:
+ *   - 5 lượt / phút  -> chờ vài chục giây là hỏi tiếp được
+ *   - 20 lượt / NGÀY -> hết sạch, phải đợi sang ngày hôm sau
+ *
+ * Trước đây cả hai trường hợp đều báo chung "thử lại sau ít phút", nên học sinh
+ * hết lượt của ngày sẽ ngồi bấm lại cả buổi mà không bao giờ được trả lời.
+ *
+ * Trả về chuỗi thông báo, hoặc '' nếu lỗi này không phải hết lượt.
+ */
+export const thongBaoHetLuot = (loi: string): string => {
+  const m = (loi || '').toLowerCase();
+  if (!(m.includes('429') || m.includes('quota') || m.includes('rate limit'))) return '';
+
+  if (m.includes('perday')) {
+    return 'Em đã dùng hết lượt hỏi miễn phí trong ngày của API key này rồi. '
+      + 'Google cấp lại lượt mới vào đầu ngày hôm sau. '
+      + 'Em chờ sang ngày mai, hoặc vào cài đặt ⚙️ để dùng một API key khác nhé!';
+  }
+
+  const giay = loi.match(/"retryDelay":\s*"(\d+)s"/)?.[1];
+  return 'Em hỏi hơi nhanh nên chạm giới hạn số câu mỗi phút rồi. Em chờ khoảng '
+    + (giay ? `${giay} giây` : 'một phút') + ' rồi hỏi lại nhé!';
+};
+
+/**
  * Hàm gọi API Gemini để lấy câu trả lời.
  */
 export const generateAIResponse = async (
@@ -165,11 +192,9 @@ export const generateAIResponse = async (
       userEmail: userEmail
     });
 
-    // Check for 429 quota exceeded error
     const msg = error?.message?.toLowerCase() || '';
-    if (msg.includes('429') || msg.includes('quota') || msg.includes('rate limit')) {
-      return 'Hệ thống AI đang quá tải hoặc hết lượt sử dụng. Vui lòng cập nhật API key mới trong cài đặt ⚙️ hoặc thử lại sau ít phút nhé!';
-    }
+    const hetLuot = thongBaoHetLuot(error?.message || '');
+    if (hetLuot) return hetLuot;
 
     // Check for 400 bad request / Invalid API Key
     if (msg.includes('api_key_invalid') || msg.includes('api key not valid')) {

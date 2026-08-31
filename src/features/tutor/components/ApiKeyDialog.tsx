@@ -7,6 +7,7 @@ import {
 import { Eye, EyeOff, Key, CheckCircle, ExternalLink, Save, Trash2 } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
 import { GEMINI_MODEL_NAME } from '../../../core/constants';
+import { thongBaoHetLuot } from '../services/geminiTutorService';
 
 interface ApiKeyDialogProps {
   open: boolean;
@@ -55,8 +56,10 @@ export const ApiKeyDialog: React.FC<ApiKeyDialogProps> = ({ open, onClose }) => 
       const msg = err?.message?.toLowerCase() || '';
       if (msg.includes('api_key_invalid') || msg.includes('api key not valid')) {
         setTestResult({ success: false, message: 'API Key không hợp lệ.' });
-      } else if (msg.includes('429') || msg.includes('quota')) {
-        setTestResult({ success: false, message: 'API Key đã hết lượt sử dụng (quota exceeded).' });
+      } else if (thongBaoHetLuot(err?.message || '')) {
+        // Dùng chung cách diễn giải với khung chat, để học sinh không nhận hai
+        // lời khuyên khác nhau cho cùng một lỗi hết lượt
+        setTestResult({ success: false, message: thongBaoHetLuot(err?.message || '') });
       } else {
         setTestResult({ success: false, message: `Lỗi kết nối: ${err?.message || 'Không xác định'}` });
       }
