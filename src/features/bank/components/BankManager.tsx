@@ -218,6 +218,14 @@ export const BankManager: React.FC = () => {
           ở màn hình hẹp hoặc khi trình duyệt phóng to, hàng này không đủ chỗ. */}
       <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5}
         sx={{ alignItems: 'stretch', mb: 2, flexWrap: 'wrap', rowGap: 1.5 }}>
+        {!daChuyenDoi() && (
+          <Tooltip title="Gom câu hỏi từ Ngân hàng dữ liệu cũ, Thư viện câu hỏi và 160 câu mẫu của trò chơi về đây">
+            <Button variant="contained" color="warning" startIcon={<Download size={18} />}
+              onClick={chuyenDoi} disabled={dangChuyen} sx={{ whiteSpace: 'nowrap' }}>
+              {dangChuyen ? 'Đang đưa về…' : 'Đưa dữ liệu cũ về'}
+            </Button>
+          </Tooltip>
+        )}
         <Button variant="contained" startIcon={<Plus size={18} />}
           onClick={() => { setForm(blank()); setMo(true); }}>
           Thêm câu hỏi
@@ -244,16 +252,10 @@ export const BankManager: React.FC = () => {
       {/* Việc cần làm đầu tiên của người dùng mới. Để hẳn thành khối riêng chứ
           không nhét vào cuối thanh công cụ — ở đó nó bị đẩy khuất khỏi màn hình. */}
       {!daChuyenDoi() && (
-        <Alert severity="warning" sx={{ mb: 2 }}
-          action={
-            <Button color="warning" variant="contained" size="small"
-              onClick={chuyenDoi} disabled={dangChuyen} sx={{ whiteSpace: 'nowrap' }}>
-              {dangChuyen ? 'Đang chuyển…' : 'Chuyển dữ liệu cũ sang'}
-            </Button>
-          }>
-          Ngân hàng này còn trống. Bấm nút bên phải để gom câu hỏi từ Ngân hàng dữ liệu cũ,
-          Thư viện câu hỏi và 160 câu mẫu của trò chơi vào đây. Dữ liệu cũ không bị xoá hay
-          sửa, chạy lại nhiều lần cũng không tạo bản trùng.
+        <Alert severity="warning" sx={{ mb: 2 }}>
+          Bấm <strong>Đưa dữ liệu cũ về</strong> ở đầu thanh trên để gom câu hỏi từ
+          Ngân hàng dữ liệu cũ, Thư viện câu hỏi và 160 câu mẫu của trò chơi vào đây.
+          Dữ liệu cũ không bị xoá hay sửa, chạy lại nhiều lần cũng không tạo bản trùng.
         </Alert>
       )}
 
@@ -310,7 +312,7 @@ export const BankManager: React.FC = () => {
         <Typography color="text.secondary" sx={{ py: 6, textAlign: 'center' }}>
           {items.length
             ? 'Không có câu hỏi nào khớp bộ lọc.'
-            : 'Ngân hàng đang trống. Bấm "Chuyển dữ liệu cũ sang" nếu bạn đã có câu hỏi ở bản trước.'}
+            : 'Ngân hàng đang trống. Bấm "Đưa dữ liệu cũ về" nếu bạn đã có câu hỏi ở bản trước.'}
         </Typography>
       ) : (
         <Stack spacing={1.5}>
