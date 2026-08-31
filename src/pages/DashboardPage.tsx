@@ -466,7 +466,9 @@ export const DashboardPage: React.FC = () => {
                 <Button
                   variant="contained"
                   color="primary"
-                  onClick={() => setActiveTab('hocmai')}
+                  /* Sang mục Bài giảng. Trước đây trỏ về 'hocmai' — tab đó đã bị ẩn
+                     khỏi thanh menu nên bấm vào là rơi vào một trang không có lối ra. */
+                  onClick={() => setActiveTab('baigiang')}
                   startIcon={<BookOpen size={16} />}
                   sx={{ borderRadius: 2, fontWeight: 'bold' }}
                 >
