@@ -3,6 +3,7 @@ import { ChatMessage } from '../../auth/types';
 import { getSession } from './aiMockService';
 import { ErrorLogService } from '../../../core/services/errorLog';
 import { GEMINI_MODEL_NAME } from '../../../core/constants';
+import { buildLessonContext } from './lessonContext';
 
 // Get effective API key from localStorage or env
 export const getEffectiveApiKey = (): string => {
@@ -23,6 +24,16 @@ Giọng điệu: thân thiện, kiên nhẫn, xưng hô "thầy/cô" - "em". Lu�
 
 ĐỐI TƯỢNG
 Học sinh 11 THPT - sách Kết nối tri thức với đời sống.
+
+HẰNG SỐ VÀ QUY ƯỚC BẮT BUỘC (chương trình 2018 — sai chỗ này là sai toàn bộ bài tính)
+- Điều kiện chuẩn viết tắt là **đkc**: 25 °C và 1 bar. Thể tích mol khí ở đkc là **24,79 L/mol**.
+  Công thức: V (L) = n (mol) × 24,79.
+- TUYỆT ĐỐI KHÔNG dùng 22,4 L/mol và không dùng chữ "đktc". Đó là quy ước của chương trình cũ
+  (0 °C, 1 atm). Sách Kết nối tri thức 2018 đã bỏ. Nếu học sinh tự viết 22,4 hoặc đktc, hãy nhẹ
+  nhàng chỉ ra rằng sách các em đang học dùng 24,79 ở đkc, rồi để học sinh tự tính lại.
+- Nếu một đề bài do học sinh chép vào có ghi rõ "đktc", được phép giải theo 22,4 cho đúng đề đó,
+  nhưng phải nói rõ đây là quy ước cũ và nêu con số tương ứng theo đkc.
+- Số thập phân viết theo kiểu Việt Nam, dùng dấu phẩy: 24,79 chứ không phải 24.79.
 
 NGUYÊN TẮC CỐT LÕI
 1. KHÔNG BAO GIỜ giải bài giùm. Không đưa ra phương trình, công thức đã tính sẵn, hay đáp số cuối cùng nếu học sinh chưa tự đi qua đủ các bước.
@@ -122,11 +133,17 @@ export const generateAIResponse = async (
     // Rút trích user message cuối ra khỏi history để truyền vào tham số message riêng
     const latestMessage = formattedHistory.pop()?.parts[0].text || '';
 
+    /* Đính kèm nội dung bài học sinh đang mở. Không có bài nào khớp — ví dụ
+       cuộc tư vấn chung — thì chuỗi rỗng và câu lệnh giữ nguyên như cũ. */
+    const nguCanhBai = buildLessonContext(lessonId);
+
     const response = await getAiInstance().models.generateContent({
       model: GEMINI_MODEL_NAME,
       contents: formattedHistory.concat({ role: 'user', parts: [{ text: latestMessage }] }),
       config: {
-        systemInstruction: SYSTEM_PROMPT,
+        systemInstruction: nguCanhBai
+          ? [SYSTEM_PROMPT, '='.repeat(60), nguCanhBai].join('\n\n')
+          : SYSTEM_PROMPT,
         temperature: 0.7, // Nhiệt độ vừa phải để sáng tạo nhưng vẫn giữ chuẩn kiến thức
         topP: 0.9,
       }

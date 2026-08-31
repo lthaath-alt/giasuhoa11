@@ -294,7 +294,7 @@ Mối quan hệ: pH + pOH = 14 (ở 25°C)`,
   },
   {
     id: 'chuong-2',
-    title: 'Chương 2: Nitrogen – Phosphorus',
+    title: 'Chương 2: Nitrogen – Sulfur',
     lessons: [
       {
         id: 'bai-3',
@@ -497,9 +497,9 @@ Quy tắc nhiệt phân muối nitrate:
           practiceQuestions: [
             {
               id: 'b4-q1',
-              question: 'Hòa tan 9,6 g Cu vào HNO₃ loãng (dư), thu được V lít NO (đktc). Tính V.',
+              question: 'Hòa tan 9,6 g Cu vào HNO₃ loãng (dư), thu được V lít NO (đkc). Tính V.',
               hint: 'nCu = 9,6/64 = 0,15 mol. Từ phương trình: 3Cu + 8HNO₃(loãng) → 3Cu(NO₃)₂ + 2NO + 4H₂O.',
-              answer: 'nCu = 0,15 mol\n3Cu + 8HNO₃ → 3Cu(NO₃)₂ + 2NO + 4H₂O\nnNO = (2/3) × 0,15 = 0,1 mol\nV = 0,1 × 22,4 = 2,24 lít',
+              answer: 'nCu = 0,15 mol\n3Cu + 8HNO₃ → 3Cu(NO₃)₂ + 2NO + 4H₂O\nnNO = (2/3) × 0,15 = 0,1 mol\nV = 0,1 × 24,79 = 2,479 lít',
             },
           ],
         },
@@ -738,7 +738,7 @@ Nhận biết: nH₂O > nCO₂; nalkane = nH₂O − nCO₂`,
           practiceQuestions: [
             {
               id: 'b6-q1',
-              question: 'Đốt cháy hoàn toàn hỗn hợp 2 alkane liên tiếp trong dãy đồng đẳng thu được 6,72 lít CO₂ (đktc) và 7,2 g H₂O. Xác định CTPT của hai alkane.',
+              question: 'Đốt cháy hoàn toàn hỗn hợp 2 alkane liên tiếp trong dãy đồng đẳng thu được 7,437 lít CO₂ (đkc) và 7,2 g H₂O. Xác định CTPT của hai alkane.',
               hint: 'nCO₂ = 0,3 mol, nH₂O = 0,4 mol. Alkane: nH₂O > nCO₂. nalkane = nH₂O − nCO₂ = 0,1 mol. C_trung bình = nCO₂/nalkane = 3.',
               answer: 'nCO₂ = 0,3 mol; nH₂O = 0,4 mol\nnalkane = nH₂O − nCO₂ = 0,1 mol\nC̄ = 0,3/0,1 = 3 (giữa 2 và 4)\n→ Hai alkane: C₂H₆ (ethane) và C₃H₈ (propane).',
             },

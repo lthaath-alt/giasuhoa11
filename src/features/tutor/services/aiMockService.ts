@@ -301,7 +301,7 @@ Em thử lại và báo kết quả nhé!`,
 ❓ Câu hỏi gợi ý: Trong bước này, em cần **chuyển đổi** đại lượng nào? Công thức liên kết hai đại lượng đó là gì?
 
 **A.** n (mol) = m (g) ÷ M (g/mol)
-**B.** V (lít) = n × 22,4 (ở đktc)
+**B.** V (lít) = n × 24,79 (ở đkc: 25 °C, 1 bar)
 **C.** C (mol/L) = n ÷ V
 **D.** Tỉ lệ mol theo phương trình hóa học
 
