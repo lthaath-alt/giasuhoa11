@@ -328,22 +328,10 @@ export const DashboardPage: React.FC = () => {
                 /* NẾU CHƯA CHỌN BÀI HỌC -> RENDER TRANG CHỦ QUẢNG BÁ CHUẨN HOCMAI.VN */
                 <Box id="hocmai-homepage-content">
                   
-                  <Box
-                    sx={{
-                      display: 'grid',
-                      gridTemplateColumns: { xs: '1fr', md: '1.2fr 3.8fr' },
-                      gap: 3,
-                    }}
-                  >
-                    {/* CỘT TRÁI (25%): DANH MỤC BÀI HỌC CHƯƠNG TRÌNH HÓA 11 */}
-                    <LessonSidebar
-                      selectedLesson={selectedLesson}
-                      setSelectedLesson={setSelectedLesson}
-                      currentUser={currentUser}
-                      getUserProgress={getUserProgress}
-                    />
-
-                    {/* CỘT GIỮA & PHẢI (75%): BANNER QUẢNG BÁ & LỢI ÍCH HỌC TẬP */}
+                  {/* Một cột, chiếm trọn bề ngang. Cột "Danh mục bài học" đã bỏ khỏi
+                      màn hình này; muốn mở một bài thì dùng ô tìm kiếm ở trên cùng.
+                      Danh mục vẫn còn khi đang đọc một bài, để chuyển nhanh giữa các bài. */}
+                  <Box>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                       
                       {/* KHU VỰC TRÒ CHƠI HÓA HỌC */}
