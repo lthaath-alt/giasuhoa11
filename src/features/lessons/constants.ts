@@ -462,7 +462,7 @@ export const CHEMISTRY_11_CURRICULUM: Chapter[] = [
       {
         "id": "bai-6",
         "title": "Bài 6: Một số hợp chất của nitrogen với oxygen",
-        "summary": "Nitric acid (HNO3) là chất lỏng không màu, bốc khói mạnh trong không khí ẩm, là một acid mạnh đồng thời là chất oxi hóa cực kỳ mạnh. HNO3 oxi hóa hầu hết kim loại (trừ Au, Pt) lên số oxi hóa cao nhất, giải phóng các sản phẩm khử của nitơ (NO, NO2, N2O, N2, NH4NO3) thay vì khí H2. Muối nitrate dễ tan trong nước, là chất điện li mạnh, kém bền với nhiệt và có tính oxi hóa mạnh ở nhiệt độ cao.",
+        "summary": "Nitric acid (HNO3) là chất lỏng không màu, bốc khói mạnh trong không khí ẩm, là một acid mạnh đồng thời là chất oxi hóa cực kỳ mạnh. HNO3 oxi hóa hầu hết kim loại (trừ Au, Pt) lên số oxi hóa cao nhất, giải phóng các sản phẩm khử của nitrogen (NO, NO2, N2O, N2, NH4NO3) thay vì khí H2. Muối nitrate dễ tan trong nước, là chất điện li mạnh, kém bền với nhiệt và có tính oxi hóa mạnh ở nhiệt độ cao.",
         "formulae": [
           "Kim loại M + HNO3 (loãng/đặc) → M(NO3)n + Sản phẩm khử (NO2/NO/N2O/N2/NH4NO3) + H2O",
           "Nhiệt phân muối nitrate: Muối của kim loại hoạt động mạnh (K -> Na) ra muối nitrite + O2; Muối của kim loại trung bình (Mg -> Cu) ra oxit kim loại + NO2 + O2; Muối của kim loại yếu (Ag, Hg...) ra kim loại + NO2 + O2",
@@ -475,7 +475,7 @@ export const CHEMISTRY_11_CURRICULUM: Chapter[] = [
         "commonQuestions": [
           {
             "question": "Cho đồng (Cu) tác dụng với dung dịch HNO3 đặc, nóng thấy thoát ra khí màu nâu đỏ độc hại. Hãy viết phương trình hóa học và xác định khí màu nâu đỏ là khí gì? Biện pháp để giảm thiểu độc hại khi làm thí nghiệm này là gì?",
-            "hint": "Khi kim loại Cu tác dụng với HNO3 đặc, sản phẩm khử chính của nitơ (+5) là gì? Khí có màu nâu đỏ là khí nào? Để hấp thụ khí có tính acid độc hại này, ta nên sử dụng một dung dịch kiềm (như NaOH hay nước vôi trong Ca(OH)2) ở nút bông của ống nghiệm đúng không?",
+            "hint": "Khi kim loại Cu tác dụng với HNO3 đặc, sản phẩm khử chính của nitrogen (+5) là gì? Khí có màu nâu đỏ là khí nào? Để hấp thụ khí có tính acid độc hại này, ta nên sử dụng một dung dịch kiềm (như NaOH hay nước vôi trong Ca(OH)2) ở nút bông của ống nghiệm đúng không?",
             "sampleAnswer": "Phương trình phản ứng:\nCu + 4HNO3 (đặc) → Cu(NO3)2 + 2NO2↑ + 2H2O\n- Khí màu nâu đỏ thoát ra chính là nitrogen dioxide (NO2), là khí rất độc hại đối với hệ hô hấp.\n- Biện pháp khắc phục trong phòng thí nghiệm: Nút ống nghiệm bằng bông tẩm dung dịch kiềm (như dung dịch NaOH hoặc Ca(OH)2). Khí NO2 thoát ra sẽ phản ứng với dung dịch kiềm tạo thành muối không bay hơi, ngăn chặn khí thoát ra ngoài môi trường không khí:\n2NO2 + 2NaOH → NaNO3 + NaNO2 + H2O"
           }
         ],
@@ -491,7 +491,7 @@ export const CHEMISTRY_11_CURRICULUM: Chapter[] = [
             {
               "id": "b4-s1",
               "sectionTitle": "I. Nitric Acid (HNO₃)",
-              "content": "Cấu tạo phân tử:\nN có số oxi hóa +5 (cao nhất) → HNO₃ có tính oxi hóa rất mạnh.\n\nTính chất vật lí:\n• Chất lỏng không màu, bốc khói mạnh trong không khí ẩm.\n• Bị phân hủy một phần khi tiếp xúc ánh sáng → dung dịch dần có màu vàng (do NO₂).\n• Axit mạnh, tan vô hạn trong nước.\n\nTính chất hóa học:\n① Tính acid mạnh: Tác dụng với oxide base, base, muối (như acid mạnh thông thường).\n② Tính oxi hóa mạnh: Đặc điểm nổi bật nhất.\n   • HNO₃ đặc → sản phẩm khử chủ yếu là NO₂ (khí màu nâu đỏ).\n   • HNO₃ loãng → sản phẩm khử chủ yếu là NO (khí không màu).\n   • Không tác dụng với Au, Pt.\n   • Sắt (Fe) và nhôm (Al) bị thụ động hóa trong HNO₃ đặc, nguội.",
+              "content": "Cấu tạo phân tử:\nN có số oxi hóa +5 (cao nhất) → HNO₃ có tính oxi hóa rất mạnh.\n\nTính chất vật lí:\n• Chất lỏng không màu, bốc khói mạnh trong không khí ẩm.\n• Bị phân hủy một phần khi tiếp xúc ánh sáng → dung dịch dần có màu vàng (do NO₂).\n• Acid mạnh, tan vô hạn trong nước.\n\nTính chất hóa học:\n① Tính acid mạnh: Tác dụng với oxide base, base, muối (như acid mạnh thông thường).\n② Tính oxi hóa mạnh: Đặc điểm nổi bật nhất.\n   • HNO₃ đặc → sản phẩm khử chủ yếu là NO₂ (khí màu nâu đỏ).\n   • HNO₃ loãng → sản phẩm khử chủ yếu là NO (khí không màu).\n   • Không tác dụng với Au, Pt.\n   • Iron (Fe) và aluminium (Al) bị thụ động hóa trong HNO₃ đặc, nguội.",
               "keyPoints": [
                 "HNO₃ vừa là acid mạnh vừa là chất oxi hóa mạnh (N: +5).",
                 "HNO₃ đặc + kim loại → NO₂ (nâu đỏ).",
@@ -768,7 +768,7 @@ export const CHEMISTRY_11_CURRICULUM: Chapter[] = [
       {
         "id": "bai-10",
         "title": "Bài 10: Hợp chất hữu cơ và hoá học hữu cơ",
-        "summary": "Hợp chất hữu cơ là hợp chất của carbon (trừ CO, CO2, muối cacbonat, xianua, cacbua...). Hóa học hữu cơ là ngành hóa học chuyên nghiên cứu về các hợp chất hữu cơ. Hợp chất hữu cơ được chia thành hai loại lớn: Hydrocarbon (chỉ chứa C và H) và Dẫn xuất của hydrocarbon (ngoài C, H còn có các nguyên tố khác như O, N, S, halogen...). Đặc điểm chung: liên kết chủ yếu là cộng hóa trị, nhiệt độ nóng chảy và sôi thấp, kém bền với nhiệt, phản ứng thường xảy ra chậm và theo nhiều hướng.",
+        "summary": "Hợp chất hữu cơ là hợp chất của carbon (trừ CO, CO2, muối carbonate, cyanide, carbide...). Hóa học hữu cơ là ngành hóa học chuyên nghiên cứu về các hợp chất hữu cơ. Hợp chất hữu cơ được chia thành hai loại lớn: Hydrocarbon (chỉ chứa C và H) và Dẫn xuất của hydrocarbon (ngoài C, H còn có các nguyên tố khác như O, N, S, halogen...). Đặc điểm chung: liên kết chủ yếu là cộng hóa trị, nhiệt độ nóng chảy và sôi thấp, kém bền với nhiệt, phản ứng thường xảy ra chậm và theo nhiều hướng.",
         "formulae": [
           "Công thức phân tử tổng quát: CxHyOzNt",
           "Thiết lập CTPT từ thành phần phần trăm khối lượng: x : y : z = (%mC/12) : (%mH/1) : (%mO/16)",
@@ -794,9 +794,9 @@ export const CHEMISTRY_11_CURRICULUM: Chapter[] = [
             {
               "id": "b5-s1",
               "sectionTitle": "I. Khái niệm hợp chất hữu cơ",
-              "content": "Hợp chất hữu cơ là hợp chất của nguyên tố carbon (C), thường có thêm H, O, N, S, halogen...\n\nNgoại lệ – KHÔNG phải hợp chất hữu cơ dù có C:\n• CO, CO₂ (oxide của carbon)\n• Muối cacbonat (Na₂CO₃, CaCO₃...)\n• Xianua (HCN, NaCN)\n• Cacbua (CaC₂, SiC...)\n\nPhân loại hợp chất hữu cơ:\n① Hydrocarbon: Chỉ chứa C và H.\n   • Mạch hở (acyclic): Alkane, Alkene, Alkyne...\n   • Mạch vòng (cyclic): Cycloalkane, Benzene...\n   \n② Dẫn xuất của hydrocarbon: Ngoài C, H còn có O, N, S, halogen...\n   • Dẫn xuất halogen (R–X): CH₃Cl, CHCl₃...\n   • Ancol (R–OH): C₂H₅OH...\n   • Acid carboxylic (R–COOH): CH₃COOH...\n   • Amine (R–NH₂): CH₃NH₂...",
+              "content": "Hợp chất hữu cơ là hợp chất của nguyên tố carbon (C), thường có thêm H, O, N, S, halogen...\n\nNgoại lệ – KHÔNG phải hợp chất hữu cơ dù có C:\n• CO, CO₂ (oxide của carbon)\n• Muối carbonate (Na₂CO₃, CaCO₃...)\n• Cyanide (HCN, NaCN)\n• Carbide (CaC₂, SiC...)\n\nPhân loại hợp chất hữu cơ:\n① Hydrocarbon: Chỉ chứa C và H.\n   • Mạch hở (acyclic): Alkane, Alkene, Alkyne...\n   • Mạch vòng (cyclic): Cycloalkane, Benzene...\n   \n② Dẫn xuất của hydrocarbon: Ngoài C, H còn có O, N, S, halogen...\n   • Dẫn xuất halogen (R–X): CH₃Cl, CHCl₃...\n   • Alcohol (R–OH): C₂H₅OH...\n   • Acid carboxylic (R–COOH): CH₃COOH...\n   • Amine (R–NH₂): CH₃NH₂...",
               "keyPoints": [
-                "Hợp chất hữu cơ là hợp chất của C (trừ CO, CO₂, cacbonat, xianua, cacbua).",
+                "Hợp chất hữu cơ là hợp chất của C (trừ CO, CO₂, carbonate, cyanide, carbide).",
                 "Phân loại: Hydrocarbon (chỉ C, H) và dẫn xuất (có thêm O, N, S, halogen)."
               ],
               "imagePrompt": "Organic chemistry classification tree diagram showing hydrocarbon and derivatives, colorful branches with examples like CH4 C2H5OH CH3COOH, clean educational poster white background",
@@ -805,7 +805,7 @@ export const CHEMISTRY_11_CURRICULUM: Chapter[] = [
             {
               "id": "b5-s2",
               "sectionTitle": "II. Đặc điểm của hợp chất hữu cơ",
-              "content": "So với hợp chất vô cơ, hợp chất hữu cơ có những đặc điểm riêng biệt:\n\n① Về liên kết: Chủ yếu là liên kết cộng hóa trị (C–C, C–H, C–O...), ít phân cực → không dẫn điện.\n\n② Về nhiệt độ nóng chảy/sôi: Thường thấp hơn hợp chất vô cơ, dễ bay hơi.\n\n③ Độ bền nhiệt: Kém bền, dễ bị phân hủy khi đun nóng mạnh (carbonized).\n\n④ Tốc độ phản ứng: Thường chậm hơn, cần xúc tác, đun nóng.\n\n⑤ Phản ứng theo nhiều hướng: Thường tạo hỗn hợp sản phẩm (phản ứng chính + phụ).\n\n⑥ Tính tan: Thường tan trong dung môi hữu cơ (cồn, ete, benzene), ít tan hoặc không tan trong nước.",
+              "content": "So với hợp chất vô cơ, hợp chất hữu cơ có những đặc điểm riêng biệt:\n\n① Về liên kết: Chủ yếu là liên kết cộng hóa trị (C–C, C–H, C–O...), ít phân cực → không dẫn điện.\n\n② Về nhiệt độ nóng chảy/sôi: Thường thấp hơn hợp chất vô cơ, dễ bay hơi.\n\n③ Độ bền nhiệt: Kém bền, dễ bị phân hủy khi đun nóng mạnh (carbonized).\n\n④ Tốc độ phản ứng: Thường chậm hơn, cần xúc tác, đun nóng.\n\n⑤ Phản ứng theo nhiều hướng: Thường tạo hỗn hợp sản phẩm (phản ứng chính + phụ).\n\n⑥ Tính tan: Thường tan trong dung môi hữu cơ (cồn, ether, benzene), ít tan hoặc không tan trong nước.",
               "keyPoints": [
                 "Liên kết cộng hóa trị → không dẫn điện.",
                 "Nhiệt độ nc/sôi thấp, kém bền nhiệt.",
@@ -840,7 +840,7 @@ export const CHEMISTRY_11_CURRICULUM: Chapter[] = [
             {
               "id": "b5-q1",
               "question": "Chất nào sau đây là hợp chất hữu cơ: CO₂, C₂H₅OH, Na₂CO₃, CH₃COOH, CaC₂, C₆H₆?",
-              "answer": "Hợp chất hữu cơ: C₂H₅OH (ethanol), CH₃COOH (acid acetic), C₆H₆ (benzene).\nKhông phải hữu cơ: CO₂ (oxide carbon), Na₂CO₃ (muối cacbonat), CaC₂ (cacbua)."
+              "answer": "Hợp chất hữu cơ: C₂H₅OH (ethanol), CH₃COOH (acid acetic), C₆H₆ (benzene).\nKhông phải hữu cơ: CO₂ (oxide carbon), Na₂CO₃ (muối carbonate), CaC₂ (carbide)."
             },
             {
               "id": "b5-q2",
@@ -1177,7 +1177,7 @@ export const CHEMISTRY_11_CURRICULUM: Chapter[] = [
         "summary": "Alkane là các hydrocarbon mạch hở chỉ chứa liên kết đơn C-C và C-H trong phân tử. Công thức chung: CnH2n+2 (n ≥ 1). Phản ứng đặc trưng của Alkane là phản ứng thế halogen (thế ưu tiên vào carbon bậc cao hơn - quy tắc thế). Ngoài ra alkane còn tham gia phản ứng cracking, phản ứng oxi hóa (đốt cháy).",
         "formulae": [
           "Công thức chung của Alkane: CnH2n+2 (n ≥ 1)",
-          "Phản ứng thế halogen (clo hóa): CnH2n+2 + Cl2 -(as)→ CnH2n+1Cl + HCl",
+          "Phản ứng thế halogen (chlorine hoá): CnH2n+2 + Cl2 -(as)→ CnH2n+1Cl + HCl",
           "Phản ứng đốt cháy: CnH2n+2 + (3n+1)/2 O2 → nCO2 + (n+1)H2O  (Lưu ý: nH2O > nCO2 và n_alkane = nH2O - nCO2)"
         ],
         "commonQuestions": [
@@ -1837,7 +1837,7 @@ export const CHEMISTRY_11_CURRICULUM: Chapter[] = [
             },
             {
               "id": "b22-m3",
-              "sectionTitle": "II. Tính chất hoá học của ancol",
+              "sectionTitle": "II. Tính chất hoá học của alcohol",
               "content": "Liên kết O – H phân cực nên trong một số phản ứng, nguyên tử hydrogen trong nhóm hydroxy có thể bị thay thế.\nAlcohol phản ứng với các kim loại mạnh như sodium, potassium giải phóng khí hydrogen:\n2R – OH + 2Na → 2RONa + H2\nKhi đun nóng alcohol với H2SO4 đặc ở nhiệt độ thích hợp thì thu được ether.\nVí dụ:\n2C2H5OH C2H5OC2H5 + H2O\n⇒ Công thức tính số ether tạo thành từ n alcohol khác nhau là\nnung nóng hoặc đun alcohol với H2SO4 đặc, H3PO4 đặc, alcohol bị tách nước tạo thành alkene:\nChú ý:\nPhản ứng tách nước của alcohol tạo alkene ưu tiên theo quy tắc tách Zaitsev: Trong phản ứng tách nước của alcohol, nhóm – OH bị tách ưu tiên cùng với nguyên tử hydrogen ở carbon bên cạnh có bậc cao hơn.\nVí dụ:\na) Oxi hoá không hoàn toàn\n+ Các alcohol bậc I bị oxi hóa không hoàn toàn tạo thành aldehyde.\nTổng quát:\nR – CH2 – OH + CuO R – CHO + Cu + H2O\n+ Các alcohol bậc II bị oxi hóa không hoàn toàn tạo thành ketone.\nTổng quát:\nR – CH(OH) – R’ + CuO R – CO – R’ + Cu + H2O\n+ Trong điều kiện trên, alcohol bậc III không phản ứng.\nb) Phản ứng cháy của alcohol\nCác alcohol có thể bị đốt cháy trong không khí tạo thành carbon dioxide, hơi nước và toả nhiệt:\nCnH2n + 2O + nCO2 + (n + 1)H2O\nCác polyalcohol có các nhóm – OH liền kề như ethylene glycol, glycerol có thể tác dụng với copper(II) hydroxide tạo thành dung dịch màu xanh lam đậm.\nVí dụ:\nVì vậy, phản ứng này có thể dùng để nhận biết các polyalcohol có các nhóm – OH liền kề.",
               "keyPoints": [
                 "1. Phản ứng thế nguyên tử H của nhóm – OH.",
