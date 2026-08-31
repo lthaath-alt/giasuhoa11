@@ -278,6 +278,13 @@ sau khi thử nghiệm. Muốn đổi thì hỏi giáo viên trước.
   trước được. Bản đầu có ký hiệu chương trên từng ô, đã bỏ theo yêu cầu.
 - **Chương được bốc ngẫu nhiên lúc chơi, không gắn cứng vào ô.** Nếu gắn cứng, học sinh chơi vài vòng
   là thuộc lòng ô nào thuộc chương nào.
+- **Ô đặc biệt có đánh dấu `?`, ô câu hỏi thì không.** Người chơi biết sắp có chuyện gì đó nhưng không
+  biết là Cơ hội, Phòng thí nghiệm hay Phản ứng phụ. Trước đây mọi ô đều chỉ hiện số; đổi ngày
+  31/08/2026 theo yêu cầu, vì giấu hoàn toàn thì ô đặc biệt mất hết sức hút. Vẫn **không** lộ chương.
+- **Ô Cơ hội mở ra hai bước.** Bước một hiện sấp bài úp kèm chữ "Ấn để rút lá cơ hội"; bấm nút thì lá
+  bài lật 180° rồi mới hiện nội dung, sau đó cùng nút đó đổi thành "Nhận thẻ". Thẻ được bốc ngay lúc
+  mở hộp thoại nên mặt trước đã sẵn sàng, người chơi không phải chờ thêm sau khi lật.
+  Sấp bài phụ (`.draw-pile`) phải nằm NGOÀI `.draw-card`, nếu để bên trong nó sẽ lật theo lá đang rút.
 - **Bốc dạng câu trước rồi mới bốc chương**, để bốn dạng xuất hiện với tỉ lệ bằng nhau. Nếu bốc phẳng
   trong toàn bộ câu thì dạng nào nhiều câu sẽ át hết các dạng khác.
 - **Trả lời sai bị trừ điểm và lùi ô, điểm được phép xuống dưới 0.** Không chặn ở 0, vì đội đang 0 điểm
@@ -621,6 +628,56 @@ details.rules li{margin:5px 0}
 .modal-foot{display:flex; justify-content:flex-end; gap:10px; padding:0 20px 20px}
 
 .card-draw{text-align:center; padding:14px 4px 4px}
+
+/* ===== Ô đặc biệt: báo có, không báo là gì ===== */
+.tile-special{
+  position:absolute; top:2px; right:4px; font-family:var(--display);
+  font-size:clamp(10px,1.3vw,14px); line-height:1; color:var(--accent); opacity:.9;
+}
+
+/* ===== Sấp bài Cơ hội đặt giữa bàn cờ ===== */
+.deck-wrap{display:flex; flex-direction:column; align-items:center; gap:4px}
+.deck{position:relative; width:42px; height:58px}
+.deck-card{
+  position:absolute; inset:0; border-radius:5px; border:1px solid rgba(255,255,255,.3);
+  background:var(--accent); display:grid; place-items:center;
+  font-family:var(--display); font-size:20px; color:#fff; box-shadow:0 2px 5px rgba(0,0,0,.3);
+}
+.deck-card:nth-child(1){transform:translate(-3px,3px) rotate(-5deg)}
+.deck-card:nth-child(2){transform:translate(2px,1px) rotate(4deg)}
+.deck-label{
+  font-family:var(--display); text-transform:uppercase; font-size:8.5px;
+  letter-spacing:.08em; color:var(--ink-soft); line-height:1;
+}
+
+/* ===== Rút bài trong hộp thoại ===== */
+.draw-wrap{perspective:900px; display:grid; place-items:center; padding:10px 0 4px}
+/* Sấp bài nằm NGOÀI .draw-card, nếu để bên trong nó sẽ lật theo lá đang rút */
+.draw-stack{position:relative; width:112px; height:152px}
+.draw-card{
+  position:relative; width:112px; height:152px; transform-style:preserve-3d;
+  transition:transform .6s cubic-bezier(.2,.75,.3,1);
+}
+.draw-card.lat{transform:rotateY(180deg) translateY(-6px)}
+.draw-face{
+  position:absolute; inset:0; border-radius:9px; display:grid; place-items:center;
+  backface-visibility:hidden; -webkit-backface-visibility:hidden; padding:8px; text-align:center;
+}
+.draw-back{background:var(--accent); color:#fff; font-family:var(--display); font-size:40px;
+  border:1px solid rgba(255,255,255,.3); box-shadow:0 3px 10px rgba(0,0,0,.35)}
+.draw-front{
+  transform:rotateY(180deg); background:var(--surface); border:1px solid var(--line);
+  font-size:12px; line-height:1.35; box-shadow:0 3px 10px rgba(0,0,0,.25);
+}
+/* Sấp bài phía sau lá đang rút, cho thấy còn cả chồng */
+.draw-pile{position:absolute; inset:0; border-radius:9px; background:var(--accent);
+  opacity:.55; border:1px solid rgba(255,255,255,.2)}
+.draw-pile.p1{transform:translate(-6px,5px) rotate(-5deg)}
+.draw-pile.p2{transform:translate(5px,3px) rotate(4deg)}
+.draw-hint{font-size:13px; color:var(--ink-soft); margin-top:10px; text-align:center}
+@media (prefers-reduced-motion: reduce){
+  .draw-card{transition:none}
+}
 .card-draw .glyph{font-family:var(--display); font-size:56px; line-height:1; color:var(--accent)}
 .card-draw .ctext{font-size:18px; margin:12px 0 4px; font-weight:500}
 .card-draw .ceffect{font-family:var(--mono); font-size:14px; color:var(--accent)}
@@ -2071,15 +2128,18 @@ function renderBoard(){
   var cols = boardCols(), ring = ringPositions(cols);
   var board = $("#board"); board.dataset.cols = String(cols); board.innerHTML = "";
 
-  /* Mọi ô chỉ hiện số thứ tự. Không lộ ô đó là câu hỏi hay ô đặc biệt,
-     cũng không lộ chương — người chơi chỉ biết khi đã dừng chân ở đó. */
+  /* Ô đặc biệt được đánh dấu "?" — người chơi biết có chuyện gì đó đang chờ
+     nhưng không biết là Cơ hội, Phòng thí nghiệm hay Phản ứng phụ. Ô câu hỏi
+     vẫn chỉ hiện số, và không ô nào lộ chương. */
   TRACK.forEach(function(tile, i){
     var el = document.createElement("div");
     el.className = "tile" + (i === 0 ? " start" : "");
     el.id = "tile-" + i;
     var p = ring.pos[i];
     el.style.gridRow = p[0]; el.style.gridColumn = p[1];
+    var dacBiet = i !== 0 && tile.t !== "q";
     el.innerHTML =
+      (dacBiet ? '<span class="tile-special" title="Ô đặc biệt">?</span>' : '') +
       '<span class="tile-num">' + (i < 10 ? "0" + i : i) + '</span>' +
       (i === 0 ? '<span class="tile-start">Xuất phát</span>' : '') +
       '<span class="tile-tokens" id="tk-' + i + '"></span>';
@@ -2094,6 +2154,12 @@ function renderBoard(){
     '<div class="turn-of">Đến lượt</div>' +
     '<div class="turn-name" id="turnName">—</div>' +
     '<div class="turn-member" id="turnMember"></div>' +
+    '<div class="deck-wrap">' +
+      '<div class="deck" id="deck" aria-hidden="true">' +
+        '<div class="deck-card">?</div><div class="deck-card">?</div><div class="deck-card">?</div>' +
+      '</div>' +
+      '<span class="deck-label">Cơ hội</span>' +
+    '</div>' +
     '<div class="dice" id="dice" aria-label="Xúc xắc"></div>' +
     '<button class="btn btn-primary btn-lg" id="rollBtn">Tung xúc xắc</button>' +
     '<p class="status" id="status">Bấm nút để bắt đầu lượt chơi.</p>';
@@ -2651,6 +2717,9 @@ function askQuestion(lvKey){
   }
 }
 
+/* Ô Cơ hội mở ra hai bước: nhìn thấy sấp bài úp và lời mời rút, bấm rút thì lá
+   bài lật lên rồi mới hiện nội dung. Bốc thẻ trước khi vẽ để nội dung mặt sau
+   đã sẵn sàng, người chơi không phải chờ thêm sau khi lật. */
 function openChanceCard(){
   var p = currentPlayer();
   var card = CARDS[Math.floor(Math.random()*CARDS.length)];
@@ -2658,16 +2727,27 @@ function openChanceCard(){
     '<div class="modal-head">' +
       '<span class="badge" style="--c:var(--accent)">Cơ hội</span>' +
       '<span class="mono" style="color:' + p.color + '">' + esc(p.name) + '</span>' +
-    '</div><div class="modal-body"><div class="card-draw">' +
-      '<div class="glyph">?</div>' +
-      '<p class="ctext">' + card.t + '</p>' +
-      '<p class="ceffect">' + card.e + '</p>' +
-    '</div></div>' +
-    '<div class="modal-foot"><button class="btn btn-primary" id="cardOk">Nhận thẻ</button></div>';
+    '</div>' +
+    '<div class="modal-body">' +
+      '<div class="draw-wrap"><div class="draw-stack">' +
+        '<div class="draw-pile p1"></div>' +
+        '<div class="draw-pile p2"></div>' +
+        '<div class="draw-card" id="drawCard">' +
+          '<div class="draw-face draw-back">?</div>' +
+          '<div class="draw-face draw-front">' +
+            '<div><p class="ctext" style="font-size:12px;margin:0 0 6px">' + card.t + '</p>' +
+            '<p class="ceffect">' + card.e + '</p></div>' +
+          '</div>' +
+        '</div>' +
+      '</div></div>' +
+      '<p class="draw-hint" id="drawHint">Ấn để rút lá cơ hội</p>' +
+    '</div>' +
+    '<div class="modal-foot"><button class="btn btn-primary" id="drawBtn">Rút lá cơ hội</button></div>';
   openModal(html);
-  sndChance();
-  $("#cardOk").focus();
-  $("#cardOk").addEventListener("click", function(){
+  $("#drawBtn").focus();
+
+  var daRut = false;
+  function nhanThe(){
     closeModal();
     if(card.score){ p.score += card.score; }
     if(card.skip){ p.skip = true; }
@@ -2677,6 +2757,19 @@ function openChanceCard(){
     renderScores();
     if(card.move){ stepMove(card.move, function(){ finishTurn(); }); }
     else finishTurn();
+  }
+  $("#drawBtn").addEventListener("click", function(){
+    if(daRut){ nhanThe(); return; }   /* cùng một nút, bấm lần hai là nhận thẻ */
+    daRut = true;
+    sndChance();
+    var c = $("#drawCard"); if(c) c.classList.add("lat");
+    var hint = $("#drawHint"); if(hint) hint.textContent = "";
+    var b = $("#drawBtn");
+    b.disabled = true;
+    setTimeout(function(){
+      var b2 = $("#drawBtn");
+      if(b2){ b2.disabled = false; b2.textContent = "Nhận thẻ"; b2.focus(); }
+    }, 620);
   });
 }
 
