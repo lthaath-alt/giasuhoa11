@@ -38,7 +38,18 @@ export function buildLessonContext(lessonId: string): string {
   const { lesson, chuong } = found;
   const L: string[] = [];
 
+  /* Cho biết chương trình có bao nhiêu bài.
+     Thiếu dòng này, khi học sinh hỏi "Bài 30 nói gì vậy thầy?" thì Gemini phải
+     đoán: có lần nó nói đúng "chỉ có đến Bài 25", có lần nói "chỉ có đến Bài 26"
+     — tức là bịa ra một bài không tồn tại. Con số lấy từ chính dữ liệu chứ
+     không viết cứng, để thêm bớt bài thì câu này tự đúng theo. */
+  const tongSoBai = CHEMISTRY_11_CURRICULUM.reduce((n, c) => n + c.lessons.length, 0);
+  const baiCuoi = CHEMISTRY_11_CURRICULUM.at(-1)?.lessons.at(-1);
+
   L.push('NỘI DUNG BÀI HỌC EM ĐANG MỞ — bám vào đây, đừng giảng lệch sang bài khác.');
+  L.push(`Chương trình Hoá học 11 (KNTT) gồm đúng ${tongSoBai} bài, `
+    + `bài cuối cùng là "${baiCuoi?.title ?? ''}". Không có bài nào ngoài khoảng này; `
+    + 'học sinh hỏi về một bài ngoài khoảng đó thì nói rõ là không có, TUYỆT ĐỐI không bịa.');
   L.push(`Chương: ${chuong}`);
   L.push(`Bài: ${lesson.title}`);
 

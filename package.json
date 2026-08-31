@@ -8,7 +8,11 @@
     "build": "vite build",
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "kiem-tra": "npm run kiem-tra:chuong-trinh && npm run kiem-tra:het-luot",
+    "kiem-tra:chuong-trinh": "tsx scripts/kiem-tra-chuong-trinh.mts",
+    "kiem-tra:het-luot": "tsx scripts/kiem-tra-het-luot.mts",
+    "thu:ai": "tsx scripts/thu-gia-su-ai.mts"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
