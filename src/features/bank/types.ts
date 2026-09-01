@@ -160,3 +160,20 @@ export function pointsOf(q: BankQuestion): number {
   const lv = LEVELS.find(l => l.key === q.lv);
   return lv ? lv.pts : 10;
 }
+
+/**
+ * Điền các trường bắt buộc còn thiếu của một câu hỏi.
+ *
+ * 148 trong 160 câu mẫu dựng sẵn của trò chơi KHÔNG có trường `t` (dạng câu),
+ * vì bên trò chơi trắc nghiệm là mặc định nên không ai ghi ra. Web thì lại dựa
+ * hẳn vào `t` để quyết định hiển thị gì: BankManager chỉ vẽ các phương án A–D
+ * khi `q.t === 'mc'`. Hệ quả là giáo viên mở ngân hàng thấy 148 câu trống trơn
+ * không phương án nào, bộ lọc "Dạng câu" không bao giờ khớp chúng, và
+ * `toLegacy()` thì đánh rơi luôn cả đáp án.
+ *
+ * Chuẩn hoá ngay lúc ĐỌC chứ không phải lúc ghi, vì số câu hỏng đã nằm sẵn
+ * trong Firestore rồi — chỉ sửa ở chiều ghi thì chúng vẫn hỏng mãi.
+ */
+export function chuanHoaCau(q: BankQuestion): BankQuestion {
+  return q.t ? q : { ...q, t: 'mc' };
+}

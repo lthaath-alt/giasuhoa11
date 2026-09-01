@@ -17,7 +17,7 @@
 
 import { collection, doc, getDocs, setDoc, deleteDoc, writeBatch } from 'firebase/firestore';
 import { db } from '../../core/services/firebase';
-import { BankQuestion, BankStore, emptyStore } from './types';
+import { BankQuestion, BankStore, emptyStore, chuanHoaCau } from './types';
 
 const COL_BANK = 'bank_questions';
 
@@ -104,7 +104,9 @@ export const BankFirestore = {
    */
   async getAll(): Promise<BankQuestion[]> {
     const snap = await getDocs(collection(db, COL_BANK));
-    return snap.docs.map(d => ({ ...(d.data() as BankQuestion), id: d.id }));
+    // chuanHoaCau: 148 cau mau cua tro choi khong co truong `t`, thieu no thi
+    // BankManager khong ve phuong an nao. Xem chu thich trong types.ts.
+    return snap.docs.map(d => chuanHoaCau({ ...(d.data() as BankQuestion), id: d.id }));
   },
 
   async save(q: BankQuestion): Promise<boolean> {

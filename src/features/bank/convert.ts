@@ -51,7 +51,10 @@ const KEYS = ['A', 'B', 'C', 'D'] as const;
 
 /** "c1" | "chuong1" | 3 → 1–6, mặc định 1 nếu không đọc được */
 export function toChapter(raw: unknown): Chapter {
-  const n = typeof raw === 'number' ? raw : parseInt(String(raw ?? '').replace(/\D+/g, ''), 10);
+  // Math.trunc để số lẻ như 2.7 không lọt qua thành "chương 2.7" — kiểu Chapter
+  // chỉ nhận 1–6, và một chương lẻ sẽ rơi khỏi mọi bộ lọc theo chương.
+  const n = Math.trunc(
+    typeof raw === 'number' ? raw : parseInt(String(raw ?? '').replace(/\D+/g, ''), 10));
   return (n >= 1 && n <= 6 ? n : 1) as Chapter;
 }
 
@@ -105,7 +108,13 @@ export function fromLegacy(
 // ─── Ngân hàng hợp nhất → web cũ ─────────────────────────────────────────────
 
 export function toLegacy(b: BankQuestion): Question {
-  const type = QTYPE_TO_WEB[b.t] ?? 'Trắc nghiệm';
+  /* Dùng một biến `t` đã có mặc định, thay vì đọc thẳng `b.t` ở mỗi nhánh.
+     148 trong 160 câu mẫu của trò chơi không có trường `t`. Khi đó dòng cũ
+     `QTYPE_TO_WEB[b.t] ?? 'Trắc nghiệm'` vẫn cho ra type = Trắc nghiệm, nhưng
+     không nhánh `b.t === '...'` nào bên dưới chạy, nên câu trả về MẤT SẠCH
+     phương án và đáp án mà không báo lỗi gì. */
+  const t: QType = b.t ?? 'mc';
+  const type = QTYPE_TO_WEB[t];
   const imgs = b.imgs && b.imgs.length ? b.imgs : b.img ? [b.img] : [];
 
   const out: Question = {
@@ -125,15 +134,15 @@ export function toLegacy(b: BankQuestion): Question {
 
   if (b.topic) out.topic = b.topic;
 
-  if (b.t === 'mc') {
+  if (t === 'mc') {
     out.options = (b.o || []).slice(0, 4).map((text, i) => ({ key: KEYS[i], text }));
     out.correctAnswer = KEYS[typeof b.a === 'number' ? b.a : 0];
-  } else if (b.t === 'tf') {
+  } else if (t === 'tf') {
     // Nhiều ý gộp lại thành một mệnh đề; đúng khi mọi ý đều đúng.
     const st = b.st || [];
     out.content = st.length > 1 ? st.map(s => `• ${s.s}`).join('\n') : (st[0]?.s ?? b.q);
     out.correctAnswer = st.every(s => s.v) ? 'Đúng' : 'Sai';
-  } else if (b.t === 'tn') {
+  } else if (t === 'tn') {
     out.essayPoints = [
       { label: 'Đáp án', content: b.ansText ?? String(b.num ?? '') + (b.unit ? ' ' + b.unit : '') },
     ];

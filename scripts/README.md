@@ -51,6 +51,7 @@ npm run thu:ai            # thử gia sư AI thật (tốn 7 lượt API)
 | Lệnh | Kiểm cái gì | Cần mạng |
 |---|---|---|
 | `npm run kiem-tra:chuong-trinh` | Dữ liệu 25 bài trong `constants.ts` | không |
+| `npm run kiem-tra:ngan-hang` | Chuyển đổi ngân hàng câu hỏi web ↔ trò chơi | không |
 | `npm run kiem-tra:het-luot` | Cách diễn giải lỗi 429 của Gemini | không |
 | `npm run thu:ai` | Gia sư AI trả lời có đúng kiến thức không | **có** |
 
@@ -69,6 +70,19 @@ npm run thu:ai            # thử gia sư AI thật (tốn 7 lượt API)
   cho học sinh.
 
 Chạy lại sau mỗi lần sinh lại `src/features/lessons/constants.ts`.
+
+## `kiem-tra:ngan-hang`
+
+Web và trò chơi dùng hai dạng dữ liệu khác nhau, đồng bộ hai chiều qua
+IndexedDB. Chuyển sai một lượt là mất câu hỏi thật của giáo viên mà không ai
+biết ngay, nên đây là chỗ dễ hỏng ngầm nhất trong dự án.
+
+Phép thử cốt lõi là **khứ hồi**: 148 câu trắc nghiệm đi vòng web → trò chơi →
+web phải giữ nguyên đề, 4 phương án, đáp án và chương.
+
+Bài này cũng khoá lại hai **mất mát có chủ ý** của mô hình cũ, để nếu chúng lan
+rộng thêm thì biết ngay: mức `vdc` (vận dụng cao) hạ về `vd` vì dạng cũ chỉ có
+3 mức, và dạng `tn` (trả lời ngắn) chuyển thành Tự luận vì dạng cũ không có.
 
 ## `thu:ai`
 
