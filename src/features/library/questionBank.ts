@@ -22,7 +22,7 @@ import { BankFirestore } from '../bank/bankStore';
 import { toLegacy } from '../bank/convert';
 
 /** Bật log chẩn đoán luồng tạo đề. Đặt false khi đã chạy ổn định. */
-export const LOG_TAO_DE = true;
+export const LOG_TAO_DE = false;
 
 /**
  * Đưa mọi cách ghi mức độ về đúng 3 bậc của `DifficultyLevel`.

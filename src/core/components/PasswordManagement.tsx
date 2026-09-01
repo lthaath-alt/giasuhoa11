@@ -130,11 +130,10 @@ export const PasswordManagement: React.FC<Props> = ({ users }) => {
 
   const getRoleChip = (role: string) => {
     switch (role) {
-      case 'super_admin': return <Chip size="small" label="Quản trị Website" sx={{ bgcolor: '#fef3c7', color: '#d97706', fontWeight: 'bold' }} />;
+      case 'admin': return <Chip size="small" label="Quản trị Website" sx={{ bgcolor: '#fef3c7', color: '#d97706', fontWeight: 'bold' }} />;
       case 'school_admin': return <Chip size="small" label="Quản trị Trường học" sx={{ bgcolor: '#e0e7ff', color: '#4f46e5', fontWeight: 'bold' }} />;
       case 'teacher': return <Chip size="small" label="Giáo viên" sx={{ bgcolor: '#ccfbf1', color: '#0f766e', fontWeight: 'bold' }} />;
       case 'student': return <Chip size="small" label="Học sinh" sx={{ bgcolor: '#dbeafe', color: '#2563eb', fontWeight: 'bold' }} />;
-      case 'free_user': return <Chip size="small" label="Học sinh tự do" sx={{ bgcolor: '#f3f4f6', color: '#4b5563', fontWeight: 'bold' }} />;
       default: return <Chip size="small" label={role} />;
     }
   };

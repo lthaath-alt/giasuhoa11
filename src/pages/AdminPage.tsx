@@ -154,7 +154,7 @@ export const AdminPage: React.FC = () => {
               users={users}
               canCreate={true}
               onCreateClick={() => setCreateClassOpen(true)}
-              currentUserRole="super_admin"
+              currentUserRole="admin"
             />
           }
           libraryContent={<LibraryManagement />}

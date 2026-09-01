@@ -34,7 +34,7 @@ export const ErrorManagement: React.FC = () => {
     const allLogs = ErrorLogService.getLogs();
     
     // Phân quyền
-    if (currentUser?.role === 'super_admin') {
+    if (currentUser?.role === 'admin') {
       setLogs(allLogs);
     } else {
       // School admin và teacher chỉ thấy lỗi của mình và học sinh mình

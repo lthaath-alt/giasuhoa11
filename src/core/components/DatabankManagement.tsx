@@ -54,7 +54,7 @@ export const DatabankManagement: React.FC = () => {
   }, []);
 
   const canEditOrDelete = (createdBy?: string) => {
-    if (currentUser?.role === 'super_admin') return true;
+    if (currentUser?.role === 'admin') return true;
     if (currentUser?.email === createdBy) return true;
     return false;
   };

@@ -118,7 +118,7 @@ export const createAccountWithFirestore = async (data: {
     const email    = (data.email || username).trim().toLowerCase();
     const status   = data.status || 'active';
 
-    if (role === 'admin' || role === 'super_admin' || role === 'school_admin') {
+    if (role === 'admin' || role === 'admin' || role === 'school_admin') {
       return { success: false, message: 'Chỉ được phép tạo tài khoản với vai trò học sinh hoặc giáo viên qua chức năng này.' };
     }
 

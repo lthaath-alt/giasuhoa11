@@ -16,7 +16,7 @@ import { loginWithFirestore, createAccountWithFirestore } from '../services/fire
 import { FirestoreService } from '../services/firestoreService';
 import { runMigrationIfNeeded } from '../services/migrationService';
 import { ErrorLogService } from '../services/errorLog';
-import { UserRole } from '../../features/auth/types';
+import { UserRole, chuanHoaVaiTro } from '../../features/auth/types';
 import { LibraryExam, Equation, MatrixResource, Question } from '../../features/library/types';
 
 // ─── Shared Data Types ────────────────────────────────────────────────────────
@@ -237,7 +237,7 @@ export interface AppContextType {
   /**
    * Học sinh tự đăng ký tài khoản (có hoặc không có mã lớp).
    * - Có mã lớp hợp lệ: tạo role='student', gán vào lớp.
-   * - Không có mã lớp: tạo role='free_user', học sinh tự do.
+   * - Không có mã lớp: tạo role='student', học sinh tự do.
    */
   registerWithOptionalClass: (
     name: string,
@@ -258,7 +258,7 @@ export interface AppContextType {
 
   /**
    * Học sinh đã đăng nhập nhập mã lớp để tham gia.
-   * Chuyển free_user/student chưa có lớp → student thuộc lớp.
+   * Gán học sinh chưa có lớp vào một lớp (đặt classId).
    * Lịch sử học tập được GIỮ NGUYÊN.
    */
   joinClassByCode: (code: string) => Promise<{
@@ -336,10 +336,14 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         FirestoreService.getSystemSettings(),
       ]);
 
-      // 3. Migrate role cũ 'admin' → 'super_admin' (nếu còn sót)
-      const migratedUsers = allUsers.map(u =>
-        (u.role as string) === 'admin' ? { ...u, role: 'super_admin' as UserRole } : u
-      );
+      /* 3. Đưa mọi tên vai trò cũ về 4 bậc hiện hành.
+            Trước đây chỗ này ánh xạ 'admin' → 'super_admin', tức NGƯỢC chiều với
+            dữ liệu sau đợt gộp vai trò 01/09/2026. Nay dùng bảng chuẩn hoá dùng
+            chung, xử lý được cả super_admin / system_admin / free_user còn sót. */
+      const migratedUsers = allUsers.map(u => {
+        const chuan = chuanHoaVaiTro(u.role as string);
+        return chuan === u.role ? u : { ...u, role: chuan };
+      });
 
       // 4. Cập nhật state
       setUsers(migratedUsers);
@@ -391,8 +395,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     const fsRes = await loginWithFirestore(identifier, password);
 
     if (fsRes.success && fsRes.user) {
-      const rawRole = fsRes.user.role as string;
-      const resolvedRole: UserRole = rawRole === 'admin' ? 'super_admin' : (rawRole as UserRole) || 'student';
+      const resolvedRole: UserRole = chuanHoaVaiTro(fsRes.user.role as string);
 
       // Tìm user đầy đủ từ state (đã load khi init)
       const lower = identifier.toLowerCase();
@@ -473,7 +476,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       username: identifier,
       password: password,
       fullName: googleInfo.name,
-      role: 'free_user',
+      role: 'student',
       email: identifier,
       status: 'active',
     });
@@ -489,7 +492,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       username: identifier,
       password,
       name: googleInfo.name,
-      role: 'free_user',
+      role: 'student',
       status: 'active',
       authProvider: 'google',
       googleId: googleInfo.sub,
@@ -764,7 +767,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   // ── Tạo tài khoản School Admin ───────────────────────────────────────────
 
   const createSchoolAdmin = async (data: CreateSchoolAdminData) => {
-    if (currentUser?.role !== 'super_admin') {
+    if (currentUser?.role !== 'admin') {
       return { success: false, message: 'Chỉ Admin Website mới có quyền tạo tài khoản admin trường.' };
     }
     if (!data.name.trim() || !data.email.trim()) {
@@ -897,14 +900,14 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     await FirestoreService.deleteClass(classId);
 
     // Gỡ học sinh khỏi lớp (chuyển về học sinh tự do hoặc xoá classId)
-    // Để an toàn, cập nhật tất cả học sinh trong lớp thành free_user và classId = null
+    // Để an toàn, cập nhật tất cả học sinh trong lớp thành học sinh chưa có lớp: classId = null
     const studentUsers = users.filter(u => targetClass.studentIdentifiers.includes(u.email) || targetClass.studentIdentifiers.includes(u.username!));
     for (const student of studentUsers) {
-      await FirestoreService.updateUserById(student.id, { classId: null, role: 'free_user' });
+      await FirestoreService.updateUserById(student.id, { classId: null, role: 'student' });
     }
     
     // Cập nhật local state users
-    setUsers(prev => prev.map(u => studentUsers.some(su => su.id === u.id) ? { ...u, classId: undefined, role: 'free_user' } : u));
+    setUsers(prev => prev.map(u => studentUsers.some(su => su.id === u.id) ? { ...u, classId: undefined, role: 'student' } : u));
     setClasses(prev => prev.filter(c => c.id !== classId));
     
     return { success: true, message: `Đã xóa lớp "${targetClass.name}" thành công.` };
@@ -1382,7 +1385,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
     const isManaged = Boolean(assignedClassId);
     const identifier = lower;
-    const targetRole = isManaged ? 'student' : 'free_user';
+    // 'free_user' da gop vao 'student'; phan biet co lop hay khong bang classId
+    const targetRole: UserRole = 'student';
 
     // Đẩy lên Firestore collection "users"
     const fsRes = await createAccountWithFirestore({

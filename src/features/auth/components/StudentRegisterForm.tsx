@@ -17,7 +17,7 @@ interface StudentRegisterFormProps {
  * StudentRegisterForm
  * Học sinh tự đăng ký tài khoản với mã lớp tuỳ chọn.
  * - Có mã lớp → role=student, gán vào lớp.
- * - Không có mã lớp → role=free_user.
+ * - Không có mã lớp → role=student, chưa có classId.
  */
 export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBackToLogin }) => {
   const { registerWithOptionalClass } = useApp();

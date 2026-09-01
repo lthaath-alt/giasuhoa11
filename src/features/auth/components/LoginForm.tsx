@@ -47,12 +47,12 @@ export const LoginForm: React.FC<LoginFormProps> = ({
     if (res.success && res.user) {
       const userRole = res.user.role;
       // Kiểm tra khớp vai trò đã chọn
-      if (selectedRole === 'teacher' && userRole !== 'teacher' && userRole !== 'super_admin' && userRole !== 'school_admin') {
+      if (selectedRole === 'teacher' && userRole !== 'teacher' && userRole !== 'admin' && userRole !== 'school_admin') {
         logout();
         setError('Tài khoản này thuộc vai trò Học sinh. Vui lòng chọn lại vai trò "Học sinh" để đăng nhập.');
         return;
       }
-      if (selectedRole === 'student' && (userRole === 'teacher' || userRole === 'super_admin' || userRole === 'school_admin')) {
+      if (selectedRole === 'student' && (userRole === 'teacher' || userRole === 'admin' || userRole === 'school_admin')) {
         logout();
         setError('Tài khoản này thuộc vai trò Giáo viên / Quản trị. Vui lòng chọn lại vai trò "Giáo viên" để đăng nhập.');
         return;

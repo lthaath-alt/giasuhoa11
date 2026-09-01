@@ -15,7 +15,7 @@ interface JoinClassFormProps {
 
 /**
  * JoinClassForm — Banner nhỏ hiển thị trong DashboardPage.
- * Chỉ xuất hiện khi currentUser là free_user hoặc student chưa có classId.
+ * Chỉ xuất hiện khi currentUser là học sinh chưa có classId.
  * Cho phép nhập mã lớp để chuyển sang học sinh được quản lý.
  * Lịch sử học tập được GIỮ NGUYÊN.
  */

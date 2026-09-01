@@ -117,7 +117,7 @@ export const LessonSidebar: React.FC<LessonSidebarProps> = ({
                 >
                   {chapter.title}
                 </Typography>
-                {(currentUser?.role === 'super_admin' || currentUser?.role === 'school_admin') && (
+                {(currentUser?.role === 'admin' || currentUser?.role === 'school_admin') && (
                   <IconButton
                     size="small"
                     color="error"
@@ -144,7 +144,7 @@ export const LessonSidebar: React.FC<LessonSidebarProps> = ({
                   const lessonIndex = allLessons.findIndex(l => l.id === les.id);
                   
                   let isLocked = false;
-                  if (currentUser && (currentUser.role === 'student' || currentUser.role === 'free_user')) {
+                  if (currentUser && currentUser.role === 'student') {
                     if (lessonIndex > 0) {
                       const prevLesson = allLessons[lessonIndex - 1];
                       const prevProgress = getLessonProgress(prevLesson.id);
@@ -227,7 +227,7 @@ export const LessonSidebar: React.FC<LessonSidebarProps> = ({
                                   )}
                                 </>
                               )}
-                              {(currentUser?.role === 'super_admin' || currentUser?.role === 'school_admin') && (
+                              {(currentUser?.role === 'admin' || currentUser?.role === 'school_admin') && (
                                 <IconButton
                                   size="small"
                                   color="error"

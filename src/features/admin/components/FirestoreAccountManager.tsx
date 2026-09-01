@@ -37,18 +37,22 @@ import {
 
 // ── Cấu hình hiển thị cho từng role ───────────────────────────────────────────
 const ROLE_CONFIG: Record<string, { label: string; color: 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' }> = {
-  super_admin:  { label: 'Super Admin',   color: 'error' },
+  admin:        { label: 'Quản trị hệ thống', color: 'error' },
   school_admin: { label: 'Admin Trường',  color: 'warning' },
   teacher:      { label: 'Giáo viên',     color: 'secondary' },
   student:      { label: 'Học sinh',      color: 'default' },
-  free_user:    { label: 'Người dùng tự do', color: 'info' },
+  // Tên cũ trước đợt gộp 01/09/2026. Giữ lại để bản ghi nào chưa kịp đổi vẫn
+  // hiện ra nhãn dễ hiểu thay vì chuỗi thô.
+  super_admin:  { label: 'Quản trị hệ thống (tên cũ)', color: 'error' },
+  system_admin: { label: 'Quản trị hệ thống (tên cũ)', color: 'error' },
+  free_user:    { label: 'Học sinh (tên cũ)', color: 'default' },
 };
 
 const ROLE_OPTIONS = [
   { value: 'student',      label: '🎒 Học sinh (student)' },
   { value: 'teacher',      label: '👨‍🏫 Giáo viên (teacher)' },
   { value: 'school_admin', label: '🏫 Admin Trường (school_admin)' },
-  { value: 'super_admin',  label: '👑 Super Admin (super_admin)' },
+  { value: 'admin',        label: '👑 Quản trị hệ thống (admin)' },
 ];
 
 /**
@@ -171,7 +175,7 @@ export const FirestoreAccountManager: React.FC = () => {
     }
     if (!confirmStep) {
       // Bước 1: yêu cầu xác nhận thêm 1 lần nữa nếu cấp quyền cao
-      if (selectedNewRole === 'super_admin' || selectedNewRole === 'school_admin') {
+      if (selectedNewRole === 'admin' || selectedNewRole === 'school_admin') {
         setConfirmStep(true);
         setRoleMsg({
           type: 'error',
@@ -504,7 +508,7 @@ export const FirestoreAccountManager: React.FC = () => {
               )}
 
               {/* Cảnh báo khi cấp quyền cao */}
-              {(selectedNewRole === 'super_admin' || selectedNewRole === 'school_admin') && !roleMsg && (
+              {(selectedNewRole === 'admin' || selectedNewRole === 'school_admin') && !roleMsg && (
                 <Alert severity="warning" sx={{ borderRadius: 2, fontSize: '0.82rem' }}>
                   ⚠️ Quyền <strong>{ROLE_CONFIG[selectedNewRole]?.label}</strong> có thể quản lý người dùng và dữ liệu hệ thống. Hãy chắc chắn trước khi cấp.
                 </Alert>

@@ -200,11 +200,13 @@ export const DashboardPage: React.FC = () => {
         />
       )}
 
-      {/* 2b. BANNER THAM GIA LỚP (chỉ hiển khi học sinh tự do hoặc chưa có lớp) */}
+      {/* 2b. BANNER THAM GIA LỚP — chỉ hiện với học sinh chưa vào lớp nào.
+          Điều kiện cũ là `role === 'free_user' || (role === 'student' && chưa có lớp)`.
+          Nay 'free_user' đã gộp vào 'student' nên vế đầu thừa; "học sinh tự do"
+          chính là học sinh không có classId. */}
       {currentUser &&
-        (currentUser.role === 'free_user' ||
-          (currentUser.role === 'student' && !currentUser.classId && !currentUser.joinedClassId)
-        ) &&
+        currentUser.role === 'student' &&
+        !currentUser.classId && !currentUser.joinedClassId &&
         activeTab === 'hocmai' && (
         <JoinClassForm
           onJoined={(_className) => {

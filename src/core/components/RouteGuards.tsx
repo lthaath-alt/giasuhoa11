@@ -14,7 +14,7 @@ const LoadingScreen: React.FC<{ label?: string }> = ({ label = 'Đang tải...' 
 
 // ─── ProtectedRoute – cho phép cả khách vãng lai ────────────────────────────
 
-/** Dashboard học tập: học sinh, free_user VÀ khách vãng lai đều vào được. */
+/** Dashboard học tập: học sinh VÀ khách vãng lai đều vào được. */
 export const ProtectedRoute: React.FC = () => {
   const { loading } = useApp();
   if (loading) return <LoadingScreen label="Đang tải dữ liệu Gia sư..." />;
@@ -22,12 +22,12 @@ export const ProtectedRoute: React.FC = () => {
   return <Outlet />;
 };
 
-// ─── SuperAdminRoute – chỉ admin hệ thống ─────────────────────────────────────────
+// ─── SuperAdminRoute – chỉ vai trò `admin` (quản trị hệ thống) ────────────────
 
 export const SuperAdminRoute: React.FC = () => {
   const { currentUser, loading } = useApp();
   if (loading) return <LoadingScreen label="Đang tải cấu hình Admin Website..." />;
-  if (!currentUser || currentUser.role !== 'super_admin') {
+  if (!currentUser || currentUser.role !== 'admin') {
     return <Navigate to="/" replace />;
   }
   return <Outlet />;
@@ -63,10 +63,10 @@ export const PublicRoute: React.FC = () => {
   if (loading) return <LoadingScreen />;
 
   if (currentUser) {
-    if (currentUser.role === 'super_admin')  return <Navigate to="/admin" replace />;
+    if (currentUser.role === 'admin')  return <Navigate to="/admin" replace />;
     if (currentUser.role === 'school_admin') return <Navigate to="/school-admin" replace />;
     if (currentUser.role === 'teacher')      return <Navigate to="/teacher" replace />;
-    // student, free_user → dashboard học tập
+    // student → dashboard học tập
     return <Navigate to="/dashboard" replace />;
   }
 

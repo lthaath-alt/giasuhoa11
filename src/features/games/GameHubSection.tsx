@@ -63,7 +63,7 @@ export const GameHubSection: React.FC = () => {
      dùng. Chấp nhận được vì trò chơi không gửi điểm về máy chủ, gian lận chỉ
      ảnh hưởng lượt chơi của chính em đó. Ngày nào điểm được ghi lại thật thì
      phải kiểm ở phía máy chủ. */
-  const choPhepThu = currentUser?.role === 'super_admin'
+  const choPhepThu = currentUser?.role === 'admin'
                   || currentUser?.role === 'school_admin';
 
   useEffect(() => {

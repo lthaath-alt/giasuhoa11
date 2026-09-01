@@ -16,7 +16,7 @@ export interface ClassManagementProps {
   users: User[];
   canCreate: boolean;
   onCreateClick: () => void;
-  currentUserRole?: 'super_admin' | 'school_admin' | 'teacher';
+  currentUserRole?: 'admin' | 'school_admin' | 'teacher';
 }
 
 export const ClassManagement: React.FC<ClassManagementProps> = ({
@@ -24,7 +24,7 @@ export const ClassManagement: React.FC<ClassManagementProps> = ({
   users,
   canCreate,
   onCreateClick,
-  currentUserRole = 'super_admin',
+  currentUserRole = 'admin',
 }) => {
   const { updateClass, deleteClass } = useApp();
   const [deleteId, setDeleteId] = useState<string | null>(null);

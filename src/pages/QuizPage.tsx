@@ -97,7 +97,7 @@ export const QuizPage: React.FC = () => {
   const lessonIndex = allLessons.findIndex(l => l.id === quiz.lessonId);
   
   let isLocked = false;
-  if (currentUser && (currentUser.role === 'student' || currentUser.role === 'free_user') && lessonIndex > 0) {
+  if (currentUser && currentUser.role === 'student' && lessonIndex > 0) {
     const prevLesson = allLessons[lessonIndex - 1];
     const prevProgress = getLessonProgress(prevLesson.id);
     if (!prevProgress || !prevProgress.basicCompleted || (!prevProgress.advancedCompleted && !prevProgress.skippedAdvanced)) {
@@ -150,7 +150,7 @@ export const QuizPage: React.FC = () => {
   }
 
   // Bảo mật: Không cho tài khoản khác làm bài
-  if (currentUser.email.toLowerCase() !== quiz.userEmail.toLowerCase() && currentUser.role !== 'super_admin' && currentUser.role !== 'school_admin') {
+  if (currentUser.email.toLowerCase() !== quiz.userEmail.toLowerCase() && currentUser.role !== 'admin' && currentUser.role !== 'school_admin') {
     return (
       <Container maxWidth="sm" sx={{ py: 8, textAlign: 'center' }}>
         <Paper variant="outlined" sx={{ p: 5, borderRadius: 4 }}>

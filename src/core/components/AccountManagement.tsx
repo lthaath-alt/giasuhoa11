@@ -17,7 +17,7 @@ export interface AccountManagementProps {
   canCreateTeacher?: boolean;
   canCreateStudent?: boolean;
   canCreateClass?: boolean;
-  /** Chỉ hiển thị với super_admin */
+  /** Chỉ hiển thị với vai trò admin */
   canCreateSchoolAdmin?: boolean;
   onCreateTeacherClick?: () => void;
   onCreateStudentClick?: () => void;
@@ -83,9 +83,9 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({
   const canEditOrDelete = (targetUser: UserType) => {
     if (!currentUser) return false;
     if (currentUser.id === targetUser.id) return false; // Không tự xoá/sửa mình
-    if (currentUser.role === 'super_admin') return true;
+    if (currentUser.role === 'admin') return true;
     if (currentUser.role === 'school_admin') {
-      if (targetUser.role === 'super_admin' || targetUser.role === 'school_admin') return false;
+      if (targetUser.role === 'admin' || targetUser.role === 'school_admin') return false;
       if (targetUser.schoolId !== currentUser.schoolId) return false;
       return true;
     }
@@ -94,11 +94,10 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({
 
   const getRoleChip = (role: string) => {
     switch (role) {
-      case 'super_admin': return <Chip size="small" label="Quản trị Website" sx={{ bgcolor: '#fef3c7', color: '#d97706', fontWeight: 'bold' }} />;
+      case 'admin': return <Chip size="small" label="Quản trị Website" sx={{ bgcolor: '#fef3c7', color: '#d97706', fontWeight: 'bold' }} />;
       case 'school_admin': return <Chip size="small" label="Quản trị Trường học" sx={{ bgcolor: '#e0e7ff', color: '#4f46e5', fontWeight: 'bold' }} />;
       case 'teacher': return <Chip size="small" label="Giáo viên" sx={{ bgcolor: '#ccfbf1', color: '#0f766e', fontWeight: 'bold' }} />;
       case 'student': return <Chip size="small" label="Học sinh" sx={{ bgcolor: '#dbeafe', color: '#2563eb', fontWeight: 'bold' }} />;
-      case 'free_user': return <Chip size="small" label="Học sinh tự do" sx={{ bgcolor: '#f3f4f6', color: '#4b5563', fontWeight: 'bold' }} />;
       default: return <Chip size="small" label={role} />;
     }
   };
@@ -203,7 +202,7 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({
         </TableContainer>
       </Box>
 
-      {/* ─── KHỐI 3: DANH SÁCH ADMIN TRƯỜNG HỌC (chỉ hiển thị với super_admin có schools) ─── */}
+      {/* ─── KHỐI 3: DANH SÁCH ADMIN TRƯỜNG HỌC (chỉ hiển thị với admin có schools) ─── */}
       {canCreateSchoolAdmin && schools.length > 0 && (
         <Box sx={{ mt: 4 }}>
           <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#0f172a', display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>

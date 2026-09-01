@@ -321,7 +321,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                   <Chip
                     size="small"
                     label={
-                      currentUser.role === 'super_admin' ? 'Quản trị Web'
+                      currentUser.role === 'admin' ? 'Quản trị Web'
                       : currentUser.role === 'school_admin' ? 'Admin Trường'
                       : currentUser.role === 'teacher' ? 'Giáo viên'
                       : currentUser.role === 'student' ? 'Học sinh'
@@ -332,14 +332,14 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                       fontSize: '0.6rem',
                       fontWeight: 'bold',
                       bgcolor:
-                        currentUser.role === 'super_admin' ? '#7c3aed'
+                        currentUser.role === 'admin' ? '#7c3aed'
                         : currentUser.role === 'school_admin' ? '#0369a1'
                         : currentUser.role === 'teacher' ? '#059669'
                         : '#ea580c',
                       color: '#fff',
                     }}
                   />
-                  {(currentUser.role === 'student' || currentUser.role === 'free_user') && hasAdvancedStudentTitle(currentUser.email) && (
+                  {currentUser.role === 'student' && hasAdvancedStudentTitle(currentUser.email) && (
                     <Chip
                       size="small"
                       label="HS Nâng cao 🎓"
@@ -579,8 +579,8 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
 
             {/* ── Mục điều hướng theo VAI TRÒ ── Chỉ hiện khi đăng nhập ── */}
 
-            {/* student, free_user → Khu vực Học sinh */}
-            {currentUser && (currentUser.role === 'student' || currentUser.role === 'free_user') && (
+            {/* student → Khu vực Học sinh */}
+            {currentUser && currentUser.role === 'student' && (
               <Button
                 id="nav-student-area-btn"
                 onClick={() => setActiveTab('hocsinh')}
@@ -643,8 +643,8 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               </Button>
             )}
 
-            {/* super_admin → Quản trị Website */}
-            {currentUser && currentUser.role === 'super_admin' && (
+            {/* admin → Quản trị Website */}
+            {currentUser && currentUser.role === 'admin' && (
               <Button
                 id="nav-admin-area-btn"
                 onClick={() => navigate('/admin')}

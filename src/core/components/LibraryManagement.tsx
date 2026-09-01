@@ -14,7 +14,7 @@ export const LibraryManagement: React.FC = () => {
   const [examToDelete, setExamToDelete] = useState<string | null>(null);
 
   const canEditOrDelete = (createdBy?: string) => {
-    if (currentUser?.role === 'super_admin') return true;
+    if (currentUser?.role === 'admin') return true;
     if (currentUser?.email === createdBy) return true;
     return false;
   };
@@ -45,7 +45,7 @@ export const LibraryManagement: React.FC = () => {
       description: form.description.trim(),
       topic: form.topic.trim(),
       driveLink: form.driveLink.trim(),
-      type: currentUser?.role === 'super_admin' ? 'Kho chung' : 'Do GV tự tải',
+      type: currentUser?.role === 'admin' ? 'Kho chung' : 'Do GV tự tải',
       createdBy: currentUser?.email,
       questionCount: 0 // Mock value since we are using drive links
     });

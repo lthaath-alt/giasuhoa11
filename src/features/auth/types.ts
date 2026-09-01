@@ -1,7 +1,36 @@
 // ─── Enums / Union Types ─────────────────────────────────────────────────────
 
-/** Vai trò người dùng trong hệ thống */
-export type UserRole = 'super_admin' | 'school_admin' | 'teacher' | 'student' | 'free_user';
+/**
+ * Vai trò người dùng trong hệ thống — 4 bậc, khớp đúng 4 guard trong RouteGuards.
+ *
+ * Gộp lại ngày 01/09/2026 từ 7 tên rời rạc trong dữ liệu thật:
+ *   super_admin, admin, system_admin  ->  admin
+ *   school_admin                      ->  school_admin  (KHÔNG gộp lên admin:
+ *                                        admin trường chỉ quản một trường)
+ *   teacher                           ->  teacher
+ *   student, free_user                ->  student
+ *
+ * `free_user` (học sinh chưa vào lớp) bị bỏ vì trùng thông tin: "có lớp hay
+ * không" đã nằm ở `classId`. Quyền tự đổi mật khẩu nay đọc từ `canChangePassword`
+ * chứ không suy ra từ vai trò.
+ */
+export type UserRole = 'admin' | 'school_admin' | 'teacher' | 'student';
+
+/** Tên vai trò cũ -> tên mới. Giữ để dữ liệu chưa kịp đổi vẫn đọc lên đúng. */
+export const VAI_TRO_CU: Record<string, UserRole> = {
+  super_admin: 'admin',
+  system_admin: 'admin',
+  admin: 'admin',
+  school_admin: 'school_admin',
+  teacher: 'teacher',
+  student: 'student',
+  free_user: 'student',
+};
+
+/** Đưa mọi cách ghi vai trò (cũ lẫn mới) về đúng 4 bậc hiện hành. */
+export function chuanHoaVaiTro(raw?: string): UserRole {
+  return VAI_TRO_CU[String(raw || '').trim()] ?? 'student';
+}
 
 /** Trạng thái tài khoản */
 export type UserStatus = 'active' | 'pending' | 'rejected';
@@ -30,7 +59,7 @@ export interface User {
   /** Họ và tên hiển thị */
   name: string;
 
-  /** Vai trò: admin hệ thống | giáo viên | học sinh | người dùng tự do */
+  /** Vai trò: quản trị hệ thống | quản trị trường | giáo viên | học sinh */
   role: UserRole;
 
   /** Trạng thái tài khoản */
@@ -59,9 +88,14 @@ export interface User {
 
   /**
    * Người dùng có được tự đổi mật khẩu không?
-   * - free_user: false (chỉ reset qua "Quên mật khẩu")
-   * - student: false (chỉ GV cấp lại)
-   * - teacher / admin: true
+   *
+   * ĐỌC THẲNG TỪ TRƯỜNG NÀY, đừng suy ra từ `role` hay `classId`. Trước đợt gộp
+   * vai trò 01/09/2026, quy tắc "free_user thì false" chỉ nằm trong chú thích mà
+   * chưa bao giờ được ghi vào dữ liệu — nên suy luận sẽ ra kết quả sai.
+   *
+   * Quy ước hiện hành:
+   * - Học sinh do giáo viên tạo: false (GV cấp lại mật khẩu)
+   * - Học sinh tự đăng ký, giáo viên, quản trị: true
    */
   canChangePassword: boolean;
 
@@ -71,7 +105,7 @@ export interface User {
   /**
    * ID lớp học mà học sinh đã tham gia qua mã mời (join class by code).
    * Khác với classId (do Admin/GV gán), joinedClassId là do học sinh tự nhập mã.
-   * Học sinh có thể chuyển từ 'free_user' sang 'student' khi join.
+   * Học sinh có thể chuyển thành học sinh có lớp khi join (classId được đặt).
    */
   joinedClassId?: string;
 
