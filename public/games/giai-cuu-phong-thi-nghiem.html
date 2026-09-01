@@ -34,6 +34,8 @@ CSS → HTML (canvas + các lớp phủ) → JavaScript trong một IIFE ở cu�
 | `function danhDauSanVo(`| Sàn vỡ: giẫm lên là đếm giờ rồi sập |
 | `function blinkPha(`  | Nhịp chớp tắt của sàn thép, dùng chung cho cả màn |
 | `function stepBoss(`  | Boss theo giai đoạn: khóa được van nào thì lò phun quái nhanh hơn |
+| `function checkKGates(`| Cửa kho vật tư: mở bằng số vật tư tích được, không phải bằng ion |
+| `TOTAL.vatTu`         | Vật tư — nằm trong TOTAL để theo người chơi sang màn sau |
 | `const P = {`         | Hằng số vật lí: trọng lực, lực nhảy, tốc độ, nhảy đôi |
 | `const vuaAnPhim`     | Nhảy đôi — chỉ nhận lần ẤN MỚI, không nhận giữ phím |
 | `doCaoNhay(`          | Đo độ cao nhảy bằng ô (cần `?dev=1`), dùng khi chỉnh lực nhảy |
@@ -415,13 +417,14 @@ const T = {
      SOLID thẳng sẽ ra kết quả sai. */
   CRUMBLE:11, // sàn vỡ: giẫm lên là rung rồi sập, một lúc sau mọc lại
   BLINK_A:12, // sàn chớp tắt nhịp lẻ
-  BLINK_B:13  // sàn chớp tắt nhịp chẵn — luôn ngược pha với BLINK_A
+  BLINK_B:13, // sàn chớp tắt nhịp chẵn — luôn ngược pha với BLINK_A
+  KGATE:14    // cửa vật tư: chỉ mở khi mang đủ vật tư lấy từ các ô ? ở màn trước
 };
 /* CRUMBLE (11) có mặt ở đây vì khi còn nguyên nó cứng như gạch; lúc sập thì ô
    được đổi thẳng thành EMPTY nên độ cứng tự đúng theo lưới.
    BLINK_A/B (12, 13) CỐ Ý không có: độ cứng của chúng đổi theo nhịp, phải hỏi
    solidAt() chứ tra bảng này sẽ ra kết quả sai. */
-const SOLID = {1:true, 2:true, 3:true, 4:true, 7:true, 8:true, 9:true, 10:true, 11:true};
+const SOLID = {1:true, 2:true, 3:true, 4:true, 7:true, 8:true, 9:true, 10:true, 11:true, 14:true};
 
 /* ==================== HẰNG SỐ VẬT LÍ ==================== */
 const TS = 36;                 // cạnh một ô, tính bằng pixel
@@ -501,7 +504,7 @@ const LEVELS = [
     id:'2-2',
     name:'Ống khói nhà máy',
     theme:'factory',
-    brief:'Trạm quan trắc báo SO₂ vượt ngưỡng, khói mù đọng thành lớp dưới thấp. Lấy khăn tẩm dung dịch kiềm để đi xuyên qua, hoặc leo bệ cao mà tránh.',
+    brief:'Trạm quan trắc báo SO₂ vượt ngưỡng, khói mù đọng thành lớp dưới thấp. Lấy khăn tẩm dung dịch kiềm để đi xuyên qua, hoặc leo bệ cao mà tránh. Hai cửa kho chắn ngang đường, mỗi cửa đòi vật tư — vật tư có được từ mỗi câu hỏi bạn trả lời đúng, kể cả những câu đã làm ở màn trước.',
     w:150, h:15,
     // Noi rong vuc 3 -> 4 o: nhay don van toi duoc nhung phai chay het da,
     // nhay doi thanh duong cuu khi hut nhip chu khong con la thua thai.
@@ -519,8 +522,22 @@ const LEVELS = [
     // [cột, hàng, rộng, cao] — lớp khói nằm sát mặt đất, đi bộ qua là dính
     gas:[[25,11,5,2],[46,11,6,2],[65,11,5,2],[105,11,7,2],[130,11,6,2]],
     // Ô ? phải nằm ở cột KHÔNG có bệ hàng 10 phía trên, nếu không sẽ bị chắn
-    qblocks:[[9,9],[28,5],[54,9],[70,9],[86,9],[110,5],[137,9],[142,9]],
-    bricks:[[10,9],[29,5],[55,9],[71,9],[87,9],[111,5],[138,9],[143,9]],
+    /* Hai cua kho, moi cua doi 3 vat tu.
+       So o ? TRUOC moi cua phai LON HON so vat tu cua do doi, neu khong thi hoc
+       sinh nao bo qua man 1 va lo tra loi sai mot cau se ket cung: tra loi sai la
+       o ? bien thanh o da dung, khong lam lai duoc, ma cung khong quay ve man
+       truoc duoc. Nen o day:
+         truoc cua 58  co 4 o ? (cot 9, 28, 39, 54) cho nhu cau 3
+         truoc cua 120 co 4 o ? (cot 70, 86, 96, 110) cho nhu cau 3
+       tuc la sai mot cau van qua duoc. Lam o man 1 thi du dat hon nhieu. */
+    kgates:[
+      {col:58, need:3, ten:'Cua kho A',
+       e:'Kho vat tu chi mo cho nguoi biet viec. Moi cau tra loi dung la mot lan chung minh dieu do, o man truoc hay man nay deu duoc tinh.'},
+      {col:120, need:3, ten:'Cua kho B',
+       e:'Cang vao sau khoi SO2 cang day, cua kho cang chac. Van 3 vat tu, nhung lan nay ban da tieu mat so cu roi.'}
+    ],
+    qblocks:[[9,9],[28,5],[39,9],[54,9],[70,9],[86,9],[96,9],[110,5],[137,9],[142,9]],
+    bricks:[[10,9],[29,5],[40,9],[55,9],[71,9],[87,9],[97,9],[111,5],[138,9],[143,9]],
     coins:[
       [14,9],[15,9],[16,9],[31,6],[32,6],[34,9],[35,9],
       [53,6],[54,6],[55,6],[58,9],[59,9],[73,6],[74,6],[78,9],[79,9],
@@ -681,7 +698,10 @@ let G = null;           // trạng thái màn đang chơi
 let running = false;    // vòng lặp có đang chạy không
 let paused = false;
 let askedIdx = [];      // các câu đã hỏi trong phiên, để không lặp lại
-let TOTAL = {score:0, coins:0, lives:3, level:0};
+/* `vatTu` CO Y nam trong TOTAL chu khong nam trong G: G bi dung lai moi lan nap
+   man, con vat tu thi phai theo nguoi choi sang man sau — do la ca y nghia cua
+   co che nay. Chi ve 0 khi choi lai tu dau. */
+let TOTAL = {score:0, coins:0, lives:3, level:0, vatTu:0};
 
 const $ = id => document.getElementById(id);
 const clamp = (v,a,b) => v < a ? a : (v > b ? b : v);
@@ -936,9 +956,16 @@ function buildLevel(def){
   });
   (def.bricks || []).forEach(([x, y]) => set(x, y, T.BRICK));
   (def.qblocks || []).forEach(([x, y]) => set(x, y, T.QBLOCK));
-  // Cửa lọc: cột chắn từ hàng 5 xuống hàng 12. Phải cao tới hàng 5, vì đứng trên
-  // bệ hàng 10 là nhảy được tới hàng 6 — thấp hơn thì vượt cửa được, khỏi cần ion.
-  (def.gates || []).forEach(g => { for(let y=5; y<=12; y++) set(g.col, y, T.GATE); });
+  /* Cửa lọc: cột chắn KÍN từ trần xuống đất.
+     Trước đây chỉ cao tới hàng 5, tính theo tầm nhảy đơn (đứng bệ hàng 10 lên
+     được hàng 6). Từ khi có nhảy đôi (cao 5,29 ô) thì đứng bệ hàng 10 lên tới
+     hàng 3,7 — đã đo và vượt được cửa 46 lẫn cửa 90, tức là bỏ qua được cả phần
+     thu thập ion, hỏng luôn ý nghĩa của màn.
+     Chắn kín tới hàng 0 là cách duy nhất chắc chắn: không có tầm nhảy nào lách
+     qua được, và sau này có chỉnh lực nhảy cũng không phải tính lại. */
+  (def.gates || []).forEach(g => { for(let y=0; y<=12; y++) set(g.col, y, T.GATE); });
+  // Cua vat tu: chan kin tu tran xuong dat, y het cua loc — nhay doi khong lach qua duoc
+  (def.kgates || []).forEach(g => { for(let y=0; y<=12; y++) set(g.col, y, T.KGATE); });
   (def.valves || []).forEach(([x, y]) => set(x, y, T.VALVE));
   if(def.wall != null) for(let y=8; y<=12; y++) set(def.wall, y, T.STONE);
   set(def.flag[0], def.flag[1], T.EMPTY);
@@ -949,6 +976,7 @@ function buildLevel(def){
     // Sàn vỡ đang đếm giờ, khoá là "cột,hàng". Rỗng lúc mới nạp màn.
     vo:new Map(),
     gates:(def.gates || []).map(g => ({...g, open:false, cool:0})),
+    kgates:(def.kgates || []).map(g => ({...g, open:false, cool:0})),
     // hpMax phải chốt lại lúc dựng màn: stepBoss dựa vào nó để biết đang ở giai
     // đoạn thứ mấy, mà b.hp thì giảm dần nên không tự suy ra được.
     boss:def.boss ? {...def.boss, hpMax:def.boss.hp, spawnT:def.boss.spawnEvery,
@@ -1167,6 +1195,7 @@ function step(){
   checkPickups(p);
   if(G.ions.length) checkIons(p);
   if(G.gates.length) checkGates(p);
+  if(G.kgates.length) checkKGates(p);
   stepBoss();
   stepFoes();
   stepFX();
@@ -1319,7 +1348,9 @@ function checkGates(p){
     if(p.x + p.w > gx - TS*1.1 && p.x < gx + TS*2){
       if(bagMatches(g)){
         g.open = true;
-        for(let y=5; y<=12; y++) G.grid[y][g.col] = T.EMPTY;
+        // phai xoa DUNG khoang da dung o buildLevel (0..12), khong phai 5..12:
+        // dung thieu thi mo cua xong van con tuong o tren, nguoi choi thay cua mo ma di khong qua
+        for(let y=0; y<=12; y++) G.grid[y][g.col] = T.EMPTY;
         p.bag = [];
         TOTAL.score += 400;
         Snd.win();
@@ -1336,6 +1367,41 @@ function checkGates(p){
       }else if(g.cool <= 0){
         g.cool = 110;
         toast(gateHint(g));
+      }
+    }
+  });
+}
+
+/* Cua vat tu: mo bang so vat tu tich duoc, khong lien quan gio ion cua man 3.
+   CO Y tach rieng khoi checkGates: hai co che khac nhau ve ban chat (mot ben la
+   dung cong thuc hoa hoc, mot ben la du so luong), tron vao nhau thi sau nay sua
+   cai nay hong cai kia. */
+function checkKGates(p){
+  G.kgates.forEach(g => {
+    if(g.cool > 0) g.cool--;
+    if(g.open) return;
+    const gx = g.col*TS;
+    if(p.x + p.w > gx - TS*1.1 && p.x < gx + TS*2){
+      if(TOTAL.vatTu >= g.need){
+        TOTAL.vatTu -= g.need;
+        g.open = true;
+        for(let y=0; y<=12; y++) G.grid[y][g.col] = T.EMPTY;
+        TOTAL.score += 300;
+        Snd.win();
+        for(let y=4; y<=12; y++)
+          burst(gx + TS/2, y*TS + TS/2, 5, ['#9fd8ff','#ffd75e','#3f4c5e'], {spread:3.6, square:true, size:3});
+        ring(gx + TS/2, 9*TS, '#9fd8ff');
+        popText(gx + TS/2, 7*TS, '+300', '#ffd75e');
+        flashScreen('#ffffff', 12);
+        shakeScreen(9);
+        paused = true;
+        showMsg('Cua da mo', g.ten,
+          g.e + '<br><br>Da dung <b>' + g.need + ' vat tu</b>. Con lai <b>' + TOTAL.vatTu + '</b>.',
+          'Di tiep', () => { hideMsg(); paused = false; });
+      }else if(g.cool <= 0){
+        g.cool = 110;
+        toast('Cua ' + g.ten + ' can ' + g.need + ' vat tu, dang co ' + TOTAL.vatTu
+          + '. Doi dau vao o ? de tra loi cau hoi lay them.');
       }
     }
   });
@@ -1546,7 +1612,13 @@ function answer(i, q, cx, cy, isValve){
     ring(cx*TS + TS/2, cy*TS + TS/2, '#8fd0a0');
     popText(cx*TS + TS/2, cy*TS - 10, '+' + (isValve ? 500 : 300), '#ffe89a');
     if(isValve) damageBoss();
-    else for(let k=-1; k<=1; k++) G.coins.push({x:cx+k, y:cy-2, got:false});
+    else{
+      for(let k=-1; k<=1; k++) G.coins.push({x:cx+k, y:cy-2, got:false});
+      /* Moi cau tra loi dung cho MOT vat tu, mang duoc sang man sau. Van van
+         khong tinh: chung da co phan thuong rieng la khoa lo. */
+      TOTAL.vatTu++;
+      popText(cx*TS + TS/2, cy*TS - 34, '+1 vat tu', '#9fd8ff');
+    }
   }else{
     Snd.wrong();
     burst(cx*TS + TS/2, cy*TS + TS/2, 10, ['#e2604e','#ffb0a0'], {spread:2.6});
@@ -1671,7 +1743,7 @@ const startAt = (function(){
 })();
 
 function restartAll(){
-  TOTAL = {score:0, coins:0, lives:3, level:startAt};
+  TOTAL = {score:0, coins:0, lives:3, level:startAt, vatTu:0};
   askedIdx = [];
   loadLevel(startAt);
 }
@@ -1811,6 +1883,14 @@ function drawTile(cx, cy, t){
     ctx.fillStyle = '#7c8794'; ctx.fillRect(x, y, TS, TS);
     ctx.fillStyle = '#68727e'; ctx.fillRect(x + 2, y + 2, TS - 4, TS - 4);
     ctx.fillStyle = '#8d99a6'; ctx.fillRect(x + 4, y + 4, TS - 8, 4);
+  }
+  else if(t === T.KGATE){                        // cửa kho vật tư: thép tấm có then ngang
+    ctx.fillStyle = '#33506b'; ctx.fillRect(x, y, TS, TS);
+    ctx.fillStyle = '#41637f'; ctx.fillRect(x + 3, y + 3, TS - 6, TS - 6);
+    ctx.fillStyle = '#5c8bad'; ctx.fillRect(x + 3, y + 6, TS - 6, 5);
+    ctx.fillStyle = '#5c8bad'; ctx.fillRect(x + 3, y + TS - 13, TS - 6, 5);
+    ctx.strokeStyle = '#9fd8ff'; ctx.lineWidth = 2.5;
+    ctx.strokeRect(x + 1.5, y + 1.5, TS - 3, TS - 3);
   }
   else if(t === T.GATE){                         // cửa lọc: lưới thép chắn ngang
     ctx.fillStyle = '#3f4c5e'; ctx.fillRect(x, y, TS, TS);
@@ -2245,6 +2325,16 @@ function drawHud(){
 
   const p = G.player;
   let bx = 440;
+
+  /* Vat tu dat o dau day huy hieu ben phai, KHONG dat canh so xu: cho do sat
+     hang trai tim (x = 340), so vat tu hai chu so la de chong len tim. */
+  if(TOTAL.vatTu > 0 || (G.kgates && G.kgates.length)){
+    ctx.fillStyle = '#9fd8ff'; ctx.fillRect(bx, 16, 11, 14);
+    ctx.fillStyle = '#33506b'; ctx.fillRect(bx + 2, 19, 7, 3);
+    ctx.fillStyle = '#fff';
+    ctx.fillText('VAT TU ' + TOTAL.vatTu, bx + 17, 24);
+    bx += 130;
+  }
   if(p.nh3 > 0){
     ctx.fillStyle = '#9fe8f5';
     ctx.fillText('NH₃ ' + Math.ceil(p.nh3/60) + 's', bx, 24);
@@ -2315,12 +2405,18 @@ function legendIcon(fn){
 function buildLegend(){
   const box = $('legend');
   const items = [
-    ['<b>Ô ?</b> — trả lời đúng thì được thưởng xu', g => {
+    ['<b>Ô ?</b> — trả lời đúng được xu và <b>1 vật tư</b>', g => {
       const grad = g.createLinearGradient(0,0,0,TS);
       grad.addColorStop(0,'#ffd75e'); grad.addColorStop(1,'#e0a418');
       g.fillStyle = grad; g.fillRect(0,0,TS,TS);
       g.fillStyle = '#7a5206'; g.font = 'bold 24px sans-serif';
       g.textAlign='center'; g.textBaseline='middle'; g.fillText('?', TS/2, TS/2);
+    }],
+    ['<b>Cửa kho</b> — mở bằng vật tư, mang được sang màn sau', g => {
+      g.fillStyle = '#33506b'; g.fillRect(0,0,TS,TS);
+      g.fillStyle = '#41637f'; g.fillRect(3,3,TS-6,TS-6);
+      g.fillStyle = '#5c8bad'; g.fillRect(3,6,TS-6,5); g.fillRect(3,TS-13,TS-6,5);
+      g.strokeStyle = '#9fd8ff'; g.lineWidth = 2.5; g.strokeRect(1.5,1.5,TS-3,TS-3);
     }],
     ['<b>Vũng acid</b> — chạm vào là mất máu', g => {
       g.fillStyle = '#7d9c05'; g.fillRect(0,0,TS,TS);
