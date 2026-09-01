@@ -816,11 +816,19 @@ const LEVELS = [
     theme:'boss',
     rescue:true,
     brief:'Lò đốt quá tải, khói SO₂ phun ra không ngừng và cô giáo bị kẹt trong lồng phía sau. Ba van lò chỉ khóa được khi bạn cân bằng đúng phương trình ghi trên van.',
+    /* Chặng parkour trước khi vào khu lò.
+       Bể acid rộng 7 ô, chỉ qua được bằng một tấm thép chớp và một ván gỗ sập —
+       vừa phải canh nhịp vừa phải né quái lò đang phun ra. Bệ dẫn lên van 26
+       cũng đổi thành ván gỗ: đứng lâu là sập, nên phải khoá van dứt khoát chứ
+       không đứng đó câu giờ chờ hết quái.
+       Đã đo lại: cả 4 van vẫn đội đầu tới được, và chặng acid qua được. */
     w:52, h:15,
-    ground:[[0,18],[21,31]],
-    acid:[[18,3]],
+    ground:[[0,16],[23,29]],
+    acid:[[16,7]],
     // Không đặt bệ ở hàng 10 trên đầu cột van, nếu không sẽ chắn mất đường đội đầu
-    plats:[[8,10,3],[13,7,3],[24,10,4],[31,7,3],[33,10,3]],
+    plats:[[8,10,3],[31,7,3],[33,10,3]],
+    crumbles:[[20,10,2],[24,10,4]],
+    blinks:[[17,10,2,'a']],
     stone:[],
     // Tường chắn cuối, chỉ mở khi lò đã tắt
     wall:44,
@@ -1120,7 +1128,11 @@ function buildLevel(def){
   // Cửa kho: chắn kín từ trần xuống đất, y hệt cửa lọc — nhảy đôi không lách qua được
   (def.kgates || []).forEach(g => { for(let y=0; y<=12; y++) set(g.col, y, T.KGATE); });
   (def.valves || []).forEach(([x, y]) => set(x, y, T.VALVE));
-  if(def.wall != null) for(let y=8; y<=12; y++) set(def.wall, y, T.STONE);
+  /* Tường chắn lồng giam: chắn KÍN từ trần xuống đất.
+     Trước đây chỉ cao từ hàng 8 — đã đo và thấy NHẢY ĐƠN cũng leo lên nóc rồi
+     đi qua được, tức là bỏ qua được cả trận boss. Lỗi có từ trước khi có nhảy
+     đôi, nhảy đôi chỉ làm nó dễ hơn. */
+  if(def.wall != null) for(let y=0; y<=12; y++) set(def.wall, y, T.STONE);
   set(def.flag[0], def.flag[1], T.EMPTY);
 
   return {
@@ -2075,7 +2087,8 @@ function damageBoss(){
       ['#ffd75e','#e2604e','#8fd0a0','#fff'], {spread:5.2, square:true, size:3.4, life:52});
   popText(bx, 6*TS, 'LÒ ĐÃ TẮT!', '#8fd0a0');
   // hạ tường chắn để đi tới lồng giam
-  if(G.def.wall != null) for(let y=8; y<=12; y++) G.grid[y][G.def.wall] = T.EMPTY;
+  // xoá ĐÚNG khoảng đã dựng (0..12), thiếu thì hạ tường xong vẫn còn phần trên
+  if(G.def.wall != null) for(let y=0; y<=12; y++) G.grid[y][G.def.wall] = T.EMPTY;
   G.foes.forEach(f => { f.alive = false; });
   Snd.win();
   toast('Lò đã tắt! Tường chắn hạ xuống — chạy tới cứu cô giáo.');
