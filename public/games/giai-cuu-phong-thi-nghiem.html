@@ -30,7 +30,10 @@ CSS → HTML (canvas + các lớp phủ) → JavaScript trong một IIFE ở cu�
 | `function locCauChoGame(`| Lọc câu hợp với trò chơi: đúng chương 2, dạng trắc nghiệm |
 | `const LEVELS = [`    | Mô tả các màn bằng toạ độ, KHÔNG vẽ bản đồ bằng chuỗi ký tự |
 | `function buildLevel(`| Dựng lưới ô từ mô tả màn |
-| `const T = {`         | Mã các loại ô (rỗng, đất, gạch, ô ?, acid…) |
+| `const T = {`         | Mã các loại ô (rỗng, đất, gạch, ô ?, acid, sàn vỡ, thép chớp…) |
+| `function danhDauSanVo(`| Sàn vỡ: giẫm lên là đếm giờ rồi sập |
+| `function blinkPha(`  | Nhịp chớp tắt của sàn thép, dùng chung cho cả màn |
+| `function stepBoss(`  | Boss theo giai đoạn: khóa được van nào thì lò phun quái nhanh hơn |
 | `const P = {`         | Hằng số vật lí: trọng lực, lực nhảy, tốc độ, nhảy đôi |
 | `const vuaAnPhim`     | Nhảy đôi — chỉ nhận lần ẤN MỚI, không nhận giữ phím |
 | `doCaoNhay(`          | Đo độ cao nhảy bằng ô (cần `?dev=1`), dùng khi chỉnh lực nhảy |
@@ -406,9 +409,19 @@ const T = {
   STONE:7,    // đá cứng, không phá được
   GATE:8,     // cửa lọc, chỉ mở khi giỏ ion đúng công thức
   VALVE:9,    // van lò, đội đầu vào để cân bằng phương trình
-  VUSED:10    // van đã khóa
+  VUSED:10,   // van đã khóa
+  /* Hai loại sàn cho màn parkour. Chúng cố tình KHÔNG nằm trong bảng SOLID:
+     độ cứng của chúng thay đổi theo thời gian nên phải hỏi solidAt(), tra bảng
+     SOLID thẳng sẽ ra kết quả sai. */
+  CRUMBLE:11, // sàn vỡ: giẫm lên là rung rồi sập, một lúc sau mọc lại
+  BLINK_A:12, // sàn chớp tắt nhịp lẻ
+  BLINK_B:13  // sàn chớp tắt nhịp chẵn — luôn ngược pha với BLINK_A
 };
-const SOLID = {1:true, 2:true, 3:true, 4:true, 7:true, 8:true, 9:true, 10:true};
+/* CRUMBLE (11) có mặt ở đây vì khi còn nguyên nó cứng như gạch; lúc sập thì ô
+   được đổi thẳng thành EMPTY nên độ cứng tự đúng theo lưới.
+   BLINK_A/B (12, 13) CỐ Ý không có: độ cứng của chúng đổi theo nhịp, phải hỏi
+   solidAt() chứ tra bảng này sẽ ra kết quả sai. */
+const SOLID = {1:true, 2:true, 3:true, 4:true, 7:true, 8:true, 9:true, 10:true, 11:true};
 
 /* ==================== HẰNG SỐ VẬT LÍ ==================== */
 const TS = 36;                 // cạnh một ô, tính bằng pixel
@@ -421,15 +434,33 @@ const P = {
      `nhayGiuaKhong` = số lần được nhảy thêm khi đang ở trên không, hồi lại mỗi
      khi chạm đất. `lucNhayGiua` = lần nhảy thứ hai yếu hơn lần đầu.
 
-     Đo bằng `__dev.doCaoNhay()` (mở kèm ?dev=1): nhảy đơn 3,20 ô, nhảy đôi
+     Đo bằng `__dev.doCaoNhay()` (mở kèm ?dev=1): nhảy đơn cao 3,20 ô, nhảy đôi
      5,29 ô. Bản đồ cao 15 ô nên còn xa mới chạm trần; các màn chỉ gồm nền mỏng
      và vực chứ không có tường cao, nên độ cao này không cho vượt qua chỗ nào
      mà màn chơi vốn bắt phải đi vòng. Chỉnh con số này thì ĐO LẠI, đừng ước
-     lượng bằng mắt. */
-  nhayGiuaKhong:1, lucNhayGiua:0.82
+     lượng bằng mắt.
+
+     TẦM BAY NGANG khi tiếp đất cùng độ cao, chạy hết đà: nhảy đơn 4,86 ô,
+     nhảy đôi 7,78 ô. Trừ bề ngang nhân vật thì quy ra bề rộng vực dùng được:
+       vực 3 ô — nhảy đơn qua thoải mái
+       vực 4 ô — nhảy đơn sát nút, nhảy đôi dễ
+       vực 5 ô — BẮT BUỘC nhảy đôi
+     Ba màn đầu dùng lần lượt 3, 4, 5 ô để độ khó lên dần. Rộng hơn 5 ô là chặn
+     đường chứ không phải làm khó. */
+  nhayGiuaKhong:1, lucNhayGiua:0.82,
+
+  /* Sàn parkour. Đơn vị là bước vật lí, 60 bước = 1 giây.
+     `sanVoTre` 26 bước ≈ 0,43 giây: đủ để người chơi kịp thấy sàn rung và nhảy
+     đi, nhưng không đủ để đứng nghỉ. `sanVoHoi` 150 bước ≈ 2,5 giây để người
+     chơi lỡ rơi còn có đường thử lại mà không phải chơi lại cả màn.
+     `blinkNhip` 78 bước ≈ 1,3 giây mỗi pha — đo bằng thời gian đi hết một nhịp
+     nhảy đôi (khoảng 1 giây) cộng chút dư cho kịp phản xạ. */
+  sanVoTre:26, sanVoHoi:150, blinkNhip:78
 };
-/* Tầm nhảy suy ra từ các số trên — bám theo đây khi thiết kế màn, đừng đặt ước chừng:
-   · độ cao nhảy ≈ 122 px ≈ 3,4 ô; tầm xa ≈ 175 px ≈ 4,8 ô (giữ khe hở ≤ 4 ô cho chắc)
+/* Tầm nhảy — số ĐO THẬT bằng __dev.doCaoNhay(), bám theo đây khi thiết kế màn:
+   · cao: nhảy đơn 3,20 ô · nhảy đôi 5,29 ô
+   · xa (tiếp đất cùng độ cao): nhảy đơn 4,86 ô · nhảy đôi 7,78 ô
+   · bề rộng vực: 3 ô nhảy đơn thoải mái · 4 ô sát nút · 5 ô bắt buộc nhảy đôi
    · đứng ở hàng R: đội đầu tới được ô ở hàng R−4 và R−5; đặt CHÂN lên được bệ ở hàng R−3
    · nền ở hàng 13 → bệ đặt ở hàng 10, rồi từ hàng 10 lên tiếp hàng 7
    · ô `?` treo ở hàng 9 (đội từ mặt đất) hoặc hàng 5 (đội từ bệ hàng 10) */
@@ -460,7 +491,9 @@ const LEVELS = [
       [65,11],[66,10],[67,11],[90,11],[91,10],[92,11],
       [110,11],[111,10],[112,11]
     ],
-    foes:[[21,12],[35,12],[57,12],[74,12],[86,12],[104,12],[128,12]],
+    // Man mo dau: GIU vuc 3 o de hoc sinh chua quen van di duoc bang nhay don.
+    // Chi them quai cho dong hon, khong dong den be va vuc.
+    foes:[[21,12],[35,12],[45,12],[57,12],[74,12],[86,12],[98,12],[104,12],[128,12]],
     items:[{x:60,y:6,kind:'nh3'},{x:101,y:6,kind:'shield'}],
     start:[2,12], flag:[129,12]
   },
@@ -470,8 +503,10 @@ const LEVELS = [
     theme:'factory',
     brief:'Trạm quan trắc báo SO₂ vượt ngưỡng, khói mù đọng thành lớp dưới thấp. Lấy khăn tẩm dung dịch kiềm để đi xuyên qua, hoặc leo bệ cao mà tránh.',
     w:150, h:15,
-    ground:[[0,20],[23,18],[44,16],[63,20],[86,14],[103,22],[128,22]],
-    acid:[[20,3],[41,3],[60,3],[83,3],[100,3],[125,3]],
+    // Noi rong vuc 3 -> 4 o: nhay don van toi duoc nhung phai chay het da,
+    // nhay doi thanh duong cuu khi hut nhip chu khong con la thua thai.
+    ground:[[0,20],[24,17],[45,15],[64,19],[87,13],[104,21],[129,21]],
+    acid:[[20,4],[41,4],[60,4],[83,4],[100,4],[125,4]],
     plats:[
       // Đừng đặt bệ hàng 10 ở đúng cột lấy đà trước hố — đội đầu vào bệ là cắt đà, rơi xuống hố
       [14,10,3],[25,10,5],[31,7,3],[34,10,3],
@@ -508,8 +543,10 @@ const LEVELS = [
     theme:'tank',
     brief:'Ba cửa lọc chắn đường, mỗi cửa chỉ mở khi bạn mang đúng các ion tạo nên hợp chất ghi trên biển. Ion nằm rải trên đường đi — ion nào không cần thì nhảy qua, đừng ăn.',
     w:160, h:15,
-    ground:[[0,26],[29,29],[61,34],[98,30],[131,29]],
-    acid:[[26,3],[58,3],[95,3],[128,3]],
+    // Vuc 5 o: cho nay CO Y bat dung nhay doi. Man 2-3 la man cuoi truoc thap
+    // parkour nen day la cho day hoc sinh quen tay truoc khi vao doan kho.
+    ground:[[0,26],[31,27],[63,32],[100,28],[133,27]],
+    acid:[[26,5],[58,5],[95,5],[128,5]],
     plats:[
       [10,10,3],[31,10,3],[36,7,3],[50,10,4],[67,10,3],
       [70,10,3],[75,7,3],[86,10,3],[104,10,3],[109,7,3],
@@ -546,7 +583,65 @@ const LEVELS = [
     start:[2,12], flag:[157,12]
   },
   {
+    /* Màn parkour. Cố ý KHÔNG có quái: bệ ở đây phần lớn rộng 2–3 ô và tự sập
+       hoặc tự tắt, thả quái lên đó thì người chơi chết vì hết chỗ đứng chứ
+       không phải vì đánh trượt — đó là khó một cách vô lý.
+       Thử thách nằm ở nhịp: ván gỗ sập sau ~0,43 giây, tấm thép đổi pha mỗi
+       ~1,3 giây, nên không có chỗ nào đứng nghỉ được. */
     id:'2-4',
+    name:'Tháp giải nhiệt',
+    theme:'parkour',
+    brief:'Sàn tháp đã mục. Ván gỗ giẫm lên là rung rồi sập, tấm thép chỉ hiện theo nhịp bơm — hai hàng thép luôn ngược pha nhau. Ở đoạn thép, canh nhịp quan trọng hơn nhảy cao: nhảy đôi mà cứ giữ phím chạy là bay vọt qua bệ, nhớ nhả phím giữa chừng.',
+    /* Bậc thang độ khó, cố ý theo đúng thứ tự này:
+       bệ gạch tĩnh (làm quen) → ván gỗ sập → thép chớp có bệ tĩnh xen giữa để
+       chờ nhịp → thép chớp liên tiếp không chỗ nghỉ → lên cao → ván gỗ về đích.
+       Mọi bệ rộng 3 ô và mọi khe rộng tối đa 3 ô: nhảy đơn với tới được hết,
+       nhảy đôi là để sửa sai chứ không phải điều kiện bắt buộc — hụt một nhịp
+       vẫn còn đường cứu, mới đáng chơi lại.
+
+       ĐÃ ĐO từng khe (đặt nhân vật ở mép bệ với đà đầy đủ rồi nhảy, quét trọn
+       hai chu kì chớp): 18/21 khe qua được bằng nhảy đơn ở bất kì lúc nào. Ba
+       khe còn lại nằm giữa hai tấm thép NGƯỢC PHA nên phải canh nhịp — cửa sổ
+       hợp lệ 11–17 trên 26 thời điểm thử, tức khoảng nửa chu kì, rộng chứ không
+       đánh đố.
+
+       Một chỗ dễ tưởng là lỗi màn: nhảy đôi mà GIỮ nguyên phím chạy thì trượt
+       cả ba khe đó (0/26), vì tầm nhảy đôi ~7,6 ô trong khi khe chỉ 2–3 ô và bệ
+       rộng 3 ô — bay vọt qua luôn. Nhả phím hướng giữa chừng thì qua được
+       12–16/26. Đây là thao tác bình thường của thể loại, đừng "sửa" bằng cách
+       nới bệ rộng ra. */
+    w:124, h:15,
+    ground:[[0,14],[116,8]],
+    acid:[[14,102]],                       // cả quãng giữa là bể acid, rơi là mất máu
+    plats:[                                // bệ gạch tĩnh: chỗ làm quen và chỗ thở
+      [16,10,3],[21,10,3],[26,10,3],
+      [51,10,3],[60,10,3],[85,10,3],[112,10,3]
+    ],
+    crumbles:[
+      [31,10,3],[36,10,3],[41,10,3],[46,10,3],      // đoạn ván gỗ đầu
+      [102,10,3],[107,10,3]                          // chặng cuối
+    ],
+    blinks:[
+      [56,10,3,'a'],[64,10,3,'b'],                   // có bệ tĩnh ở giữa để chờ nhịp
+      [69,10,3,'a'],[74,10,3,'b'],[79,10,3,'a'],     // ba tấm liên tiếp, không chỗ nghỉ
+      [90,7,3,'b'],[96,7,3,'a']                      // tuyến trên
+    ],
+    stone:[],
+    qblocks:[[17,7],[52,7],[86,7],[113,7]],
+    bricks:[],
+    coins:[
+      [17,9],[22,9],[27,9],
+      [32,9],[37,9],[42,9],[47,9],
+      [57,9],[65,9],[70,9],[75,9],[80,9],
+      [91,6],[97,6],
+      [103,9],[108,9],[113,9]
+    ],
+    foes:[],
+    items:[{x:26,y:7,kind:'shield'},{x:85,y:7,kind:'nh3'}],
+    start:[2,12], flag:[120,12]
+  },
+  {
+    id:'2-5',
     name:'Lò đốt',
     theme:'boss',
     rescue:true,
@@ -559,10 +654,13 @@ const LEVELS = [
     stone:[],
     // Tường chắn cuối, chỉ mở khi lò đã tắt
     wall:44,
-    boss:{hp:3, col:47, spawnEvery:60*5},
-    valves:[[6,9],[26,5],[38,9]],
+    /* spawnEvery 5 giây lúc đầu, mỗi van khóa được thì nhanh thêm 1 giây, sàn
+       dưới 2 giây. `toiDa` là số quái cùng lúc trên màn — giữ 6, tăng nữa thì
+       không còn chỗ nhảy chứ không phải khó hơn. */
+    boss:{hp:4, col:47, spawnEvery:60*5, spawnGiam:60, spawnMin:60*2, toiDa:6},
+    valves:[[6,9],[26,5],[38,9],[42,9]],
     qblocks:[],
-    bricks:[[7,9],[27,5],[39,9]],
+    bricks:[[7,9],[27,5],[39,9],[43,9]],
     coins:[
       [8,9],[9,9],[10,9],[13,6],[14,6],[24,9],[25,9],
       [31,6],[32,6],[33,9],[34,9],
@@ -703,6 +801,12 @@ const TUNES = {
     lead:['D5',0,'F5',0,'A5',0,'G5',0,'F5',0,'D5',0,'E5',0,'F5',0,
           'A5',0,'D6',0,'C6',0,'A5',0,'G5',0,'F5',0,'D5',0,0,0],
     bass:['D3',0,0,0,'A2',0,0,0,'B2',0,0,0,'F2',0,0,0] },
+  /* Màn parkour: nhanh nhất bộ, giai điệu chạy nốt liền bậc để tai bám được
+     nhịp — người chơi canh nhảy theo nhạc chứ không chỉ theo mắt. */
+  parkour:{ bpm:168,
+    lead:['G4','B4','D5','G5','F#5','D5','B4','G4','A4','C5','E5','A5','G5','E5','C5','A4',
+          'B4','D5','G5','B5','A5','F#5','D5','B4','C5','E5','A5','C6','B5','G5','D5',0],
+    bass:['G2','G2',0,'G2','D2','D2',0,'D2','E2','E2',0,'E2','C2','C2',0,'C2'] },
   boss:{ bpm:150,
     lead:['E4','F4','E4','D#4','E4','B4','E5','D#5','E5','B4','G4','E4','C5','B4','A#4',0,
           'E4','F4','E4','D#4','E4','C5','E5','D#5','E5','C5','A4','E4','D5','C5','B4',0],
@@ -818,6 +922,12 @@ function buildLevel(def){
   });
   (def.plats || []).forEach(([x, y, w]) => { for(let i=0; i<w; i++) set(x+i, y, T.BRICK); });
   (def.stone || []).forEach(([x, y, w]) => { for(let i=0; i<w; i++) set(x+i, y, T.STONE); });
+  // Sàn parkour: [cột, hàng, độ rộng]. `blinks` nhận thêm 'a' hoặc 'b' để chọn pha.
+  (def.crumbles || []).forEach(([x, y, w]) => { for(let i=0; i<w; i++) set(x+i, y, T.CRUMBLE); });
+  (def.blinks || []).forEach(([x, y, w, pha]) => {
+    const t = pha === 'b' ? T.BLINK_B : T.BLINK_A;
+    for(let i=0; i<w; i++) set(x+i, y, t);
+  });
   (def.bricks || []).forEach(([x, y]) => set(x, y, T.BRICK));
   (def.qblocks || []).forEach(([x, y]) => set(x, y, T.QBLOCK));
   // Cửa lọc: cột chắn từ hàng 5 xuống hàng 12. Phải cao tới hàng 5, vì đứng trên
@@ -830,8 +940,13 @@ function buildLevel(def){
   return {
     def, grid, w:def.w, h:def.h,
     gas:(def.gas || []).map(([x,y,w,h]) => ({x, y, w, h})),
+    // Sàn vỡ đang đếm giờ, khoá là "cột,hàng". Rỗng lúc mới nạp màn.
+    vo:new Map(),
     gates:(def.gates || []).map(g => ({...g, open:false, cool:0})),
-    boss:def.boss ? {...def.boss, spawnT:def.boss.spawnEvery, dead:false, shake:0} : null,
+    // hpMax phải chốt lại lúc dựng màn: stepBoss dựa vào nó để biết đang ở giai
+    // đoạn thứ mấy, mà b.hp thì giảm dần nên không tự suy ra được.
+    boss:def.boss ? {...def.boss, hpMax:def.boss.hp, spawnT:def.boss.spawnEvery,
+                     dead:false, shake:0} : null,
     ions:(def.ions || []).map(([x, ion]) => ({x, y:12, ion, wait:0})),
     coins:(def.coins || []).map(([x,y]) => ({x, y, got:false})),
     items:(def.items || []).map(o => ({x:o.x, y:o.y, kind:o.kind, got:false})),
@@ -915,7 +1030,18 @@ function tileAt(x, y){
   if(cx < 0 || cx >= G.w) return T.STONE;   // chặn mép màn
   return G.grid[cy][cx];
 }
-function solidAt(x, y){ return !!SOLID[tileAt(x, y)]; }
+/* Nhịp chớp tắt của sàn BLINK, đếm theo bước vật lí nên không lệ thuộc tốc độ
+   khung hình. Một biến toàn cục thay vì trạng thái từng ô: mọi sàn chớp phải
+   cùng pha, nếu lệch nhau thì người chơi không đọc được nhịp để canh nhảy. */
+let blinkT = 0;
+function blinkPha(){ return Math.floor(blinkT / P.blinkNhip) % 2; }
+
+function solidAt(x, y){
+  const t = tileAt(x, y);
+  if(t === T.BLINK_A) return blinkPha() === 0;
+  if(t === T.BLINK_B) return blinkPha() === 1;
+  return !!SOLID[t];
+}
 
 /* Quét các ô mà hình chữ nhật đè lên, gọi fn(cx, cy, tile) */
 function eachTile(bx, by, bw, bh, fn){
@@ -1014,6 +1140,10 @@ function step(){
   moveX(p, p.vx);
   const hitRow = moveY(p, p.vy);
   if(hitRow !== null) hitBlock(p, hitRow);
+
+  blinkT++;
+  capNhatSanVo();
+  if(p.onGround) danhDauSanVo(p);
 
   // vừa chạm đất sau khi rơi nhanh: nhún người và tung bụi
   if(p.onGround && dangBay && vyTruoc > 7){
@@ -1293,6 +1423,45 @@ function respawn(){
   G.cam = 0;
 }
 
+/* ==================== SÀN PARKOUR ==================== */
+
+/* Nhân vật vừa đứng lên sàn vỡ nào thì bắt đầu đếm giờ cho sàn đó.
+   Quét ba điểm dưới chân (trái, giữa, phải) chứ không chỉ điểm giữa: đứng vắt
+   nửa người sang ô bên cạnh vẫn phải làm ô đó rung, nếu không người chơi sẽ
+   thấy có chỗ giẫm mãi không sập. */
+function danhDauSanVo(p){
+  const y = p.y + p.h + 1;
+  [p.x + 2, p.x + p.w/2, p.x + p.w - 2].forEach(x => {
+    if(tileAt(x, y) !== T.CRUMBLE) return;
+    const cx = Math.floor(x / TS), cy = Math.floor(y / TS);
+    const k = cx + ',' + cy;
+    if(!G.vo.has(k)) G.vo.set(k, {cx, cy, pha:'rung', t:P.sanVoTre});
+  });
+}
+
+function capNhatSanVo(){
+  G.vo.forEach((o, k) => {
+    if(--o.t > 0) return;
+    if(o.pha === 'rung'){
+      G.grid[o.cy][o.cx] = T.EMPTY;
+      o.pha = 'mat'; o.t = P.sanVoHoi;
+      Snd.bump();
+      burst(o.cx*TS + TS/2, o.cy*TS + TS/2, 9, ['#c9b28a','#8f7a58'],
+            {spread:2.2, grav:.16, life:26, size:2.4});
+    }else{
+      /* Mọc lại — nhưng KHÔNG mọc khi nhân vật đang đứng chồng lên ô đó, vì ô
+         đặc hiện ra ngay trong người sẽ đẩy nhân vật kẹt vào tường hoặc xuyên
+         qua sàn. Cứ thử lại ở bước sau cho tới khi trống chỗ. */
+      const p = G.player;
+      const chong = p.x + p.w > o.cx*TS && p.x < (o.cx+1)*TS
+                 && p.y + p.h > o.cy*TS && p.y < (o.cy+1)*TS;
+      if(chong){ o.t = 12; return; }
+      G.grid[o.cy][o.cx] = T.CRUMBLE;
+      G.vo.delete(k);
+    }
+  });
+}
+
 /* ==================== LỚP PHỦ CÂU HỎI ==================== */
 function pickQuestion(){
   if(askedIdx.length >= QUESTIONS.length) askedIdx = [];
@@ -1419,11 +1588,18 @@ function stepBoss(){
   if(b.shake > 0) b.shake--;
   if(b.dead) return;
   if(--b.spawnT > 0) return;
-  b.spawnT = b.spawnEvery;
+
+  /* Lò vào giai đoạn nặng hơn sau mỗi van bị khóa: phun quái dày hơn và quái
+     chạy nhanh hơn. Nếu để nhịp cố định thì van cuối lại dễ hơn van đầu — lúc
+     đó người chơi đã thuộc đường đi và đã ăn hết vật phẩm. */
+  const doanDaXong = b.hpMax - b.hp;                    // 0, 1, 2…
+  b.spawnT = Math.max(b.spawnMin, b.spawnEvery - doanDaXong * b.spawnGiam);
+
   const live = G.foes.filter(f => f.alive).length;
-  if(live >= 6) return;                       // đừng để màn hình ngập quái
+  if(live >= b.toiDa) return;                 // đừng để màn hình ngập quái
   G.foes.push({
-    x:(b.col - 3)*TS, y:11*TS, w:28, h:26, vx:-1.35, alive:true, t:0
+    x:(b.col - 3)*TS, y:11*TS, w:28, h:26,
+    vx:-(1.35 + doanDaXong * 0.22), alive:true, t:0
   });
   Snd.bump();
 }
@@ -1514,6 +1690,10 @@ function draw(){
     sky.addColorStop(0, '#6b6f7d'); sky.addColorStop(.55, '#a89a86'); sky.addColorStop(1, '#d8c9a8');
   }else if(G.def.theme === 'tank'){
     sky.addColorStop(0, '#1f5f6b'); sky.addColorStop(.6, '#3f93a0'); sky.addColorStop(1, '#8fc9cf');
+  }else if(G.def.theme === 'parkour'){
+    // Trời chiều tím trên đỉnh tháp giải nhiệt: sáng đủ để nhìn rõ mép sàn,
+    // nhưng khác hẳn màu trời xanh của màn 2-1 để người chơi biết đã sang chặng mới.
+    sky.addColorStop(0, '#3b2f5e'); sky.addColorStop(.55, '#7a5a86'); sky.addColorStop(1, '#d8a08a');
   }else if(G.def.theme === 'boss'){
     const cooled = G.boss && G.boss.dead;
     if(cooled){ sky.addColorStop(0, '#2b4a6b'); sky.addColorStop(.6, '#5f86ad'); sky.addColorStop(1, '#a8c6e0'); }
@@ -1645,6 +1825,63 @@ function drawTile(cx, cy, t){
     ctx.moveTo(x + TS/4, y + TS/2); ctx.lineTo(x + TS/4, y + TS);
     ctx.moveTo(x + TS*.75, y + TS/2); ctx.lineTo(x + TS*.75, y + TS);
     ctx.stroke();
+  }
+  else if(t === T.CRUMBLE){
+    /* Sàn vỡ: ván gỗ có khe nứt. Khi đang đếm giờ thì rung ngang và nứt đỏ dần,
+       để người chơi thấy trước là sắp sập chứ không bị sập bất ngờ. */
+    const o = G.vo.get(cx + ',' + cy);
+    const rung = o && o.pha === 'rung' ? Math.sin(blinkT * 1.4) * 2.2 : 0;
+    const gap = o && o.pha === 'rung' ? 1 - o.t / P.sanVoTre : 0;
+    ctx.save(); ctx.translate(rung, 0);
+    /* Màu xám mốc, KHÁC hẳn gạch cam của bệ tĩnh. Lúc đầu để màu gỗ nâu thì
+       trong ảnh chụp gần như trùng với gạch — nhìn không ra sàn nào sắp sập thì
+       màn parkour thành đánh đố. Thêm vết nứt vẽ SẴN (chưa giẫm cũng thấy) và
+       ba khe ván để nhận ra ngay từ xa. */
+    ctx.fillStyle = '#9a9382'; ctx.fillRect(x, y, TS, TS);
+    ctx.fillStyle = '#7e7768'; ctx.fillRect(x, y + TS - 8, TS, 8);
+    ctx.fillStyle = '#b3ac99'; ctx.fillRect(x, y, TS, 5);
+    ctx.strokeStyle = 'rgba(40,36,28,.55)'; ctx.lineWidth = 2;   // khe giữa các ván
+    for(let i=1; i<=2; i++){
+      ctx.beginPath();
+      ctx.moveTo(x + i*TS/3, y); ctx.lineTo(x + i*TS/3, y + TS);
+      ctx.stroke();
+    }
+    ctx.strokeStyle = 'rgba(40,36,28,.42)'; ctx.lineWidth = 1.6; // vết nứt cố định
+    ctx.beginPath();
+    ctx.moveTo(x + 4, y + TS - 4); ctx.lineTo(x + TS*0.4, y + TS*0.55);
+    ctx.lineTo(x + TS*0.58, y + TS*0.75); ctx.lineTo(x + TS - 5, y + 5);
+    ctx.stroke();
+    if(gap > 0){                                   // vết nứt loang ra khi sắp sập
+      ctx.strokeStyle = 'rgba(226,96,78,' + (0.35 + gap*0.65).toFixed(2) + ')';
+      ctx.lineWidth = 1 + gap*2.4;
+      ctx.beginPath();
+      ctx.moveTo(x + 5, y + TS); ctx.lineTo(x + TS*0.42, y + TS*0.45);
+      ctx.lineTo(x + TS*0.62, y + TS*0.7); ctx.lineTo(x + TS - 4, y + 3);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+  else if(t === T.BLINK_A || t === T.BLINK_B){
+    /* Sàn chớp tắt. Lúc đặc thì vẽ kín, lúc rỗng vẫn vẽ viền mờ — phải nhìn
+       thấy chỗ sàn sắp hiện thì mới canh nhảy được; xoá hẳn là đánh đố. */
+    const hien = (t === T.BLINK_A) === (blinkPha() === 0);
+    const conLai = P.blinkNhip - (blinkT % P.blinkNhip);
+    const sapDoi = conLai < 24;                    // nhấp nháy báo trước ~0,4 giây
+    if(hien){
+      ctx.globalAlpha = sapDoi && Math.floor(blinkT/5) % 2 ? .55 : 1;
+      ctx.fillStyle = '#3f7fae'; ctx.fillRect(x, y, TS, TS);
+      ctx.fillStyle = '#5aa9e6'; ctx.fillRect(x + 2, y + 2, TS - 4, 6);
+      ctx.strokeStyle = '#9fd8ff'; ctx.lineWidth = 2;
+      ctx.strokeRect(x + 1.5, y + 1.5, TS - 3, TS - 3);
+      ctx.globalAlpha = 1;
+    }else{
+      ctx.globalAlpha = sapDoi && Math.floor(blinkT/5) % 2 ? .5 : .22;
+      ctx.strokeStyle = '#9fd8ff'; ctx.lineWidth = 2;
+      ctx.setLineDash([5, 4]);
+      ctx.strokeRect(x + 2, y + 2, TS - 4, TS - 4);
+      ctx.setLineDash([]);
+      ctx.globalAlpha = 1;
+    }
   }
   else if(t === T.QBLOCK){
     const g = ctx.createLinearGradient(x, y, x, y + TS);
