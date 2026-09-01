@@ -48,6 +48,16 @@ export interface Question {
   /** Chủ đề câu hỏi (VD: Cân bằng hóa học, v.v.) */
   topic?: string;
 
+  /**
+   * Bài học mà câu hỏi thuộc về — khớp `Chapter.id` / `Lesson.id` trong
+   * curriculum: `chuong-1`…`chuong-6` và `bai-1`…`bai-25`.
+   *
+   * BẮT BUỘC nếu muốn câu hỏi được đưa vào đề kiểm tra. Để dấu `?` vì câu cũ
+   * trong kho chưa chắc đã gắn bài (hiện còn 36 câu bỏ trống).
+   */
+  chapterId?: string;
+  lessonId?: string;
+
   /** Chỉ dùng cho Trắc nghiệm */
   options?: QuestionOption[];
 

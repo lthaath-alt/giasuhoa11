@@ -23,7 +23,7 @@ function ChemicalText({ html }: { html: string }) {
 export const QuizPage: React.FC = () => {
   const { quizId } = useParams<{ quizId: string }>();
   const navigate = useNavigate();
-  const { currentUser, updateLessonProgress, getLessonProgress, curriculum } = useApp();
+  const { currentUser, updateLessonProgress, getLessonProgress, curriculum, libraryQuestions } = useApp();
 
   const [quiz, setQuiz] = useState<Quiz | null>(null);
   const [answers, setAnswers] = useState<Record<string, string>>({});
@@ -245,9 +245,15 @@ export const QuizPage: React.FC = () => {
     }, 1200);
   };
 
-  const handleRetry = () => {
+  const handleRetry = async () => {
     if (!quiz) return;
-    const retryQuiz = QuizService.createRetryQuiz(quiz.chapterId, quiz.lessonId, currentUser!.email, quiz.questions.map(q => q.id));
+    const retryQuiz = await QuizService.createRetryQuiz(
+      quiz.chapterId,
+      quiz.lessonId,
+      currentUser!.email,
+      quiz.questions.map(q => q.id),
+      libraryQuestions,
+    );
     if (!retryQuiz) {
       setErrorMsg('Không đủ câu hỏi mới trong ngân hàng để tạo đề làm lại. Vui lòng quay lại màn hình học tập và liên hệ giáo viên.');
       setShowRetryDialog(false);

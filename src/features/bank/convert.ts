@@ -134,6 +134,11 @@ export function toLegacy(b: BankQuestion): Question {
 
   if (b.topic) out.topic = b.topic;
 
+  /* Giữ liên kết bài học khi đổi mô hình. Thiếu hai trường này thì câu bước ra
+     khỏi ngân hàng là "mồ côi" — đề kiểm tra không biết nó thuộc bài nào. */
+  if (b.lessonId) out.lessonId = b.lessonId;
+  if (b.chapterId) out.chapterId = b.chapterId;
+
   if (t === 'mc') {
     out.options = (b.o || []).slice(0, 4).map((text, i) => ({ key: KEYS[i], text }));
     out.correctAnswer = KEYS[typeof b.a === 'number' ? b.a : 0];

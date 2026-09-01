@@ -15,7 +15,7 @@
 // CỐ Ý dùng collection MỚI thay vì ghi đè `questions`: dữ liệu cũ giữ nguyên làm
 // đường lùi, chuyển đổi sai vẫn khôi phục được.
 
-import { collection, doc, getDocs, setDoc, deleteDoc, writeBatch } from 'firebase/firestore';
+import { collection, doc, getDocs, setDoc, deleteDoc, writeBatch, getCountFromServer, query, where } from 'firebase/firestore';
 import { db } from '../../core/services/firebase';
 import { BankQuestion, BankStore, emptyStore, chuanHoaCau } from './types';
 
@@ -96,6 +96,19 @@ function clean<T extends Record<string, unknown>>(o: T): Record<string, unknown>
 
 export const BankFirestore = {
   /**
+   * Đếm số lượng câu hỏi trong collection bank_questions.
+   */
+  async getCount(): Promise<number> {
+    try {
+      const snap = await getCountFromServer(collection(db, COL_BANK));
+      return snap.data().count;
+    } catch {
+      const snap = await getDocs(collection(db, COL_BANK));
+      return snap.docs.length;
+    }
+  },
+
+  /**
    * CỐ Ý ném lỗi ra ngoài thay vì trả mảng rỗng.
    *
    * Nếu nuốt lỗi, mất mạng hay thiếu quyền sẽ hiện y như "ngân hàng trống" —
@@ -107,6 +120,30 @@ export const BankFirestore = {
     // chuanHoaCau: 148 cau mau cua tro choi khong co truong `t`, thieu no thi
     // BankManager khong ve phuong an nao. Xem chu thich trong types.ts.
     return snap.docs.map(d => chuanHoaCau({ ...(d.data() as BankQuestion), id: d.id }));
+  },
+
+  /**
+   * Câu hỏi đã gắn vào một bài học cụ thể.
+   *
+   * Dùng `where` thay vì tải cả ngân hàng rồi lọc: đề kiểm tra chỉ cần vài câu,
+   * còn ngân hàng có ảnh base64 nên tải hết rất nặng cho máy học sinh.
+   *
+   * Câu chưa gắn `lessonId` sẽ không khớp — đúng ý: thà đề trống còn hơn lấy
+   * nhầm câu của bài khác.
+   */
+  async getByLesson(lessonId: string): Promise<BankQuestion[]> {
+    if (!lessonId) return [];
+    try {
+      const snap = await getDocs(
+        query(collection(db, COL_BANK), where('lessonId', '==', lessonId)),
+      );
+      return snap.docs.map(d => chuanHoaCau({ ...(d.data() as BankQuestion), id: d.id }));
+    } catch (err) {
+      // Mất mạng / thiếu quyền: trả rỗng để chỗ gọi tự quyết, KHÔNG chặn chat.
+      // Log ra để phân biệt "bài chưa có câu" với "không đọc được ngân hàng".
+      console.error('[Quiz] Không đọc được bank_questions cho bài', lessonId, err);
+      return [];
+    }
   },
 
   async save(q: BankQuestion): Promise<boolean> {

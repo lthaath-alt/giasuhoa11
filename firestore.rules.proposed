@@ -1,0 +1,103 @@
+rules_version = '2';
+
+// ─────────────────────────────────────────────────────────────────────────────
+// BẢN ĐỀ XUẤT — CHƯA DEPLOY. Đọc hết phần ghi chú trước khi dùng.
+//
+// Đổi tên thành `firestore.rules` và thêm khoá "rules" vào firebase.json thì
+// mới deploy được. Cố ý để tên khác để không lỡ tay đẩy lên.
+// ─────────────────────────────────────────────────────────────────────────────
+//
+// ⚠️ ĐIỀU KIỆN TIÊN QUYẾT MÀ DỰ ÁN CHƯA CÓ
+//
+// App KHÔNG dùng Firebase Auth. Đăng nhập được làm thủ công trong
+// `src/core/services/firestoreAuth.ts`: đọc thẳng collection `users` rồi so
+// chuỗi mật khẩu ngay trên trình duyệt (dòng 65: `userData.password !== password`).
+//
+// Hệ quả với Security Rules: `request.auth` LUÔN LUÔN null với mọi truy vấn từ
+// app này. Nên mọi luật kiểu:
+//
+//     allow read: if request.auth != null;              // ❌ chặn sạch app
+//     allow read: if request.auth.token.role == 'admin' // ❌ chặn sạch app
+//
+// sẽ làm CHẾT TOÀN BỘ ứng dụng, kể cả màn hình đăng nhập. Không phân biệt được
+// "học sinh đã đăng nhập" với "người lạ trên Internet" ở tầng rules, vì với
+// Firestore cả hai đều là cùng một khách vô danh.
+//
+// Vì vậy bản dưới đây KHÔNG siết được gì so với hiện tại. Nó chỉ:
+//   - Viết tường minh ra những gì đang ngầm mở, để về sau còn rà soát.
+//   - Chặn hẳn vài collection app không hề dùng.
+//   - Đánh dấu rõ chỗ nào đang hở và vì sao chưa vá được bằng rules.
+//
+// Cách vá thật sự nằm ở mục "LỘ TRÌNH" cuối file.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Nội dung học liệu: đọc công khai là ĐÚNG Ý ─────────────────────────
+    // Đây chính là thứ bạn hỏi: học sinh đọc được `bank_questions` để làm đề.
+    // Hiện đã đọc được (tôi thử với phiên chưa đăng nhập: lấy ra 21 câu của
+    // bai-1), nên đề kiểm tra sẽ chạy bình thường.
+    //
+    // Ghi vẫn phải mở vì màn hình Ngân hàng dữ liệu của giáo viên ghi thẳng từ
+    // trình duyệt mà không có danh tính Firebase nào để kiểm tra.
+    match /bank_questions/{doc} {
+      allow read: if true;
+      allow write: if true;   // TODO: siết sau khi có Firebase Auth
+    }
+
+    match /questions/{doc}   { allow read: if true; allow write: if true; }
+    match /curriculum/{doc}  { allow read: if true; allow write: if true; }
+    match /exams/{doc}       { allow read: if true; allow write: if true; }
+    match /equations/{doc}   { allow read: if true; allow write: if true; }
+    match /matrix_resources/{doc} { allow read: if true; allow write: if true; }
+
+    // ── Dữ liệu cá nhân: ĐANG HỞ, rules không cứu được ────────────────────
+    //
+    // `users` chứa `password` LƯU DẠNG PLAIN TEXT (chú thích của chính dự án ở
+    // firestoreAuth.ts dòng 21). Collection này bắt buộc phải cho đọc công khai
+    // thì hàm đăng nhập mới chạy — nó tải bản ghi user về máy khách rồi mới so
+    // mật khẩu. Nghĩa là bất kỳ ai biết projectId đều đọc được toàn bộ tài
+    // khoản và mật khẩu.
+    //
+    // KHÔNG có cách nào sửa bằng rules: Firestore không lọc được theo từng
+    // trường, mà bỏ quyền đọc thì không ai đăng nhập được nữa.
+    match /users/{doc} {
+      allow read: if true;    // ⚠️ HỞ — xem LỘ TRÌNH
+      allow write: if true;   // ⚠️ HỞ — cần cho đăng ký tài khoản
+    }
+
+    // Nội dung trò chuyện của học sinh với gia sư AI.
+    match /chats/{doc} {
+      allow read: if true;    // ⚠️ HỞ — app lọc theo userEmail ở phía client
+      allow write: if true;
+    }
+
+    match /progress/{doc}     { allow read: if true; allow write: if true; }
+    match /schools/{doc}      { allow read: if true; allow write: if true; }
+    match /classes/{doc}      { allow read: if true; allow write: if true; }
+
+    // ── Mọi thứ còn lại: chặn ─────────────────────────────────────────────
+    // App không đụng tới, nên đóng lại để thu hẹp bề mặt tấn công.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LỘ TRÌNH VÁ THẬT SỰ (không làm được bằng rules)
+//
+// 1. Chuyển đăng nhập sang Firebase Auth (`signInWithEmailAndPassword`).
+//    Mật khẩu do Firebase giữ và băm, không nằm trong Firestore nữa.
+// 2. Chuyển `users` thành hồ sơ không chứa mật khẩu, khoá theo chủ sở hữu:
+//         match /users/{uid} {
+//           allow read:  if request.auth != null && request.auth.uid == uid;
+//           allow write: if request.auth != null && request.auth.uid == uid;
+//         }
+// 3. Gắn Custom Claims cho vai trò, rồi siết ghi trên học liệu:
+//         allow write: if request.auth.token.role in ['admin', 'teacher'];
+// 4. Khoá `chats` theo chủ sở hữu thay vì lọc ở client.
+// 5. ĐỔI TOÀN BỘ MẬT KHẨU hiện có — chúng đã nằm ở dạng đọc được công khai.
+//
+// Trước khi làm xong bước 1, đừng deploy bất kỳ luật nào có `request.auth`.
+// ─────────────────────────────────────────────────────────────────────────────

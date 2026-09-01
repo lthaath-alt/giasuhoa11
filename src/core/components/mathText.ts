@@ -1,33 +1,28 @@
-// ─── Đổi LaTeX của AI thành chữ đọc được ─────────────────────────────────────
+// ─── Đổi ký hiệu công thức của AI thành chỉ số trên/dưới ─────────────────────
 //
-// Gemini rất hay viết công thức bằng LaTeX, nhất là phân số kiểu hằng số cân
-// bằng Kc. Giao diện này không dựng LaTeX nên học sinh thấy nguyên chuỗi thô:
+// Gemini viết công thức hóa học theo hai kiểu, tùy câu:
 //
-//   $K_c = \frac{[C]^c \times [D]^d}{[A]^a \times [B]^b}$
+//   1. LaTeX trong cặp đô la:  $K_c = \frac{[C]^c}{[A]^a}$
+//   2. Viết trần, không đô la: K_c, H_2SO_4, Fe^2+, 10^-7, K_{sp}
 //
-// Đã thử cấm trong SYSTEM_PROMPT nhưng model vẫn dùng — và cũng dễ hiểu, vì
-// phân số thật sự khó viết bằng chữ thuần. Nên xử lý ở phía hiển thị: đây là
-// cách chắc chắn, không phụ thuộc model có nghe lời hay không.
+// SYSTEM_PROMPT đã cấm LaTeX nên kiểu (2) mới là kiểu chiếm đa số.
 //
-// CỐ Ý không kéo thư viện KaTeX về: nó nặng vài trăm KB cho một nhu cầu nhỏ,
-// trong khi đổi sang ký tự Unicode là đủ đọc.
+// CỐ Ý không kéo thư viện KaTeX về: nó nặng vài trăm KB cho một nhu cầu nhỏ.
+//
+// CỐ Ý KHÔNG đổi sang ký tự Unicode kiểu ₂ ⁺ nữa. Bảng Unicode chỉ có chỉ số
+// dưới cho vài chữ cái (a, n, p, x) — KHÔNG có b, c, d, e, s... Bản trước phải
+// lách bằng cách map 'c' sang chữ 'c' thường, nên "K_c" ra "Kc" với chữ c nằm
+// ngang hàng, còn "K_b" thì không đổi được gì và học sinh đọc nguyên "K_b".
+// Nay hàm này đánh dấu vị trí chỉ số bằng ký tự điều khiển, để RichText dựng
+// thành thẻ <sub>/<sup> thật — đúng với MỌI chữ cái và đúng cỡ chữ.
 
-const SUP: Record<string, string> = {
-  '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶',
-  '7': '⁷', '8': '⁸', '9': '⁹', '+': '⁺', '-': '⁻', 'n': 'ⁿ',
-  'a': 'ᵃ', 'b': 'ᵇ', 'c': 'ᶜ', 'd': 'ᵈ',
-};
-const SUB: Record<string, string> = {
-  '0': '₀', '1': '₁', '2': '₂', '3': '₃', '4': '₄', '5': '₅', '6': '₆',
-  '7': '₇', '8': '₈', '9': '₉', '+': '₊', '-': '₋',
-  'a': 'ₐ', 'c': '𝚌', 'n': 'ₙ', 'p': 'ₚ', 'x': 'ₓ',
-};
+/** Ký tự điều khiển đánh dấu chỉ số. Không xuất hiện trong văn bản người gõ. */
+export const SUB_OPEN = '\u0011';
+export const SUP_OPEN = '\u0012';
+export const MARK_CLOSE = '\u0013';
 
-function doiChiSo(noiDung: string, bang: Record<string, string>): string {
-  // Chỉ đổi khi MỌI ký tự đều có ký hiệu tương ứng, tránh ra chuỗi nửa nạc nửa mỡ
-  const ra = [...noiDung].map(c => bang[c] ?? bang[c.toLowerCase()] ?? '');
-  return ra.every(Boolean) ? ra.join('') : '';
-}
+const sub = (x: string) => `${SUB_OPEN}${x}${MARK_CLOSE}`;
+const sup = (x: string) => `${SUP_OPEN}${x}${MARK_CLOSE}`;
 
 /** Các lệnh LaTeX hay gặp trong bài Hóa, đổi thẳng sang ký tự Unicode */
 const LENH: [RegExp, string][] = [
@@ -77,27 +72,44 @@ function doiLatex(s: string): string {
   LENH.forEach(([re, tv]) => { r = r.replace(re, tv); });
 
   // Chỉ số trên/dưới: ưu tiên dạng có ngoặc nhọn trước
-  r = r.replace(/\^\{([^{}]+)\}/g, (m, x) => doiChiSo(x, SUP) || `^${x}`);
-  r = r.replace(/_\{([^{}]+)\}/g, (m, x) => doiChiSo(x, SUB) || `_${x}`);
-  r = r.replace(/\^([A-Za-z0-9+\-])/g, (m, x) => SUP[x] ?? m);
-  r = r.replace(/_([A-Za-z0-9+\-])/g, (m, x) => SUB[x] ?? m);
+  r = r.replace(/\^\{([^{}]+)\}/g, (_m, x) => sup(x));
+  r = r.replace(/_\{([^{}]+)\}/g, (_m, x) => sub(x));
+  r = r.replace(/\^([A-Za-z0-9+-])/g, (_m, x) => sup(x));
+  r = r.replace(/_([A-Za-z0-9+-])/g, (_m, x) => sub(x));
 
   // Lệnh lạ còn sót: bỏ dấu gạch chéo, giữ lại chữ cho người đọc tự hiểu
   r = r.replace(/\\([A-Za-z]+)/g, '$1');
   r = r.replace(/[{}]/g, '');
 
-  return r.replace(/\s{2,}/g, ' ').trim();
+  return r.replace(/ {2,}/g, ' ').trim();
 }
 
 /**
- * Tìm các đoạn đặt trong $...$ hoặc $$...$$ rồi đổi sang chữ thường.
- * Phần ngoài dấu đô la giữ nguyên tuyệt đối.
+ * Đổi ký hiệu viết trần — không có dấu đô la bao quanh.
+ *
+ * Mỗi mẫu đều đòi một ký tự "neo" phía trước (chữ, số, dấu đóng ngoặc) để dấu
+ * gạch dưới đứng lẻ trong câu tiếng Việt không bị hiểu nhầm là chỉ số.
  */
-export function doiCongThuc(text: string): string {
-  if (!text || text.indexOf('$') === -1) return text;
-  return text
-    .replace(/\$\$([\s\S]+?)\$\$/g, (m, x) => (laCongThuc(x) ? doiLatex(x) : m))
-    .replace(/\$([^$\n]+?)\$/g, (m, x) => (laCongThuc(x) ? doiLatex(x) : m));
+function doiVietTran(s: string): string {
+  let r = s;
+
+  // Lệnh LaTeX lọt ra ngoài cặp đô la vẫn phải đổi
+  LENH.forEach(([re, tv]) => { r = r.replace(re, tv); });
+
+  // Dạng ngoặc nhọn trước (ưu tiên cao hơn): K_{sp}, Fe^{2+}
+  r = r.replace(/([A-Za-z0-9)\]}])_\{([^{}\n]{1,8})\}/g, (_m, pre, x) => pre + sub(x));
+  r = r.replace(/([A-Za-z0-9)\]}])\^\{([^{}\n]{1,8})\}/g, (_m, pre, x) => pre + sup(x));
+
+  // Chỉ số dưới: chữ số trước (H_2O -> H₂O, không nuốt luôn chữ O)
+  r = r.replace(/([A-Za-z0-9)\]}])_(\d+)/g, (_m, pre, x) => pre + sub(x));
+  // rồi tới chữ cái: K_c, K_sp, K_a1
+  r = r.replace(/([A-Za-z0-9)\]}])_([A-Za-z]{1,3}\d?)(?![A-Za-z])/g, (_m, pre, x) => pre + sub(x));
+
+  // Chỉ số trên: Fe^2+, Na^+, 10^-7, x^n
+  r = r.replace(/([A-Za-z0-9)\]}])\^(-?\d+[+-]?|[+-])/g, (_m, pre, x) => pre + sup(x));
+  r = r.replace(/([A-Za-z0-9)\]}])\^([A-Za-z]\d?)(?![A-Za-z])/g, (_m, pre, x) => pre + sup(x));
+
+  return r;
 }
 
 /**
@@ -109,4 +121,44 @@ export function doiCongThuc(text: string): string {
  */
 function laCongThuc(s: string): boolean {
   return /\\[A-Za-z]|[_^{}]/.test(s);
+}
+
+/** Địa chỉ web viết trần: bên trong có gạch dưới của id, không được đụng vào. */
+const URL_TRAN = /(https?:\/\/\S+|www\.\S+)/g;
+
+/**
+ * Đổi công thức trong MỘT ĐOẠN CHỮ THUẦN.
+ *
+ * Trả về chuỗi có chèn ký tự đánh dấu chỉ số (SUB_OPEN/SUP_OPEN/MARK_CLOSE);
+ * RichText chịu trách nhiệm dựng chúng thành thẻ <sub>/<sup>.
+ *
+ * LƯU Ý QUAN TRỌNG: chỉ gọi hàm này trên phần CHỮ, KHÔNG gọi trên địa chỉ của
+ * link. Mã bài kiểm tra dạng `quiz_1788260660617_862` có gạch dưới, đi qua đây
+ * sẽ thành `quiz₁788260660617₈62` và link chết. Bản trước tự bảo vệ bằng cách
+ * thay markdown link bằng placeholder ngay trong hàm này, nhưng cách đó chỉ đỡ
+ * được link có cú pháp `[chữ](địa chỉ)` — URL viết trần vẫn hỏng. Nay RichText
+ * tách markdown TRƯỚC và chỉ đưa phần chữ vào đây, nên vấn đề hết tận gốc.
+ */
+export function doiCongThuc(text: string): string {
+  if (!text) return text;
+
+  // Model đôi khi trả thẳng thẻ HTML — nhận luôn cho đỡ lệ thuộc vào may rủi
+  let r = text
+    .replace(/<sub>([\s\S]*?)<\/sub>/gi, (_m, x) => sub(x))
+    .replace(/<sup>([\s\S]*?)<\/sup>/gi, (_m, x) => sup(x));
+
+  // Đoạn trong cặp đô la: đổi trọn vẹn bằng bộ luật LaTeX
+  if (r.indexOf('$') !== -1) {
+    r = r
+      .replace(/\$\$([\s\S]+?)\$\$/g, (m, x) => (laCongThuc(x) ? doiLatex(x) : m))
+      .replace(/\$([^$\n]+?)\$/g, (m, x) => (laCongThuc(x) ? doiLatex(x) : m));
+  }
+
+  // Phần còn lại: ký hiệu viết trần. Bỏ qua các đoạn là địa chỉ web.
+  if (r.indexOf('_') === -1 && r.indexOf('^') === -1 && r.indexOf('\\') === -1) return r;
+
+  return r
+    .split(URL_TRAN)
+    .map((phan, i) => (i % 2 === 1 ? phan : doiVietTran(phan)))
+    .join('');
 }

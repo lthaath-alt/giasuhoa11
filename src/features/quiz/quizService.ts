@@ -1,11 +1,24 @@
 import { Quiz, QuizQuestionResult } from './types';
 import { QuizStorage } from './quizStorage';
-import { LibraryStorage } from '../library/libraryStorage';
 import { Question, QuestionType, DifficultyLevel } from '../library/types';
+import {
+  layCauHoiCuaBai,
+  chuanHoaDoKho,
+  TRONG_SO_DO_KHO,
+  LOG_TAO_DE,
+} from '../library/questionBank';
 
 // ============================================================
 // BỘ CÂU HỎI DỰ PHÒNG (MOCK BACKUP QUESTIONS)
 // ============================================================
+//
+// Chỉ dùng khi bài học ĐÓ chưa có câu nào trong cả 3 kho, và chỉ lấy đúng khoá
+// `lessonId` của chính nó.
+//
+// CỐ Ý KHÔNG còn `DEFAULT_FALLBACK_QUESTIONS` — bộ "dự phòng chung" cho mọi
+// bài. Bài nào không có khoá riêng ở đây thì trước kia lấy một bộ câu cứng về
+// hợp chất hữu cơ/alkane, nên học sinh hỏi Bài 1 xong bấm link kiểm tra lại
+// phải làm đề của bài khác hẳn. Thà không có đề còn hơn giao nhầm đề.
 
 const BACKUP_QUESTIONS: Record<string, any[]> = {
   'bai-1': [
@@ -126,99 +139,66 @@ const BACKUP_QUESTIONS: Record<string, any[]> = {
   ]
 };
 
-// Fallback chung cho các bài học khác chưa được định nghĩa
-const DEFAULT_FALLBACK_QUESTIONS: any[] = [
-  {
-    id: 'bq-def-1',
-    type: 'Trắc nghiệm',
-    difficulty: 'Thấp',
-    points: 1,
-    content: 'Tính chất hóa học đặc trưng của hợp chất hữu cơ là gì?',
-    options: [
-      { key: 'A', text: 'Dễ cháy, kém bền nhiệt' },
-      { key: 'B', text: 'Dẫn điện tốt trong nước' },
-      { key: 'C', text: 'Nhiệt độ nóng chảy cực kỳ cao' },
-      { key: 'D', text: 'Phản ứng xảy ra tức thời, tốc độ rất nhanh' }
-    ],
-    correctAnswer: 'A'
-  },
-  {
-    id: 'bq-def-2',
-    type: 'Trắc nghiệm',
-    difficulty: 'Trung bình',
-    points: 2,
-    content: 'Công thức phân tử cho biết điều nào sau đây?',
-    options: [
-      { key: 'A', text: 'Trật tự liên kết giữa các nguyên tử' },
-      { key: 'B', text: 'Số lượng nguyên tử của mỗi nguyên tố trong phân tử' },
-      { key: 'C', text: 'Hình dạng không gian của phân tử' },
-      { key: 'D', text: 'Tỷ lệ tối giản của các nguyên tử' }
-    ],
-    correctAnswer: 'B'
-  },
-  {
-    id: 'bq-def-3',
-    type: 'Đúng/Sai',
-    difficulty: 'Thấp',
-    points: 1,
-    content: 'Tất cả các hợp chất chứa nguyên tố Carbon đều là hợp chất hữu cơ.',
-    correctAnswer: 'Sai'
-  },
-  {
-    id: 'bq-def-4',
-    type: 'Đúng/Sai',
-    difficulty: 'Trung bình',
-    points: 2,
-    content: 'Đồng phân là các chất có cùng công thức phân tử nhưng có cấu tạo hóa học khác nhau.',
-    correctAnswer: 'Đúng'
-  },
-  {
-    id: 'bq-def-5',
-    type: 'Tự luận',
-    difficulty: 'Cao',
-    points: 3,
-    content: 'Hãy giải thích tại sao các liên kết trong phân tử alkene (như ethylene) lại dễ tham gia phản ứng cộng hơn so với alkane (như ethane).',
-    essayPoints: [
-      { label: 'Ý 1', content: 'Alkene chứa liên kết đôi C=C gồm một liên kết σ bền vững và một liên kết π kém bền.' },
-      { label: 'Ý 2', content: 'Liên kết π kém bền dễ bị đứt ra trong phản ứng hóa học để tạo liên kết mới.' },
-      { label: 'Ý 3', content: 'Alkane chỉ chứa các liên kết đơn C-C và C-H bền vững, khó tham gia phản ứng cộng.' }
-    ]
-  }
-];
-
 // ============================================================
 // QUIZ SERVICE FUNCTIONS
 // ============================================================
 
 export const QuizService = {
   /**
-   * Tạo bài kiểm tra làm lại (chọn câu mới, loại bỏ các câu hỏi cũ đã làm ở lần gần nhất)
-   * Trả về Quiz nếu thành công, trả về null nếu không đủ câu hỏi hợp lệ.
+   * Kho câu hỏi dùng được cho MỘT bài học.
+   *
+   * Thứ tự ưu tiên: câu THẬT của bài (gom từ cả 3 kho qua `layCauHoiCuaBai`),
+   * hết mới tới bộ dự phòng ĐÚNG bài đó. Không bao giờ với sang bài khác.
    */
-  createRetryQuiz(chapterId: string, lessonId: string, userEmail: string, excludeIds: string[]): Quiz | null {
-    let rawQuestions = LibraryStorage.getQuestions(chapterId, lessonId);
-    if (rawQuestions.length === 0) {
-      rawQuestions = (BACKUP_QUESTIONS[lessonId] || DEFAULT_FALLBACK_QUESTIONS) as any;
-    }
+  async layKhoCauHoi(chapterId: string, lessonId: string, nganHang: Question[] = []): Promise<Question[]> {
+    const cauThat = await layCauHoiCuaBai(chapterId, lessonId, nganHang);
+    if (cauThat.length > 0) return cauThat;
 
-    const bankQuestions: Question[] = rawQuestions.map(q => ({
+    const duPhong = BACKUP_QUESTIONS[lessonId];
+    if (LOG_TAO_DE) {
+      console.warn(
+        `[Quiz] Bài "${lessonId}" KHÔNG có câu thật nào. ` +
+        (duPhong
+          ? `Dùng bộ dự phòng riêng của bài này (${duPhong.length} câu).`
+          : 'Cũng không có bộ dự phòng riêng → sẽ KHÔNG tạo đề.'),
+      );
+    }
+    if (!duPhong) return [];
+
+    return duPhong.map(q => ({
       id: q.id,
-      type: q.type,
-      difficulty: q.difficulty,
+      type: q.type as QuestionType,
+      difficulty: chuanHoaDoKho(q.difficulty),
       points: q.points,
       content: q.content,
       images: q.images || [],
       options: q.options,
       correctAnswer: q.correctAnswer,
       essayPoints: q.essayPoints,
-      createdAt: q.createdAt || new Date().toISOString()
+      chapterId,
+      lessonId,
+      createdAt: q.createdAt || new Date().toISOString(),
     }));
+  },
+
+  /**
+   * Tạo bài kiểm tra làm lại (chọn câu mới, loại bỏ các câu hỏi cũ đã làm ở lần gần nhất)
+   * Trả về Quiz nếu thành công, trả về null nếu không đủ câu hỏi hợp lệ.
+   */
+  async createRetryQuiz(
+    chapterId: string,
+    lessonId: string,
+    userEmail: string,
+    excludeIds: string[],
+    nganHang: Question[] = [],
+  ): Promise<Quiz | null> {
+    const bankQuestions = await this.layKhoCauHoi(chapterId, lessonId, nganHang);
 
     // Lọc bỏ những câu đã xuất hiện trong đề cũ (excludeIds)
     const availableQuestions = bankQuestions.filter(q => !excludeIds.includes(q.id));
 
     // Cần tối thiểu 5 câu để tạo đề mới
-    const targetCount = 5; 
+    const targetCount = 5;
     if (availableQuestions.length < targetCount) {
       return null; // Không đủ câu hỏi mới
     }
@@ -226,8 +206,7 @@ export const QuizService = {
     // Lấy câu hỏi ngẫu nhiên từ kho câu hỏi hợp lệ (có thể ưu tiên chưa làm bao giờ, nhưng ở đây cứ random)
     const finalSelection = this.shuffleArray(availableQuestions).slice(0, Math.min(8, availableQuestions.length));
 
-    const difficultyWeight = { 'Thấp': 1, 'Trung bình': 2, 'Cao': 3 };
-    finalSelection.sort((a, b) => difficultyWeight[a.difficulty] - difficultyWeight[b.difficulty]);
+    finalSelection.sort((a, b) => TRONG_SO_DO_KHO[a.difficulty] - TRONG_SO_DO_KHO[b.difficulty]);
 
     const maxScore = finalSelection.reduce((sum, q) => sum + (q.points || 1), 0);
     const createdAt = new Date().toISOString();
@@ -252,30 +231,22 @@ export const QuizService = {
   },
 
   /**
-   * Tạo bài kiểm tra cho học sinh
+   * Tạo bài kiểm tra cho học sinh.
+   *
+   * Trả về `null` khi bài học chưa có câu hỏi nào — chỗ gọi phải tự xử lý
+   * (không hiện link kiểm tra). KHÔNG bịa đề bằng câu của bài khác.
+   *
+   * @param nganHang Câu hỏi kho `questions` đời cũ mà AppContext đã tải sẵn.
    */
-  createQuiz(chapterId: string, lessonId: string, userEmail: string): Quiz {
-    // 1. Lấy câu hỏi từ ngân hàng câu hỏi chính
-    let rawQuestions = LibraryStorage.getQuestions(chapterId, lessonId);
-
-    // Nếu trống, lấy từ câu hỏi dự phòng
-    if (rawQuestions.length === 0) {
-      rawQuestions = (BACKUP_QUESTIONS[lessonId] || DEFAULT_FALLBACK_QUESTIONS) as any;
-    }
-
-    // Chuẩn hóa thành Question hoàn chỉnh (thêm images, createdAt nếu thiếu)
-    const bankQuestions: Question[] = rawQuestions.map(q => ({
-      id: q.id,
-      type: q.type,
-      difficulty: q.difficulty,
-      points: q.points,
-      content: q.content,
-      images: q.images || [],
-      options: q.options,
-      correctAnswer: q.correctAnswer,
-      essayPoints: q.essayPoints,
-      createdAt: q.createdAt || new Date().toISOString()
-    }));
+  async createQuiz(
+    chapterId: string,
+    lessonId: string,
+    userEmail: string,
+    nganHang: Question[] = [],
+  ): Promise<Quiz | null> {
+    // 1. Gom câu hỏi CỦA ĐÚNG BÀI NÀY từ mọi kho
+    const bankQuestions = await this.layKhoCauHoi(chapterId, lessonId, nganHang);
+    if (bankQuestions.length === 0) return null;
 
     // 2. Lấy danh sách lịch sử làm bài để lọc chống trùng đề
     const doneIds = QuizStorage.getQuestionsDone(userEmail, lessonId);
@@ -309,8 +280,7 @@ export const QuizService = {
     const finalSelection = this.shuffleArray(selectedQuestions.slice(0, targetCount));
 
     // Sắp xếp theo độ khó: Thấp -> Trung bình -> Cao
-    const difficultyWeight = { 'Thấp': 1, 'Trung bình': 2, 'Cao': 3 };
-    finalSelection.sort((a, b) => difficultyWeight[a.difficulty] - difficultyWeight[b.difficulty]);
+    finalSelection.sort((a, b) => TRONG_SO_DO_KHO[a.difficulty] - TRONG_SO_DO_KHO[b.difficulty]);
 
     // Tính điểm tối đa
     const maxScore = finalSelection.reduce((sum, q) => sum + (q.points || 1), 0);

@@ -6,6 +6,7 @@ import {
 } from '@mui/material';
 import { Plus, Pencil, Trash2, RefreshCw, Upload, Download, Image as ImageIcon, X, FileUp } from 'lucide-react';
 import { useApp } from '../../../core/hooks/useApp';
+import { CHEMISTRY_11_CURRICULUM } from '../../lessons/constants';
 import {
   BankQuestion, Chapter, Level, QType, LEVELS, QTYPE_NAME, CHAPTERS, pointsOf,
 } from '../types';
@@ -35,7 +36,21 @@ function blank(): BankQuestion {
 }
 
 export const BankManager: React.FC = () => {
-  const { currentUser } = useApp();
+  const { currentUser, curriculum } = useApp();
+
+  const currentCurriculum = useMemo(() => {
+    return curriculum && curriculum.length > 0 ? curriculum : CHEMISTRY_11_CURRICULUM;
+  }, [curriculum]);
+
+  const allLessonsMap = useMemo(() => {
+    const map = new Map<string, string>();
+    currentCurriculum.forEach(c => {
+      c.lessons.forEach(l => {
+        map.set(l.id, l.title);
+      });
+    });
+    return map;
+  }, [currentCurriculum]);
 
   const [items, setItems] = useState<BankQuestion[]>([]);
   const [dangTai, setDangTai] = useState(true);
@@ -49,6 +64,12 @@ export const BankManager: React.FC = () => {
   const [mo, setMo] = useState(false);
   const [form, setForm] = useState<BankQuestion>(blank());
   const fileRef = useRef<HTMLInputElement>(null);
+
+  const availableLessonsForForm = useMemo(() => {
+    const chObj = currentCurriculum.find(c => c.id === `chuong-${form.ch}` || c.id === String(form.ch))
+      || currentCurriculum[form.ch - 1];
+    return chObj?.lessons || [];
+  }, [currentCurriculum, form.ch]);
 
   // ── Nạp dữ liệu ──
   const [napLoi, setNapLoi] = useState(false);
@@ -326,7 +347,24 @@ export const BankManager: React.FC = () => {
                   sx={{ bgcolor: LV_COLOR[q.lv], color: '#fff' }} />
                 <Chip size="small" label={QTYPE_NAME[q.t]} variant="outlined" />
                 <Chip size="small" label={`${pointsOf(q)}đ`} variant="outlined" />
-                {q.lessonId && <Chip size="small" label={`Bài ${q.lessonId}`} variant="outlined" />}
+                {q.lessonId ? (
+                  <Chip
+                    size="small"
+                    label={
+                      allLessonsMap.get(q.lessonId) ||
+                      (q.lessonId.startsWith('bai-') ? `Bài ${q.lessonId.replace('bai-', '')}` : `Bài ${q.lessonId}`)
+                    }
+                    variant="outlined"
+                    sx={{ borderColor: '#cbd5e1', color: '#334155' }}
+                  />
+                ) : (
+                  <Chip
+                    size="small"
+                    label="Chưa gắn bài"
+                    variant="outlined"
+                    sx={{ bgcolor: '#fff7ed', color: '#c2410c', borderColor: '#ffedd5', fontWeight: 600 }}
+                  />
+                )}
                 {q.topic && <Chip size="small" label={q.topic} variant="outlined" />}
                 {q.img && <Chip size="small" icon={<ImageIcon size={14} />} label="có ảnh" variant="outlined" />}
                 <Box sx={{ flex: 1 }} />
@@ -521,8 +559,28 @@ export const BankManager: React.FC = () => {
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
               <TextField size="small" fullWidth label="Chủ đề" value={form.topic || ''}
                 onChange={e => setForm(s => ({ ...s, topic: e.target.value }))} />
-              <TextField size="small" fullWidth label="Mã bài học" placeholder="để trống nếu không gắn"
-                value={form.lessonId || ''} onChange={e => setForm(s => ({ ...s, lessonId: e.target.value }))} />
+              <FormControl size="small" fullWidth>
+                <InputLabel>Gắn bài học</InputLabel>
+                <Select
+                  label="Gắn bài học"
+                  value={form.lessonId || ''}
+                  onChange={e => setForm(s => ({ ...s, lessonId: e.target.value }))}
+                >
+                  <MenuItem value="">
+                    <em>Chưa gắn bài (Để trống)</em>
+                  </MenuItem>
+                  {availableLessonsForForm.map(l => (
+                    <MenuItem key={l.id} value={l.id}>
+                      {l.title}
+                    </MenuItem>
+                  ))}
+                  {form.lessonId && !availableLessonsForForm.some(l => l.id === form.lessonId) && (
+                    <MenuItem value={form.lessonId}>
+                      {allLessonsMap.get(form.lessonId) || `Bài ${form.lessonId}`}
+                    </MenuItem>
+                  )}
+                </Select>
+              </FormControl>
               <TextField size="small" fullWidth label="Điểm riêng"
                 placeholder={`mặc định ${LEVELS.find(l => l.key === form.lv)?.pts}đ theo mức`}
                 value={form.points ?? ''}

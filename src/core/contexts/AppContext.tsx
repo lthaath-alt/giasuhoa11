@@ -15,6 +15,7 @@ import { QuizStorage } from '../../features/quiz/quizStorage';
 import { loginWithFirestore, createAccountWithFirestore } from '../services/firestoreAuth';
 import { FirestoreService } from '../services/firestoreService';
 import { runMigrationIfNeeded } from '../services/migrationService';
+import { ErrorLogService } from '../services/errorLog';
 import { UserRole } from '../../features/auth/types';
 import { LibraryExam, Equation, MatrixResource, Question } from '../../features/library/types';
 
@@ -1107,10 +1108,34 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       aiResponseText.includes('Chúc mừng em đã hoàn thành bài toán!')
     ) {
       const chapter = curriculum.find(c => c.lessons.some(l => l.id === lessonId));
-      const chapterId = chapter ? chapter.id : 'c1';
-      const quiz = QuizService.createQuiz(chapterId, lessonId, userEmail);
-      const quizLink = `${window.location.origin}${window.location.pathname}#/quiz/${quiz.id}`;
-      finalAiResponse += `\n\n👉 **Hãy làm bài kiểm tra ngắn ngay tại đây để củng cố kiến thức nhé:** [Làm bài kiểm tra ngay](${quizLink})`;
+
+      /* Không tìm ra chương thì THÔI, không đoán bừa. Trước đây chỗ này rơi về
+         'c1' — một mã chương không có thật (mã thật là 'chuong-1'). Màn hình tư
+         vấn chung còn gọi addMessage('global-advisor', ...), một lessonId không
+         thuộc bài nào, nên luôn rơi vào nhánh này và luôn dựng đề từ bộ dự
+         phòng của bài khác. */
+      const quiz = chapter
+        ? await QuizService.createQuiz(chapter.id, lessonId, userEmail, libraryQuestions)
+        : null;
+
+      if (quiz) {
+        const quizLink = `${window.location.origin}${window.location.pathname}#/quiz/${quiz.id}`;
+        finalAiResponse += `\n\n👉 **Hãy làm bài kiểm tra ngắn ngay tại đây để củng cố kiến thức nhé:** [Làm bài kiểm tra ngay](${quizLink})`;
+      } else {
+        /* Bài chưa có câu hỏi nào: im lặng bỏ link, KHÔNG giao đề của bài khác.
+           Ghi log để Admin biết bài nào cần gắn câu hỏi. */
+        console.warn(
+          `[Quiz] Không tạo được đề cho bài "${lessonId}" ` +
+          (chapter ? '(bài chưa có câu hỏi nào).' : '(lessonId không thuộc chương nào).') +
+          ' Đã bỏ link kiểm tra.',
+        );
+        ErrorLogService.logError({
+          level: 'Cảnh Báo Hệ Thống',
+          component: 'AppContext.addMessage',
+          message: `Bài "${lessonId}" chưa có câu hỏi trong ngân hàng nên không tạo được bài kiểm tra.`,
+          userEmail,
+        });
+      }
     }
 
     const aiMsg: ChatMessage = {

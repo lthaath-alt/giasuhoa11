@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box, Typography, Button, Paper, Grid, Chip, IconButton, Tooltip,
   Dialog, DialogTitle, DialogContent, DialogActions, TextField, Alert,
@@ -8,6 +8,7 @@ import {
 import { Database, Plus, Search, Trash2, Edit, ExternalLink, Link2, FileText, FlaskConical } from 'lucide-react';
 import { useApp } from '../hooks/useApp';
 import { BankManager } from '../../features/bank/components/BankManager';
+import { BankFirestore } from '../../features/bank/bankStore';
 import { Question, Equation, MatrixResource } from '../../features/library/types';
 
 interface TabPanelProps {
@@ -42,6 +43,15 @@ export const DatabankManagement: React.FC = () => {
   } = useApp();
 
   const [tabValue, setTabValue] = useState(0);
+  const [bankQuestionCount, setBankQuestionCount] = useState<number>(0);
+
+  useEffect(() => {
+    let isMounted = true;
+    BankFirestore.getCount().then(count => {
+      if (isMounted) setBankQuestionCount(count);
+    });
+    return () => { isMounted = false; };
+  }, []);
 
   const canEditOrDelete = (createdBy?: string) => {
     if (currentUser?.role === 'super_admin') return true;
@@ -187,7 +197,7 @@ export const DatabankManagement: React.FC = () => {
             </Box>
             <Box>
               <Typography variant="overline" sx={{ color: '#64748b', fontWeight: 'bold', lineHeight: 1 }}>TỔNG SỐ CÂU HỎI</Typography>
-              <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#1e293b' }}>{libraryQuestions.length} câu trong kho</Typography>
+              <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#1e293b' }}>{bankQuestionCount} câu trong kho</Typography>
             </Box>
           </Paper>
         </Grid>
