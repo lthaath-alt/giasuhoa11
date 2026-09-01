@@ -25,7 +25,9 @@ CSS → HTML (canvas + các lớp phủ) → JavaScript trong một IIFE ở cu�
 ## Mốc mã quan trọng — tra bằng chuỗi tìm kiếm, đừng dựa vào số dòng
 | Tìm chuỗi | Vai trò |
 |---|---|
-| `const QUESTIONS = [` | Ngân hàng câu hỏi chương 2 |
+| `const QUESTIONS = [` | 23 câu chương 2 dựng sẵn — chỉ là BẢN DỰ PHÒNG, xem mục dưới |
+| `function docNganHangWeb(`| Đọc ngân hàng câu hỏi của web từ IndexedDB |
+| `function locCauChoGame(`| Lọc câu hợp với trò chơi: đúng chương 2, dạng trắc nghiệm |
 | `const LEVELS = [`    | Mô tả các màn bằng toạ độ, KHÔNG vẽ bản đồ bằng chuỗi ký tự |
 | `function buildLevel(`| Dựng lưới ô từ mô tả màn |
 | `const T = {`         | Mã các loại ô (rỗng, đất, gạch, ô ?, acid…) |
@@ -41,6 +43,25 @@ CSS → HTML (canvas + các lớp phủ) → JavaScript trong một IIFE ở cu�
 - Thêm một object vào `LEVELS`; mọi thứ mô tả bằng toạ độ ô (cột, hàng), gốc ở góc trên trái.
 - `ground` là các đoạn nền: `[cột bắt đầu, độ rộng]`. Chỗ nào không có nền thì là vực.
 - Đừng vẽ bản đồ bằng chuỗi ký tự — đếm cột bằng tay rất dễ sai.
+
+## Câu hỏi lấy từ đâu
+Trang này được nhúng trong dự án React `giasuhoa11` tại
+`public/games/giai-cuu-phong-thi-nghiem.html`, cùng origin với web nên đọc chung
+được kho **IndexedDB `hoa11` / store `kv` / khoá `bank`** mà web ghi ra — đúng
+kênh mà bàn cờ "Vòng Quanh Hóa 11" đang dùng. Web tự ghi kho này mỗi khi mở mục
+Trò chơi (`GameHubSection.tsx` gọi `pushToGame`).
+
+**Web là nguồn, trò chơi CHỈ ĐỌC.** Không có đường nào ghi ngược, nên không cách
+nào làm hỏng dữ liệu thật của giáo viên từ đây.
+
+Muốn sửa câu hỏi thì sửa trong mục **Ngân hàng** của web, đừng sửa `QUESTIONS`
+trong file này — 23 câu đó chỉ còn là bản dự phòng cho hai trường hợp: mở file
+trực tiếp bằng `file://`, hoặc ngân hàng web có ít hơn `TOI_THIEU_DE_THAY` câu
+hợp lệ của chương này. Màn giới thiệu luôn hiện một dòng cho biết đang dùng
+nguồn nào, nên không bao giờ phải đoán.
+
+`VALVE_Q` (câu cân bằng phương trình ở trận boss) KHÔNG đồng bộ: nó hỏi dãy hệ
+số chứ không phải trắc nghiệm 4 lựa chọn thường, ngân hàng web không có dạng đó.
 ============================================== -->
 <title>Giải Cứu Phòng Thí Nghiệm — Thế giới 2: Nitrogen &amp; Sulfur (Hóa 11)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -244,6 +265,7 @@ body.touch .stage{max-height:calc(100vh - 104px)}
         <div class="keyrow"><span class="kbd">P</span> tạm dừng</div>
       </div>
       <div class="legend" id="legend"></div>
+      <p class="kicker" id="nguon-cau-hoi" style="margin-top:14px">Đang đọc ngân hàng câu hỏi…</p>
       <button class="btn" id="btn-play">Vào màn 2‑1</button>
     </div>
   </div>
@@ -2073,6 +2095,99 @@ function buildLegend(){
   });
 }
 buildLegend();
+
+/* ==================== ĐỒNG BỘ VỚI NGÂN HÀNG CÂU HỎI CỦA WEB ====================
+   Trò chơi này được nhúng trong dự án React `giasuhoa11`, cùng origin với web,
+   nên đọc chung được kho IndexedDB `hoa11` / store `kv` / khoá `bank` mà web ghi
+   ra (giống hệt cách bàn cờ "Vòng Quanh Hóa 11" làm). Nhờ vậy giáo viên sửa câu
+   hỏi trong mục Ngân hàng của web là trò này đổi theo, không phải sửa file HTML.
+
+   Web là NGUỒN, trò chơi chỉ đọc — không bao giờ ghi ngược, để không có đường
+   nào làm hỏng dữ liệu thật của giáo viên.
+
+   23 câu viết cứng ở đầu file vẫn giữ nguyên làm bản dự phòng: mở file này
+   trực tiếp (không qua web), hoặc web chưa bấm "Đưa sang trò chơi", thì trò
+   chơi vẫn chơi được đủ câu chứ không đứng hình. */
+var CHUONG_CUA_GAME = 2;          // Thế giới 2 — Nitrogen & Sulfur
+var TOI_THIEU_DE_THAY = 5;        // dưới ngần này thì giữ bộ dự phòng, xem chú thích dưới
+
+function docNganHangWeb(xong){
+  /* Mọi nhánh hỏng đều gọi xong(null): không có IndexedDB, kho chưa tạo, tab
+     khác đang giữ, dữ liệu sai dạng… Trò chơi khi đó im lặng dùng bộ dự phòng.
+     CỐ Ý không báo lỗi ầm ĩ với học sinh — các em không sửa được gì. */
+  var da = false;
+  var tra = function(v){ if(da) return; da = true; setTimeout(function(){ xong(v); }, 0); };
+  try{
+    if(!window.indexedDB){ tra(null); return; }
+    var rq = indexedDB.open('hoa11');
+    rq.onerror = function(){ tra(null); };
+    rq.onblocked = function(){ tra(null); };
+    rq.onsuccess = function(){
+      try{
+        var db = rq.result;
+        if(!db.objectStoreNames.contains('kv')){ tra(null); return; }
+        var g = db.transaction('kv', 'readonly').objectStore('kv').get('bank');
+        g.onsuccess = function(){ tra(g.result || null); };
+        g.onerror = function(){ tra(null); };
+      }catch(e){ tra(null); }
+    };
+  }catch(e){ tra(null); }
+}
+
+function locCauChoGame(kho){
+  /* Kho của web là một đối tượng BankStore: { v, questions, deleted, ... }.
+     Chỉ lấy câu TRẮC NGHIỆM đúng chương của trò chơi này. Câu Đúng/Sai, trả lời
+     ngắn và tự luận không hợp với lớp phủ 4 lựa chọn nên bỏ qua.
+
+     Nhiều câu trong ngân hàng KHÔNG có trường `t` (dạng câu) — 148/160 câu mẫu
+     thiếu nó vì bên trò chơi trắc nghiệm vốn là mặc định. Nên thiếu `t` phải
+     hiểu là trắc nghiệm, không phải là loại bỏ. */
+  if(!kho || !Array.isArray(kho.questions)) return [];
+  var boXoa = {};
+  (kho.deleted || []).forEach(function(id){ boXoa[id] = 1; });
+
+  return kho.questions.filter(function(q){
+    return q && !boXoa[q.id]
+      && Number(q.ch) === CHUONG_CUA_GAME
+      && (!q.t || q.t === 'mc')
+      && Array.isArray(q.o) && q.o.length >= 2
+      && q.o.every(function(x){ return typeof x === 'string' && x.trim(); })
+      && typeof q.a === 'number' && q.a >= 0 && q.a < q.o.length
+      && typeof q.q === 'string' && q.q.trim();
+  }).map(function(q){
+    // Đưa về đúng dạng mà pickQuestion và lớp phủ câu hỏi đang dùng
+    return { lv: q.lv || 'nb', q: q.q, o: q.o.slice(), a: q.a, e: q.e || '' };
+  });
+}
+
+function ganNguon(chu){
+  var el = $('nguon-cau-hoi');
+  if(el) el.textContent = chu;
+}
+
+docNganHangWeb(function(kho){
+  var moi = locCauChoGame(kho);
+
+  /* Vì sao có ngưỡng: ngân hàng mới lập hoặc vừa bị lọc gắt có thể chỉ còn
+     một hai câu chương 2. Thay bộ dự phòng bằng ngần ấy câu thì cả trò chơi
+     hỏi đi hỏi lại đúng một câu — tệ hơn hẳn so với giữ 23 câu sẵn có. */
+  if(moi.length < TOI_THIEU_DE_THAY){
+    ganNguon(moi.length
+      ? 'Ngân hàng web mới có ' + moi.length + ' câu chương ' + CHUONG_CUA_GAME
+        + ' — đang dùng ' + QUESTIONS.length + ' câu dựng sẵn.'
+      : QUESTIONS.length + ' câu dựng sẵn trong trò chơi.');
+    return;
+  }
+
+  /* Thay TẠI CHỖ bằng splice chứ không gán lại biến: QUESTIONS được tham chiếu
+     ở window.__dev và có thể ở chỗ khác, gán lại sẽ để chúng trỏ vào mảng cũ. */
+  QUESTIONS.splice(0, QUESTIONS.length);
+  moi.forEach(function(q){ QUESTIONS.push(q); });
+  askedIdx = [];   // bộ câu đã đổi, danh sách "đã hỏi" của bộ cũ không còn nghĩa
+
+  ganNguon('Đồng bộ với ngân hàng của web: ' + QUESTIONS.length
+    + ' câu chương ' + CHUONG_CUA_GAME + '.');
+});
 
 /* ==================== KHỞI ĐỘNG ==================== */
 /* Móc kiểm thử màn: mở kèm ?dev=1 rồi dùng window.__dev trong console.
