@@ -255,6 +255,10 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
 .k-bang .dong{display:flex; gap:10px; align-items:center}
 .k-bang .khop{color:#8fd0a0} .k-bang .lech{color:#e2604e}
 .k-nut{display:flex; gap:10px; flex-wrap:wrap}
+.k-loi{
+  margin:0 0 12px; padding:10px 13px; border-radius:11px; font-size:13px; line-height:1.6;
+  background:#fdeae7; border:2px solid var(--danger); border-left-width:6px; color:#8c2a1c;
+}
 
 /* ---------- Bảng chế độ thử ---------- */
 .thu{
@@ -405,7 +409,9 @@ body.touch .stage{max-height:calc(100vh - 104px)}
 
       <div class="k-bang" id="k-bang"></div>
 
+      <p class="k-loi hide" id="k-loi"></p>
       <div class="k-nut">
+        <button class="btn" id="k-xong">Hoàn thành</button>
         <button class="btn ghost" id="k-tra">Trả hết về kho</button>
         <button class="btn ghost" id="k-thoat">Để lát nữa</button>
       </div>
@@ -1198,6 +1204,7 @@ function padBtn(id, key){
   el.addEventListener('pointerleave', off);
 }
 padBtn('p-left', 'left'); padBtn('p-right', 'right'); padBtn('p-jump', 'jump');
+$('k-xong').addEventListener('click', chamKho);
 $('k-tra').addEventListener('click', traHetVeKho);
 $('k-thoat').addEventListener('click', dongKho);
 $('p-dump').addEventListener('pointerdown', e => { e.preventDefault(); Snd.kick(); dumpBag(); });
@@ -1607,6 +1614,7 @@ function dongKho(){
 
 function traHetVeKho(){
   if(!khoDangMo) return;
+  $('k-loi').classList.add('hide');
   khoDangMo.oGhep.forEach(o => {
     o.forEach(k => { TOTAL.kho[k] = (TOTAL.kho[k] || 0) + 1; });
     o.length = 0;
@@ -1689,8 +1697,12 @@ function veKho(){
   });
   bang.innerHTML = dong.join('');
 
-  const duPhanTu = oGhep.every(o => vietCongThuc(demNguyenTo(o), g.thuTu) === g.phanTu);
-  if(khopHet && duPhanTu) moCuaKho(g);
+  /* KHÔNG tự mở cửa khi vừa khớp. Phải để người chơi bấm "Hoàn thành" thì mới
+     chấm: tự mở làm mất bước tự kiểm lại, và nhiều em vừa kéo xong đã thấy cửa
+     bật ra, không kịp hiểu vì sao mình đúng. */
+  khoDangMo.duPhanTu = oGhep.every(o => vietCongThuc(demNguyenTo(o), g.thuTu) === g.phanTu);
+  khoDangMo.khopHet = khopHet;
+  $('k-loi').classList.add('hide');            // sửa gì thì xoá lời báo lỗi cũ
 }
 
 /* Kéo thả bằng pointer events — chạy được cả chuột lẫn cảm ứng.
@@ -1742,6 +1754,42 @@ function ganKeo(el, ngTo){
     window.addEventListener('pointerup', tha);
     window.addEventListener('pointercancel', tha);
   });
+}
+
+/* Bấm "Hoàn thành": chấm và nói rõ sai ở đâu.
+   Nói cụ thể thiếu bao nhiêu nguyên tử nào, chứ không chỉ "chưa đúng" — báo
+   chung chung thì học sinh chỉ biết thử mò. */
+function chamKho(){
+  if(!khoDangMo) return;
+  const { g, oGhep } = khoDangMo;
+
+  if(khoDangMo.duPhanTu && khoDangMo.khopHet){ moCuaKho(g); return; }
+
+  const loi = [];
+  const sai = oGhep
+    .map((o, i) => ({ i, ct: vietCongThuc(demNguyenTo(o), g.thuTu) }))
+    .filter(x => x.ct !== g.phanTu);
+  if(sai.length){
+    loi.push('Phân tử ' + sai.map(x => x.i + 1).join(' và ') + ' chưa phải '
+      + g.phanTu + ' (đang là ' + sai.map(x => x.ct).join(', ') + ').');
+  }
+
+  const phai = demNguyenTo(oGhep.flat());
+  const lech = [];
+  Object.keys(g.veTrai).forEach(k => {
+    const d = g.veTrai[k] - (phai[k] || 0);
+    if(d > 0) lech.push('thiếu ' + d + ' nguyên tử ' + k);
+    else if(d < 0) lech.push('thừa ' + (-d) + ' nguyên tử ' + k);
+  });
+  Object.keys(phai).forEach(k => {
+    if(g.veTrai[k] === undefined) lech.push('thừa ' + phai[k] + ' nguyên tử ' + k + ' (vế trái không có)');
+  });
+  if(lech.length) loi.push('So với vế trái: ' + lech.join(', ') + '.');
+
+  const el = $('k-loi');
+  el.textContent = loi.join(' ') || 'Chưa ghép xong.';
+  el.classList.remove('hide');
+  Snd.wrong();
 }
 
 function moCuaKho(g){
