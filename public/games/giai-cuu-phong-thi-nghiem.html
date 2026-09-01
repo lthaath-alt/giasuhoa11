@@ -889,8 +889,14 @@ const Snd = (function(){
       return musOn;
     },
     musicOn(){ return musOn; },
-    /* Để kiểm tra: trình duyệt chỉ cho phát tiếng sau khi người dùng bấm thật */
-    trangThai(){ return ctxA ? ctxA.state : 'chưa tạo' + (timer ? ' (có nhịp)' : ''); },
+    /* Để kiểm tra: trình duyệt chỉ cho phát tiếng sau khi người dùng bấm thật.
+       Phải báo cả nhịp nhạc, không chỉ trạng thái AudioContext — tắt nhạc thì
+       context vẫn "running", nhìn mỗi nó sẽ tưởng nhạc chưa tắt. */
+    trangThai(){
+      return (ctxA ? ctxA.state : 'chưa tạo')
+        + (timer ? ' · nhạc đang chạy' : ' · nhạc đã tắt')
+        + (musOn ? '' : ' (người chơi tắt nhạc)');
+    },
     jump(){ tone({freq:330, to:640, dur:.13, vol:.09, type:'square'}); },
     // Nhảy lần hai: cao hơn và mảnh hơn, để tai nghe ra ngay là cú nhảy khác
     jump2(){ tone({freq:520, to:880, dur:.11, vol:.075, type:'triangle'}); },
@@ -2468,6 +2474,16 @@ docNganHangWeb(function(kho){
 });
 
 /* ==================== KHỞI ĐỘNG ==================== */
+
+/* Chuyển sang tab khác thì tắt nhạc, quay lại thì bật tiếp.
+   Vòng lặp game chạy bằng requestAnimationFrame nên trình duyệt tự ghìm lại khi
+   tab bị ẩn, NHƯNG nhạc thì không: nó chạy bằng setInterval và hẹn giờ sẵn
+   trong Web Audio, nên vẫn phát tiếp. Học sinh mở trò chơi rồi chuyển tab đi
+   học bài khác sẽ nghe nhạc vọng ra mà không biết tắt ở đâu. */
+document.addEventListener('visibilitychange', () => {
+  if(document.hidden) Snd.musicStop();
+  else if(G && G.def) Snd.music(G.def.theme || 'day');
+});
 /* Móc kiểm thử màn: mở kèm ?dev=1 rồi dùng window.__dev trong console.
    __dev.run(n) chạy n bước vật lí không phụ thuộc tốc độ khung hình — dùng để
    kiểm tra một màn mới có đi hết được không mà không phải ngồi chơi tay. */
