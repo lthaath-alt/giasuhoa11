@@ -36,6 +36,7 @@ CSS → HTML (canvas + các lớp phủ) → JavaScript trong một IIFE ở cu�
 | `function stepBoss(`  | Boss theo giai đoạn: khóa được van nào thì lò phun quái nhanh hơn |
 | `function checkKGates(`| Tới gần cửa kho thì mở lớp phủ kho đồ |
 | `TOTAL.kho`           | Kho nguyên tử — nằm trong TOTAL để theo người chơi sang màn sau |
+| `CHE_DO_THU`          | Chế độ thử của giáo viên: bất tử, bay, nhảy màn (bật bằng `?gv=1`) |
 | `function moKho(`     | Lớp phủ kho đồ: kéo thả nguyên tử ghép phân tử, cân bằng thì cửa mở |
 | `function ganKeo(`    | Kéo thả bằng pointer events, chạy được cả chuột lẫn cảm ứng |
 | `const P = {`         | Hằng số vật lí: trọng lực, lực nhảy, tốc độ, nhảy đôi |
@@ -255,6 +256,35 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
 .k-bang .khop{color:#8fd0a0} .k-bang .lech{color:#e2604e}
 .k-nut{display:flex; gap:10px; flex-wrap:wrap}
 
+/* ---------- Bảng chế độ thử ---------- */
+.thu{
+  position:absolute; left:12px; top:56px; z-index:4; width:186px;
+  font-family:var(--f-mono); font-size:12px;
+  background:rgba(12,26,42,.9); color:#dbe9f7;
+  border:2px solid #4b6c8e; border-radius:12px; overflow:hidden;
+  box-shadow:0 8px 24px rgba(0,0,0,.35);
+}
+.thu-dau{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:7px 10px; background:#1c3a5c; font-weight:700; letter-spacing:.05em;
+}
+.thu-dau button{
+  background:none; border:none; color:#dbe9f7; font-size:16px; cursor:pointer; line-height:1;
+}
+.thu-than{padding:9px 10px; display:flex; flex-direction:column; gap:7px}
+.thu-than.gon{display:none}
+.thu label{display:flex; align-items:center; gap:7px; cursor:pointer}
+.thu kbd{
+  margin-left:auto; background:#31506f; border-radius:5px; padding:1px 5px; font-size:10.5px;
+}
+.thu-hang{display:flex; gap:6px}
+.thu-nut{
+  flex:1; background:#31506f; color:#dbe9f7; border:1px solid #4b6c8e;
+  border-radius:7px; padding:5px 4px; font-family:inherit; font-size:11px; cursor:pointer;
+}
+.thu-nut:hover{background:#3d648a}
+.thu-ghi{margin:2px 0 0; font-size:10.5px; color:#8fb0cf; line-height:1.5}
+
 .opts{display:grid;gap:10px;margin:0 0 6px}
 .opt{
   display:flex;gap:12px;align-items:flex-start;text-align:left;
@@ -319,6 +349,27 @@ body.touch .stage{max-height:calc(100vh - 104px)}
 <div class="shell">
 <div class="stage" id="stage">
   <canvas id="cv" width="960" height="540"></canvas>
+
+  <!-- Chế độ thử — chỉ hiện khi trang được mở kèm ?gv=1, xem chú thích ở CHE_DO_THU -->
+  <div class="thu hide" id="thu">
+    <div class="thu-dau">
+      <span>Chế độ thử</span>
+      <button id="thu-thu-gon" title="Thu gọn">–</button>
+    </div>
+    <div class="thu-than" id="thu-than">
+      <label><input type="checkbox" id="thu-batu"> Bất tử <kbd>F1</kbd></label>
+      <label><input type="checkbox" id="thu-bay"> Bay <kbd>F2</kbd></label>
+      <div class="thu-hang">
+        <button class="thu-nut" id="thu-truoc">◀ Màn trước</button>
+        <button class="thu-nut" id="thu-sau">Màn sau ▶</button>
+      </div>
+      <div class="thu-hang">
+        <button class="thu-nut" id="thu-kho">Đầy kho nguyên tử</button>
+        <button class="thu-nut" id="thu-mang">+3 mạng</button>
+      </div>
+      <p class="thu-ghi">Chỉ ảnh hưởng lượt chơi này, không ghi vào đâu cả.</p>
+    </div>
+  </div>
 
   <!-- Màn giới thiệu -->
   <div class="veil" id="v-intro">
@@ -1115,7 +1166,7 @@ function startLoop(){
 }
 
 /* ==================== ĐIỀU KHIỂN ==================== */
-const keys = {left:false, right:false, jump:false};
+const keys = {left:false, right:false, jump:false, down:false};
 /* Trạng thái phím nhảy ở khung hình TRƯỚC, để phân biệt "vừa ấn" với "đang giữ".
    Cú nhảy giữa không trung chỉ nhận lần ấn mới — xem chú thích trong step(). */
 let jumpTruoc = false;
@@ -1124,7 +1175,11 @@ function bindKey(e, down){
   if(k === 'ArrowLeft' || k === 'a' || k === 'A'){ keys.left = down; e.preventDefault(); }
   else if(k === 'ArrowRight' || k === 'd' || k === 'D'){ keys.right = down; e.preventDefault(); }
   else if(k === ' ' || k === 'ArrowUp' || k === 'w' || k === 'W'){ keys.jump = down; e.preventDefault(); }
-  else if(k === 'ArrowDown' || k === 's' || k === 'S'){ if(down) dumpBag(); e.preventDefault(); }
+  else if(k === 'ArrowDown' || k === 's' || k === 'S'){
+    keys.down = down;                       // chế độ bay dùng phím này để hạ xuống
+    if(down && !CHE_DO_THU.bay) dumpBag();
+    e.preventDefault();
+  }
   else if(down && (k === 'm' || k === 'M')){
     toast(Snd.musicToggle() ? 'Đã bật nhạc' : 'Đã tắt nhạc');
   }
@@ -1223,6 +1278,22 @@ function step(){
   if(p.nh3 > 0) p.nh3--;
   if(p.mask > 0) p.mask--;
   if(p.dead){ deadStep(); return; }
+
+  /* Chế độ bay: bỏ qua trọng lực và va chạm, đi thẳng theo phím. Đặt TRƯỚC phần
+     chạy ngang để không phải vá vào giữa luồng vật lí thường — thoát chế độ bay
+     là mọi thứ trở lại y như cũ. */
+  if(CHE_DO_THU.bay){
+    const v = 7;
+    p.vx = (keys.right ? v : 0) - (keys.left ? v : 0);
+    p.vy = (keys.jump ? -v : 0) + (keys.down ? v : 0);
+    p.x = clamp(p.x + p.vx, 0, G.w*TS - p.w);
+    p.y = clamp(p.y + p.vy, -TS*4, G.h*TS);
+    if(p.vx) p.face = p.vx > 0 ? 1 : -1;
+    p.onGround = false; p.inv = 6; p.squash = 0;
+    G.cam = clamp(p.x - W/2, 0, Math.max(0, G.w*TS - W));
+    blinkT++; capNhatSanVo();
+    return;
+  }
 
   // chạy ngang
   if(keys.left){ p.vx -= P.accel; p.face = -1; }
@@ -1771,6 +1842,7 @@ function stepFoes(){
 function hurt(fell){
   const p = G.player;
   if(p.dead) return;
+  if(CHE_DO_THU.batTu){ if(fell) respawn(); return; }   // bất tử: rơi xuống vực thì đặt lại chỗ cũ
   if(!fell && p.inv > 0) return;
   if(!fell && p.shield){
     p.shield = false; p.inv = 90; Snd.bump();
@@ -2878,6 +2950,72 @@ docNganHangWeb(function(kho){
   ganNguon('Đồng bộ với ngân hàng của web: ' + QUESTIONS.length
     + ' câu chương ' + CHUONG_CUA_GAME + '.');
 });
+
+/* ==================== CHẾ ĐỘ THỬ (chỉ dành cho giáo viên) ====================
+   Bật bằng ?gv=1 trên địa chỉ trang. Phía web React chỉ thêm tham số này khi
+   người đăng nhập có vai trò super_admin hoặc school_admin.
+
+   NÓI RÕ CHO ĐÚNG: đây là cổng TIỆN LỢI, không phải cổng an ninh. Trang trò chơi
+   là tệp tĩnh ai cũng tải được, nên học sinh nào biết thì tự thêm ?gv=1 vào địa
+   chỉ cũng bật được. Chấp nhận được vì trò chơi KHÔNG gửi điểm về máy chủ hay
+   về ứng dụng (không có postMessage nào) — gian lận chỉ ảnh hưởng lượt chơi của
+   chính em đó, không làm sai dữ liệu của ai. Ngày nào điểm được ghi lại thật thì
+   phải kiểm ở phía máy chủ, đừng tin tham số này. */
+const CHE_DO_THU = { bat:false, batTu:false, bay:false };
+
+(function dungCheDoThu(){
+  if(new URLSearchParams(location.search).get('gv') !== '1') return;
+  CHE_DO_THU.bat = true;
+  $('thu').classList.remove('hide');
+
+  const oBatTu = $('thu-batu'), oBay = $('thu-bay');
+  const dongBo = () => {
+    CHE_DO_THU.batTu = oBatTu.checked;
+    CHE_DO_THU.bay = oBay.checked;
+    if(!CHE_DO_THU.bay && G && G.player) G.player.vy = 0;   // thoát bay thì rơi tự nhiên, đừng giữ vận tốc cũ
+  };
+  oBatTu.addEventListener('change', dongBo);
+  oBay.addEventListener('change', dongBo);
+
+  $('thu-thu-gon').addEventListener('click', () => {
+    const than = $('thu-than');
+    than.classList.toggle('gon');
+    $('thu-thu-gon').textContent = than.classList.contains('gon') ? '+' : '–';
+  });
+
+  const doiMan = d => {
+    const i = clamp(TOTAL.level + d, 0, LEVELS.length - 1);
+    if(i === TOTAL.level) { toast(d < 0 ? 'Đang ở màn đầu rồi' : 'Đang ở màn cuối rồi'); return; }
+    TOTAL.level = i;
+    hideMsg(); paused = false;
+    $('v-kho').classList.add('hide'); $('v-quiz').classList.add('hide');
+    khoDangMo = null;
+    loadLevel(i);
+    toast('Chế độ thử — đã sang màn ' + LEVELS[i].id);
+  };
+  $('thu-truoc').addEventListener('click', () => doiMan(-1));
+  $('thu-sau').addEventListener('click', () => doiMan(1));
+
+  $('thu-kho').addEventListener('click', () => {
+    ['N','H','O','S'].forEach(k => { TOTAL.kho[k] = (TOTAL.kho[k] || 0) + 10; });
+    toast('Chế độ thử — đã thêm 10 nguyên tử mỗi loại');
+  });
+  $('thu-mang').addEventListener('click', () => {
+    TOTAL.lives += 3;
+    toast('Chế độ thử — mạng hiện có: ' + TOTAL.lives);
+  });
+
+  /* Phím tắt F1/F2 để bật tắt nhanh mà không phải rời tay khỏi bàn phím.
+     Dùng F1/F2 chứ không dùng chữ cái: chữ cái đang là phím điều khiển nhân vật. */
+  window.addEventListener('keydown', e => {
+    if(e.key === 'F1'){ oBatTu.checked = !oBatTu.checked; dongBo(); e.preventDefault();
+      toast('Bất tử: ' + (CHE_DO_THU.batTu ? 'BẬT' : 'tắt')); }
+    if(e.key === 'F2'){ oBay.checked = !oBay.checked; dongBo(); e.preventDefault();
+      toast('Bay: ' + (CHE_DO_THU.bay ? 'BẬT' : 'tắt')); }
+  });
+
+  toast('Chế độ thử đang bật — bảng điều khiển ở góc trái');
+})();
 
 /* ==================== KHỞI ĐỘNG ==================== */
 

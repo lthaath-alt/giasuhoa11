@@ -3,6 +3,7 @@ import { Box, Typography, Card, Button, Dialog, IconButton } from '@mui/material
 import { Gamepad2, Play, X } from 'lucide-react';
 import { DetectiveArt, BoardGameArt, RescueArt } from './GameArt';
 import { BankFirestore, pushToGame } from '../bank/bankStore';
+import { useApp } from '../../core/hooks/useApp';
 
 interface GameData {
   id: string;
@@ -44,6 +45,19 @@ const GAMES: GameData[] = [
 
 export const GameHubSection: React.FC = () => {
   const [activeGame, setActiveGame] = useState<GameData | null>(null);
+  const { currentUser } = useApp();
+
+  /* Chế độ thử của trò chơi (bất tử, bay, nhảy màn) — chỉ mở cho quản trị.
+     Giáo viên cần đi hết các màn để kiểm nội dung câu hỏi mà không phải chơi giỏi.
+
+     NÓI RÕ CHO ĐÚNG: đây là cổng TIỆN LỢI, không phải cổng an ninh. Trang trò
+     chơi là tệp tĩnh ai cũng tải được, nên học sinh nào biết thì tự thêm ?gv=1
+     vào địa chỉ cũng bật được. Chấp nhận được vì trò chơi KHÔNG gửi điểm về máy
+     chủ hay về ứng dụng — gian lận chỉ ảnh hưởng lượt chơi của chính em đó,
+     không làm sai dữ liệu của ai. Ngày nào điểm được ghi lại thật thì phải kiểm
+     ở phía máy chủ, đừng tin tham số này. */
+  const choPhepThu = currentUser?.role === 'super_admin'
+                  || currentUser?.role === 'school_admin';
 
   /**
    * Đưa ngân hàng câu hỏi từ web sang trò chơi ngay khi mở mục này.
@@ -263,7 +277,7 @@ export const GameHubSection: React.FC = () => {
             </Box>
             <Box sx={{ flexGrow: 1, bgcolor: '#000000' }}>
               <iframe
-                src={activeGame.path}
+                src={activeGame.path + (choPhepThu ? '?gv=1' : '')}
                 title={activeGame.title}
                 style={{ width: '100%', height: '100%', border: 'none', display: 'block' }}
               />
