@@ -31,7 +31,9 @@ CSS → HTML (canvas + các lớp phủ) → JavaScript trong một IIFE ở cu�
 | `const LEVELS = [`    | Mô tả các màn bằng toạ độ, KHÔNG vẽ bản đồ bằng chuỗi ký tự |
 | `function buildLevel(`| Dựng lưới ô từ mô tả màn |
 | `const T = {`         | Mã các loại ô (rỗng, đất, gạch, ô ?, acid…) |
-| `const P = {`         | Hằng số vật lí: trọng lực, lực nhảy, tốc độ |
+| `const P = {`         | Hằng số vật lí: trọng lực, lực nhảy, tốc độ, nhảy đôi |
+| `const vuaAnPhim`     | Nhảy đôi — chỉ nhận lần ẤN MỚI, không nhận giữ phím |
+| `doCaoNhay(`          | Đo độ cao nhảy bằng ô (cần `?dev=1`), dùng khi chỉnh lực nhảy |
 | `function step(`      | Một bước cập nhật vật lí, chạy ở bước thời gian cố định |
 | `function moveX(`     | Va chạm theo trục ngang, tách riêng khỏi trục dọc |
 | `function hitBlock(`  | Đội đầu vào ô `?` → mở câu hỏi |
@@ -259,7 +261,7 @@ body.touch .stage{max-height:calc(100vh - 104px)}
       <p>Bạn là học sinh trực phòng thí nghiệm. Một sự cố làm cả khu xưởng hóa chất rò rỉ, và <b>cô giáo bị kẹt trong kho cuối dãy</b>. Muốn tới được đó, bạn phải đi qua bốn khu — và ở đâu cũng cần biết hóa mới sống sót.</p>
       <div class="keys">
         <div class="keyrow"><span class="kbd">←</span><span class="kbd">→</span> di chuyển</div>
-        <div class="keyrow"><span class="kbd">Space</span> hoặc <span class="kbd">↑</span> nhảy</div>
+        <div class="keyrow"><span class="kbd">Space</span> hoặc <span class="kbd">↑</span> nhảy — ấn lần nữa giữa không trung để <b>nhảy đôi</b></div>
         <div class="keyrow"><span class="kbd">↓</span> xả giỏ ion (màn Bể lắng)</div>
         <div class="keyrow"><span class="kbd">M</span> bật / tắt nhạc</div>
         <div class="keyrow"><span class="kbd">P</span> tạm dừng</div>
@@ -413,7 +415,18 @@ const TS = 36;                 // cạnh một ô, tính bằng pixel
 const P = {
   grav:0.78, jump:-13.8, jumpNH3:-16.8,
   accel:0.72, maxRun:5.0, fric:0.78, airFric:0.92,
-  maxFall:15, coyote:6, buffer:7
+  maxFall:15, coyote:6, buffer:7,
+
+  /* Nhảy đôi.
+     `nhayGiuaKhong` = số lần được nhảy thêm khi đang ở trên không, hồi lại mỗi
+     khi chạm đất. `lucNhayGiua` = lần nhảy thứ hai yếu hơn lần đầu.
+
+     Đo bằng `__dev.doCaoNhay()` (mở kèm ?dev=1): nhảy đơn 3,20 ô, nhảy đôi
+     5,29 ô. Bản đồ cao 15 ô nên còn xa mới chạm trần; các màn chỉ gồm nền mỏng
+     và vực chứ không có tường cao, nên độ cao này không cho vượt qua chỗ nào
+     mà màn chơi vốn bắt phải đi vòng. Chỉnh con số này thì ĐO LẠI, đừng ước
+     lượng bằng mắt. */
+  nhayGiuaKhong:1, lucNhayGiua:0.82
 };
 /* Tầm nhảy suy ra từ các số trên — bám theo đây khi thiết kế màn, đừng đặt ước chừng:
    · độ cao nhảy ≈ 122 px ≈ 3,4 ô; tầm xa ≈ 175 px ≈ 4,8 ô (giữ khe hở ≤ 4 ô cho chắc)
@@ -775,6 +788,8 @@ const Snd = (function(){
     /* Để kiểm tra: trình duyệt chỉ cho phát tiếng sau khi người dùng bấm thật */
     trangThai(){ return ctxA ? ctxA.state : 'chưa tạo' + (timer ? ' (có nhịp)' : ''); },
     jump(){ tone({freq:330, to:640, dur:.13, vol:.09, type:'square'}); },
+    // Nhảy lần hai: cao hơn và mảnh hơn, để tai nghe ra ngay là cú nhảy khác
+    jump2(){ tone({freq:520, to:880, dur:.11, vol:.075, type:'triangle'}); },
     coin(){ tone({freq:988, dur:.07, vol:.09, type:'square'}); tone({freq:1319, dur:.13, vol:.08, delay:.06, type:'square'}); },
     bump(){ tone({freq:180, to:110, dur:.1, vol:.1, type:'triangle'}); },
     stomp(){ tone({freq:520, to:150, dur:.14, vol:.1, type:'sawtooth'}); },
@@ -827,6 +842,7 @@ function buildLevel(def){
       x:def.start[0]*TS, y:def.start[1]*TS, w:24, h:32,
       vx:0, vy:0, onGround:false, face:1,
       coyote:0, buffer:0, inv:0, nh3:0, mask:0, shield:false, dead:false, t:0,
+      nhayGiua:P.nhayGiuaKhong,              // số lần nhảy giữa không trung còn lại
       bag:[],                                // giỏ ion đang mang
       squash:0                               // âm = dẹt xuống, dương = kéo dài
     },
@@ -855,6 +871,9 @@ function startLoop(){
 
 /* ==================== ĐIỀU KHIỂN ==================== */
 const keys = {left:false, right:false, jump:false};
+/* Trạng thái phím nhảy ở khung hình TRƯỚC, để phân biệt "vừa ấn" với "đang giữ".
+   Cú nhảy giữa không trung chỉ nhận lần ấn mới — xem chú thích trong step(). */
+let jumpTruoc = false;
 function bindKey(e, down){
   const k = e.key;
   if(k === 'ArrowLeft' || k === 'a' || k === 'A'){ keys.left = down; e.preventDefault(); }
@@ -956,7 +975,15 @@ function step(){
 
   // nhảy: có coyote time và đệm phím cho đỡ hụt
   if(keys.jump) p.buffer = P.buffer; else if(p.buffer > 0) p.buffer--;
-  if(p.onGround) p.coyote = P.coyote; else if(p.coyote > 0) p.coyote--;
+  if(p.onGround){ p.coyote = P.coyote; p.nhayGiua = P.nhayGiuaKhong; }
+  else if(p.coyote > 0) p.coyote--;
+
+  /* Lần nhảy thứ hai phải đòi ẤN LẠI phím, không dùng chung cơ chế đệm với lần
+     đầu. Vì giữ phím thì `p.buffer` được nạp đầy mỗi khung hình, nên nếu chỉ xét
+     buffer thì ngay khung hình sau cú nhảy đầu là lần thứ hai tự kích hoạt —
+     người chơi mất cú nhảy đôi mà không hiểu vì sao. */
+  const vuaAnPhim = keys.jump && !jumpTruoc;
+
   if(p.buffer > 0 && p.coyote > 0){
     p.vy = p.nh3 > 0 ? P.jumpNH3 : P.jump;
     p.onGround = false; p.buffer = 0; p.coyote = 0;
@@ -964,7 +991,21 @@ function step(){
     p.squash = .3;                                 // kéo dài người khi bật lên
     burst(p.x + p.w/2, p.y + p.h, 6, ['#ffffff','#dbe6f2'], {spread:1.7, grav:.06, life:20, size:2});
   }
+  else if(vuaAnPhim && !p.onGround && p.nhayGiua > 0){
+    p.nhayGiua--;
+    /* Đặt thẳng vận tốc chứ không cộng thêm: đang rơi nhanh mà cộng thì cú nhảy
+       gần như vô tác dụng, còn đang bay lên mà cộng thì vọt lên rất cao. Đặt
+       thẳng cho độ cao lần hai luôn như nhau, dễ ước lượng khi chơi. */
+    p.vy = (p.nh3 > 0 ? P.jumpNH3 : P.jump) * P.lucNhayGiua;
+    p.buffer = 0;
+    Snd.jump2();
+    p.squash = .26;
+    // vòng bụi quanh chân, khác với chùm bụi thẳng của cú nhảy đầu
+    burst(p.x + p.w/2, p.y + p.h/2, 10, ['#ffffff','#9fd8ff','#dbe6f2'],
+          {spread:2.6, grav:.02, life:22, size:2});
+  }
   if(!keys.jump && p.vy < -4) p.vy *= .86;        // thả phím sớm thì nhảy thấp
+  jumpTruoc = keys.jump;
 
   p.vy = clamp(p.vy + P.grav, -30, P.maxFall);
   const vyTruoc = p.vy;
@@ -2198,7 +2239,41 @@ if(new URLSearchParams(location.search).get('dev') === '1'){
     keys, step, draw, loadLevel, QUESTIONS, VALVE_Q, FX, Snd,
     get G(){ return G; },
     get TOTAL(){ return TOTAL; },
-    run(n){ for(let i=0; i<n; i++) step(); }
+    run(n){ for(let i=0; i<n; i++) step(); },
+
+    /* Đo độ cao nhảy bằng ô, để chỉnh P.lucNhayGiua mà không phải ngồi ước
+       lượng bằng mắt. `nhayDoi` = false thì GIỮ phím suốt (cú nhảy đầy, vì thả
+       phím sớm sẽ bị cắt bởi luật `p.vy *= .86`); true thì nhả rồi ấn lại đúng
+       lúc lên tới đỉnh cú đầu — chính là cách người chơi bấm nhảy đôi. */
+    doCaoNhay(nhayDoi){
+      /* PHẢI tạm dừng vòng lặp game trước khi đo. Nếu không, requestAnimationFrame
+         vẫn gọi step() song song với vòng đo này, mỗi khung hình nhân vật bị
+         cập nhật hai lần và số đo nhảy lung tung — cùng một cú nhảy đơn lúc ra
+         2,13 ô lúc ra 3,2 ô. */
+      const dungTruoc = paused;
+      paused = true;
+
+      const p = G.player;
+      let cho = 0;
+      while(!p.onGround && cho++ < 300) step();   // chờ tiếp đất rồi mới đo
+      const y0 = p.y;
+      let cao = 0, daNhayLai = false;
+
+      keys.jump = false; jumpTruoc = false;
+      keys.jump = true;
+      for(let i = 0; i < 240; i++){
+        step();
+        cao = Math.max(cao, (y0 - p.y) / TS);
+        if(nhayDoi && !daNhayLai && p.vy >= -0.5 && !p.onGround){
+          keys.jump = false; step();          // nhả một khung hình rồi ấn lại
+          keys.jump = true;  daNhayLai = true;
+        }
+        if(p.onGround && i > 10) break;
+      }
+      keys.jump = false; jumpTruoc = false;
+      paused = dungTruoc;
+      return Math.round(cao * 100) / 100;
+    }
   };
 }
 
