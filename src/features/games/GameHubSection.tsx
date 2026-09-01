@@ -50,14 +50,35 @@ export const GameHubSection: React.FC = () => {
   /* Chế độ thử của trò chơi (bất tử, bay, nhảy màn) — chỉ mở cho quản trị.
      Giáo viên cần đi hết các màn để kiểm nội dung câu hỏi mà không phải chơi giỏi.
 
-     NÓI RÕ CHO ĐÚNG: đây là cổng TIỆN LỢI, không phải cổng an ninh. Trang trò
-     chơi là tệp tĩnh ai cũng tải được, nên học sinh nào biết thì tự thêm ?gv=1
-     vào địa chỉ cũng bật được. Chấp nhận được vì trò chơi KHÔNG gửi điểm về máy
-     chủ hay về ứng dụng — gian lận chỉ ảnh hưởng lượt chơi của chính em đó,
-     không làm sai dữ liệu của ai. Ngày nào điểm được ghi lại thật thì phải kiểm
-     ở phía máy chủ, đừng tin tham số này. */
+     Bản đầu truyền ?gv=1 vào địa chỉ trang trò chơi. Đó là LỖ HỔNG: trang trò
+     chơi là tệp tĩnh, học sinh nào biết thì tự gõ thêm ?gv=1 là bật được, kể cả
+     khi đăng nhập bằng tài khoản học sinh. Đã bỏ hẳn cách đó.
+
+     Nay trang trò chơi phải HỎI XIN, và chỗ này mới là nơi quyết định — dựa vào
+     vai trò của người ĐANG ĐĂNG NHẬP chứ không dựa vào địa chỉ trang. Học sinh
+     sửa địa chỉ cũng không ăn thua vì câu trả lời không nhìn địa chỉ.
+
+     Giới hạn còn lại, nói cho đúng: ai mở được công cụ lập trình của trình duyệt
+     thì vẫn sửa được biến trong bộ nhớ — không cách nào chặn ở phía máy người
+     dùng. Chấp nhận được vì trò chơi không gửi điểm về máy chủ, gian lận chỉ
+     ảnh hưởng lượt chơi của chính em đó. Ngày nào điểm được ghi lại thật thì
+     phải kiểm ở phía máy chủ. */
   const choPhepThu = currentUser?.role === 'super_admin'
                   || currentUser?.role === 'school_admin';
+
+  useEffect(() => {
+    const traLoi = (e: MessageEvent) => {
+      // Chỉ nghe khung cùng nguồn, và chỉ đúng loại tin nhắn này
+      if (e.origin !== window.location.origin) return;
+      if (!e.data || e.data.loai !== 'hoa11:xin-che-do-thu') return;
+      (e.source as Window | null)?.postMessage(
+        { loai: 'hoa11:tra-loi-che-do-thu', cho: choPhepThu },
+        window.location.origin,
+      );
+    };
+    window.addEventListener('message', traLoi);
+    return () => window.removeEventListener('message', traLoi);
+  }, [choPhepThu]);
 
   /**
    * Đưa ngân hàng câu hỏi từ web sang trò chơi ngay khi mở mục này.
@@ -277,7 +298,7 @@ export const GameHubSection: React.FC = () => {
             </Box>
             <Box sx={{ flexGrow: 1, bgcolor: '#000000' }}>
               <iframe
-                src={activeGame.path + (choPhepThu ? '?gv=1' : '')}
+                src={activeGame.path}
                 title={activeGame.title}
                 style={{ width: '100%', height: '100%', border: 'none', display: 'block' }}
               />

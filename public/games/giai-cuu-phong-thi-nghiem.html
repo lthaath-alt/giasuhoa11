@@ -2951,20 +2951,27 @@ docNganHangWeb(function(kho){
     + ' câu chương ' + CHUONG_CUA_GAME + '.');
 });
 
-/* ==================== CHẾ ĐỘ THỬ (chỉ dành cho giáo viên) ====================
-   Bật bằng ?gv=1 trên địa chỉ trang. Phía web React chỉ thêm tham số này khi
-   người đăng nhập có vai trò super_admin hoặc school_admin.
+/* ==================== CHẾ ĐỘ THỬ (chỉ dành cho quản trị) ====================
+   KHÔNG bật bằng tham số trên địa chỉ. Trang trò chơi là tệp tĩnh, học sinh nào
+   biết thì gõ thêm ?gv=1 là bật được — nên phiên bản đầu dùng cách đó là một lỗ
+   hổng thật, đã bỏ.
 
-   NÓI RÕ CHO ĐÚNG: đây là cổng TIỆN LỢI, không phải cổng an ninh. Trang trò chơi
-   là tệp tĩnh ai cũng tải được, nên học sinh nào biết thì tự thêm ?gv=1 vào địa
-   chỉ cũng bật được. Chấp nhận được vì trò chơi KHÔNG gửi điểm về máy chủ hay
-   về ứng dụng (không có postMessage nào) — gian lận chỉ ảnh hưởng lượt chơi của
-   chính em đó, không làm sai dữ liệu của ai. Ngày nào điểm được ghi lại thật thì
-   phải kiểm ở phía máy chủ, đừng tin tham số này. */
+   Nay trang tự HỎI ứng dụng web đang nhúng nó: gửi một tin nhắn xin phép, ứng
+   dụng đọc vai trò của người ĐANG ĐĂNG NHẬP rồi mới trả lời cho hay không.
+   Nhờ vậy:
+     - mở thẳng tệp trò chơi (không qua web) thì không có ai để hỏi -> không bật
+     - đăng nhập bằng tài khoản học sinh -> ứng dụng trả lời "không" -> không bật
+     - chỉ super_admin và school_admin mới được trả lời "có"
+
+   Vẫn phải nói thẳng giới hạn: người biết mở công cụ lập trình của trình duyệt
+   thì sửa được biến trong bộ nhớ, không cách nào chặn ở phía máy người dùng.
+   Chấp nhận được vì trò chơi không gửi điểm về máy chủ — gian lận chỉ ảnh hưởng
+   lượt chơi của chính em đó. Ngày nào điểm được ghi lại thật thì phải kiểm ở
+   phía máy chủ. */
 const CHE_DO_THU = { bat:false, batTu:false, bay:false };
 
-(function dungCheDoThu(){
-  if(new URLSearchParams(location.search).get('gv') !== '1') return;
+function batCheDoThu(){
+  if(CHE_DO_THU.bat) return;
   CHE_DO_THU.bat = true;
   $('thu').classList.remove('hide');
 
@@ -2972,7 +2979,7 @@ const CHE_DO_THU = { bat:false, batTu:false, bay:false };
   const dongBo = () => {
     CHE_DO_THU.batTu = oBatTu.checked;
     CHE_DO_THU.bay = oBay.checked;
-    if(!CHE_DO_THU.bay && G && G.player) G.player.vy = 0;   // thoát bay thì rơi tự nhiên, đừng giữ vận tốc cũ
+    if(!CHE_DO_THU.bay && G && G.player) G.player.vy = 0;   // thoát bay thì rơi tự nhiên
   };
   oBatTu.addEventListener('change', dongBo);
   oBay.addEventListener('change', dongBo);
@@ -2985,7 +2992,7 @@ const CHE_DO_THU = { bat:false, batTu:false, bay:false };
 
   const doiMan = d => {
     const i = clamp(TOTAL.level + d, 0, LEVELS.length - 1);
-    if(i === TOTAL.level) { toast(d < 0 ? 'Đang ở màn đầu rồi' : 'Đang ở màn cuối rồi'); return; }
+    if(i === TOTAL.level){ toast(d < 0 ? 'Đang ở màn đầu rồi' : 'Đang ở màn cuối rồi'); return; }
     TOTAL.level = i;
     hideMsg(); paused = false;
     $('v-kho').classList.add('hide'); $('v-quiz').classList.add('hide');
@@ -3005,8 +3012,7 @@ const CHE_DO_THU = { bat:false, batTu:false, bay:false };
     toast('Chế độ thử — mạng hiện có: ' + TOTAL.lives);
   });
 
-  /* Phím tắt F1/F2 để bật tắt nhanh mà không phải rời tay khỏi bàn phím.
-     Dùng F1/F2 chứ không dùng chữ cái: chữ cái đang là phím điều khiển nhân vật. */
+  /* F1/F2 chứ không dùng chữ cái: chữ cái đang là phím điều khiển nhân vật. */
   window.addEventListener('keydown', e => {
     if(e.key === 'F1'){ oBatTu.checked = !oBatTu.checked; dongBo(); e.preventDefault();
       toast('Bất tử: ' + (CHE_DO_THU.batTu ? 'BẬT' : 'tắt')); }
@@ -3015,6 +3021,20 @@ const CHE_DO_THU = { bat:false, batTu:false, bay:false };
   });
 
   toast('Chế độ thử đang bật — bảng điều khiển ở góc trái');
+}
+
+(function xinCheDoThu(){
+  if(window.parent === window) return;         // mở thẳng tệp, không có ai để hỏi
+
+  window.addEventListener('message', e => {
+    // Chỉ nghe ứng dụng cùng nguồn. Bỏ kiểm chỗ này là trang web bất kì nhúng
+    // trò chơi vào rồi tự trả lời "có" cũng bật được chế độ thử.
+    if(e.origin !== window.location.origin) return;
+    if(!e.data || e.data.loai !== 'hoa11:tra-loi-che-do-thu') return;
+    if(e.data.cho === true) batCheDoThu();
+  });
+
+  window.parent.postMessage({ loai:'hoa11:xin-che-do-thu' }, window.location.origin);
 })();
 
 /* ==================== KHỞI ĐỘNG ==================== */
