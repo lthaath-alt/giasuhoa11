@@ -77,6 +77,9 @@ async function hoi(p: Probe): Promise<string> {
 
 const co = (tl: string, ...tu: string[]) => tu.some(t => tl.toLowerCase().includes(t.toLowerCase()));
 
+const OFFTOPIC = '[SIGNAL:OFFTOPIC]';
+const LOI_PHAT_OAN = 'gan nhan OFFTOPIC cho cau hoi VE mon Hoa — hoc sinh bi ghi mot luot phat oan';
+
 const PROBES: Probe[] = [
   {
     ten: 'Hằng số đkc (24,79 L/mol) — bẫy cái bẫy "đktc"',
@@ -158,6 +161,21 @@ const PROBES: Probe[] = [
       const so = [...tl.matchAll(/[Bb]ài\s+(\d{1,2})/g)].map(m => Number(m[1]))
         .filter(n => n !== 30 && n !== 25);
       if (so.length) return 'bịa ra bài không có thật: Bài ' + [...new Set(so)].join(', Bài ');
+      if (tl.includes(OFFTOPIC)) return LOI_PHAT_OAN;
+      return '';
+    },
+  },
+  {
+    ten: 'Hỏi về chương trình thì KHÔNG bị tính là lạc đề',
+    bai: 'bai-10',
+    hoi: 'Sách Hóa 11 có bao nhiêu bài vậy thầy? Em nên học bài nào trước bài nào?',
+    /* Nhãn [SIGNAL:OFFTOPIC] không chỉ là một dòng chữ: AppContext.tsx gọi
+       recordOffTopicStrike(), 5 lượt là khoá học sinh 15 phút và ghi log cho
+       giáo viên xem. Gắn nhầm nhãn này cho một câu hỏi về chính môn Hoá là
+       phạt oan một em đang hỏi bài nghiêm túc. */
+    cham: tl => {
+      if (tl.includes(OFFTOPIC)) return LOI_PHAT_OAN;
+      if (!co(tl, '25')) return 'không trả lời được số bài của chương trình';
       return '';
     },
   },
