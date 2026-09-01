@@ -34,8 +34,10 @@ CSS → HTML (canvas + các lớp phủ) → JavaScript trong một IIFE ở cu�
 | `function danhDauSanVo(`| Sàn vỡ: giẫm lên là đếm giờ rồi sập |
 | `function blinkPha(`  | Nhịp chớp tắt của sàn thép, dùng chung cho cả màn |
 | `function stepBoss(`  | Boss theo giai đoạn: khóa được van nào thì lò phun quái nhanh hơn |
-| `function checkKGates(`| Cửa kho vật tư: mở bằng số vật tư tích được, không phải bằng ion |
-| `TOTAL.vatTu`         | Vật tư — nằm trong TOTAL để theo người chơi sang màn sau |
+| `function checkKGates(`| Tới gần cửa kho thì mở lớp phủ kho đồ |
+| `TOTAL.kho`           | Kho nguyên tử — nằm trong TOTAL để theo người chơi sang màn sau |
+| `function moKho(`     | Lớp phủ kho đồ: kéo thả nguyên tử ghép phân tử, cân bằng thì cửa mở |
+| `function ganKeo(`    | Kéo thả bằng pointer events, chạy được cả chuột lẫn cảm ứng |
 | `const P = {`         | Hằng số vật lí: trọng lực, lực nhảy, tốc độ, nhảy đôi |
 | `const vuaAnPhim`     | Nhảy đôi — chỉ nhận lần ẤN MỚI, không nhận giữ phím |
 | `doCaoNhay(`          | Đo độ cao nhảy bằng ô (cần `?dev=1`), dùng khi chỉnh lực nhảy |
@@ -119,7 +121,12 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
 /* ---------- Lớp phủ chung ---------- */
 .veil{
   position:absolute;inset:0;z-index:5;
-  display:flex;align-items:center;justify-content:center;
+  /* align-items:flex-start + margin:auto trên .card, KHÔNG dùng align-items:center.
+     Với center, khi thẻ cao hơn lớp phủ thì phần tràn ở PHÍA TRÊN bị cắt và không
+     cuộn tới được — lỗi flexbox kinh điển. margin:auto vẫn căn giữa khi đủ chỗ.
+     Đây là phòng xa cho máy màn hình thấp: ở các cỡ đã thử thì khung kho đồ vẫn
+     vừa màn hình, chưa quan sát được lỗi thật. */
+  display:flex;align-items:flex-start;justify-content:center;
   background:rgba(122,182,232,.55);backdrop-filter:blur(4px);
   padding:20px;overflow-y:auto;
   animation:veilIn .18s ease-out;
@@ -128,7 +135,7 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
 .card{
   background:linear-gradient(180deg,var(--ui-bg) 0%,var(--ui-bg-2) 100%);
   border:3px solid #fff;border-radius:20px;
-  padding:clamp(16px,3vw,30px);max-width:660px;width:100%;
+  padding:clamp(16px,3vw,30px);max-width:660px;width:100%;margin:auto;
   box-shadow:0 0 0 3px var(--ui-line), 0 22px 50px rgba(8,26,48,.4);
   animation:cardPop .26s cubic-bezier(.2,1.5,.5,1);
 }
@@ -193,6 +200,61 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
   font-size:clamp(14.5px,2.1vw,17px);line-height:1.6;margin:0 0 16px;
   color:var(--ui-text);font-weight:700;
 }
+/* ── Kho đồ: kéo thả nguyên tử ─────────────────────────────────────────────
+   Kéo thả dùng chung một cơ chế cho cả chuột lẫn cảm ứng (pointer events), chứ
+   KHÔNG dùng HTML5 drag-and-drop: API đó không chạy trên hầu hết trình duyệt
+   điện thoại, mà nửa lớp học mở web bằng điện thoại. */
+.k-pt{
+  font-family:var(--f-mono); font-size:clamp(15px,2.3vw,21px); font-weight:600;
+  text-align:center; color:var(--ui-text); background:rgba(255,255,255,.06);
+  border:1px solid var(--ui-line); border-radius:12px; padding:12px 10px; margin:0 0 14px;
+}
+.k-nhan{margin:0 0 7px; font-size:12.5px; color:var(--ui-text-dim); font-weight:700}
+/* Khung kho do dai hon cac lop phu khac (phuong trinh + kho + o ghep + bang kiem),
+   nen ep gon lai cho vua man hinh laptop thap va dien thoai nam ngang. */
+#v-kho .card{padding:clamp(13px,2.2vw,20px)}
+#v-kho .stem{font-size:clamp(13px,1.8vw,15px); margin-bottom:10px}
+#v-kho .k-pt{padding:9px 10px; margin-bottom:11px}
+#v-kho .k-kho{margin-bottom:12px}
+#v-kho .k-bang{padding-top:9px; margin-bottom:11px; line-height:1.7}
+.k-kho{display:flex; flex-wrap:wrap; gap:9px; margin-bottom:16px; min-height:44px}
+.k-oghep{display:flex; flex-wrap:wrap; gap:12px; margin-bottom:14px}
+
+.ngtu{
+  width:42px; height:42px; border-radius:11px; border:2px solid rgba(255,255,255,.28);
+  display:flex; align-items:center; justify-content:center; position:relative;
+  font-family:var(--f-mono); font-weight:700; font-size:16px; color:#10202e;
+  cursor:grab; user-select:none; touch-action:none;
+}
+.ngtu.keo{opacity:.45}
+.ngtu .dem{
+  position:absolute; right:-5px; bottom:-5px; min-width:18px; height:18px; padding:0 4px;
+  border-radius:9px; background:#10202e; color:#fff; font-size:11px;
+  display:flex; align-items:center; justify-content:center;
+}
+.ngtu.het{opacity:.28; cursor:not-allowed}
+
+.o-ghep{
+  min-width:132px; min-height:74px; border-radius:14px; padding:9px;
+  border:2px dashed var(--ui-line); background:rgba(255,255,255,.04);
+  display:flex; flex-direction:column; gap:6px;
+}
+.o-ghep.tren{border-color:#9fd8ff; background:rgba(159,216,255,.12)}
+.o-ghep.dung{border-style:solid; border-color:#8fd0a0; background:rgba(143,208,160,.14)}
+.o-ghep .ten{font-size:11px; color:var(--ui-text-dim); font-weight:700}
+.o-ghep .chua{display:flex; flex-wrap:wrap; gap:5px}
+.o-ghep .ct{font-family:var(--f-mono); font-size:14px; font-weight:700; color:var(--ui-text)}
+.o-ghep .vien{width:26px;height:26px;border-radius:8px;display:flex;align-items:center;
+  justify-content:center;font-family:var(--f-mono);font-size:12px;font-weight:700;color:#10202e;cursor:pointer}
+
+.k-bang{
+  font-family:var(--f-mono); font-size:13px; line-height:1.9;
+  border-top:1px solid var(--ui-line); padding-top:12px; margin-bottom:14px;
+}
+.k-bang .dong{display:flex; gap:10px; align-items:center}
+.k-bang .khop{color:#8fd0a0} .k-bang .lech{color:#e2604e}
+.k-nut{display:flex; gap:10px; flex-wrap:wrap}
+
 .opts{display:grid;gap:10px;margin:0 0 6px}
 .opt{
   display:flex;gap:12px;align-items:flex-start;text-align:left;
@@ -274,6 +336,28 @@ body.touch .stage{max-height:calc(100vh - 104px)}
       <div class="legend" id="legend"></div>
       <p class="kicker" id="nguon-cau-hoi" style="margin-top:14px">Đang đọc ngân hàng câu hỏi…</p>
       <button class="btn" id="btn-play">Vào màn 2‑1</button>
+    </div>
+  </div>
+
+  <!-- Kho đồ: kéo nguyên tử ra ghép phân tử để mở cửa kho -->
+  <div class="veil hide" id="v-kho">
+    <div class="card qwrap">
+      <p class="kicker" id="k-kicker">Cửa kho</p>
+      <p class="stem" id="k-de"></p>
+      <p class="k-pt" id="k-pt"></p>
+
+      <p class="k-nhan">Kho đồ — kéo nguyên tử thả vào ô ghép bên dưới</p>
+      <div class="k-kho" id="k-kho"></div>
+
+      <p class="k-nhan" id="k-nhan-o"></p>
+      <div class="k-oghep" id="k-oghep"></div>
+
+      <div class="k-bang" id="k-bang"></div>
+
+      <div class="k-nut">
+        <button class="btn ghost" id="k-tra">Trả hết về kho</button>
+        <button class="btn ghost" id="k-thoat">Để lát nữa</button>
+      </div>
     </div>
   </div>
 
@@ -504,7 +588,7 @@ const LEVELS = [
     id:'2-2',
     name:'Ống khói nhà máy',
     theme:'factory',
-    brief:'Trạm quan trắc báo SO₂ vượt ngưỡng, khói mù đọng thành lớp dưới thấp. Lấy khăn tẩm dung dịch kiềm để đi xuyên qua, hoặc leo bệ cao mà tránh. Hai cửa kho chắn ngang đường, mỗi cửa đòi vật tư — vật tư có được từ mỗi câu hỏi bạn trả lời đúng, kể cả những câu đã làm ở màn trước.',
+    brief:'Trạm quan trắc báo SO₂ vượt ngưỡng, khói mù đọng thành lớp dưới thấp. Lấy khăn tẩm dung dịch kiềm để đi xuyên qua, hoặc leo bệ cao mà tránh. Hai cửa kho chắn ngang đường: tới nơi thì mở kho đồ, kéo nguyên tử ra ghép thành phân tử sao cho hai vế phương trình cân bằng. Nguyên tử lấy từ các câu hỏi trả lời đúng, kể cả câu đã làm ở màn trước.',
     w:150, h:15,
     // Noi rong vuc 3 -> 4 o: nhay don van toi duoc nhung phai chay het da,
     // nhay doi thanh duong cuu khi hut nhip chu khong con la thua thai.
@@ -522,19 +606,31 @@ const LEVELS = [
     // [cột, hàng, rộng, cao] — lớp khói nằm sát mặt đất, đi bộ qua là dính
     gas:[[25,11,5,2],[46,11,6,2],[65,11,5,2],[105,11,7,2],[130,11,6,2]],
     // Ô ? phải nằm ở cột KHÔNG có bệ hàng 10 phía trên, nếu không sẽ bị chắn
-    /* Hai cua kho, moi cua doi 3 vat tu.
-       So o ? TRUOC moi cua phai LON HON so vat tu cua do doi, neu khong thi hoc
-       sinh nao bo qua man 1 va lo tra loi sai mot cau se ket cung: tra loi sai la
-       o ? bien thanh o da dung, khong lam lai duoc, ma cung khong quay ve man
-       truoc duoc. Nen o day:
-         truoc cua 58  co 4 o ? (cot 9, 28, 39, 54) cho nhu cau 3
-         truoc cua 120 co 4 o ? (cot 70, 86, 96, 110) cho nhu cau 3
-       tuc la sai mot cau van qua duoc. Lam o man 1 thi du dat hon nhieu. */
+    /* Hai cửa kho. Mỗi cửa bắt ghép phân tử từ nguyên tử trong kho, rồi số
+       nguyên tử hai vế phải khớp — tức là tự cân bằng phương trình.
+
+       Số ô ? TRƯỚC mỗi cửa phải dư so với số nguyên tử cửa đó cần, nếu không
+       thì học sinh nào bỏ qua màn 1 và lỡ trả lời sai một câu sẽ kẹt cứng: ô ?
+       trả lời sai là thành ô đã dùng, không làm lại được, mà cũng không quay về
+       màn trước được.
+         cửa 58  cần N 2 · H 6, trước nó có 4 ô ? (cột 9, 28, 39, 54)
+         cửa 120 cần S 2 · O 6, trước nó có 4 ô ? (cột 70, 86, 96, 110)
+       Mỗi câu đúng cho N1 H2 S1 O2, nên 3 câu là đủ cho một cửa — sai một câu
+       vẫn qua được. Làm bài ở màn 1 thì dư dả hơn nhiều. */
     kgates:[
-      {col:58, need:3, ten:'Cua kho A',
-       e:'Kho vat tu chi mo cho nguoi biet viec. Moi cau tra loi dung la mot lan chung minh dieu do, o man truoc hay man nay deu duoc tinh.'},
-      {col:120, need:3, ten:'Cua kho B',
-       e:'Cang vao sau khoi SO2 cang day, cua kho cang chac. Van 3 vat tu, nhung lan nay ban da tieu mat so cu roi.'}
+      {col:58, ten:'Cửa kho A — tổng hợp ammonia',
+       de:'Cửa chỉ mở khi bạn ghép đủ sản phẩm của phản ứng tổng hợp ammonia và số nguyên tử hai vế khớp nhau.',
+       pt:'N₂  +  3H₂  →  ?',
+       ptDu:'N₂ + 3H₂ → 2NH₃',
+       veTrai:{N:2, H:6}, phanTu:'NH₃', thuTu:['N','H'], soPhanTu:2,
+       e:'Hai vế phải có đúng 2 nguyên tử N và 6 nguyên tử H, nên sản phẩm là 2 phân tử NH₃. Đây là phản ứng Haber, nền tảng của cả ngành phân đạm.'},
+
+      {col:120, ten:'Cửa kho B — oxi hoá sulfur dioxide',
+       de:'Khói SO₂ ngoài kia phải được oxi hoá tiếp thì mới xử lí được. Ghép đúng sản phẩm rồi cửa mở.',
+       pt:'2SO₂  +  O₂  →  ?',
+       ptDu:'2SO₂ + O₂ → 2SO₃',
+       veTrai:{S:2, O:6}, phanTu:'SO₃', thuTu:['S','O'], soPhanTu:2,
+       e:'Vế trái có 2 nguyên tử S và 4 + 2 = 6 nguyên tử O, nên sản phẩm là 2 phân tử SO₃. Đây là bước then chốt trong dây chuyền sản xuất sulfuric acid.'}
     ],
     qblocks:[[9,9],[28,5],[39,9],[54,9],[70,9],[86,9],[96,9],[110,5],[137,9],[142,9]],
     bricks:[[10,9],[29,5],[40,9],[55,9],[71,9],[87,9],[97,9],[111,5],[138,9],[143,9]],
@@ -698,10 +794,10 @@ let G = null;           // trạng thái màn đang chơi
 let running = false;    // vòng lặp có đang chạy không
 let paused = false;
 let askedIdx = [];      // các câu đã hỏi trong phiên, để không lặp lại
-/* `vatTu` CO Y nam trong TOTAL chu khong nam trong G: G bi dung lai moi lan nap
-   man, con vat tu thi phai theo nguoi choi sang man sau — do la ca y nghia cua
-   co che nay. Chi ve 0 khi choi lai tu dau. */
-let TOTAL = {score:0, coins:0, lives:3, level:0, vatTu:0};
+/* `kho` (nguyên tử đã nhặt) CỐ Ý nằm trong TOTAL chứ không nằm trong G: G bị
+   dựng lại mỗi lần nạp màn, còn nguyên tử thì phải theo người chơi sang màn sau
+   — đó là cả ý nghĩa của cơ chế này. Chỉ về rỗng khi chơi lại từ đầu. */
+let TOTAL = {score:0, coins:0, lives:3, level:0, kho:{}};
 
 const $ = id => document.getElementById(id);
 const clamp = (v,a,b) => v < a ? a : (v > b ? b : v);
@@ -964,7 +1060,7 @@ function buildLevel(def){
      Chắn kín tới hàng 0 là cách duy nhất chắc chắn: không có tầm nhảy nào lách
      qua được, và sau này có chỉnh lực nhảy cũng không phải tính lại. */
   (def.gates || []).forEach(g => { for(let y=0; y<=12; y++) set(g.col, y, T.GATE); });
-  // Cua vat tu: chan kin tu tran xuong dat, y het cua loc — nhay doi khong lach qua duoc
+  // Cửa kho: chắn kín từ trần xuống đất, y hệt cửa lọc — nhảy đôi không lách qua được
   (def.kgates || []).forEach(g => { for(let y=0; y<=12; y++) set(g.col, y, T.KGATE); });
   (def.valves || []).forEach(([x, y]) => set(x, y, T.VALVE));
   if(def.wall != null) for(let y=8; y<=12; y++) set(def.wall, y, T.STONE);
@@ -1047,6 +1143,8 @@ function padBtn(id, key){
   el.addEventListener('pointerleave', off);
 }
 padBtn('p-left', 'left'); padBtn('p-right', 'right'); padBtn('p-jump', 'jump');
+$('k-tra').addEventListener('click', traHetVeKho);
+$('k-thoat').addEventListener('click', dongKho);
 $('p-dump').addEventListener('pointerdown', e => { e.preventDefault(); Snd.kick(); dumpBag(); });
 if(window.matchMedia('(pointer:coarse)').matches) document.body.classList.add('touch');
 
@@ -1372,36 +1470,238 @@ function checkGates(p){
   });
 }
 
-/* Cua vat tu: mo bang so vat tu tich duoc, khong lien quan gio ion cua man 3.
-   CO Y tach rieng khoi checkGates: hai co che khac nhau ve ban chat (mot ben la
-   dung cong thuc hoa hoc, mot ben la du so luong), tron vao nhau thi sau nay sua
-   cai nay hong cai kia. */
+/* ==================== KHO ĐỒ VÀ CỬA KHO ====================
+   Cửa kho không mở bằng số lượng, mà bắt người chơi tự GHÉP phân tử từ những
+   nguyên tử đã nhặt được, rồi phải khớp với vế trái của phương trình.
+
+   Tách hẳn khỏi cửa lọc (checkGates) của màn Bể lắng: bên đó là chọn đúng ion có
+   sẵn, bên này là ghép nguyên tử thành phân tử và cân bằng. Trộn hai cơ chế vào
+   nhau thì sau này sửa cái này sẽ hỏng cái kia. */
+
+/* Mỗi câu hỏi trả lời đúng cho một mẻ nguyên tử. Cho cả bốn nguyên tố để nguyên
+   tử nhặt ở màn 1 dùng được cho cả hai cửa của màn 2, khỏi phải nhớ cửa nào cần
+   gì. Tỉ lệ H và O gấp đôi vì phân tử nào cũng cần nhiều chúng hơn. */
+const THUONG_NGUYEN_TU = {N:1, H:2, S:1, O:2};
+
+/* Màu theo nguyên tố — giữ đúng quy ước màu quen thuộc trong sách: O đỏ,
+   N xanh dương, H trắng, S vàng. */
+const MAU_NGUYEN_TU = {
+  N:'#7fb2ff', H:'#f0f4f8', O:'#ff8a7a', S:'#f5d142', C:'#b9c3cc'
+};
+
+/* Đếm nguyên tố trong một danh sách nguyên tử: ['N','H','H','H'] → {N:1, H:3} */
+function demNguyenTo(ds){
+  const m = {};
+  ds.forEach(k => { m[k] = (m[k] || 0) + 1; });
+  return m;
+}
+
+/* {N:1, H:3} → "NH₃". Thứ tự nguyên tố lấy theo `thuTu` của phân tử đích, để
+   NH₃ không bị viết thành H₃N — đúng chất nhưng học sinh nhìn sẽ tưởng sai. */
+const SO_DUOI = {1:'', 2:'₂', 3:'₃', 4:'₄', 5:'₅', 6:'₆', 7:'₇', 8:'₈', 9:'₉'};
+function vietCongThuc(dem, thuTu){
+  const khoa = (thuTu || []).filter(k => dem[k]).concat(
+    Object.keys(dem).filter(k => !(thuTu || []).includes(k)));
+  return khoa.map(k => k + (SO_DUOI[dem[k]] ?? ('_' + dem[k]))).join('') || '—';
+}
+
+function tongKho(){
+  return Object.values(TOTAL.kho).reduce((a, b) => a + b, 0);
+}
+
+/* ── Trạng thái của lần mở kho đang diễn ra ──
+   Để ngoài hàm để nút "Trả hết về kho" và phần kéo thả cùng nhìn thấy. */
+let khoDangMo = null;   // { g, oGhep: [ ['N','H',…], … ] }
+
+function moKho(g){
+  paused = true;
+  khoDangMo = { g, oGhep: Array.from({length: g.soPhanTu}, () => []) };
+  $('k-kicker').textContent = g.ten;
+  $('k-de').textContent = g.de;
+  $('k-pt').textContent = g.pt;
+  $('k-nhan-o').textContent = 'Ghép ' + g.soPhanTu + ' phân tử ' + g.phanTu
+    + ' — kéo nguyên tử vào từng ô, bấm vào nguyên tử đã đặt để trả về kho';
+  $('v-kho').classList.remove('hide');
+  veKho();
+}
+
+function dongKho(){
+  // Trả lại toàn bộ nguyên tử đang nằm trên bàn trước khi đóng, nếu không thì
+  // thoát ra là mất trắng số đã kéo — người chơi không hiểu vì sao kho vơi đi.
+  traHetVeKho();
+  khoDangMo = null;
+  $('v-kho').classList.add('hide');
+  paused = false;
+}
+
+function traHetVeKho(){
+  if(!khoDangMo) return;
+  khoDangMo.oGhep.forEach(o => {
+    o.forEach(k => { TOTAL.kho[k] = (TOTAL.kho[k] || 0) + 1; });
+    o.length = 0;
+  });
+  veKho();
+}
+
+/* Vẽ lại toàn bộ nội dung lớp phủ theo trạng thái hiện tại. Vẽ lại cả bảng thay
+   vì sửa từng chỗ: bảng nhỏ, vẽ lại cho chắc, khỏi lệch trạng thái. */
+function veKho(){
+  if(!khoDangMo) return;
+  const { g, oGhep } = khoDangMo;
+
+  // ── Kho nguyên tử ──
+  const kho = $('k-kho');
+  kho.innerHTML = '';
+  const dsNguyenTo = [...new Set([...Object.keys(g.veTrai), ...Object.keys(TOTAL.kho)])];
+  dsNguyenTo.forEach(k => {
+    const n = TOTAL.kho[k] || 0;
+    const el = document.createElement('div');
+    el.className = 'ngtu' + (n <= 0 ? ' het' : '');
+    el.style.background = MAU_NGUYEN_TU[k] || '#c9d4de';
+    el.dataset.ngto = k;
+    el.innerHTML = k + '<span class="dem">' + n + '</span>';
+    if(n > 0) ganKeo(el, k);
+    kho.appendChild(el);
+  });
+  if(!dsNguyenTo.length) kho.innerHTML = '<p class="k-nhan">Kho đang trống — đội đầu vào ô ? để trả lời câu hỏi lấy nguyên tử.</p>';
+
+  // ── Các ô ghép ──
+  const box = $('k-oghep');
+  box.innerHTML = '';
+  oGhep.forEach((o, i) => {
+    const dem = demNguyenTo(o);
+    const ct = vietCongThuc(dem, g.thuTu);
+    const dung = ct === g.phanTu;
+    const el = document.createElement('div');
+    el.className = 'o-ghep' + (dung ? ' dung' : '');
+    el.dataset.o = String(i);
+    el.innerHTML = '<span class="ten">Phân tử ' + (i+1) + (dung ? ' ✓' : '') + '</span>'
+      + '<span class="ct">' + ct + '</span>';
+    const chua = document.createElement('div');
+    chua.className = 'chua';
+    o.forEach((k, j) => {
+      const v = document.createElement('span');
+      v.className = 'vien';
+      v.style.background = MAU_NGUYEN_TU[k] || '#c9d4de';
+      v.textContent = k;
+      v.title = 'Bấm để trả về kho';
+      v.addEventListener('click', () => {
+        o.splice(j, 1);
+        TOTAL.kho[k] = (TOTAL.kho[k] || 0) + 1;
+        veKho();
+      });
+      chua.appendChild(v);
+    });
+    el.appendChild(chua);
+    box.appendChild(el);
+  });
+
+  // ── Bảng kiểm nguyên tố hai vế ──
+  const phai = demNguyenTo(oGhep.flat());
+  const bang = $('k-bang');
+  const dong = [];
+  let khopHet = true;
+  Object.keys(g.veTrai).forEach(k => {
+    const t = g.veTrai[k], ph = phai[k] || 0;
+    const ok = t === ph;
+    if(!ok) khopHet = false;
+    dong.push('<div class="dong"><b>' + k + '</b> — vế trái ' + t
+      + ' · vế phải <span class="' + (ok ? 'khop' : 'lech') + '">' + ph + (ok ? ' ✓' : ' ✗') + '</span></div>');
+  });
+  // nguyên tố thừa ở vế phải cũng là lệch, đừng bỏ sót
+  Object.keys(phai).forEach(k => {
+    if(g.veTrai[k] === undefined){
+      khopHet = false;
+      dong.push('<div class="dong"><b>' + k + '</b> — vế trái 0 · vế phải <span class="lech">'
+        + phai[k] + ' ✗ (thừa)</span></div>');
+    }
+  });
+  bang.innerHTML = dong.join('');
+
+  const duPhanTu = oGhep.every(o => vietCongThuc(demNguyenTo(o), g.thuTu) === g.phanTu);
+  if(khopHet && duPhanTu) moCuaKho(g);
+}
+
+/* Kéo thả bằng pointer events — chạy được cả chuột lẫn cảm ứng.
+   HTML5 drag-and-drop KHÔNG dùng được: nó không chạy trên đa số trình duyệt
+   điện thoại, mà nhiều em mở web bằng điện thoại. */
+function ganKeo(el, ngTo){
+  el.addEventListener('pointerdown', e => {
+    e.preventDefault();
+    if((TOTAL.kho[ngTo] || 0) <= 0) return;
+    el.classList.add('keo');
+
+    const bong = el.cloneNode(true);
+    bong.style.position = 'fixed';
+    bong.style.pointerEvents = 'none';
+    bong.style.zIndex = '99';
+    bong.style.opacity = '.92';
+    document.body.appendChild(bong);
+    const dat = ev => {
+      bong.style.left = (ev.clientX - 21) + 'px';
+      bong.style.top = (ev.clientY - 21) + 'px';
+    };
+    dat(e);
+
+    const oDuoi = ev => document.elementsFromPoint(ev.clientX, ev.clientY)
+      .find(n => n.classList && n.classList.contains('o-ghep'));
+
+    const dichuyen = ev => {
+      dat(ev);
+      document.querySelectorAll('.o-ghep').forEach(n => n.classList.remove('tren'));
+      const o = oDuoi(ev);
+      if(o) o.classList.add('tren');
+    };
+    const tha = ev => {
+      window.removeEventListener('pointermove', dichuyen);
+      window.removeEventListener('pointerup', tha);
+      window.removeEventListener('pointercancel', tha);
+      bong.remove();
+      el.classList.remove('keo');
+      document.querySelectorAll('.o-ghep').forEach(n => n.classList.remove('tren'));
+      const o = oDuoi(ev);
+      if(o && khoDangMo && (TOTAL.kho[ngTo] || 0) > 0){
+        TOTAL.kho[ngTo]--;
+        khoDangMo.oGhep[Number(o.dataset.o)].push(ngTo);
+        Snd.coin();
+        veKho();
+      }
+    };
+    window.addEventListener('pointermove', dichuyen);
+    window.addEventListener('pointerup', tha);
+    window.addEventListener('pointercancel', tha);
+  });
+}
+
+function moCuaKho(g){
+  if(g.open) return;
+  g.open = true;
+  khoDangMo = null;                    // nguyên tử đã dùng, không trả lại kho
+  $('v-kho').classList.add('hide');
+
+  const gx = g.col*TS;
+  for(let y=0; y<=12; y++) G.grid[y][g.col] = T.EMPTY;
+  TOTAL.score += 400;
+  Snd.win();
+  for(let y=4; y<=12; y++)
+    burst(gx + TS/2, y*TS + TS/2, 5, ['#9fd8ff','#ffd75e','#3f4c5e'], {spread:3.6, square:true, size:3});
+  ring(gx + TS/2, 9*TS, '#9fd8ff');
+  popText(gx + TS/2, 7*TS, '+400', '#ffd75e');
+  flashScreen('#ffffff', 12);
+  shakeScreen(9);
+  showMsg('Cửa kho đã mở', g.ptDu, g.e + '<br><br>Được <b>400 điểm</b>.',
+    'Đi tiếp', () => { hideMsg(); paused = false; });
+}
+
 function checkKGates(p){
   G.kgates.forEach(g => {
     if(g.cool > 0) g.cool--;
-    if(g.open) return;
+    if(g.open || khoDangMo) return;
     const gx = g.col*TS;
     if(p.x + p.w > gx - TS*1.1 && p.x < gx + TS*2){
-      if(TOTAL.vatTu >= g.need){
-        TOTAL.vatTu -= g.need;
-        g.open = true;
-        for(let y=0; y<=12; y++) G.grid[y][g.col] = T.EMPTY;
-        TOTAL.score += 300;
-        Snd.win();
-        for(let y=4; y<=12; y++)
-          burst(gx + TS/2, y*TS + TS/2, 5, ['#9fd8ff','#ffd75e','#3f4c5e'], {spread:3.6, square:true, size:3});
-        ring(gx + TS/2, 9*TS, '#9fd8ff');
-        popText(gx + TS/2, 7*TS, '+300', '#ffd75e');
-        flashScreen('#ffffff', 12);
-        shakeScreen(9);
-        paused = true;
-        showMsg('Cua da mo', g.ten,
-          g.e + '<br><br>Da dung <b>' + g.need + ' vat tu</b>. Con lai <b>' + TOTAL.vatTu + '</b>.',
-          'Di tiep', () => { hideMsg(); paused = false; });
-      }else if(g.cool <= 0){
-        g.cool = 110;
-        toast('Cua ' + g.ten + ' can ' + g.need + ' vat tu, dang co ' + TOTAL.vatTu
-          + '. Doi dau vao o ? de tra loi cau hoi lay them.');
+      if(g.cool <= 0){
+        g.cool = 40;
+        moKho(g);
       }
     }
   });
@@ -1614,10 +1914,12 @@ function answer(i, q, cx, cy, isValve){
     if(isValve) damageBoss();
     else{
       for(let k=-1; k<=1; k++) G.coins.push({x:cx+k, y:cy-2, got:false});
-      /* Moi cau tra loi dung cho MOT vat tu, mang duoc sang man sau. Van van
-         khong tinh: chung da co phan thuong rieng la khoa lo. */
-      TOTAL.vatTu++;
-      popText(cx*TS + TS/2, cy*TS - 34, '+1 vat tu', '#9fd8ff');
+      /* Mỗi câu trả lời đúng cho một mẻ nguyên tử, mang được sang màn sau.
+         Van không tính: chúng đã có phần thưởng riêng là khóa lò. */
+      Object.entries(THUONG_NGUYEN_TU).forEach(([k, n]) => {
+        TOTAL.kho[k] = (TOTAL.kho[k] || 0) + n;
+      });
+      popText(cx*TS + TS/2, cy*TS - 34, '+ nguyên tử', '#9fd8ff');
     }
   }else{
     Snd.wrong();
@@ -1743,7 +2045,7 @@ const startAt = (function(){
 })();
 
 function restartAll(){
-  TOTAL = {score:0, coins:0, lives:3, level:startAt, vatTu:0};
+  TOTAL = {score:0, coins:0, lives:3, level:startAt, kho:{}};
   askedIdx = [];
   loadLevel(startAt);
 }
@@ -2326,14 +2628,22 @@ function drawHud(){
   const p = G.player;
   let bx = 440;
 
-  /* Vat tu dat o dau day huy hieu ben phai, KHONG dat canh so xu: cho do sat
-     hang trai tim (x = 340), so vat tu hai chu so la de chong len tim. */
-  if(TOTAL.vatTu > 0 || (G.kgates && G.kgates.length)){
-    ctx.fillStyle = '#9fd8ff'; ctx.fillRect(bx, 16, 11, 14);
-    ctx.fillStyle = '#33506b'; ctx.fillRect(bx + 2, 19, 7, 3);
-    ctx.fillStyle = '#fff';
-    ctx.fillText('VAT TU ' + TOTAL.vatTu, bx + 17, 24);
-    bx += 130;
+  /* Kho nguyên tử đặt ở đầu dãy huy hiệu bên phải, KHÔNG đặt cạnh số xu:
+     chỗ đó sát hàng trái tim (x = 340), bày thêm vào là chồng lên tim. */
+  if(tongKho() > 0 || (G.kgates && G.kgates.length)){
+    ctx.font = '600 13px ' + "'IBM Plex Mono', monospace";
+    Object.keys(TOTAL.kho).forEach(k => {
+      if(!TOTAL.kho[k]) return;
+      ctx.fillStyle = MAU_NGUYEN_TU[k] || '#c9d4de';
+      ctx.beginPath(); ctx.arc(bx + 7, 23, 7, 0, 7); ctx.fill();
+      ctx.fillStyle = '#10202e'; ctx.textAlign = 'center';
+      ctx.fillText(k, bx + 7, 24);
+      ctx.fillStyle = '#fff'; ctx.textAlign = 'left';
+      ctx.fillText(String(TOTAL.kho[k]), bx + 18, 24);
+      bx += 38;
+    });
+    ctx.font = '600 15px ' + "'IBM Plex Mono', monospace";
+    bx += 8;
   }
   if(p.nh3 > 0){
     ctx.fillStyle = '#9fe8f5';
@@ -2405,14 +2715,14 @@ function legendIcon(fn){
 function buildLegend(){
   const box = $('legend');
   const items = [
-    ['<b>Ô ?</b> — trả lời đúng được xu và <b>1 vật tư</b>', g => {
+    ['<b>Ô ?</b> — trả lời đúng được xu và <b>nguyên tử</b>', g => {
       const grad = g.createLinearGradient(0,0,0,TS);
       grad.addColorStop(0,'#ffd75e'); grad.addColorStop(1,'#e0a418');
       g.fillStyle = grad; g.fillRect(0,0,TS,TS);
       g.fillStyle = '#7a5206'; g.font = 'bold 24px sans-serif';
       g.textAlign='center'; g.textBaseline='middle'; g.fillText('?', TS/2, TS/2);
     }],
-    ['<b>Cửa kho</b> — mở bằng vật tư, mang được sang màn sau', g => {
+    ['<b>Cửa kho</b> — ghép phân tử từ nguyên tử trong kho mới mở được', g => {
       g.fillStyle = '#33506b'; g.fillRect(0,0,TS,TS);
       g.fillStyle = '#41637f'; g.fillRect(3,3,TS-6,TS-6);
       g.fillStyle = '#5c8bad'; g.fillRect(3,6,TS-6,5); g.fillRect(3,TS-13,TS-6,5);
