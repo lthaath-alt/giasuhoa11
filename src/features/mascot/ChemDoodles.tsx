@@ -55,7 +55,9 @@ export const ChemDoodles: React.FC = () => (
       pointerEvents: 'none',   // không chặn click vào nội dung phía sau
       userSelect: 'none',
       color: '#0f172a',
-      opacity: 0.2,
+      /* Hình nằm ngoài lề, không bao giờ đè lên chữ, nên đậm được mà không
+         làm rối mắt lúc đọc. */
+      opacity: 0.42,
       // Màn hình hẹp thì lề gần như không còn, hình chỉ còn là mảnh vụn ở rìa
       // nên ẩn hẳn cho sạch.
       display: { xs: 'none', md: 'block' },

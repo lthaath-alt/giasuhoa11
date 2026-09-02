@@ -41,7 +41,9 @@ const KHUNG: Record<TenHinh, string> = {
 const NET: React.SVGProps<SVGGElement> = {
   fill: 'none',
   stroke: 'currentColor',
-  strokeWidth: 2.6,
+  /* Nét đậm hẳn lên cho ra dáng vẽ bút mực trên lề vở. Nét mảnh bị mờ tịt khi
+     hạ độ đậm của cả lớp xuống. */
+  strokeWidth: 3.4,
   strokeLinecap: 'round',
   strokeLinejoin: 'round',
 };
