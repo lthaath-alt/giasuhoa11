@@ -87,7 +87,9 @@ for (const b of bais) {
 }
 ok(tongDapAn > 0, 'dữ liệu VẪN giữ đáp án cho trình đọc SGK', tongDapAn + ' câu');
 ok(loLot === 0, 'KHÔNG đáp án nào lọt vào ngữ cảnh gửi AI', loLot + ' câu lọt');
-ok(daiNhat <= 4000, 'ngữ cảnh dài nhất ≤ 4000 ký tự', String(daiNhat));
+/* Ngưỡng phải khớp TRAN_KY_TU trong lessonContext.ts. Vượt trần thì phần đuôi
+   bị cắt — mất câu luyện tập và lời dặn cuối mà không có dấu hiệu gì. */
+ok(daiNhat <= 4600, 'ngữ cảnh dài nhất ≤ 4600 ký tự (trần của lessonContext)', String(daiNhat));
 
 console.log('\n' + (hong === 0 ? '>>> TẤT CẢ ĐẠT' : `>>> CÓ ${hong} MỤC HỎNG`) + '\n');
 process.exit(hong === 0 ? 0 : 1);

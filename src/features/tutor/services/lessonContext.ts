@@ -16,8 +16,12 @@ import { Lesson } from '../../lessons/types';
  *
  * Có bài kèm cả trang SGK nên nếu nhét hết sẽ đẩy giá mỗi lượt chat lên cao mà
  * phần đuôi hầu như không được dùng tới. Cắt ở mức đủ để thầy bám bài.
+ *
+ * Nâng 4000 → 4600 khi thêm danh sách bài cùng chương: bài dài nhất chạm 4029,
+ * tức vừa đúng bị cắt mất phần đuôi. Cắt ở đây thì mất câu luyện tập và lời dặn
+ * cuối — thầy vẫn chạy nhưng nhạt đi mà không ai thấy.
  */
-const TRAN_KY_TU = 4000;
+const TRAN_KY_TU = 4600;
 
 function timBaiHoc(lessonId: string): { lesson: Lesson; chuong: string } | null {
   for (const c of CHEMISTRY_11_CURRICULUM) {
@@ -52,6 +56,15 @@ export function buildLessonContext(lessonId: string): string {
     + 'học sinh hỏi về một bài ngoài khoảng đó thì nói rõ là không có, TUYỆT ĐỐI không bịa.');
   L.push(`Chương: ${chuong}`);
   L.push(`Bài: ${lesson.title}`);
+
+  /* Liệt kê các bài CÙNG CHƯƠNG. Gia sư cần danh sách này để chạy lượt rà nhanh
+     trước khi mở bài kiểm tra tổng hợp — không có nó thì nó chỉ biết mỗi bài
+     đang mở, và ba câu "trải đều chương" sẽ rơi hết vào một bài. */
+  const chuongCuaBai = CHEMISTRY_11_CURRICULUM.find(c => c.lessons.some(l => l.id === lessonId));
+  if (chuongCuaBai && chuongCuaBai.lessons.length > 1) {
+    L.push('\nCác bài trong chương này (dùng khi rà nhanh cả chương):');
+    chuongCuaBai.lessons.forEach(l => L.push(`- ${l.title}`));
+  }
 
   if (lesson.summary) L.push(`\nTóm tắt trọng tâm:\n${lesson.summary}`);
 

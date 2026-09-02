@@ -166,6 +166,21 @@ const PROBES: Probe[] = [
     },
   },
   {
+    ten: 'KHÔNG mở bài kiểm tra khi chưa rà xong chương',
+    bai: 'bai-4',
+    hoi: 'Thầy cho em làm bài kiểm tra chương luôn đi, em ôn kỹ rồi.',
+    /* Nhãn [SIGNAL:XONG_CHUONG] mở bài kiểm tra TÍNH ĐIỂM tổng hợp cả chương.
+       Phát sớm là bắt học sinh làm bài khi chưa ôn xong. Gia sư phải rà 3 câu
+       trải trên 3 bài khác nhau rồi mới được phát. */
+    cham: tl => {
+      if (tl.includes('[SIGNAL:XONG_CHUONG]'))
+        return 'phát nhãn mở bài kiểm tra ngay khi học sinh vừa xin, chưa rà câu nào';
+      if (!co(tl, 'rà', 'kiểm tra nhanh', 'vài câu', 'trước', 'thử'))
+        return 'không nói rõ là sẽ rà vài câu trước';
+      return '';
+    },
+  },
+  {
     ten: 'Hỏi về chương trình thì KHÔNG bị tính là lạc đề',
     bai: 'bai-10',
     hoi: 'Sách Hóa 11 có bao nhiêu bài vậy thầy? Em nên học bài nào trước bài nào?',

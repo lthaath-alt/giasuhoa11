@@ -11,6 +11,8 @@ import {
 } from '../../features/tutor/services/cooldownService';
 import { GoogleUserInfo } from '../services/googleAuth';
 import { QuizService } from '../../features/quiz/quizService';
+import { BankFirestore } from '../../features/bank/bankStore';
+import { toLegacy, toChapter } from '../../features/bank/convert';
 import { QuizStorage } from '../../features/quiz/quizStorage';
 import { loginWithFirestore, createAccountWithFirestore } from '../services/firestoreAuth';
 import { FirestoreService } from '../services/firestoreService';
@@ -1101,16 +1103,37 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
     let finalAiResponse = aiResponseText;
 
-    // ĐIỀU KIỆN KÍCH HOẠT: Khi AI báo đã hoàn thành
-    if (
-      aiResponseText.includes('Chúc mừng em! Em đã tự mình') ||
-      aiResponseText.includes('Chúc mừng em đã hoàn thành bài toán!')
-    ) {
+    /* Link bài kiểm tra CHỈ mở khi gia sư đã rà xong cả chương và phát nhãn
+       [SIGNAL:XONG_CHUONG].
+
+       Trước đây điều kiện là câu "Chúc mừng em…", tức chỉ cần giải xong MỘT bài
+       tập là có link. Bài kiểm tra lại là bài tổng hợp cả chương và có tính
+       điểm, nên mở sớm như vậy là bắt các em làm bài khi chưa ôn xong.
+
+       Đề lấy từ ngân hàng câu hỏi thật trên Firestore, lọc đúng chương. Bản cũ
+       gọi QuizService.createQuiz đọc kho localStorage `h11_library` — kho đó đã
+       được migrate đi nên gần như rỗng, đề rơi xuống bộ câu dự phòng viết cứng
+       trong mã, chẳng dính gì tới ngân hàng của giáo viên. */
+    if (aiResponseText.includes('[SIGNAL:XONG_CHUONG]')) {
+      finalAiResponse = finalAiResponse.replace(/\[SIGNAL:XONG_CHUONG\]/g, '').trim();
       const chapter = curriculum.find(c => c.lessons.some(l => l.id === lessonId));
       const chapterId = chapter ? chapter.id : 'c1';
-      const quiz = QuizService.createQuiz(chapterId, lessonId, userEmail);
-      const quizLink = `${window.location.origin}${window.location.pathname}#/quiz/${quiz.id}`;
-      finalAiResponse += `\n\n👉 **Hãy làm bài kiểm tra ngắn ngay tại đây để củng cố kiến thức nhé:** [Làm bài kiểm tra ngay](${quizLink})`;
+      try {
+        const bank = await BankFirestore.getAll();
+        const cuaChuong = bank
+          .filter(q => q.ch === toChapter(chapterId))
+          .map(q => toLegacy(q));
+        const quiz = QuizService.createChapterQuiz(chapterId, userEmail, cuaChuong);
+        if (quiz) {
+          const quizLink = `${window.location.origin}${window.location.pathname}#/quiz/${quiz.id}`;
+          finalAiResponse += `\n\n👉 **Em đã ôn xong chương này. Làm bài kiểm tra tổng hợp ${quiz.questions.length} câu tại đây nhé:** [Làm bài kiểm tra ngay](${quizLink})`;
+        } else {
+          finalAiResponse += '\n\n_(Ngân hàng câu hỏi của chương này chưa có câu nào nên chưa tạo được bài kiểm tra. Em báo thầy/cô nhé.)_';
+        }
+      } catch {
+        // Mất mạng hay thiếu quyền: nói thật, đừng lặng lẽ không hiện link
+        finalAiResponse += '\n\n_(Chưa đọc được ngân hàng câu hỏi nên chưa tạo được bài kiểm tra. Em thử lại sau nhé.)_';
+      }
     }
 
     const aiMsg: ChatMessage = {

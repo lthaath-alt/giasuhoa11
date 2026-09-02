@@ -44,14 +44,15 @@ Chạy xong luôn kiểm lại bằng `npm run kiem-tra:chuong-trinh`.
 ## Chạy kiểm tra
 
 ```bash
-npm run kiem-tra          # hai bài kiểm tra không cần mạng
-npm run thu:ai            # thử gia sư AI thật (tốn 7 lượt API)
+npm run kiem-tra          # bốn bài kiểm tra không cần mạng
+npm run thu:ai            # thử gia sư AI thật (tốn 8 lượt API)
 ```
 
 | Lệnh | Kiểm cái gì | Cần mạng |
 |---|---|---|
 | `npm run kiem-tra:chuong-trinh` | Dữ liệu 25 bài trong `constants.ts` | không |
 | `npm run kiem-tra:ngan-hang` | Chuyển đổi ngân hàng câu hỏi web ↔ trò chơi | không |
+| `npm run kiem-tra:de-chuong` | Sinh đề kiểm tra tổng hợp một chương | không |
 | `npm run kiem-tra:het-luot` | Cách diễn giải lỗi 429 của Gemini | không |
 | `npm run thu:ai` | Gia sư AI trả lời có đúng kiến thức không | **có** |
 
@@ -84,15 +85,29 @@ Bài này cũng khoá lại hai **mất mát có chủ ý** của mô hình cũ,
 rộng thêm thì biết ngay: mức `vdc` (vận dụng cao) hạ về `vd` vì dạng cũ chỉ có
 3 mức, và dạng `tn` (trả lời ngắn) chuyển thành Tự luận vì dạng cũ không có.
 
+## `kiem-tra:de-chuong`
+
+Bài kiểm tra tổng hợp chương phải lấy câu từ **ngân hàng thật trên Firestore**,
+lọc đúng chương, 10 câu chia 3 nhận biết · 3 thông hiểu · 4 vận dụng.
+
+Bài này dựng đề cho cả 6 chương từ `public/bank/seed-160.json` và kiểm: đủ số
+câu, không câu nào lặp, mọi câu thuộc đúng chương, câu trắc nghiệm còn đủ phương
+án và đáp án, đề xếp từ dễ đến khó, và ngân hàng rỗng thì trả về `null` để web
+báo cho học sinh chứ không dựng đề rỗng.
+
+Trước đây đề đọc kho localStorage `h11_library` — kho cũ đã được migrate đi nên
+gần như rỗng, khiến đề rơi xuống bộ câu dự phòng viết cứng trong mã, chẳng dính
+gì tới ngân hàng của giáo viên.
+
 ## `thu:ai`
 
 Gọi Gemini bằng **đúng** `SYSTEM_PROMPT` và ngữ cảnh bài mà web dựng (đọc thẳng
 từ mã nguồn, không sao chép — sao chép thì sửa prompt xong bài thử vẫn kiểm bản
 cũ mà không ai hay).
 
-Bảy phép thử: hằng số đkc 24,79 L/mol · bám nội dung bài đang mở · dùng thuật
+Tám phép thử: hằng số đkc 24,79 L/mol · bám nội dung bài đang mở · dùng thuật
 ngữ 2018 · không đưa đáp án thẳng · bắt lỗi sai của học sinh · từ chối việc
-ngoài môn Hoá · không bịa bài không có thật.
+ngoài môn Hoá · không bịa bài không có thật · không mở bài kiểm tra chương khi chưa rà xong.
 
 Cần `GEMINI_API_KEY` trong `.env.local` (tệp này nằm trong `.gitignore`).
 Script không bao giờ in giá trị key ra màn hình.
@@ -100,7 +115,7 @@ Script không bao giờ in giá trị key ra màn hình.
 ### Hạn mức API
 
 Bậc miễn phí của Gemini cho **5 lượt/phút** và **20 lượt/ngày**, tính riêng cho
-**từng model**. Chạy hết bộ này tốn 7 lượt.
+**từng model**. Chạy hết bộ này tốn 8 lượt.
 
 Khi model của web đã hết lượt trong ngày, truyền tên model khác để thử tiếp:
 
