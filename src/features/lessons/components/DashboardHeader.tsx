@@ -294,7 +294,10 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 size="small"
                 onClick={() => window.open('https://zalo.me', '_blank')}
                 sx={{
-                  backgroundColor: '#0084ff',
+                  /* Trước là #0084ff: chữ trắng trên đó chỉ đạt 3,66, hơi chói và
+                     khó đọc. Dùng luôn màu xanh nền chuẩn của web (#0062b8) —
+                     tương phản lên 5,9 và ăn nhập với thanh menu. */
+                  backgroundColor: 'var(--xanh-nen)',
                   color: 'var(--chu-nguoc)',
                   borderRadius: 20,
                   fontSize: '0.75rem',
@@ -417,7 +420,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                     fontSize: '0.75rem',
                     fontWeight: 'bold',
                     backgroundColor: 'var(--vang-nen)',
-                    color: 'var(--chu-nguoc)',
+                    color: 'var(--chu-tren-vang)',
                     '&:hover': { backgroundColor: '#e68a00' },
                   }}
                 >

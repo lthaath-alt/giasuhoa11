@@ -168,6 +168,24 @@ export default function App() {
             background: { default: '#0f151d', paper: '#18212c' },
             text: { primary: '#e8eef5', secondary: '#a8b8c8' },
             divider: '#2c3947',
+            /* PHẢI đặt lại `light` cho từng màu, không được để nguyên bản sáng.
+               Ở bản sáng, `light` là rgba trong suốt 8% — dùng làm nền phớt cho
+               các vùng nhấn, đúng vai. Nhưng ở nền tối MUI lại lấy CHÍNH `light`
+               làm MÀU CHỮ cho <Alert>, <Chip>, nút outlined… Chữ màu rgba 8%
+               nghĩa là gần như trong suốt: băng "Em đang dùng bản dùng thử" mờ
+               tới mức không đọc nổi. Đây là lỗi ăn vào 66 chỗ dùng <Alert>, sửa
+               một chỗ này là hết. */
+            /* Cam ở nền tối đậm hơn một bậc (#ea580c → #c2410c, chính là
+               primary.dark của bản sáng). Chữ trắng trên #ea580c chỉ đạt
+               3,56 — dưới mức đọc được cho cỡ chữ 14px; đổi sang #c2410c
+               lên 5,18 mà vẫn đúng màu cam thương hiệu, lại đỡ chói trên
+               nền đậm. CỐ Ý chỉ đổi ở nền tối: nền sáng giữ nguyên. */
+            primary:   { ...(themeGoc as any).palette.primary,   main: '#c2410c', light: '#ff9a5c' },
+            secondary: { ...(themeGoc as any).palette.secondary, light: '#5fc8bd' },
+            warning:   { ...(themeGoc as any).palette.warning,   light: '#fbbf24' },
+            success:   { ...(themeGoc as any).palette.success,   light: '#5fc8bd' },
+            error:     { main: '#ef4444', light: '#ff9a9a', dark: '#b91c1c' },
+            info:      { main: '#4da3ec', light: '#8ec5f5', dark: '#1e6fb8' },
           },
         })
       : theme),

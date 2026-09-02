@@ -77,6 +77,10 @@
   /* Khối mã / công thức: cố ý nền tối ở CẢ hai chế độ, như mọi trình soạn mã */
   --nen-ma:       #1e293b;
   --chu-ma:       #e2e8f0;
+  /* Chữ trên nền VÀNG. Vàng quá sáng nên chữ trắng chỉ đạt tương phản 2,8 —
+     dưới mức đọc được. Chữ nâu đậm trên vàng đạt hơn 8 mà vẫn giữ đúng
+     màu nút. Giữ nguyên ở cả hai chế độ vì nút vàng cũng giữ nguyên. */
+  --chu-tren-vang:#3a2400;
 }
 
 :root[data-theme="dark"] {
@@ -139,6 +143,7 @@
   --vang-nen:     #d98600;
   --nen-ma:       #111a24;
   --chu-ma:       #dfe7ef;
+  --chu-tren-vang:#3a2400;
 }
 
 body {

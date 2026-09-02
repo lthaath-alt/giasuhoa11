@@ -85,7 +85,6 @@ export const DashboardPage: React.FC = () => {
   const [ichatInput, setIchatInput] = useState('');
   const [isIchatSending, setIsIchatSending] = useState(false);
   const [ichatError, setIchatError] = useState<string | null>(null);
-  const [isSgkCached, setIsSgkCached] = useState(false);
 
   /* Tab iChat trước đây KHÔNG có lối nhập API key nào. Chưa có key thì
      geminiTutorService âm thầm rơi sang kịch bản mẫu, học sinh tưởng đang nói
@@ -96,12 +95,6 @@ export const DashboardPage: React.FC = () => {
      người dùng dù app thừa sức gọi Gemini. */
   const coKey = () => getEffectiveApiKey() !== 'MISSING_API_KEY' && !!getEffectiveApiKey();
   const [hasApiKey, setHasApiKey] = useState(coKey);
-
-  // Kiểm tra trạng thái cache SGK HOA11.pdf từ localStorage
-  useEffect(() => {
-    const cached = localStorage.getItem('sgk_hoa11_cached') === 'true';
-    setIsSgkCached(cached);
-  }, [chats]);
 
   // Lấy tổng số bài học
   const allLessons = curriculum.flatMap((c) => c.lessons);
@@ -132,10 +125,6 @@ export const DashboardPage: React.FC = () => {
 
     try {
       await addMessage('global-advisor', text);
-      // Kiểm tra lại trạng thái cache sau khi gửi
-      setTimeout(() => {
-        setIsSgkCached(localStorage.getItem('sgk_hoa11_cached') === 'true');
-      }, 1000);
     } catch (err: any) {
       setIchatError(err.message || 'Có lỗi xảy ra khi trò chuyện với Gia sư AI.');
     } finally {
@@ -525,21 +514,33 @@ export const DashboardPage: React.FC = () => {
                     
                     <Divider sx={{ my: 2 }} />
 
-                    {/* Trạng thái Cache SGK HOA11.pdf */}
+                    {/* Nguồn kiến thức thật sự nạp cho Thầy.
+
+                        Chỗ này TRƯỚC ĐÂY ghi "Tài liệu: SGK HOA11.pdf — Sẽ nạp
+                        tự động khi bắt đầu hỏi", với một chấm tròn vàng chờ
+                        chuyển xanh. Không đúng: trong dự án không có tệp PDF
+                        nào, và khoá `sgk_hoa11_cached` chỉ được ĐỌC chứ chưa
+                        bao giờ được GHI, nên chấm tròn vĩnh viễn không xanh
+                        được. Nói cách khác đó là một chỉ báo trang trí.
+
+                        Thứ thật sự đi kèm mỗi câu hỏi nằm ở
+                        `tutor/services/lessonContext.ts`: danh mục 25 bài
+                        (~1.700 ký tự) luôn được gửi, cộng thêm toàn văn bài
+                        đang mở (~2.500–3.400 ký tự) khi học sinh vào đọc một
+                        bài cụ thể. Nội dung này sinh từ các tệp .docx của thầy
+                        qua `npm run soan`, đóng sẵn trong web nên không phải
+                        tải gì — vì thế trạng thái luôn là "đã sẵn sàng". */}
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, p: 1.5, bgcolor: 'var(--nen-trang)', borderRadius: 2 }}>
                       <Box sx={{ position: 'relative', display: 'flex' }}>
-                        <Box sx={{ width: 10, height: 10, bgcolor: isSgkCached ? 'var(--teal)' : 'var(--vang)', borderRadius: '50%' }} />
+                        <Box sx={{ width: 10, height: 10, bgcolor: 'var(--teal)', borderRadius: '50%' }} />
                       </Box>
                       <Box>
                         <Typography variant="caption" sx={{ fontWeight: 'bold', display: 'block' }}>
-                          Tài liệu: SGK HOA11.pdf
+                          Nguồn kiến thức: {allLessons.length} bài Hóa 11 (KNTT 2018)
                         </Typography>
                         <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.68rem', display: 'block' }}>
-                          Trạng thái bộ đệm: {isSgkCached ? (
-                            <span style={{ color: 'var(--teal)', fontWeight: 'bold' }}>Đã lưu trong trình duyệt ⚡</span>
-                          ) : (
-                            <span style={{ color: 'var(--cam)' }}>Sẽ nạp tự động khi bắt đầu hỏi</span>
-                          )}
+                          <span style={{ color: 'var(--teal)', fontWeight: 'bold' }}>Đã nạp sẵn trong web ⚡</span>
+                          {' '}— Thầy luôn có danh mục cả 25 bài; mở một bài cụ thể thì có thêm toàn văn bài đó.
                         </Typography>
                       </Box>
                     </Box>
