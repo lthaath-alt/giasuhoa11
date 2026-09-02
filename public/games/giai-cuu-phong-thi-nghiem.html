@@ -747,37 +747,8 @@ const LEVELS = [
       [50,'NH₄⁺'],[54,'Cl⁻'],[63,'NH₄⁺'],[67,'SO₄²⁻'],[71,'OH⁻'],[76,'NH₄⁺'],[80,'NO₃⁻'],[85,'SO₄²⁻'],
       [101,'NO₃⁻'],[106,'Ba²⁺'],[111,'NH₄⁺'],[116,'SO₄²⁻'],[121,'NO₃⁻'],[125,'Cl⁻'],[134,'NH₄⁺'],[137,'NO₃⁻']
     ],
-    /* Cửa kho — cùng cơ chế với màn 2-2: kéo nguyên tử trong kho ra ghép phân tử
-       sao cho số nguyên tử hai vế khớp nhau. Hai phản ứng ở đây là chuỗi oxide
-       của nitrogen, khác hẳn NH₃ và SO₃ của màn 2-2 để không lặp bài.
-
-       CỘT ĐẶT CỬA phải trống: không trùng cửa lọc (46, 90, 140) và không cắt
-       ngang bệ nào. Cột 40 và 124 thoả cả hai — lúc đầu tôi chọn 114, nhưng cột
-       đó đang là viên gạch đi kèm ô ? ở cột 113, cửa dựng đè lên nhìn rất khó
-       hiểu. */
-    kgates:[
-      {col:40, ten:'Cửa kho C — nitrogen gặp oxygen',
-       de:'Trong lò hồ quang hoặc lúc sét đánh, nitrogen phản ứng thẳng với oxygen. Ghép đúng sản phẩm thì cửa mở.',
-       pt:'N₂  +  O₂  →  ?',
-       ptDu:'N₂ + O₂ → 2NO',
-       veTrai:{N:2, O:2}, phanTu:'NO', thuTu:['N','O'], soPhanTu:2,
-       e:'Hai vế phải có đúng 2 nguyên tử N và 2 nguyên tử O, nên sản phẩm là 2 phân tử NO. Đây là phản ứng cần nhiệt độ rất cao, xảy ra khi sét đánh — cũng là nguồn đạm tự nhiên cho đất.'},
-
-      {col:124, ten:'Cửa kho D — NO hoá nâu trong không khí',
-       de:'Khí NO không màu vừa ra tới không khí là hoá nâu ngay. Ghép sản phẩm của nó.',
-       pt:'2NO  +  O₂  →  ?',
-       ptDu:'2NO + O₂ → 2NO₂',
-       veTrai:{N:2, O:4}, phanTu:'NO₂', thuTu:['N','O'], soPhanTu:2,
-       e:'Vế trái có 2 nguyên tử N và 2 + 2 = 4 nguyên tử O, nên sản phẩm là 2 phân tử NO₂ màu nâu đỏ. Chính hiện tượng hoá nâu này là dấu hiệu nhận biết khí NO.'}
-    ],
-    /* Thêm ô ? để màn tự đủ nguyên tử. Mỗi câu đúng cho N1 H2 S1 O2:
-         cửa 40  cần N2 O2 → 2 câu là đủ, trước nó có 3 ô ? (cột 16, 24, 34)
-         cửa 114 cần N2 O4 → 2 câu là đủ, giữa hai cửa có 3 ô ? (cột 65, 82, 101)
-       Dư một câu ở mỗi chặng, nên sai một lần vẫn qua được mà không cần nguyên
-       tử mang từ màn trước. Cột đặt ô ? cũng phải tránh bệ hàng 10 chắn bên trên
-       — vì vậy chọn 82 và 101 chứ không phải 86 và 106 như thoạt nhìn. */
-    qblocks:[[16,9],[24,9],[34,9],[65,9],[82,9],[101,9],[113,9],[149,9]],
-    bricks:[[17,9],[25,9],[35,9],[66,9],[83,9],[102,9],[114,9],[150,9]],
+    qblocks:[[16,9],[65,9],[113,9],[149,9]],
+    bricks:[[17,9],[66,9],[114,9],[150,9]],
     coins:[
       [10,9],[11,9],[12,9],[36,6],[37,6],[50,9],[51,9],
       [70,9],[71,9],[75,6],[76,6],[86,9],[87,9],
