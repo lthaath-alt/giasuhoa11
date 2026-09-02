@@ -720,7 +720,7 @@ const LEVELS = [
     id:'2-3',
     name:'Bể lắng',
     theme:'tank',
-    brief:'Ba cửa lọc chắn đường. Tới nơi thì mở giỏ ion ra, kéo từng ion vào ô ghép sao cho đúng hợp chất ghi trên biển VÀ tổng điện tích bằng 0 — một NH₄⁺ không bù nổi một SO₄²⁻ đâu. Ion nằm rải trên đường đi, cứ nhặt thoải mái, thừa thì trả lại giỏ.',
+    brief:'Ba cửa lọc chắn đường. Tới nơi thì mở giỏ ion ra, kéo từng ion vào ô ghép sao cho đúng hợp chất ghi trên biển VÀ tổng điện tích bằng 0 — một NH₄⁺ không bù nổi một SO₄²⁻ đâu. Nhưng ion không nhặt không được: mỗi câu hỏi ở ô ? trả lời đúng mới cho 3 lượt nhặt, hết lượt thì đi ngang ion cũng đành chịu.',
     w:160, h:15,
     // Vuc 5 o: cho nay CO Y bat dung nhay doi. Man 2-3 la man cuoi truoc thap
     // parkour nen day la cho day hoc sinh quen tay truoc khi vao doan kho.
@@ -1198,6 +1198,11 @@ function buildLevel(def){
     hopHoi:new Map(),  // hộp vũ khí đang chờ đầy lại, khoá là "cột,hàng"
     quaiSO2:null,      // khối SO₂ cuối màn, chỉ hiện sau khi khoá hết van
     nhacDan:0,
+    /* Số lượt được nhặt ion, kiếm bằng cách trả lời đúng ô ?. Để trong G chứ
+       không để trong player: hồi sinh sau khi chết sẽ dựng lại player, mất sạch
+       số lượt đã kiếm thì chết một lần là phải làm lại hết câu hỏi. */
+    luotNhat:0,
+    nhacNhat:0,
     gates:(def.gates || []).map(g => ({...g, open:false, cool:0})),
     kgates:(def.kgates || []).map(g => ({...g, open:false, cool:0})),
     // hpMax phải chốt lại lúc dựng màn: stepBoss dựa vào nó để biết đang ở giai
@@ -1561,17 +1566,30 @@ function checkPickups(p){
 const CATION = {'Ba²⁺':true, 'Na⁺':true, 'NH₄⁺':true, 'Cu²⁺':true};
 
 function checkIons(p){
+  if(G.nhacNhat > 0) G.nhacNhat--;
   G.ions.forEach(io => {
     if(io.wait > 0){ io.wait--; return; }         // đã bị ăn, đang chờ dòng chất mang tới cái mới
     if(p.x < io.x*TS + TS && p.x + p.w > io.x*TS &&
        p.y < io.y*TS + TS && p.y + p.h > io.y*TS){
+      /* Phải trả lời đúng câu hỏi mới được nhặt. Nếu cho nhặt thoải mái thì học
+         sinh chạy một vòng gom hết ion rồi mở cửa, chẳng cần đọc câu nào — phần
+         kiến thức thành trang trí. */
+      if(G.luotNhat <= 0){
+        if(G.nhacNhat <= 0){
+          G.nhacNhat = 120;
+          toast('Chưa được lấy ' + io.ion + ' — đội đầu vào ô ? trả lời đúng một câu thì mới lấy được ion.');
+        }
+        return;
+      }
+      G.luotNhat--;
       io.wait = 60*5;
       p.bag.push(io.ion);
       Snd.coin();
       const mau = CATION[io.ion] ? ['#e2604e','#ff9c8a','#fff'] : ['#2e86c1','#7fc4ef','#fff'];
       burst(io.x*TS + TS/2, io.y*TS + TS/2, 12, mau, {spread:2.8});
       popText(io.x*TS + TS/2, io.y*TS - 4, io.ion, CATION[io.ion] ? '#ffb3a5' : '#9ed6f7');
-      toast('Đã lấy ' + io.ion + ' — giỏ: ' + (p.bag.join(' + ') || 'trống') + '   (bấm ↓ để xả giỏ)');
+      toast('Đã lấy ' + io.ion + ' — giỏ: ' + (p.bag.join(' + ') || 'trống')
+        + '   · còn ' + G.luotNhat + ' lượt nhặt   (bấm ↓ để xả giỏ)');
     }
   });
 }
@@ -2501,6 +2519,13 @@ function answer(i, q, cx, cy, isValve){
         TOTAL.kho[k] = (TOTAL.kho[k] || 0) + n;
       });
       popText(cx*TS + TS/2, cy*TS - 34, '+ nguyên tử', '#9fd8ff');
+      /* Màn nào có ion thì mỗi câu đúng cho thêm mấy lượt nhặt. 3 lượt/câu:
+         màn 2-3 có 4 ô ? = 12 lượt, trong khi ba cửa chỉ cần đúng 7 ion —
+         dư đủ để lỡ nhặt nhầm vài lần vẫn qua được. */
+      if(G.ions.length){
+        G.luotNhat += 3;
+        popText(cx*TS + TS/2, cy*TS - 52, '+3 lượt nhặt ion', '#8fd0a0');
+      }
     }
   }else{
     Snd.wrong();
@@ -3316,6 +3341,16 @@ function drawHud(){
     ctx.fillText('GIỎ', 22, 120);
     ctx.fillStyle = p.bag.length ? '#ffd75e' : 'rgba(255,255,255,.45)';
     ctx.fillText(txt, 76, 120);
+
+    /* Số lượt nhặt ngay dưới giỏ. Không hiện thì người chơi đi qua ion mà không
+       nhặt được sẽ tưởng trò chơi hỏng, chứ không hiểu là mình chưa trả lời câu
+       hỏi nào. */
+    ctx.font = '600 13px ' + "'IBM Plex Mono', monospace";
+    ctx.fillStyle = G.luotNhat > 0 ? '#8fd0a0' : '#e2604e';
+    ctx.fillText(G.luotNhat > 0
+      ? 'CÒN ' + G.luotNhat + ' LƯỢT NHẶT ION'
+      : 'CHƯA CÓ LƯỢT NHẶT — ĐỘI ĐẦU Ô ? TRẢ LỜI ĐÚNG ĐỂ ĐƯỢC 3 LƯỢT', 22, 146);
+    ctx.font = '600 15px ' + "'IBM Plex Mono', monospace";
   }
 
   if(toastT > 0){
@@ -3391,7 +3426,7 @@ function buildLegend(){
       g.strokeStyle = 'rgba(180,160,40,.9)'; g.lineWidth = 2.5;
       g.beginPath(); g.moveTo(0,3); g.lineTo(TS,3); g.stroke();
     }],
-    ['<b>Ion</b> — đỏ là cation, xanh là anion; ion không cần thì nhảy qua', g => {
+    ['<b>Ion</b> — đỏ là cation, xanh là anion. Phải trả lời đúng ô ? mới có lượt nhặt', g => {
       g.fillStyle = 'rgba(226,96,78,.95)';
       g.beginPath(); g.arc(13, TS/2, 12, 0, 7); g.fill();
       g.fillStyle = 'rgba(46,134,193,.95)';
