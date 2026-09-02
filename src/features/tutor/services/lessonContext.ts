@@ -53,6 +53,80 @@ export function buildLessonCatalog(): string {
 }
 
 /**
+ * Trần ký tự cho dàn bài cả chương trình.
+ *
+ * Đo thực tế: 25 bài với tóm tắt + công thức + tên mục + ý chính là khoảng
+ * 17.000 ký tự nội dung, cộng nhãn và gạch đầu dòng ra ngót 24.000. Để trần
+ * 30.000 là còn dư chỗ cho vài bài soạn thêm mà chưa phải sửa mã.
+ */
+const TRAN_CHUONG_TRINH = 30000;
+
+/**
+ * Dàn bài CẢ CHƯƠNG TRÌNH — chỉ dùng cho khung iChat tư vấn chung.
+ *
+ * Vì sao cần: ở khung iChat, `buildLessonContext` trả chuỗi rỗng vì học sinh
+ * không mở bài nào cả. Trước đây thầy chỉ nhận được danh mục TÊN 25 bài, tức là
+ * biết bài nào tồn tại nhưng không biết trong bài có gì — hỏi "quy tắc
+ * Markovnikov học ở bài nào" thì thầy phải đoán. Mà khung iChat mới chính là
+ * nơi học sinh hỏi vắt qua nhiều bài nhất.
+ *
+ * Mức chi tiết chọn ở giữa: tóm tắt, công thức, tên mục và ý chính của từng
+ * bài. CỐ Ý bỏ phần gợi ý dẫn dắt của giáo viên và câu luyện tập — riêng hai
+ * phần đó đã 19.000 ký tự, gấp đôi cả khối này, mà chúng chỉ phát huy khi học
+ * sinh đang mở đúng bài đó (lúc ấy `buildLessonContext` đã kèm đủ rồi).
+ *
+ * Gửi kèm mỗi lượt hỏi ở khung iChat. Không tốn thêm lượt gọi API nào — hạn
+ * mức miễn phí của Google đếm theo SỐ LƯỢT gọi chứ không theo số chữ.
+ */
+export function buildProgramContext(): string {
+  const tongSoBai = CHEMISTRY_11_CURRICULUM.reduce((n, c) => n + c.lessons.length, 0);
+  const baiCuoi = CHEMISTRY_11_CURRICULUM.at(-1)?.lessons.at(-1);
+
+  const L: string[] = [];
+  L.push('DÀN BÀI CẢ CHƯƠNG TRÌNH HOÁ 11 (KNTT) — em đang ở khung hỏi đáp chung, '
+    + 'không mở sẵn bài nào. Đây là toàn bộ nội dung có trong chương trình.');
+  L.push(`Chương trình gồm đúng ${tongSoBai} bài, bài cuối là "${baiCuoi?.title ?? ''}". `
+    + 'Không có bài nào ngoài khoảng này; hỏi về bài ngoài khoảng đó thì nói rõ là '
+    + 'không có, TUYỆT ĐỐI không bịa.');
+
+  CHEMISTRY_11_CURRICULUM.forEach(c => {
+    L.push(`\n══ ${c.title} ══`);
+    c.lessons.forEach(l => {
+      L.push(`\n▸ ${l.title}  (mã: ${l.id})`);
+      if (l.summary) L.push(`  Trọng tâm: ${l.summary}`);
+      if (l.formulae?.length) L.push(`  Công thức: ${l.formulae.join(' | ')}`);
+      const tb = l.textbook;
+      if (tb?.sections?.length) {
+        tb.sections.forEach(sec => {
+          L.push(`  • ${sec.sectionTitle}`);
+          if (sec.keyPoints?.length) sec.keyPoints.forEach(k => L.push(`     - ${k}`));
+        });
+      }
+    });
+  });
+
+  /* Dàn bài là để thầy BIẾT, không phải để thầy trả lời thay.
+     Bước A1/B1 vẫn bắt học sinh tự xác định chương — đó là chủ ý sư phạm, bỏ đi
+     là hỏng cả quy trình. Nói rõ chỗ này, nếu không hai lời dặn sẽ đá nhau và
+     thầy lúc hỏi lúc không. */
+  L.push('\nCÁCH DÙNG DÀN BÀI TRÊN:');
+  L.push('- Ở bước A1/B1 VẪN hỏi học sinh kiến thức thuộc chương nào. Khác trước ở chỗ '
+    + 'nay thầy biết chắc đáp án, nên xác nhận hay chỉnh lại cho đúng chứ không đoán '
+    + 'và không bao giờ nói sai tên chương.');
+  L.push('- Học sinh hỏi thuần tuý tra cứu ("cái này học ở bài nào thầy?", "chương 3 có '
+    + 'những bài gì?") thì trả lời thẳng — đó là câu hỏi tra mục lục, không phải bài '
+    + 'tập, không cần chạy quy trình 6 bước.');
+  L.push('- Cần chi tiết sâu hơn dàn bài này (câu luyện tập, ví dụ mẫu, gợi ý dẫn dắt '
+    + 'của giáo viên) thì mời các em mở đúng bài đó ở mục Bài giảng — ở đó thầy có '
+    + 'đầy đủ nội dung bài.');
+
+  const out = L.join('\n');
+  return out.length > TRAN_CHUONG_TRINH
+    ? out.slice(0, TRAN_CHUONG_TRINH) + '\n… (đã lược bớt phần còn lại)'
+    : out;
+}
+
+/**
  * Dựng khối ngữ cảnh cho một bài học. Trả về chuỗi rỗng nếu không tìm thấy bài
  * — ví dụ cuộc trò chuyện tư vấn chung `global-advisor`.
  */

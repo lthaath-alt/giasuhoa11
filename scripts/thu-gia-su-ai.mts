@@ -19,7 +19,8 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { GoogleGenAI } from '@google/genai';
 
-import { buildLessonContext } from '../src/features/tutor/services/lessonContext';
+import { buildLessonContext, buildLessonCatalog, buildProgramContext }
+  from '../src/features/tutor/services/lessonContext';
 import { GEMINI_MODEL_NAME } from '../src/core/constants';
 
 const GOC = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -61,13 +62,28 @@ interface Probe {
   cham: (traLoi: string) => string;
 }
 
+/* Dựng ngữ cảnh Y HỆT geminiTutorService.
+   Bản trước chỉ ghép SYSTEM_PROMPT + ngữ cảnh bài, THIẾU danh mục bài — tức là
+   phép thử chấm một cấu hình mà học sinh không bao giờ gặp. Đặt `bai: ''` để
+   thử đúng khung iChat tư vấn chung (không mở bài nào). */
+function dungNguCanh(bai: string): string {
+  const nguCanhBai = buildLessonContext(bai);
+  const danBaiChung = nguCanhBai ? '' : buildProgramContext();
+  return [
+    SYSTEM_PROMPT,
+    '='.repeat(60),
+    buildLessonCatalog(),
+    ...(nguCanhBai ? ['='.repeat(60), nguCanhBai] : []),
+    ...(danBaiChung ? ['='.repeat(60), danBaiChung] : []),
+  ].join('\n\n');
+}
+
 async function hoi(p: Probe): Promise<string> {
-  const nguCanh = buildLessonContext(p.bai);
   const r = await ai.models.generateContent({
     model: MODEL,
     contents: [{ role: 'user', parts: [{ text: p.hoi }] }],
     config: {
-      systemInstruction: nguCanh ? [SYSTEM_PROMPT, '='.repeat(60), nguCanh].join('\n\n') : SYSTEM_PROMPT,
+      systemInstruction: dungNguCanh(p.bai),
       temperature: 0.7,
       topP: 0.9,
     },
@@ -81,6 +97,23 @@ const OFFTOPIC = '[SIGNAL:OFFTOPIC]';
 const LOI_PHAT_OAN = 'gan nhan OFFTOPIC cho cau hoi VE mon Hoa — hoc sinh bi ghi mot luot phat oan';
 
 const PROBES: Probe[] = [
+  {
+    ten: 'Khung iChat chung — tra được khái niệm nằm ở bài nào',
+    bai: '',   // '' = không mở bài nào, đúng như khung iChat tư vấn chung
+    hoi: 'Thầy ơi, quy tắc Markovnikov em học ở bài nào vậy ạ?',
+    /* Đây là phép thử cho dàn bài cả chương trình. Trước khi có dàn bài, thầy ở
+       khung này chỉ có danh mục TÊN 25 bài nên phải đoán bài — hoặc bịa.
+       Chấm: phải chỉ ra đúng bài Alkene/hydrocarbon không no (Bài 16 trong
+       chương 4), và KHÔNG được bịa ra bài ngoài khoảng 1–25. */
+    cham: tl => {
+      if (!co(tl, 'alkene', 'hydrocarbon không no', 'bài 16'))
+        return 'không chỉ ra được bài chứa quy tắc Markovnikov';
+      const so = [...tl.matchAll(/bài\s*(\d{1,2})/gi)].map(m => Number(m[1]));
+      const bia = so.filter(n => n < 1 || n > 25);
+      if (bia.length) return 'bịa ra bài ngoài chương trình: bài ' + bia.join(', ');
+      return '';
+    },
+  },
   {
     ten: 'Hằng số đkc (24,79 L/mol) — bẫy cái bẫy "đktc"',
     bai: 'bai-4',

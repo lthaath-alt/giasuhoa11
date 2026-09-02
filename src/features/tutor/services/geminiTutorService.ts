@@ -3,7 +3,7 @@ import { ChatMessage } from '../../auth/types';
 import { getSession } from './aiMockService';
 import { ErrorLogService } from '../../../core/services/errorLog';
 import { GEMINI_MODEL_NAME } from '../../../core/constants';
-import { buildLessonContext, buildLessonCatalog } from './lessonContext';
+import { buildLessonContext, buildLessonCatalog, buildProgramContext } from './lessonContext';
 
 // Get effective API key from localStorage or env
 export const getEffectiveApiKey = (): string => {
@@ -195,6 +195,17 @@ export const generateAIResponse = async (
        nên đó là nơi cần mã bài nhất — mà lại là nơi `nguCanhBai` rỗng. */
     const danhMucBai = buildLessonCatalog();
 
+    /* Không mở bài nào (khung iChat tư vấn chung) thì đưa DÀN BÀI CẢ CHƯƠNG
+       TRÌNH thay vào chỗ trống đó.
+
+       Trước đây khung này chỉ có danh mục TÊN 25 bài — thầy biết bài nào tồn
+       tại nhưng không biết trong bài có gì, nên hỏi "cái này học ở bài nào"
+       là phải đoán. Mà đây lại đúng là nơi học sinh hỏi vắt qua nhiều bài nhất.
+
+       Khi ĐANG mở một bài thì KHÔNG kèm dàn bài: `nguCanhBai` đã có toàn văn
+       bài đó rồi, thêm dàn bài chỉ làm loãng trọng tâm. */
+    const danBaiChung = nguCanhBai ? '' : buildProgramContext();
+
     const response = await getAiInstance().models.generateContent({
       model: GEMINI_MODEL_NAME,
       contents: formattedHistory.concat({ role: 'user', parts: [{ text: latestMessage }] }),
@@ -204,6 +215,7 @@ export const generateAIResponse = async (
           '='.repeat(60),
           danhMucBai,
           ...(nguCanhBai ? ['='.repeat(60), nguCanhBai] : []),
+          ...(danBaiChung ? ['='.repeat(60), danBaiChung] : []),
         ].join('\n\n'),
         temperature: 0.7, // Nhiệt độ vừa phải để sáng tạo nhưng vẫn giữ chuẩn kiến thức
         topP: 0.9,

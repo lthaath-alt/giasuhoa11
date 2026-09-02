@@ -10,7 +10,7 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
 import { CHEMISTRY_11_CURRICULUM } from '../src/features/lessons/constants';
-import { buildLessonContext } from '../src/features/tutor/services/lessonContext';
+import { buildLessonContext, buildProgramContext } from '../src/features/tutor/services/lessonContext';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 
@@ -90,6 +90,39 @@ ok(loLot === 0, 'KHÔNG đáp án nào lọt vào ngữ cảnh gửi AI', loLot 
 /* Ngưỡng phải khớp TRAN_KY_TU trong lessonContext.ts. Vượt trần thì phần đuôi
    bị cắt — mất câu luyện tập và lời dặn cuối mà không có dấu hiệu gì. */
 ok(daiNhat <= 4600, 'ngữ cảnh dài nhất ≤ 4600 ký tự (trần của lessonContext)', String(daiNhat));
+
+console.log('\n== Dàn bài cả chương trình (khung iChat tư vấn chung) ==');
+/* Khối này chỉ gửi ở khung iChat, nơi học sinh không mở bài nào. Nó phải đủ
+   để thầy tra ra bài, mà vẫn không lọt đáp án và không bị cắt cụt. */
+{
+  const dan: string = buildProgramContext();
+  ok(!dan.includes('đã lược bớt'), 'không bị cắt cụt (dưới trần 30000)', dan.length + ' ký tự');
+
+  const soBai = (dan.match(/^▸ /gm) ?? []).length;
+  ok(soBai === bais.length, `có đủ ${bais.length} bài`, soBai + ' bài');
+
+  const thieuTen = bais.filter(b => !dan.includes(b.title));
+  ok(thieuTen.length === 0, 'bài nào cũng có tên trong dàn bài',
+     thieuTen.map(b => b.id).join(', '));
+
+  const thieuMa = bais.filter(b => !dan.includes(`(mã: ${b.id})`));
+  ok(thieuMa.length === 0, 'bài nào cũng kèm mã bài', thieuMa.map(b => b.id).join(', '));
+
+  /* Cùng lý do với ngữ cảnh từng bài: dàn bài KHÔNG được mang đáp án sang, nếu
+     không thầy đọc thấy rồi đưa thẳng cho học sinh. */
+  let lot = 0;
+  for (const b of bais) {
+    for (const q of b.textbook?.practiceQuestions ?? []) {
+      if (q.answer && dan.includes(String(q.answer).slice(0, 40))) lot++;
+    }
+  }
+  ok(lot === 0, 'KHÔNG đáp án luyện tập nào lọt vào dàn bài', lot + ' câu lọt');
+
+  /* Lời dặn cách dùng nằm ở CUỐI khối. Còn đọc được nghĩa là chưa bị cắt mất —
+     mất nó thì thầy sẽ bỏ bước bắt học sinh xác định chương. */
+  ok(dan.includes('Ở bước A1/B1 VẪN hỏi học sinh'),
+     'còn nguyên lời dặn giữ bước xác định chương');
+}
 
 console.log('\n' + (hong === 0 ? '>>> TẤT CẢ ĐẠT' : `>>> CÓ ${hong} MỤC HỎNG`) + '\n');
 process.exit(hong === 0 ? 0 : 1);
