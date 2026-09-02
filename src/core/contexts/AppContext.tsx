@@ -1114,10 +1114,13 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
        tập là có link. Bài kiểm tra lại là bài tổng hợp cả chương và có tính
        điểm, nên mở sớm như vậy là bắt các em làm bài khi chưa ôn xong.
 
-       Đề lấy từ ngân hàng câu hỏi thật trên Firestore, lọc đúng chương. Bản cũ
-       gọi QuizService.createQuiz đọc kho localStorage `h11_library` — kho đó đã
-       được migrate đi nên gần như rỗng, đề rơi xuống bộ câu dự phòng viết cứng
-       trong mã, chẳng dính gì tới ngân hàng của giáo viên. */
+       Đề lấy từ ngân hàng Firestore, lọc đúng chương và trải đều 4 mức độ.
+
+       (Đính chính: lúc đầu tôi tưởng bài kiểm tra không hề đọc ngân hàng vì
+       thấy `LibraryStorage.getQuestions` trong quizService. Đọc kỹ thì đó là
+       nhánh cũ; `createQuiz` hiện tại gom câu từ cả ba kho qua `layCauHoiCuaBai`
+       và CÓ đọc `bank_questions`. Cái thiếu thật sự chỉ là đề theo CẢ CHƯƠNG —
+       `createQuiz` lọc theo từng bài.) */
     if (aiResponseText.includes('[SIGNAL:XONG_CHUONG]')) {
       finalAiResponse = finalAiResponse.replace(/\[SIGNAL:XONG_CHUONG\]/g, '').trim();
       const chapter = curriculum.find(c => c.lessons.some(l => l.id === lessonId));
