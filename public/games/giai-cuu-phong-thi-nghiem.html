@@ -823,7 +823,6 @@ const LEVELS = [
     id:'2-5',
     name:'Lò đốt',
     theme:'boss',
-    rescue:true,
     brief:'Lò đốt quá tải, khói SO₂ phun ra không ngừng và cô giáo bị kẹt trong lồng phía sau. Bốn van lò chỉ khóa được khi bạn cân bằng đúng phương trình ghi trên van — càng khóa được nhiều thì lò càng phun quái dữ. Khóa hết van rồi, đống khí SO₂ đã thoát ra sẽ tụ thành một khối lớn: nhặt sữa vôi Ca(OH)₂ trong các hộp và ném để trung hoà nó, vì SO₂ là oxide acid. Giẫm lên vô ích. Khối SO₂ cũng phun khí trả lại — càng bị trung hoà nó phun càng dày, nhớ né. Hộp sữa vôi tự đầy lại nên đừng sợ hết đạn, chỉ mất thời gian chờ.',
     /* Chặng parkour trước khi vào khu lò.
        Bể acid rộng 7 ô, chỉ qua được bằng một tấm thép chớp và một ván gỗ sập —
@@ -864,6 +863,38 @@ const LEVELS = [
     foes:[[16,12],[30,12]],
     items:[{x:15,y:6,kind:'shield'},{x:33,y:6,kind:'mask'}],
     start:[2,12], flag:[50,12]
+  },
+  {
+    /* ĐẤU TRƯỜNG — nơi thật sự đánh khối SO₂ và cứu cô giáo.
+
+       Tách hẳn ra một màn riêng thay vì đánh ngay trong khu lò: ở khu lò còn
+       nền đất chạy dài, đứng xa nhả đạn là thắng, chẳng khác gì bắn bia. Ở đây
+       CHỈ CÓ vũng acid và mấy hòn đảo nhỏ — muốn né đạn phải nhảy sang đảo khác,
+       muốn nhặt sữa vôi phải leo lên. Rơi xuống là mất máu.
+
+       CỐ Ý không có quái thường và không có ô ?: đủ thứ để lo rồi. Toàn bộ màn
+       chỉ có một việc — hạ khối SO₂ rồi mở lồng. */
+    id:'2-6',
+    name:'Đấu trường acid',
+    theme:'boss',
+    rescue:true,
+    brief:'Lò đã tắt nhưng khối SO₂ thoát ra vẫn chắn đường tới lồng giam. Sàn ở đây sập hết, chỉ còn mấy hòn đảo giữa bể acid. Nhặt sữa vôi Ca(OH)₂ ở các hộp trên cao và ném để trung hoà nó — nó cũng phun khí trả lại, càng yếu phun càng dày. Hạ được nó thì lồng mở.',
+    w:58, h:15,
+    ground:[[0,6],[50,8]],
+    acid:[[6,44]],
+    // Đảo rộng 4 ô, khe 3 ô: nhảy đơn qua thoải mái, vì còn phải vừa nhảy vừa né
+    plats:[[8,10,4],[15,10,4],[22,10,4],[29,10,4],[36,10,4],[43,10,4]],
+    stone:[],
+    /* Hộp ở hàng 7, ngay trên các đảo hàng 10: đứng trên đảo đội đầu là tới.
+       Đặt ở hàng 9 thì trùng đúng tầm người đang đứng, không đội được. */
+    wboxes:[[9,7],[23,7],[37,7],[44,7]],
+    quaiO:30,                      // khối SO₂ hiện ở cột này ngay khi vào màn
+    qblocks:[],
+    bricks:[],
+    coins:[[9,9],[16,9],[23,9],[30,9],[37,9],[44,9]],
+    foes:[],
+    items:[{x:16,y:7,kind:'shield'}],
+    start:[2,12], flag:[55,12]
   }
 ];
 
@@ -2096,20 +2127,20 @@ function drawDan(){
    CỐ Ý cho giẫm lên đầu KHÔNG ăn thua, chỉ sữa vôi mới hạ được — nếu giẫm cũng
    thắng thì phần vũ khí thành thừa, và cái ý "phải dùng base" cũng mất. */
 function hienQuaiSO2(){
-  const b = G.boss;
-  /* Hiện ra TRƯỚC tường chắn (cột 44), không phải cạnh lò ở cột 47. Đặt sau
-     tường thì đạn bay tới là vỡ vào tường, người chơi bắn mãi không trúng mà
-     không hiểu vì sao. */
-  /* Độ cao PHẢI nằm trong tầm ném. Bản đầu để hàng 8 thì đạn bay ở hàng 11
-     (ngang ngực nhân vật đứng trên nền) lọt hết dưới bụng quái — bắn cả băng
+  /* Cột hiện lấy từ `quaiO` của màn. Trước đây suy ra từ G.boss.col — nhưng đấu
+     trường không có lò nên G.boss là null, đọc thẳng vào đó là lỗi ngay.
+
+     Độ cao PHẢI nằm trong tầm ném. Bản đầu để hàng 8 thì đạn bay ở hàng 11
+     (ngang ngực nhân vật đứng trên bệ) lọt hết dưới bụng quái — bắn cả băng
      không trúng phát nào. Hàng 10 thì thân quái cao 64px phủ đúng đường đạn. */
+  const cot = G.def.quaiO != null ? G.def.quaiO : 30;
   G.quaiSO2 = {
-    x:(b.col - 7)*TS, y:10*TS, w:64, h:64,
+    x:cot*TS, y:10*TS, w:64, h:64,
     hp:5, hpMax:5, vx:-1.5, song:true, t:0, nhay:0, mien:0, banT:90
   };
   flashScreen('#e2604e', 16);
   shakeScreen(20);
-  popText((b.col - 7)*TS, 6*TS, 'KHỐI SO₂ THOÁT RA!', '#ffd75e');
+  popText(cot*TS, 6*TS, 'KHỐI SO₂ THOÁT RA!', '#ffd75e');
   toast('Khí SO₂ tụ thành một khối lớn! Dùng sữa vôi Ca(OH)₂ trung hoà nó — giẫm lên vô ích.');
 }
 
@@ -2145,12 +2176,12 @@ function trungQuaiSO2(){
 /* Hạ tường chắn để đi tới lồng giam. Tách riêng vì nay có hai chỗ gọi:
    trước đây lò tắt là hạ luôn, nay phải hạ quái SO₂ xong mới hạ tường. */
 function moTuongCuoi(){
-  if(G.def.wall == null) return;
-  for(let y=0; y<=12; y++) G.grid[y][G.def.wall] = T.EMPTY;
+  // Đấu trường không có tường chắn — hạ được khối SO₂ là đường đã thông
+  if(G.def.wall != null) for(let y=0; y<=12; y++) G.grid[y][G.def.wall] = T.EMPTY;
   G.foes.forEach(f => { f.alive = false; });
   showMsg('Đã trung hoà khối SO₂', 'SO₂ + Ca(OH)₂ → CaSO₃ + H₂O',
     'Sữa vôi là base, trung hoà được oxide acid SO₂ — đây đúng là cách nhà máy '
-    + 'xử lí khí thải trước khi cho ra ống khói.<br><br>Tường chắn đã hạ. Chạy tới cứu cô giáo!',
+    + 'xử lí khí thải trước khi cho ra ống khói.<br><br>Đường đã thông. Chạy tới cứu cô giáo!',
     'Đi tiếp', () => { hideMsg(); paused = false; });
   paused = true;
 }
@@ -2416,11 +2447,20 @@ function damageBoss(){
   G.foes.forEach(f => { f.alive = false; });
   Snd.win();
 
-  /* Lò tắt KHÔNG còn hạ tường ngay. Khí SO₂ đã phun ra không tự mất — nó tụ lại
-     thành một khối phải trung hoà bằng sữa vôi. Tường chỉ hạ khi khối đó tan,
-     xem trungQuaiSO2(). Hạ tường ở đây thì người chơi chạy thẳng qua, phần đánh
-     quái thành thừa. */
-  hienQuaiSO2();
+  /* Lò tắt thì SANG HẲN ĐẤU TRƯỜNG, không đánh khối SO₂ ngay tại khu lò.
+     Ở khu lò còn nền đất chạy dài, đứng xa nhả đạn là thắng — chẳng khác gì bắn
+     bia. Đấu trường chỉ có đảo giữa bể acid nên phải vừa né vừa đánh. */
+  paused = true;
+  showMsg('Lò đã tắt', 'Nhưng khí SO₂ vẫn còn',
+    'Bốn van đã khoá, lò ngừng phun. Nhưng đống khí SO₂ thoát ra từ nãy đã tụ '
+    + 'thành một khối lớn, chắn ngay lối vào lồng giam.<br><br>Sàn khu sau sập '
+    + 'hết rồi, chỉ còn mấy hòn đảo giữa bể acid. Chuẩn bị đánh nhau.',
+    'Vào đấu trường', () => {
+      hideMsg(); paused = false;
+      TOTAL.lives = MANG_TOI_DA;        // vào trận cuối với đủ máu
+      TOTAL.level = LEVELS.length - 1;
+      loadLevel(TOTAL.level);
+    });
 }
 
 /* Lò nhả phân tử SO₂ theo chu kì cho tới khi bị khóa hết van */
@@ -2476,9 +2516,10 @@ function finale(){
   showMsg('Hoàn thành thế giới 2', 'Đã cứu được cô giáo!',
     'Bạn về đích với <b>' + TOTAL.score + ' điểm</b> · <b>' + TOTAL.coins + ' xu</b> · còn <b>' +
     TOTAL.lives + ' mạng</b>.<br>Danh hiệu: <b>' + rank(TOTAL.score) + '</b>.' +
-    '<br><br>Bốn khu vừa đi qua ứng với bốn phần của chương Nitrogen &amp; Sulfur: kho hóa chất ' +
-    '(tính chất acid – base, nhận biết ion), ống khói nhà máy (SO₂ và cách hấp thụ bằng kiềm), ' +
-    'bể lắng (ion và công thức hợp chất) và lò đốt (cân bằng phương trình oxi hóa – khử).',
+    '<br><br>Sáu khu vừa đi qua ứng với các phần của chương Nitrogen &amp; Sulfur: kho hóa chất ' +
+    '(tính chất acid – base, nhận biết ion), ống khói nhà máy (SO₂, hấp thụ bằng kiềm, ghép phân tử ' +
+    'sao cho cân bằng phương trình), bể lắng (ion và công thức hợp chất), tháp giải nhiệt (rèn phản xạ), ' +
+    'lò đốt (cân bằng phương trình oxi hóa – khử) và đấu trường acid (trung hòa oxide acid bằng base).',
     'Chơi lại từ đầu', () => { hideMsg(); restartAll(); });
 }
 
@@ -2526,6 +2567,8 @@ function loadLevel(i){
   paused = false;
   FX.reset();
   Snd.music(LEVELS[i].theme || 'day');
+  // Đấu trường không có lò để khoá van, khối SO₂ chờ sẵn ngay khi vào màn
+  if(G.def.quaiO != null) hienQuaiSO2();
   toast(LEVELS[i].id + ' · ' + LEVELS[i].name);
   startLoop();
 }

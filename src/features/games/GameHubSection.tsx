@@ -28,7 +28,7 @@ const GAMES: GameData[] = [
     title: 'Giải Cứu Phòng Thí Nghiệm',
     chapter: 'Chương 2 — Nitrogen & Sulfur',
     description:
-      'Game chạy nhảy 4 màn: đập ô ? trả lời câu hỏi, dùng khăn tẩm kiềm băng qua khói SO₂, ghép ion mở cửa lọc, rồi cân bằng phương trình để khóa van lò và cứu cô giáo.',
+      'Game chạy nhảy 6 màn: đập ô ? trả lời câu hỏi, ghép phân tử mở cửa kho, băng qua khói SO₂, ghép ion mở cửa lọc, vượt tháp parkour, khóa van lò rồi đấu khối SO₂ giữa bể acid để cứu cô giáo.',
     path: '/games/giai-cuu-phong-thi-nghiem.html',
     art: <RescueArt />,
   },
