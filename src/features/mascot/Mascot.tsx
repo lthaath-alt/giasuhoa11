@@ -15,21 +15,26 @@ export type TabMascot = 'gioithieu' | 'baigiang' | 'trochoi';
 
 /* Mỗi lần vào trang bốc ngẫu nhiên một câu cho đỡ nhàm. */
 const LOI_THOAI: Record<TabMascot, string[]> = {
+  /* Giọng "bạn cùng bàn": ngang hàng với học sinh, không lên giọng dạy dỗ —
+     đúng vai người dẫn dắt mà trang này tự đặt ra. Xưng "mình", tránh dấu
+     chấm than dồn dập cho đỡ hô hào.
+     Câu ở tab Giới thiệu giữ dưới 30 ký tự: bong bóng ở đó nằm trên một cột
+     chỉ rộng 245px (khổ 1440), dài hơn là tràn ra mép trái màn hình. */
   gioithieu: [
-    'Cùng học thôi nào!',
-    'Hôm nay mình học gì nè?',
-    'Mở sách ra thôi!',
-    'Hoá 11 không khó đâu!',
+    'Ê, học chung không?',
+    'Không hiểu cứ hỏi nhé.',
+    'Bắt đầu từ đâu cũng được.',
+    'Hoá không khó, chỉ hơi nhiều.',
   ],
   baigiang: [
-    'Bắt tay vào học thôi!',
-    'Chọn bài mình thích đi!',
-    'Học từng bài một là ổn mà!',
+    'Đang mắc bài nào thế?',
+    'Chọn bài đi, mình chờ.',
+    'Bài nào cũng được, miễn là mở ra.',
   ],
   trochoi: [
-    'Học rồi thì chơi tí cho nhớ lâu!',
-    'Chơi mà học, học mà chơi!',
-    'Thử sức một ván nào!',
+    'Chơi tí cho đỡ nản.',
+    'Ván này dễ mà.',
+    'Chơi trước học sau cũng được.',
   ],
 };
 
@@ -93,17 +98,23 @@ const BongBong: React.FC<{ loi: string; huong: 'duoi' | 'trai' }> = ({ loi, huon
   </Box>
 );
 
+/* Bề ngang ảnh toàn thân, ăn theo chỗ trống thực tế của lề trái.
+   Lề trái rộng = (bề ngang màn hình − 900px khối chữ) / 2 − 16px khe hở:
+     1440px -> 254px chỗ trống, dùng 245
+     1536px -> 302px            dùng 300
+     1800px -> 434px            dùng 375
+   Ảnh có kèm hoạ tiết vẽ tay nên nhân vật chỉ chiếm 70,8% bề ngang ảnh —
+   phải để ảnh to hơn hẳn thì nhân vật mới bằng cỡ cũ. */
+const KHUNG_TOAN_THAN = {
+  width: { xs: 245, xl: 300 },
+  '@media (min-width:1800px)': { width: 375 },
+};
+
 /* ---------- Kiểu 1: đứng toàn thân ở lề trái ---------- */
-export const MascotToanThan: React.FC<{ tab?: TabMascot; rong?: number }> = ({
-  tab = 'gioithieu',
-  rong = 230,
-}) => {
+export const MascotToanThan: React.FC<{ tab?: TabMascot }> = ({ tab = 'gioithieu' }) => {
   const loi = useMemo(() => dungLoiThoai(tab), [tab]);
-  /* Từ 1536px trở lên lề rộng ra gần 300px, để nguyên 215px thì nhân vật lọt
-     thỏm và chữ trên quyển sách bé tí. Phóng thêm 20% cho tương xứng. */
-  const beRong = { xs: rong, xl: Math.round(rong * 1.2) };
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: beRong }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', ...KHUNG_TOAN_THAN }}>
       <Box sx={{ mb: 1.5 }}>
         <BongBong loi={loi} huong="duoi" />
       </Box>
@@ -116,8 +127,8 @@ export const MascotToanThan: React.FC<{ tab?: TabMascot; rong?: number }> = ({
            chỗ đứng bị trống một nhịp rồi ảnh mới nhảy vào. aspectRatio giữ sẵn
            đúng khoảng cho ảnh nên trang không bị xô lệch lúc tải. */
         sx={{
-          width: beRong,
-          aspectRatio: '460 / 969',
+          ...KHUNG_TOAN_THAN,
+          aspectRatio: '620 / 924',
           height: 'auto',
           display: 'block',
           ...NHIP_THO,

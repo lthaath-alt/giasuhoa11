@@ -442,7 +442,7 @@ export const DashboardPage: React.FC = () => {
                   '@media (min-width:1440px)': { display: 'block' },
                 }}
               >
-                <MascotToanThan tab="gioithieu" rong={215} />
+                <MascotToanThan tab="gioithieu" />
               </Box>
               <Paper sx={{ p: { xs: 4, md: 6 }, borderRadius: 4, border: '1px solid #e2e8f0', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
                 {/* Màn hình hẹp không đủ lề cho nhân vật đứng — thay bằng kiểu
