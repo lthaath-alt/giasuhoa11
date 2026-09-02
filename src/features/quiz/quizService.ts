@@ -231,12 +231,80 @@ export const QuizService = {
   },
 
   /**
-   * Tạo bài kiểm tra cho học sinh.
+   * Tạo bài kiểm tra TỔNG HỢP một chương từ ngân hàng câu hỏi.
    *
-   * Trả về `null` khi bài học chưa có câu hỏi nào — chỗ gọi phải tự xử lý
-   * (không hiện link kiểm tra). KHÔNG bịa đề bằng câu của bài khác.
+   * Khác `createQuiz` cũ ở hai điểm quan trọng:
+   *  - Nguồn là ngân hàng thật (Firestore `bank_questions`, truyền vào đây đã
+   *    đọc sẵn), không phải kho localStorage `h11_library` cũ. Kho cũ đã được
+   *    migrate đi nên gần như rỗng, khiến bài kiểm tra rơi xuống bộ câu dự
+   *    phòng viết cứng trong mã — học sinh làm bài không dính gì tới ngân hàng
+   *    của giáo viên.
+   *  - Lấy câu của CẢ CHƯƠNG chứ không riêng một bài, vì đây là bài tổng hợp
+   *    sau khi gia sư đã rà xong chương.
    *
-   * @param nganHang Câu hỏi kho `questions` đời cũ mà AppContext đã tải sẵn.
+   * Cơ cấu 10 câu: 3 nhận biết · 3 thông hiểu · 3 vận dụng · 1 vận dụng cao.
+   * Mức nào thiếu thì bù bằng mức gần nhất, chứ không bỏ trống — thà đề lệch
+   * một chút còn hơn trả về đề 4 câu mà không nói gì.
+   */
+  createChapterQuiz(chapterId: string, userEmail: string, bankQuestions: Question[]): Quiz | null {
+    if (!bankQuestions.length) return null;
+
+    const CO_CAU: { muc: DifficultyLevel; can: number }[] = [
+      { muc: 'Thấp', can: 3 },
+      { muc: 'Trung bình', can: 3 },
+      { muc: 'Cao', can: 4 },   // gộp vận dụng + vận dụng cao: mô hình cũ chỉ có 3 mức
+    ];
+
+    /* Ưu tiên câu chưa từng làm, rồi câu từng làm sai, cuối cùng mới tới câu đã
+       làm đúng — giống logic chống trùng đề của createQuiz, nhưng xét trên cả
+       chương nên dùng chapterId làm khoá. */
+    const doneIds = QuizStorage.getQuestionsDone(userEmail, chapterId);
+    const failedIds = QuizStorage.getQuestionsFailed(userEmail, chapterId);
+    const uuTien = (q: Question) =>
+      !doneIds.includes(q.id) ? 0 : failedIds.includes(q.id) ? 1 : 2;
+
+    const chon: Question[] = [];
+    const daLay = new Set<string>();
+
+    for (const { muc, can } of CO_CAU) {
+      const nhom = bankQuestions
+        .filter(q => q.difficulty === muc && !daLay.has(q.id))
+        .sort((a, b) => uuTien(a) - uuTien(b));
+      this.shuffleArray(nhom.filter(q => uuTien(q) === 0));
+      nhom.slice(0, can).forEach(q => { chon.push(q); daLay.add(q.id); });
+    }
+
+    // Chưa đủ 10 thì bù bằng bất kỳ câu nào còn lại
+    if (chon.length < 10) {
+      const conLai = this.shuffleArray(bankQuestions.filter(q => !daLay.has(q.id)));
+      conLai.slice(0, 10 - chon.length).forEach(q => { chon.push(q); daLay.add(q.id); });
+    }
+
+    const trongSo: Record<DifficultyLevel, number> = { 'Thấp': 1, 'Trung bình': 2, 'Cao': 3 };
+    chon.sort((a, b) => trongSo[a.difficulty] - trongSo[b.difficulty]);
+
+    const quiz: Quiz = {
+      id: `quiz_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+      // lessonId dùng chính chapterId: bài này là của cả chương, không của bài nào
+      lessonId: chapterId,
+      chapterId,
+      userEmail,
+      questions: chon,
+      answers: {},
+      status: 'pending',
+      score: 0,
+      maxScore: chon.reduce((t, q) => t + (q.points || 1), 0),
+      createdAt: new Date().toISOString(),
+      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    };
+
+    QuizStorage.addQuiz(quiz);
+    return quiz;
+  },
+
+  /**
+   * Tạo bài kiểm tra cho học sinh
+>>>>>>> 3fb5848173974ea00d23aee54cc60ddf37e7f9d1
    */
   async createQuiz(
     chapterId: string,
