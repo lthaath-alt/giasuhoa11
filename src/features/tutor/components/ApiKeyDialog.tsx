@@ -84,7 +84,7 @@ export const ApiKeyDialog: React.FC<ApiKeyDialogProps> = ({ open, onClose }) => 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1, fontWeight: 'bold' }}>
-        <Key size={20} color="#0f766e" />
+        <Key size={20} color="var(--teal)" />
         Cài đặt Gemini API Key
       </DialogTitle>
       
@@ -162,7 +162,7 @@ export const ApiKeyDialog: React.FC<ApiKeyDialogProps> = ({ open, onClose }) => 
             <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1 }}>
               Hướng dẫn lấy API Key miễn phí
             </Typography>
-            <ol style={{ paddingLeft: '20px', margin: 0, fontSize: '0.875rem', color: '#475569' }}>
+            <ol style={{ paddingLeft: '20px', margin: 0, fontSize: '0.875rem', color: 'var(--chu)' }}>
               <li>Truy cập <Link href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, fontWeight: 'bold' }}>Google AI Studio <ExternalLink size={12} /></Link></li>
               <li>Đăng nhập bằng tài khoản Google của bạn.</li>
               <li>Bấm nút <strong>"Create API Key"</strong>.</li>

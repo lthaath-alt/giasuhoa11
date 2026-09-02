@@ -10,13 +10,13 @@ import { useApp } from '../hooks/useApp';
 import { ErrorLog, ErrorLogService, ErrorLevel } from '../services/errorLog';
 
 const ERROR_LEVEL_COLORS: Record<ErrorLevel, { bg: string; color: string; icon: React.ReactNode }> = {
-  'Nghiêm Trọng (Critical)': { bg: '#fee2e2', color: '#dc2626', icon: <ServerCrash size={14} /> },
-  'Lỗi API/AI Service': { bg: '#fef3c7', color: '#d97706', icon: <Globe size={14} /> },
-  'Lỗi Cơ Sở Dữ Liệu': { bg: '#e0e7ff', color: '#4f46e5', icon: <Database size={14} /> },
+  'Nghiêm Trọng (Critical)': { bg: 'var(--nen-do-nhat)', color: 'var(--do)', icon: <ServerCrash size={14} /> },
+  'Lỗi API/AI Service': { bg: 'var(--nen-vang-nhat)', color: 'var(--vang-dam)', icon: <Globe size={14} /> },
+  'Lỗi Cơ Sở Dữ Liệu': { bg: 'var(--nen-tim-nhat)', color: 'var(--tim)', icon: <Database size={14} /> },
   'Lỗi Xác Thực/Phân Quyền': { bg: '#fce7f3', color: '#db2777', icon: <UserCog size={14} /> },
-  'Lỗi Giao Diện Client': { bg: '#ffedd5', color: '#ea580c', icon: <Bug size={14} /> },
+  'Lỗi Giao Diện Client': { bg: 'var(--nen-cam-nhat2)', color: 'var(--cam)', icon: <Bug size={14} /> },
   'Cảnh Báo Hệ Thống': { bg: '#fef08a', color: '#a16207', icon: <AlertTriangle size={14} /> },
-  'Thông Tin Hệ Thống': { bg: '#dbeafe', color: '#2563eb', icon: <Info size={14} /> }
+  'Thông Tin Hệ Thống': { bg: 'var(--nen-xanh-nhat)', color: 'var(--xanh-troi)', icon: <Info size={14} /> }
 };
 
 export const ErrorManagement: React.FC = () => {
@@ -93,30 +93,30 @@ export const ErrorManagement: React.FC = () => {
       {/* ─── 4 THẺ THỐNG KÊ ────────────────────────────────────────────── */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid #e2e8f0' }}>
+          <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid var(--vien)' }}>
             <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 'bold' }}>TỔNG SỐ LỖI THU THẬP</Typography>
-            <Typography variant="h4" sx={{ fontWeight: 'bold', my: 1, color: '#0f172a' }}>{totalLogs}</Typography>
+            <Typography variant="h4" sx={{ fontWeight: 'bold', my: 1, color: 'var(--chu-dam)' }}>{totalLogs}</Typography>
             <Typography variant="caption" color="text.secondary">Ghi nhận trên toàn hệ thống</Typography>
           </Paper>
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid #fecaca', bgcolor: '#fef2f2' }}>
-            <Typography variant="body2" sx={{ fontWeight: 'bold', color: '#b91c1c' }}>LỖI CHƯA XỬ LÝ (NEW)</Typography>
-            <Typography variant="h4" sx={{ fontWeight: 'bold', my: 1, color: '#dc2626' }}>{unhandledLogs}</Typography>
+          <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid #fecaca', bgcolor: 'var(--nen-do-nhat2)' }}>
+            <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'var(--do-dam)' }}>LỖI CHƯA XỬ LÝ (NEW)</Typography>
+            <Typography variant="h4" sx={{ fontWeight: 'bold', my: 1, color: 'var(--do)' }}>{unhandledLogs}</Typography>
             <Typography variant="caption" sx={{ color: '#991b1b' }}>{criticalLogs} lỗi nghiêm trọng / API</Typography>
           </Paper>
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid #bbf7d0', bgcolor: '#f0fdf4' }}>
-            <Typography variant="body2" sx={{ fontWeight: 'bold', color: '#15803d' }}>TỈ LỆ ỔN ĐỊNH NỀN TẢNG</Typography>
-            <Typography variant="h4" sx={{ fontWeight: 'bold', my: 1, color: '#16a34a' }}>{stabilityRate}%</Typography>
-            <Typography variant="caption" sx={{ color: '#166534' }}>Đã khắc phục: {resolvedLogs} sự cố</Typography>
+          <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid #bbf7d0', bgcolor: 'var(--nen-luc-nhat2)' }}>
+            <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'var(--luc-dam)' }}>TỈ LỆ ỔN ĐỊNH NỀN TẢNG</Typography>
+            <Typography variant="h4" sx={{ fontWeight: 'bold', my: 1, color: 'var(--luc)' }}>{stabilityRate}%</Typography>
+            <Typography variant="caption" sx={{ color: 'var(--luc-dam2)' }}>Đã khắc phục: {resolvedLogs} sự cố</Typography>
           </Paper>
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid #e0e7ff', bgcolor: '#f5f3ff' }}>
+          <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid var(--nen-tim-nhat)', bgcolor: 'var(--nen-tim-nhat2)' }}>
             <Typography variant="body2" sx={{ fontWeight: 'bold', color: '#4338ca' }}>NGUỒN DỮ LIỆU CẮT LỚP</Typography>
-            <Typography variant="h4" sx={{ fontWeight: 'bold', my: 1, color: '#4f46e5' }}>{componentsList.length}</Typography>
+            <Typography variant="h4" sx={{ fontWeight: 'bold', my: 1, color: 'var(--tim)' }}>{componentsList.length}</Typography>
             <Typography variant="caption" sx={{ color: '#3730a3' }}>Module dịch vụ hoạt động</Typography>
           </Paper>
         </Grid>
@@ -125,7 +125,7 @@ export const ErrorManagement: React.FC = () => {
       <Grid container spacing={3} sx={{ mb: 4 }}>
         {/* ─── PHÂN PHỐI LỖI THEO MỨC ĐỘ ───────────────────────────────────── */}
         <Grid size={{ xs: 12, md: 7 }}>
-          <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid #e2e8f0', height: '100%' }}>
+          <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid var(--vien)', height: '100%' }}>
             <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 3 }}>Phân Phối Lỗi Theo Mức Độ</Typography>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               {levelDistribution.map((item, index) => {
@@ -136,7 +136,7 @@ export const ErrorManagement: React.FC = () => {
                       <Box sx={{ p: 0.5, borderRadius: 1, bgcolor: config.bg, color: config.color, display: 'flex' }}>
                         {config.icon}
                       </Box>
-                      <Typography variant="body2" sx={{ fontWeight: 500, color: '#475569' }}>
+                      <Typography variant="body2" sx={{ fontWeight: 500, color: 'var(--chu)' }}>
                         {item.level}
                       </Typography>
                     </Box>
@@ -144,7 +144,7 @@ export const ErrorManagement: React.FC = () => {
                       <LinearProgress 
                         variant="determinate" 
                         value={item.percent} 
-                        sx={{ height: 8, borderRadius: 4, bgcolor: '#f1f5f9', '& .MuiLinearProgress-bar': { bgcolor: config.color } }} 
+                        sx={{ height: 8, borderRadius: 4, bgcolor: 'var(--nen-nhat)', '& .MuiLinearProgress-bar': { bgcolor: config.color } }} 
                       />
                     </Box>
                     <Box sx={{ minWidth: 80, textAlign: 'right' }}>
@@ -160,7 +160,7 @@ export const ErrorManagement: React.FC = () => {
 
         {/* ─── PHÂN PHỐI SỰ CỐ THEO THÀNH PHẦN ──────────────────────────────── */}
         <Grid size={{ xs: 12, md: 5 }}>
-          <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid #e2e8f0', height: '100%' }}>
+          <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid var(--vien)', height: '100%' }}>
             <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 3 }}>Phân Phối Sự Cố Theo Thành Phần</Typography>
             
             {componentsList.length === 0 ? (
@@ -170,9 +170,9 @@ export const ErrorManagement: React.FC = () => {
             ) : (
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 {componentsList.map(([comp, count], idx) => (
-                  <Box key={idx} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 1.5, bgcolor: '#f8fafc', borderRadius: 2 }}>
-                    <Typography variant="body2" sx={{ fontWeight: 'bold', color: '#334155' }}>{comp}</Typography>
-                    <Chip label={`${count} sự cố`} size="small" sx={{ bgcolor: '#e2e8f0', fontWeight: 'bold' }} />
+                  <Box key={idx} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 1.5, bgcolor: 'var(--nen-trang)', borderRadius: 2 }}>
+                    <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'var(--chu-dam-3)' }}>{comp}</Typography>
+                    <Chip label={`${count} sự cố`} size="small" sx={{ bgcolor: 'var(--vien)', fontWeight: 'bold' }} />
                   </Box>
                 ))}
               </Box>
@@ -182,17 +182,17 @@ export const ErrorManagement: React.FC = () => {
       </Grid>
 
       {/* ─── DANH SÁCH LỖI CHI TIẾT ───────────────────────────────────────── */}
-      <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid #e2e8f0' }}>
+      <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid var(--vien)' }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
           <Typography variant="h6" sx={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1 }}>
-            <ShieldAlert size={20} color="#dc2626" /> Danh sách sự cố chi tiết
+            <ShieldAlert size={20} color="var(--do)" /> Danh sách sự cố chi tiết
           </Typography>
           
           <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
             <TextField
               size="small"
               placeholder="Tìm theo Mã lỗi, Nội dung, Thành phần..."
-              slotProps={{ input: { startAdornment: <Search size={18} style={{ marginRight: 8, color: '#94a3b8' }} /> } }}
+              slotProps={{ input: { startAdornment: <Search size={18} style={{ marginRight: 8, color: 'var(--chu-mo)' }} /> } }}
               value={search}
               onChange={e => setSearch(e.target.value)}
               sx={{ width: 300 }}
@@ -220,7 +220,7 @@ export const ErrorManagement: React.FC = () => {
         <TableContainer>
           <Table>
             <TableHead>
-              <TableRow sx={{ bgcolor: '#f8fafc' }}>
+              <TableRow sx={{ bgcolor: 'var(--nen-trang)' }}>
                 <TableCell sx={{ fontWeight: 'bold' }}>Mã lỗi & Thời gian</TableCell>
                 <TableCell sx={{ fontWeight: 'bold' }}>Mức độ & Thành phần</TableCell>
                 <TableCell sx={{ fontWeight: 'bold', width: '35%' }}>Nội dung</TableCell>
@@ -240,7 +240,7 @@ export const ErrorManagement: React.FC = () => {
                     </TableCell>
                     <TableCell>
                       <Chip size="small" label={log.level} icon={React.cloneElement(config.icon as React.ReactElement<any>, { size: 12 })} sx={{ bgcolor: config.bg, color: config.color, fontWeight: 'bold', mb: 0.5, fontSize: '0.7rem' }} />
-                      <Typography variant="body2" sx={{ fontWeight: 'bold', color: '#475569' }}>{log.component}</Typography>
+                      <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'var(--chu)' }}>{log.component}</Typography>
                     </TableCell>
                     <TableCell>
                       <Typography variant="body2">{log.message}</Typography>
@@ -254,8 +254,8 @@ export const ErrorManagement: React.FC = () => {
                         label={log.status}
                         icon={log.status === 'Đã khắc phục' ? <CheckCircle2 size={12} /> : undefined}
                         sx={{
-                          bgcolor: log.status === 'Đã khắc phục' ? '#dcfce7' : '#fee2e2',
-                          color: log.status === 'Đã khắc phục' ? '#16a34a' : '#dc2626',
+                          bgcolor: log.status === 'Đã khắc phục' ? 'var(--nen-luc-nhat)' : 'var(--nen-do-nhat)',
+                          color: log.status === 'Đã khắc phục' ? 'var(--luc)' : 'var(--do)',
                           fontWeight: 'bold'
                         }}
                       />
@@ -263,13 +263,13 @@ export const ErrorManagement: React.FC = () => {
                     <TableCell align="right">
                       {log.status === 'Chưa xử lý' && (
                         <Tooltip title="Đánh dấu đã xử lý">
-                          <IconButton size="small" onClick={() => handleResolve(log.id)} sx={{ color: '#16a34a' }}>
+                          <IconButton size="small" onClick={() => handleResolve(log.id)} sx={{ color: 'var(--luc)' }}>
                             <CheckCircle2 size={18} />
                           </IconButton>
                         </Tooltip>
                       )}
                       <Tooltip title="Xóa log">
-                        <IconButton size="small" onClick={() => handleDelete(log.id)} sx={{ color: '#ef4444' }}>
+                        <IconButton size="small" onClick={() => handleDelete(log.id)} sx={{ color: 'var(--do)' }}>
                           <Trash2 size={18} />
                         </IconButton>
                       </Tooltip>

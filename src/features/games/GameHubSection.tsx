@@ -103,19 +103,28 @@ export const GameHubSection: React.FC = () => {
     return () => { huy = true; };
   }, []);
 
+  /* Mở trò chơi thì vào luôn toàn màn hình.
+     Trình duyệt CHỈ cho gọi requestFullscreen từ trong một cú bấm thật của
+     người dùng, nên phải gọi ngay tại đây — đẩy vào useEffect hay setTimeout là
+     mất "cử chỉ người dùng" và trình duyệt từ chối im lặng.
+     Bọc catch vì có máy chặn toàn màn hình (iOS Safari, hoặc chính sách của
+     trường): trò chơi vẫn phải mở bình thường, chỉ là không tràn màn hình. */
   const handleOpenGame = (game: GameData) => {
     setActiveGame(game);
+    document.documentElement.requestFullscreen?.().catch(() => {});
   };
 
   const handleCloseGame = () => {
     setActiveGame(null);
+    // Chỉ thoát khi CHÍNH mình đã bật; người chơi tự bấm F11 thì đừng đụng vào
+    if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {});
   };
 
   return (
     <Box
       sx={{
         width: '100%',
-        bgcolor: '#f7f9fc',
+        bgcolor: 'var(--nen-xam)',
         borderRadius: 3,
         p: 3,
       }}
@@ -126,7 +135,7 @@ export const GameHubSection: React.FC = () => {
           sx={{
             fontWeight: 800,
             fontSize: '28px',
-            color: '#1e50a2',
+            color: 'var(--xanh-dam)',
             display: 'flex',
             alignItems: 'center',
             gap: 1.5,
@@ -138,7 +147,7 @@ export const GameHubSection: React.FC = () => {
         <Typography
           sx={{
             fontSize: '15px',
-            color: '#5a6472',
+            color: 'var(--chu-2)',
             mt: '6px',
           }}
         >
@@ -164,8 +173,8 @@ export const GameHubSection: React.FC = () => {
               display: 'flex',
               flexDirection: 'column',
               height: '100%',
-              bgcolor: '#ffffff',
-              border: '2px solid #1e50a2',
+              bgcolor: 'var(--nen-the)',
+              border: '2px solid var(--xanh-dam)',
               boxShadow: '0 4px 16px rgba(30, 80, 162, 0.12)',
               transition: 'transform 0.2s, box-shadow 0.2s',
               overflow: 'hidden',
@@ -226,7 +235,7 @@ export const GameHubSection: React.FC = () => {
                 sx={{
                   fontSize: '19px',
                   fontWeight: 700,
-                  color: '#0f172a',
+                  color: 'var(--chu-dam)',
                   lineHeight: 1.25,
                   mb: '10px',
                   display: 'block',
@@ -243,7 +252,7 @@ export const GameHubSection: React.FC = () => {
                 sx={{
                   fontSize: '14px',
                   lineHeight: 1.6,
-                  color: '#5a6472',
+                  color: 'var(--chu-2)',
                   flexGrow: 1,
                 }}
               >
@@ -259,8 +268,8 @@ export const GameHubSection: React.FC = () => {
                   textTransform: 'none',
                   fontWeight: 'bold',
                   borderRadius: 5,
-                  background: 'linear-gradient(90deg, #1e50a2 0%, #007bf2 100%)',
-                  color: '#ffffff',
+                  background: 'linear-gradient(90deg, var(--xanh-dam-nen) 0%, var(--xanh-nen) 100%)',
+                  color: 'var(--chu-nguoc)',
                   '&:hover': {
                     background: 'linear-gradient(90deg, #16407e 0%, #0056a3 100%)',
                   },
@@ -284,15 +293,15 @@ export const GameHubSection: React.FC = () => {
                 justifyContent: 'space-between',
                 px: 2,
                 py: 1,
-                bgcolor: '#1e50a2',
-                color: '#ffffff',
+                bgcolor: 'var(--xanh-dam-nen)',
+                color: 'var(--chu-nguoc)',
                 boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
               }}
             >
               <Typography variant="subtitle1" sx={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1 }}>
                 <Gamepad2 size={20} /> {activeGame.title}
               </Typography>
-              <IconButton onClick={handleCloseGame} sx={{ color: '#ffffff' }} size="small">
+              <IconButton onClick={handleCloseGame} sx={{ color: 'var(--chu-nguoc)' }} size="small">
                 <X size={24} />
               </IconButton>
             </Box>

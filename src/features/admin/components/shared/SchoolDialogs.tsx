@@ -23,7 +23,7 @@ export const CredentialDialog: React.FC<{ open: boolean; onClose: () => void; cr
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle sx={{ bgcolor: '#ea580c', color: '#fff', fontWeight: 'bold' }}>
+      <DialogTitle sx={{ bgcolor: 'var(--cam-nen)', color: 'var(--chu-nguoc)', fontWeight: 'bold' }}>
         ✅ Tài khoản Giáo viên đã được tạo!
       </DialogTitle>
       <DialogContent sx={{ pt: 3 }}>
@@ -31,7 +31,7 @@ export const CredentialDialog: React.FC<{ open: boolean; onClose: () => void; cr
           Cấp thông tin này cho giáo viên ngay. Mật khẩu sẽ không hiển thị lại!
         </Alert>
         {credentials && (
-          <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 3, bgcolor: '#f8fafc' }}>
+          <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 3, bgcolor: 'var(--nen-trang)' }}>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
               <Box>
                 <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'bold' }}>HỌ TÊN</Typography>
@@ -40,13 +40,13 @@ export const CredentialDialog: React.FC<{ open: boolean; onClose: () => void; cr
               <Divider />
               <Box>
                 <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'bold' }}>EMAIL ĐĂNG NHẬP</Typography>
-                <Typography variant="body1" sx={{ fontWeight: 'bold', fontFamily: 'monospace', color: '#ea580c' }}>{credentials.identifier}</Typography>
+                <Typography variant="body1" sx={{ fontWeight: 'bold', fontFamily: 'monospace', color: 'var(--cam)' }}>{credentials.identifier}</Typography>
               </Box>
               <Divider />
               <Box>
                 <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'bold' }}>MẬT KHẨU</Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Typography variant="body1" sx={{ fontWeight: 'bold', fontFamily: 'monospace', color: '#0f766e', letterSpacing: showPassword ? 0 : 4 }}>
+                  <Typography variant="body1" sx={{ fontWeight: 'bold', fontFamily: 'monospace', color: 'var(--teal)', letterSpacing: showPassword ? 0 : 4 }}>
                     {showPassword ? credentials.password : '••••••••••'}
                   </Typography>
                   <IconButton size="small" onClick={() => setShowPassword(v => !v)}>
@@ -94,7 +94,7 @@ export const CreateTeacherDialog: React.FC<{ open: boolean; onClose: () => void;
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
       <DialogTitle sx={{ fontWeight: 'bold' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <UserPlus size={20} color="#ea580c" /> Tạo tài khoản Giáo viên
+          <UserPlus size={20} color="var(--cam)" /> Tạo tài khoản Giáo viên
         </Box>
       </DialogTitle>
       <DialogContent>
@@ -138,7 +138,7 @@ export const CreateClassDialog: React.FC<{ open: boolean; onClose: () => void; s
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
       <DialogTitle sx={{ fontWeight: 'bold' }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}><GraduationCap size={20} color="#ea580c" /> Tạo lớp học mới</Box>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}><GraduationCap size={20} color="var(--cam)" /> Tạo lớp học mới</Box>
       </DialogTitle>
       <DialogContent>
         {error && <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>{error}</Alert>}
@@ -191,7 +191,7 @@ export const CreateSchoolDialog: React.FC<{ open: boolean; onClose: () => void; 
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle sx={{ fontWeight: 'bold' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Building2 size={20} color="#ea580c" />  Thêm trường học mới
+          <Building2 size={20} color="var(--cam)" />  Thêm trường học mới
         </Box>
       </DialogTitle>
       <DialogContent>
@@ -240,7 +240,7 @@ export const CreateSchoolAdminDialog: React.FC<{ open: boolean; onClose: () => v
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
       <DialogTitle sx={{ fontWeight: 'bold' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <ShieldCheck size={20} color="#ea580c" /> Tạo tài khoản Admin Trường
+          <ShieldCheck size={20} color="var(--cam)" /> Tạo tài khoản Admin Trường
         </Box>
       </DialogTitle>
       <DialogContent>

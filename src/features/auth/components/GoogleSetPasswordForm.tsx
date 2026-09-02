@@ -15,7 +15,8 @@ interface GoogleSetPasswordFormProps {
 
 /** Kiểm tra độ mạnh mật khẩu: ≥8 ký tự, có chữ và số */
 function checkPasswordStrength(pw: string): { score: number; label: string; color: string } {
-  if (pw.length === 0) return { score: 0, label: '', color: '#e2e8f0' };
+  // Chưa gõ gì thì thanh rỗng: đây là màu RÃNH, đúng vai viền, không phải chữ.
+  if (pw.length === 0) return { score: 0, label: '', color: 'var(--vien)' }; // mau-ok
   const hasLetter = /[a-zA-Z]/.test(pw);
   const hasDigit  = /[0-9]/.test(pw);
   const hasSpecial = /[^a-zA-Z0-9]/.test(pw);
@@ -25,9 +26,9 @@ function checkPasswordStrength(pw: string): { score: number; label: string; colo
   const score = [hasLetter, hasDigit, longEnough, hasSpecial, veryLong]
     .filter(Boolean).length;
 
-  if (score <= 2) return { score: 20, label: 'Yếu',     color: '#ef4444' };
-  if (score === 3) return { score: 55, label: 'Trung bình', color: '#f59e0b' };
-  if (score === 4) return { score: 80, label: 'Tốt',     color: '#0f766e' };
+  if (score <= 2) return { score: 20, label: 'Yếu',     color: 'var(--do)' };
+  if (score === 3) return { score: 55, label: 'Trung bình', color: 'var(--vang)' };
+  if (score === 4) return { score: 80, label: 'Tốt',     color: 'var(--teal)' };
   return               { score: 100, label: 'Rất mạnh', color: '#059669' };
 }
 
@@ -86,20 +87,20 @@ export const GoogleSetPasswordForm: React.FC<GoogleSetPasswordFormProps> = ({
         {googleInfo.picture ? (
           <img src={googleInfo.picture} alt="avatar" style={{ width: 40, height: 40, borderRadius: '50%' }} />
         ) : (
-          <Box sx={{ width: 40, height: 40, borderRadius: '50%', bgcolor: '#0f766e', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Typography sx={{ color: '#fff', fontWeight: 'bold' }}>{googleInfo.name.charAt(0)}</Typography>
+          <Box sx={{ width: 40, height: 40, borderRadius: '50%', bgcolor: 'var(--teal-nen)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Typography sx={{ color: 'var(--chu-nguoc)', fontWeight: 'bold' }}>{googleInfo.name.charAt(0)}</Typography>
           </Box>
         )}
         <Box>
-          <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: '#0f172a' }}>
+          <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)' }}>
             {googleInfo.name}
           </Typography>
           <Typography variant="caption" color="text.secondary">{googleInfo.email}</Typography>
         </Box>
-        <ShieldCheck size={18} color="#0f766e" style={{ marginLeft: 'auto' }} />
+        <ShieldCheck size={18} color="var(--teal)" style={{ marginLeft: 'auto' }} />
       </Box>
 
-      <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#0f172a', mb: 0.5 }}>
+      <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)', mb: 0.5 }}>
         Thiết lập mật khẩu
       </Typography>
       <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
@@ -144,7 +145,7 @@ export const GoogleSetPasswordForm: React.FC<GoogleSetPasswordFormProps> = ({
                   value={strength.score}
                   sx={{
                     height: 6, borderRadius: 3,
-                    bgcolor: '#e2e8f0',
+                    bgcolor: 'var(--vien)',
                     '& .MuiLinearProgress-bar': { bgcolor: strength.color, borderRadius: 3 }
                   }}
                 />

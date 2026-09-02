@@ -23,7 +23,7 @@ import { ImportFromFile } from './ImportFromFile';
  */
 
 const LV_COLOR: Record<Level, string> = {
-  nb: '#0f766e', th: '#0062b8', vd: '#ea580c', vdc: '#b91c1c',
+  nb: 'var(--teal)', th: 'var(--xanh)', vd: 'var(--cam)', vdc: 'var(--do-dam)',
 };
 
 function blank(): BankQuestion {
@@ -294,7 +294,7 @@ export const BankManager: React.FC = () => {
         <Chip label={`Tổng ${items.length} câu`} sx={{ fontWeight: 'bold' }} />
         {LEVELS.map(l => (
           <Chip key={l.key} label={`${l.name}: ${dem[l.key] || 0}`}
-            sx={{ bgcolor: LV_COLOR[l.key], color: '#fff', fontWeight: 600 }} />
+            sx={{ bgcolor: LV_COLOR[l.key], color: 'var(--chu-nguoc)', fontWeight: 600 }} />
         ))}
       </Stack>
 
@@ -344,7 +344,7 @@ export const BankManager: React.FC = () => {
               <Stack direction="row" spacing={1} sx={{ mb: 1, flexWrap: 'wrap', gap: 0.5 }}>
                 <Chip size="small" label={`Chương ${q.ch}`} />
                 <Chip size="small" label={LEVELS.find(l => l.key === q.lv)?.name || q.lv}
-                  sx={{ bgcolor: LV_COLOR[q.lv], color: '#fff' }} />
+                  sx={{ bgcolor: LV_COLOR[q.lv], color: 'var(--chu-nguoc)' }} />
                 <Chip size="small" label={QTYPE_NAME[q.t]} variant="outlined" />
                 <Chip size="small" label={`${pointsOf(q)}đ`} variant="outlined" />
                 {q.lessonId ? (
@@ -355,14 +355,14 @@ export const BankManager: React.FC = () => {
                       (q.lessonId.startsWith('bai-') ? `Bài ${q.lessonId.replace('bai-', '')}` : `Bài ${q.lessonId}`)
                     }
                     variant="outlined"
-                    sx={{ borderColor: '#cbd5e1', color: '#334155' }}
+                    sx={{ borderColor: 'var(--vien)', color: 'var(--chu-dam-3)' }}
                   />
                 ) : (
                   <Chip
                     size="small"
                     label="Chưa gắn bài"
                     variant="outlined"
-                    sx={{ bgcolor: '#fff7ed', color: '#c2410c', borderColor: '#ffedd5', fontWeight: 600 }}
+                    sx={{ bgcolor: 'var(--nen-cam-nhat)', color: 'var(--cam-dam)', borderColor: 'var(--nen-cam-nhat2)', fontWeight: 600 }}
                   />
                 )}
                 {q.topic && <Chip size="small" label={q.topic} variant="outlined" />}
@@ -380,7 +380,7 @@ export const BankManager: React.FC = () => {
                 <Stack sx={{ mt: 1 }}>
                   {(q.o || []).map((o, i) => (
                     <Typography key={i} variant="body2"
-                      sx={{ color: i === q.a ? '#0f766e' : 'text.secondary', fontWeight: i === q.a ? 700 : 400 }}>
+                      sx={{ color: i === q.a ? 'var(--teal)' : 'text.secondary', fontWeight: i === q.a ? 700 : 400 }}>
                       {String.fromCharCode(65 + i)}. {o}{i === q.a ? '  ✓' : ''}
                     </Typography>
                   ))}
@@ -396,7 +396,7 @@ export const BankManager: React.FC = () => {
                 </Stack>
               )}
               {q.t === 'tn' && (
-                <Typography variant="body2" sx={{ mt: 1, color: '#0f766e' }}>
+                <Typography variant="body2" sx={{ mt: 1, color: 'var(--teal)' }}>
                   Đáp án: {q.ansText}{q.unit ? ` ${q.unit}` : ''}{q.tol ? ` (sai số ±${q.tol})` : ''}
                 </Typography>
               )}
@@ -598,7 +598,7 @@ export const BankManager: React.FC = () => {
                 {form.img && (
                   <>
                     <Box component="img" src={form.img}
-                      sx={{ height: 56, borderRadius: 1, border: '1px solid #e2e8f0' }} />
+                      sx={{ height: 56, borderRadius: 1, border: '1px solid var(--vien)' }} />
                     <Button size="small" color="error" onClick={() => setForm(s => ({ ...s, img: undefined }))}>
                       Bỏ ảnh
                     </Button>

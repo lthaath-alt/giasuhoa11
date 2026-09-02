@@ -55,8 +55,8 @@ export const LibraryManagement: React.FC = () => {
   return (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#0f172a', display: 'flex', alignItems: 'center', gap: 1 }}>
-          <BookOpen size={22} color="#0f766e" />
+        <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)', display: 'flex', alignItems: 'center', gap: 1 }}>
+          <BookOpen size={22} color="var(--teal)" />
           Thư viện đề thi & kho câu hỏi hệ thống
         </Typography>
         <Button
@@ -71,9 +71,9 @@ export const LibraryManagement: React.FC = () => {
       </Box>
 
       {exams.length === 0 ? (
-        <Paper elevation={0} sx={{ p: 6, textAlign: 'center', border: '2px dashed #e2e8f0', borderRadius: 3, bgcolor: '#f8fafc' }}>
+        <Paper elevation={0} sx={{ p: 6, textAlign: 'center', border: '2px dashed var(--vien)', borderRadius: 3, bgcolor: 'var(--nen-trang)' }}>
           <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
-            <FileText size={48} color="#94a3b8" />
+            <FileText size={48} color="var(--chu-mo)" />
           </Box>
           <Typography variant="h6" color="text.secondary" sx={{ mb: 1, fontWeight: 'bold' }}>
             Kho bài tập đang trống
@@ -86,15 +86,15 @@ export const LibraryManagement: React.FC = () => {
         <Grid container spacing={3}>
           {exams.map(exam => (
             <Grid size={{ xs: 12, md: 6 }} key={exam.id}>
-              <Paper elevation={0} sx={{ p: 3, border: '1px solid #e2e8f0', borderRadius: 3, height: '100%', position: 'relative' }}>
+              <Paper elevation={0} sx={{ p: 3, border: '1px solid var(--vien)', borderRadius: 3, height: '100%', position: 'relative' }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                  <Chip size="small" label={exam.topic} sx={{ bgcolor: '#f1f5f9', color: '#475569', fontWeight: 'bold' }} />
+                  <Chip size="small" label={exam.topic} sx={{ bgcolor: 'var(--nen-nhat)', color: 'var(--chu)', fontWeight: 'bold' }} />
                   <Chip
                     size="small"
                     label={exam.type}
                     sx={{
-                      bgcolor: exam.type === 'Kho chung' ? '#e0e7ff' : '#dcfce7',
-                      color: exam.type === 'Kho chung' ? '#4f46e5' : '#16a34a',
+                      bgcolor: exam.type === 'Kho chung' ? 'var(--nen-tim-nhat)' : 'var(--nen-luc-nhat)',
+                      color: exam.type === 'Kho chung' ? 'var(--tim)' : 'var(--luc)',
                       fontWeight: 'bold'
                     }}
                   />
@@ -107,7 +107,7 @@ export const LibraryManagement: React.FC = () => {
                 </Typography>
                 
                 {exam.driveLink ? (
-                  <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 1, color: '#0f766e', mb: 3 }}>
+                  <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'var(--teal)', mb: 3 }}>
                     <ExternalLink size={16} /> Tệp đính kèm (Google Drive)
                   </Typography>
                 ) : (

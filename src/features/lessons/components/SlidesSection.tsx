@@ -1,4 +1,5 @@
 import React, { useRef } from 'react';
+import { useCheDoMau } from '../../../core/hooks/useCheDoMau';
 import { Box, Typography, Button, Paper } from '@mui/material';
 import { Presentation, Maximize2 } from 'lucide-react';
 
@@ -12,12 +13,18 @@ import { Presentation, Maximize2 } from 'lucide-react';
  * Dùng chung cách làm với GameHubSection: iframe trỏ vào file HTML tĩnh.
  */
 
-// theme=light  -> khớp nền sáng của app (trang đó mặc định theo giao diện hệ thống)
+// theme=light|dark -> ép trang slide đi theo chế độ của app.
+//   Không truyền thì trang đó tự theo giao diện hệ thống, nên máy để nền tối mà
+//   app đang sáng (hoặc ngược lại) sẽ ra một mảng lệch tông giữa trang.
+//   Trang slide có nút đổi nền riêng và tự nhớ trong localStorage, nhưng tham số
+//   URL được ưu tiên — coi nút trên thanh đầu trang là nơi quyết định duy nhất.
 // embed=1      -> ẩn nút Toàn màn hình bên trong, tránh trùng với nút ở đây
-const SLIDES_URL = '/hoa11/index.html?theme=light&embed=1';
+const diaChiSlide = (toi: boolean) =>
+  `/hoa11/index.html?theme=${toi ? 'dark' : 'light'}&embed=1`;
 
 export const SlidesSection: React.FC = () => {
   const frameRef = useRef<HTMLIFrameElement>(null);
+  const { laToi } = useCheDoMau();
 
   const handleFullscreen = () => {
     frameRef.current?.requestFullscreen?.();
@@ -36,7 +43,7 @@ export const SlidesSection: React.FC = () => {
     <Box
       sx={{
         width: '100%',
-        bgcolor: '#f7f9fc',
+        bgcolor: 'var(--nen-xam)',
         borderRadius: 3,
         p: 3,
       }}
@@ -57,7 +64,7 @@ export const SlidesSection: React.FC = () => {
             sx={{
               fontWeight: 800,
               fontSize: '28px',
-              color: '#1e50a2',
+              color: 'var(--xanh-dam)',
               display: 'flex',
               alignItems: 'center',
               gap: 1.5,
@@ -66,7 +73,7 @@ export const SlidesSection: React.FC = () => {
           >
             <Presentation size={30} /> Bài Giảng Hóa 11
           </Typography>
-          <Typography sx={{ fontSize: '15px', color: '#5a6472', mt: '6px' }}>
+          <Typography sx={{ fontSize: '15px', color: 'var(--chu-2)', mt: '6px' }}>
             25 bài · 257 slide. Bấm vào một bài để xem, dùng phím mũi tên để lật slide.
           </Typography>
         </Box>
@@ -80,8 +87,8 @@ export const SlidesSection: React.FC = () => {
             textTransform: 'none',
             fontWeight: 'bold',
             borderRadius: 5,
-            background: 'linear-gradient(90deg, #1e50a2 0%, #007bf2 100%)',
-            color: '#ffffff',
+            background: 'linear-gradient(90deg, var(--xanh-dam-nen) 0%, var(--xanh-nen) 100%)',
+            color: 'var(--chu-nguoc)',
             '&:hover': {
               background: 'linear-gradient(90deg, #16407e 0%, #0056a3 100%)',
             },
@@ -96,7 +103,7 @@ export const SlidesSection: React.FC = () => {
         sx={{
           overflow: 'hidden',
           borderRadius: '16px',
-          border: '2px solid #1e50a2',
+          border: '2px solid var(--xanh-dam)',
           boxShadow: '0 4px 16px rgba(30, 80, 162, 0.12)',
           height: { xs: 'calc(100vh - 290px)', md: 'calc(100vh - 250px)' },
           minHeight: '400px',
@@ -104,7 +111,7 @@ export const SlidesSection: React.FC = () => {
       >
         <iframe
           ref={frameRef}
-          src={SLIDES_URL}
+          src={diaChiSlide(laToi)}
           title="Bài giảng Hóa 11"
           onLoad={handleLoad}
           allow="fullscreen"

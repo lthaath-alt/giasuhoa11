@@ -70,7 +70,7 @@ export const JoinClassForm: React.FC<JoinClassFormProps> = ({ onJoined, onDismis
         id="join-class-dismiss-btn"
         size="small"
         onClick={handleDismiss}
-        sx={{ position: 'absolute', top: 8, right: 8, color: '#94a3b8' }}
+        sx={{ position: 'absolute', top: 8, right: 8, color: 'var(--chu-mo)' }}
         title="Bỏ qua"
       >
         <X size={16} />
@@ -80,9 +80,9 @@ export const JoinClassForm: React.FC<JoinClassFormProps> = ({ onJoined, onDismis
       <Collapse in={Boolean(success)}>
         {success && (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-            <CheckCircle size={20} color="#10b981" />
+            <CheckCircle size={20} color="var(--luc)" />
             <Box>
-              <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: '#10b981' }}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--luc)' }}>
                 Tham gia lớp thành công!
               </Typography>
               <Typography variant="caption" color="text.secondary">
@@ -100,11 +100,11 @@ export const JoinClassForm: React.FC<JoinClassFormProps> = ({ onJoined, onDismis
             p: 1, bgcolor: 'rgba(15,118,110,0.1)',
             borderRadius: 2, display: 'flex', flexShrink: 0, mt: 0.5,
           }}>
-            <School size={18} color="#0f766e" />
+            <School size={18} color="var(--teal)" />
           </Box>
 
           <Box sx={{ flex: 1 }}>
-            <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: '#0f172a', mb: 0.5 }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)', mb: 0.5 }}>
               Bạn có mã lớp do giáo viên cấp?
             </Typography>
             <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1.5, lineHeight: 1.5 }}>
@@ -129,7 +129,7 @@ export const JoinClassForm: React.FC<JoinClassFormProps> = ({ onJoined, onDismis
                   input: {
                     startAdornment: (
                       <InputAdornment position="start">
-                        <School size={14} color="#0f766e" />
+                        <School size={14} color="var(--teal)" />
                       </InputAdornment>
                     ),
                   },
@@ -138,14 +138,14 @@ export const JoinClassForm: React.FC<JoinClassFormProps> = ({ onJoined, onDismis
                   width: 200,
                   '& .MuiOutlinedInput-root': {
                     borderRadius: 2.5,
-                    '&.Mui-focused fieldset': { borderColor: '#0f766e' },
+                    '&.Mui-focused fieldset': { borderColor: 'var(--teal)' },
                   },
                   '& .MuiInputBase-input': {
                     fontFamily: 'monospace',
                     fontSize: '0.95rem',
                     letterSpacing: '0.15em',
                     fontWeight: 700,
-                    color: '#0f766e',
+                    color: 'var(--teal)',
                   },
                 }}
               />
@@ -160,10 +160,10 @@ export const JoinClassForm: React.FC<JoinClassFormProps> = ({ onJoined, onDismis
                   textTransform: 'none',
                   fontWeight: 'bold',
                   borderRadius: 2.5,
-                  bgcolor: '#0f766e',
+                  bgcolor: 'var(--teal-nen)',
                   boxShadow: 'none',
                   '&:hover': { bgcolor: '#0d9488', boxShadow: '0 2px 8px rgba(15,118,110,0.25)' },
-                  '&:disabled': { bgcolor: '#94a3b8' },
+                  '&:disabled': { bgcolor: 'var(--chu-mo)' },
                 }}
               >
                 {loading ? 'Đang xử lý...' : 'Tham gia lớp'}

@@ -94,10 +94,10 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({
 
   const getRoleChip = (role: string) => {
     switch (role) {
-      case 'admin': return <Chip size="small" label="Quản trị Website" sx={{ bgcolor: '#fef3c7', color: '#d97706', fontWeight: 'bold' }} />;
-      case 'school_admin': return <Chip size="small" label="Quản trị Trường học" sx={{ bgcolor: '#e0e7ff', color: '#4f46e5', fontWeight: 'bold' }} />;
-      case 'teacher': return <Chip size="small" label="Giáo viên" sx={{ bgcolor: '#ccfbf1', color: '#0f766e', fontWeight: 'bold' }} />;
-      case 'student': return <Chip size="small" label="Học sinh" sx={{ bgcolor: '#dbeafe', color: '#2563eb', fontWeight: 'bold' }} />;
+      case 'admin': return <Chip size="small" label="Quản trị Website" sx={{ bgcolor: 'var(--nen-vang-nhat)', color: 'var(--vang-dam)', fontWeight: 'bold' }} />;
+      case 'school_admin': return <Chip size="small" label="Quản trị Trường học" sx={{ bgcolor: 'var(--nen-tim-nhat)', color: 'var(--tim)', fontWeight: 'bold' }} />;
+      case 'teacher': return <Chip size="small" label="Giáo viên" sx={{ bgcolor: '#ccfbf1', color: 'var(--teal)', fontWeight: 'bold' }} />;
+      case 'student': return <Chip size="small" label="Học sinh" sx={{ bgcolor: 'var(--nen-xanh-nhat)', color: 'var(--xanh-troi)', fontWeight: 'bold' }} />;
       default: return <Chip size="small" label={role} />;
     }
   };
@@ -114,8 +114,8 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({
       <Box>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, flexWrap: 'wrap', gap: 2 }}>
           <Box>
-            <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#0f172a', display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Users size={20} color="#0f766e" />
+            <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)', display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Users size={20} color="var(--teal)" />
               Danh sách người dùng hệ thống ({users.length} tài khoản)
             </Typography>
           </Box>
@@ -127,7 +127,7 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({
                 onClick={() => onCreateSchoolAdminClick?.(schools[0]?.id || '')}
                 sx={{
                   textTransform: 'none', borderRadius: 2, fontWeight: 'bold', boxShadow: 'none',
-                  bgcolor: '#4f46e5', '&:hover': { bgcolor: '#4338ca' }
+                  bgcolor: 'var(--tim-nen)', '&:hover': { bgcolor: '#4338ca' }
                 }}
               >
                 Thêm Admin Trường
@@ -151,25 +151,25 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({
           </Box>
         </Box>
 
-        <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid #e2e8f0', borderRadius: 3 }}>
+        <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid var(--vien)', borderRadius: 3 }}>
           <Table>
             <TableHead>
-              <TableRow sx={{ bgcolor: '#f8fafc' }}>
-                <TableCell sx={{ fontWeight: 'bold', color: '#475569' }}>Họ Tên</TableCell>
-                <TableCell sx={{ fontWeight: 'bold', color: '#475569' }}>Tên Đăng Nhập</TableCell>
-                <TableCell sx={{ fontWeight: 'bold', color: '#475569' }}>Vai Trò</TableCell>
-                <TableCell sx={{ fontWeight: 'bold', color: '#475569' }}>Lớp Học</TableCell>
-                <TableCell sx={{ fontWeight: 'bold', color: '#475569', align: 'right' }}>Hành Động</TableCell>
+              <TableRow sx={{ bgcolor: 'var(--nen-trang)' }}>
+                <TableCell sx={{ fontWeight: 'bold', color: 'var(--chu)' }}>Họ Tên</TableCell>
+                <TableCell sx={{ fontWeight: 'bold', color: 'var(--chu)' }}>Tên Đăng Nhập</TableCell>
+                <TableCell sx={{ fontWeight: 'bold', color: 'var(--chu)' }}>Vai Trò</TableCell>
+                <TableCell sx={{ fontWeight: 'bold', color: 'var(--chu)' }}>Lớp Học</TableCell>
+                <TableCell sx={{ fontWeight: 'bold', color: 'var(--chu)', align: 'right' }}>Hành Động</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {users.map(user => (
-                <TableRow key={user.id} sx={{ '&:hover': { bgcolor: '#f8fafc' } }}>
+                <TableRow key={user.id} sx={{ '&:hover': { bgcolor: 'var(--nen-trang)' } }}>
                   <TableCell>
                     <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>{user.name}</Typography>
                   </TableCell>
                   <TableCell>
-                    <Typography variant="body2" sx={{ fontFamily: 'monospace', color: '#0f766e' }}>
+                    <Typography variant="body2" sx={{ fontFamily: 'monospace', color: 'var(--teal)' }}>
                       {user.username || user.email}
                     </Typography>
                   </TableCell>
@@ -183,12 +183,12 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({
                     {canEditOrDelete(user) && (
                       <>
                         <Tooltip title="Sửa thông tin">
-                          <IconButton size="small" onClick={() => handleEditOpen(user)} sx={{ color: '#64748b' }}>
+                          <IconButton size="small" onClick={() => handleEditOpen(user)} sx={{ color: 'var(--chu-2)' }}>
                             <Edit size={16} />
                           </IconButton>
                         </Tooltip>
                         <Tooltip title="Xóa tài khoản">
-                          <IconButton size="small" onClick={() => setUserToDelete(user)} sx={{ color: '#ef4444' }}>
+                          <IconButton size="small" onClick={() => setUserToDelete(user)} sx={{ color: 'var(--do)' }}>
                             <Trash2 size={16} />
                           </IconButton>
                         </Tooltip>
@@ -205,20 +205,20 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({
       {/* ─── KHỐI 3: DANH SÁCH ADMIN TRƯỜNG HỌC (chỉ hiển thị với admin có schools) ─── */}
       {canCreateSchoolAdmin && schools.length > 0 && (
         <Box sx={{ mt: 4 }}>
-          <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#0f172a', display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-            <ShieldCheck size={20} color="#4f46e5" />
+          <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)', display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+            <ShieldCheck size={20} color="var(--tim)" />
             Quản trị viên Trường học
           </Typography>
 
           {schools.map(school => {
             const admins = users.filter(u => u.role === 'school_admin' && u.schoolId === school.id);
             return (
-              <Paper key={school.id} elevation={0} sx={{ border: '1px solid #e0e7ff', borderRadius: 3, mb: 2, overflow: 'hidden' }}>
+              <Paper key={school.id} elevation={0} sx={{ border: '1px solid var(--nen-tim-nhat)', borderRadius: 3, mb: 2, overflow: 'hidden' }}>
                 {/* Header của từng trường */}
-                <Box sx={{ px: 3, py: 2, bgcolor: '#f5f3ff', borderBottom: '1px solid #e0e7ff', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <Box sx={{ px: 3, py: 2, bgcolor: 'var(--nen-tim-nhat2)', borderBottom: '1px solid var(--nen-tim-nhat)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                    <Box sx={{ p: 0.8, bgcolor: '#e0e7ff', borderRadius: 1.5, display: 'flex' }}>
-                      <ShieldCheck size={16} color="#4f46e5" />
+                    <Box sx={{ p: 0.8, bgcolor: 'var(--nen-tim-nhat)', borderRadius: 1.5, display: 'flex' }}>
+                      <ShieldCheck size={16} color="var(--tim)" />
                     </Box>
                     <Box>
                       <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: '#1e1b4b' }}>
@@ -236,7 +236,7 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({
                     onClick={() => onCreateSchoolAdminClick?.(school.id)}
                     sx={{
                       textTransform: 'none', borderRadius: 2, fontWeight: 'bold', fontSize: '0.78rem',
-                      borderColor: '#6366f1', color: '#4f46e5',
+                      borderColor: 'var(--tim-2)', color: 'var(--tim)',
                       '&:hover': { bgcolor: 'rgba(99,102,241,0.08)' }
                     }}
                   >
@@ -247,7 +247,7 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({
                 {/* Danh sách admin của trường */}
                 {admins.length === 0 ? (
                   <Box sx={{ px: 3, py: 2.5, color: 'text.secondary' }}>
-                    <Typography variant="body2" sx={{ fontStyle: 'italic', color: '#94a3b8' }}>
+                    <Typography variant="body2" sx={{ fontStyle: 'italic', color: 'var(--chu-mo)' }}>
                       ⚠️ Trường này chưa có Admin. Hãy thêm ít nhất một Admin để quản lý trường.
                     </Typography>
                   </Box>
@@ -255,20 +255,20 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({
                   <Table size="small">
                     <TableHead>
                       <TableRow sx={{ bgcolor: '#f8f7ff' }}>
-                        <TableCell sx={{ fontWeight: 'bold', color: '#4f46e5', fontSize: '0.78rem' }}>Họ Tên</TableCell>
-                        <TableCell sx={{ fontWeight: 'bold', color: '#4f46e5', fontSize: '0.78rem' }}>Email Đăng Nhập</TableCell>
-                        <TableCell sx={{ fontWeight: 'bold', color: '#4f46e5', fontSize: '0.78rem' }}>Trạng Thái</TableCell>
-                        <TableCell sx={{ fontWeight: 'bold', color: '#4f46e5', fontSize: '0.78rem', align: 'right' }}>Hành Động</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold', color: 'var(--tim)', fontSize: '0.78rem' }}>Họ Tên</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold', color: 'var(--tim)', fontSize: '0.78rem' }}>Email Đăng Nhập</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold', color: 'var(--tim)', fontSize: '0.78rem' }}>Trạng Thái</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold', color: 'var(--tim)', fontSize: '0.78rem', align: 'right' }}>Hành Động</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
                       {admins.map(admin => (
-                        <TableRow key={admin.id} sx={{ '&:hover': { bgcolor: '#f5f3ff' } }}>
+                        <TableRow key={admin.id} sx={{ '&:hover': { bgcolor: 'var(--nen-tim-nhat2)' } }}>
                           <TableCell>
                             <Typography variant="body2" sx={{ fontWeight: 600 }}>{admin.name}</Typography>
                           </TableCell>
                           <TableCell>
-                            <Typography variant="body2" sx={{ fontFamily: 'monospace', color: '#4f46e5', fontSize: '0.82rem' }}>
+                            <Typography variant="body2" sx={{ fontFamily: 'monospace', color: 'var(--tim)', fontSize: '0.82rem' }}>
                               {admin.username || admin.email}
                             </Typography>
                           </TableCell>
@@ -279,14 +279,14 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({
                               sx={{
                                 fontWeight: 'bold', fontSize: '0.7rem',
                                 bgcolor: admin.status === 'active' ? 'rgba(79,70,229,0.1)' : 'rgba(239,68,68,0.1)',
-                                color: admin.status === 'active' ? '#4f46e5' : '#dc2626',
+                                color: admin.status === 'active' ? 'var(--tim)' : 'var(--do)',
                               }}
                             />
                           </TableCell>
                           <TableCell align="right">
                             {canEditOrDelete(admin) && (
                               <Tooltip title="Xóa admin">
-                                <IconButton size="small" onClick={() => setUserToDelete(admin)} sx={{ color: '#ef4444' }}>
+                                <IconButton size="small" onClick={() => setUserToDelete(admin)} sx={{ color: 'var(--do)' }}>
                                   <Trash2 size={15} />
                                 </IconButton>
                               </Tooltip>

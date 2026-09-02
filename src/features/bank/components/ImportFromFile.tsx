@@ -31,7 +31,7 @@ interface Props {
 
 const o_chon = {
   font: 'inherit', fontSize: '0.85rem', padding: '6px 8px',
-  border: '1px solid #cbd5e1', borderRadius: '6px', background: '#fff', minWidth: 120,
+  border: '1px solid var(--vien)', borderRadius: '6px', background: 'var(--nen-the)', minWidth: 120,
 };
 
 export const ImportFromFile: React.FC<Props> = ({ mo, dong, daCo, duyet }) => {

@@ -56,10 +56,10 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onBackTo
           bgcolor: 'rgba(15, 118, 110, 0.08)', border: '2px solid rgba(15, 118, 110, 0.2)',
           mx: 'auto', mb: 2
         }}>
-          <KeyRound size={28} color="#0f766e" />
+          <KeyRound size={28} color="var(--teal)" />
         </Box>
 
-        <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#0f172a', mb: 0.5 }}>
+        <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)', mb: 0.5 }}>
           Mật khẩu mới đã được tạo
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
@@ -73,7 +73,7 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onBackTo
         {/* Hiển thị mật khẩu mới */}
         <Box sx={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          p: 2.5, bgcolor: '#f8fafc', borderRadius: 3,
+          p: 2.5, bgcolor: 'var(--nen-trang)', borderRadius: 3,
           border: '1.5px solid rgba(15, 118, 110, 0.25)', mb: 2
         }}>
           <Box sx={{ textAlign: 'left' }}>
@@ -83,7 +83,7 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onBackTo
             <Typography
               variant="h6"
               sx={{
-                fontFamily: 'monospace', fontWeight: 'bold', color: '#0f766e',
+                fontFamily: 'monospace', fontWeight: 'bold', color: 'var(--teal)',
                 letterSpacing: showPassword ? 2 : 6,
                 mt: 0.5
               }}
@@ -133,10 +133,10 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onBackTo
     <Box id="forgot-password-form">
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
         <Box sx={{ p: 1, bgcolor: 'rgba(234, 88, 12, 0.08)', borderRadius: 2 }}>
-          <RefreshCw size={20} color="#ea580c" />
+          <RefreshCw size={20} color="var(--cam)" />
         </Box>
         <Box>
-          <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#0f172a', lineHeight: 1.2 }}>
+          <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)', lineHeight: 1.2 }}>
             Quên mật khẩu?
           </Typography>
           <Typography variant="caption" color="text.secondary">

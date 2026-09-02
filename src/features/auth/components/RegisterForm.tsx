@@ -30,7 +30,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleForm }) => {
 
   return (
     <Box id="register-info-container">
-      <Typography variant="h5" align="center" sx={{ mb: 0.5, fontWeight: 'bold', color: '#0f172a' }}>
+      <Typography variant="h5" align="center" sx={{ mb: 0.5, fontWeight: 'bold', color: 'var(--chu-dam)' }}>
         Tạo tài khoản
       </Typography>
       <Typography variant="body2" align="center" color="text.secondary" sx={{ mb: 3 }}>
@@ -57,10 +57,10 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleForm }) => {
       >
         <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
           <Box sx={{ p: 1, bgcolor: 'rgba(234, 88, 12, 0.1)', borderRadius: 2, display: 'flex' }}>
-            <UserPlus size={22} color="#ea580c" />
+            <UserPlus size={22} color="var(--cam)" />
           </Box>
           <Box>
-            <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: '#0f172a', mb: 0.5 }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)', mb: 0.5 }}>
               Học sinh đăng ký bằng Email ✨
             </Typography>
             <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.6, display: 'block' }}>
@@ -83,10 +83,10 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleForm }) => {
       >
         <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
           <Box sx={{ p: 1, bgcolor: 'rgba(15, 118, 110, 0.08)', borderRadius: 2, display: 'flex' }}>
-            <GraduationCap size={22} color="#0f766e" />
+            <GraduationCap size={22} color="var(--teal)" />
           </Box>
           <Box>
-            <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: '#0f172a', mb: 0.5 }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)', mb: 0.5 }}>
               Tài khoản do nhà trường cấp
             </Typography>
             <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.6, display: 'block' }}>
@@ -108,8 +108,8 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleForm }) => {
         onClick={onToggleForm}
         sx={{
           py: 1.3, borderRadius: 3, fontWeight: 'bold', textTransform: 'none',
-          borderColor: '#ea580c', color: '#ea580c',
-          '&:hover': { backgroundColor: 'rgba(234, 88, 12, 0.06)', borderColor: '#ea580c' }
+          borderColor: 'var(--cam)', color: 'var(--cam)',
+          '&:hover': { backgroundColor: 'rgba(234, 88, 12, 0.06)', borderColor: 'var(--cam)' }
         }}
       >
         Quay lại Đăng nhập

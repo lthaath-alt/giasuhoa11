@@ -39,7 +39,7 @@ export const AdminDashboard: React.FC = () => {
       />
 
       {/* Tabs chuyển đổi */}
-      <Paper elevation={0} sx={{ borderRadius: 3, p: 0.8, mb: 3, border: '1px solid #e2e8f0', backgroundColor: '#ffffff' }}>
+      <Paper elevation={0} sx={{ borderRadius: 3, p: 0.8, mb: 3, border: '1px solid var(--vien)', backgroundColor: 'var(--nen-the)' }}>
         <Tabs
           value={activeTab}
           onChange={(_, val) => setActiveTab(val)}
@@ -54,22 +54,22 @@ export const AdminDashboard: React.FC = () => {
               minHeight: 44,
               px: 2.5,
               mr: 0.5,
-              color: '#475569',
+              color: 'var(--chu)',
               transition: 'all 0.2s',
               fontSize: '0.92rem',
               '&:hover': {
-                backgroundColor: '#f1f5f9',
-                color: '#0f172a',
+                backgroundColor: 'var(--nen-nhat)',
+                color: 'var(--chu-dam)',
               },
               '&.Mui-selected': {
-                color: '#ea580c',
+                color: 'var(--cam)',
                 backgroundColor: 'rgba(234, 88, 12, 0.08)',
               }
             },
             '& .MuiTabs-indicator': {
               height: 3,
               borderRadius: '3px 3px 0 0',
-              backgroundColor: '#ea580c',
+              backgroundColor: 'var(--cam-nen)',
             }
           }}
         >

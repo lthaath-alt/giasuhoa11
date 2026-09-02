@@ -71,9 +71,9 @@ const TYPE_COLOR: Record<QuestionType, 'primary' | 'secondary' | 'warning'> = {
 };
 
 const DIFFICULTY_COLOR: Record<DifficultyLevel, string> = {
-  'Thấp': '#10b981',
-  'Trung bình': '#f59e0b',
-  'Cao': '#ef4444',
+  'Thấp': 'var(--luc)',
+  'Trung bình': 'var(--vang)',
+  'Cao': 'var(--do)',
 };
 
 // ─── Helper: render HTML content (giữ sub/sup) ───────────────────────────────
@@ -104,9 +104,9 @@ function QuestionImages({ images }: { images: Question['images'] }) {
             maxHeight: 200,
             objectFit: 'contain',
             borderRadius: 1,
-            border: '1px solid #e2e8f0',
+            border: '1px solid var(--vien)',
             p: 0.5,
-            bgcolor: '#fff',
+            bgcolor: 'var(--nen-the)',
           }}
         />
       ))}
@@ -135,17 +135,17 @@ function Breadcrumb({ view, chapterTitle, lessonTitle, onGoChapters, onGoLessons
         size="small"
         startIcon={<Library size={14} />}
         onClick={onGoChapters}
-        sx={{ textTransform: 'none', fontWeight: view === 'chapters' ? 'bold' : 'normal', color: view === 'chapters' ? '#0062b8' : '#64748b' }}
+        sx={{ textTransform: 'none', fontWeight: view === 'chapters' ? 'bold' : 'normal', color: view === 'chapters' ? 'var(--xanh)' : 'var(--chu-2)' }}
       >
         Thư viện
       </Button>
       {view !== 'chapters' && (
         <>
-          <ChevronRight size={14} color="#94a3b8" />
+          <ChevronRight size={14} color="var(--chu-mo)" />
           <Button
             size="small"
             onClick={onGoLessons}
-            sx={{ textTransform: 'none', fontWeight: view === 'lessons' ? 'bold' : 'normal', color: view === 'lessons' ? '#0062b8' : '#64748b' }}
+            sx={{ textTransform: 'none', fontWeight: view === 'lessons' ? 'bold' : 'normal', color: view === 'lessons' ? 'var(--xanh)' : 'var(--chu-2)' }}
           >
             {chapterTitle}
           </Button>
@@ -153,8 +153,8 @@ function Breadcrumb({ view, chapterTitle, lessonTitle, onGoChapters, onGoLessons
       )}
       {view === 'questions' && (
         <>
-          <ChevronRight size={14} color="#94a3b8" />
-          <Typography variant="body2" sx={{ fontWeight: 'bold', color: '#0062b8' }}>{lessonTitle}</Typography>
+          <ChevronRight size={14} color="var(--chu-mo)" />
+          <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'var(--xanh)' }}>{lessonTitle}</Typography>
         </>
       )}
     </Box>
@@ -229,9 +229,9 @@ function UploadWordDialog({ open, chapterId, lessonId, lessonTitle, onClose, onS
 
   return (
     <Dialog open={open} onClose={handleClose} fullWidth maxWidth="md" scroll="paper">
-      <DialogTitle sx={{ fontWeight: 'bold', borderBottom: '1px solid #e2e8f0', pb: 2 }}>
+      <DialogTitle sx={{ fontWeight: 'bold', borderBottom: '1px solid var(--vien)', pb: 2 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-          <Upload size={20} color="#0062b8" />
+          <Upload size={20} color="var(--xanh)" />
           <Box>
             <Typography variant="h6" sx={{ fontWeight: 'bold', lineHeight: 1.2 }}>Upload câu hỏi từ file Word</Typography>
             <Typography variant="caption" color="text.secondary">{lessonTitle}</Typography>
@@ -272,11 +272,11 @@ function UploadWordDialog({ open, chapterId, lessonId, lessonTitle, onClose, onS
             textAlign: 'center',
             borderRadius: 3,
             borderStyle: 'dashed',
-            borderColor: '#94a3b8',
-            bgcolor: '#f8fafc',
+            borderColor: 'var(--chu-mo)',
+            bgcolor: 'var(--nen-trang)',
             cursor: 'pointer',
             transition: 'all 0.2s',
-            '&:hover': { borderColor: '#0062b8', bgcolor: 'rgba(0,98,184,0.04)' },
+            '&:hover': { borderColor: 'var(--xanh)', bgcolor: 'rgba(0,98,184,0.04)' },
           }}
           onClick={() => fileInputRef.current?.click()}
         >
@@ -287,7 +287,7 @@ function UploadWordDialog({ open, chapterId, lessonId, lessonTitle, onClose, onS
             style={{ display: 'none' }}
             onChange={handleFileChange}
           />
-          <Upload size={32} color="#94a3b8" />
+          <Upload size={32} color="var(--chu-mo)" />
           <Typography variant="body1" sx={{ mt: 1, fontWeight: 600 }}>
             Nhấn để chọn file Word (.docx)
           </Typography>
@@ -357,7 +357,7 @@ function UploadWordDialog({ open, chapterId, lessonId, lessonTitle, onClose, onS
         )}
       </DialogContent>
 
-      <DialogActions sx={{ px: 3, py: 2, borderTop: '1px solid #e2e8f0', gap: 1 }}>
+      <DialogActions sx={{ px: 3, py: 2, borderTop: '1px solid var(--vien)', gap: 1 }}>
         <Button onClick={handleClose} color="inherit" sx={{ textTransform: 'none' }}>
           Hủy
         </Button>
@@ -390,7 +390,7 @@ function PreviewQuestionCard({ question, index, onRemove }: { question: ParsedQu
           justifyContent: 'space-between',
           px: 2,
           py: 1.5,
-          bgcolor: '#f8fafc',
+          bgcolor: 'var(--nen-trang)',
           cursor: 'pointer',
         }}
         onClick={() => setOpen(!open)}
@@ -404,7 +404,7 @@ function PreviewQuestionCard({ question, index, onRemove }: { question: ParsedQu
           <Chip
             label={question.difficulty}
             size="small"
-            sx={{ bgcolor: DIFFICULTY_COLOR[question.difficulty], color: '#fff', fontWeight: 'bold' }}
+            sx={{ bgcolor: DIFFICULTY_COLOR[question.difficulty], color: 'var(--chu-nguoc)', fontWeight: 'bold' }}
           />
           <Chip label={`${question.points} điểm`} size="small" variant="outlined" />
           {question.images && question.images.length > 0 && (
@@ -418,7 +418,7 @@ function PreviewQuestionCard({ question, index, onRemove }: { question: ParsedQu
 
       <Collapse in={open}>
         <Box sx={{ px: 2, py: 1.5 }}>
-          <Typography variant="body2" sx={{ mb: 1, color: '#1e293b' }}>
+          <Typography variant="body2" sx={{ mb: 1, color: 'var(--chu-dam-2)' }}>
             <QuestionContent html={question.content} />
           </Typography>
           <QuestionImages images={question.images || []} />
@@ -430,7 +430,7 @@ function PreviewQuestionCard({ question, index, onRemove }: { question: ParsedQu
                   key={opt.key}
                   variant="caption"
                   sx={{
-                    color: opt.key === question.correctAnswer ? '#10b981' : '#475569',
+                    color: opt.key === question.correctAnswer ? 'var(--luc)' : 'var(--chu)',
                     fontWeight: opt.key === question.correctAnswer ? 'bold' : 'normal',
                   }}
                 >
@@ -442,16 +442,16 @@ function PreviewQuestionCard({ question, index, onRemove }: { question: ParsedQu
           )}
 
           {question.correctAnswer && question.type !== 'Trắc nghiệm' && (
-            <Typography variant="caption" sx={{ color: '#10b981', fontWeight: 'bold', display: 'block', mt: 1 }}>
+            <Typography variant="caption" sx={{ color: 'var(--luc)', fontWeight: 'bold', display: 'block', mt: 1 }}>
               Đáp án: {question.correctAnswer}
             </Typography>
           )}
 
           {question.essayPoints && question.essayPoints.length > 0 && (
-            <Box sx={{ mt: 1, display: 'flex', flexDirection: 'column', gap: 0.5, bgcolor: '#f8fafc', p: 1, borderRadius: 1 }}>
-              <Typography variant="caption" sx={{ fontWeight: 'bold', color: '#475569' }}>Đáp án mẫu:</Typography>
+            <Box sx={{ mt: 1, display: 'flex', flexDirection: 'column', gap: 0.5, bgcolor: 'var(--nen-trang)', p: 1, borderRadius: 1 }}>
+              <Typography variant="caption" sx={{ fontWeight: 'bold', color: 'var(--chu)' }}>Đáp án mẫu:</Typography>
               {question.essayPoints.map((p, i) => (
-                <Typography key={i} variant="caption" sx={{ color: '#374151' }}>
+                <Typography key={i} variant="caption" sx={{ color: 'var(--chu-dam-2)' }}>
                   <strong>{p.label}:</strong> {p.content}
                 </Typography>
               ))}
@@ -523,7 +523,7 @@ function EditQuestionDialog({ open, question, chapterId, lessonId, onClose, onSa
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
       <DialogTitle sx={{ fontWeight: 'bold' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Edit2 size={18} color="#0062b8" />
+          <Edit2 size={18} color="var(--xanh)" />
           Sửa câu hỏi
           <Chip label={question.type} size="small" color={TYPE_COLOR[question.type]} sx={{ ml: 1 }} />
         </Box>
@@ -636,11 +636,11 @@ function QuestionCard({ question, index, chapterId, lessonId, onDeleted, onEdite
       <Paper variant="outlined" sx={{ borderRadius: 2.5, overflow: 'hidden', transition: 'box-shadow 0.2s', '&:hover': { boxShadow: '0 2px 8px rgba(0,0,0,0.08)' } }}>
         {/* Header */}
         <Box
-          sx={{ display: 'flex', alignItems: 'center', gap: 1.5, px: 2, py: 1.5, bgcolor: '#f8fafc', cursor: 'pointer' }}
+          sx={{ display: 'flex', alignItems: 'center', gap: 1.5, px: 2, py: 1.5, bgcolor: 'var(--nen-trang)', cursor: 'pointer' }}
           onClick={() => setExpanded(!expanded)}
         >
-          <Box sx={{ width: 28, height: 28, borderRadius: '50%', bgcolor: '#0062b8', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <Typography variant="caption" sx={{ color: '#fff', fontWeight: 'bold', fontSize: 11 }}>{index + 1}</Typography>
+          <Box sx={{ width: 28, height: 28, borderRadius: '50%', bgcolor: 'var(--xanh-nen)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <Typography variant="caption" sx={{ color: 'var(--chu-nguoc)', fontWeight: 'bold', fontSize: 11 }}>{index + 1}</Typography>
           </Box>
 
           <Box sx={{ flex: 1, minWidth: 0 }}>
@@ -649,7 +649,7 @@ function QuestionCard({ question, index, chapterId, lessonId, onDeleted, onEdite
               <Chip
                 label={question.difficulty}
                 size="small"
-                sx={{ bgcolor: DIFFICULTY_COLOR[question.difficulty], color: '#fff', fontWeight: 600, height: 20 }}
+                sx={{ bgcolor: DIFFICULTY_COLOR[question.difficulty], color: 'var(--chu-nguoc)', fontWeight: 600, height: 20 }}
               />
               <Chip label={`${question.points} điểm`} size="small" variant="outlined" />
               {question.images && question.images.length > 0 && (
@@ -658,7 +658,7 @@ function QuestionCard({ question, index, chapterId, lessonId, onDeleted, onEdite
             </Box>
             <Typography
               variant="body2"
-              sx={{ mt: 0.5, color: '#374151', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: expanded ? 'normal' : 'nowrap', maxWidth: '100%' }}
+              sx={{ mt: 0.5, color: 'var(--chu-dam-2)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: expanded ? 'normal' : 'nowrap', maxWidth: '100%' }}
             >
               <QuestionContent html={question.content || '(không có nội dung text)'} />
             </Typography>
@@ -671,13 +671,13 @@ function QuestionCard({ question, index, chapterId, lessonId, onDeleted, onEdite
             <IconButton size="small" color="error" title="Xóa câu hỏi" onClick={handleDelete}>
               <Trash2 size={15} />
             </IconButton>
-            {expanded ? <ChevronDown size={16} color="#94a3b8" /> : <ChevronRight size={16} color="#94a3b8" />}
+            {expanded ? <ChevronDown size={16} color="var(--chu-mo)" /> : <ChevronRight size={16} color="var(--chu-mo)" />}
           </Box>
         </Box>
 
         {/* Expanded detail */}
         <Collapse in={expanded}>
-          <Box sx={{ px: 2, py: 2, borderTop: '1px solid #f1f5f9' }}>
+          <Box sx={{ px: 2, py: 2, borderTop: '1px solid var(--nen-nhat)' }}>
             {question.images && question.images.length > 0 && <QuestionImages images={question.images} />}
 
             {question.options && (
@@ -691,26 +691,26 @@ function QuestionCard({ question, index, chapterId, lessonId, onDeleted, onEdite
                       gap: 1,
                       p: 1,
                       borderRadius: 1.5,
-                      bgcolor: opt.key === question.correctAnswer ? 'rgba(16,185,129,0.08)' : '#f8fafc',
-                      border: opt.key === question.correctAnswer ? '1px solid #10b981' : '1px solid transparent',
+                      bgcolor: opt.key === question.correctAnswer ? 'rgba(16,185,129,0.08)' : 'var(--nen-trang)',
+                      border: opt.key === question.correctAnswer ? '1px solid var(--luc)' : '1px solid transparent',
                     }}
                   >
-                    <Typography variant="body2" sx={{ fontWeight: 'bold', minWidth: 20, color: opt.key === question.correctAnswer ? '#10b981' : '#475569' }}>
+                    <Typography variant="body2" sx={{ fontWeight: 'bold', minWidth: 20, color: opt.key === question.correctAnswer ? 'var(--luc)' : 'var(--chu)' }}>
                       {opt.key}.
                     </Typography>
-                    <Typography variant="body2" sx={{ color: '#374151', flex: 1 }}>
+                    <Typography variant="body2" sx={{ color: 'var(--chu-dam-2)', flex: 1 }}>
                       <QuestionContent html={opt.text} />
                     </Typography>
-                    {opt.key === question.correctAnswer && <CheckCircle size={16} color="#10b981" />}
+                    {opt.key === question.correctAnswer && <CheckCircle size={16} color="var(--luc)" />}
                   </Box>
                 ))}
               </Box>
             )}
 
             {question.correctAnswer && question.type !== 'Trắc nghiệm' && (
-              <Box sx={{ mt: 1.5, p: 1, bgcolor: 'rgba(16,185,129,0.08)', borderRadius: 1.5, border: '1px solid #10b981', display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
-                <CheckCircle size={14} color="#10b981" />
-                <Typography variant="caption" sx={{ color: '#10b981', fontWeight: 'bold' }}>
+              <Box sx={{ mt: 1.5, p: 1, bgcolor: 'rgba(16,185,129,0.08)', borderRadius: 1.5, border: '1px solid var(--luc)', display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
+                <CheckCircle size={14} color="var(--luc)" />
+                <Typography variant="caption" sx={{ color: 'var(--luc)', fontWeight: 'bold' }}>
                   Đáp án đúng: {question.correctAnswer}
                 </Typography>
               </Box>
@@ -718,13 +718,13 @@ function QuestionCard({ question, index, chapterId, lessonId, onDeleted, onEdite
 
             {question.essayPoints && question.essayPoints.length > 0 && (
               <Box sx={{ mt: 1.5 }}>
-                <Typography variant="caption" sx={{ fontWeight: 'bold', color: '#475569', display: 'block', mb: 0.5 }}>
+                <Typography variant="caption" sx={{ fontWeight: 'bold', color: 'var(--chu)', display: 'block', mb: 0.5 }}>
                   Đáp án mẫu:
                 </Typography>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, pl: 1, borderLeft: '3px solid #e2e8f0' }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, pl: 1, borderLeft: '3px solid var(--vien)' }}>
                   {question.essayPoints.map((p, i) => (
-                    <Typography key={i} variant="body2" sx={{ color: '#374151' }}>
-                      <strong style={{ color: '#0062b8' }}>{p.label}:</strong> {p.content}
+                    <Typography key={i} variant="body2" sx={{ color: 'var(--chu-dam-2)' }}>
+                      <strong style={{ color: 'var(--xanh)' }}>{p.label}:</strong> {p.content}
                     </Typography>
                   ))}
                 </Box>
@@ -801,7 +801,7 @@ export const LibraryTab: React.FC = () => {
       <Box id="library-tab-container">
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
           <Box>
-            <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#0062b8', display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant="h5" sx={{ fontWeight: 'bold', color: 'var(--xanh)', display: 'flex', alignItems: 'center', gap: 1 }}>
               <Library size={24} />
               Thư viện câu hỏi
             </Typography>
@@ -829,11 +829,11 @@ export const LibraryTab: React.FC = () => {
                     id={`library-chapter-card-${chapter.id}`}
                     sx={{
                       borderRadius: 3,
-                      border: '1px solid #e2e8f0',
+                      border: '1px solid var(--vien)',
                       boxShadow: 'none',
                       transition: 'all 0.2s',
                       '&:hover': {
-                        borderColor: '#0062b8',
+                        borderColor: 'var(--xanh)',
                         boxShadow: '0 4px 16px rgba(0,98,184,0.12)',
                         transform: 'translateY(-2px)',
                       },
@@ -854,7 +854,7 @@ export const LibraryTab: React.FC = () => {
                             </Typography>
                           </Box>
                           <Box sx={{ flex: 1 }}>
-                            <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#1e293b', lineHeight: 1.3 }}>
+                            <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: 'var(--chu-dam-2)', lineHeight: 1.3 }}>
                               {chapter.title}
                             </Typography>
                             <Typography variant="caption" color="text.secondary">
@@ -875,7 +875,7 @@ export const LibraryTab: React.FC = () => {
                               variant={totalQ > 0 ? 'filled' : 'outlined'}
                             />
                           </Box>
-                          <ChevronRight size={18} color="#94a3b8" />
+                          <ChevronRight size={18} color="var(--chu-mo)" />
                         </Box>
                       </CardContent>
                     </CardActionArea>
@@ -903,7 +903,7 @@ export const LibraryTab: React.FC = () => {
 
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
           <Box>
-            <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#1e293b' }}>
+            <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--chu-dam-2)' }}>
               {selectedChapter.title}
             </Typography>
             <Typography variant="body2" color="text.secondary">
@@ -931,7 +931,7 @@ export const LibraryTab: React.FC = () => {
                     borderRadius: 2.5,
                     transition: 'all 0.15s',
                     cursor: 'pointer',
-                    '&:hover': { borderColor: '#0062b8', boxShadow: '0 2px 8px rgba(0,98,184,0.08)' },
+                    '&:hover': { borderColor: 'var(--xanh)', boxShadow: '0 2px 8px rgba(0,98,184,0.08)' },
                   }}
                   onClick={() => goToQuestions(lesson.id)}
                 >
@@ -943,11 +943,11 @@ export const LibraryTab: React.FC = () => {
                         display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
                       }}
                     >
-                      <FileText size={18} color="#0062b8" />
+                      <FileText size={18} color="var(--xanh)" />
                     </Box>
 
                     <Box sx={{ flex: 1 }}>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: '#1e293b' }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--chu-dam-2)' }}>
                         {lesson.title}
                       </Typography>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
@@ -970,7 +970,7 @@ export const LibraryTab: React.FC = () => {
                       </Box>
                     </Box>
 
-                    <ChevronRight size={18} color="#94a3b8" />
+                    <ChevronRight size={18} color="var(--chu-mo)" />
                   </Box>
                 </Paper>
               );
@@ -1004,7 +1004,7 @@ export const LibraryTab: React.FC = () => {
         {/* Header */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3, flexWrap: 'wrap', gap: 2 }}>
           <Box>
-            <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#1e293b' }}>
+            <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--chu-dam-2)' }}>
               {selectedLesson.title}
             </Typography>
             <Box sx={{ display: 'flex', gap: 1, mt: 0.5, flexWrap: 'wrap' }}>
@@ -1038,10 +1038,10 @@ export const LibraryTab: React.FC = () => {
         {questions.length === 0 ? (
           <Paper
             variant="outlined"
-            sx={{ p: 5, textAlign: 'center', borderRadius: 3, borderStyle: 'dashed', borderColor: '#cbd5e1' }}
+            sx={{ p: 5, textAlign: 'center', borderRadius: 3, borderStyle: 'dashed', borderColor: 'var(--vien)' }}
           >
-            <Upload size={40} color="#94a3b8" />
-            <Typography variant="h6" sx={{ mt: 2, fontWeight: 'bold', color: '#64748b' }}>
+            <Upload size={40} color="var(--chu-mo)" />
+            <Typography variant="h6" sx={{ mt: 2, fontWeight: 'bold', color: 'var(--chu-2)' }}>
               Chưa có câu hỏi nào
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mt: 1, mb: 3 }}>

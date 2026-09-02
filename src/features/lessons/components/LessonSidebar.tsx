@@ -36,8 +36,8 @@ export const LessonSidebar: React.FC<LessonSidebarProps> = ({
           sx={{
             p: 1.5,
             borderRadius: 3,
-            border: '1px solid #e2e8f0',
-            backgroundColor: '#ffffff',
+            border: '1px solid var(--vien)',
+            backgroundColor: 'var(--nen-the)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -45,9 +45,9 @@ export const LessonSidebar: React.FC<LessonSidebarProps> = ({
             alignSelf: 'flex-start',
             boxShadow: '0 4px 12px rgba(0,0,0,0.02)',
             '&:hover': {
-              backgroundColor: '#f8fafc',
-              borderColor: '#ea580c',
-              color: '#ea580c',
+              backgroundColor: 'var(--nen-trang)',
+              borderColor: 'var(--cam)',
+              color: 'var(--cam)',
             },
             position: 'sticky',
             top: 20,
@@ -66,8 +66,8 @@ export const LessonSidebar: React.FC<LessonSidebarProps> = ({
       sx={{
         p: 2,
         borderRadius: 3,
-        border: '1px solid #e2e8f0',
-        backgroundColor: '#ffffff',
+        border: '1px solid var(--vien)',
+        backgroundColor: 'var(--nen-the)',
         position: 'sticky',
         top: 20,
         boxShadow: '0 4px 12px rgba(0,0,0,0.02)',
@@ -76,7 +76,7 @@ export const LessonSidebar: React.FC<LessonSidebarProps> = ({
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 1, pb: 1.5 }}>
         <Typography
           variant="subtitle1"
-          sx={{ display: 'flex', alignItems: 'center', gap: 1, color: '#ea580c', fontWeight: 'bold' }}
+          sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'var(--cam)', fontWeight: 'bold' }}
         >
           <BookOpen size={18} /> Danh mục bài học
         </Typography>
@@ -84,7 +84,7 @@ export const LessonSidebar: React.FC<LessonSidebarProps> = ({
           id="collapse-sidebar-btn"
           size="small"
           onClick={() => setIsCollapsed(true)}
-          sx={{ color: '#64748b', '&:hover': { color: '#ea580c' } }}
+          sx={{ color: 'var(--chu-2)', '&:hover': { color: 'var(--cam)' } }}
           title="Thu gọn danh mục"
         >
           <ChevronLeft size={18} />
@@ -131,7 +131,7 @@ export const LessonSidebar: React.FC<LessonSidebarProps> = ({
                         }
                       }
                     }}
-                    sx={{ p: 0.5, color: '#ef4444', '&:hover': { backgroundColor: 'rgba(239, 68, 68, 0.08)' } }}
+                    sx={{ p: 0.5, color: 'var(--do)', '&:hover': { backgroundColor: 'rgba(239, 68, 68, 0.08)' } }}
                   >
                     <Trash2 size={13} />
                   </IconButton>
@@ -194,7 +194,7 @@ export const LessonSidebar: React.FC<LessonSidebarProps> = ({
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                               {isLocked ? (
                                 <Box sx={{ p: 0.5, bgcolor: 'rgba(100, 116, 139, 0.1)', borderRadius: 1, display: 'flex' }}>
-                                  <Lock size={14} color="#64748b" />
+                                  <Lock size={14} color="var(--chu-2)" />
                                 </Box>
                               ) : (
                                 <>
@@ -241,7 +241,7 @@ export const LessonSidebar: React.FC<LessonSidebarProps> = ({
                                       }
                                     }
                                   }}
-                                  sx={{ p: 0.2, color: '#ef4444', '&:hover': { backgroundColor: 'rgba(239, 68, 68, 0.08)' } }}
+                                  sx={{ p: 0.2, color: 'var(--do)', '&:hover': { backgroundColor: 'rgba(239, 68, 68, 0.08)' } }}
                                 >
                                   <Trash2 size={12} />
                                 </IconButton>

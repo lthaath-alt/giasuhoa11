@@ -184,8 +184,8 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
               alignItems: 'center',
               justifyContent: 'space-between',
               boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-              border: '1px solid #e2e8f0',
-              backgroundColor: '#ffffff',
+              border: '1px solid var(--vien)',
+              backgroundColor: 'var(--nen-the)',
               borderRadius: 3,
             }}
           >
@@ -238,8 +238,8 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
           borderRadius: 3,
           overflow: 'hidden',
           boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-          border: '1px solid #e2e8f0',
-          backgroundColor: '#ffffff',
+          border: '1px solid var(--vien)',
+          backgroundColor: 'var(--nen-the)',
         }}
       >
         {/* Chat Header */}
@@ -247,15 +247,15 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
           id="chat-header"
           sx={{
             p: 2,
-            backgroundColor: '#f8fafc',
-            borderBottom: '1px solid #e2e8f0',
+            backgroundColor: 'var(--nen-trang)',
+            borderBottom: '1px solid var(--vien)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-            <Avatar sx={{ bgcolor: '#ea580c', color: '#ffffff' }}>
+            <Avatar sx={{ bgcolor: 'var(--cam-nen)', color: 'var(--chu-nguoc)' }}>
               <Sparkles size={20} />
             </Avatar>
             <Box>
@@ -351,7 +351,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
             flex: 1,
             p: 3,
             overflowY: 'auto',
-            backgroundColor: '#ffffff',
+            backgroundColor: 'var(--nen-the)',
             display: 'flex',
             flexDirection: 'column',
             gap: 2,
@@ -370,7 +370,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
                 textAlign: 'center',
               }}
             >
-              <Avatar sx={{ width: 64, height: 64, bgcolor: 'rgba(15, 118, 110, 0.08)', color: '#0f766e' }}>
+              <Avatar sx={{ width: 64, height: 64, bgcolor: 'rgba(15, 118, 110, 0.08)', color: 'var(--teal)' }}>
                 <Key size={32} />
               </Avatar>
               <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
@@ -402,7 +402,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
                 textAlign: 'center',
               }}
             >
-              <Avatar sx={{ width: 64, height: 64, bgcolor: 'rgba(234, 88, 12, 0.08)', color: '#ea580c' }}>
+              <Avatar sx={{ width: 64, height: 64, bgcolor: 'rgba(234, 88, 12, 0.08)', color: 'var(--cam)' }}>
                 <Sparkles size={32} />
               </Avatar>
               <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
@@ -413,9 +413,9 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
                 <strong>Câu hỏi tự luyện mẫu</strong> ở cột trái để bắt đầu buổi thảo luận nhé!
               </Typography>
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'center' }}>
-                <Chip icon={<Award size={14} color="#ea580c" />} label="Hỗ trợ lý thuyết" variant="outlined" size="small" />
-                <Chip icon={<Lightbulb size={14} color="#ea580c" />} label="Gợi mở phương pháp" variant="outlined" size="small" />
-                <Chip icon={<HelpCircle size={14} color="#ea580c" />} label="Giải đáp thắc mắc 24/7" variant="outlined" size="small" />
+                <Chip icon={<Award size={14} color="var(--cam)" />} label="Hỗ trợ lý thuyết" variant="outlined" size="small" />
+                <Chip icon={<Lightbulb size={14} color="var(--cam)" />} label="Gợi mở phương pháp" variant="outlined" size="small" />
+                <Chip icon={<HelpCircle size={14} color="var(--cam)" />} label="Giải đáp thắc mắc 24/7" variant="outlined" size="small" />
               </Box>
             </Box>
           ) : (
@@ -439,7 +439,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
                         width: 32,
                         height: 32,
                         bgcolor: 'rgba(234, 88, 12, 0.08)',
-                        color: '#ea580c',
+                        color: 'var(--cam)',
                         border: '1px solid rgba(234, 88, 12, 0.15)',
                       }}
                     >
@@ -452,14 +452,14 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
                       sx={{
                         p: 2,
                         borderRadius: isAi ? '0 16px 16px 16px' : '16px 0 16px 16px',
-                        backgroundColor: isAi ? '#f1f5f9' : '#0f766e',
-                        color: isAi ? 'text.primary' : '#ffffff',
-                        border: isAi ? '1px solid #e2e8f0' : 'none',
+                        backgroundColor: isAi ? 'var(--nen-nhat)' : 'var(--teal)',
+                        color: isAi ? 'text.primary' : 'var(--nen-the)',
+                        border: isAi ? '1px solid var(--vien)' : 'none',
                         boxShadow: 'none',
                       }}
                     >
                       <Typography variant="body2" sx={{ whiteSpace: 'pre-line', lineHeight: 1.6, fontSize: '0.9rem' }}>
-                        <RichText text={msg.content} linkColor={isAi ? '#0062b8' : '#ffffff'} />
+                        <RichText text={msg.content} linkColor={isAi ? 'var(--xanh)' : 'var(--nen-the)'} />
                       </Typography>
                     </Paper>
                     <Typography
@@ -483,7 +483,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
                   width: 32,
                   height: 32,
                   bgcolor: 'rgba(234, 88, 12, 0.08)',
-                  color: '#ea580c',
+                  color: 'var(--cam)',
                   border: '1px solid rgba(234, 88, 12, 0.15)',
                 }}
               >
@@ -493,8 +493,8 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
                 sx={{
                   p: 1.5,
                   borderRadius: '0 16px 16px 16px',
-                  backgroundColor: '#f1f5f9',
-                  border: '1px solid #e2e8f0',
+                  backgroundColor: 'var(--nen-nhat)',
+                  border: '1px solid var(--vien)',
                   display: 'flex',
                   alignItems: 'center',
                   gap: 1,
@@ -523,8 +523,8 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
           id="chat-input-box"
           sx={{
             p: 2,
-            backgroundColor: '#f8fafc',
-            borderTop: '1px solid #e2e8f0',
+            backgroundColor: 'var(--nen-trang)',
+            borderTop: '1px solid var(--vien)',
             display: 'flex',
             gap: 1.5,
             alignItems: 'center',
@@ -547,7 +547,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
             onKeyDown={handleKeyPress}
             disabled={guestLimitReached || isSending || remainingCooldown > 0}
             sx={{
-              backgroundColor: '#ffffff',
+              backgroundColor: 'var(--nen-the)',
               '& .MuiOutlinedInput-root': {
                 borderRadius: 2.5,
               },

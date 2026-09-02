@@ -1,6 +1,8 @@
 import React from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useMemo } from 'react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { useCheDoMau } from './core/hooks/useCheDoMau';
 import { CssBaseline } from '@mui/material';
 import { AppProvider } from './core/contexts/AppContext';
 
@@ -15,7 +17,12 @@ import QuizPage from './pages/QuizPage';
 import NotFoundPage from './pages/NotFoundPage';
 
 // Tạo theme Material-UI cao cấp theo tone màu Giáo Viên Đổi Mới (Sáng, Cam & Teal)
-const theme = createTheme({
+const themeGoc = {
+  /* CHÚ Ý: palette của MUI phải là MÀU THẬT, không dùng var(--…).
+     MUI tự tính sắc độ đậm/nhạt và màu chữ tương phản từ các giá trị này bằng
+     hàm darken/lighten — đưa biến CSS vào thì nó không đọc ra số nào để tính và
+     hỏng cả bảng màu. Phần nền tối được xử lý bằng cách dựng lại theme ở dưới,
+     chứ không phải bằng biến CSS. */
   palette: {
     mode: 'light',
     primary: {
@@ -107,8 +114,8 @@ const theme = createTheme({
         root: {
           borderRadius: 16,
           boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05)',
-          border: '1px solid #e2e8f0', // Viền mỏng tinh tế
-          backgroundColor: '#ffffff',
+          border: '1px solid var(--vien)', // Viền mỏng tinh tế
+          backgroundColor: 'var(--nen-the)',
         },
       },
     },
@@ -117,8 +124,8 @@ const theme = createTheme({
         root: {
           borderRadius: 16,
           boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05)',
-          border: '1px solid #e2e8f0',
-          backgroundColor: '#ffffff',
+          border: '1px solid var(--vien)',
+          backgroundColor: 'var(--nen-the)',
         },
       },
     },
@@ -128,24 +135,47 @@ const theme = createTheme({
           '& .MuiOutlinedInput-root': {
             borderRadius: 12,
             '& fieldset': {
-              borderColor: '#e2e8f0',
+              borderColor: 'var(--vien)',
             },
             '&:hover fieldset': {
-              borderColor: '#ea580c',
+              borderColor: 'var(--cam)',
             },
             '&.Mui-focused fieldset': {
-              borderColor: '#ea580c',
+              borderColor: 'var(--cam)',
             },
           },
         },
       },
     },
   },
-});
+};
+
+const theme = createTheme(themeGoc as any);
 
 export default function App() {
+  /* Cho các thành phần MUI (hộp thoại, ô nhập, bảng…) đổi theo nền tối.
+     Phần giao diện tự viết đã dùng biến màu trong index.css rồi, nhưng MUI tự
+     vẽ nền trắng của riêng nó — không đổi mode thì hộp thoại vẫn trắng loá
+     giữa trang tối. */
+  const { laToi } = useCheDoMau();
+  const themeDangDung = useMemo(
+    () => (laToi
+      ? createTheme({
+          ...themeGoc,
+          palette: {
+            ...(themeGoc as any).palette,
+            mode: 'dark',
+            background: { default: '#0f151d', paper: '#18212c' },
+            text: { primary: '#e8eef5', secondary: '#a8b8c8' },
+            divider: '#2c3947',
+          },
+        })
+      : theme),
+    [laToi],
+  );
+
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={themeDangDung}>
       <CssBaseline />
       <AppProvider>
         <HashRouter>

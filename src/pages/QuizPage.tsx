@@ -77,7 +77,7 @@ export const QuizPage: React.FC = () => {
     return (
       <Container maxWidth="sm" sx={{ py: 8, textAlign: 'center' }}>
         <Paper variant="outlined" sx={{ p: 5, borderRadius: 4 }}>
-          <AlertTriangle size={48} color="#ef4444" style={{ margin: '0 auto 16px' }} />
+          <AlertTriangle size={48} color="var(--do)" style={{ margin: '0 auto 16px' }} />
           <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 1 }}>
             Không tìm thấy bài kiểm tra
           </Typography>
@@ -109,8 +109,8 @@ export const QuizPage: React.FC = () => {
     return (
       <Container maxWidth="sm" sx={{ py: 8, textAlign: 'center' }}>
         <Paper variant="outlined" sx={{ p: 5, borderRadius: 4 }}>
-          <Lock size={48} color="#94a3b8" style={{ margin: '0 auto 16px' }} />
-          <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 1, color: '#ef4444' }}>
+          <Lock size={48} color="var(--chu-mo)" style={{ margin: '0 auto 16px' }} />
+          <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 1, color: 'var(--do)' }}>
             Bài học đang bị khóa
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
@@ -129,7 +129,7 @@ export const QuizPage: React.FC = () => {
     return (
       <Container maxWidth="sm" sx={{ py: 8, textAlign: 'center' }}>
         <Paper variant="outlined" sx={{ p: 5, borderRadius: 4 }}>
-          <GraduationCap size={48} color="#ea580c" style={{ margin: '0 auto 16px' }} />
+          <GraduationCap size={48} color="var(--cam)" style={{ margin: '0 auto 16px' }} />
           <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 1 }}>
             Yêu cầu Đăng nhập
           </Typography>
@@ -154,8 +154,8 @@ export const QuizPage: React.FC = () => {
     return (
       <Container maxWidth="sm" sx={{ py: 8, textAlign: 'center' }}>
         <Paper variant="outlined" sx={{ p: 5, borderRadius: 4 }}>
-          <XCircle size={48} color="#ef4444" style={{ margin: '0 auto 16px' }} />
-          <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 1, color: '#ef4444' }}>
+          <XCircle size={48} color="var(--do)" style={{ margin: '0 auto 16px' }} />
+          <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 1, color: 'var(--do)' }}>
             Quyền truy cập bị từ chối
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
@@ -175,7 +175,7 @@ export const QuizPage: React.FC = () => {
     return (
       <Container maxWidth="sm" sx={{ py: 8, textAlign: 'center' }}>
         <Paper variant="outlined" sx={{ p: 5, borderRadius: 4 }}>
-          <Clock size={48} color="#94a3b8" style={{ margin: '0 auto 16px' }} />
+          <Clock size={48} color="var(--chu-mo)" style={{ margin: '0 auto 16px' }} />
           <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 1 }}>
             Bài kiểm tra đã hết hạn
           </Typography>
@@ -279,7 +279,7 @@ export const QuizPage: React.FC = () => {
     const correctCount = Object.values(quiz.results).filter(r => r.correct).length;
 
     return (
-      <Box id="quiz-result-view" sx={{ minHeight: '100vh', py: 6, bgcolor: '#f8fafc' }}>
+      <Box id="quiz-result-view" sx={{ minHeight: '100vh', py: 6, bgcolor: 'var(--nen-trang)' }}>
         <Container maxWidth="md">
           {/* Header Kết quả */}
           <Paper
@@ -298,9 +298,9 @@ export const QuizPage: React.FC = () => {
               bgcolor: 'rgba(15,118,110,0.12)', display: 'flex',
               alignItems: 'center', justifyContent: 'center', mx: 'auto', mb: 2,
             }}>
-              <Award size={36} color="#0f766e" />
+              <Award size={36} color="var(--teal)" />
             </Box>
-            <Typography variant="h4" sx={{ fontWeight: 'black', color: '#0f766e', mb: 1 }}>
+            <Typography variant="h4" sx={{ fontWeight: 'black', color: 'var(--teal)', mb: 1 }}>
               KẾT QUẢ BÀI KIỂM TRA
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
@@ -310,7 +310,7 @@ export const QuizPage: React.FC = () => {
             <Grid container spacing={2} sx={{ mb: 2, justifyContent: 'center' }}>
               <Grid size={{ xs: 6, sm: 4 }}>
                 <Paper variant="outlined" sx={{ p: 2, borderRadius: 3 }}>
-                  <Typography variant="h4" sx={{ fontWeight: 800, color: '#ea580c' }}>
+                  <Typography variant="h4" sx={{ fontWeight: 800, color: 'var(--cam)' }}>
                     {quiz.score}/{quiz.maxScore}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">Điểm số đạt được</Typography>
@@ -318,7 +318,7 @@ export const QuizPage: React.FC = () => {
               </Grid>
               <Grid size={{ xs: 6, sm: 4 }}>
                 <Paper variant="outlined" sx={{ p: 2, borderRadius: 3 }}>
-                  <Typography variant="h4" sx={{ fontWeight: 800, color: '#0f766e' }}>
+                  <Typography variant="h4" sx={{ fontWeight: 800, color: 'var(--teal)' }}>
                     {percent}%
                   </Typography>
                   <Typography variant="caption" color="text.secondary">Tỉ lệ chính xác</Typography>
@@ -326,7 +326,7 @@ export const QuizPage: React.FC = () => {
               </Grid>
               <Grid size={{ xs: 12, sm: 4 }}>
                 <Paper variant="outlined" sx={{ p: 2, borderRadius: 3 }}>
-                  <Typography variant="h4" sx={{ fontWeight: 800, color: '#475569' }}>
+                  <Typography variant="h4" sx={{ fontWeight: 800, color: 'var(--chu)' }}>
                     {correctCount}/{quiz.questions.length}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">Số câu trả lời đúng</Typography>
@@ -348,7 +348,7 @@ export const QuizPage: React.FC = () => {
           </Paper>
 
           {/* Chi tiết từng câu hỏi */}
-          <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: '#1e293b' }}>
+          <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: 'var(--chu-dam-2)' }}>
             Chi tiết bài làm
           </Typography>
 
@@ -356,35 +356,35 @@ export const QuizPage: React.FC = () => {
             {quiz.questions.map((q, idx) => {
               const res = quiz.results![q.id];
               const isCorrect = res?.correct;
-              const weightColor = q.difficulty === 'Thấp' ? '#10b981' : q.difficulty === 'Trung bình' ? '#f59e0b' : '#ef4444';
+              const weightColor = q.difficulty === 'Thấp' ? 'var(--luc)' : q.difficulty === 'Trung bình' ? 'var(--vang)' : 'var(--do)';
 
               return (
-                <Paper key={q.id} variant="outlined" sx={{ p: 3, borderRadius: 3.5, borderLeft: `5px solid ${isCorrect ? '#10b981' : '#ef4444'}` }}>
+                <Paper key={q.id} variant="outlined" sx={{ p: 3, borderRadius: 3.5, borderLeft: `5px solid ${isCorrect ? 'var(--luc)' : 'var(--do)'}` }}>
                   {/* Câu header */}
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5, flexWrap: 'wrap', gap: 1 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                       <Chip label={`Câu ${idx + 1}`} color={isCorrect ? 'success' : 'error'} size="small" sx={{ fontWeight: 'bold' }} />
                       <Chip label={q.type} size="small" variant="outlined" />
-                      <Chip label={q.difficulty} size="small" sx={{ bgcolor: weightColor, color: '#fff', fontSize: '0.7rem', height: 20 }} />
+                      <Chip label={q.difficulty} size="small" sx={{ bgcolor: weightColor, color: 'var(--chu-nguoc)', fontSize: '0.7rem', height: 20 }} />
                     </Box>
-                    <Typography variant="caption" sx={{ fontWeight: 'bold', color: isCorrect ? '#10b981' : '#ef4444' }}>
+                    <Typography variant="caption" sx={{ fontWeight: 'bold', color: isCorrect ? 'var(--luc)' : 'var(--do)' }}>
                       Điểm đạt: {res?.score}/{q.points}đ
                     </Typography>
                   </Box>
 
                   {/* Nội dung đề */}
-                  <Typography variant="body1" sx={{ fontWeight: 600, color: '#1e293b', mb: 2 }}>
+                  <Typography variant="body1" sx={{ fontWeight: 600, color: 'var(--chu-dam-2)', mb: 2 }}>
                     <ChemicalText html={q.content} />
                   </Typography>
 
                   {/* Hiển thị câu trả lời */}
-                  <Box sx={{ p: 2, bgcolor: '#f8fafc', borderRadius: 2.5, mb: 2 }}>
+                  <Box sx={{ p: 2, bgcolor: 'var(--nen-trang)', borderRadius: 2.5, mb: 2 }}>
                     <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5, fontWeight: 'bold' }}>
                       CÂU TRẢ LỜI CỦA BẠN:
                     </Typography>
                     <Typography variant="body2" sx={{
                       fontWeight: 600,
-                      color: isCorrect ? '#0f766e' : '#b91c1c',
+                      color: isCorrect ? 'var(--teal)' : 'var(--do-dam)',
                       display: 'flex', alignItems: 'center', gap: 0.5
                     }}>
                       {isCorrect ? <CheckCircle size={16} /> : <XCircle size={16} />}
@@ -394,11 +394,11 @@ export const QuizPage: React.FC = () => {
 
                   {/* Nhận xét từ AI */}
                   {res?.feedback && (
-                    <Box sx={{ p: 2, bgcolor: 'rgba(15,118,110,0.04)', borderRadius: 2.5, mb: 2, borderLeft: '3px solid #0f766e' }}>
-                      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5, fontWeight: 'bold', color: '#0f766e' }}>
+                    <Box sx={{ p: 2, bgcolor: 'rgba(15,118,110,0.04)', borderRadius: 2.5, mb: 2, borderLeft: '3px solid var(--teal)' }}>
+                      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5, fontWeight: 'bold', color: 'var(--teal)' }}>
                         🤖 NHẬN XÉT CỦA GIA SƯ AI:
                       </Typography>
-                      <Typography variant="body2" sx={{ whiteSpace: 'pre-line', color: '#334155' }}>
+                      <Typography variant="body2" sx={{ whiteSpace: 'pre-line', color: 'var(--chu-dam-3)' }}>
                         {res.feedback}
                       </Typography>
                       {q.type === 'Tự luận' && (
@@ -406,7 +406,7 @@ export const QuizPage: React.FC = () => {
                           <Chip label={`Độ tin cậy: ${res.confidence}`} size="small" variant="outlined" color={res.confidence === 'high' ? 'success' : res.confidence === 'medium' ? 'warning' : 'default'} />
                           {res.confidence !== 'high' && (
                             <Tooltip title="Câu tự luận diễn đạt phức tạp, điểm AI chấm là sơ bộ và có thể được giáo viên chấm lại.">
-                              <HelpCircle size={14} color="#94a3b8" />
+                              <HelpCircle size={14} color="var(--chu-mo)" />
                             </Tooltip>
                           )}
                         </Box>
@@ -416,11 +416,11 @@ export const QuizPage: React.FC = () => {
 
                   {/* Đáp án đúng mẫu */}
                   {!isCorrect && (
-                    <Box sx={{ p: 2, bgcolor: '#f1f5f9', borderRadius: 2.5 }}>
+                    <Box sx={{ p: 2, bgcolor: 'var(--nen-nhat)', borderRadius: 2.5 }}>
                       <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5, fontWeight: 'bold' }}>
                         ĐÁP ÁN MẪU CHUẨN:
                       </Typography>
-                      <Typography variant="body2" sx={{ color: '#475569', whiteSpace: 'pre-line' }}>
+                      <Typography variant="body2" sx={{ color: 'var(--chu)', whiteSpace: 'pre-line' }}>
                         {q.type === 'Tự luận'
                           ? q.essayPoints?.map(p => `${p.label}: ${p.content}`).join('\n')
                           : q.correctAnswer
@@ -448,7 +448,7 @@ export const QuizPage: React.FC = () => {
 
         {/* Dialog báo chưa đạt (dưới 7 điểm) */}
         <Dialog open={showRetryDialog} onClose={() => {}} maxWidth="sm" fullWidth>
-          <DialogTitle sx={{ fontWeight: 'bold', color: '#ea580c' }}>
+          <DialogTitle sx={{ fontWeight: 'bold', color: 'var(--cam)' }}>
             Chưa đạt yêu cầu phần Cơ bản
           </DialogTitle>
           <DialogContent>
@@ -469,7 +469,7 @@ export const QuizPage: React.FC = () => {
 
         {/* Dialog báo đạt (>= 7 điểm) */}
         <Dialog open={showUnlockDialog} onClose={() => setShowUnlockDialog(false)} maxWidth="sm" fullWidth>
-          <DialogTitle sx={{ fontWeight: 'bold', color: '#10b981' }}>
+          <DialogTitle sx={{ fontWeight: 'bold', color: 'var(--luc)' }}>
             🎉 Chúc mừng! Mở khoá thành công
           </DialogTitle>
           <DialogContent>
@@ -491,7 +491,7 @@ export const QuizPage: React.FC = () => {
   // ── RENDER 2: GIAO DIỆN LÀM BÀI KIỂM TRA (PENDING) ─────────────────────────
 
   return (
-    <Box id="quiz-taking-view" sx={{ minHeight: '100vh', py: 6, bgcolor: '#f8fafc' }}>
+    <Box id="quiz-taking-view" sx={{ minHeight: '100vh', py: 6, bgcolor: 'var(--nen-trang)' }}>
       <Container maxWidth="md">
         {/* Banner đếm ngược thời gian */}
         <Paper
@@ -509,10 +509,10 @@ export const QuizPage: React.FC = () => {
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
             <Box sx={{ p: 1, bgcolor: 'rgba(234,88,12,0.1)', borderRadius: 2, display: 'flex' }}>
-              <Clock size={20} color="#ea580c" />
+              <Clock size={20} color="var(--cam)" />
             </Box>
             <Box>
-              <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: '#ea580c' }}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--cam)' }}>
                 Thời gian nộp bài còn lại
               </Typography>
               <Typography variant="caption" color="text.secondary">
@@ -525,7 +525,7 @@ export const QuizPage: React.FC = () => {
             sx={{
               fontFamily: 'monospace',
               fontWeight: 'black',
-              color: '#ea580c',
+              color: 'var(--cam)',
             }}
           >
             {timeLeftStr || '--:--:--'}
@@ -534,7 +534,7 @@ export const QuizPage: React.FC = () => {
 
         {/* Tiêu đề đề bài */}
         <Paper variant="outlined" sx={{ p: 4, mb: 4, borderRadius: 4 }}>
-          <Typography variant="h5" sx={{ fontWeight: 900, color: '#0f766e', mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Typography variant="h5" sx={{ fontWeight: 900, color: 'var(--teal)', mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
             <GraduationCap size={24} />
             BÀI KIỂM TRA TỰ HỌC PHẢN XẠ HÓA 11
           </Typography>
@@ -552,7 +552,7 @@ export const QuizPage: React.FC = () => {
         {/* Danh sách câu hỏi */}
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3.5, mb: 4 }}>
           {quiz.questions.map((q, idx) => {
-            const weightColor = q.difficulty === 'Thấp' ? '#10b981' : q.difficulty === 'Trung bình' ? '#f59e0b' : '#ef4444';
+            const weightColor = q.difficulty === 'Thấp' ? 'var(--luc)' : q.difficulty === 'Trung bình' ? 'var(--vang)' : 'var(--do)';
             const value = answers[q.id] || '';
 
             return (
@@ -561,14 +561,14 @@ export const QuizPage: React.FC = () => {
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
                   <Chip label={`Câu ${idx + 1}`} color="primary" size="small" sx={{ fontWeight: 'bold' }} />
                   <Chip label={q.type} size="small" variant="outlined" />
-                  <Chip label={q.difficulty} size="small" sx={{ bgcolor: weightColor, color: '#fff', fontSize: '0.7rem', height: 20 }} />
+                  <Chip label={q.difficulty} size="small" sx={{ bgcolor: weightColor, color: 'var(--chu-nguoc)', fontSize: '0.7rem', height: 20 }} />
                   <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'bold', ml: 'auto' }}>
                     {q.points} điểm
                   </Typography>
                 </Box>
 
                 {/* Nội dung câu hỏi */}
-                <Typography variant="body1" sx={{ fontWeight: 600, color: '#1e293b', mb: 3, lineHeight: 1.7 }}>
+                <Typography variant="body1" sx={{ fontWeight: 600, color: 'var(--chu-dam-2)', mb: 3, lineHeight: 1.7 }}>
                   <ChemicalText html={q.content} />
                 </Typography>
 
@@ -591,9 +591,9 @@ export const QuizPage: React.FC = () => {
                                   borderRadius: 2.5,
                                   cursor: 'pointer',
                                   transition: 'all 0.15s',
-                                  borderColor: isSelected ? '#ea580c' : '#e2e8f0',
-                                  bgcolor: isSelected ? 'rgba(234,88,12,0.04)' : '#fff',
-                                  '&:hover': { borderColor: '#ea580c', bgcolor: 'rgba(234,88,12,0.02)' }
+                                  borderColor: isSelected ? 'var(--cam)' : 'var(--vien)',
+                                  bgcolor: isSelected ? 'rgba(234,88,12,0.04)' : 'var(--nen-the)',
+                                  '&:hover': { borderColor: 'var(--cam)', bgcolor: 'rgba(234,88,12,0.02)' }
                                 }}
                               >
                                 <CardContent sx={{ py: 1.5, px: 2, display: 'flex', alignItems: 'center', gap: 1, '&:last-child': { pb: 1.5 } }}>
@@ -603,10 +603,10 @@ export const QuizPage: React.FC = () => {
                                     color="primary"
                                     sx={{ p: 0.5 }}
                                   />
-                                  <Typography variant="body2" sx={{ fontWeight: 600, color: '#475569', minWidth: 20 }}>
+                                  <Typography variant="body2" sx={{ fontWeight: 600, color: 'var(--chu)', minWidth: 20 }}>
                                     {opt.key}.
                                   </Typography>
-                                  <Typography variant="body2" sx={{ color: '#1e293b' }}>
+                                  <Typography variant="body2" sx={{ color: 'var(--chu-dam-2)' }}>
                                     <ChemicalText html={opt.text} />
                                   </Typography>
                                 </CardContent>

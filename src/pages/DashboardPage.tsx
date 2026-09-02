@@ -167,7 +167,7 @@ export const DashboardPage: React.FC = () => {
       id="dashboard-layout"
       sx={{
         minHeight: '100vh',
-        backgroundColor: '#f8fafc',
+        backgroundColor: 'var(--nen-trang)',
         display: 'flex',
         flexDirection: 'column',
       }}
@@ -235,8 +235,8 @@ export const DashboardPage: React.FC = () => {
                       p: 2,
                       mb: 3,
                       borderRadius: 3,
-                      border: '1px solid #e2e8f0',
-                      backgroundColor: '#ffffff',
+                      border: '1px solid var(--vien)',
+                      backgroundColor: 'var(--nen-the)',
                       display: 'flex',
                       flexDirection: { xs: 'column', sm: 'row' },
                       alignItems: { xs: 'flex-start', sm: 'center' },
@@ -246,7 +246,7 @@ export const DashboardPage: React.FC = () => {
                     }}
                   >
                     <Box>
-                      <Typography variant="caption" sx={{ color: '#ea580c', fontWeight: 'bold', display: 'block', mb: 0.3 }}>
+                      <Typography variant="caption" sx={{ color: 'var(--cam)', fontWeight: 'bold', display: 'block', mb: 0.3 }}>
                         CHƯƠNG TRÌNH TỰ HỌC HÓA HỌC 11 THÔNG MINH
                       </Typography>
                       <Typography variant="h6" color="text.primary" sx={{ fontWeight: 'bold', fontSize: { xs: '1rem', sm: '1.1rem' } }}>
@@ -258,7 +258,7 @@ export const DashboardPage: React.FC = () => {
                       <Box
                         sx={{
                           display: 'flex',
-                          bgcolor: '#f1f5f9',
+                          bgcolor: 'var(--nen-nhat)',
                           borderRadius: 2.5,
                           p: 0.5,
                           gap: 0.5,
@@ -277,8 +277,8 @@ export const DashboardPage: React.FC = () => {
                             fontSize: '0.82rem',
                             px: 1.5,
                             ...(studyMode === 'sgk'
-                              ? { bgcolor: '#0369a1', color: '#fff', boxShadow: '0 2px 8px rgba(3,105,161,0.3)', '&:hover': { bgcolor: '#0284c7' } }
-                              : { color: '#64748b', '&:hover': { bgcolor: '#e2e8f0', color: '#0369a1' } }
+                              ? { bgcolor: 'var(--xanh-troi2)', color: 'var(--chu-nguoc)', boxShadow: '0 2px 8px rgba(3,105,161,0.3)', '&:hover': { bgcolor: '#0284c7' } }
+                              : { color: 'var(--chu-2)', '&:hover': { bgcolor: 'var(--vien)', color: 'var(--xanh-troi2)' } }
                             ),
                           }}
                         >
@@ -297,8 +297,8 @@ export const DashboardPage: React.FC = () => {
                             fontSize: '0.82rem',
                             px: 1.5,
                             ...(studyMode === 'chat'
-                              ? { bgcolor: '#ea580c', color: '#fff', boxShadow: '0 2px 8px rgba(234,88,12,0.3)', '&:hover': { bgcolor: '#dc2626' } }
-                              : { color: '#64748b', '&:hover': { bgcolor: '#e2e8f0', color: '#ea580c' } }
+                              ? { bgcolor: 'var(--cam-nen)', color: 'var(--chu-nguoc)', boxShadow: '0 2px 8px rgba(234,88,12,0.3)', '&:hover': { bgcolor: 'var(--do-nen)' } }
+                              : { color: 'var(--chu-2)', '&:hover': { bgcolor: 'var(--vien)', color: 'var(--cam)' } }
                             ),
                           }}
                         >
@@ -311,7 +311,7 @@ export const DashboardPage: React.FC = () => {
                         size="small"
                         startIcon={<ArrowRight size={15} />}
                         onClick={() => { setSelectedLesson(null); setStudyMode('sgk'); }}
-                        sx={{ textTransform: 'none', fontWeight: 'bold', borderRadius: 2, fontSize: '0.82rem', borderColor: '#cbd5e1', color: '#64748b', '&:hover': { borderColor: '#ea580c', color: '#ea580c', bgcolor: '#fff7ed' } }}
+                        sx={{ textTransform: 'none', fontWeight: 'bold', borderRadius: 2, fontSize: '0.82rem', borderColor: 'var(--vien)', color: 'var(--chu-2)', '&:hover': { borderColor: 'var(--cam)', color: 'var(--cam)', bgcolor: 'var(--nen-cam-nhat)' } }}
                       >
                         Quay lại
                       </Button>
@@ -367,8 +367,8 @@ export const DashboardPage: React.FC = () => {
                           px: 4,
                           py: 3,
                           borderRadius: 3,
-                          background: 'radial-gradient(circle, #fff7ed 0%, #ffedd5 100%)',
-                          border: '1px solid #fed7aa',
+                          background: 'radial-gradient(circle, var(--nen-cam-nhat) 0%, var(--nen-cam-nhat2) 100%)',
+                          border: '1px solid var(--cam-vien)',
                           display: 'flex',
                           flexDirection: { xs: 'column', sm: 'row' },
                           alignItems: 'center',
@@ -378,7 +378,7 @@ export const DashboardPage: React.FC = () => {
                         }}
                       >
                         <Box sx={{ flex: 1 }}>
-                          <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#c2410c', mb: 0.5 }}>
+                          <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--cam-dam)', mb: 0.5 }}>
                             Chơi Xong Rồi, Học Tiếp Thôi!
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
@@ -444,7 +444,7 @@ export const DashboardPage: React.FC = () => {
               >
                 <MascotToanThan tab="gioithieu" />
               </Box>
-              <Paper sx={{ p: { xs: 4, md: 6 }, borderRadius: 4, border: '1px solid #e2e8f0', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
+              <Paper sx={{ p: { xs: 4, md: 6 }, borderRadius: 4, border: '1px solid var(--vien)', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
                 {/* Màn hình hẹp không đủ lề cho nhân vật đứng — thay bằng kiểu
                     ló đầu xếp ngay trên tiêu đề. */}
                 <Box
@@ -457,29 +457,29 @@ export const DashboardPage: React.FC = () => {
                   <MascotDauVai tab="gioithieu" rong={84} />
                 </Box>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 4 }}>
-                  <Avatar sx={{ bgcolor: '#0062b8', color: '#ffffff', width: 56, height: 56 }}>
+                  <Avatar sx={{ bgcolor: 'var(--xanh-nen)', color: 'var(--chu-nguoc)', width: 56, height: 56 }}>
                     <Info size={32} />
                   </Avatar>
                   <Box>
-                    <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#0062b8' }}>Giới thiệu về Gia Sư Hóa Học 11 AI</Typography>
+                    <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'var(--xanh)' }}>Giới thiệu về Gia Sư Hóa Học 11 AI</Typography>
                     <Typography variant="subtitle2" color="text.secondary">Nền tảng tự học đột phá kết hợp Trí tuệ nhân tạo thế hệ mới</Typography>
                   </Box>
                 </Box>
 
-                <Typography variant="body1" sx={{ mb: 3, lineHeight: 1.8, color: '#334155' }}>
+                <Typography variant="body1" sx={{ mb: 3, lineHeight: 1.8, color: 'var(--chu-dam-3)' }}>
                   Chào mừng các em học sinh đến với <strong>Gia Sư Hóa Học 11 AI</strong>! Đây là dự án học tập thông minh tiên phong tại Việt Nam, mang đến giải pháp hỗ trợ tự học Hóa học lớp 11 vượt trội theo chương trình phổ thông mới.
                 </Typography>
-                <Typography variant="body1" sx={{ mb: 4, lineHeight: 1.8, color: '#334155' }}>
+                <Typography variant="body1" sx={{ mb: 4, lineHeight: 1.8, color: 'var(--chu-dam-3)' }}>
                   Với mong muốn giúp mọi học sinh đều có thể tự tin làm chủ môn Hóa mà không cần đi học thêm tốn kém, chúng tôi đã tích hợp công nghệ trí tuệ nhân tạo (AI) thông minh để tạo ra một <strong>Người Thầy Gia Sư Đồng Hành 24/7</strong>. Gia sư AI không làm thay bài tập cho học sinh, mà đóng vai trò người hướng dẫn tận tình, khơi gợi suy nghĩ và dìu dắt các em giải quyết bài tập qua từng bước tư duy.
                 </Typography>
 
 
                 {/* TRIẾT LÝ GIẢNG DẠY */}
-                <Box sx={{ p: 3.5, bgcolor: '#eff6ff', borderRadius: 3, border: '1px solid #bfdbfe', mb: 4 }}>
-                  <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#1e40af', mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Box sx={{ p: 3.5, bgcolor: 'var(--nen-xanh-nhat2)', borderRadius: 3, border: '1px solid var(--vien-xanh)', mb: 4 }}>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: 'var(--xanh-chu)', mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
                     <ShieldCheck size={20} /> Triết lý giảng dạy của Gia sư AI
                   </Typography>
-                  <Typography variant="body2" sx={{ lineHeight: 1.7, color: '#1e3a8a' }}>
+                  <Typography variant="body2" sx={{ lineHeight: 1.7, color: 'var(--xanh-chu2)' }}>
                     <strong>“Cho con cá không bằng cho cần câu”</strong> – Gia sư AI của chúng tôi được thiết kế theo chuẩn sư phạm nghiêm ngặt. Khi học sinh gõ một câu hỏi hoặc bài tập, thầy sẽ không bao giờ đưa thẳng đáp số cuối cùng để học sinh chép. Thay vào đó, thầy sẽ phân tích đề, gợi ý lý thuyết nền tảng và dẫn dắt học sinh đặt bút tính toán từng bước. Điều này giúp học sinh phát triển tư duy logic tự chủ, tự mình tìm ra đáp số để nhớ kiến thức bền vững nhất!
                   </Typography>
                 </Box>
@@ -512,9 +512,9 @@ export const DashboardPage: React.FC = () => {
                 
                 {/* PANEL TRÁI (30%): GIỚI THIỆU & GỢI Ý ĐỀ TÀI */}
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                  <Card sx={{ p: 3, borderRadius: 3, border: '1px solid #e2e8f0' }}>
-                    <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#0062b8', mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Sparkles size={20} color="#ea580c" /> Thầy Hùng Trợ Giảng AI
+                  <Card sx={{ p: 3, borderRadius: 3, border: '1px solid var(--vien)' }}>
+                    <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--xanh)', mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Sparkles size={20} color="var(--cam)" /> Thầy Hùng Trợ Giảng AI
                     </Typography>
                     <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.7 }}>
                       Thầy là Trợ lý học tập cá nhân của em. Thầy sẵn sàng giải đáp mọi thắc mắc lý thuyết liên quan đến <strong>Hóa học lớp 11</strong>!
@@ -526,9 +526,9 @@ export const DashboardPage: React.FC = () => {
                     <Divider sx={{ my: 2 }} />
 
                     {/* Trạng thái Cache SGK HOA11.pdf */}
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, p: 1.5, bgcolor: '#f8fafc', borderRadius: 2 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, p: 1.5, bgcolor: 'var(--nen-trang)', borderRadius: 2 }}>
                       <Box sx={{ position: 'relative', display: 'flex' }}>
-                        <Box sx={{ width: 10, height: 10, bgcolor: isSgkCached ? '#0f766e' : '#f59e0b', borderRadius: '50%' }} />
+                        <Box sx={{ width: 10, height: 10, bgcolor: isSgkCached ? 'var(--teal)' : 'var(--vang)', borderRadius: '50%' }} />
                       </Box>
                       <Box>
                         <Typography variant="caption" sx={{ fontWeight: 'bold', display: 'block' }}>
@@ -536,9 +536,9 @@ export const DashboardPage: React.FC = () => {
                         </Typography>
                         <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.68rem', display: 'block' }}>
                           Trạng thái bộ đệm: {isSgkCached ? (
-                            <span style={{ color: '#0f766e', fontWeight: 'bold' }}>Đã lưu trong trình duyệt ⚡</span>
+                            <span style={{ color: 'var(--teal)', fontWeight: 'bold' }}>Đã lưu trong trình duyệt ⚡</span>
                           ) : (
-                            <span style={{ color: '#ea580c' }}>Sẽ nạp tự động khi bắt đầu hỏi</span>
+                            <span style={{ color: 'var(--cam)' }}>Sẽ nạp tự động khi bắt đầu hỏi</span>
                           )}
                         </Typography>
                       </Box>
@@ -546,7 +546,7 @@ export const DashboardPage: React.FC = () => {
                   </Card>
 
                   {/* Câu hỏi gợi ý nhanh */}
-                  <Card sx={{ p: 3, borderRadius: 3, border: '1px solid #e2e8f0' }}>
+                  <Card sx={{ p: 3, borderRadius: 3, border: '1px solid var(--vien)' }}>
                     <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 2 }}>
                       Các chủ đề gợi ý em có thể hỏi Thầy:
                     </Typography>
@@ -565,12 +565,12 @@ export const DashboardPage: React.FC = () => {
                             p: 1.5,
                             cursor: 'pointer',
                             borderRadius: 2,
-                            border: '1px solid #e2e8f0',
-                            bgcolor: '#ffffff',
+                            border: '1px solid var(--vien)',
+                            bgcolor: 'var(--nen-the)',
                             fontSize: '0.8rem',
                             transition: 'all 0.2s',
                             '&:hover': {
-                              borderColor: '#ea580c',
+                              borderColor: 'var(--cam)',
                               bgcolor: 'rgba(234, 88, 12, 0.04)',
                             },
                           }}
@@ -591,12 +591,12 @@ export const DashboardPage: React.FC = () => {
                     flexDirection: 'column',
                     borderRadius: 3,
                     overflow: 'hidden',
-                    border: '1px solid #e2e8f0',
+                    border: '1px solid var(--vien)',
                   }}
                 >
                   {/* Header Khung Chat */}
-                  <Box sx={{ p: 2.5, bgcolor: '#f8fafc', borderBottom: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <Avatar sx={{ bgcolor: '#0062b8', color: '#ffffff', width: 44, height: 44, boxShadow: '0 2px 6px rgba(0,98,184,0.15)' }}>
+                  <Box sx={{ p: 2.5, bgcolor: 'var(--nen-trang)', borderBottom: '1px solid var(--vien)', display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Avatar sx={{ bgcolor: 'var(--xanh-nen)', color: 'var(--chu-nguoc)', width: 44, height: 44, boxShadow: '0 2px 6px rgba(0,98,184,0.15)' }}>
                       <Sparkles size={24} />
                     </Avatar>
                     <Box>
@@ -640,10 +640,10 @@ export const DashboardPage: React.FC = () => {
                   )}
 
                   {/* Vùng Tin Nhắn */}
-                  <Box sx={{ flex: 1, p: 3, overflowY: 'auto', bgcolor: '#ffffff', display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  <Box sx={{ flex: 1, p: 3, overflowY: 'auto', bgcolor: 'var(--nen-the)', display: 'flex', flexDirection: 'column', gap: 2 }}>
                     {globalChats.length === 0 ? (
                       <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', textAlign: 'center', gap: 2, p: 4 }}>
-                        <Avatar sx={{ width: 64, height: 64, bgcolor: 'rgba(0,98,184,0.08)', color: '#0062b8' }}>
+                        <Avatar sx={{ width: 64, height: 64, bgcolor: 'rgba(0,98,184,0.08)', color: 'var(--xanh)' }}>
                           <MessageSquare size={32} />
                         </Avatar>
                         <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Bắt đầu buổi tư vấn riêng cùng Thầy!</Typography>
@@ -665,7 +665,7 @@ export const DashboardPage: React.FC = () => {
                             }}
                           >
                             {isAi && (
-                              <Avatar sx={{ bgcolor: 'rgba(0,98,184,0.08)', color: '#0062b8', width: 32, height: 32 }}>
+                              <Avatar sx={{ bgcolor: 'rgba(0,98,184,0.08)', color: 'var(--xanh)', width: 32, height: 32 }}>
                                 <Sparkles size={16} />
                               </Avatar>
                             )}
@@ -674,14 +674,14 @@ export const DashboardPage: React.FC = () => {
                                 sx={{
                                   p: 2,
                                   borderRadius: isAi ? '0 16px 16px 16px' : '16px 0 16px 16px',
-                                  backgroundColor: isAi ? '#f1f5f9' : '#0062b8',
-                                  color: isAi ? 'text.primary' : '#ffffff',
+                                  backgroundColor: isAi ? 'var(--nen-nhat)' : 'var(--xanh)',
+                                  color: isAi ? 'text.primary' : 'var(--nen-the)',
                                   boxShadow: 'none',
-                                  border: isAi ? '1px solid #e2e8f0' : 'none',
+                                  border: isAi ? '1px solid var(--vien)' : 'none',
                                 }}
                               >
                                 <Typography variant="body2" sx={{ whiteSpace: 'pre-line', lineHeight: 1.6, fontSize: '0.9rem' }}>
-                                  <RichText text={msg.content} linkColor={isAi ? '#0062b8' : '#ffffff'} />
+                                  <RichText text={msg.content} linkColor={isAi ? 'var(--xanh)' : 'var(--nen-the)'} />
                                 </Typography>
                               </Paper>
                               <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5, textAlign: isAi ? 'left' : 'right' }}>
@@ -695,10 +695,10 @@ export const DashboardPage: React.FC = () => {
 
                     {isIchatSending && (
                       <Box sx={{ display: 'flex', gap: 1.5, alignSelf: 'flex-start' }}>
-                        <Avatar sx={{ bgcolor: 'rgba(0,98,184,0.08)', color: '#0062b8', width: 32, height: 32 }}>
+                        <Avatar sx={{ bgcolor: 'rgba(0,98,184,0.08)', color: 'var(--xanh)', width: 32, height: 32 }}>
                           <Sparkles size={16} />
                         </Avatar>
-                        <Paper sx={{ p: 1.5, bgcolor: '#f1f5f9', border: '1px solid #e2e8f0', borderRadius: '0 16px 16px 16px', display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Paper sx={{ p: 1.5, bgcolor: 'var(--nen-nhat)', border: '1px solid var(--vien)', borderRadius: '0 16px 16px 16px', display: 'flex', alignItems: 'center', gap: 1 }}>
                           <RefreshCw size={14} className="animate-spin" />
                           <Typography variant="caption" color="text.secondary">Thầy đang viết câu trả lời...</Typography>
                         </Paper>
@@ -713,7 +713,7 @@ export const DashboardPage: React.FC = () => {
                   )}
 
                   {/* Vùng Nhập */}
-                  <Box sx={{ p: 2, bgcolor: '#f8fafc', borderTop: '1px solid #e2e8f0', display: 'flex', gap: 1.5 }}>
+                  <Box sx={{ p: 2, bgcolor: 'var(--nen-trang)', borderTop: '1px solid var(--vien)', display: 'flex', gap: 1.5 }}>
                     <TextField
                       fullWidth
                       size="small"
@@ -722,7 +722,7 @@ export const DashboardPage: React.FC = () => {
                       onChange={(e) => setIchatInput(e.target.value)}
                       onKeyDown={handleKeyPressIchat}
                       disabled={guestLimitReached || isIchatSending}
-                      sx={{ bgcolor: '#ffffff', '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
+                      sx={{ bgcolor: 'var(--nen-the)', '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
                     />
                     <Button
                       variant="contained"
@@ -750,22 +750,22 @@ export const DashboardPage: React.FC = () => {
           {/* ================= TAB 4: HỖ TRỢ (GIẢI ĐÁP CÁC THẮC MẮC) ================= */}
           {activeTab === 'hotro' && (
             <Box id="tab-content-support" sx={{ maxWidth: 850, mx: 'auto' }}>
-              <Paper sx={{ p: 4, borderRadius: 4, border: '1px solid #e2e8f0', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
+              <Paper sx={{ p: 4, borderRadius: 4, border: '1px solid var(--vien)', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 4 }}>
-                  <Avatar sx={{ bgcolor: '#ea580c', color: '#ffffff', width: 56, height: 56 }}>
+                  <Avatar sx={{ bgcolor: 'var(--cam-nen)', color: 'var(--chu-nguoc)', width: 56, height: 56 }}>
                     <HelpCircle size={32} />
                   </Avatar>
                   <Box>
-                    <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#0f172a' }}>Trung tâm hỗ trợ học viên</Typography>
+                    <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)' }}>Trung tâm hỗ trợ học viên</Typography>
                     <Typography variant="subtitle2" color="text.secondary">Giải đáp các thắc mắc thường gặp về cách thức vận hành của Hệ Thống AI</Typography>
                   </Box>
                 </Box>
 
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                   {/* Câu 1 */}
-                  <Accordion sx={{ borderRadius: '12px !important', '&:before': { display: 'none' }, boxShadow: '0 1px 3px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0' }}>
+                  <Accordion sx={{ borderRadius: '12px !important', '&:before': { display: 'none' }, boxShadow: '0 1px 3px rgba(0,0,0,0.05)', border: '1px solid var(--vien)' }}>
                     <AccordionSummary expandIcon={<ChevronDown size={18} />}>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: '#0062b8' }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--xanh)' }}>
                         1. Làm thế nào để đăng ký và đăng nhập tài khoản học viên?
                       </Typography>
                     </AccordionSummary>
@@ -778,9 +778,9 @@ export const DashboardPage: React.FC = () => {
                   </Accordion>
 
                   {/* Câu 2 */}
-                  <Accordion sx={{ borderRadius: '12px !important', '&:before': { display: 'none' }, boxShadow: '0 1px 3px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0' }}>
+                  <Accordion sx={{ borderRadius: '12px !important', '&:before': { display: 'none' }, boxShadow: '0 1px 3px rgba(0,0,0,0.05)', border: '1px solid var(--vien)' }}>
                     <AccordionSummary expandIcon={<ChevronDown size={18} />}>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: '#0062b8' }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--xanh)' }}>
                         2. Sử dụng học tập trên website này có mất chi phí nào không?
                       </Typography>
                     </AccordionSummary>
@@ -794,9 +794,9 @@ export const DashboardPage: React.FC = () => {
                   </Accordion>
 
                   {/* Câu 3 */}
-                  <Accordion sx={{ borderRadius: '12px !important', '&:before': { display: 'none' }, boxShadow: '0 1px 3px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0' }}>
+                  <Accordion sx={{ borderRadius: '12px !important', '&:before': { display: 'none' }, boxShadow: '0 1px 3px rgba(0,0,0,0.05)', border: '1px solid var(--vien)' }}>
                     <AccordionSummary expandIcon={<ChevronDown size={18} />}>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: '#0062b8' }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--xanh)' }}>
                         3. Gia sư AI hỗ trợ em học tập cụ thể như thế nào?
                       </Typography>
                     </AccordionSummary>
@@ -812,8 +812,8 @@ export const DashboardPage: React.FC = () => {
                   </Accordion>
                 </Box>
 
-                <Box sx={{ mt: 5, p: 3, bgcolor: '#fff7ed', borderRadius: 3, border: '1px solid #ffedd5', textAlign: 'center' }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: '#ea580c', mb: 1 }}>
+                <Box sx={{ mt: 5, p: 3, bgcolor: 'var(--nen-cam-nhat)', borderRadius: 3, border: '1px solid var(--nen-cam-nhat2)', textAlign: 'center' }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--cam)', mb: 1 }}>
                     Học viên vẫn còn thắc mắc khác cần hỗ trợ nhanh?
                   </Typography>
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>

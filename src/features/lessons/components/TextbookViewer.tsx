@@ -33,16 +33,16 @@ interface TextbookViewerProps {
 }
 
 const CHAPTER_COLORS: Record<string, { primary: string; light: string; accent: string }> = {
-  'bai-1': { primary: '#0369a1', light: '#e0f2fe', accent: '#0ea5e9' },
-  'bai-2': { primary: '#0369a1', light: '#e0f2fe', accent: '#0ea5e9' },
-  'bai-3': { primary: '#15803d', light: '#dcfce7', accent: '#22c55e' },
-  'bai-4': { primary: '#15803d', light: '#dcfce7', accent: '#22c55e' },
+  'bai-1': { primary: 'var(--xanh-troi2)', light: '#e0f2fe', accent: '#0ea5e9' },
+  'bai-2': { primary: 'var(--xanh-troi2)', light: '#e0f2fe', accent: '#0ea5e9' },
+  'bai-3': { primary: 'var(--luc-dam)', light: 'var(--nen-luc-nhat)', accent: '#22c55e' },
+  'bai-4': { primary: 'var(--luc-dam)', light: 'var(--nen-luc-nhat)', accent: '#22c55e' },
   'bai-5': { primary: '#7c3aed', light: '#ede9fe', accent: '#a78bfa' },
-  'bai-6': { primary: '#b45309', light: '#fef3c7', accent: '#f59e0b' },
+  'bai-6': { primary: '#b45309', light: 'var(--nen-vang-nhat)', accent: 'var(--vang)' },
 };
 
 const getColors = (lessonId: string) =>
-  CHAPTER_COLORS[lessonId] || { primary: '#ea580c', light: '#fff7ed', accent: '#fb923c' };
+  CHAPTER_COLORS[lessonId] || { primary: 'var(--cam)', light: 'var(--nen-cam-nhat)', accent: 'var(--cam-nhat)' };
 
 export const TextbookViewer: React.FC<TextbookViewerProps> = ({ lesson, onOpenChat }) => {
   const tb = lesson.textbook;
@@ -83,7 +83,7 @@ export const TextbookViewer: React.FC<TextbookViewerProps> = ({ lesson, onOpenCh
 
       {/* ===== HEADER BÀI HỌC ===== */}
       <Paper sx={{ borderRadius: 3, overflow: 'hidden', border: `1px solid ${colors.light}`, boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}>
-        <Box sx={{ background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.accent} 100%)`, p: 3, color: '#fff' }}>
+        <Box sx={{ background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.accent} 100%)`, p: 3, color: 'var(--chu-nguoc)' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1 }}>
             <BookOpen size={22} />
             <Typography variant="caption" sx={{ fontWeight: 700, letterSpacing: 1, opacity: 0.85, textTransform: 'uppercase' }}>
@@ -96,7 +96,7 @@ export const TextbookViewer: React.FC<TextbookViewerProps> = ({ lesson, onOpenCh
           <Chip
             label={`📄 ${tb.pageRange}`}
             size="small"
-            sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: '#fff', fontWeight: 600, fontSize: '0.8rem' }}
+            sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'var(--chu-nguoc)', fontWeight: 600, fontSize: '0.8rem' }}
           />
         </Box>
 
@@ -112,7 +112,7 @@ export const TextbookViewer: React.FC<TextbookViewerProps> = ({ lesson, onOpenCh
             {tb.objectives.map((obj, i) => (
               <Box key={i} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
                 <CheckCircle2 size={16} color={colors.accent} style={{ marginTop: 2, flexShrink: 0 }} />
-                <Typography variant="body2" sx={{ color: '#374151', lineHeight: 1.6 }}>{obj}</Typography>
+                <Typography variant="body2" sx={{ color: 'var(--chu-dam-2)', lineHeight: 1.6 }}>{obj}</Typography>
               </Box>
             ))}
           </Box>
@@ -136,7 +136,7 @@ export const TextbookViewer: React.FC<TextbookViewerProps> = ({ lesson, onOpenCh
                 key={section.id}
                 sx={{
                   borderRadius: 3,
-                  border: `1px solid ${isOpen ? colors.accent : '#e5e7eb'}`,
+                  border: `1px solid ${isOpen ? colors.accent : 'var(--vien-2)'}`,
                   boxShadow: isOpen ? `0 4px 16px ${colors.accent}30` : '0 2px 8px rgba(0,0,0,0.04)',
                   overflow: 'hidden',
                   transition: 'box-shadow 0.2s, border-color 0.2s',
@@ -151,30 +151,30 @@ export const TextbookViewer: React.FC<TextbookViewerProps> = ({ lesson, onOpenCh
                     justifyContent: 'space-between',
                     px: 2.5,
                     py: 1.8,
-                    bgcolor: isOpen ? colors.light : '#fafafa',
+                    bgcolor: isOpen ? colors.light : 'var(--nen-rat-nhat)',
                     cursor: 'pointer',
                     userSelect: 'none',
                     transition: 'background-color 0.2s',
-                    '&:hover': { bgcolor: isOpen ? colors.light : '#f1f5f9' },
+                    '&:hover': { bgcolor: isOpen ? colors.light : 'var(--nen-nhat)' },
                   }}
                 >
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                     <Box
                       sx={{
                         width: 32, height: 32, borderRadius: '8px',
-                        bgcolor: isOpen ? colors.primary : '#94a3b8',
-                        color: '#fff', display: 'flex', alignItems: 'center',
+                        bgcolor: isOpen ? colors.primary : 'var(--chu-mo)',
+                        color: 'var(--chu-nguoc)', display: 'flex', alignItems: 'center',
                         justifyContent: 'center', fontSize: '0.85rem', fontWeight: 700,
                         flexShrink: 0, transition: 'background-color 0.2s',
                       }}
                     >
                       {sIdx + 1}
                     </Box>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 700, color: isOpen ? colors.primary : '#374151' }}>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 700, color: isOpen ? colors.primary : 'var(--chu-dam-2)' }}>
                       {section.sectionTitle}
                     </Typography>
                   </Box>
-                  <Box sx={{ color: isOpen ? colors.primary : '#94a3b8', display: 'flex', alignItems: 'center' }}>
+                  <Box sx={{ color: isOpen ? colors.primary : 'var(--chu-mo)', display: 'flex', alignItems: 'center' }}>
                     {isOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                   </Box>
                 </Box>
@@ -184,7 +184,7 @@ export const TextbookViewer: React.FC<TextbookViewerProps> = ({ lesson, onOpenCh
                   <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 2.5 }}>
 
                     {/* Lý thuyết chính */}
-                    <Box sx={{ p: 2.5, bgcolor: '#fafafa', borderRadius: 2, border: '1px solid #f3f4f6' }}>
+                    <Box sx={{ p: 2.5, bgcolor: 'var(--nen-rat-nhat)', borderRadius: 2, border: '1px solid #f3f4f6' }}>
                       <Typography
                         variant="body2"
                         sx={{ lineHeight: 2, color: '#1f2937', whiteSpace: 'pre-line', fontFamily: '"Georgia", serif', fontSize: '0.95rem' }}
@@ -206,7 +206,7 @@ export const TextbookViewer: React.FC<TextbookViewerProps> = ({ lesson, onOpenCh
                           {section.keyPoints.map((kp, i) => (
                             <Box key={i} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
                               <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: colors.accent, mt: 1, flexShrink: 0 }} />
-                              <Typography variant="body2" sx={{ color: '#374151', fontWeight: 500, lineHeight: 1.7 }}>{kp}</Typography>
+                              <Typography variant="body2" sx={{ color: 'var(--chu-dam-2)', fontWeight: 500, lineHeight: 1.7 }}>{kp}</Typography>
                             </Box>
                           ))}
                         </Box>
@@ -215,10 +215,10 @@ export const TextbookViewer: React.FC<TextbookViewerProps> = ({ lesson, onOpenCh
 
                     {/* Công thức */}
                     {section.formulae && section.formulae.length > 0 && (
-                      <Box sx={{ p: 2, borderRadius: 2, bgcolor: '#0f172a', border: '1px solid #1e293b' }}>
+                      <Box sx={{ p: 2, borderRadius: 2, bgcolor: 'var(--chu-dam)', border: '1px solid var(--chu-dam-2)' }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
-                          <Calculator size={16} color="#94a3b8" />
-                          <Typography variant="caption" sx={{ fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                          <Calculator size={16} color="var(--chu-mo)" />
+                          <Typography variant="caption" sx={{ fontWeight: 700, color: 'var(--chu-mo)', textTransform: 'uppercase', letterSpacing: 0.5 }}>
                             Công thức cần nhớ
                           </Typography>
                         </Box>
@@ -226,7 +226,7 @@ export const TextbookViewer: React.FC<TextbookViewerProps> = ({ lesson, onOpenCh
                           {section.formulae.map((f, i) => (
                             <Typography
                               key={i} variant="body2"
-                              sx={{ color: '#e2e8f0', fontFamily: '"Courier New", monospace', fontSize: '0.9rem', p: 1, bgcolor: '#1e293b', borderRadius: 1, borderLeft: `3px solid ${colors.accent}`, lineHeight: 1.6 }}
+                              sx={{ color: 'var(--chu-ma)', fontFamily: '"Courier New", monospace', fontSize: '0.9rem', p: 1, bgcolor: 'var(--nen-ma)', borderRadius: 1, borderLeft: `3px solid ${colors.accent}`, lineHeight: 1.6 }}
                             >
                               {f}
                             </Typography>
@@ -240,20 +240,20 @@ export const TextbookViewer: React.FC<TextbookViewerProps> = ({ lesson, onOpenCh
                       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
                         {section.examples.map((ex, i) => (
                           <Box key={i} sx={{ borderRadius: 2, border: '1px solid #d1d5db', overflow: 'hidden' }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 2, py: 1, bgcolor: '#f8fafc', borderBottom: '1px solid #e5e7eb' }}>
-                              <FlaskConical size={15} color="#64748b" />
-                              <Typography variant="caption" sx={{ fontWeight: 700, color: '#475569', textTransform: 'uppercase' }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 2, py: 1, bgcolor: 'var(--nen-trang)', borderBottom: '1px solid var(--vien-2)' }}>
+                              <FlaskConical size={15} color="var(--chu-2)" />
+                              <Typography variant="caption" sx={{ fontWeight: 700, color: 'var(--chu)', textTransform: 'uppercase' }}>
                                 {ex.title}
                               </Typography>
                             </Box>
                             <Box sx={{ p: 2 }}>
-                              <Box sx={{ p: 1.5, bgcolor: '#eff6ff', borderRadius: 1.5, mb: 1.5, border: '1px solid #bfdbfe' }}>
-                                <Typography variant="caption" sx={{ fontWeight: 700, color: '#1d4ed8', display: 'block', mb: 0.5 }}>ĐỀ BÀI</Typography>
-                                <Typography variant="body2" sx={{ color: '#1e40af', whiteSpace: 'pre-line', lineHeight: 1.7 }}>{ex.problem}</Typography>
+                              <Box sx={{ p: 1.5, bgcolor: 'var(--nen-xanh-nhat2)', borderRadius: 1.5, mb: 1.5, border: '1px solid var(--vien-xanh)' }}>
+                                <Typography variant="caption" sx={{ fontWeight: 700, color: 'var(--xanh)', display: 'block', mb: 0.5 }}>ĐỀ BÀI</Typography>
+                                <Typography variant="body2" sx={{ color: 'var(--xanh-chu)', whiteSpace: 'pre-line', lineHeight: 1.7 }}>{ex.problem}</Typography>
                               </Box>
-                              <Box sx={{ p: 1.5, bgcolor: '#f0fdf4', borderRadius: 1.5, border: '1px solid #bbf7d0' }}>
-                                <Typography variant="caption" sx={{ fontWeight: 700, color: '#15803d', display: 'block', mb: 0.5 }}>LỜI GIẢI</Typography>
-                                <Typography variant="body2" sx={{ color: '#166534', whiteSpace: 'pre-line', lineHeight: 1.8, fontFamily: '"Georgia", serif' }}>{ex.solution}</Typography>
+                              <Box sx={{ p: 1.5, bgcolor: 'var(--nen-luc-nhat2)', borderRadius: 1.5, border: '1px solid #bbf7d0' }}>
+                                <Typography variant="caption" sx={{ fontWeight: 700, color: 'var(--luc-dam)', display: 'block', mb: 0.5 }}>LỜI GIẢI</Typography>
+                                <Typography variant="body2" sx={{ color: 'var(--luc-dam2)', whiteSpace: 'pre-line', lineHeight: 1.8, fontFamily: '"Georgia", serif' }}>{ex.solution}</Typography>
                               </Box>
                             </Box>
                           </Box>
@@ -277,17 +277,17 @@ export const TextbookViewer: React.FC<TextbookViewerProps> = ({ lesson, onOpenCh
           </Box>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             {tb.practiceQuestions.map((q, qIdx) => (
-              <Paper key={q.id} sx={{ borderRadius: 3, border: '1px solid #e5e7eb', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+              <Paper key={q.id} sx={{ borderRadius: 3, border: '1px solid var(--vien-2)', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
                 <Box sx={{ p: 2.5 }}>
                   <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
-                    <Box sx={{ width: 28, height: 28, borderRadius: '50%', bgcolor: colors.primary, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', fontWeight: 700, flexShrink: 0, mt: 0.2 }}>
+                    <Box sx={{ width: 28, height: 28, borderRadius: '50%', bgcolor: colors.primary, color: 'var(--chu-nguoc)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', fontWeight: 700, flexShrink: 0, mt: 0.2 }}>
                       {qIdx + 1}
                     </Box>
                     <Typography variant="body1" sx={{ fontWeight: 600, color: '#1f2937', lineHeight: 1.7 }}>{q.question}</Typography>
                   </Box>
                   {q.hint && (
                     <Box sx={{ mt: 1.5, ml: 4.5, p: 1.5, bgcolor: '#fefce8', borderRadius: 1.5, border: '1px solid #fde68a', display: 'flex', gap: 1 }}>
-                      <HelpCircle size={16} color="#d97706" style={{ flexShrink: 0, marginTop: 2 }} />
+                      <HelpCircle size={16} color="var(--vang-dam)" style={{ flexShrink: 0, marginTop: 2 }} />
                       <Typography variant="caption" sx={{ color: '#92400e', lineHeight: 1.7, whiteSpace: 'pre-line' }}>
                         <strong>Gợi ý:</strong> {q.hint}
                       </Typography>
@@ -295,7 +295,7 @@ export const TextbookViewer: React.FC<TextbookViewerProps> = ({ lesson, onOpenCh
                   )}
                 </Box>
                 <Divider />
-                <Box sx={{ p: 2, bgcolor: '#fafafa', display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
+                <Box sx={{ p: 2, bgcolor: 'var(--nen-rat-nhat)', display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
                   {q.answer && (
                     <Button
                       size="small"
@@ -316,15 +316,15 @@ export const TextbookViewer: React.FC<TextbookViewerProps> = ({ lesson, onOpenCh
                     size="small" variant="outlined"
                     startIcon={<MessageSquare size={14} />}
                     onClick={onOpenChat}
-                    sx={{ textTransform: 'none', fontWeight: 600, borderRadius: 2, fontSize: '0.8rem', borderColor: '#ea580c', color: '#ea580c', '&:hover': { bgcolor: '#fff7ed' } }}
+                    sx={{ textTransform: 'none', fontWeight: 600, borderRadius: 2, fontSize: '0.8rem', borderColor: 'var(--cam)', color: 'var(--cam)', '&:hover': { bgcolor: 'var(--nen-cam-nhat)' } }}
                   >
                     Hỏi Gia sư AI
                   </Button>
                 </Box>
                 {revealedAnswers[q.id] && q.answer && (
-                  <Box sx={{ mx: 2, mb: 2, p: 2, bgcolor: '#f0fdf4', borderRadius: 2, border: '1px solid #86efac' }}>
-                    <Typography variant="caption" sx={{ fontWeight: 700, color: '#15803d', display: 'block', mb: 0.5 }}>ĐÁP ÁN</Typography>
-                    <Typography variant="body2" sx={{ color: '#166534', whiteSpace: 'pre-line', lineHeight: 1.9, fontFamily: '"Georgia", serif' }}>
+                  <Box sx={{ mx: 2, mb: 2, p: 2, bgcolor: 'var(--nen-luc-nhat2)', borderRadius: 2, border: '1px solid #86efac' }}>
+                    <Typography variant="caption" sx={{ fontWeight: 700, color: 'var(--luc-dam)', display: 'block', mb: 0.5 }}>ĐÁP ÁN</Typography>
+                    <Typography variant="body2" sx={{ color: 'var(--luc-dam2)', whiteSpace: 'pre-line', lineHeight: 1.9, fontFamily: '"Georgia", serif' }}>
                       {q.answer}
                     </Typography>
                   </Box>
@@ -347,7 +347,7 @@ export const TextbookViewer: React.FC<TextbookViewerProps> = ({ lesson, onOpenCh
       >
         <Box>
           <Typography variant="subtitle1" sx={{ fontWeight: 700, color: colors.primary }}>🤖 Còn thắc mắc về bài học này?</Typography>
-          <Typography variant="body2" sx={{ color: '#64748b', mt: 0.5 }}>Gia sư AI sẵn sàng giải đáp mọi câu hỏi của bạn ngay lập tức!</Typography>
+          <Typography variant="body2" sx={{ color: 'var(--chu-2)', mt: 0.5 }}>Gia sư AI sẵn sàng giải đáp mọi câu hỏi của bạn ngay lập tức!</Typography>
         </Box>
         <Button
           variant="contained"
@@ -355,7 +355,7 @@ export const TextbookViewer: React.FC<TextbookViewerProps> = ({ lesson, onOpenCh
           onClick={onOpenChat}
           sx={{
             background: `linear-gradient(135deg, ${colors.primary}, ${colors.accent})`,
-            color: '#fff', textTransform: 'none', fontWeight: 700, borderRadius: 2.5, px: 3, py: 1.2,
+            color: 'var(--chu-nguoc)', textTransform: 'none', fontWeight: 700, borderRadius: 2.5, px: 3, py: 1.2,
             boxShadow: `0 4px 12px ${colors.primary}40`, whiteSpace: 'nowrap', flexShrink: 0,
             '&:hover': { background: `linear-gradient(135deg, ${colors.accent}, ${colors.primary})` },
           }}

@@ -64,7 +64,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   };
 
   const isStudent = selectedRole === 'student';
-  const accentColor = isStudent ? '#ea580c' : '#0f766e';
+  const accentColor = isStudent ? 'var(--cam)' : 'var(--teal)';
 
   return (
     <Box id="login-form-container">
@@ -83,8 +83,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             gap: 0.5,
             p: 0.5,
             borderRadius: 999,
-            backgroundColor: '#f1f5f9',
-            border: '1px solid #e2e8f0',
+            backgroundColor: 'var(--nen-nhat)',
+            border: '1px solid var(--vien)',
           }}
         >
           {/* Pill: Học sinh */}
@@ -99,11 +99,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({
               textTransform: 'none',
               fontWeight: 'bold',
               transition: 'all 0.2s',
-              color: isStudent ? '#ffffff' : '#64748b',
-              backgroundColor: isStudent ? '#ea580c' : 'transparent',
+              color: isStudent ? 'var(--nen-the)' : 'var(--chu-2)',
+              backgroundColor: isStudent ? 'var(--cam)' : 'transparent',
               boxShadow: isStudent ? '0 2px 8px rgba(234, 88, 12, 0.25)' : 'none',
               '&:hover': {
-                backgroundColor: isStudent ? '#c2410c' : 'rgba(0,0,0,0.03)',
+                backgroundColor: isStudent ? 'var(--cam-dam)' : 'rgba(0,0,0,0.03)',
               },
             }}
           >
@@ -122,8 +122,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({
               textTransform: 'none',
               fontWeight: 'bold',
               transition: 'all 0.2s',
-              color: !isStudent ? '#ffffff' : '#64748b',
-              backgroundColor: !isStudent ? '#0f766e' : 'transparent',
+              color: !isStudent ? 'var(--nen-the)' : 'var(--chu-2)',
+              backgroundColor: !isStudent ? 'var(--teal)' : 'transparent',
               boxShadow: !isStudent ? '0 2px 8px rgba(15, 118, 110, 0.25)' : 'none',
               '&:hover': {
                 backgroundColor: !isStudent ? '#0d5e56' : 'rgba(0,0,0,0.03)',
@@ -219,7 +219,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
               backgroundColor: accentColor,
               boxShadow: 'none',
               '&:hover': {
-                backgroundColor: isStudent ? '#c2410c' : '#0d5e56',
+                backgroundColor: isStudent ? 'var(--cam-dam)' : '#0d5e56',
                 boxShadow: isStudent ? '0 4px 12px rgba(234, 88, 12, 0.2)' : '0 4px 12px rgba(15, 118, 110, 0.2)'
               }
             }}
@@ -231,7 +231,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
       {/* Dòng nhỏ: tài khoản do trường cấp */}
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.6, mt: 2 }}>
-        <Lock size={12} color="#94a3b8" />
+        <Lock size={12} color="var(--chu-mo)" />
         <Typography variant="caption" color="text.secondary">
           Tài khoản học sinh/giáo viên thường được cấp bởi nhà trường.
         </Typography>

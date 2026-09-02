@@ -220,10 +220,10 @@ export const FirestoreAccountManager: React.FC = () => {
   return (
     <Box id="firestore-account-manager-container" sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
       {/* Tiêu đề phần quản lý */}
-      <Paper elevation={0} sx={{ p: 2.5, borderRadius: 3, border: '1px solid #e2e8f0', bgcolor: '#f8fafc' }}>
+      <Paper elevation={0} sx={{ p: 2.5, borderRadius: 3, border: '1px solid var(--vien)', bgcolor: 'var(--nen-trang)' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-          <ShieldCheck color="#0f766e" size={24} />
-          <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#0f172a' }}>
+          <ShieldCheck color="var(--teal)" size={24} />
+          <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)' }}>
             Quản lý Tài khoản Firestore (Trực tiếp từ Client)
           </Typography>
         </Box>
@@ -235,10 +235,10 @@ export const FirestoreAccountManager: React.FC = () => {
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1.4fr' }, gap: 3 }}>
         {/* CỘT TRÁI: FORM TẠO TÀI KHOẢN MỚI */}
         <Box>
-          <Card sx={{ borderRadius: 3, border: '1px solid #e2e8f0', boxShadow: 'none' }}>
+          <Card sx={{ borderRadius: 3, border: '1px solid var(--vien)', boxShadow: 'none' }}>
             <CardContent sx={{ p: 3 }}>
               <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-                <UserPlus size={18} color="#ea580c" /> Tạo Tài khoản mới (Firestore)
+                <UserPlus size={18} color="var(--cam)" /> Tạo Tài khoản mới (Firestore)
               </Typography>
 
               {createMsg && (
@@ -310,11 +310,11 @@ export const FirestoreAccountManager: React.FC = () => {
 
         {/* CỘT PHẢI: DANH SÁCH TÀI KHOẢN FIRESTORE */}
         <Box>
-          <Card sx={{ borderRadius: 3, border: '1px solid #e2e8f0', boxShadow: 'none' }}>
+          <Card sx={{ borderRadius: 3, border: '1px solid var(--vien)', boxShadow: 'none' }}>
             <CardContent sx={{ p: 3 }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                 <Typography variant="subtitle1" sx={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <User size={18} color="#0f766e" /> Danh sách Collection "users"
+                  <User size={18} color="var(--teal)" /> Danh sách Collection "users"
                 </Typography>
                 <Button
                   size="small"
@@ -336,9 +336,9 @@ export const FirestoreAccountManager: React.FC = () => {
                   Chưa có tài khoản nào trong collection "users" trên Firestore (hoặc chưa kết nối Config).
                 </Alert>
               ) : (
-                <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid #f1f5f9', borderRadius: 2 }}>
+                <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid var(--nen-nhat)', borderRadius: 2 }}>
                   <Table size="small">
-                    <TableHead sx={{ bgcolor: '#f8fafc' }}>
+                    <TableHead sx={{ bgcolor: 'var(--nen-trang)' }}>
                       <TableRow>
                         <TableCell sx={{ fontWeight: 'bold' }}>Username</TableCell>
                         <TableCell sx={{ fontWeight: 'bold' }}>Họ tên</TableCell>
@@ -349,7 +349,7 @@ export const FirestoreAccountManager: React.FC = () => {
                     <TableBody>
                       {users.map((u) => (
                         <TableRow key={u.uid} hover>
-                          <TableCell sx={{ fontWeight: 600, color: '#0f172a' }}>{u.username}</TableCell>
+                          <TableCell sx={{ fontWeight: 600, color: 'var(--chu-dam)' }}>{u.username}</TableCell>
                           <TableCell>{u.fullName}</TableCell>
                           <TableCell>{getRoleChip(u.role)}</TableCell>
                           <TableCell align="center">
@@ -461,7 +461,7 @@ export const FirestoreAccountManager: React.FC = () => {
               {/* Thông tin tài khoản đang được chọn */}
               <Paper elevation={0} sx={{ p: 2, borderRadius: 2, bgcolor: '#f0f9ff', border: '1px solid #bae6fd' }}>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>Tài khoản được chọn</Typography>
-                <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: '#0f172a' }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)' }}>
                   {roleTargetUser.fullName}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">@{roleTargetUser.username}</Typography>

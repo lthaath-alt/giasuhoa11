@@ -28,7 +28,7 @@ export const SchoolTab: React.FC = () => {
       {/* Header */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Box>
-          <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#0f172a' }}>Quản lý Trường học</Typography>
+          <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)' }}>Quản lý Trường học</Typography>
           <Typography variant="body2" color="text.secondary">Tạo trường, quản lý giáo viên và lớp học</Typography>
         </Box>
         <Button
@@ -43,8 +43,8 @@ export const SchoolTab: React.FC = () => {
       </Box>
 
       {schools.length === 0 ? (
-        <Paper sx={{ p: 6, textAlign: 'center', borderRadius: 3, border: '1px dashed #e2e8f0' }}>
-          <Building2 size={48} color="#cbd5e1" style={{ marginBottom: 12 }} />
+        <Paper sx={{ p: 6, textAlign: 'center', borderRadius: 3, border: '1px dashed var(--vien)' }}>
+          <Building2 size={48} color="var(--chu-mo)" style={{ marginBottom: 12 }} />
           <Typography variant="h6" color="text.secondary" sx={{ fontWeight: 600 }}>Chưa có trường học nào</Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>Nhấn "Thêm trường mới" để bắt đầu cấu hình.</Typography>
         </Paper>
@@ -55,14 +55,14 @@ export const SchoolTab: React.FC = () => {
             const schoolClasses = getSchoolClasses(school.id);
             const schoolAdmins = getSchoolAdmins(school.id);
             return (
-              <Accordion key={school.id} defaultExpanded sx={{ borderRadius: '12px !important', border: '1px solid #e2e8f0', boxShadow: 'none', '&:before': { display: 'none' } }}>
+              <Accordion key={school.id} defaultExpanded sx={{ borderRadius: '12px !important', border: '1px solid var(--vien)', boxShadow: 'none', '&:before': { display: 'none' } }}>
                 <AccordionSummary expandIcon={<ChevronDown size={20} />} sx={{ px: 3, py: 1 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: '100%' }}>
                     <Box sx={{ p: 1, bgcolor: 'rgba(234,88,12,0.08)', borderRadius: 2 }}>
-                      <Building2 size={20} color="#ea580c" />
+                      <Building2 size={20} color="var(--cam)" />
                     </Box>
                     <Box sx={{ flex: 1 }}>
-                      <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#0f172a' }}>{school.name}</Typography>
+                      <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)' }}>{school.name}</Typography>
                       <Typography variant="caption" color="text.secondary">
                         {schoolTeachers.length} giáo viên · {schoolClasses.length} lớp
                       </Typography>
@@ -77,7 +77,7 @@ export const SchoolTab: React.FC = () => {
                   <Box sx={{ mb: 3 }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
                       <Box>
-                        <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: '#475569', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--chu)', display: 'flex', alignItems: 'center', gap: 0.5 }}>
                           <Users size={16} /> Giáo viên ({schoolTeachers.length})
                         </Typography>
                         {schoolAdmins.length > 0 && (
@@ -113,7 +113,7 @@ export const SchoolTab: React.FC = () => {
                     ) : (
                       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                         {schoolTeachers.map(t => (
-                          <Chip key={t.email} avatar={<Avatar sx={{ bgcolor: 'rgba(234,88,12,0.1)', color: '#ea580c' }}>{t.name.charAt(0)}</Avatar>}
+                          <Chip key={t.email} avatar={<Avatar sx={{ bgcolor: 'rgba(234,88,12,0.1)', color: 'var(--cam)' }}>{t.name.charAt(0)}</Avatar>}
                             label={`${t.name} – ${t.email}`} variant="outlined" sx={{ fontWeight: 600 }} />
                         ))}
                       </Box>
@@ -123,7 +123,7 @@ export const SchoolTab: React.FC = () => {
                   {/* Lớp học */}
                   <Box>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: '#475569', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--chu)', display: 'flex', alignItems: 'center', gap: 0.5 }}>
                         <GraduationCap size={16} /> Lớp học ({schoolClasses.length})
                       </Typography>
                       <Button
@@ -131,7 +131,7 @@ export const SchoolTab: React.FC = () => {
                         size="small" variant="outlined" color="secondary"
                         startIcon={<Plus size={14} />}
                         onClick={() => setCreateClassSchool(school.id)}
-                        sx={{ textTransform: 'none', borderRadius: 2, fontWeight: 'bold', color: '#0f766e', borderColor: '#0f766e' }}
+                        sx={{ textTransform: 'none', borderRadius: 2, fontWeight: 'bold', color: 'var(--teal)', borderColor: 'var(--teal)' }}
                       >
                         Tạo lớp
                       </Button>
@@ -145,7 +145,7 @@ export const SchoolTab: React.FC = () => {
                           const teacher = users.find(u => u.email.toLowerCase() === cls.teacherEmail.toLowerCase());
                           return (
                             <Paper key={cls.id} variant="outlined" sx={{ p: 1.5, borderRadius: 2, minWidth: 160 }}>
-                              <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: '#0f766e' }}>Lớp {cls.name}</Typography>
+                              <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--teal)' }}>Lớp {cls.name}</Typography>
                               <Typography variant="caption" color="text.secondary">GVCN: {teacher?.name || cls.teacherEmail}</Typography>
                               <br />
                               <Typography variant="caption" color="text.secondary">{cls.studentIdentifiers.length} học sinh</Typography>

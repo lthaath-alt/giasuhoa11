@@ -78,7 +78,7 @@ interface RichTextProps {
   linkColor?: string;
 }
 
-export const RichText: React.FC<RichTextProps> = ({ text: raw, linkColor = '#0062b8' }) => {
+export const RichText: React.FC<RichTextProps> = ({ text: raw, linkColor = 'var(--xanh)' }) => {
   if (!raw) return null;
 
   const nodes: React.ReactNode[] = [];

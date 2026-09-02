@@ -30,9 +30,9 @@ const BrandPanel: React.FC = () => (
       minHeight: '100vh',
       px: { md: 5, lg: 7 },
       py: 6,
-      backgroundColor: '#0f766e', // Teal đậm — màu thương hiệu đã có sẵn trong theme
+      backgroundColor: 'var(--teal-nen)', // Teal đậm — màu thương hiệu đã có sẵn trong theme
       backgroundImage: 'radial-gradient(circle at 15% 20%, rgba(255,255,255,0.06), transparent 45%)',
-      color: '#ffffff',
+      color: 'var(--chu-nguoc)',
     }}
   >
     {/* Logo trên cùng */}
@@ -42,7 +42,7 @@ const BrandPanel: React.FC = () => (
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         border: '1px solid rgba(255,255,255,0.25)'
       }}>
-        <BookOpen size={22} color="#ffffff" />
+        <BookOpen size={22} color="var(--chu-nguoc)" />
       </Box>
       <Typography variant="h6" sx={{ fontWeight: 'bold', letterSpacing: '-0.3px' }}>
         Gia sư Hóa học 11 AI
@@ -54,7 +54,7 @@ const BrandPanel: React.FC = () => (
       <Typography variant="h3" sx={{ fontWeight: 800, lineHeight: 1.2, mb: 1 }}>
         Nâng tầm tư duy
       </Typography>
-      <Typography variant="h3" sx={{ fontWeight: 800, lineHeight: 1.2, mb: 3, color: '#fdba74' }}>
+      <Typography variant="h3" sx={{ fontWeight: 800, lineHeight: 1.2, mb: 3, color: 'var(--cam-nhat2)' }}>
         tự học Hóa học lớp 11
       </Typography>
 
@@ -79,7 +79,7 @@ const BrandPanel: React.FC = () => (
               backgroundColor: 'rgba(255,255,255,0.06)',
             }}
           >
-            <Box sx={{ color: '#fdba74', mb: 1 }}>{icon}</Box>
+            <Box sx={{ color: 'var(--cam-nhat2)', mb: 1 }}>{icon}</Box>
             <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 0.5 }}>{title}</Typography>
             <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.75)', lineHeight: 1.5, display: 'block' }}>
               {desc}
@@ -179,7 +179,7 @@ export const LoginPage: React.FC = () => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          backgroundColor: '#f8fafc',
+          backgroundColor: 'var(--nen-trang)',
           px: 2,
           py: 6,
         }}
@@ -190,14 +190,14 @@ export const LoginPage: React.FC = () => {
             sx={{
               p: { xs: 3, sm: 5 },
               borderRadius: 4,
-              border: '1px solid #e2e8f0',
-              backgroundColor: '#ffffff',
+              border: '1px solid var(--vien)',
+              backgroundColor: 'var(--nen-the)',
             }}
           >
             {/* Logo mobile (chỉ hiện khi màn hình nhỏ, vì cột trái đã ẩn) */}
             <Box sx={{ display: { xs: 'flex', md: 'none' }, alignItems: 'center', gap: 1, mb: 3, justifyContent: 'center' }}>
-              <BookOpen size={24} color="#0f766e" />
-              <Typography variant="h5" color="#0f766e" sx={{ fontWeight: 'bold' }}>
+              <BookOpen size={24} color="var(--teal)" />
+              <Typography variant="h5" color="var(--teal)" sx={{ fontWeight: 'bold' }}>
                 Gia sư Hóa học 11 AI
               </Typography>
             </Box>
@@ -205,7 +205,7 @@ export const LoginPage: React.FC = () => {
             {/* Tiêu đề form */}
             {view === 'login' && (
               <Box sx={{ mb: 3 }}>
-                <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#0f172a' }}>
+                <Typography variant="h5" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)' }}>
                   Đăng nhập tài khoản
                 </Typography>
                 <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
@@ -239,11 +239,11 @@ export const LoginPage: React.FC = () => {
                     borderRadius: 3,
                     textTransform: 'none',
                     fontWeight: 'bold',
-                    borderColor: '#ea580c',
-                    color: '#ea580c',
+                    borderColor: 'var(--cam)',
+                    color: 'var(--cam)',
                     '&:hover': {
                       backgroundColor: 'rgba(234, 88, 12, 0.08)',
-                      borderColor: '#ea580c',
+                      borderColor: 'var(--cam)',
                     },
                   }}
                 >

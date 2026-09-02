@@ -71,9 +71,9 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
           bgcolor: 'rgba(16,185,129,0.12)', display: 'flex',
           alignItems: 'center', justifyContent: 'center', mx: 'auto', mb: 2,
         }}>
-          <CheckCircle size={36} color="#10b981" />
+          <CheckCircle size={36} color="var(--luc)" />
         </Box>
-        <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#10b981', mb: 1 }}>
+        <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--luc)', mb: 1 }}>
           Đăng ký thành công!
         </Typography>
         <Typography variant="body2" color="text.secondary">
@@ -88,8 +88,8 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
   return (
     <Box id="student-register-form-container">
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-        <UserPlus size={22} color="#ea580c" />
-        <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#0f172a' }}>
+        <UserPlus size={22} color="var(--cam)" />
+        <Typography variant="h5" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)' }}>
           Đăng ký học sinh
         </Typography>
       </Box>
@@ -120,7 +120,7 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
               input: {
                 startAdornment: (
                   <InputAdornment position="start">
-                    <User size={16} color="#94a3b8" />
+                    <User size={16} color="var(--chu-mo)" />
                   </InputAdornment>
                 ),
               },
@@ -144,7 +144,7 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
               input: {
                 startAdornment: (
                   <InputAdornment position="start">
-                    <Mail size={16} color="#94a3b8" />
+                    <Mail size={16} color="var(--chu-mo)" />
                   </InputAdornment>
                 ),
               },
@@ -168,7 +168,7 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
               input: {
                 startAdornment: (
                   <InputAdornment position="start">
-                    <Key size={16} color="#94a3b8" />
+                    <Key size={16} color="var(--chu-mo)" />
                   </InputAdornment>
                 ),
                 endAdornment: (
@@ -200,7 +200,7 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
               input: {
                 startAdornment: (
                   <InputAdornment position="start">
-                    <Key size={16} color="#94a3b8" />
+                    <Key size={16} color="var(--chu-mo)" />
                   </InputAdornment>
                 ),
                 endAdornment: (
@@ -218,8 +218,8 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
           {/* Mã lớp (tùy chọn) */}
           <Box sx={{
             p: 2, borderRadius: 3,
-            border: '1px dashed #94a3b8',
-            bgcolor: inviteCode ? 'rgba(15,118,110,0.04)' : '#f8fafc',
+            border: '1px dashed var(--chu-mo)',
+            bgcolor: inviteCode ? 'rgba(15,118,110,0.04)' : 'var(--nen-trang)',
             transition: 'all 0.2s',
           }}>
             <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, display: 'block', mb: 1 }}>
@@ -239,7 +239,7 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
                 input: {
                   startAdornment: (
                     <InputAdornment position="start">
-                      <School size={16} color={inviteCode ? '#0f766e' : '#94a3b8'} />
+                      <School size={16} color={inviteCode ? 'var(--teal)' : 'var(--chu-mo)'} />
                     </InputAdornment>
                   ),
                 },
@@ -247,14 +247,14 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
               sx={{
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 2.5,
-                  ...(inviteCode && { borderColor: '#0f766e' }),
+                  ...(inviteCode && { borderColor: 'var(--teal)' }),
                 },
                 '& .MuiInputBase-input': {
                   fontFamily: 'monospace',
                   fontSize: '1.1rem',
                   letterSpacing: '0.2em',
                   fontWeight: 'bold',
-                  color: inviteCode ? '#0f766e' : 'inherit',
+                  color: inviteCode ? 'var(--teal)' : 'inherit',
                 },
               }}
             />
@@ -295,7 +295,7 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
           size="small"
           startIcon={<ArrowLeft size={14} />}
           onClick={onBackToLogin}
-          sx={{ textTransform: 'none', color: '#64748b', fontWeight: 600 }}
+          sx={{ textTransform: 'none', color: 'var(--chu-2)', fontWeight: 600 }}
         >
           Quay lại đăng nhập
         </Button>
