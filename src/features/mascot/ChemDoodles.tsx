@@ -28,10 +28,12 @@ interface ViTri {
 }
 
 const VI_TRI: ViTri[] = [
-  // ---- Lề trái: neo theo ĐÁY để luôn nằm dưới chân nhân vật ----
-  { ten: 'amoniac', bottom: '22%', left: '4%', rong: 132, xoay: -8 },
-  { ten: 'phanTuNuoc', bottom: '9%', left: '12%', rong: 108, xoay: 6, chiManHinhRong: true },
-  { ten: 'ongNghiem', bottom: '1%', left: '5%', rong: 46, xoay: -14 },
+  /* ---- Lề trái ----
+     Nhân vật chiếm gần hết lề trái từ trên xuống (ở 1440px cô ấy kéo tới
+     y≈660, chỉ chừa lại quãng 240px cuối). Nên chỉ đặt 2 hình, neo theo ĐÁY
+     và xếp so le nhau để vừa né chân váy vừa không đè lên nhau. */
+  { ten: 'amoniac', bottom: '12%', left: '2%', rong: 132, xoay: -8 },
+  { ten: 'ongNghiem', bottom: '3%', left: '16%', rong: 46, xoay: -14 },
 
   // ---- Lề phải: hai cột so le, cột trong chỉ hiện khi màn hình rộng ----
   { ten: 'benzen', top: '6%', right: '6%', rong: 86, xoay: 10 },

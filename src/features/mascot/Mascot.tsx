@@ -99,8 +99,11 @@ export const MascotToanThan: React.FC<{ tab?: TabMascot; rong?: number }> = ({
   rong = 230,
 }) => {
   const loi = useMemo(() => dungLoiThoai(tab), [tab]);
+  /* Từ 1536px trở lên lề rộng ra gần 300px, để nguyên 215px thì nhân vật lọt
+     thỏm và chữ trên quyển sách bé tí. Phóng thêm 20% cho tương xứng. */
+  const beRong = { xs: rong, xl: Math.round(rong * 1.2) };
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: rong }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: beRong }}>
       <Box sx={{ mb: 1.5 }}>
         <BongBong loi={loi} huong="duoi" />
       </Box>
@@ -113,8 +116,8 @@ export const MascotToanThan: React.FC<{ tab?: TabMascot; rong?: number }> = ({
            chỗ đứng bị trống một nhịp rồi ảnh mới nhảy vào. aspectRatio giữ sẵn
            đúng khoảng cho ảnh nên trang không bị xô lệch lúc tải. */
         sx={{
-          width: rong,
-          aspectRatio: '424 / 900',
+          width: beRong,
+          aspectRatio: '460 / 969',
           height: 'auto',
           display: 'block',
           ...NHIP_THO,
@@ -145,7 +148,7 @@ export const MascotDauVai: React.FC<{ tab: TabMascot; rong?: number }> = ({ tab,
         sx={{
           // Thu nhỏ trên điện thoại để còn chỗ cho bong bóng thoại bên cạnh.
           width: { xs: Math.round(rong * 0.8), sm: rong },
-          aspectRatio: '220 / 259',
+          aspectRatio: '240 / 307',
           height: 'auto',
           display: 'block',
           flexShrink: 0,
