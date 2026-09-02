@@ -441,13 +441,12 @@ h1.title .sub{display:block; font-size:.36em; letter-spacing:.22em; font-weight:
 .formula-strip span{border:1px solid var(--line); padding:3px 8px; color:var(--muted)}
 
 /* ---------- nhân vật + hình vẽ trang trí ở màn hình chuẩn bị ---------- */
-/* Nhân vật thành dải ngang bên dưới phần chữ.
-   Chặn theo CHIỀU CAO chứ không theo bề ngang: ảnh tỉ lệ 760/586 (gần vuông)
-   nên nếu cho rộng hết 1190px của khối thì cao hơn 900px, nuốt cả khối tiêu
-   đề và đẩy Bước 1 / Bước 2 xuống dưới màn hình. */
-.plate-mascot{
-  display:block; width:auto; height:clamp(210px,26vw,360px); max-width:100%;
-  margin:24px auto 0;
+.plate-body{display:flex; align-items:center; gap:28px}
+.plate-text{flex:1 1 auto; min-width:0}
+.plate-mascot{flex:0 0 auto; width:min(44%,440px); height:auto; display:block}
+@media (max-width:900px){
+  .plate-body{display:block}
+  .plate-mascot{width:100%; max-width:400px; margin:20px auto 0}
 }
 
 /* Lớp hình vẽ hoá học rải ra hai bên lề trang.
@@ -964,18 +963,22 @@ table.bank tr.picked td{background:var(--accent-soft)}
       <span class="plate-code">HÓA HỌC 11 · KẾT NỐI TRI THỨC VỚI CUỘC SỐNG</span>
       <span class="plate-code" id="plateCount">28 Ô · 6 CHƯƠNG · 160 CÂU HỎI</span>
     </div>
-    <h1 class="title">Vòng Quanh<br>Hóa 11<span class="sub">Trò chơi bàn cờ ôn tập</span></h1>
-    <p class="lede" style="margin-top:16px">
-      Tung xúc xắc, đi quanh 28 ô đánh số. Không ai biết trước ô mình dừng chân là gì — chọn mức độ
-      xong mới lộ ra chương và câu hỏi. Đội nào chạm mốc điểm trước sẽ thắng, và mỗi câu đều có lời
-      giải thích ngắn để học sinh hiểu bản chất.
-    </p>
-    <div class="formula-strip">
-      <span>Kc</span><span>N₂ · S</span><span>C<sub>x</sub>H<sub>y</sub>O<sub>z</sub></span>
-      <span>C–H</span><span>–OH</span><span>–COOH</span>
+    <div class="plate-body">
+      <div class="plate-text">
+        <h1 class="title">Vòng Quanh<br>Hóa 11<span class="sub">Trò chơi bàn cờ ôn tập</span></h1>
+        <p class="lede" style="margin-top:16px">
+          Tung xúc xắc, đi quanh 28 ô đánh số. Không ai biết trước ô mình dừng chân là gì — chọn mức độ
+          xong mới lộ ra chương và câu hỏi. Đội nào chạm mốc điểm trước sẽ thắng, và mỗi câu đều có lời
+          giải thích ngắn để học sinh hiểu bản chất.
+        </p>
+        <div class="formula-strip">
+          <span>Kc</span><span>N₂ · S</span><span>C<sub>x</sub>H<sub>y</sub>O<sub>z</sub></span>
+          <span>C–H</span><span>–OH</span><span>–COOH</span>
+        </div>
+      </div>
+      <img class="plate-mascot" src="/mascot/mascot-boardgame.png"
+           alt="Bạn học dắt theo ba ô nguyên tố Ne, Cr và B đi dạo">
     </div>
-    <img class="plate-mascot" src="/mascot/mascot-boardgame.png"
-         alt="Bạn học dắt theo ba ô nguyên tố Ne, Cr và B đi dạo">
   </div>
 
   <div class="setup-grid">
