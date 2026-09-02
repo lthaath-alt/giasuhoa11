@@ -40,6 +40,8 @@ CSS → HTML (canvas + các lớp phủ) → JavaScript trong một IIFE ở cu�
 | `const DAN =`         | Vũ khí sữa vôi Ca(OH)₂: tốc độ, độ rơi, số viên mỗi hộp |
 | `function banDan(`    | Ném một viên; `stepDan` lo bay và va chạm |
 | `function hienQuaiSO2(`| Khoá hết van thì khối SO₂ hiện ra, phải trung hoà mới hạ tường |
+| `function stepDanQuai(`| Khí SO₂ khối boss phun ra, chạm là mất máu |
+| `function capNhatHopVuKhi(`| Hộp sữa vôi tự đầy lại sau `DAN.hopHoi` bước |
 | `function moKho(`     | Lớp phủ kho đồ: kéo thả nguyên tử ghép phân tử, cân bằng thì cửa mở |
 | `function ganKeo(`    | Kéo thả bằng pointer events, chạy được cả chuột lẫn cảm ứng |
 | `const P = {`         | Hằng số vật lí: trọng lực, lực nhảy, tốc độ, nhảy đôi |
@@ -822,7 +824,7 @@ const LEVELS = [
     name:'Lò đốt',
     theme:'boss',
     rescue:true,
-    brief:'Lò đốt quá tải, khói SO₂ phun ra không ngừng và cô giáo bị kẹt trong lồng phía sau. Bốn van lò chỉ khóa được khi bạn cân bằng đúng phương trình ghi trên van — càng khóa được nhiều thì lò càng phun quái dữ. Khóa hết van rồi, đống khí SO₂ đã thoát ra sẽ tụ thành một khối lớn: nhặt sữa vôi Ca(OH)₂ trong các hộp và ném để trung hoà nó, vì SO₂ là oxide acid. Giẫm lên vô ích.',
+    brief:'Lò đốt quá tải, khói SO₂ phun ra không ngừng và cô giáo bị kẹt trong lồng phía sau. Bốn van lò chỉ khóa được khi bạn cân bằng đúng phương trình ghi trên van — càng khóa được nhiều thì lò càng phun quái dữ. Khóa hết van rồi, đống khí SO₂ đã thoát ra sẽ tụ thành một khối lớn: nhặt sữa vôi Ca(OH)₂ trong các hộp và ném để trung hoà nó, vì SO₂ là oxide acid. Giẫm lên vô ích. Khối SO₂ cũng phun khí trả lại — càng bị trung hoà nó phun càng dày, nhớ né. Hộp sữa vôi tự đầy lại nên đừng sợ hết đạn, chỉ mất thời gian chờ.',
     /* Chặng parkour trước khi vào khu lò.
        Bể acid rộng 7 ô, chỉ qua được bằng một tấm thép chớp và một ván gỗ sập —
        vừa phải canh nhịp vừa phải né quái lò đang phun ra. Bệ dẫn lên van 26
@@ -1161,6 +1163,8 @@ function buildLevel(def){
     // Sàn vỡ đang đếm giờ, khoá là "cột,hàng". Rỗng lúc mới nạp màn.
     vo:new Map(),
     dan:[],            // đạn sữa vôi đang bay
+    danQuai:[],        // đạn khí SO₂ do khối SO₂ phun ra
+    hopHoi:new Map(),  // hộp vũ khí đang chờ đầy lại, khoá là "cột,hàng"
     quaiSO2:null,      // khối SO₂ cuối màn, chỉ hiện sau khi khoá hết van
     nhacDan:0,
     gates:(def.gates || []).map(g => ({...g, open:false, cool:0})),
@@ -1393,7 +1397,9 @@ function step(){
   blinkT++;
   capNhatSanVo();
   stepDan();
+  stepDanQuai();
   stepQuaiSO2();
+  capNhatHopVuKhi();
   if(p.onGround) danhDauSanVo(p);
 
   // vừa chạm đất sau khi rơi nhanh: nhún người và tung bụi
@@ -1466,6 +1472,7 @@ function hitBlock(p, cy){
     }
     if(t === T.WBOX){
       G.grid[cy][cx] = T.WUSED;
+      G.hopHoi.set(cx + ',' + cy, {cx, cy, t:DAN.hopHoi});
       G.bump.push({x:cx, y:cy, t:10});
       p.dan += DAN.moiHop;
       Snd.power();
@@ -1949,7 +1956,12 @@ const DAN = {
   toc:9.4,          // tốc độ bay ngang
   roi:0.24,         // rơi nhẹ để phải canh khoảng cách, không phải tia thẳng
   song:110,         // số bước rồi tự tắt
-  moiHop:3          // một hộp vũ khí cho mấy viên
+  moiHop:3,         // một hộp vũ khí cho mấy viên
+  /* Hộp tự đầy lại sau ngần này bước (300 ≈ 5 giây). Có hồi thì người chơi
+     không bao giờ kẹt vì hết đạn giữa trận boss — nhưng phải chờ, nên vẫn
+     đáng tiếc mỗi phát ném trượt. Để hồi ngay lập tức thì đứng một chỗ đội
+     đầu liên tục là có đạn vô hạn, trận boss mất hết sức ép. */
+  hopHoi:300
 };
 
 function banDan(){
@@ -1969,6 +1981,55 @@ function banDan(){
     w: 12, h: 12, vx: p.face * DAN.toc, vy: -1.4, t: 0
   });
   Snd.ban();
+}
+
+/* Hộp sữa vôi đầy lại sau một lúc. Cùng kiểu với sàn vỡ: giữ một bảng đếm giờ
+   riêng thay vì nhét trạng thái vào ô lưới, vì ô lưới chỉ chứa được một con số. */
+function capNhatHopVuKhi(){
+  G.hopHoi.forEach((o, k) => {
+    if(--o.t > 0) return;
+    // đừng đầy lại khi nhân vật đang đứng chồng lên ô đó — ô đặc hiện ra trong
+    // người sẽ đẩy nhân vật kẹt vào tường
+    const p = G.player;
+    const chong = p.x + p.w > o.cx*TS && p.x < (o.cx+1)*TS
+               && p.y + p.h > o.cy*TS && p.y < (o.cy+1)*TS;
+    if(chong){ o.t = 12; return; }
+    G.grid[o.cy][o.cx] = T.WBOX;
+    G.hopHoi.delete(k);
+    burst(o.cx*TS + TS/2, o.cy*TS + TS/2, 8, ['#9fd8ff','#fff'], {spread:1.8, life:18, size:2});
+  });
+}
+
+/* Khối SO₂ phun khí về phía nhân vật. Đạn của nó bay CHẬM hơn sữa vôi để còn né
+   được — boss bắn nhanh bằng người chơi thì thành đánh đố chứ không phải khó. */
+function stepDanQuai(){
+  const p = G.player;
+  G.danQuai = G.danQuai.filter(d => {
+    d.t++;
+    if(d.t > 150) return false;
+    d.x += d.vx;
+    d.y += d.vy;
+    if(d.x < -TS || d.x > G.w*TS + TS) return false;
+    if(solidAt(d.x + 7, d.y + 7)){
+      burst(d.x, d.y, 6, ['#e8c33a','#b8933a'], {spread:1.8, life:14, size:2});
+      return false;
+    }
+    if(!p.dead && p.inv <= 0
+       && d.x < p.x + p.w && d.x + 14 > p.x && d.y < p.y + p.h && d.y + 14 > p.y){
+      hurt(false);
+      return false;
+    }
+    return true;
+  });
+}
+
+function drawDanQuai(){
+  G.danQuai.forEach(d => {
+    ctx.fillStyle = '#b8933a';
+    ctx.beginPath(); ctx.arc(d.x + 7, d.y + 7, 7.5, 0, 7); ctx.fill();
+    ctx.fillStyle = '#e8c33a';
+    ctx.beginPath(); ctx.arc(d.x + 7, d.y + 6, 5.5, 0, 7); ctx.fill();
+  });
 }
 
 function stepDan(){
@@ -2044,7 +2105,7 @@ function hienQuaiSO2(){
      không trúng phát nào. Hàng 10 thì thân quái cao 64px phủ đúng đường đạn. */
   G.quaiSO2 = {
     x:(b.col - 7)*TS, y:10*TS, w:64, h:64,
-    hp:5, hpMax:5, vx:-1.5, song:true, t:0, nhay:0, mien:0
+    hp:5, hpMax:5, vx:-1.5, song:true, t:0, nhay:0, mien:0, banT:90
   };
   flashScreen('#e2604e', 16);
   shakeScreen(20);
@@ -2069,6 +2130,7 @@ function trungQuaiSO2(){
   }
 
   q.song = false;
+  G.danQuai.length = 0;      // khối tan rồi thì khí nó phun ra cũng tan theo
   TOTAL.score += 800;
   Snd.win();
   flashScreen('#ffffff', 22);
@@ -2107,6 +2169,20 @@ function stepQuaiSO2(){
   q.x += q.vx;
   q.x = clamp(q.x, 0, G.w*TS - q.w);
   q.y = 10*TS + Math.sin(q.t / 24) * 22;         // dập dềnh, không đi bộ
+
+  /* Phun khí về phía nhân vật. Càng ít máu càng phun dày — cùng ý với lò đốt:
+     đoạn cuối phải căng hơn đoạn đầu, chứ không phải dễ dần vì người chơi đã
+     quen tay. */
+  const nhip = Math.max(48, 108 - (q.hpMax - q.hp) * 15);
+  if(--q.banT <= 0){
+    q.banT = nhip;
+    const cx = q.x + q.w/2, cy = q.y + q.h/2;
+    const dx = (p.x + p.w/2) - cx, dy = (p.y + p.h/2) - cy;
+    const d = Math.hypot(dx, dy) || 1;
+    const toc = 4.6;                              // chậm hơn sữa vôi (9,4) để né được
+    G.danQuai.push({x:cx - 7, y:cy - 7, vx:dx/d*toc, vy:dy/d*toc, t:0});
+    Snd.bump();
+  }
 
   if(p.dead || p.inv > 0) return;
   if(p.x < q.x + q.w && p.x + p.w > q.x && p.y < q.y + q.h && p.y + p.h > q.y){
@@ -2501,6 +2577,7 @@ function draw(){
   G.foes.forEach(f => { if(f.alive) drawFoe(f); });
   drawQuaiSO2();
   drawDan();
+  drawDanQuai();
   drawPlayer();
   drawFX();
 
@@ -3148,7 +3225,7 @@ function buildLegend(){
       g.fillStyle = '#5c8bad'; g.fillRect(3,6,TS-6,5); g.fillRect(3,TS-13,TS-6,5);
       g.strokeStyle = '#9fd8ff'; g.lineWidth = 2.5; g.strokeRect(1.5,1.5,TS-3,TS-3);
     }],
-    ['<b>Hộp sữa vôi</b> — đội đầu lấy Ca(OH)₂, bấm <b>X</b> để ném', g => {
+    ['<b>Hộp sữa vôi</b> — đội đầu lấy Ca(OH)₂, bấm <b>X</b> để ném. Hộp tự đầy lại sau ít giây', g => {
       g.fillStyle = '#4a7fa8'; g.fillRect(0,0,TS,TS);
       g.fillStyle = '#5f9cc9'; g.fillRect(3,3,TS-6,TS-6);
       g.strokeStyle = '#9fd8ff'; g.lineWidth = 2; g.strokeRect(1.5,1.5,TS-3,TS-3);
