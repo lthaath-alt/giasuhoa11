@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useCheDoMau } from '../../../core/hooks/useCheDoMau';
 import { Box, Typography, Button, Paper } from '@mui/material';
 import { Presentation, Maximize2 } from 'lucide-react';
@@ -25,6 +25,22 @@ const diaChiSlide = (toi: boolean) =>
 export const SlidesSection: React.FC = () => {
   const frameRef = useRef<HTMLIFrameElement>(null);
   const { laToi } = useCheDoMau();
+  /* Địa chỉ chốt một lần lúc dựng, KHÔNG dựng lại theo `laToi`.
+     Để nó đổi theo thì mỗi lần bấm đổi nền là iframe nạp lại, ai đang xem dở
+     một bài sẽ bị đá về đầu danh sách. Đổi nền giữa chừng nhắn tin sang. */
+  const [diaChi] = useState(() => diaChiSlide(laToi));
+
+  useEffect(() => {
+    const w = frameRef.current?.contentWindow;
+    if (!w) return;
+    const gui = () => w.postMessage(
+      { loai: 'hoa11:che-do-mau', toi: laToi },
+      window.location.origin,
+    );
+    gui();
+    const hen = window.setTimeout(gui, 400);
+    return () => window.clearTimeout(hen);
+  }, [laToi]);
 
   const handleFullscreen = () => {
     frameRef.current?.requestFullscreen?.();
@@ -111,7 +127,7 @@ export const SlidesSection: React.FC = () => {
       >
         <iframe
           ref={frameRef}
-          src={diaChiSlide(laToi)}
+          src={diaChi}
           title="Bài giảng Hóa 11"
           onLoad={handleLoad}
           allow="fullscreen"

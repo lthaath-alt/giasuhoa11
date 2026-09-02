@@ -116,7 +116,13 @@ body{
 .hide{display:none !important}
 
 .stage{
-  position:relative;width:100%;max-width:1000px;
+  /* Khung chơi lấy hết chỗ đang có mà vẫn giữ đúng tỉ lệ 16:9.
+     Trước đây chặn cứng ở 1000px: mở toàn màn hình trên máy 1920 thì khung chỉ
+     chiếm hơn nửa bề ngang, còn lại là một vành đen to. Nay bề ngang do .shell
+     quyết định (lớn nhất mà chiều cao vẫn vừa màn hình), ở đây chỉ giữ tỉ lệ.
+     Canvas bên trong luôn là 960×540 rồi phóng to, nên phóng bao nhiêu cũng nét
+     — image-rendering:pixelated giữ cạnh sắc, không bị nhoè. */
+  position:relative;width:100%;
   aspect-ratio:16/9;max-height:calc(100vh - 24px);
   border-radius:8px;overflow:hidden;
   box-shadow:0 20px 50px rgba(0,0,0,.55);
@@ -327,7 +333,10 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
 /* Bảng nút xếp dưới khung chơi, không phủ lên dải mặt đất nơi nhân vật đi */
 .shell{
   display:flex;flex-direction:column;align-items:center;gap:10px;
-  width:100%;max-width:1000px;
+  width:100%;
+  /* Bề ngang lớn nhất mà khung 16:9 vẫn không cao quá màn hình.
+     Trừ 24px là phần padding 12px hai bên của <body>. */
+  max-width:calc((100vh - 24px) * 16 / 9);
 }
 .pad{
   width:100%;
@@ -347,6 +356,9 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
 body.touch .pad{display:flex}
 /* Chừa chỗ cho bảng nút bên dưới, khỏi phải cuộn trang */
 body.touch .stage{max-height:calc(100vh - 104px)}
+/* Có bảng nút cảm ứng thì khung phải thấp hơn, nên bề ngang cũng phải hẹp lại
+   theo, nếu không khung bị chiều cao ép và thừa chỗ trống hai bên. */
+body.touch .shell{max-width:calc((100vh - 104px) * 16 / 9)}
 @media (max-width:560px){
   .pad .side{gap:9px}
   .pad button{width:52px;height:52px;font-size:18px}

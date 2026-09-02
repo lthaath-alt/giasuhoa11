@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Box, Typography, Card, Button, Dialog, IconButton } from '@mui/material';
 import { Gamepad2, Play, X } from 'lucide-react';
 import { DetectiveArt, BoardGameArt, RescueArt } from './GameArt';
 import { BankFirestore, pushToGame } from '../bank/bankStore';
 import { useApp } from '../../core/hooks/useApp';
+import { useCheDoMau } from '../../core/hooks/useCheDoMau';
 
 interface GameData {
   id: string;
@@ -45,7 +46,14 @@ const GAMES: GameData[] = [
 
 export const GameHubSection: React.FC = () => {
   const [activeGame, setActiveGame] = useState<GameData | null>(null);
+  /* Địa chỉ iframe chốt lại NGAY LÚC MỞ và không đổi nữa.
+     Nếu để React tự dựng địa chỉ từ `laToi` thì mỗi lần bấm đổi nền, prop src
+     đổi theo → iframe nạp lại → ván cờ đang chơi dở mất sạch. Đổi nền giữa
+     chừng được xử lý bằng postMessage ở dưới, không đụng tới địa chỉ. */
+  const [diaChiKhung, datDiaChiKhung] = useState('');
   const { currentUser } = useApp();
+  const { laToi } = useCheDoMau();
+  const khungRef = useRef<HTMLIFrameElement>(null);
 
   /* Chế độ thử của trò chơi (bất tử, bay, nhảy màn) — chỉ mở cho quản trị.
      Giáo viên cần đi hết các màn để kiểm nội dung câu hỏi mà không phải chơi giỏi.
@@ -80,6 +88,27 @@ export const GameHubSection: React.FC = () => {
     return () => window.removeEventListener('message', traLoi);
   }, [choPhepThu]);
 
+  /* Báo cho trò chơi biết web đang ở nền sáng hay tối.
+
+     Lần mở đầu tiên đã có ?theme= trên địa chỉ. Chỗ này lo phần người dùng bấm
+     đổi nền GIỮA LÚC ĐANG CHƠI.
+
+     Gửi hai lần (ngay và sau 400ms) vì không biết trang trò chơi đã nạp xong bộ
+     nghe chưa. Nhắn thừa thì trò chơi chỉ đặt lại đúng màu đang có, vô hại.
+
+     Trò chơi nào chưa biết nghe tin này thì bỏ qua, không sao. */
+  useEffect(() => {
+    const w = khungRef.current?.contentWindow;
+    if (!w) return;
+    const gui = () => w.postMessage(
+      { loai: 'hoa11:che-do-mau', toi: laToi },
+      window.location.origin,
+    );
+    gui();
+    const hen = window.setTimeout(gui, 400);
+    return () => window.clearTimeout(hen);
+  }, [laToi, activeGame]);
+
   /**
    * Đưa ngân hàng câu hỏi từ web sang trò chơi ngay khi mở mục này.
    *
@@ -111,6 +140,7 @@ export const GameHubSection: React.FC = () => {
      trường): trò chơi vẫn phải mở bình thường, chỉ là không tràn màn hình. */
   const handleOpenGame = (game: GameData) => {
     setActiveGame(game);
+    datDiaChiKhung(`${game.path}?theme=${laToi ? 'dark' : 'light'}`);
     document.documentElement.requestFullscreen?.().catch(() => {});
   };
 
@@ -307,7 +337,8 @@ export const GameHubSection: React.FC = () => {
             </Box>
             <Box sx={{ flexGrow: 1, bgcolor: '#000000' }}>
               <iframe
-                src={activeGame.path}
+                ref={khungRef}
+                src={diaChiKhung}
                 title={activeGame.title}
                 style={{ width: '100%', height: '100%', border: 'none', display: 'block' }}
               />
