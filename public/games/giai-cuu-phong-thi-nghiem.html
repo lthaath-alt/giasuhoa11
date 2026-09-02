@@ -407,7 +407,7 @@ body.touch .stage{max-height:calc(100vh - 104px)}
       <p class="stem" id="k-de"></p>
       <p class="k-pt" id="k-pt"></p>
 
-      <p class="k-nhan">Kho đồ — kéo nguyên tử thả vào ô ghép bên dưới</p>
+      <p class="k-nhan" id="k-nhan-kho">Kho đồ — kéo nguyên tử thả vào ô ghép bên dưới</p>
       <div class="k-kho" id="k-kho"></div>
 
       <p class="k-nhan" id="k-nhan-o"></p>
@@ -720,7 +720,7 @@ const LEVELS = [
     id:'2-3',
     name:'Bể lắng',
     theme:'tank',
-    brief:'Ba cửa lọc chắn đường, mỗi cửa chỉ mở khi bạn mang đúng các ion tạo nên hợp chất ghi trên biển. Ion nằm rải trên đường đi — ion nào không cần thì nhảy qua, đừng ăn.',
+    brief:'Ba cửa lọc chắn đường. Tới nơi thì mở giỏ ion ra, kéo từng ion vào ô ghép sao cho đúng hợp chất ghi trên biển VÀ tổng điện tích bằng 0 — một NH₄⁺ không bù nổi một SO₄²⁻ đâu. Ion nằm rải trên đường đi, cứ nhặt thoải mái, thừa thì trả lại giỏ.',
     w:160, h:15,
     // Vuc 5 o: cho nay CO Y bat dung nhay doi. Man 2-3 la man cuoi truoc thap
     // parkour nen day la cho day hoc sinh quen tay truoc khi vao doan kho.
@@ -1583,56 +1583,32 @@ function tally(list){
   return m;
 }
 
-function bagMatches(g){
-  const have = tally(G.player.bag), need = g.need;
-  const keys = new Set([...Object.keys(have), ...Object.keys(need)]);
-  for(const k of keys) if((have[k] || 0) !== (need[k] || 0)) return false;
-  return true;
-}
 
 /* Câu nhắc khi giỏ chưa đúng: nói thiếu gì, thừa gì */
-function gateHint(g){
-  const have = tally(G.player.bag), need = g.need;
-  const thieu = [], thua = [];
-  new Set([...Object.keys(have), ...Object.keys(need)]).forEach(k => {
-    const d = (need[k] || 0) - (have[k] || 0);
-    if(d > 0) thieu.push(d > 1 ? d + '×' + k : k);
-    else if(d < 0) thua.push(-d > 1 ? (-d) + '×' + k : k);
-  });
-  let s = 'Cửa ' + g.formula + ' chưa mở —';
-  if(thieu.length) s += ' còn thiếu ' + thieu.join(' và ');
-  if(thua.length) s += (thieu.length ? ',' : '') + ' đang thừa ' + thua.join(' và ');
-  return s + '. Bấm ↓ để xả giỏ.';
-}
 
+/* Cửa lọc: tới gần thì mở lớp phủ để KÉO THẢ ion vào ô ghép, y như cửa kho.
+
+   Trước đây cửa tự mở ngay khi giỏ ion tình cờ khớp — người chơi đi ngang, cửa
+   bật ra, chẳng kịp biết mình vừa ghép đúng cái gì. Nay phải tự đặt từng ion rồi
+   bấm Hoàn thành, và bảng bên dưới cộng điện tích cho thấy vì sao một NH₄⁺ chưa
+   đủ cho một SO₄²⁻. */
 function checkGates(p){
   G.gates.forEach(g => {
     if(g.cool > 0) g.cool--;
-    if(g.open) return;
+    if(g.open || khoDangMo) return;
     const gx = g.col*TS;
-    if(p.x + p.w > gx - TS*1.1 && p.x < gx + TS*2){
-      if(bagMatches(g)){
-        g.open = true;
-        // phai xoa DUNG khoang da dung o buildLevel (0..12), khong phai 5..12:
-        // dung thieu thi mo cua xong van con tuong o tren, nguoi choi thay cua mo ma di khong qua
-        for(let y=0; y<=12; y++) G.grid[y][g.col] = T.EMPTY;
-        p.bag = [];
-        TOTAL.score += 400;
-        Snd.win();
-        // cửa vỡ ra thành mảnh, vòng sáng lan từ giữa cột
-        for(let y=5; y<=12; y++)
-          burst(gx + TS/2, y*TS + TS/2, 5, ['#8fa3bb','#ffd75e','#3f4c5e'], {spread:3.6, square:true, size:3});
-        ring(gx + TS/2, 9*TS, '#ffd75e');
-        popText(gx + TS/2, 7*TS, '+400', '#ffd75e');
-        flashScreen('#ffffff', 12);
-        shakeScreen(9);
-        paused = true;
-        showMsg('Cửa lọc đã mở', g.formula, g.e + '<br><br>Được <b>400 điểm</b>.',
-          'Đi tiếp', () => { hideMsg(); paused = false; });
-      }else if(g.cool <= 0){
-        g.cool = 110;
-        toast(gateHint(g));
-      }
+    if(p.x + p.w > gx - TS*1.1 && p.x < gx + TS*2 && g.cool <= 0){
+      g.cool = 40;
+      moKho({
+        ...g,
+        loai:'ion',
+        ten:'Cửa lọc ' + g.formula,
+        de:'Cửa chỉ mở khi bạn ghép đúng ' + g.formula
+           + ' từ các ion đang mang, và tổng điện tích bằng 0.',
+        pt:g.formula,
+        ptDu:g.formula,
+        phanTu:g.formula
+      });
     }
   });
 }
@@ -1652,6 +1628,14 @@ const THUONG_NGUYEN_TU = {N:1, H:2, S:1, O:2};
 
 /* Màu theo nguyên tố — giữ đúng quy ước màu quen thuộc trong sách: O đỏ,
    N xanh dương, H trắng, S vàng. */
+/* Điện tích từng ion, dùng cho bảng kiểm ở cửa lọc. Ghép đúng công thức thôi
+   chưa đủ — tổng điện tích phải bằng 0, đó mới là chỗ học sinh hay sai:
+   (NH₄)₂SO₄ cần HAI NH₄⁺ mới bù nổi một SO₄²⁻. */
+const DIEN_TICH_ION = {
+  'Ba²⁺':2, 'NH₄⁺':1, 'Na⁺':1,
+  'SO₄²⁻':-2, 'NO₃⁻':-1, 'Cl⁻':-1, 'OH⁻':-1
+};
+
 const MAU_NGUYEN_TU = {
   N:'#7fb2ff', H:'#f0f4f8', O:'#ff8a7a', S:'#f5d142', C:'#b9c3cc'
 };
@@ -1672,6 +1656,22 @@ function vietCongThuc(dem, thuTu){
   return khoa.map(k => k + (SO_DUOI[dem[k]] ?? ('_' + dem[k]))).join('') || '—';
 }
 
+/* Ion đã thả vào ô → tên hợp chất để hiện cho người chơi. Đủ đúng thì trả về
+   công thức thật của cửa, chưa đủ thì liệt kê ion đang có — như vậy nhìn vào ô
+   là biết mình đang cầm gì, không phải đoán. */
+function vietHopChat(dem, g){
+  const ds = Object.keys(dem);
+  if(!ds.length) return '—';
+  if(khopIon(dem, g.need)) return g.phanTu;
+  return ds.map(k => (dem[k] > 1 ? dem[k] + '×' : '') + k).join(' + ');
+}
+
+function khopIon(dem, need){
+  const ds = new Set([...Object.keys(dem), ...Object.keys(need)]);
+  for(const k of ds) if((dem[k] || 0) !== (need[k] || 0)) return false;
+  return true;
+}
+
 function tongKho(){
   return Object.values(TOTAL.kho).reduce((a, b) => a + b, 0);
 }
@@ -1680,14 +1680,25 @@ function tongKho(){
    Để ngoài hàm để nút "Trả hết về kho" và phần kéo thả cùng nhìn thấy. */
 let khoDangMo = null;   // { g, oGhep: [ ['N','H',…], … ] }
 
+/* Lớp phủ dùng chung cho HAI loại cửa:
+     'nguyenTu' — kho là nguyên tử tích được từ ô ?, ghép thành phân tử
+     'ion'      — kho là giỏ ion nhặt trên đường, ghép thành hợp chất
+   Chung một giao diện vì thao tác giống hệt nhau; chỉ khác nguồn hàng trong kho
+   và cách chấm (phân tử xét công thức, ion xét cả công thức lẫn điện tích). */
 function moKho(g){
   paused = true;
-  khoDangMo = { g, oGhep: Array.from({length: g.soPhanTu}, () => []) };
+  const laIon = g.loai === 'ion';
+  khoDangMo = { g, laIon, oGhep: Array.from({length: laIon ? 1 : g.soPhanTu}, () => []) };
   $('k-kicker').textContent = g.ten;
   $('k-de').textContent = g.de;
   $('k-pt').textContent = g.pt;
-  $('k-nhan-o').textContent = 'Ghép ' + g.soPhanTu + ' phân tử ' + g.phanTu
-    + ' — kéo nguyên tử vào từng ô, bấm vào nguyên tử đã đặt để trả về kho';
+  $('k-nhan-kho').textContent = laIon
+    ? 'Giỏ ion đang mang — kéo ion thả vào ô ghép bên dưới'
+    : 'Kho đồ — kéo nguyên tử thả vào ô ghép bên dưới';
+  $('k-nhan-o').textContent = laIon
+    ? 'Kéo ion vào ô ghép sao cho ra đúng ' + g.phanTu + ' và tổng điện tích bằng 0'
+    : 'Ghép ' + g.soPhanTu + ' phân tử ' + g.phanTu
+      + ' — kéo nguyên tử vào từng ô, bấm vào nguyên tử đã đặt để trả về kho';
   $('v-kho').classList.remove('hide');
   veKho();
 }
@@ -1705,7 +1716,11 @@ function traHetVeKho(){
   if(!khoDangMo) return;
   $('k-loi').classList.add('hide');
   khoDangMo.oGhep.forEach(o => {
-    o.forEach(k => { TOTAL.kho[k] = (TOTAL.kho[k] || 0) + 1; });
+    // ion trả về giỏ của nhân vật, nguyên tử trả về kho mang theo giữa các màn
+    o.forEach(k => {
+      if(khoDangMo.laIon) G.player.bag.push(k);
+      else TOTAL.kho[k] = (TOTAL.kho[k] || 0) + 1;
+    });
     o.length = 0;
   });
   veKho();
@@ -1717,45 +1732,57 @@ function veKho(){
   if(!khoDangMo) return;
   const { g, oGhep } = khoDangMo;
 
-  // ── Kho nguyên tử ──
+  // ── Kho hàng: nguyên tử hoặc ion, tuỳ loại cửa ──
+  const laIon = khoDangMo.laIon;
+  const conLai = laIon ? tally(G.player.bag) : TOTAL.kho;
   const kho = $('k-kho');
   kho.innerHTML = '';
-  const dsNguyenTo = [...new Set([...Object.keys(g.veTrai), ...Object.keys(TOTAL.kho)])];
+  const dsNguyenTo = laIon
+    ? [...new Set([...Object.keys(g.need), ...Object.keys(conLai)])]
+    : [...new Set([...Object.keys(g.veTrai), ...Object.keys(conLai)])];
   dsNguyenTo.forEach(k => {
-    const n = TOTAL.kho[k] || 0;
+    const n = conLai[k] || 0;
     const el = document.createElement('div');
-    el.className = 'ngtu' + (n <= 0 ? ' het' : '');
-    el.style.background = MAU_NGUYEN_TU[k] || '#c9d4de';
+    el.className = 'ngtu' + (n <= 0 ? ' het' : '') + (laIon ? ' ion' : '');
+    el.style.background = laIon
+      ? (DIEN_TICH_ION[k] > 0 ? '#f2a7a0' : '#9fd0f5')   // cation đỏ, anion xanh — đúng quy ước trong bài
+      : (MAU_NGUYEN_TU[k] || '#c9d4de');
     el.dataset.ngto = k;
     el.innerHTML = k + '<span class="dem">' + n + '</span>';
     if(n > 0) ganKeo(el, k);
     kho.appendChild(el);
   });
-  if(!dsNguyenTo.length) kho.innerHTML = '<p class="k-nhan">Kho đang trống — đội đầu vào ô ? để trả lời câu hỏi lấy nguyên tử.</p>';
+  if(!dsNguyenTo.length) kho.innerHTML = '<p class="k-nhan">'
+    + (laIon ? 'Giỏ ion đang trống — nhặt ion rải trên đường đi.'
+             : 'Kho đang trống — đội đầu vào ô ? để trả lời câu hỏi lấy nguyên tử.') + '</p>';
 
   // ── Các ô ghép ──
   const box = $('k-oghep');
   box.innerHTML = '';
   oGhep.forEach((o, i) => {
     const dem = demNguyenTo(o);
-    const ct = vietCongThuc(dem, g.thuTu);
-    const dung = ct === g.phanTu;
+    const ct = laIon ? vietHopChat(dem, g) : vietCongThuc(dem, g.thuTu);
+    const dung = laIon ? khopIon(dem, g.need) : ct === g.phanTu;
     const el = document.createElement('div');
     el.className = 'o-ghep' + (dung ? ' dung' : '');
     el.dataset.o = String(i);
-    el.innerHTML = '<span class="ten">Phân tử ' + (i+1) + (dung ? ' ✓' : '') + '</span>'
+    el.innerHTML = '<span class="ten">' + (laIon ? 'Hợp chất' : 'Phân tử ' + (i+1))
+      + (dung ? ' ✓' : '') + '</span>'
       + '<span class="ct">' + ct + '</span>';
     const chua = document.createElement('div');
     chua.className = 'chua';
     o.forEach((k, j) => {
       const v = document.createElement('span');
       v.className = 'vien';
-      v.style.background = MAU_NGUYEN_TU[k] || '#c9d4de';
+      v.style.background = laIon
+        ? (DIEN_TICH_ION[k] > 0 ? '#f2a7a0' : '#9fd0f5')
+        : (MAU_NGUYEN_TU[k] || '#c9d4de');
       v.textContent = k;
       v.title = 'Bấm để trả về kho';
       v.addEventListener('click', () => {
         o.splice(j, 1);
-        TOTAL.kho[k] = (TOTAL.kho[k] || 0) + 1;
+        if(laIon) G.player.bag.push(k);
+        else TOTAL.kho[k] = (TOTAL.kho[k] || 0) + 1;
         veKho();
       });
       chua.appendChild(v);
@@ -1764,11 +1791,36 @@ function veKho(){
     box.appendChild(el);
   });
 
-  // ── Bảng kiểm nguyên tố hai vế ──
+  // ── Bảng kiểm ──
   const phai = demNguyenTo(oGhep.flat());
   const bang = $('k-bang');
   const dong = [];
   let khopHet = true;
+
+  if(laIon){
+    /* Cửa lọc: đếm từng ion rồi cộng điện tích. Bảng này chính là chỗ dạy bài —
+       học sinh thấy ngay vì sao một NH₄⁺ chưa đủ cho một SO₄²⁻. */
+    let tong = 0;
+    const dsIon = [...new Set([...Object.keys(g.need), ...Object.keys(phai)])];
+    dsIon.forEach(k => {
+      const c = g.need[k] || 0, co = phai[k] || 0;
+      const ok = c === co;
+      if(!ok) khopHet = false;
+      dong.push('<div class="dong"><b>' + k + '</b> — cần ' + c
+        + ' · đang có <span class="' + (ok ? 'khop' : 'lech') + '">' + co + (ok ? ' ✓' : ' ✗') + '</span></div>');
+    });
+    Object.keys(phai).forEach(k => { tong += (DIEN_TICH_ION[k] || 0) * phai[k]; });
+    const dienOK = tong === 0 && oGhep.flat().length > 0;
+    dong.push('<div class="dong"><b>Tổng điện tích</b> — <span class="' + (dienOK ? 'khop' : 'lech') + '">'
+      + (tong > 0 ? '+' : '') + tong + (dienOK ? ' ✓ trung hoà' : ' ✗ chưa trung hoà') + '</span></div>');
+    if(!dienOK) khopHet = false;
+    bang.innerHTML = dong.join('');
+    khoDangMo.duPhanTu = khopHet;
+    khoDangMo.khopHet = khopHet;
+    $('k-loi').classList.add('hide');
+    return;
+  }
+
   Object.keys(g.veTrai).forEach(k => {
     const t = g.veTrai[k], ph = phai[k] || 0;
     const ok = t === ph;
@@ -1800,7 +1852,9 @@ function veKho(){
 function ganKeo(el, ngTo){
   el.addEventListener('pointerdown', e => {
     e.preventDefault();
-    if((TOTAL.kho[ngTo] || 0) <= 0) return;
+    const laIon = khoDangMo && khoDangMo.laIon;
+    const con = laIon ? G.player.bag.filter(x => x === ngTo).length : (TOTAL.kho[ngTo] || 0);
+    if(con <= 0) return;
     el.classList.add('keo');
 
     const bong = el.cloneNode(true);
@@ -1832,8 +1886,16 @@ function ganKeo(el, ngTo){
       el.classList.remove('keo');
       document.querySelectorAll('.o-ghep').forEach(n => n.classList.remove('tren'));
       const o = oDuoi(ev);
-      if(o && khoDangMo && (TOTAL.kho[ngTo] || 0) > 0){
-        TOTAL.kho[ngTo]--;
+      if(!o || !khoDangMo) return;
+      const laIon2 = khoDangMo.laIon;
+      const con2 = laIon2 ? G.player.bag.filter(x => x === ngTo).length : (TOTAL.kho[ngTo] || 0);
+      if(con2 > 0){
+        if(laIon2){
+          const i = G.player.bag.indexOf(ngTo);
+          if(i >= 0) G.player.bag.splice(i, 1);
+        }else{
+          TOTAL.kho[ngTo]--;
+        }
         khoDangMo.oGhep[Number(o.dataset.o)].push(ngTo);
         Snd.coin();
         veKho();
@@ -1853,6 +1915,31 @@ function chamKho(){
   const { g, oGhep } = khoDangMo;
 
   if(khoDangMo.duPhanTu && khoDangMo.khopHet){ moCuaKho(g); return; }
+
+  /* Cửa lọc chấm theo ion, phần dưới chấm theo nguyên tử — nói nhầm ngôn ngữ thì
+     lời báo ra rỗng hoặc vô nghĩa. Đã gặp: bấm Hoàn thành ở cửa ion mà không
+     hiện chữ nào. */
+  if(khoDangMo.laIon){
+    const co = demNguyenTo(oGhep.flat());
+    const y = [];
+    let tong = 0;
+    Object.keys(co).forEach(k => { tong += (DIEN_TICH_ION[k] || 0) * co[k]; });
+    new Set([...Object.keys(g.need), ...Object.keys(co)]).forEach(k => {
+      const d = (g.need[k] || 0) - (co[k] || 0);
+      if(d > 0) y.push('thiếu ' + d + ' ' + k);
+      else if(d < 0) y.push('thừa ' + (-d) + ' ' + k);
+    });
+    const el0 = $('k-loi');
+    el0.textContent = (y.length ? 'Chưa ra ' + g.phanTu + ': ' + y.join(', ') + '. ' : '')
+      + (tong !== 0
+          ? 'Tổng điện tích đang là ' + (tong > 0 ? '+' : '') + tong
+            + ', phải bằng 0 thì hợp chất mới trung hoà.'
+          : '');
+    if(!el0.textContent.trim()) el0.textContent = 'Chưa ghép xong.';
+    el0.classList.remove('hide');
+    Snd.wrong();
+    return;
+  }
 
   const loi = [];
   const sai = oGhep
@@ -1882,8 +1969,12 @@ function chamKho(){
 }
 
 function moCuaKho(g){
-  if(g.open) return;
-  g.open = true;
+  /* `g` truyền vào có thể là BẢN SAO (cửa lọc dựng thêm mấy trường để hiện chữ),
+     nên phải tìm lại đúng đối tượng trong G để đánh dấu đã mở — sửa trên bản sao
+     thì cửa vẫn đóng, người chơi mở đi mở lại mãi. */
+  const that = [...G.kgates, ...G.gates].find(x => x.col === g.col) || g;
+  if(that.open) return;
+  that.open = true;
   khoDangMo = null;                    // nguyên tử đã dùng, không trả lại kho
   $('v-kho').classList.add('hide');
 
@@ -3306,7 +3397,7 @@ function buildLegend(){
       g.fillStyle = 'rgba(46,134,193,.95)';
       g.beginPath(); g.arc(28, TS/2 + 4, 10, 0, 7); g.fill();
     }],
-    ['<b>Cửa lọc</b> — mang đúng ion tạo nên công thức trên biển thì cửa mở', g => {
+    ['<b>Cửa lọc</b> — kéo ion trong giỏ ra ghép đúng hợp chất, tổng điện tích phải bằng 0', g => {
       g.fillStyle = '#3f4c5e'; g.fillRect(0,0,TS,TS);
       g.strokeStyle = '#8fa3bb'; g.lineWidth = 2;
       for(let i=6; i<TS; i+=9){
