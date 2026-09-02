@@ -36,7 +36,10 @@ CSS → HTML (canvas + các lớp phủ) → JavaScript trong một IIFE ở cu�
 | `function stepBoss(`  | Boss theo giai đoạn: khóa được van nào thì lò phun quái nhanh hơn |
 | `function checkKGates(`| Tới gần cửa kho thì mở lớp phủ kho đồ |
 | `TOTAL.kho`           | Kho nguyên tử — nằm trong TOTAL để theo người chơi sang màn sau |
-| `CHE_DO_THU`          | Chế độ thử của giáo viên: bất tử, bay, nhảy màn (bật bằng `?gv=1`) |
+| `CHE_DO_THU`          | Chế độ thử của quản trị: bất tử, bay, nhảy màn (web cấp phép qua postMessage) |
+| `const DAN =`         | Vũ khí sữa vôi Ca(OH)₂: tốc độ, độ rơi, số viên mỗi hộp |
+| `function banDan(`    | Ném một viên; `stepDan` lo bay và va chạm |
+| `function hienQuaiSO2(`| Khoá hết van thì khối SO₂ hiện ra, phải trung hoà mới hạ tường |
 | `function moKho(`     | Lớp phủ kho đồ: kéo thả nguyên tử ghép phân tử, cân bằng thì cửa mở |
 | `function ganKeo(`    | Kéo thả bằng pointer events, chạy được cả chuột lẫn cảm ứng |
 | `const P = {`         | Hằng số vật lí: trọng lực, lực nhảy, tốc độ, nhảy đôi |
@@ -385,6 +388,7 @@ body.touch .stage{max-height:calc(100vh - 104px)}
         <div class="keyrow"><span class="kbd">←</span><span class="kbd">→</span> di chuyển</div>
         <div class="keyrow"><span class="kbd">Space</span> hoặc <span class="kbd">↑</span> nhảy — ấn lần nữa giữa không trung để <b>nhảy đôi</b></div>
         <div class="keyrow"><span class="kbd">↓</span> xả giỏ ion (màn Bể lắng)</div>
+        <div class="keyrow"><span class="kbd">X</span> ném sữa vôi Ca(OH)₂</div>
         <div class="keyrow"><span class="kbd">M</span> bật / tắt nhạc</div>
         <div class="keyrow"><span class="kbd">P</span> tạm dừng</div>
       </div>
@@ -450,6 +454,7 @@ body.touch .stage{max-height:calc(100vh - 104px)}
   <div class="side">
     <button id="p-dump" aria-label="Xả giỏ ion">XẢ</button>
     <button id="p-jump" aria-label="Nhảy">▲</button>
+  <button id="p-ban" aria-label="Ném sữa vôi">✦</button>
   </div>
 </div>
 </div>
@@ -559,13 +564,15 @@ const T = {
   CRUMBLE:11, // sàn vỡ: giẫm lên là rung rồi sập, một lúc sau mọc lại
   BLINK_A:12, // sàn chớp tắt nhịp lẻ
   BLINK_B:13, // sàn chớp tắt nhịp chẵn — luôn ngược pha với BLINK_A
-  KGATE:14    // cửa vật tư: chỉ mở khi mang đủ vật tư lấy từ các ô ? ở màn trước
+  KGATE:14,   // cửa kho: chỉ mở khi ghép đúng phân tử từ nguyên tử trong kho
+  WBOX:15,    // hộp vũ khí: đội đầu vào để lấy sữa vôi Ca(OH)₂
+  WUSED:16    // hộp vũ khí đã lấy
 };
 /* CRUMBLE (11) có mặt ở đây vì khi còn nguyên nó cứng như gạch; lúc sập thì ô
    được đổi thẳng thành EMPTY nên độ cứng tự đúng theo lưới.
    BLINK_A/B (12, 13) CỐ Ý không có: độ cứng của chúng đổi theo nhịp, phải hỏi
    solidAt() chứ tra bảng này sẽ ra kết quả sai. */
-const SOLID = {1:true, 2:true, 3:true, 4:true, 7:true, 8:true, 9:true, 10:true, 11:true, 14:true};
+const SOLID = {1:true, 2:true, 3:true, 4:true, 7:true, 8:true, 9:true, 10:true, 11:true, 14:true, 15:true, 16:true};
 
 /* ==================== HẰNG SỐ VẬT LÍ ==================== */
 const TS = 36;                 // cạnh một ô, tính bằng pixel
@@ -815,7 +822,7 @@ const LEVELS = [
     name:'Lò đốt',
     theme:'boss',
     rescue:true,
-    brief:'Lò đốt quá tải, khói SO₂ phun ra không ngừng và cô giáo bị kẹt trong lồng phía sau. Ba van lò chỉ khóa được khi bạn cân bằng đúng phương trình ghi trên van.',
+    brief:'Lò đốt quá tải, khói SO₂ phun ra không ngừng và cô giáo bị kẹt trong lồng phía sau. Bốn van lò chỉ khóa được khi bạn cân bằng đúng phương trình ghi trên van — càng khóa được nhiều thì lò càng phun quái dữ. Khóa hết van rồi, đống khí SO₂ đã thoát ra sẽ tụ thành một khối lớn: nhặt sữa vôi Ca(OH)₂ trong các hộp và ném để trung hoà nó, vì SO₂ là oxide acid. Giẫm lên vô ích.',
     /* Chặng parkour trước khi vào khu lò.
        Bể acid rộng 7 ô, chỉ qua được bằng một tấm thép chớp và một ván gỗ sập —
        vừa phải canh nhịp vừa phải né quái lò đang phun ra. Bệ dẫn lên van 26
@@ -837,6 +844,14 @@ const LEVELS = [
        không còn chỗ nhảy chứ không phải khó hơn. */
     boss:{hp:4, col:47, spawnEvery:60*5, spawnGiam:60, spawnMin:60*2, toiDa:6},
     valves:[[6,9],[26,5],[38,9],[42,9]],
+    /* Hộp sữa vôi rải dọc màn. 4 hộp cho 12 viên, trong khi khối SO₂ chỉ cần 5
+       phát trúng — dư để hụt vài phát, nhưng không dư tới mức bắn bừa.
+
+       CỘT ĐẶT HỘP PHẢI KHÔNG CÓ BỆ Ở HÀNG 10 phía trên, y như quy tắc của ô ?:
+       có bệ là chắn mất đường đội đầu, hộp thành vô dụng. Bản đầu tôi đặt ở cột
+       10 và 35 — đúng hai cột có bệ [8,10,3] và [33,10,3] — nên không lấy được
+       viên nào. Cột 41 hàng 5 thì còn tệ hơn: không bệ nào quanh đó với tới. */
+    wboxes:[[12,9],[29,9],[36,9],[40,9]],
     qblocks:[],
     bricks:[[7,9],[27,5],[39,9],[43,9]],
     coins:[
@@ -862,7 +877,10 @@ let askedIdx = [];      // các câu đã hỏi trong phiên, để không lặp
 /* `kho` (nguyên tử đã nhặt) CỐ Ý nằm trong TOTAL chứ không nằm trong G: G bị
    dựng lại mỗi lần nạp màn, còn nguyên tử thì phải theo người chơi sang màn sau
    — đó là cả ý nghĩa của cơ chế này. Chỉ về rỗng khi chơi lại từ đầu. */
-let TOTAL = {score:0, coins:0, lives:3, level:0, kho:{}};
+/* Số mạng tối đa. Dùng hằng số chứ đừng rải số 3 khắp nơi: thanh máu trên HUD
+   cũng đọc theo đây, sửa một chỗ là cả hai khớp nhau. */
+const MANG_TOI_DA = 4;
+let TOTAL = {score:0, coins:0, lives:MANG_TOI_DA, level:0, kho:{}};
 
 const $ = id => document.getElementById(id);
 const clamp = (v,a,b) => v < a ? a : (v > b ? b : v);
@@ -1081,6 +1099,7 @@ const Snd = (function(){
     jump(){ tone({freq:330, to:640, dur:.13, vol:.09, type:'square'}); },
     // Nhảy lần hai: cao hơn và mảnh hơn, để tai nghe ra ngay là cú nhảy khác
     jump2(){ tone({freq:520, to:880, dur:.11, vol:.075, type:'triangle'}); },
+    ban(){ tone({freq:760, to:300, dur:.1, vol:.075, type:'triangle'}); },
     coin(){ tone({freq:988, dur:.07, vol:.09, type:'square'}); tone({freq:1319, dur:.13, vol:.08, delay:.06, type:'square'}); },
     bump(){ tone({freq:180, to:110, dur:.1, vol:.1, type:'triangle'}); },
     stomp(){ tone({freq:520, to:150, dur:.14, vol:.1, type:'sawtooth'}); },
@@ -1127,6 +1146,7 @@ function buildLevel(def){
   (def.gates || []).forEach(g => { for(let y=0; y<=12; y++) set(g.col, y, T.GATE); });
   // Cửa kho: chắn kín từ trần xuống đất, y hệt cửa lọc — nhảy đôi không lách qua được
   (def.kgates || []).forEach(g => { for(let y=0; y<=12; y++) set(g.col, y, T.KGATE); });
+  (def.wboxes || []).forEach(([x, y]) => set(x, y, T.WBOX));
   (def.valves || []).forEach(([x, y]) => set(x, y, T.VALVE));
   /* Tường chắn lồng giam: chắn KÍN từ trần xuống đất.
      Trước đây chỉ cao từ hàng 8 — đã đo và thấy NHẢY ĐƠN cũng leo lên nóc rồi
@@ -1140,6 +1160,9 @@ function buildLevel(def){
     gas:(def.gas || []).map(([x,y,w,h]) => ({x, y, w, h})),
     // Sàn vỡ đang đếm giờ, khoá là "cột,hàng". Rỗng lúc mới nạp màn.
     vo:new Map(),
+    dan:[],            // đạn sữa vôi đang bay
+    quaiSO2:null,      // khối SO₂ cuối màn, chỉ hiện sau khi khoá hết van
+    nhacDan:0,
     gates:(def.gates || []).map(g => ({...g, open:false, cool:0})),
     kgates:(def.kgates || []).map(g => ({...g, open:false, cool:0})),
     // hpMax phải chốt lại lúc dựng màn: stepBoss dựa vào nó để biết đang ở giai
@@ -1158,6 +1181,7 @@ function buildLevel(def){
       coyote:0, buffer:0, inv:0, nh3:0, mask:0, shield:false, dead:false, t:0,
       nhayGiua:P.nhayGiuaKhong,              // số lần nhảy giữa không trung còn lại
       bag:[],                                // giỏ ion đang mang
+      dan:0, banCool:0,                      // sữa vôi đang mang và nhịp chờ giữa hai phát
       squash:0                               // âm = dẹt xuống, dương = kéo dài
     },
     cam:0, done:false, bump:[]
@@ -1193,6 +1217,7 @@ function bindKey(e, down){
   if(k === 'ArrowLeft' || k === 'a' || k === 'A'){ keys.left = down; e.preventDefault(); }
   else if(k === 'ArrowRight' || k === 'd' || k === 'D'){ keys.right = down; e.preventDefault(); }
   else if(k === ' ' || k === 'ArrowUp' || k === 'w' || k === 'W'){ keys.jump = down; e.preventDefault(); }
+  else if(k === 'x' || k === 'X' || k === 'j' || k === 'J'){ if(down) banDan(); e.preventDefault(); }
   else if(k === 'ArrowDown' || k === 's' || k === 'S'){
     keys.down = down;                       // chế độ bay dùng phím này để hạ xuống
     if(down && !CHE_DO_THU.bay) dumpBag();
@@ -1216,6 +1241,8 @@ function padBtn(id, key){
   el.addEventListener('pointerleave', off);
 }
 padBtn('p-left', 'left'); padBtn('p-right', 'right'); padBtn('p-jump', 'jump');
+// Nút ném không dùng padBtn: padBtn giữ phím, còn ném là một lần bấm một phát
+$('p-ban').addEventListener('pointerdown', e => { e.preventDefault(); Snd.kick(); banDan(); });
 $('k-xong').addEventListener('click', chamKho);
 $('k-tra').addEventListener('click', traHetVeKho);
 $('k-thoat').addEventListener('click', dongKho);
@@ -1365,6 +1392,8 @@ function step(){
 
   blinkT++;
   capNhatSanVo();
+  stepDan();
+  stepQuaiSO2();
   if(p.onGround) danhDauSanVo(p);
 
   // vừa chạm đất sau khi rơi nhanh: nhún người và tung bụi
@@ -1433,6 +1462,16 @@ function hitBlock(p, cy){
     if(t === T.VALVE){
       G.bump.push({x:cx, y:cy, t:10});
       askQuestion(cx, cy, true);
+      return;
+    }
+    if(t === T.WBOX){
+      G.grid[cy][cx] = T.WUSED;
+      G.bump.push({x:cx, y:cy, t:10});
+      p.dan += DAN.moiHop;
+      Snd.power();
+      popText(cx*TS + TS/2, cy*TS - 8, '+' + DAN.moiHop + ' sữa vôi', '#9fd8ff');
+      burst(cx*TS + TS/2, cy*TS, 12, ['#fff','#9fd8ff'], {spread:2.8, up:true});
+      toast('Sữa vôi Ca(OH)₂ — bấm X để ném, dùng trung hoà khí SO₂.');
       return;
     }
     if(t === T.BRICK){
@@ -1898,6 +1937,218 @@ function stepFoes(){
   });
 }
 
+/* ==================== VŨ KHÍ: SỮA VÔI Ca(OH)₂ ====================
+   Vũ khí CỐ Ý chọn đúng hoá chất thật dùng để xử lí khí SO₂ trong ống khói nhà
+   máy: SO₂ + Ca(OH)₂ → CaSO₃ + H₂O. Chọn một vũ khí bất kì (súng, bom) thì trò
+   chơi vẫn chạy nhưng học sinh không học được gì từ nó.
+
+   Đạn bay theo hướng nhân vật đang quay, có rơi nhẹ, tắt khi chạm tường hoặc
+   hết thời gian. Không xuyên qua tường — nếu xuyên thì đứng ngoài bắn vào là
+   thắng, mất hết phần parkour. */
+const DAN = {
+  toc:9.4,          // tốc độ bay ngang
+  roi:0.24,         // rơi nhẹ để phải canh khoảng cách, không phải tia thẳng
+  song:110,         // số bước rồi tự tắt
+  moiHop:3          // một hộp vũ khí cho mấy viên
+};
+
+function banDan(){
+  const p = G.player;
+  if(p.dan <= 0){
+    if(!G.nhacDan || G.nhacDan <= 0){
+      G.nhacDan = 90;
+      toast('Hết sữa vôi rồi — đội đầu vào hộp vũ khí để lấy thêm.');
+    }
+    return;
+  }
+  if(p.banCool > 0) return;
+  p.dan--;
+  p.banCool = 16;
+  G.dan.push({
+    x: p.x + (p.face > 0 ? p.w : -10), y: p.y + 12,
+    w: 12, h: 12, vx: p.face * DAN.toc, vy: -1.4, t: 0
+  });
+  Snd.ban();
+}
+
+function stepDan(){
+  const p = G.player;
+  if(p.banCool > 0) p.banCool--;
+  if(G.nhacDan > 0) G.nhacDan--;
+
+  G.dan = G.dan.filter(d => {
+    d.t++;
+    if(d.t > DAN.song) return false;
+    d.vy += DAN.roi;
+    d.x += d.vx;
+    d.y += d.vy;
+    if(d.x < -TS || d.x > G.w*TS + TS || d.y > G.h*TS) return false;
+    if(solidAt(d.x + d.w/2, d.y + d.h/2)){        // chạm tường thì vỡ tại chỗ
+      burst(d.x, d.y, 7, ['#ffffff','#dfe9f2'], {spread:2.2, life:16, size:2});
+      return false;
+    }
+
+    // trúng quái thường
+    for(const f of G.foes){
+      if(!f.alive) continue;
+      if(d.x < f.x + f.w && d.x + d.w > f.x && d.y < f.y + f.h && d.y + d.h > f.y){
+        f.alive = false;
+        TOTAL.score += 150;
+        Snd.stomp();
+        burst(f.x + f.w/2, f.y + f.h/2, 14, ['#fff','#9fd8ff','#e8c33a'], {spread:3.4});
+        popText(f.x + f.w/2, f.y - 6, '+150', '#9fd8ff');
+        return false;
+      }
+    }
+
+    // trúng quái SO₂ cuối màn
+    const q = G.quaiSO2;
+    if(q && q.song && d.x < q.x + q.w && d.x + d.w > q.x && d.y < q.y + q.h && d.y + d.h > q.y){
+      trungQuaiSO2();
+      return false;
+    }
+    return true;
+  });
+}
+
+/* Toạ độ THẾ GIỚI, không trừ camera: draw() đã gọi ctx.translate(-cam…) rồi,
+   trừ thêm lần nữa là đẩy vật ra ngoài màn hình. drawFoe cũng làm y như vậy. */
+function drawDan(){
+  G.dan.forEach(d => {
+    const x = d.x, y = d.y;
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath(); ctx.arc(x + 6, y + 6, 6.5, 0, 7); ctx.fill();
+    ctx.strokeStyle = '#9fd8ff'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(x + 6, y + 6, 6.5, 0, 7); ctx.stroke();
+    ctx.fillStyle = '#5c8bad';
+    ctx.font = '700 8px ' + "'IBM Plex Mono', monospace";
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('OH', x + 6, y + 7);
+  });
+}
+
+/* ==================== QUÁI SO₂ CUỐI MÀN ====================
+   Khoá xong cả bốn van thì lò tắt, nhưng khối khí SO₂ đã phun ra không tự mất —
+   nó tụ lại thành một khối lớn chắn đường. Đây là chỗ để học sinh dùng đúng
+   thứ vừa học: SO₂ là oxide acid, phải trung hoà bằng base.
+
+   CỐ Ý cho giẫm lên đầu KHÔNG ăn thua, chỉ sữa vôi mới hạ được — nếu giẫm cũng
+   thắng thì phần vũ khí thành thừa, và cái ý "phải dùng base" cũng mất. */
+function hienQuaiSO2(){
+  const b = G.boss;
+  /* Hiện ra TRƯỚC tường chắn (cột 44), không phải cạnh lò ở cột 47. Đặt sau
+     tường thì đạn bay tới là vỡ vào tường, người chơi bắn mãi không trúng mà
+     không hiểu vì sao. */
+  /* Độ cao PHẢI nằm trong tầm ném. Bản đầu để hàng 8 thì đạn bay ở hàng 11
+     (ngang ngực nhân vật đứng trên nền) lọt hết dưới bụng quái — bắn cả băng
+     không trúng phát nào. Hàng 10 thì thân quái cao 64px phủ đúng đường đạn. */
+  G.quaiSO2 = {
+    x:(b.col - 7)*TS, y:10*TS, w:64, h:64,
+    hp:5, hpMax:5, vx:-1.5, song:true, t:0, nhay:0, mien:0
+  };
+  flashScreen('#e2604e', 16);
+  shakeScreen(20);
+  popText((b.col - 7)*TS, 6*TS, 'KHỐI SO₂ THOÁT RA!', '#ffd75e');
+  toast('Khí SO₂ tụ thành một khối lớn! Dùng sữa vôi Ca(OH)₂ trung hoà nó — giẫm lên vô ích.');
+}
+
+function trungQuaiSO2(){
+  const q = G.quaiSO2;
+  if(!q || !q.song || q.mien > 0) return;
+  q.hp--;
+  q.mien = 26;                                   // vài bước miễn thương, khỏi trúng chùm
+  q.nhay = 16;
+  Snd.right();
+  shakeScreen(8);
+  burst(q.x + q.w/2, q.y + q.h/2, 16, ['#ffffff','#9fd8ff','#e8c33a'], {spread:3.8});
+  ring(q.x + q.w/2, q.y + q.h/2, '#9fd8ff');
+
+  if(q.hp > 0){
+    popText(q.x + q.w/2, q.y - 8, 'Còn ' + q.hp, '#9fd8ff');
+    return;
+  }
+
+  q.song = false;
+  TOTAL.score += 800;
+  Snd.win();
+  flashScreen('#ffffff', 22);
+  shakeScreen(28);
+  for(let k=0; k<4; k++)
+    burst(q.x + q.w/2 + (Math.random()-.5)*3*TS, q.y + q.h/2, 14,
+      ['#ffd75e','#8fd0a0','#fff'], {spread:5, square:true, size:3.2, life:48});
+  popText(q.x + q.w/2, q.y - 10, 'ĐÃ TRUNG HOÀ!', '#8fd0a0');
+  moTuongCuoi();
+}
+
+/* Hạ tường chắn để đi tới lồng giam. Tách riêng vì nay có hai chỗ gọi:
+   trước đây lò tắt là hạ luôn, nay phải hạ quái SO₂ xong mới hạ tường. */
+function moTuongCuoi(){
+  if(G.def.wall == null) return;
+  for(let y=0; y<=12; y++) G.grid[y][G.def.wall] = T.EMPTY;
+  G.foes.forEach(f => { f.alive = false; });
+  showMsg('Đã trung hoà khối SO₂', 'SO₂ + Ca(OH)₂ → CaSO₃ + H₂O',
+    'Sữa vôi là base, trung hoà được oxide acid SO₂ — đây đúng là cách nhà máy '
+    + 'xử lí khí thải trước khi cho ra ống khói.<br><br>Tường chắn đã hạ. Chạy tới cứu cô giáo!',
+    'Đi tiếp', () => { hideMsg(); paused = false; });
+  paused = true;
+}
+
+function stepQuaiSO2(){
+  const q = G.quaiSO2;
+  if(!q || !q.song) return;
+  const p = G.player;
+  q.t++;
+  if(q.mien > 0) q.mien--;
+  if(q.nhay > 0) q.nhay--;
+
+  // đuổi theo nhân vật, càng ít máu càng nhanh
+  const nhanh = 1.5 + (q.hpMax - q.hp) * 0.42;
+  q.vx = p.x > q.x ? nhanh : -nhanh;
+  q.x += q.vx;
+  q.x = clamp(q.x, 0, G.w*TS - q.w);
+  q.y = 10*TS + Math.sin(q.t / 24) * 22;         // dập dềnh, không đi bộ
+
+  if(p.dead || p.inv > 0) return;
+  if(p.x < q.x + q.w && p.x + p.w > q.x && p.y < q.y + q.h && p.y + p.h > q.y){
+    hurt(false);
+  }
+}
+
+function drawQuaiSO2(){
+  const q = G.quaiSO2;
+  if(!q || !q.song) return;
+  const x = q.x, y = q.y;      // toạ độ thế giới, xem chú thích ở drawDan
+  const nhay = q.nhay > 0 && Math.floor(q.nhay/3) % 2;
+
+  ctx.save();
+  if(nhay) ctx.globalAlpha = .5;
+
+  // khối khí: một đám mây vàng nâu với hai nguyên tử O đỏ hai bên
+  ctx.fillStyle = '#b8933a';
+  ctx.beginPath(); ctx.arc(x + 32, y + 34, 27, 0, 7); ctx.fill();
+  ctx.fillStyle = '#e8c33a';
+  ctx.beginPath(); ctx.arc(x + 32, y + 30, 23, 0, 7); ctx.fill();
+  ctx.fillStyle = '#e2604e';
+  ctx.beginPath(); ctx.arc(x + 6, y + 40, 13, 0, 7); ctx.fill();
+  ctx.beginPath(); ctx.arc(x + 58, y + 40, 13, 0, 7); ctx.fill();
+  // mắt
+  ctx.fillStyle = '#3a2a12';
+  ctx.beginPath(); ctx.arc(x + 24, y + 26, 4.2, 0, 7); ctx.fill();
+  ctx.beginPath(); ctx.arc(x + 41, y + 26, 4.2, 0, 7); ctx.fill();
+  ctx.fillStyle = '#7a5206';
+  ctx.font = '700 12px ' + "'IBM Plex Mono', monospace";
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('SO₂', x + 32, y + 44);
+  ctx.restore();
+
+  // thanh máu ngay trên đầu, để biết còn mấy phát nữa
+  const bw = 74, bx = x + 32 - bw/2, by = y - 14;
+  ctx.fillStyle = 'rgba(0,0,0,.45)'; ctx.fillRect(bx, by, bw, 8);
+  ctx.fillStyle = '#8fd0a0';
+  ctx.fillRect(bx + 1, by + 1, (bw - 2) * (q.hp / q.hpMax), 6);
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.4; ctx.strokeRect(bx, by, bw, 8);
+}
+
 /* ==================== MẤT MÁU ==================== */
 function hurt(fell){
   const p = G.player;
@@ -2086,12 +2337,14 @@ function damageBoss(){
     burst(bx + (Math.random()-.5)*4*TS, (7 + Math.random()*5)*TS, 14,
       ['#ffd75e','#e2604e','#8fd0a0','#fff'], {spread:5.2, square:true, size:3.4, life:52});
   popText(bx, 6*TS, 'LÒ ĐÃ TẮT!', '#8fd0a0');
-  // hạ tường chắn để đi tới lồng giam
-  // xoá ĐÚNG khoảng đã dựng (0..12), thiếu thì hạ tường xong vẫn còn phần trên
-  if(G.def.wall != null) for(let y=0; y<=12; y++) G.grid[y][G.def.wall] = T.EMPTY;
   G.foes.forEach(f => { f.alive = false; });
   Snd.win();
-  toast('Lò đã tắt! Tường chắn hạ xuống — chạy tới cứu cô giáo.');
+
+  /* Lò tắt KHÔNG còn hạ tường ngay. Khí SO₂ đã phun ra không tự mất — nó tụ lại
+     thành một khối phải trung hoà bằng sữa vôi. Tường chỉ hạ khi khối đó tan,
+     xem trungQuaiSO2(). Hạ tường ở đây thì người chơi chạy thẳng qua, phần đánh
+     quái thành thừa. */
+  hienQuaiSO2();
 }
 
 /* Lò nhả phân tử SO₂ theo chu kì cho tới khi bị khóa hết van */
@@ -2159,9 +2412,18 @@ function levelClear(){
   const more = nxt < LEVELS.length;
   if(!more && G.def.rescue){ finale(); return; }
   showMsg('Qua màn ' + G.def.id, 'Thoát khỏi ' + G.def.name,
-    'Điểm hiện tại <b>' + TOTAL.score + '</b> · xu <b>' + TOTAL.coins + '</b> · mạng còn <b>' + TOTAL.lives + '</b>.',
+    'Điểm hiện tại <b>' + TOTAL.score + '</b> · xu <b>' + TOTAL.coins + '</b> · mạng còn <b>'
+      + TOTAL.lives + '</b>.' + (more ? '<br>Sang màn mới bạn được hồi đầy <b>' + MANG_TOI_DA + ' mạng</b>.' : ''),
     more ? 'Vào màn tiếp theo' : 'Chơi lại từ đầu',
-    () => { hideMsg(); if(more){ TOTAL.level = nxt; loadLevel(nxt); } else restartAll(); });
+    () => { hideMsg();
+      if(more){
+        /* Hồi đầy máu khi sang màn mới. Các màn sau khó hơn hẳn (parkour, boss),
+           vào đó với một mạng sót lại thì gần như chắc chắn phải chơi lại từ màn
+           1 — mất cả phần đã làm được, nản hơn là khó. */
+        TOTAL.lives = MANG_TOI_DA;
+        TOTAL.level = nxt; loadLevel(nxt);
+      } else restartAll();
+    });
 }
 
 function gameOver(){
@@ -2178,7 +2440,7 @@ const startAt = (function(){
 })();
 
 function restartAll(){
-  TOTAL = {score:0, coins:0, lives:3, level:startAt, kho:{}};
+  TOTAL = {score:0, coins:0, lives:MANG_TOI_DA, level:startAt, kho:{}};
   askedIdx = [];
   loadLevel(startAt);
 }
@@ -2237,6 +2499,8 @@ function draw(){
   G.coins.forEach(c => { if(!c.got) drawCoin(c.x*TS + TS/2, c.y*TS + TS/2); });
   G.items.forEach(it => { if(!it.got) drawItem(it); });
   G.foes.forEach(f => { if(f.alive) drawFoe(f); });
+  drawQuaiSO2();
+  drawDan();
   drawPlayer();
   drawFX();
 
@@ -2318,6 +2582,21 @@ function drawTile(cx, cy, t){
     ctx.fillStyle = '#7c8794'; ctx.fillRect(x, y, TS, TS);
     ctx.fillStyle = '#68727e'; ctx.fillRect(x + 2, y + 2, TS - 4, TS - 4);
     ctx.fillStyle = '#8d99a6'; ctx.fillRect(x + 4, y + 4, TS - 8, 4);
+  }
+  else if(t === T.WBOX || t === T.WUSED){        // hộp vũ khí: thùng sữa vôi
+    const rong = t === T.WUSED;
+    ctx.fillStyle = rong ? '#6f7b86' : '#4a7fa8'; ctx.fillRect(x, y, TS, TS);
+    ctx.fillStyle = rong ? '#5d6870' : '#5f9cc9'; ctx.fillRect(x + 3, y + 3, TS - 6, TS - 6);
+    ctx.strokeStyle = rong ? '#4b545c' : '#9fd8ff'; ctx.lineWidth = 2;
+    ctx.strokeRect(x + 1.5, y + 1.5, TS - 3, TS - 3);
+    if(!rong){
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath(); ctx.arc(x + TS/2, y + TS/2 - 2, 9, 0, 7); ctx.fill();
+      ctx.fillStyle = '#2c5b7d';
+      ctx.font = '700 9px ' + "'IBM Plex Mono', monospace";
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('OH', x + TS/2, y + TS/2 - 1);
+    }
   }
   else if(t === T.KGATE){                        // cửa kho vật tư: thép tấm có then ngang
     ctx.fillStyle = '#33506b'; ctx.fillRect(x, y, TS, TS);
@@ -2749,7 +3028,7 @@ function drawHud(){
   ctx.fillStyle = '#fff';
   ctx.fillText('× ' + TOTAL.coins, 264, 24);
 
-  for(let i=0; i<3; i++){                            // trái tim = mạng
+  for(let i=0; i<MANG_TOI_DA; i++){                  // trái tim = mạng
     const hx = 340 + i*26;
     ctx.fillStyle = i < TOTAL.lives ? '#e2604e' : 'rgba(255,255,255,.22)';
     ctx.beginPath();
@@ -2760,6 +3039,14 @@ function drawHud(){
 
   const p = G.player;
   let bx = 440;
+
+  if(p.dan > 0){
+    ctx.fillStyle = '#9fd8ff';
+    ctx.beginPath(); ctx.arc(bx + 7, 23, 7, 0, 7); ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.fillText('SỮA VÔI ' + p.dan, bx + 18, 24);
+    bx += 130;
+  }
 
   /* Kho nguyên tử đặt ở đầu dãy huy hiệu bên phải, KHÔNG đặt cạnh số xu:
      chỗ đó sát hàng trái tim (x = 340), bày thêm vào là chồng lên tim. */
@@ -2860,6 +3147,14 @@ function buildLegend(){
       g.fillStyle = '#41637f'; g.fillRect(3,3,TS-6,TS-6);
       g.fillStyle = '#5c8bad'; g.fillRect(3,6,TS-6,5); g.fillRect(3,TS-13,TS-6,5);
       g.strokeStyle = '#9fd8ff'; g.lineWidth = 2.5; g.strokeRect(1.5,1.5,TS-3,TS-3);
+    }],
+    ['<b>Hộp sữa vôi</b> — đội đầu lấy Ca(OH)₂, bấm <b>X</b> để ném', g => {
+      g.fillStyle = '#4a7fa8'; g.fillRect(0,0,TS,TS);
+      g.fillStyle = '#5f9cc9'; g.fillRect(3,3,TS-6,TS-6);
+      g.strokeStyle = '#9fd8ff'; g.lineWidth = 2; g.strokeRect(1.5,1.5,TS-3,TS-3);
+      g.fillStyle = '#fff'; g.beginPath(); g.arc(TS/2, TS/2-2, 9, 0, 7); g.fill();
+      g.fillStyle = '#2c5b7d'; g.font = '700 9px monospace';
+      g.textAlign='center'; g.textBaseline='middle'; g.fillText('OH', TS/2, TS/2-1);
     }],
     ['<b>Vũng acid</b> — chạm vào là mất máu', g => {
       g.fillStyle = '#7d9c05'; g.fillRect(0,0,TS,TS);
@@ -3115,6 +3410,8 @@ document.addEventListener('visibilitychange', () => {
 if(new URLSearchParams(location.search).get('dev') === '1'){
   window.__dev = {
     keys, step, draw, loadLevel, QUESTIONS, VALVE_Q, FX, Snd,
+    // móc để kiểm trận cuối mà không phải chơi tay qua bốn van
+    damageBoss, hienQuaiSO2, trungQuaiSO2, banDan, TOTAL,
     get G(){ return G; },
     get TOTAL(){ return TOTAL; },
     run(n){ for(let i=0; i<n; i++) step(); },
