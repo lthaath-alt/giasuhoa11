@@ -18,13 +18,13 @@ const LOI_THOAI: Record<TabMascot, string[]> = {
   /* Giọng "bạn cùng bàn": ngang hàng với học sinh, không lên giọng dạy dỗ —
      đúng vai người dẫn dắt mà trang này tự đặt ra. Xưng "mình", tránh dấu
      chấm than dồn dập cho đỡ hô hào.
-     Câu ở tab Giới thiệu giữ dưới 30 ký tự: bong bóng ở đó nằm trên một cột
-     chỉ rộng 245px (khổ 1440), dài hơn là tràn ra mép trái màn hình. */
+     Câu ở tab Giới thiệu dài ngắn tuỳ ý: bong bóng của nhân vật đứng tự ngắt
+     dòng trong bề ngang cột (xem `xuongDong` ở BongBong). */
   gioithieu: [
     'Ê, học chung không?',
     'Không hiểu cứ hỏi nhé.',
     'Bắt đầu từ đâu cũng được.',
-    'Hoá không khó, chỉ hơi nhiều.',
+    'Hoá không khó, chỉ hơi nhiều, quan trọng bạn có tự giác học tập không. Vào học cùng mình nhé! <3',
   ],
   baigiang: [
     'Đang mắc bài nào thế?',
@@ -54,8 +54,16 @@ const NHIP_THO = {
   '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
 } as const;
 
-/* Bong bóng thoại. `huong` quyết định đuôi nhọn chỉ xuống dưới hay sang trái. */
-const BongBong: React.FC<{ loi: string; huong: 'duoi' | 'trai' }> = ({ loi, huong }) => (
+/* Bong bóng thoại.
+   `huong`     — đuôi nhọn chỉ xuống dưới (nhân vật đứng) hay sang trái (ló đầu).
+   `xuongDong` — cho câu tự ngắt dòng thay vì ép nằm một dòng. Bật cho nhân vật
+                 đứng vì câu ở tab Giới thiệu có thể dài cả trăm ký tự, để một
+                 dòng thì bong bóng kéo dài ra khỏi mép màn hình. */
+const BongBong: React.FC<{ loi: string; huong: 'duoi' | 'trai'; xuongDong?: boolean }> = ({
+  loi,
+  huong,
+  xuongDong = false,
+}) => (
   <Box
     sx={{
       position: 'relative',
@@ -65,10 +73,11 @@ const BongBong: React.FC<{ loi: string; huong: 'duoi' | 'trai' }> = ({ loi, huon
       px: 2,
       py: 1.15,
       boxShadow: '0 4px 14px rgba(0,98,184,0.13)',
-      /* Điện thoại hẹp không đủ chỗ cho câu dài nằm một dòng (ví dụ câu ở tab
-         Trò chơi), nên chặn bề ngang và cho xuống dòng. Từ 600px trở lên mới
-         giữ một dòng cho gọn. */
-      maxWidth: { xs: 170, sm: 'none' },
+      /* Chặn bề ngang để câu dài tự ngắt dòng thay vì kéo bong bóng ra khỏi
+         màn hình. Câu ngắn vẫn nằm gọn một dòng vì hộp co theo nội dung.
+         Kiểu đứng: gói trong bề ngang cột nhân vật.
+         Kiểu ló đầu: 170px trên điện thoại, 360px từ 600px trở lên. */
+      maxWidth: xuongDong ? '100%' : { xs: 170, sm: 360 },
       // Đuôi nhọn: một ô vuông xoay 45° nhô ra, che nét viền phía trong đi.
       '&::after': {
         content: '""',
@@ -90,7 +99,7 @@ const BongBong: React.FC<{ loi: string; huong: 'duoi' | 'trai' }> = ({ loi, huon
         fontSize: { xs: 13, md: 14.5 },
         lineHeight: 1.35,
         color: '#0f172a',
-        whiteSpace: { xs: 'normal', sm: 'nowrap' },
+        whiteSpace: 'normal',
       }}
     >
       {loi}
@@ -116,7 +125,7 @@ export const MascotToanThan: React.FC<{ tab?: TabMascot }> = ({ tab = 'gioithieu
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', ...KHUNG_TOAN_THAN }}>
       <Box sx={{ mb: 1.5 }}>
-        <BongBong loi={loi} huong="duoi" />
+        <BongBong loi={loi} huong="duoi" xuongDong />
       </Box>
       <Box
         component="img"
