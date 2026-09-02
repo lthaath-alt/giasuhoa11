@@ -98,6 +98,51 @@ const LOI_PHAT_OAN = 'gan nhan OFFTOPIC cho cau hoi VE mon Hoa — hoc sinh bi g
 
 const PROBES: Probe[] = [
   {
+    ten: 'Không lôi vào 6 bước khi em chỉ hỏi nghĩa một từ',
+    bai: 'bai-25',
+    hoi: 'Thầy ơi phản ứng ester hoá là gì ạ?',
+    /* Đây là phép thử cho BƯỚC LỌC. Em hỏi nghĩa một thuật ngữ chứ không đưa
+       bài tập — bắt em khai "lý thuyết hay bài toán" rồi đi sáu bước là làm em
+       nản. Chấm: phải nêu được định nghĩa, và KHÔNG mở màn bằng câu phân loại. */
+    cham: tl => {
+      if (/lý thuyết.{0,30}(hay|hoặc).{0,30}(bài toán|tính toán)/i.test(tl))
+        return 'vẫn hỏi máy móc "lý thuyết hay bài toán" cho một câu hỏi nghĩa từ';
+      if (!co(tl, 'ester', 'este')) return 'không nói gì về ester hoá';
+      if (!co(tl, 'carboxylic', 'alcohol', 'acid', 'phản ứng giữa'))
+        return 'không nêu được bản chất phản ứng';
+      return '';
+    },
+  },
+  {
+    ten: 'Đề rõ là bài toán thì tự phân loại, đừng hỏi lại',
+    bai: 'bai-1',
+    hoi: 'Thầy ơi giúp em bài này: cho 0,2 mol N₂ và 0,6 mol H₂ vào bình kín, tính hiệu suất phản ứng khi thu được 0,1 mol NH₃ ạ.',
+    /* Đề có số liệu và chữ "tính" — không thể là gì khác ngoài bài toán. Hỏi lại
+       "đây là lý thuyết hay bài toán?" là kiểu cứng nhắc thầy phàn nàn. */
+    cham: tl => {
+      if (/lý thuyết.{0,30}(hay|hoặc).{0,30}(bài toán|tính toán)/i.test(tl))
+        return 'hỏi lại loại câu hỏi trong khi đề rõ ràng là bài toán';
+      if (/\b0[.,]1\s*mol\s*NH|hiệu suất.{0,20}=\s*\d/i.test(tl) && /%/.test(tl))
+        return 'có dấu hiệu tính hộ ra đáp số';
+      return '';
+    },
+  },
+  {
+    ten: 'Trả lời không quá dài và chỉ hỏi MỘT câu',
+    bai: 'bai-6',
+    hoi: 'Thầy ơi vì sao sulfuric acid đặc lại háo nước ạ?',
+    /* Học sinh lớp 11 bỏ qua không đọc những đoạn dài. Đo thô bằng số ký tự và
+       số dấu hỏi — không chính xác tuyệt đối nhưng đủ bắt trường hợp thầy viết
+       cả trang hoặc dồn bốn câu hỏi vào một lượt. */
+    cham: tl => {
+      const sach = tl.replace(/\[SIGNAL:[^\]]*\]/g, '');
+      if (sach.length > 1400) return `trả lời quá dài: ${sach.length} ký tự`;
+      const soHoi = (sach.match(/\?/g) ?? []).length;
+      if (soHoi > 2) return `dồn ${soHoi} câu hỏi vào một lượt`;
+      return '';
+    },
+  },
+  {
     ten: 'Khung iChat chung — tra được khái niệm nằm ở bài nào',
     bai: '',   // '' = không mở bài nào, đúng như khung iChat tư vấn chung
     hoi: 'Thầy ơi, quy tắc Markovnikov em học ở bài nào vậy ạ?',
@@ -131,7 +176,11 @@ const PROBES: Probe[] = [
       const la = [...tl.matchAll(/(\d{1,2}[.,]\d{1,2})\s*(?:L|lít)\s*\/\s*mol/gi)]
         .map(m => m[1].replace('.', ',')).filter(v => v !== '24,79');
       if (la.some(v => v !== '22,4')) return 'nêu thể tích mol sai: ' + la.join(', ');
-      if (la.includes('22,4') && !co(tl, 'chương trình cũ', 'không còn', 'không dùng', 'thay cho', 'trước đây'))
+      /* Chỉ cần chữ "cũ" là đủ. Bản đầu liệt kê cứng vài cụm ('chương trình cũ',
+         'không còn'…) rồi chấm HỎNG một câu trả lời ĐÚNG, vì gia sư viết "thuộc quy
+         ước cũ rồi đấy" — cách nói đúng nhưng không có trong danh sách. Đây là lỗi
+         của phép thử chứ không phải của gia sư; liệt kê cứng từng cụm là sai cách. */
+      if (la.includes('22,4') && !co(tl, 'cũ', 'không còn', 'không dùng', 'thay cho', 'trước đây'))
         return 'nêu 22,4 L/mol mà không nói rõ đó là của chương trình cũ';
       return '';
     },
