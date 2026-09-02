@@ -49,6 +49,7 @@ import { JoinClassForm } from '../features/auth/components/JoinClassForm';
 import { StudentArea } from '../features/student/components/StudentArea';
 import { GameHubSection } from '../features/games/GameHubSection';
 import { SlidesSection } from '../features/lessons/components/SlidesSection';
+import { ChemDoodles, MascotToanThan, MascotDauVai } from '../features/mascot';
 import { RichText } from '../core/components/RichText';
 import { ApiKeyDialog } from '../features/tutor/components/ApiKeyDialog';
 import { getEffectiveApiKey } from '../features/tutor/services/geminiTutorService';
@@ -214,9 +215,14 @@ export const DashboardPage: React.FC = () => {
       )}
 
       {/* 3. KHU VỰC NỘI DUNG CHÍNH THAY ĐỔI DỰA TRÊN TAB ĐANG CHỌN */}
-      <Box sx={{ flex: 1, py: 4 }}>
-        <Container maxWidth="xl">
-          
+      <Box sx={{ flex: 1, py: 4, position: 'relative' }}>
+        {/* Hình vẽ hoá học trang trí hai bên lề. Đặt ngang hàng với Container
+            (không lồng vào trong) để trải hết bề ngang trang mà vẫn không đẩy
+            ra thanh cuộn ngang. Chỉ dùng ở tab Giới thiệu — nơi khối chữ hẹp
+            nên còn thừa lề hai bên. */}
+        {activeTab === 'gioithieu' && <ChemDoodles />}
+        <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
+
           {/* ================= TAB 1: CÁC KHÓA HỌC (HỌC MÃI LAYOUT CHÍNH) ================= */}
           {activeTab === 'hocmai' && (
             <Box id="tab-content-courses">
@@ -401,6 +407,9 @@ export const DashboardPage: React.FC = () => {
           {/* ================= TAB: BÀI GIẢNG SLIDE ================= */}
           {activeTab === 'baigiang' && (
             <Box id="tab-content-slides">
+              <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 1 }}>
+                <MascotDauVai tab="baigiang" />
+              </Box>
               <SlidesSection />
             </Box>
           )}
@@ -410,14 +419,43 @@ export const DashboardPage: React.FC = () => {
               tách ra thành mục menu riêng để vẫn vào chơi được. */}
           {activeTab === 'trochoi' && (
             <Box id="tab-content-games">
+              <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 1 }}>
+                <MascotDauVai tab="trochoi" />
+              </Box>
               <GameHubSection />
             </Box>
           )}
 
           {/* ================= TAB 2: GIỚI THIỆU ================= */}
           {activeTab === 'gioithieu' && (
-            <Box id="tab-content-about" sx={{ maxWidth: 900, mx: 'auto' }}>
+            <Box id="tab-content-about" sx={{ maxWidth: 900, mx: 'auto', position: 'relative' }}>
+              {/* Nhân vật đứng ngoài lề trái, sát mép khối chữ. Cần khoảng
+                  215px + 16px lề nên chỉ bật từ 1440px trở lên; hẹp hơn thì
+                  rơi xuống kiểu ló đầu nằm trong khối chữ bên dưới. */}
+              <Box
+                sx={{
+                  position: 'absolute',
+                  top: 0,
+                  right: '100%',
+                  mr: 2,
+                  display: 'none',
+                  '@media (min-width:1440px)': { display: 'block' },
+                }}
+              >
+                <MascotToanThan tab="gioithieu" rong={215} />
+              </Box>
               <Paper sx={{ p: { xs: 4, md: 6 }, borderRadius: 4, border: '1px solid #e2e8f0', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
+                {/* Màn hình hẹp không đủ lề cho nhân vật đứng — thay bằng kiểu
+                    ló đầu xếp ngay trên tiêu đề. */}
+                <Box
+                  sx={{
+                    display: 'flex',
+                    mb: 2,
+                    '@media (min-width:1440px)': { display: 'none' },
+                  }}
+                >
+                  <MascotDauVai tab="gioithieu" rong={84} />
+                </Box>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 4 }}>
                   <Avatar sx={{ bgcolor: '#0062b8', color: '#ffffff', width: 56, height: 56 }}>
                     <Info size={32} />
