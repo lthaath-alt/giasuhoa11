@@ -26,8 +26,6 @@ import {
 import {
   Sparkles,
   BookOpen,
-  Users,
-  Award,
   HelpCircle,
   Info,
   ChevronDown,
@@ -437,41 +435,6 @@ export const DashboardPage: React.FC = () => {
                   Với mong muốn giúp mọi học sinh đều có thể tự tin làm chủ môn Hóa mà không cần đi học thêm tốn kém, chúng tôi đã tích hợp công nghệ trí tuệ nhân tạo (AI) thông minh để tạo ra một <strong>Người Thầy Gia Sư Đồng Hành 24/7</strong>. Gia sư AI không làm thay bài tập cho học sinh, mà đóng vai trò người hướng dẫn tận tình, khơi gợi suy nghĩ và dìu dắt các em giải quyết bài tập qua từng bước tư duy.
                 </Typography>
 
-                {/* THÔNG SỐ ĐÁNG TIN CẬY */}
-                <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 3, color: '#0f172a' }}>Thông số hoạt động & Sự tin cậy</Typography>
-                
-                <Box
-                  sx={{
-                    display: 'grid',
-                    gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr 1fr' },
-                    gap: 3,
-                    mb: 5,
-                  }}
-                >
-                  <Card sx={{ textAlign: 'center', p: 2.5, height: '100%', bgcolor: '#f8fafc' }}>
-                    <Users size={32} color="#0062b8" style={{ margin: '0 auto 8px' }} />
-                    <Typography variant="h5" sx={{ fontWeight: 900, color: '#0062b8' }}>150.000+</Typography>
-                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>Học sinh tin tưởng sử dụng tự học hàng ngày</Typography>
-                  </Card>
-
-                  <Card sx={{ textAlign: 'center', p: 2.5, height: '100%', bgcolor: '#f8fafc' }}>
-                    <BookOpen size={32} color="#ea580c" style={{ margin: '0 auto 8px' }} />
-                    <Typography variant="h5" sx={{ fontWeight: 900, color: '#ea580c' }}>6 Chương</Typography>
-                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>Khóa học bám sát toàn diện cấu trúc sách giáo khoa</Typography>
-                  </Card>
-
-                  <Card sx={{ textAlign: 'center', p: 2.5, height: '100%', bgcolor: '#f8fafc' }}>
-                    <Award size={32} color="#0f766e" style={{ margin: '0 auto 8px' }} />
-                    <Typography variant="h5" sx={{ fontWeight: 900, color: '#0f766e' }}>500+</Typography>
-                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>Đề kiểm tra định kỳ và bài tập mẫu tự luyện</Typography>
-                  </Card>
-
-                  <Card sx={{ textAlign: 'center', p: 2.5, height: '100%', bgcolor: '#f8fafc' }}>
-                    <Sparkles size={32} color="#ff9900" style={{ margin: '0 auto 8px' }} />
-                    <Typography variant="h5" sx={{ fontWeight: 900, color: '#ff9900' }}>2.000+</Typography>
-                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>Câu hỏi thảo luận & giải đáp hóa học thông minh</Typography>
-                  </Card>
-                </Box>
 
                 {/* TRIẾT LÝ GIẢNG DẠY */}
                 <Box sx={{ p: 3.5, bgcolor: '#eff6ff', borderRadius: 3, border: '1px solid #bfdbfe', mb: 4 }}>
