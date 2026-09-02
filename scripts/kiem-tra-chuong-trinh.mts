@@ -63,10 +63,20 @@ const CHUYEN: Record<string, string> = {
   'bai-1': 'bai-1', 'bai-2': 'bai-2', 'bai-3': 'bai-4',
   'bai-4': 'bai-6', 'bai-5': 'bai-10', 'bai-6': 'bai-15',
 };
+/* So sánh BỎ QUA kiểu chữ số: bộ sinh hạ chỉ số công thức (N2 -> N₂), đó là
+   thay đổi có chủ ý chứ không phải làm mất nội dung. Đưa cả hai bên về chữ số
+   thường rồi mới so, nên mọi sửa đổi THẬT vào chữ nghĩa vẫn bị bắt.
+
+   CỐ Ý không chép lại hàm ha_chi_so của bộ sinh sang đây: chép thì mỗi lần sửa
+   bộ sinh là phép thử lại canh một bản cũ mà không ai hay — đúng lỗi đã mắc với
+   bộ thử gia sư AI. Đưa về dạng chung rồi so là không có gì để lệch. */
+const boChiSo = (o: any) =>
+  JSON.stringify(o).replace(/[₀-₉]/g, c => String('₀₁₂₃₄₅₆₇₈₉'.indexOf(c)));
+
 for (const t of tay) {
   const moi = bais.find(b => b.id === CHUYEN[t.id]);
   const giong = !!moi && ['summary', 'commonQuestions', 'textbook'].every(
-    k => JSON.stringify(moi[k]) === JSON.stringify(t[k]));
+    k => boChiSo(moi[k]) === boChiSo(t[k]));
   ok(giong, `${t.id} → ${CHUYEN[t.id]} giữ nguyên từng chữ`);
 }
 
@@ -90,6 +100,47 @@ ok(loLot === 0, 'KHÔNG đáp án nào lọt vào ngữ cảnh gửi AI', loLot 
 /* Ngưỡng phải khớp TRAN_KY_TU trong lessonContext.ts. Vượt trần thì phần đuôi
    bị cắt — mất câu luyện tập và lời dặn cuối mà không có dấu hiệu gì. */
 ok(daiNhat <= 4600, 'ngữ cảnh dài nhất ≤ 4600 ký tự (trần của lessonContext)', String(daiNhat));
+
+console.log('\n== Công thức hoá học phải có chỉ số dưới ==');
+/* Văn bản trích từ .docx mất hết định dạng, nên dữ liệu từng mang "N2", "NH3",
+   "H2SO4" và phần đọc SGK hiển thị đúng chuỗi viết sai đó cho học sinh — trong
+   khi gia sư AI ngay bên cạnh lại viết đúng "N₂". Bộ sinh (2-sinh-bai-hoc.py)
+   nay tự hạ chỉ số; ba mục dưới đây canh cho nó không hạ nhầm chỗ. */
+{
+  const chu: string[] = [];
+  const gom = (x?: string) => { if (x) chu.push(x); };
+  for (const b of bais as any[]) {
+    gom(b.summary); (b.formulae ?? []).forEach(gom);
+    for (const s of b.textbook?.sections ?? []) { gom(s.sectionTitle); (s.keyPoints ?? []).forEach(gom); }
+    (b.textbook?.objectives ?? []).forEach(gom);
+    (b.commonQuestions ?? []).forEach((q: any) => { gom(q.question); gom(q.hint); });
+    (b.textbook?.practiceQuestions ?? []).forEach((q: any) => { gom(q.question); gom(q.answer); });
+  }
+  const tatCa = chu.join('\n');
+  const SUB = /[₀-₉]/;
+
+  /* Công thức còn viết thô: chữ số dính ngay sau ký hiệu nguyên tố. CỐ Ý bỏ qua
+     đoạn có dấu +/- dính liền (Fe2+, SO42-) — ở đó chữ số có thể là điện tích,
+     bộ sinh chọn không đoán và để nguyên. */
+  const tho = [...new Set(tatCa.match(/\b(?:[A-Z][a-z]?\d+)+[A-Za-z]*\b(?![+-])/g) ?? [])];
+  ok(tho.length === 0, 'không còn công thức viết thô kiểu N2 / H2SO4', tho.slice(0, 10).join(', '));
+
+  const soChiSo = (tatCa.match(/[₀-₉]/g) ?? []).length;
+  ok(soChiSo > 300, 'có đủ chỉ số dưới trong nội dung bài', soChiSo + ' ký tự');
+
+  /* Không được hạ nhầm số thứ tự và hằng số — đây mới là rủi ro thật của việc
+     tự động hạ chỉ số. */
+  ok(!SUB.test(bais.map(b => b.title).join(' ')), 'KHÔNG hạ nhầm số trong tên bài');
+  const ids: string[] = [];
+  const gomId = (o: any) => {
+    if (Array.isArray(o)) return o.forEach(gomId);
+    if (o && typeof o === 'object') { if (typeof o.id === 'string') ids.push(o.id); Object.values(o).forEach(gomId); }
+  };
+  gomId(bais);
+  const idHong = ids.filter(i => SUB.test(i));
+  ok(idHong.length === 0, `KHÔNG hạ nhầm số trong mã (${ids.length} mã)`, idHong.join(', '));
+  ok(tatCa.includes('24,79'), 'hằng số 24,79 L/mol còn nguyên vẹn');
+}
 
 console.log('\n== Dàn bài cả chương trình (khung iChat tư vấn chung) ==');
 /* Khối này chỉ gửi ở khung iChat, nơi học sinh không mở bài nào. Nó phải đủ

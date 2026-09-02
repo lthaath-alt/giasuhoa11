@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { LINK_ZALO } from '../core/constants';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -821,7 +822,7 @@ export const DashboardPage: React.FC = () => {
                     Hãy liên hệ trực tiếp với đội ngũ tư vấn viên qua số Zalo hỗ trợ kỹ thuật miễn phí dưới đây:
                   </Typography>
                   <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
-                    <Button variant="contained" color="primary" startIcon={<MessageSquare size={14} />} onClick={() => window.open('https://zalo.me', '_blank')} sx={{ borderRadius: 2 }}>
+                    <Button variant="contained" color="primary" startIcon={<MessageSquare size={14} />} onClick={() => window.open(LINK_ZALO, '_blank', 'noopener,noreferrer')} sx={{ borderRadius: 2 }}>
                       Zalo Hỗ Trợ: 0345203054
                     </Button>
                   </Box>

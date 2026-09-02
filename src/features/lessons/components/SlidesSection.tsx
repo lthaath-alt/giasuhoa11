@@ -43,7 +43,12 @@ export const SlidesSection: React.FC = () => {
   }, [laToi]);
 
   const handleFullscreen = () => {
-    frameRef.current?.requestFullscreen?.();
+    /* PHẢI có catch. Trình duyệt từ chối toàn màn hình trong khá nhiều trường
+       hợp — chính sách máy trường, iOS Safari, hay trang nhúng trong khung không
+       được cấp quyền — và khi đó promise bị từ chối mà không ai bắt, hiện lên
+       console thành lỗi đỏ. Đo được ở bản trước: "Permissions check failed".
+       Từ chối thì thôi, người dùng vẫn xem slide bình thường. */
+    frameRef.current?.requestFullscreen?.().catch(() => {});
   };
 
   // Cho phép bấm phím mũi tên chuyển slide ngay, không phải click vào khung trước

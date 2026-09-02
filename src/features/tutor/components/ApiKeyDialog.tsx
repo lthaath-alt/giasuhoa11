@@ -69,6 +69,23 @@ export const ApiKeyDialog: React.FC<ApiKeyDialogProps> = ({ open, onClose }) => 
   };
 
   const handleSave = () => {
+    /* KHÔNG lưu một key vừa bị kiểm tra và báo là hỏng.
+
+       Key của người dùng ĐÈ LÊN key của web (xem getEffectiveApiKey), nên lưu
+       nhầm một key sai là tắt luôn gia sư — mà học sinh sẽ không hiểu vì sao,
+       chỉ thấy thầy im lặng. Bản trước nút "Lưu Key" vẫn bật ngay sau khi hộp
+       thoại báo "API Key không hợp lệ".
+
+       Chưa bấm kiểm tra thì vẫn cho lưu: có thể em dán key đúng mà mạng trường
+       chặn lúc kiểm, chặn cứng thì lại thành cản trở. */
+    if (testResult && !testResult.success) {
+      setTestResult({
+        success: false,
+        message: 'Key này vừa kiểm tra và không dùng được nên thầy chưa lưu. '
+          + 'Em kiểm tra lại key rồi bấm Lưu, hoặc bấm Hủy để giữ nguyên như cũ.',
+      });
+      return;
+    }
     if (apiKey.trim()) {
       localStorage.setItem('gemini_api_key_user', apiKey.trim());
     }

@@ -123,6 +123,81 @@ def chuan_hoa(s):
     return s
 
 
+SO_DUOI = str.maketrans('0123456789', '\u2080\u2081\u2082\u2083\u2084\u2085\u2086\u2087\u2088\u2089')
+
+# Công thức hoá học: một chuỗi ký hiệu nguyên tố, trong đó có ít nhất một chữ số.
+#   N2, O2, H2O, H2SO4, C6H5OH, Al2O3, Cu2O …
+# Bắt buộc chữ số phải đứng NGAY SAU một ký hiệu nguyên tố (chữ hoa, có thể kèm
+# một chữ thường). Nhờ vậy "lớp 11", "Bài 2", "Chương 3", "25 °C" không dính —
+# ở đó chữ số đứng sau dấu cách chứ không sau ký hiệu nguyên tố.
+CONG_THUC = re.compile(r'\b((?:[A-Z][a-z]?\d*)+)\b')
+
+
+def ha_chi_so(s):
+    """Đưa công thức hoá học viết thô về đúng chỉ số dưới: N2 -> N\u2082, H2SO4 -> H\u2082SO\u2084.
+
+    Vì sao cần: văn bản trích từ .docx mất hết định dạng chỉ số dưới, nên dữ
+    liệu bài học mang "N2", "NH3", "H2SO4". Phần đọc SGK và ô tìm kiếm hiển thị
+    thẳng chuỗi này, nên học sinh đọc được đúng cái công thức viết sai — trong
+    khi chính con gia sư AI lại luôn viết đúng "N\u2082". Hai bên lệch nhau ngay
+    trên cùng một màn hình.
+
+    Đo trước khi sửa: 85 lần xuất hiện, 22 dạng, và không dạng nào là nhầm.
+
+    Chỗ CỐ Ý bỏ qua:
+      - Từ viết hoa toàn bộ không có số (SGK, IUPAC) — không khớp vì thiếu chữ số.
+      - Số đứng rời ("lớp 11") — không khớp vì phải dính ngay sau ký hiệu.
+      - Mã bài, mã đề dạng bai-4, quiz_123 — có gạch nối/gạch dưới nên \b chặn lại.
+    """
+    def thay(m):
+        t = m.group(1)
+        if not any(c.isdigit() for c in t):
+            return t          # không có số thì không phải công thức, để yên
+        if t[0].islower():
+            return t
+        # Ngay sau là dấu + hoặc - DÍNH LIỀN thì đây là ion mang điện tích, và
+        # chữ số cuối là chỉ số TRÊN chứ không phải chỉ số dưới: Fe2+ đọc là
+        # Fe²⁺, hạ xuống thành Fe₂+ là sai hẳn nghĩa. Phân biệt cho đúng thì
+        # phải biết hoá (SO42- là SO₄²⁻ — vừa có chỉ số dưới vừa có chỉ số
+        # trên), nên ở đây CHỌN KHÔNG ĐOÁN: để nguyên văn. Viết nguyên là xấu
+        # nhưng vẫn đọc đúng; đoán sai thì học sinh học phải công thức sai.
+        # Dữ liệu hiện tại không có dạng này (đã đo), đây là phòng cho sau.
+        # Dấu +/- DÍNH LIỀN sau công thức có hai nghĩa khác hẳn nhau:
+        #   · điện tích ion  — "Fe2+", "H3O+"        -> chữ số là chỉ số TRÊN
+        #   · dấu cộng phản ứng — "C6H5OH+H2O⇌..."   -> vẫn là chỉ số dưới
+        # Phân biệt bằng ký tự đứng SAU dấu: còn công thức nữa (chữ cái hoặc
+        # chữ số) thì đó là phản ứng; hết câu hay gặp dấu cách/dấu câu thì đó là
+        # điện tích.
+        #
+        # Gặp điện tích thì CHỌN KHÔNG ĐOÁN, để nguyên văn: viết đúng cần biết
+        # hoá (SO42- là SO₄²⁻ — vừa chỉ số dưới vừa chỉ số trên), đoán sai thì
+        # học sinh học phải công thức sai. Viết thô tuy xấu nhưng vẫn đọc đúng.
+        #
+        # PHẢI kiểm chuỗi khác rỗng trước: trong Python `'' in '+-'` là True,
+        # nên công thức ở CUỐI chuỗi từng bị coi là ion và bỏ qua oan — đúng lỗi
+        # đã mắc: "Cu2O" cuối câu không đổi trong khi giữa câu thì có.
+        sau = s[m.end():m.end() + 1]
+        ke = s[m.end() + 1:m.end() + 2]
+        # Chỉ nhập nhằng khi CHỮ SỐ dính ngay trước dấu: "Fe2+" — số 2 là điện
+        # tích chứ không phải chỉ số. Còn "H3O+" hay "C6H5O-" thì trước dấu là
+        # chữ cái, mọi chữ số trong đó chắc chắn là chỉ số dưới, hạ được an toàn.
+        if sau and sau in '+-' and not (ke and ke.isalnum()) and t[-1].isdigit():
+            return t
+        return ''.join(c.translate(SO_DUOI) if c.isdigit() else c for c in t)
+    return CONG_THUC.sub(thay, s)
+
+
+def ha_chi_so_cay(o):
+    """Áp dụng ha_chi_so cho mọi chuỗi trong cây dữ liệu."""
+    if isinstance(o, str):
+        return ha_chi_so(o)
+    if isinstance(o, list):
+        return [ha_chi_so_cay(x) for x in o]
+    if isinstance(o, dict):
+        return {k: ha_chi_so_cay(v) for k, v in o.items()}
+    return o
+
+
 def chuan_hoa_cay(o):
     """Áp dụng chuan_hoa cho mọi chuỗi trong cây dữ liệu."""
     if isinstance(o, str):
@@ -238,6 +313,9 @@ def main():
 
     truoc = json.dumps(chuong_ra, ensure_ascii=False)
     chuong_ra = chuan_hoa_cay(chuong_ra)
+    # Hạ chỉ số SAU khi chuẩn hoá thuật ngữ: bảng THUAT_NGU viết bằng công thức
+    # thô ("H2SO4"), khớp trước rồi mới hạ chỉ số thì không có gì lệch nhau.
+    chuong_ra = ha_chi_so_cay(chuong_ra)
     than = json.dumps(chuong_ra, ensure_ascii=False, indent=2)
     if truoc != json.dumps(chuong_ra, ensure_ascii=False):
         print('Da chuan hoa thuat ngu 2006 -> 2018.')

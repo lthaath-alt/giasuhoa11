@@ -7,8 +7,18 @@ import { buildLessonContext, buildLessonCatalog, buildProgramContext } from './l
 
 // Get effective API key from localStorage or env
 export const getEffectiveApiKey = (): string => {
-  const userKey = localStorage.getItem('gemini_api_key_user');
-  if (userKey) return userKey;
+  /* Key của người dùng được ưu tiên, nhưng chỉ khi nó TRÔNG như một key thật.
+
+     Bản trước nhận bất cứ chuỗi nào khác rỗng. Một chuỗi rác — hay một chuỗi
+     toàn dấu cách còn sót trong localStorage — vẫn đè lên key của web và làm
+     gia sư câm hẳn, trong khi web thừa sức tự gọi được. Key của Google AI
+     Studio luôn bắt đầu bằng "AIza" và dài khoảng 39 ký tự; kiểm thô như dưới
+     đây đủ để loại chuỗi rác mà không loại nhầm key thật.
+
+     Đây là kiểm ở phía người dùng cho đỡ hỏng, KHÔNG phải kiểm bảo mật: key
+     sai hình dạng thì Google tự từ chối. */
+  const userKey = (localStorage.getItem('gemini_api_key_user') ?? '').trim();
+  if (userKey.startsWith('AIza') && userKey.length >= 30) return userKey;
   return import.meta.env.VITE_GEMINI_API_KEY || import.meta.env.GEMINI_API_KEY || 'MISSING_API_KEY';
 };
 

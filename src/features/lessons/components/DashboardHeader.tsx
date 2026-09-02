@@ -38,6 +38,7 @@ import {
   Sun,
 } from 'lucide-react';
 import { useCheDoMau } from '../../../core/hooks/useCheDoMau';
+import { LINK_ZALO } from '../../../core/constants';
 import { User } from '../../auth/types';
 import { useApp } from '../../../core/hooks/useApp';
 import { Lesson } from '../types';
@@ -292,7 +293,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 id="zalo-contact-btn"
                 variant="contained"
                 size="small"
-                onClick={() => window.open('https://zalo.me', '_blank')}
+                onClick={() => window.open(LINK_ZALO, '_blank', 'noopener,noreferrer')}
                 sx={{
                   /* Trước là #0084ff: chữ trắng trên đó chỉ đạt 3,66, hơi chói và
                      khó đọc. Dùng luôn màu xanh nền chuẩn của web (#0062b8) —

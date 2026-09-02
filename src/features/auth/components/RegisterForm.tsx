@@ -53,7 +53,17 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleForm }) => {
             transform: 'translateY(-1px)',
           }
         }}
+        /* Thẻ này bấm được nên PHẢI dùng được bằng bàn phím.
+           Trước đây nó chỉ là một <div> có onClick: chuột bấm được, còn ai đi
+           bằng phím Tab thì không bao giờ tới được nó, và trình đọc màn hình
+           cũng không đọc ra đây là chỗ bấm. Thêm role/tabIndex và bắt phím
+           Enter, Space là xong — không đổi gì về hình thức. */
+        role="button"
+        tabIndex={0}
         onClick={() => setShowStudentForm(true)}
+        onKeyDown={e => {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setShowStudentForm(true); }
+        }}
       >
         <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
           <Box sx={{ p: 1, bgcolor: 'rgba(234, 88, 12, 0.1)', borderRadius: 2, display: 'flex' }}>

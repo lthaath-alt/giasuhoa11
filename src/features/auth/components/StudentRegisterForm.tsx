@@ -34,14 +34,40 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
   const [error, setError]       = useState<string | null>(null);
   const [successInfo, setSuccessInfo] = useState<{ className?: string } | null>(null);
 
+  /* Kiểm ngay tại chỗ trước khi gọi Firebase.
+
+     Bản trước CHỈ so hai ô mật khẩu. Để trống hết rồi bấm Đăng ký thì form gọi
+     thẳng registerWithOptionalClass('', '', '') — đo được: màn hình không hiện
+     báo lỗi nào, em ngồi bấm mãi mà không hiểu vì sao. Email sai định dạng cũng
+     lọt xuống tận Firebase rồi trả về thông báo tiếng Anh.
+
+     Yêu cầu "ít nhất 8 ký tự, gồm cả chữ và số" vốn chỉ được ghi làm chú thích
+     dưới ô mật khẩu, chưa bao giờ được kiểm — dán vào đây cho khớp lời hứa. */
+  const kiemDuLieu = (): string | null => {
+    if (!name.trim()) return 'Em chưa nhập họ và tên.';
+    if (!email.trim()) return 'Em chưa nhập email.';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim()))
+      return 'Email chưa đúng định dạng. Ví dụ đúng: ten@gmail.com';
+    if (!password) return 'Em chưa nhập mật khẩu.';
+    if (password.length < 8) return 'Mật khẩu phải có ít nhất 8 ký tự.';
+    if (!/[A-Za-z]/.test(password) || !/\d/.test(password))
+      return 'Mật khẩu phải có cả chữ cái và chữ số.';
+    if (password !== confirmPw) return 'Mật khẩu xác nhận không khớp. Vui lòng kiểm tra lại.';
+    return null;
+  };
+
+  /* Xoá báo lỗi ngay khi em sửa lại ô nhập.
+
+     Bản trước chỉ xoá lúc bấm Đăng ký, nên câu "Mật khẩu xác nhận không khớp"
+     vẫn nằm đó cả sau khi em đã gõ lại cho khớp — em tưởng mình vẫn sai. */
+  const goLai = <T,>(dat: (v: T) => void) => (v: T) => { setError(null); dat(v); };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
-    if (password !== confirmPw) {
-      setError('Mật khẩu xác nhận không khớp. Vui lòng kiểm tra lại.');
-      return;
-    }
+    const sai = kiemDuLieu();
+    if (sai) { setError(sai); return; }
 
     setLoading(true);
     const res = await registerWithOptionalClass(
@@ -113,7 +139,7 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
             fullWidth
             required
             value={name}
-            onChange={e => setName(e.target.value)}
+            onChange={e => goLai(setName)(e.target.value)}
             disabled={loading}
             placeholder="Nguyễn Văn An"
             slotProps={{
@@ -137,7 +163,7 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
             fullWidth
             required
             value={email}
-            onChange={e => setEmail(e.target.value)}
+            onChange={e => goLai(setEmail)(e.target.value)}
             disabled={loading}
             placeholder="example@gmail.com"
             slotProps={{
@@ -161,7 +187,7 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
             fullWidth
             required
             value={password}
-            onChange={e => setPassword(e.target.value)}
+            onChange={e => goLai(setPassword)(e.target.value)}
             disabled={loading}
             helperText="Ít nhất 8 ký tự, gồm cả chữ cái và chữ số"
             slotProps={{
@@ -192,7 +218,7 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
             fullWidth
             required
             value={confirmPw}
-            onChange={e => setConfirmPw(e.target.value)}
+            onChange={e => goLai(setConfirmPw)(e.target.value)}
             disabled={loading}
             error={confirmPw.length > 0 && password !== confirmPw}
             helperText={confirmPw.length > 0 && password !== confirmPw ? 'Mật khẩu không khớp' : ''}
