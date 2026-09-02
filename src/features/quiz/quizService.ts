@@ -304,7 +304,6 @@ export const QuizService = {
 
   /**
    * Tạo bài kiểm tra cho học sinh
->>>>>>> 3fb5848173974ea00d23aee54cc60ddf37e7f9d1
    */
   async createQuiz(
     chapterId: string,

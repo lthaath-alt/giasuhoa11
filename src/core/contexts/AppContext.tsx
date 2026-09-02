@@ -1121,52 +1121,34 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     if (aiResponseText.includes('[SIGNAL:XONG_CHUONG]')) {
       finalAiResponse = finalAiResponse.replace(/\[SIGNAL:XONG_CHUONG\]/g, '').trim();
       const chapter = curriculum.find(c => c.lessons.some(l => l.id === lessonId));
-<<<<<<< HEAD
 
-      /* Không tìm ra chương thì THÔI, không đoán bừa. Trước đây chỗ này rơi về
-         'c1' — một mã chương không có thật (mã thật là 'chuong-1'). Màn hình tư
-         vấn chung còn gọi addMessage('global-advisor', ...), một lessonId không
-         thuộc bài nào, nên luôn rơi vào nhánh này và luôn dựng đề từ bộ dự
-         phòng của bài khác. */
-      const quiz = chapter
-        ? await QuizService.createQuiz(chapter.id, lessonId, userEmail, libraryQuestions)
-        : null;
+      /* Không tìm ra chương thì THÔI, không đoán bừa.
 
-      if (quiz) {
-        const quizLink = `${window.location.origin}${window.location.pathname}#/quiz/${quiz.id}`;
-        finalAiResponse += `\n\n👉 **Hãy làm bài kiểm tra ngắn ngay tại đây để củng cố kiến thức nhé:** [Làm bài kiểm tra ngay](${quizLink})`;
-      } else {
-        /* Bài chưa có câu hỏi nào: im lặng bỏ link, KHÔNG giao đề của bài khác.
-           Ghi log để Admin biết bài nào cần gắn câu hỏi. */
+         Bản trước rơi về `chapterId = 'c1'` — một mã chương KHÔNG có thật
+         (mã đúng là 'chuong-1'). Giữ nó thì `toChapter('c1')` vẫn ra số 1,
+         nên mọi lessonId lạc (ví dụ 'global-advisor' của khung tư vấn chung)
+         đều lặng lẽ nhận đề của Chương 1. */
+      if (!chapter) {
         console.warn(
-          `[Quiz] Không tạo được đề cho bài "${lessonId}" ` +
-          (chapter ? '(bài chưa có câu hỏi nào).' : '(lessonId không thuộc chương nào).') +
-          ' Đã bỏ link kiểm tra.',
+          `[Quiz] lessonId "${lessonId}" không thuộc chương nào — bỏ qua bài kiểm tra tổng hợp.`,
         );
-        ErrorLogService.logError({
-          level: 'Cảnh Báo Hệ Thống',
-          component: 'AppContext.addMessage',
-          message: `Bài "${lessonId}" chưa có câu hỏi trong ngân hàng nên không tạo được bài kiểm tra.`,
-          userEmail,
-        });
-=======
-      const chapterId = chapter ? chapter.id : 'c1';
-      try {
-        const bank = await BankFirestore.getAll();
-        const cuaChuong = bank
-          .filter(q => q.ch === toChapter(chapterId))
-          .map(q => toLegacy(q));
-        const quiz = QuizService.createChapterQuiz(chapterId, userEmail, cuaChuong);
-        if (quiz) {
-          const quizLink = `${window.location.origin}${window.location.pathname}#/quiz/${quiz.id}`;
-          finalAiResponse += `\n\n👉 **Em đã ôn xong chương này. Làm bài kiểm tra tổng hợp ${quiz.questions.length} câu tại đây nhé:** [Làm bài kiểm tra ngay](${quizLink})`;
-        } else {
-          finalAiResponse += '\n\n_(Ngân hàng câu hỏi của chương này chưa có câu nào nên chưa tạo được bài kiểm tra. Em báo thầy/cô nhé.)_';
+      } else {
+        try {
+          const bank = await BankFirestore.getAll();
+          const cuaChuong = bank
+            .filter(q => q.ch === toChapter(chapter.id))
+            .map(q => toLegacy(q));
+          const quiz = QuizService.createChapterQuiz(chapter.id, userEmail, cuaChuong);
+          if (quiz) {
+            const quizLink = `${window.location.origin}${window.location.pathname}#/quiz/${quiz.id}`;
+            finalAiResponse += `\n\n👉 **Em đã ôn xong chương này. Làm bài kiểm tra tổng hợp ${quiz.questions.length} câu tại đây nhé:** [Làm bài kiểm tra ngay](${quizLink})`;
+          } else {
+            finalAiResponse += '\n\n_(Ngân hàng câu hỏi của chương này chưa có câu nào nên chưa tạo được bài kiểm tra. Em báo thầy/cô nhé.)_';
+          }
+        } catch {
+          // Mất mạng hay thiếu quyền: nói thật, đừng lặng lẽ không hiện link
+          finalAiResponse += '\n\n_(Chưa đọc được ngân hàng câu hỏi nên chưa tạo được bài kiểm tra. Em thử lại sau nhé.)_';
         }
-      } catch {
-        // Mất mạng hay thiếu quyền: nói thật, đừng lặng lẽ không hiện link
-        finalAiResponse += '\n\n_(Chưa đọc được ngân hàng câu hỏi nên chưa tạo được bài kiểm tra. Em thử lại sau nhé.)_';
->>>>>>> 3fb5848173974ea00d23aee54cc60ddf37e7f9d1
       }
     }
 
