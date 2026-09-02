@@ -440,6 +440,11 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               py: 0.5,
               gap: 1,
               '&::-webkit-scrollbar': { display: 'none' },
+              /* Không có hai dòng này thì trên điện thoại flex bóp các nút lại
+                 cho vừa bề ngang: chữ vỡ dòng, icon đè lên chữ mục kế bên.
+                 Ép nút giữ nguyên bề ngang để `overflowX: auto` ở trên làm
+                 đúng việc của nó là cho cuộn ngang. */
+              '& > *': { flexShrink: 0, whiteSpace: 'nowrap' },
             }}
           >
             {/* Mục Các Khóa Học — ẩn qua cờ HIEN_MUC_KHOA_HOC ở đầu file */}
