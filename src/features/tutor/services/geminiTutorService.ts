@@ -3,7 +3,7 @@ import { ChatMessage } from '../../auth/types';
 import { getSession } from './aiMockService';
 import { ErrorLogService } from '../../../core/services/errorLog';
 import { GEMINI_MODEL_NAME } from '../../../core/constants';
-import { buildLessonContext } from './lessonContext';
+import { buildLessonContext, buildLessonCatalog } from './lessonContext';
 
 // Get effective API key from localStorage or env
 export const getEffectiveApiKey = (): string => {
@@ -97,6 +97,18 @@ Ví dụ: "[SIGNAL:XONG_CHUONG] Ba câu vừa rồi em nắm chắc rồi. Giờ
 TUYỆT ĐỐI KHÔNG phát nhãn này khi chưa đủ ba câu đúng, và không phát chỉ vì em vừa giải xong một bài tập. Nhãn này mở bài kiểm tra tính điểm — phát sớm là em làm bài khi chưa ôn xong.
 Nếu em xin làm bài kiểm tra ngay, cứ trả lời rằng mình rà nhanh vài câu trước cho chắc, rồi bắt đầu hỏi câu thứ nhất.
 
+BÀI KIỂM TRA NGẮN THEO TỪNG BÀI (khác với bài kiểm tra cả chương ở trên)
+Hai nhãn dưới đây đều PHẢI kèm mã bài, chép nguyên văn từ DANH MỤC BÀI HỌC ở phần ngữ cảnh bên dưới. Đặt nhãn ở ĐẦU câu trả lời.
+
+a) [SIGNAL:XONG_BAI:<mã bài>] — phát khi em đã tự mình giải quyết xong đúng vấn đề em hỏi, sau khi đi trọn quy trình. Mã bài là bài chứa kiến thức em VỪA HỎI, không phải bài đang mở trên màn hình nếu hai thứ đó khác nhau.
+Ví dụ: "[SIGNAL:XONG_BAI:bai-3] Chúc mừng em! Em đã tự mình suy ra được tính chất của ammonia rồi đó."
+
+b) [SIGNAL:YEU_CAU_DE:<mã bài>] — phát khi em CHỦ ĐỘNG xin đề, kiểu "cho em bài kiểm tra về cân bằng hoá học", "em muốn luyện tập bài alkane". Trường hợp này không cần đi qua quy trình 6 bước, đưa đề luôn.
+Ví dụ: "[SIGNAL:YEU_CAU_DE:bai-1] Được thôi, đây là đề ngắn về cân bằng hoá học cho em luyện nhé."
+Em xin đề mà nói chung chung, không rõ bài nào, thì hỏi lại em muốn ôn bài nào — ĐỪNG đoán bừa một mã bài.
+
+Không chắc mã bài thì TUYỆT ĐỐI đừng phát hai nhãn này. Thà không có đề còn hơn giao nhầm đề của bài khác.
+
 5. Cảnh báo Lạc đề (QUAN TRỌNG): Mỗi khi học sinh hỏi bất cứ thứ gì KHÔNG LIÊN QUAN đến kiến thức Hóa Học 11 (Toán, Lý, Văn, chơi game, tán gẫu...), BẠN PHẢI BẮT ĐẦU CÂU TRẢ LỜI BẰNG ĐÚNG CHUỖI KÝ TỰ SAU: [SIGNAL:OFFTOPIC]
 Ví dụ: "[SIGNAL:OFFTOPIC] Câu hỏi này nằm ngoài phạm vi hỗ trợ của thầy/cô (chỉ hỗ trợ Hóa học 11 - KNTT). Em quay lại với bài học hôm nay nhé?"
 TUYỆT ĐỐI KHÔNG gắn [SIGNAL:OFFTOPIC] cho các câu hỏi VỀ chính môn Hóa 11, kể cả khi câu trả lời là "không có". Cụ thể, những câu sau đây LÀ ĐÚNG PHẠM VI:
@@ -178,13 +190,21 @@ export const generateAIResponse = async (
        cuộc tư vấn chung — thì chuỗi rỗng và câu lệnh giữ nguyên như cũ. */
     const nguCanhBai = buildLessonContext(lessonId);
 
+    /* Danh mục mã bài thì LUÔN đính kèm, kể cả ở cuộc tư vấn chung.
+       Chính khung tư vấn chung mới là nơi học sinh hỏi lung tung về nhiều bài,
+       nên đó là nơi cần mã bài nhất — mà lại là nơi `nguCanhBai` rỗng. */
+    const danhMucBai = buildLessonCatalog();
+
     const response = await getAiInstance().models.generateContent({
       model: GEMINI_MODEL_NAME,
       contents: formattedHistory.concat({ role: 'user', parts: [{ text: latestMessage }] }),
       config: {
-        systemInstruction: nguCanhBai
-          ? [SYSTEM_PROMPT, '='.repeat(60), nguCanhBai].join('\n\n')
-          : SYSTEM_PROMPT,
+        systemInstruction: [
+          SYSTEM_PROMPT,
+          '='.repeat(60),
+          danhMucBai,
+          ...(nguCanhBai ? ['='.repeat(60), nguCanhBai] : []),
+        ].join('\n\n'),
         temperature: 0.7, // Nhiệt độ vừa phải để sáng tạo nhưng vẫn giữ chuẩn kiến thức
         topP: 0.9,
       }

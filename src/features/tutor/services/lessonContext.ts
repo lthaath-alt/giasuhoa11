@@ -32,6 +32,27 @@ function timBaiHoc(lessonId: string): { lesson: Lesson; chuong: string } | null 
 }
 
 /**
+ * Danh mục MÃ BÀI, để gia sư gắn đúng bài khi phát tín hiệu ra đề.
+ *
+ * CỐ Ý tách riêng và luôn đính kèm, kể cả ở cuộc tư vấn chung `global-advisor`
+ * — nơi `buildLessonContext` trả chuỗi rỗng. Không có khối này thì gia sư không
+ * biết `bai-3` ứng với bài nào, tín hiệu [SIGNAL:XONG_BAI:...] sẽ mang mã bịa,
+ * và đề kiểm tra lại ra sai bài đúng như lỗi cũ.
+ *
+ * Chỉ gồm mã + tên, không kèm nội dung, nên rất nhẹ (~1,5 KB mỗi lượt).
+ */
+export function buildLessonCatalog(): string {
+  const L: string[] = ['DANH MỤC BÀI HỌC — dùng để điền mã bài vào tín hiệu ra đề:'];
+  CHEMISTRY_11_CURRICULUM.forEach(c => {
+    L.push(c.title);
+    c.lessons.forEach(l => L.push(`  ${l.id} = ${l.title}`));
+  });
+  L.push('Mã bài PHẢI chép nguyên văn từ danh sách trên (dạng bai-1 … bai-25). '
+    + 'Không chắc là bài nào thì ĐỪNG phát tín hiệu ra đề.');
+  return L.join('\n');
+}
+
+/**
  * Dựng khối ngữ cảnh cho một bài học. Trả về chuỗi rỗng nếu không tìm thấy bài
  * — ví dụ cuộc trò chuyện tư vấn chung `global-advisor`.
  */

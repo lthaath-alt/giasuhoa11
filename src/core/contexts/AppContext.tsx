@@ -1152,6 +1152,46 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       }
     }
 
+    /* ── Đề kiểm tra NGẮN theo TỪNG BÀI ────────────────────────────────────
+       Hai nhãn kèm mã bài, do gia sư phát ra:
+         [SIGNAL:XONG_BAI:bai-3]    học sinh vừa giải xong đúng vấn đề đã hỏi
+         [SIGNAL:YEU_CAU_DE:bai-7]  học sinh chủ động xin đề về một bài
+
+       Vì sao phải mang mã bài trong nhãn: ở khung tư vấn chung, `lessonId` luôn
+       là 'global-advisor' — không phải bài nào cả. Đó chính là lý do các đề
+       trước đây ra sai bài. Nay bài nào ra đề là do gia sư chỉ đích danh, không
+       suy từ màn hình đang mở.
+
+       `createQuiz` đã sẵn logic chống trùng đề: ưu tiên câu CHƯA làm, rồi tới
+       câu từng làm SAI, cuối cùng mới tới câu từng làm đúng — và xáo trong từng
+       nhóm lẫn xáo lần cuối. Nên làm lại lần hai sẽ ra đề khác. */
+    const nhanRaDe = /\[SIGNAL:(XONG_BAI|YEU_CAU_DE):\s*([a-zA-Z0-9-]+)\s*\]/.exec(aiResponseText);
+    if (nhanRaDe) {
+      const [nguyenVan, loaiNhan, maBai] = nhanRaDe;
+      finalAiResponse = finalAiResponse.replace(nguyenVan, '').trim();
+
+      const chuongCuaBai = curriculum.find(c => c.lessons.some(l => l.id === maBai));
+
+      if (!chuongCuaBai) {
+        // Gia sư bịa mã bài: bỏ qua, KHÔNG giao nhầm đề của bài khác
+        console.warn(`[Quiz] Gia sư phát mã bài không có thật: "${maBai}" — bỏ qua.`);
+      } else {
+        const deBai = await QuizService.createQuiz(
+          chuongCuaBai.id, maBai, userEmail, libraryQuestions,
+        );
+        if (deBai) {
+          const tenBai = chuongCuaBai.lessons.find(l => l.id === maBai)?.title ?? maBai;
+          const link = `${window.location.origin}${window.location.pathname}#/quiz/${deBai.id}`;
+          const mo = loaiNhan === 'YEU_CAU_DE'
+            ? `👉 **Đề luyện tập về ${tenBai}** (${deBai.questions.length} câu):`
+            : `👉 **Em vừa nắm được ${tenBai}. Làm nhanh ${deBai.questions.length} câu để chắc kiến thức nhé:**`;
+          finalAiResponse += `\n\n${mo} [Làm bài kiểm tra ngay](${link})`;
+        } else {
+          finalAiResponse += '\n\n_(Bài này chưa có câu hỏi nào trong ngân hàng nên chưa tạo được đề. Em báo thầy/cô nhé.)_';
+        }
+      }
+    }
+
     const aiMsg: ChatMessage = {
       id: `m-ai-${Date.now() + 1}`,
       userEmail,
