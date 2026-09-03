@@ -277,7 +277,31 @@ Phần này được nêu thẳng vì hai rủi ro đầu đã được xác đ�
 
 **Hậu quả nếu không xử lý:** hệ thống ngừng phản hồi giữa đợt thực nghiệm, và chính hạn mức — chứ không phải thiết kế nghiên cứu — sẽ quyết định học sinh nào được sử dụng. Số liệu thu được sẽ không dùng được.
 
-**Phương án:** bật thanh toán trước tuần 1. Cần dự trù kinh phí cho khoảng 2.000 lượt gọi, mỗi lượt mang theo tối đa khoảng 7.500 đơn vị từ ngữ cảnh. Đơn giá phải tra tại thời điểm thực hiện.
+**Phương án:** bật thanh toán trước tuần 1.
+
+**Dự trù kinh phí** (đo bằng `npm run do-chi-phi`, dùng chính ngữ cảnh hệ thống đang gửi):
+
+| Khối ngữ cảnh | Số token |
+|---|---|
+| Câu lệnh hệ thống | 4.407 |
+| Danh mục 25 bài (luôn gửi kèm) | 604 |
+| Toàn văn một bài (khi đang đọc bài) | 1.174 |
+| Dàn bài cả chương trình (khung hỏi đáp chung) | 7.994 |
+| **Cộng mỗi lượt hỏi ở khung hỏi đáp chung** | **13.005** |
+
+Lưu ý một yếu tố dễ bỏ sót: **lịch sử hội thoại được gửi lại ở mỗi lượt**, nên một cuộc trò chuyện mười lượt tốn nhiều hơn mười lượt rời rạc khoảng 12%.
+
+| Quy mô | Tổng lượt gọi | Token vào | Token ra |
+|---|---|---|---|
+| 100 học sinh × 25 lượt | 2.500 | 34,7 triệu | 0,75 triệu |
+| 200 học sinh × 25 lượt | 5.000 | 69,5 triệu | 1,5 triệu |
+| 300 học sinh × 50 lượt | 15.000 | 208,4 triệu | 4,5 triệu |
+
+Với mặt bằng đơn giá của các mô hình hạng nhẹ hiện nay, chi phí cho quy mô 200 học sinh ước tính **dưới 25 đô-la Mỹ**. Kể cả khi cộng hệ số an toàn ba lần cho việc chạy thử và dùng nhiều hơn dự kiến, kinh phí đề nghị dự trù là **khoảng 1,5 triệu đồng**. Đơn giá cụ thể phải tra tại thời điểm thực hiện.
+
+**Hai việc bắt buộc khi bật thanh toán:** đặt hạn mức chi tiêu theo ngày để một lỗi lặp vô hạn không làm phát sinh chi phí ngoài dự kiến, và bật cảnh báo khi đạt ngưỡng.
+
+**Giảm chi phí:** phần câu lệnh hệ thống và danh mục bài (5.011 token) là cố định, lặp lại y hệt ở mọi lượt gọi của mọi học sinh. Mô hình đang dùng có hỗ trợ bộ nhớ đệm ngữ cảnh; đưa phần cố định vào bộ đệm sẽ giảm đáng kể chi phí khi triển khai cho cả khối.
 
 **Phương án dự phòng:** nếu không kịp bật thanh toán, thu hẹp thực nghiệm còn hai lớp và bố trí lịch sử dụng luân phiên, đồng thời báo cáo rõ giới hạn này.
 
