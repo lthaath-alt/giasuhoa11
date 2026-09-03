@@ -25,13 +25,24 @@ interface Mon {
   tuKho?: 'sm' | 'md' | 'lg';
 }
 
-const DS: Mon[] = [
-  // ---- hàng trên: khoảng trống bên phải bong bóng thoại của nhân vật ----
-  { tep: 'lets-play.png', ten: "Chữ Let's Play kiểu pixel", rong: 128, top: 4, left: '31%', tuKho: 'md' },
-  { tep: 'ngoi-sao.png', ten: 'Ngôi sao trò chơi', rong: 100, top: 0, left: '47%', xoay: -6, tuKho: 'md' },
-  { tep: 'can-dieu-khien.png', ten: 'Cần điều khiển', rong: 84, top: 28, left: '63%', tuKho: 'lg' },
-  { tep: 'chuot.png', ten: 'Chuột máy tính', rong: 90, top: 2, right: '3%', xoay: 8, tuKho: 'md' },
+/* Hàng trên xếp theo DÒNG CHẢY cạnh nhân vật chứ không đặt tuyệt đối.
 
+   Lý do: bong bóng thoại của nhân vật nằm trong dòng chảy, nên mép phải của
+   nó dịch theo bề rộng container VÀ theo độ dài câu thoại bốc ngẫu nhiên
+   (câu dài nhất rộng hơn câu ngắn nhất 109px). Trong khi đó vị trí đặt theo
+   phần trăm lại chạy theo bề rộng MÀN HÌNH. Hai thứ khác nhịp nên khổ nào
+   cũng có thể đụng — đo ở 1024 thì "Let's Play" đè lên bong bóng 65px.
+   Giao cho flex tự chia chỗ thì hết hẳn loại lỗi này.
+
+   `mt` lệch nhau để hàng không thẳng đơ như bảng biểu. */
+const HANG_TREN: { tep: string; ten: string; rong: number; mt: number; xoay?: number; tuKho?: 'md' | 'lg' }[] = [
+  { tep: 'lets-play.png', ten: "Chữ Let's Play kiểu pixel", rong: 128, mt: 2 },
+  { tep: 'ngoi-sao.png', ten: 'Ngôi sao trò chơi', rong: 100, mt: -4, xoay: -6 },
+  { tep: 'can-dieu-khien.png', ten: 'Cần điều khiển', rong: 84, mt: 20, tuKho: 'lg' },
+  { tep: 'chuot.png', ten: 'Chuột máy tính', rong: 90, mt: 4, xoay: 8 },
+];
+
+const DS: Mon[] = [
   // ---- giữa: đè lên mép trên lưới thẻ ----
   /* Mario nằm ngang tầm dòng tiêu đề "Học Hóa 11 Qua Trò Chơi". Chữ tiêu đề
      rộng cố định 373px (đo được: x 48→421) còn 27% thì co theo màn hình, nên
@@ -41,8 +52,11 @@ const DS: Mon[] = [
   { tep: 'gamer.png', ten: 'Chữ Gamer kiểu pixel', rong: 118, top: 116, left: '51%', xoay: -4, tuKho: 'lg' },
 
   // ---- hàng dưới ----
-  { tep: 'tay-cam.png', ten: 'Tay cầm chơi game', rong: 106, bottom: 8, left: '-1%', xoay: -8, tuKho: 'sm' },
-  { tep: 'nam.png', ten: 'Nấm 1-up', rong: 84, bottom: -6, left: '57%', tuKho: 'md' },
+  /* Hai món này trước đây đặt lấn ra ngoài mép (left:-1%, bottom:-6) nên bị
+     `overflow:hidden` của lớp xén mất một góc, nhìn như cắt thiếu. Kéo vào
+     trong hẳn. */
+  { tep: 'tay-cam.png', ten: 'Tay cầm chơi game', rong: 106, bottom: 18, left: 'max(10px, 0.5%)', xoay: -8, tuKho: 'sm' },
+  { tep: 'nam.png', ten: 'Nấm 1-up', rong: 84, bottom: 8, left: '57%', tuKho: 'md' },
   { tep: 'may-cam-tay.png', ten: 'Máy chơi game cầm tay', rong: 74, bottom: 12, right: '2%', xoay: 6, tuKho: 'sm' },
 ];
 
@@ -91,6 +105,22 @@ const VE_THEM: { ten: string; rong: number; left?: string; right?: string; botto
   },
 ];
 
+/* Đung đưa nhẹ và chậm: nhấc lên 7px kèm nghiêng 1,5° rồi trở lại, một vòng
+   6–9 giây. Mỗi món một nhịp và một điểm xuất phát khác nhau (độ trễ âm) để
+   cả đám không nhấp nhô đồng loạt như bảng đèn.
+   Ai bật "giảm chuyển động" trong hệ điều hành thì đứng yên hoàn toàn. */
+const NHIP = {
+  '@keyframes gameDungDua': {
+    '0%, 100%': { transform: 'translateY(0) rotate(-1.5deg)' },
+    '50%': { transform: 'translateY(-7px) rotate(1.5deg)' },
+  },
+};
+
+const dungDua = (k: number) => ({
+  animation: `gameDungDua ${6 + (k % 4) * 1}s ease-in-out ${-(k * 0.9).toFixed(1)}s infinite`,
+  '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
+});
+
 const HIEN: Record<NonNullable<Mon['tuKho']>, object> = {
   sm: { display: { xs: 'none', sm: 'block' } },
   md: { display: { xs: 'none', md: 'block' } },
@@ -107,29 +137,66 @@ export const GameDoodles: React.FC = () => (
       pointerEvents: 'none',
       userSelect: 'none',
       overflow: 'hidden', // hình thò ra ngoài không được đẻ ra thanh cuộn ngang
+      ...NHIP,
     }}
   >
-    {DS.map((m) => (
+    {DS.map((m, k) => (
+      /* Hai lớp: lớp ngoài lo đung đưa, lớp trong giữ góc nghiêng tĩnh. Gộp
+         một lớp thì animation ghi đè `transform` làm mất góc nghiêng. */
+      <Box key={m.tep} sx={{ ...dungDua(k), position: 'absolute', top: m.top, bottom: m.bottom, left: m.left, right: m.right, ...HIEN[m.tuKho ?? 'sm'] }}>
+        <Box
+          component="img"
+          src={THU_MUC + m.tep}
+          alt=""
+          draggable={false}
+          sx={{
+            display: 'block',
+            width: m.rong,
+            height: 'auto',
+            transform: m.xoay ? `rotate(${m.xoay}deg)` : undefined,
+          }}
+        />
+      </Box>
+    ))}
+  </Box>
+);
+
+/* Hàng hoạ tiết nằm cùng dòng với nhân vật, chiếm nốt chỗ trống bên phải
+   bong bóng thoại. Đặt `flex: 1` + `space-around` để tự giãn theo chỗ còn
+   lại, khỏi tính toán phần trăm. */
+export const GameDoodlesTren: React.FC = () => (
+  <Box
+    aria-hidden="true"
+    sx={{
+      flex: 1,
+      minWidth: 0,
+      display: { xs: 'none', md: 'flex' },
+      alignItems: 'flex-start',
+      justifyContent: 'space-around',
+      pointerEvents: 'none',
+      userSelect: 'none',
+      ...NHIP,
+    }}
+  >
+    {HANG_TREN.map((m, k) => (
       <Box
         key={m.tep}
-        component="img"
-        src={THU_MUC + m.tep}
-        alt=""
-        draggable={false}
         sx={{
-          position: 'absolute',
-          top: m.top,
-          bottom: m.bottom,
-          left: m.left,
-          right: m.right,
-          width: m.rong,
-          height: 'auto',
-          transform: m.xoay ? `rotate(${m.xoay}deg)` : undefined,
-          ...HIEN[m.tuKho ?? 'sm'],
+          ...dungDua(k),
+          mt: `${m.mt}px`,
+          flexShrink: 0,
+          ...(m.tuKho === 'lg' ? { display: { xs: 'none', lg: 'block' } } : null),
         }}
-      />
+      >
+        <Box
+          component="img"
+          src={THU_MUC + m.tep}
+          alt=""
+          draggable={false}
+          sx={{ display: 'block', width: m.rong, height: 'auto', transform: m.xoay ? `rotate(${m.xoay}deg)` : undefined }}
+        />
+      </Box>
     ))}
-
   </Box>
 );
 
@@ -145,23 +212,24 @@ export const GameDoodlesDuoi: React.FC = () => (
       pointerEvents: 'none',
       userSelect: 'none',
       overflow: 'hidden',
+      ...NHIP,
     }}
   >
-    {VE_THEM.map((v) => (
+    {VE_THEM.map((v, k) => (
       <Box
         key={v.ten}
         sx={{
+          ...dungDua(k + 2),   // lệch pha so với hàng hoạ tiết phía trên
           position: 'absolute',
           bottom: v.bottom,
           left: v.left,
           right: v.right,
           width: v.rong,
           color: '#101828',
-          transform: v.xoay ? `rotate(${v.xoay}deg)` : undefined,
           display: { xs: 'none', md: 'block' },
         }}
       >
-        {v.hinh}
+        <Box sx={{ transform: v.xoay ? `rotate(${v.xoay}deg)` : undefined }}>{v.hinh}</Box>
       </Box>
     ))}
   </Box>
