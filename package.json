@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",
-    "kiem-tra": "npm run kiem-tra:chuong-trinh && npm run kiem-tra:ngan-hang && npm run kiem-tra:de-chuong && npm run kiem-tra:het-luot && npm run kiem-tra:mau",
+    "kiem-tra": "npm run kiem-tra:chuong-trinh && npm run kiem-tra:ngan-hang && npm run kiem-tra:de-chuong && npm run kiem-tra:het-luot && npm run kiem-tra:mau && npm run kiem-tra:thuc-nghiem",
     "kiem-tra:chuong-trinh": "tsx scripts/kiem-tra-chuong-trinh.mts",
     "kiem-tra:het-luot": "tsx scripts/kiem-tra-het-luot.mts",
     "thu:ai": "tsx scripts/thu-gia-su-ai.mts",
@@ -18,7 +18,9 @@
     "soan:sinh": "python scripts/soan-noi-dung/2-sinh-bai-hoc.py",
     "kiem-tra:ngan-hang": "tsx scripts/kiem-tra-ngan-hang.mts",
     "kiem-tra:de-chuong": "tsx scripts/kiem-tra-de-chuong.mts",
-    "kiem-tra:mau": "tsx scripts/kiem-tra-mau.mts"
+    "kiem-tra:mau": "tsx scripts/kiem-tra-mau.mts",
+    "kiem-tra:thuc-nghiem": "tsx scripts/kiem-tra-thuc-nghiem.mts",
+    "phan-tich": "tsx scripts/phan-tich-thuc-nghiem.mts"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

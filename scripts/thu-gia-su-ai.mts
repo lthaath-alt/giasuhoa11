@@ -19,6 +19,7 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { GoogleGenAI } from '@google/genai';
 
+import { dungPrompt } from '../src/features/tutor/services/promptSuPham';
 import { buildLessonContext, buildLessonCatalog, buildProgramContext }
   from '../src/features/tutor/services/lessonContext';
 import { GEMINI_MODEL_NAME } from '../src/core/constants';
@@ -36,17 +37,13 @@ if (!key) {
   process.exit(1);
 }
 
-/* SYSTEM_PROMPT không được export (chỉ web dùng), nên đọc thẳng từ mã nguồn.
-   Cố ý không sao chép nội dung prompt sang đây: sao chép thì mỗi lần sửa prompt
-   là bài thử lại kiểm tra một bản cũ mà không ai hay. */
-const src = readFileSync(join(GOC, 'src/features/tutor/services/geminiTutorService.ts'), 'utf8');
-const i = src.indexOf('const SYSTEM_PROMPT = `');
-const j = src.indexOf('`;', i);
-if (i < 0 || j < 0) {
-  console.error('Không đọc được SYSTEM_PROMPT trong geminiTutorService.ts');
-  process.exit(1);
-}
-const SYSTEM_PROMPT = src.slice(i + 'const SYSTEM_PROMPT = `'.length, j);
+/* Nạp thẳng câu lệnh hệ thống từ promptSuPham.ts.
+
+   Bản trước phải ĐỌC MÃ NGUỒN của geminiTutorService rồi cắt chuỗi giữa hai dấu
+   backtick, vì nạp thẳng module đó sẽ kéo theo firebase và getAuth() ném lỗi
+   ngay khi chạy bằng Node. Cách đó hỏng ngay khi ai đó xuống dòng khác đi.
+   Nay câu lệnh nằm trong một tệp KHÔNG import gì cả nên nạp bình thường được. */
+const SYSTEM_PROMPT = dungPrompt('socratic');
 
 const MODEL = process.argv[2] || GEMINI_MODEL_NAME;
 console.log(`system prompt: ${SYSTEM_PROMPT.length} ký tự | model: ${MODEL}`
