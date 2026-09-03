@@ -1,13 +1,17 @@
 ---
 # Thông tin dựng trang bìa. Sửa ở đây rồi chạy `npm run word` là bìa đổi theo.
+# Dòng nào để trống thì bìa tự bỏ dòng đó đi.
 co_quan: "SỞ GIÁO DỤC VÀ ĐÀO TẠO"
 don_vi: "TRƯỜNG THPT"
-loai: "ĐỀ CƯƠNG NGHIÊN CỨU KHOA HỌC CẤP CƠ SỞ"
-ten_de_tai: "Neo mô hình ngôn ngữ lớn vào Chương trình giáo dục phổ thông 2018: kiểm chứng tự động và thực nghiệm sư phạm trên môn Hoá học 11"
-ten_tieng_anh: "Grounding Large Language Models in Vietnam's 2018 National Curriculum: Automated Verification and a Controlled Classroom Study in Grade-11 Chemistry"
-linh_vuc: "Khoa học máy tính — Trí tuệ nhân tạo ứng dụng và Công nghệ phần mềm"
+loai: "ĐỀ TÀI NGHIÊN CỨU KHOA HỌC CẤP TRƯỜNG"
+ten_de_tai: "Gia sư ảo bám sát Chương trình Hoá học 11 (2018): phương pháp ràng buộc mô hình ngôn ngữ lớn và kiểm chứng tự động"
+ten_tieng_anh: "A Curriculum-Grounded AI Tutor for Grade-11 Chemistry: Constraining a Large Language Model and Verifying It Automatically"
+linh_vuc: "Khoa học máy tính — Trí tuệ nhân tạo ứng dụng"
+mon_lien_quan: "Hoá học 11 — Kết nối tri thức với cuộc sống"
 chu_nhiem: "(bổ sung họ tên)"
-thanh_vien: "(bổ sung, nếu có)"
+gv_huong_dan: ""
+hoc_sinh: ""
+thanh_vien: ""
 don_vi_chu_tri: "(bổ sung)"
 thoi_gian: "Tháng 9 – tháng 10 năm 2026"
 dia_danh: "(địa phương), tháng 9 năm 2026"
@@ -18,328 +22,335 @@ muc_luc: true
 
 | | |
 |---|---|
-| **Lĩnh vực** | Khoa học máy tính — Trí tuệ nhân tạo ứng dụng và Công nghệ phần mềm |
-| **Cấp đề tài** | Cấp cơ sở |
+| **Lĩnh vực** | Khoa học máy tính — Trí tuệ nhân tạo ứng dụng |
+| **Môn học liên quan** | Hoá học 11 — Kết nối tri thức với cuộc sống |
+| **Cấp đề tài** | Cấp trường |
 | **Chủ nhiệm đề tài** | *(bổ sung)* |
 | **Đơn vị chủ trì** | *(bổ sung)* |
 | **Thời gian thực hiện** | Tháng 9 – tháng 10 năm 2026 |
-| **Đối tượng thực nghiệm** | Học sinh khối 11 |
+| **Đối tượng thực nghiệm** | Học sinh khối 11 của trường |
 
 ---
 
 # 1. TÍNH CẤP THIẾT CỦA ĐỀ TÀI
 
-## 1.1. Bối cảnh
+## 1.1. Học sinh đang dùng trí tuệ nhân tạo để học, mà chưa ai kiểm tra nó dạy đúng hay sai
 
-Chương trình giáo dục phổ thông 2018 (Thông tư 32/2018/TT-BGDĐT) bắt đầu áp dụng cho lớp 11 từ năm học 2023–2024, mang theo những thay đổi có tính nền tảng đối với môn Hoá học: đổi hệ quy ước điều kiện chuẩn, chuyển toàn bộ danh pháp sang tiếng Anh theo IUPAC, và tái cấu trúc nội dung.
+Các công cụ trí tuệ nhân tạo như ChatGPT hay Gemini đã trở thành thứ học sinh mở ra hằng ngày để hỏi bài. Nhà trường gần như không kiểm soát được việc này, và cũng chưa có cách nào biết chúng đang dạy các em điều gì.
 
-Cùng thời điểm đó, các mô hình ngôn ngữ lớn (Large Language Model — LLM) như ChatGPT, Gemini trở thành công cụ học sinh sử dụng hằng ngày mà nhà trường gần như không kiểm soát được.
+Cùng lúc đó, Chương trình giáo dục phổ thông 2018 (Thông tư 32/2018/TT-BGDĐT) bắt đầu áp dụng cho lớp 11 từ năm học 2023–2024, mang theo nhiều thay đổi căn bản đối với môn Hoá học.
 
-Hai xu hướng này gặp nhau và tạo ra một vấn đề chưa được nghiên cứu ở Việt Nam.
+Hai việc này gặp nhau và tạo ra vấn đề mà đề tài muốn giải quyết.
 
-## 1.2. Vấn đề thứ nhất: mô hình ngôn ngữ lớn trả lời theo chương trình cũ
+## 1.2. Vấn đề thứ nhất: trí tuệ nhân tạo trả lời theo sách cũ
 
-Dữ liệu huấn luyện của các LLM phổ biến chủ yếu là tài liệu tiếng Việt được viết trước năm 2018 cùng tài liệu quốc tế. Hệ quả là khi được hỏi về Hoá học phổ thông Việt Nam, mô hình có xu hướng trả lời theo **chương trình 2006**. Khảo sát sơ bộ của nhóm nghiên cứu ghi nhận ba nhóm sai lệch có thể kiểm chứng khách quan:
+Các mô hình ngôn ngữ lớn (sau đây gọi tắt là **mô hình**) học từ một kho văn bản khổng lồ trên mạng. Kho đó chủ yếu là tài liệu tiếng Việt viết **trước năm 2018** cùng tài liệu nước ngoài. Vì vậy khi được hỏi về Hoá học phổ thông Việt Nam, mô hình có xu hướng trả lời theo **chương trình 2006**.
 
-**a) Sai hằng số.** Mô hình dùng "điều kiện tiêu chuẩn (đktc)" với thể tích mol khí 22,4 L/mol — quy ước 0 °C, 1 atm của chương trình cũ. Chương trình 2018 dùng "điều kiện chuẩn (đkc)" ở 25 °C và 1 bar với thể tích mol khí **24,79 L/mol**.
+Nhóm nghiên cứu đã thử và ghi nhận ba dạng sai, cả ba đều kiểm tra đúng sai được rõ ràng:
 
-Đây là sai lệch nghiêm trọng nhất, vì hằng số này xuất hiện trong hầu hết bài toán tính lượng chất khí. Sai ở đây thì **toàn bộ kết quả bài tính sai theo**, trong khi cách trình bày vẫn hoàn toàn chỉnh chu và thuyết phục.
+**Một là sai hằng số.** Mô hình dùng "điều kiện tiêu chuẩn (đktc)" với thể tích mol khí **22,4 L/mol** — quy ước 0 °C, 1 atm của sách cũ. Chương trình 2018 dùng "điều kiện chuẩn (đkc)" ở 25 °C và 1 bar, thể tích mol khí là **24,79 L/mol**.
 
-**b) Sai danh pháp.** Mô hình gọi NaOH là "natri hiđroxit" thay vì "sodium hydroxide"; gọi alcohol là "ancol", aldehyde là "anđehit". Học sinh chép lại vào bài kiểm tra sẽ bị trừ điểm dù bản chất hoá học các em hiểu đúng.
+Đây là sai lệch nặng nhất. Hằng số này có mặt trong hầu hết bài toán tính lượng chất khí, nên **sai ở đây là sai toàn bộ đáp số** — trong khi bài giải vẫn trình bày mạch lạc, đủ các bước, trông rất đáng tin.
 
-**c) Bịa nội dung ngoài chương trình.** Được hỏi "Bài 30 nói gì?", mô hình có thể mô tả một bài học không tồn tại, trong khi chương trình chỉ có đúng 25 bài.
+**Hai là sai tên gọi.** Mô hình gọi NaOH là "natri hiđroxit" thay vì "sodium hydroxide", gọi alcohol là "ancol", aldehyde là "anđehit". Học sinh chép vào bài kiểm tra sẽ bị trừ điểm dù bản chất hoá học các em hiểu đúng.
 
-Điều làm ba sai lệch trên trở nên nguy hiểm không phải bản thân chúng, mà là **học sinh không có đủ năng lực để phát hiện**. Một câu trả lời sai được trình bày mạch lạc, đúng văn phong sư phạm, có phương trình hoá học kèm theo — đối với người học, nó không khác gì một câu trả lời đúng.
+**Ba là bịa nội dung không có trong sách.** Hỏi "Bài 30 nói gì?", mô hình có thể mô tả một bài học không tồn tại, trong khi chương trình chỉ có đúng 25 bài.
 
-## 1.3. Vấn đề thứ hai: mô hình được huấn luyện để chiều người dùng
+Điều nguy hiểm không nằm ở bản thân ba lỗi ấy, mà ở chỗ **học sinh không đủ khả năng nhận ra**. Một câu trả lời sai được viết trôi chảy, đúng giọng thầy cô, có kèm phương trình hoá học — với người đang đi học, nó không khác gì một câu trả lời đúng.
 
-Các LLM thương mại được tinh chỉnh theo hướng hữu ích và làm hài lòng người dùng. Khi học sinh yêu cầu "cho em đáp án luôn", mô hình đưa đáp án. Điều này đi ngược mục tiêu sư phạm: học sinh nhận được kết quả nhưng không trải qua quá trình tư duy tạo ra kết quả đó.
+## 1.3. Vấn đề thứ hai: cứ hỏi là nó cho đáp án
 
-Từ góc độ khoa học máy tính, đây là một bài toán đáng chú ý: **làm thế nào ràng buộc một mô hình vốn được tối ưu để giúp đỡ, phải từ chối giúp đỡ theo đúng cách người dùng đang yêu cầu** — và duy trì được ràng buộc đó khi người dùng gây áp lực liên tục qua nhiều lượt hội thoại.
+Các công cụ này được nhà sản xuất điều chỉnh theo hướng làm hài lòng người dùng. Học sinh gõ "cho em đáp án luôn" thì nó đưa đáp án ngay. Kết quả là các em có bài nộp nhưng không hề trải qua quá trình suy nghĩ để ra bài nộp đó.
 
-## 1.4. Khoảng trống nghiên cứu
+Từ góc độ tin học, đây là một bài toán đáng chú ý: **làm sao buộc một chương trình vốn được thiết kế để giúp đỡ hết mình phải từ chối giúp theo đúng cách người dùng đang đòi** — và giữ được thái độ ấy khi học sinh nài nỉ liên tục qua nhiều lượt.
 
-Qua khảo sát tài liệu, nhóm nghiên cứu xác định hai khoảng trống:
+## 1.4. Chỗ chưa ai làm
 
-**Khoảng trống 1 — chưa có nghiên cứu về neo LLM vào chương trình Việt Nam 2018.** Các hệ dạy học thông minh (Intelligent Tutoring System) đã có lịch sử trên năm mươi năm và các nghiên cứu về LLM trong giáo dục xuất hiện dày đặc từ 2023, nhưng đều xây dựng trên chương trình Hoa Kỳ hoặc châu Âu. Bài toán neo mô hình vào một chương trình quốc gia **vừa cải cách**, nơi dữ liệu huấn luyện của mô hình mâu thuẫn trực tiếp với nội dung cần dạy, chưa được nghiên cứu.
+Đề tài xác định hai chỗ trống:
 
-**Khoảng trống 2 — thiếu phương pháp kiểm chứng tự động.** Phần lớn ứng dụng LLM trong giáo dục dừng ở mức mô tả cách thiết kế câu lệnh và khẳng định hệ thống hoạt động tốt, không có cơ chế nào để **phát hiện tự động** khi hệ thống bắt đầu trả lời sai. Với một hệ thống mà nhà cung cấp có thể cập nhật mô hình bất kỳ lúc nào, đây là thiếu sót có hậu quả thực tế: hệ thống có thể suy giảm chất lượng mà không ai hay biết.
+**Chỗ trống thứ nhất — chưa có ai làm cho chương trình Việt Nam 2018.** Trên thế giới đã có nhiều hệ dạy học thông minh và rất nhiều nghiên cứu về trí tuệ nhân tạo trong giáo dục, nhưng đều dựa trên chương trình của Mỹ hoặc châu Âu. Việc buộc mô hình bám theo một chương trình quốc gia **vừa mới thay đổi** — nơi kiến thức mô hình đã học mâu thuẫn thẳng với nội dung cần dạy — thì chưa thấy công trình nào.
 
-## 1.5. Tính cấp thiết về thời điểm
+**Chỗ trống thứ hai — không ai kiểm tra tự động.** Phần lớn ứng dụng trí tuệ nhân tạo trong giáo dục dừng ở chỗ mô tả cách viết câu lệnh rồi khẳng định "hệ thống hoạt động tốt". Không có cơ chế nào **tự phát hiện** khi hệ thống bắt đầu trả lời sai. Với một công cụ mà nhà sản xuất có thể cập nhật bất cứ lúc nào, đây là thiếu sót có hậu quả thật: chất lượng tụt xuống mà không ai hay biết.
 
-Học sinh **đang** sử dụng các công cụ này, không chờ nghiên cứu kết luận. Mỗi năm học trôi qua là thêm một khoá học sinh tiếp nhận kiến thức theo quy ước đã bị thay thế. Nghiên cứu này cần được thực hiện trong giai đoạn chương trình 2018 còn đang triển khai, khi kết quả còn kịp có tác dụng.
+## 1.5. Vì sao phải làm ngay
+
+Học sinh **đang** dùng, không chờ nghiên cứu xong. Mỗi năm học trôi qua là thêm một khoá tiếp nhận kiến thức theo quy ước đã bị thay thế. Đề tài cần làm trong giai đoạn chương trình 2018 còn đang triển khai, khi kết quả còn kịp có ích.
 
 ---
 
 # 2. MỤC TIÊU NGHIÊN CỨU
 
-## 2.1. Mục tiêu tổng quát
+## 2.1. Mục tiêu chung
 
-Xây dựng và kiểm chứng một phương pháp neo mô hình ngôn ngữ lớn vào Chương trình giáo dục phổ thông 2018 môn Hoá học lớp 11, bảo đảm đồng thời **tính đúng đắn về nội dung** và **tính phù hợp về phương pháp sư phạm**, trong đó sự tuân thủ của hệ thống phải kiểm chứng được một cách tự động thay vì chỉ được cam kết bằng lời.
+Xây dựng một gia sư ảo **bám sát Chương trình Hoá học 11 năm 2018**, vừa trả lời đúng kiến thức vừa dẫn dắt học sinh tự tìm ra lời giải thay vì cho đáp án; và quan trọng không kém — **chứng minh được điều đó bằng kiểm tra tự động**, chứ không chỉ nói suông.
 
 ## 2.2. Mục tiêu cụ thể
 
-**MT1 — Xây dựng phương pháp neo nội dung.**
-Thiết kế kiến trúc dựng ngữ cảnh đưa nội dung chương trình 2018 vào mỗi lượt hỏi đáp, sao cho mô hình bám đúng 25 bài của chương trình.
+**Mục tiêu 1 — Buộc mô hình bám đúng chương trình.**
+Xây dựng cách đưa nội dung 25 bài của chương trình vào từng lượt hỏi đáp.
 
-*Tiêu chí đạt:* hệ thống trả lời đúng quy ước đkc 24,79 L/mol và danh pháp IUPAC trong toàn bộ phép thử; không bịa bài học ngoài phạm vi 25 bài.
+*Đạt khi:* hệ thống dùng đúng đkc 24,79 L/mol và tên chất theo IUPAC trong toàn bộ các phép thử; không bịa ra bài học nào ngoài 25 bài.
 
-**MT2 — Xây dựng phương pháp ràng buộc sư phạm.**
-Thiết kế cơ chế buộc mô hình dẫn dắt học sinh tự tìm ra lời giải thay vì cung cấp đáp án, đồng thời không quá cứng nhắc tới mức cản trở các câu hỏi tra cứu thông thường.
+**Mục tiêu 2 — Buộc mô hình dẫn dắt thay vì cho đáp án.**
+Xây dựng cơ chế bắt gia sư gợi mở từng bước, nhưng không cứng nhắc tới mức những câu hỏi tra cứu đơn giản cũng bị bắt đi vòng.
 
-*Tiêu chí đạt:* hệ thống không cung cấp đáp án ngay cả khi học sinh yêu cầu trực tiếp hoặc tìm cách lách; đồng thời trả lời thẳng các câu hỏi tra cứu mà không bắt học sinh đi qua quy trình dẫn dắt.
+*Đạt khi:* hệ thống không đưa đáp án kể cả khi học sinh đòi thẳng hoặc tìm cách lách; đồng thời trả lời gọn những câu hỏi kiểu "phần này học ở bài nào".
 
-**MT3 — Xây dựng bộ kiểm chứng tự động.**
-Phát triển bộ công cụ chạy bằng một lệnh, phát hiện được các sai lệch về nội dung, về thuật ngữ và về hành vi sư phạm.
+**Mục tiêu 3 — Xây dựng bộ kiểm tra tự động.**
+Làm bộ công cụ chạy bằng một câu lệnh, tự phát hiện được sai sót về kiến thức, về tên gọi và về cách dạy.
 
-*Tiêu chí đạt:* bộ kiểm chứng phát hiện được lỗi thực tế trên hệ thống đang chạy, không chỉ trên tình huống giả định.
+*Đạt khi:* bộ kiểm tra bắt được lỗi thật trên hệ thống đang chạy, không phải chỉ trên tình huống nghĩ ra.
 
-**MT4 — Đánh giá hiệu quả bằng thực nghiệm sư phạm.**
-Tiến hành nghiên cứu có nhóm đối chứng, phân nhóm ngẫu nhiên, để trả lời câu hỏi cách dạy gợi mở có làm tăng kết quả học tập so với cách giảng thẳng hay không.
+**Mục tiêu 4 — Đo hiệu quả thật trên học sinh.**
+Tổ chức thực nghiệm có nhóm đối chứng để trả lời: cách dạy gợi mở có giúp học sinh làm bài tốt hơn cách giảng thẳng hay không.
 
-*Tiêu chí đạt:* thu thập và phân tích được số liệu trước – sau trên toàn khối 11, báo cáo đầy đủ giá trị *p* và mức chênh lệch kèm đánh giá lực kiểm định.
+*Đạt khi:* thu và phân tích được điểm trước – sau trên học sinh khối 11, báo cáo đầy đủ kết quả kèm đánh giá mức tin cậy.
 
 ---
 
 # 3. NỘI DUNG NGHIÊN CỨU
 
-## ND1. Nghiên cứu tổng quan
+## Nội dung 1. Tìm hiểu tài liệu
 
-Khảo sát các hệ dạy học thông minh kinh điển và các nghiên cứu về LLM trong giáo dục giai đoạn 2023–2026; phân tích các kỹ thuật neo tri thức; xác định vị trí của đề tài trong bức tranh chung và làm rõ khoảng trống nghiên cứu.
+Tìm hiểu một số công trình tiêu biểu về hệ dạy học thông minh và về trí tuệ nhân tạo trong giáo dục; tìm hiểu các cách buộc mô hình bám nội dung; nêu rõ đề tài khác gì những gì đã có.
 
-## ND2. Phân tích sai lệch của mô hình đối với Chương trình 2018
+## Nội dung 2. Đo mức sai của mô hình so với chương trình mới
 
-Xây dựng bộ tình huống thử có đáp án khách quan, tập trung vào các điểm chương trình 2018 khác chương trình 2006. Đo tỉ lệ sai của mô hình khi **không** được neo, làm cơ sở đối chiếu cho phần sau.
+Soạn bộ câu hỏi thử có đáp án rõ ràng, tập trung vào những điểm chương trình 2018 khác chương trình 2006. Đo tỉ lệ sai của mô hình khi **chưa** được ràng buộc, để sau này có cái mà so sánh.
 
-## ND3. Xây dựng phương pháp neo và ràng buộc
+## Nội dung 3. Xây dựng cách ràng buộc
 
-**ND3.1. Kiến trúc dựng ngữ cảnh ba tầng.** Thiết kế cơ chế lựa chọn nội dung đưa vào mỗi lượt hỏi, cân bằng giữa độ bao phủ và chi phí:
+**3.1. Đưa nội dung chương trình vào từng lượt hỏi.** Không thể nhét cả cuốn sách vào mỗi câu hỏi, nên phải chọn đưa gì và lúc nào:
 
-| Tầng | Nội dung | Khi nào dùng |
+| Phần đưa vào | Nội dung | Dùng khi nào |
 |---|---|---|
 | Danh mục bài học | Mã và tên 25 bài | Luôn luôn |
-| Toàn văn bài đang mở | Trọng tâm, công thức, mục, ý chính, câu hỏi gợi mở | Khi học sinh đang đọc một bài cụ thể |
+| Toàn văn bài đang mở | Trọng tâm, công thức, các mục, ý chính | Khi học sinh đang đọc một bài |
 | Dàn bài cả chương trình | Tóm tắt và ý chính của cả 25 bài | Khi hỏi đáp chung, không mở bài nào |
 
-**ND3.2. Chuẩn hoá dữ liệu nguồn.** Xây dựng quy trình chuyển tài liệu giáo viên soạn thành dữ liệu có cấu trúc, kèm hai bước chuẩn hoá: đổi thuật ngữ 2006 sang 2018 và khôi phục ký hiệu hoá học (chỉ số dưới) bị mất khi trích xuất văn bản.
+**3.2. Chuẩn hoá dữ liệu bài học.** Xây dựng quy trình biến tài liệu giáo viên soạn thành dữ liệu cho máy đọc, kèm hai bước làm sạch: đổi thuật ngữ 2006 sang 2018, và khôi phục chỉ số dưới trong công thức hoá học bị mất khi lấy chữ ra khỏi tệp Word.
 
-**ND3.3. Ràng buộc sư phạm.** Thiết kế quy trình dẫn dắt theo nhánh lý thuyết và nhánh bài toán, kèm cơ chế phân loại để không áp quy trình lên các câu hỏi không cần thiết.
+**3.3. Ràng buộc cách dạy.** Thiết kế quy trình dẫn dắt cho câu hỏi lý thuyết và cho bài toán tính, kèm bước lọc để không bắt mọi câu hỏi đều phải đi qua quy trình.
 
-## ND4. Xây dựng bộ kiểm chứng tự động
+## Nội dung 4. Xây dựng bộ kiểm tra tự động
 
-**ND4.1. Kiểm chứng tĩnh** — chạy không cần gọi mô hình: tính toàn vẹn dữ liệu chương trình, ngân hàng câu hỏi, thuật toán sinh đề, ký hiệu hoá học, và ràng buộc không để lộ đáp án sang phần ngữ cảnh gửi cho mô hình.
+**4.1. Kiểm tra phần dữ liệu** — chạy không cần gọi mô hình: dữ liệu 25 bài có đủ và đúng không, ngân hàng câu hỏi có hợp lệ không, đề kiểm tra sinh ra có đúng cấu trúc không, công thức hoá học có đúng ký hiệu không, và **đáp án có bị lọt sang phần gửi cho mô hình không**.
 
-**ND4.2. Kiểm chứng hành vi** — gọi mô hình thật với các tình huống có tiêu chí chấm khách quan: dùng đúng hằng số, dùng đúng danh pháp, không cung cấp đáp án khi bị yêu cầu, không bịa nội dung, từ chối yêu cầu ngoài phạm vi môn học.
+**4.2. Kiểm tra cách trả lời** — gọi mô hình thật với những tình huống có đáp án rõ ràng: dùng đúng hằng số, đúng tên chất, không cho đáp án khi bị đòi, không bịa bài, từ chối câu hỏi ngoài môn Hoá.
 
-**ND4.3. Kiểm chứng thiết kế thực nghiệm** — đối chiếu hai nhánh thực nghiệm để bảo đảm chúng chỉ khác nhau ở biến nghiên cứu, và kiểm chứng phần thống kê tự cài với bảng tra chuẩn.
+**4.3. Kiểm tra thiết kế thực nghiệm** — đối chiếu hai nhóm để bảo đảm chúng chỉ khác nhau ở cách dạy, và kiểm tra phần tính toán thống kê có đúng không.
 
-## ND5. Thực nghiệm sư phạm và phân tích số liệu
+## Nội dung 5. Thực nghiệm và xử lý số liệu
 
-Tiến hành thực nghiệm có đối chứng trên toàn khối 11; xử lý số liệu; phân tích kết quả; rút ra kết luận và chỉ rõ hạn chế.
+Tổ chức thực nghiệm có nhóm đối chứng trên học sinh khối 11; thu và xử lý số liệu; phân tích; rút kết luận và nêu rõ những gì đề tài chưa làm được.
 
 ---
 
 # 4. PHƯƠNG PHÁP NGHIÊN CỨU
 
-## 4.1. Phương pháp nghiên cứu lý luận
+## 4.1. Phương pháp nghiên cứu tài liệu
 
-Phân tích, tổng hợp tài liệu về hệ dạy học thông minh, kỹ thuật neo tri thức cho mô hình ngôn ngữ, và Chương trình giáo dục phổ thông 2018 môn Hoá học.
+Đọc, phân tích và tổng hợp tài liệu về hệ dạy học thông minh, về cách buộc mô hình bám nội dung, và về Chương trình giáo dục phổ thông 2018 môn Hoá học.
 
-## 4.2. Phương pháp thiết kế và xây dựng hệ thống
+## 4.2. Phương pháp xây dựng sản phẩm
 
-Xây dựng hệ thống theo hướng lặp: thiết kế — hiện thực — đo — sửa. Nguyên tắc xuyên suốt là **đo trước khi sửa**: mọi thay đổi phải dựa trên số liệu quan sát được chứ không dựa trên phỏng đoán, và số đo được ghi lại ngay trong mã nguồn.
+Làm theo vòng lặp: thiết kế — làm — đo — sửa. Nguyên tắc xuyên suốt là **đo trước khi sửa**: mọi thay đổi phải dựa trên số liệu quan sát được chứ không dựa vào cảm tính, và con số đo được ghi lại ngay trong mã nguồn để lần sau còn đối chiếu.
 
-## 4.3. Phương pháp kiểm chứng tự động
+## 4.3. Phương pháp kiểm tra tự động
 
-Đây là phương pháp mang tính đóng góp chính của đề tài về mặt công nghệ phần mềm.
+Đây là phần đóng góp chính của đề tài về mặt tin học.
 
-**Nguyên tắc thiết kế:** mỗi phép thử phải có **tiêu chí chấm khách quan**, không phụ thuộc đánh giá chủ quan. Thí dụ, phép thử về hằng số không đòi mô hình phải in ra con số 24,79 — vì mô hình có quyền hỏi ngược lại học sinh, và đó mới là hành vi sư phạm đúng — mà chỉ kiểm rằng mô hình **không** tính bằng 22,4 L/mol, và nếu có nhắc tới 22,4 thì phải nói rõ đó là quy ước cũ.
+**Mỗi phép thử phải chấm được khách quan.** Ví dụ, phép thử về hằng số **không** đòi mô hình phải in ra con số 24,79 — vì gia sư có quyền hỏi ngược lại học sinh, và đó mới là cách dạy đúng. Phép thử chỉ kiểm rằng mô hình **không** tính bằng 22,4 L/mol, và nếu có nhắc tới 22,4 thì phải nói rõ đó là quy ước cũ.
 
-**Xử lý tính ngẫu nhiên của mô hình:** LLM sinh văn bản có yếu tố ngẫu nhiên, nên một lần chạy đạt không bảo đảm hệ thống ổn định. Nghiên cứu sẽ chạy lặp mỗi phép thử và báo cáo tỉ lệ đạt thay vì kết quả một lần.
+**Chạy lặp nhiều lần.** Mô hình trả lời có yếu tố ngẫu nhiên, nên một lần chạy đạt chưa nói lên điều gì. Đề tài sẽ chạy lặp mỗi phép thử và báo cáo tỉ lệ đạt thay vì kết quả một lần.
 
-**Kiểm chứng chính bộ kiểm chứng:** trong quá trình phát triển, nhóm nghiên cứu ghi nhận bộ chấm tự động có thể **báo hỏng oan** một câu trả lời đúng khi tiêu chí chấm liệt kê cứng các cụm từ chấp nhận được. Đây là một phát hiện có giá trị phương pháp luận và sẽ được trình bày trong báo cáo: bộ chấm tự động cũng cần được kiểm chứng, và tỉ lệ sai của nó phải được báo cáo cùng kết quả.
+**Kiểm tra lại chính bộ kiểm tra.** Trong quá trình làm, nhóm nghiên cứu phát hiện bộ chấm tự động có thể **báo hỏng oan** một câu trả lời đúng, khi tiêu chí chấm liệt kê cứng các cách diễn đạt được chấp nhận. Đây là một bài học có giá trị và sẽ được trình bày trong báo cáo: bộ chấm cũng cần được kiểm tra, và tỉ lệ chấm sai của nó phải nêu ra cùng kết quả.
 
 ## 4.4. Phương pháp thực nghiệm sư phạm
 
-**Thiết kế:** thực nghiệm ngẫu nhiên có đối chứng, đo trước – đo sau, hai nhóm song song.
+**Cách bố trí:** chia học sinh thành hai nhóm ngẫu nhiên, cùng kiểm tra trước, cùng học hai tuần, cùng kiểm tra sau.
 
-**Phân nhóm:** ngẫu nhiên bằng hàm băm từ định danh học sinh. Cách này bảo đảm mỗi học sinh cố định ở một nhánh trong suốt đợt — nếu tung ngẫu nhiên mỗi lượt truy cập, học sinh sẽ nhận cả hai cách dạy trộn lẫn và không còn hai nhóm để so sánh. Không ai, kể cả nhóm nghiên cứu, chọn được học sinh nào vào nhóm nào.
+**Chia nhóm:** máy tự chia ngẫu nhiên dựa trên mã học sinh. Cách này bảo đảm mỗi em cố định ở một nhóm suốt đợt — nếu chia lại mỗi lần đăng nhập, các em sẽ nhận cả hai cách dạy trộn lẫn và không còn hai nhóm để so sánh. Không ai, kể cả người làm đề tài, chọn được em nào vào nhóm nào.
 
-**Hai nhánh:**
+**Hai nhóm khác nhau ở đâu:**
 
 | | Nhóm thực nghiệm | Nhóm đối chứng |
 |---|---|---|
-| Cách dạy | Dẫn dắt gợi mở, không cung cấp đáp án | Giảng trực tiếp, có lời giải mẫu đầy đủ |
-| Neo Chương trình 2018 | Có | **Có** |
+| Cách dạy | Gợi mở, không cho đáp án | Giảng thẳng, có bài giải mẫu |
+| Bám Chương trình 2018 | Có | **Có** |
 | Hằng số đkc 24,79 L/mol | Có | **Có** |
-| Danh pháp IUPAC | Có | **Có** |
-| Giới hạn phạm vi và an toàn | Có | **Có** |
+| Tên chất theo IUPAC | Có | **Có** |
+| Giới hạn phạm vi, rào an toàn | Có | **Có** |
 
-Đây là điểm mấu chốt về mặt phương pháp: **hai nhánh chỉ được khác nhau ở đúng một biến là cách dạy.** Nếu nhóm đối chứng đồng thời yếu hơn ở phần neo nội dung thì chênh lệch kết quả không quy được về nguyên nhân nào, và thực nghiệm mất giá trị. Điều kiện này được kiểm chứng tự động bằng cách đối chiếu từng thành phần bắt buộc phải có ở cả hai nhánh.
+Đây là điểm quan trọng nhất về mặt phương pháp: **hai nhóm chỉ được khác nhau ở đúng một thứ là cách dạy.** Nếu nhóm đối chứng đồng thời cũng kém hơn ở phần bám chương trình, thì chênh lệch điểm cuối cùng không biết là do cách dạy hay do một bên nắm kiến thức tốt hơn — và cả thực nghiệm trở nên vô nghĩa. Điều kiện này được máy kiểm tra tự động bằng cách đối chiếu từng phần bắt buộc phải có ở cả hai bên.
 
-**Nhóm đối chứng không phải phương án hình thức.** Nhánh đối chứng được thiết kế đầy đủ, tương đương chất lượng mà học sinh nhận được khi sử dụng một trợ lý AI thông thường. So sánh với một đối tượng cố ý làm yếu đi sẽ không cho kết luận có ý nghĩa.
+**Nhóm đối chứng không phải làm cho có.** Nó được viết đầy đủ, ngang với chất lượng học sinh nhận được khi hỏi một trợ lý trí tuệ nhân tạo thông thường. So sánh với một đối thủ cố tình làm yếu đi thì thắng cũng chẳng chứng minh được gì.
 
-**Công cụ đo:** bài kiểm tra 15 câu do giáo viên bộ môn soạn và thẩm định, trải đều bốn mức nhận biết – thông hiểu – vận dụng – vận dụng cao. Dùng cùng một đề cho lần đo trước và lần đo sau; hiệu ứng ghi nhớ đề tác động như nhau lên hai nhóm nên không ảnh hưởng phép so sánh giữa hai nhóm. Các câu trong đề được rút khỏi phần luyện tập của hệ thống trong suốt đợt thực nghiệm. Bài làm được chấm rọc phách.
+**Bài kiểm tra:** 15 câu do giáo viên bộ môn soạn và duyệt, trải đều bốn mức nhận biết – thông hiểu – vận dụng – vận dụng cao. Dùng **cùng một đề** cho lần trước và lần sau; việc học sinh nhớ đề tác động như nhau lên hai nhóm nên không làm lệch phép so sánh giữa hai nhóm. Các câu trong đề được **rút khỏi phần luyện tập** của hệ thống suốt đợt thực nghiệm, để tránh chuyện gia sư ôn đúng câu sắp thi. Bài làm chấm rọc phách.
 
-**Biến phụ thuộc:** mức tiến bộ, tính bằng điểm sau trừ điểm trước. Biến này được chốt trước khi thu số liệu.
+**Đo cái gì:** mức tiến bộ, tức là điểm sau trừ điểm trước. Chốt trước khi thu số liệu, không đổi giữa chừng.
 
 ## 4.5. Phương pháp xử lý số liệu
 
-| Bước | Kiểm định | Mục đích |
+| Bước | Việc | Để làm gì |
 |---|---|---|
-| 1 | t Welch trên điểm trước | Xác nhận hai nhóm tương đương từ đầu |
-| 2 | t Welch trên mức tiến bộ | Câu hỏi nghiên cứu chính |
-| 3 | t cặp trong từng nhóm | Xác nhận đợt học có tác động |
+| 1 | So điểm trước của hai nhóm | Xem hai nhóm có ngang nhau từ đầu không |
+| 2 | So mức tiến bộ của hai nhóm | Câu hỏi chính của đề tài |
+| 3 | So điểm trước – sau trong từng nhóm | Xem đợt học có tác dụng không |
 
-Sử dụng kiểm định **t Welch** thay vì t Student vì Welch không giả định hai nhóm có phương sai bằng nhau — giả định mà lớp học thực tế không bảo đảm, và khi giả định sai thì Student cho giá trị *p* lạc quan hơn thực tế.
+Phép so sánh dùng **kiểm định t** — công cụ chuẩn để trả lời câu hỏi "chênh lệch này là thật hay chỉ do may rủi". Đề tài dùng biến thể **Welch** vì nó không đòi hỏi hai nhóm phải dao động đều như nhau, điều mà lớp học thực tế không bao giờ bảo đảm.
 
-Báo cáo đồng thời **giá trị *p*** và **mức chênh lệch (Hedges' g)**. Chỉ báo cáo *p* thì không biết chênh lệch có đáng kể trên thực tế hay không; chỉ báo cáo mức chênh lệch thì không biết nó có phải do ngẫu nhiên.
+Báo cáo đồng thời hai con số:
 
-**Lực kiểm định.** Với cỡ mẫu toàn khối 11, ở mức ý nghĩa 0,05 hai phía và lực kiểm định 80%:
+- **Mức tin cậy (giá trị *p*)** — khả năng chênh lệch quan sát được chỉ là do may rủi. Dưới 0,05 thì coi là đáng tin.
+- **Mức chênh lệch thực tế (hệ số ảnh hưởng)** — chênh lệch đó **lớn tới đâu**. Với số học sinh đông, một khác biệt bé xíu vẫn cho *p* nhỏ; nên chỉ nhìn *p* thì không biết kết quả có ý nghĩa gì trên lớp học hay không.
 
-| Số học sinh mỗi nhóm | Phát hiện được chênh lệch từ |
+**Cần bao nhiêu học sinh mới đủ.** Đây là câu hỏi quyết định kết luận có giá trị hay không:
+
+| Số em mỗi nhóm | Phát hiện được chênh lệch từ mức |
 |---|---|
-| 40 | g ≈ 0,63 (mức vừa – lớn) |
-| 60 | g ≈ 0,51 (mức vừa) |
-| 100 | g ≈ 0,40 (mức vừa – nhỏ) |
-| 150 | g ≈ 0,32 (mức nhỏ – vừa) |
+| 40 | Lớn |
+| 60 | Vừa |
+| 100 | Vừa – nhỏ |
+| 150 | Nhỏ |
 
-Toàn bộ hàm thống kê được cài đặt trong đề tài và **đối chiếu với bảng tra phân phối t chuẩn** ở nhiều bậc tự do trước khi sử dụng.
+Vì đề tài có toàn khối 11, cỡ mẫu đủ để phát hiện chênh lệch mức vừa — tốt hơn phần lớn nghiên cứu ở cấp trường.
 
-## 4.6. Đạo đức nghiên cứu
+Toàn bộ phần tính toán được viết trong đề tài và **đối chiếu với bảng tra chuẩn** trước khi đem dùng, để chắc chắn không tính sai.
 
-Đối tượng là người chưa thành niên, do đó:
+## 4.6. Bảo đảm quyền lợi học sinh
 
-- Xin đồng ý của học sinh và của phụ huynh trước khi bắt đầu; nêu rõ có hai cách dạy, việc phân nhóm là ngẫu nhiên, và học sinh có thể rút khỏi nghiên cứu bất cứ lúc nào.
-- Kết quả nghiên cứu **không ảnh hưởng đến điểm số chính thức** của học sinh.
-- Số liệu chỉ lưu mã ẩn danh, không lưu họ tên, địa chỉ thư điện tử hay lớp.
-- Nhóm đối chứng không bị thiệt: các em vẫn được một gia sư đầy đủ chức năng. Sau khi kết thúc đợt, toàn bộ học sinh dùng chung phiên bản chính thức.
+Học sinh là người chưa thành niên, nên đề tài đặt ra các nguyên tắc bắt buộc:
+
+- Xin ý kiến đồng ý của học sinh và phụ huynh trước khi bắt đầu; nói rõ có hai cách dạy, việc chia nhóm là ngẫu nhiên, và em nào muốn dừng thì dừng bất cứ lúc nào.
+- Kết quả nghiên cứu **không ảnh hưởng gì tới điểm số chính thức** của học sinh.
+- Số liệu chỉ lưu mã, **không lưu họ tên, lớp hay địa chỉ thư điện tử**.
+- Nhóm đối chứng không bị thiệt: các em vẫn có một gia sư đầy đủ, thậm chí trả lời nhanh hơn. Hết đợt thì cả hai nhóm dùng chung bản chính thức.
 
 ---
 
 # 5. KẾT QUẢ DỰ KIẾN
 
-## 5.1. Sản phẩm khoa học
+## 5.1. Sản phẩm
 
-1. **Phương pháp neo LLM vào chương trình quốc gia vừa cải cách**, mô tả đủ chi tiết để áp dụng lại cho môn học khác hoặc cấp học khác.
-2. **Bộ kiểm chứng tự động** cho hệ thống giáo dục dựa trên LLM, gồm cả kiểm chứng tĩnh và kiểm chứng hành vi, kèm phân tích về độ tin cậy của chính bộ chấm.
-3. **Số liệu thực nghiệm** về hiệu quả của cách dạy gợi mở so với cách giảng trực tiếp trên mẫu học sinh Việt Nam.
-4. **Báo cáo tổng kết** và **01 bài báo** đăng kỷ yếu hội nghị hoặc tạp chí chuyên ngành.
+1. **Hệ thống gia sư ảo hoạt động được**, đã triển khai thực tế: hỏi đáp có gia sư, kho bài giảng 25 bài, ngân hàng câu hỏi, bài kiểm tra theo chương và ba trò chơi ôn tập.
+2. **Bộ kiểm tra tự động** chạy bằng một câu lệnh, gồm phần kiểm dữ liệu và phần kiểm cách trả lời.
+3. **Bộ số liệu thực nghiệm** trên học sinh khối 11.
+4. **Báo cáo tổng kết đề tài** và bài trình bày bảo vệ.
 
-## 5.2. Sản phẩm ứng dụng
+## 5.2. Kết quả về mặt khoa học
 
-Hệ thống hoạt động được, triển khai thực tế, gồm phần hỏi đáp có gia sư ảo, kho bài giảng, ngân hàng câu hỏi, bài kiểm tra theo chương và ba trò chơi ôn tập. Mã nguồn kèm bộ kiểm chứng được công bố để nhóm khác kiểm chứng lại.
+1. Một **cách làm có thể áp dụng lại** cho môn học khác: mô tả đủ chi tiết để giáo viên Vật lí, Sinh học làm theo cho môn của mình.
+2. **Bằng chứng số** đầu tiên trên học sinh của trường về hiệu quả của cách dạy gợi mở bằng trí tuệ nhân tạo.
+3. Một **bài học về phương pháp**: bộ chấm tự động cũng có thể chấm sai, và điều đó phải được báo cáo chứ không giấu đi.
 
-## 5.3. Kết quả định lượng dự kiến
+## 5.3. Chỉ tiêu định lượng
 
-| Chỉ tiêu | Mức dự kiến |
+| Chỉ tiêu | Mức đặt ra |
 |---|---|
-| Tỉ lệ trả lời đúng quy ước Chương trình 2018 | ≥ 95% số phép thử |
-| Tỉ lệ giữ được ràng buộc không cung cấp đáp án | ≥ 90% số lượt bị yêu cầu trực tiếp |
-| Số phép thử tự động | ≥ 30 |
-| Cỡ mẫu thực nghiệm | Toàn khối 11 |
+| Tỉ lệ trả lời đúng quy ước Chương trình 2018 | Từ 95% số phép thử trở lên |
+| Tỉ lệ giữ được nguyên tắc không cho đáp án | Từ 90% số lượt bị đòi trở lên |
+| Số phép thử tự động | Từ 30 trở lên |
+| Số học sinh tham gia thực nghiệm | Toàn khối 11 |
 
-## 5.4. Hai kịch bản kết quả thực nghiệm — cả hai đều có giá trị
+## 5.4. Hai khả năng — và cả hai đều có giá trị
 
-Điểm này được nêu ngay trong đề cương để tránh áp lực phải ra một kết quả định sẵn:
+Điều này được nói ngay từ đề cương, để không ai phải chịu áp lực ra một kết quả định sẵn:
 
-**Kịch bản A — nhóm gợi mở tiến bộ hơn có ý nghĩa thống kê.** Cung cấp bằng chứng định lượng đầu tiên trên học sinh Việt Nam cho phương pháp dẫn dắt gợi mở bằng LLM, và là cơ sở để nhân rộng.
+**Khả năng A — nhóm gợi mở tiến bộ hơn rõ rệt.** Đây là bằng chứng số cho cách dạy này, và là cơ sở để nhân rộng ra các môn khác trong trường.
 
-**Kịch bản B — không đủ bằng chứng kết luận hai cách dạy khác nhau.** Vẫn là kết quả có giá trị công bố, vì nó cảnh báo rằng lợi ích của cách dạy gợi mở không hiển nhiên như nhiều tài liệu quảng bá công nghệ giáo dục ngụ ý. Trong trường hợp này, đề tài sẽ báo cáo mức chênh lệch quan sát được kèm khoảng tin cậy và lực kiểm định của mẫu, đồng thời đề xuất cỡ mẫu cần thiết cho nghiên cứu tiếp theo.
+**Khả năng B — không đủ bằng chứng kết luận hai cách dạy khác nhau.** Kết quả này **vẫn có giá trị và vẫn báo cáo được**, vì nó cảnh báo rằng lợi ích của cách dạy gợi mở không hiển nhiên như nhiều lời quảng cáo về công nghệ giáo dục. Khi đó đề tài sẽ báo cáo mức chênh lệch quan sát được, nêu rõ cỡ mẫu đủ hay chưa, và đề xuất số học sinh cần cho lần sau.
 
-Nhóm nghiên cứu cam kết **chốt biến đo và kế hoạch phân tích trước khi thu số liệu**, không thay đổi sau khi đã nhìn thấy kết quả.
+Nhóm nghiên cứu cam kết **chốt cách đo và cách phân tích trước khi thu số liệu**, không thay đổi sau khi đã nhìn thấy kết quả.
 
-## 5.5. Khả năng ứng dụng và mở rộng
+## 5.5. Khả năng áp dụng và nhân rộng
 
-Phương pháp neo và bộ kiểm chứng không gắn cứng với môn Hoá học. Cấu trúc dữ liệu chương trình, cơ chế dựng ngữ cảnh và bộ phép thử đều có thể áp dụng cho Vật lí, Sinh học hoặc bất kỳ môn nào có chương trình được quy định chặt chẽ. Đây là hướng mở rộng tự nhiên sau khi đề tài kết thúc.
+Cách làm của đề tài **không gắn cứng với môn Hoá**. Cấu trúc dữ liệu bài học, cách đưa nội dung vào từng lượt hỏi, và bộ phép thử đều dùng lại được cho Vật lí, Sinh học hay bất kỳ môn nào có chương trình quy định chặt chẽ. Đây là hướng mở rộng tự nhiên sau khi đề tài kết thúc.
+
+Trong phạm vi nhà trường, sản phẩm dùng được ngay cho việc tự học ở nhà và cho tiết ôn tập trên máy chiếu.
 
 ---
 
 # 6. KẾ HOẠCH THỰC HIỆN
 
-| Tuần | Thời gian | Nội dung | Sản phẩm |
+| Tuần | Thời gian | Việc làm | Kết quả |
 |---|---|---|---|
-| 1 | 08–13/9 | Hoàn thiện tổng quan; chốt đề kiểm tra 15 câu; rút các câu đó khỏi phần luyện tập; xin đồng ý của học sinh và phụ huynh; **bật thanh toán dịch vụ API** | Đề kiểm tra; văn bản đồng ý |
-| 2 | 15–20/9 | Kiểm tra trước cho toàn khối; kích hoạt phân nhóm; tập huấn cách sử dụng | Số liệu điểm trước |
-| 3–4 | 22/9–04/10 | Giai đoạn can thiệp; theo dõi mức độ sử dụng; ghi nhật ký sự cố | Nhật ký; số lượt sử dụng |
-| 5 | 06–11/10 | Kiểm tra sau; nhập và làm sạch số liệu; chạy phân tích thống kê | Bảng số liệu; kết quả phân tích |
-| 6 | 13–18/10 | Viết báo cáo tổng kết; chuẩn bị bảo vệ | Báo cáo; bài trình bày |
+| 1 | 08–13/9 | Hoàn thiện phần tìm hiểu tài liệu; soạn và duyệt đề kiểm tra 15 câu; rút các câu đó khỏi phần luyện tập; xin ý kiến đồng ý của học sinh và phụ huynh; **bật thanh toán dịch vụ** | Đề kiểm tra; phiếu đồng ý |
+| 2 | 15–20/9 | Kiểm tra trước cho cả khối; bật chế độ chia nhóm; hướng dẫn học sinh cách dùng | Bảng điểm trước |
+| 3–4 | 22/9–04/10 | Học sinh sử dụng hệ thống; theo dõi mức độ dùng; ghi nhật ký sự cố | Nhật ký; số lượt dùng |
+| 5 | 06–11/10 | Kiểm tra sau; nhập và kiểm tra số liệu; chạy phân tích | Bảng số liệu; kết quả |
+| 6 | 13–18/10 | Viết báo cáo tổng kết; làm bài trình bày | Báo cáo; slide |
 
 ---
 
-# 7. RỦI RO VÀ PHƯƠNG ÁN DỰ PHÒNG
+# 7. NHỮNG RỦI RO ĐÃ LƯỜNG TRƯỚC
 
-Phần này được nêu thẳng vì hai rủi ro đầu đã được xác định là **đường găng** của đề tài.
+Nêu thẳng vì hai rủi ro đầu là chỗ dễ làm hỏng cả đề tài nhất.
 
-## 7.1. Hạn mức dịch vụ API — rủi ro cao nhất
+## 7.1. Hết lượt dùng dịch vụ — rủi ro lớn nhất
 
-**Vấn đề:** bậc miễn phí của dịch vụ mô hình ngôn ngữ giới hạn 20 lượt gọi mỗi ngày cho mỗi mô hình. Với toàn khối 11 sử dụng trong hai tuần, nhu cầu ước tính khoảng 2.000 lượt, trong khi bậc miễn phí chỉ đáp ứng khoảng 280 lượt cho cả đợt — thiếu khoảng bảy lần.
+**Vấn đề:** bản miễn phí của dịch vụ chỉ cho **20 lượt hỏi mỗi ngày**. Cả khối 11 dùng trong hai tuần cần khoảng **5.000 lượt**, trong khi bản miễn phí chỉ đáp ứng chừng 280 lượt cho cả đợt.
 
-**Hậu quả nếu không xử lý:** hệ thống ngừng phản hồi giữa đợt thực nghiệm, và chính hạn mức — chứ không phải thiết kế nghiên cứu — sẽ quyết định học sinh nào được sử dụng. Số liệu thu được sẽ không dùng được.
+**Hậu quả nếu không xử lý:** hệ thống ngừng trả lời giữa đợt, và chính cái hạn mức đó — chứ không phải thiết kế nghiên cứu — sẽ quyết định em nào được dùng. Số liệu thu về sẽ không dùng được.
 
-**Phương án:** bật thanh toán trước tuần 1.
+**Cách xử lý:** bật thanh toán trước tuần 1.
 
-**Dự trù kinh phí** (đo bằng `npm run do-chi-phi`, dùng chính ngữ cảnh hệ thống đang gửi):
+**Kinh phí cần chuẩn bị** (đo bằng chính hệ thống, không ước lượng):
 
-| Khối ngữ cảnh | Số token |
+| Phần nội dung gửi đi mỗi lượt | Số token |
 |---|---|
-| Câu lệnh hệ thống | 4.407 |
+| Câu lệnh điều khiển gia sư | 4.407 |
 | Danh mục 25 bài (luôn gửi kèm) | 604 |
-| Toàn văn một bài (khi đang đọc bài) | 1.174 |
-| Dàn bài cả chương trình (khung hỏi đáp chung) | 7.994 |
-| **Cộng mỗi lượt hỏi ở khung hỏi đáp chung** | **13.005** |
+| Dàn bài cả chương trình | 7.994 |
+| **Cộng mỗi lượt hỏi** | **13.005** |
 
-Lưu ý một yếu tố dễ bỏ sót: **lịch sử hội thoại được gửi lại ở mỗi lượt**, nên một cuộc trò chuyện mười lượt tốn nhiều hơn mười lượt rời rạc khoảng 12%.
+Một điểm dễ bỏ sót: **lịch sử trò chuyện được gửi lại ở mỗi lượt**, nên một cuộc mười lượt tốn nhiều hơn mười lượt rời rạc khoảng 12%.
 
-| Quy mô | Tổng lượt gọi | Token vào | Token ra |
+| Quy mô | Tổng lượt | Token gửi đi | Token nhận về |
 |---|---|---|---|
 | 100 học sinh × 25 lượt | 2.500 | 34,7 triệu | 0,75 triệu |
 | 200 học sinh × 25 lượt | 5.000 | 69,5 triệu | 1,5 triệu |
 | 300 học sinh × 50 lượt | 15.000 | 208,4 triệu | 4,5 triệu |
 
-Với mặt bằng đơn giá của các mô hình hạng nhẹ hiện nay, chi phí cho quy mô 200 học sinh ước tính **dưới 25 đô-la Mỹ**. Kể cả khi cộng hệ số an toàn ba lần cho việc chạy thử và dùng nhiều hơn dự kiến, kinh phí đề nghị dự trù là **khoảng 1,5 triệu đồng**. Đơn giá cụ thể phải tra tại thời điểm thực hiện.
+Với mặt bằng giá hiện nay của các mô hình hạng nhẹ, quy mô 200 học sinh tốn **dưới 25 đô-la Mỹ**. Cộng hệ số an toàn ba lần cho việc chạy thử và dùng nhiều hơn dự kiến, **kinh phí đề nghị dự trù là khoảng 1,5 triệu đồng**. Đơn giá cụ thể tra tại thời điểm thực hiện.
 
-**Hai việc bắt buộc khi bật thanh toán:** đặt hạn mức chi tiêu theo ngày để một lỗi lặp vô hạn không làm phát sinh chi phí ngoài dự kiến, và bật cảnh báo khi đạt ngưỡng.
-
-**Giảm chi phí:** phần câu lệnh hệ thống và danh mục bài (5.011 token) là cố định, lặp lại y hệt ở mọi lượt gọi của mọi học sinh. Mô hình đang dùng có hỗ trợ bộ nhớ đệm ngữ cảnh; đưa phần cố định vào bộ đệm sẽ giảm đáng kể chi phí khi triển khai cho cả khối.
-
-**Phương án dự phòng:** nếu không kịp bật thanh toán, thu hẹp thực nghiệm còn hai lớp và bố trí lịch sử dụng luân phiên, đồng thời báo cáo rõ giới hạn này.
+**Hai việc bắt buộc khi bật thanh toán:** đặt hạn mức chi tiêu theo ngày, để một lỗi lặp vô hạn không làm phát sinh chi phí ngoài tầm; và bật cảnh báo khi sắp chạm ngưỡng.
 
 ## 7.2. Thời gian rất gấp
 
-**Vấn đề:** kế hoạch trên kết thúc giữa tháng 10 và không có tuần dự phòng. Bất kỳ chậm trễ nào ở tuần 1 hoặc tuần 2 đều đẩy phần phân tích ra sau thời hạn.
+**Vấn đề:** kế hoạch trên kết thúc giữa tháng 10 và **không có tuần dự phòng**. Chậm ở tuần 1 hay tuần 2 là phần phân tích bị đẩy quá hạn.
 
-**Phương án dự phòng:** nếu không kịp hoàn tất thực nghiệm, đề tài vẫn đứng vững trên các nội dung ND1–ND4 — phương pháp neo, chuẩn hoá dữ liệu và bộ kiểm chứng tự động đều đã có kết quả kiểm chứng được. Phần thực nghiệm khi đó được trình bày ở dạng **thiết kế nghiên cứu đã hoàn chỉnh và đang triển khai**, kèm số liệu thăm dò trên một lớp. Cách trình bày này trung thực và vẫn đủ nội dung khoa học, tốt hơn nhiều so với việc rút ngắn đợt can thiệp để lấy số liệu vội.
+**Phương án dự phòng:** nếu không kịp làm xong thực nghiệm, đề tài vẫn đứng vững trên bốn nội dung đầu — cách ràng buộc, chuẩn hoá dữ liệu và bộ kiểm tra tự động đều đã có kết quả kiểm chứng được. Phần thực nghiệm khi đó trình bày ở dạng **thiết kế đã hoàn chỉnh và đang triển khai**, kèm số liệu thăm dò trên một lớp. Cách này trung thực và vẫn đủ nội dung, tốt hơn nhiều so với rút ngắn đợt học để lấy số liệu vội.
 
-## 7.3. Mô hình bị nhà cung cấp cập nhật giữa chừng
+## 7.3. Nhà cung cấp cập nhật mô hình giữa chừng
 
-**Vấn đề:** nhà cung cấp có thể cập nhật mô hình bất kỳ lúc nào, làm thay đổi hành vi hệ thống trong khi thực nghiệm đang diễn ra.
+**Vấn đề:** mô hình có thể được cập nhật bất cứ lúc nào, làm đổi cách trả lời ngay trong lúc đang thực nghiệm.
 
-**Phương án:** ghi rõ tên và phiên bản mô hình cùng ngày chạy; chạy bộ kiểm chứng hành vi vào đầu và cuối đợt để phát hiện thay đổi; nếu phát hiện, ghi nhận vào phần hạn chế.
+**Cách xử lý:** ghi rõ tên và phiên bản mô hình cùng ngày chạy; chạy bộ kiểm tra vào đầu và cuối đợt để phát hiện thay đổi; nếu có thì ghi vào phần hạn chế.
 
-## 7.4. Học sinh sử dụng không đều
+## 7.4. Học sinh dùng không đều
 
-**Vấn đề:** một số học sinh gần như không dùng hệ thống, làm loãng hiệu ứng cần đo.
+**Vấn đề:** một số em gần như không dùng, làm loãng kết quả cần đo.
 
-**Phương án:** ghi số lượt sử dụng của từng em; báo cáo song song hai phân tích — trên toàn bộ mẫu theo nhóm được phân (*intention-to-treat*) và trên nhóm có sử dụng thực chất — và nêu rõ sự khác biệt giữa hai cách.
+**Cách xử lý:** ghi số lượt dùng của từng em; báo cáo song song hai kết quả — tính trên toàn bộ học sinh theo nhóm đã chia, và tính riêng trên những em có dùng thật — rồi nêu rõ khác biệt giữa hai cách tính.
 
 ---
 
-# 8. HẠN CHẾ CỦA NGHIÊN CỨU
+# 8. NHỮNG ĐIỀU ĐỀ TÀI CHƯA LÀM ĐƯỢC
 
-Được nêu ngay trong đề cương, không chờ đến khi báo cáo:
+Nêu ngay từ đề cương, không đợi tới lúc bảo vệ mới nói:
 
-- **Không thể làm mù.** Học sinh biết mình đang được dạy theo cách nào. Không có cách khắc phục trong thiết kế này.
-- **Công cụ đo là bài kiểm tra giấy.** Không đo được năng lực tự học lâu dài — vốn là điều hệ thống hướng tới. Đây là khoảng cách thật giữa thứ đo được và thứ muốn biết.
-- **Phạm vi hẹp.** Một trường, một khối, một chương, một đợt ngắn. Chưa suy rộng được.
-- **Hiệu ứng mới lạ.** Học sinh dùng công cụ mới thường tích cực hơn bình thường; hiệu ứng này tác động lên cả hai nhóm nhưng có thể không đều.
-- **Phụ thuộc mô hình đóng.** Không tái lập được hoàn toàn kết quả nếu nhà cung cấp thay đổi mô hình.
+- **Không giấu được nhóm.** Học sinh biết mình đang được dạy theo cách nào. Không có cách khắc phục trong điều kiện này.
+- **Chỉ đo bằng bài kiểm tra.** Không đo được năng lực tự học lâu dài — vốn mới là điều hệ thống hướng tới. Đây là khoảng cách thật giữa thứ đo được và thứ muốn biết.
+- **Phạm vi hẹp.** Một trường, một khối, một chương, một đợt ngắn. Chưa suy rộng ra được cho nơi khác.
+- **Hiệu ứng đồ mới.** Học sinh dùng công cụ mới thường hào hứng hơn bình thường; điều này tác động lên cả hai nhóm nhưng có thể không đều.
+- **Phụ thuộc dịch vụ bên ngoài.** Nếu nhà cung cấp thay đổi mô hình thì không lặp lại được y hệt kết quả.
 
 ---
 
 # 9. TÀI LIỆU THAM KHẢO
 
-*(Danh mục khởi đầu, cần bổ sung trong quá trình thực hiện ND1)*
+*(Danh mục ban đầu, sẽ bổ sung trong quá trình thực hiện Nội dung 1)*
 
 1. Bộ Giáo dục và Đào tạo (2018). *Chương trình giáo dục phổ thông môn Hoá học*. Ban hành kèm Thông tư số 32/2018/TT-BGDĐT.
 2. Bộ sách giáo khoa *Hoá học 11 — Kết nối tri thức với cuộc sống*. NXB Giáo dục Việt Nam.

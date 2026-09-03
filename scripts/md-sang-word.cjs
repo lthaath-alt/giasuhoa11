@@ -115,11 +115,17 @@ if (meta.ten_de_tai) {
   if (meta.ten_tieng_anh)
     khoi.push(bia(meta.ten_tieng_anh, { co: 22, nghieng: true, sau: 700 }));
 
+  /* Chỉ in dòng nào có nội dung. Đề tài do giáo viên đứng tên và đề tài do
+     học sinh thực hiện có giáo viên hướng dẫn dùng những dòng khác nhau — để
+     trống dòng không dùng trong tệp .md là bìa tự bỏ qua, khỏi phải sửa mã. */
   khoi.push(biaDong('Lĩnh vực', meta.linh_vuc));
-  khoi.push(biaDong('Chủ nhiệm đề tài', meta.chu_nhiem));
+  if (meta.mon_lien_quan) khoi.push(biaDong('Môn học liên quan', meta.mon_lien_quan));
+  if (meta.chu_nhiem) khoi.push(biaDong('Chủ nhiệm đề tài', meta.chu_nhiem));
+  if (meta.gv_huong_dan) khoi.push(biaDong('Giáo viên hướng dẫn', meta.gv_huong_dan));
+  if (meta.hoc_sinh) khoi.push(biaDong('Học sinh thực hiện', meta.hoc_sinh));
   if (meta.thanh_vien) khoi.push(biaDong('Thành viên tham gia', meta.thanh_vien));
-  khoi.push(biaDong('Đơn vị chủ trì', meta.don_vi_chu_tri));
-  khoi.push(biaDong('Thời gian thực hiện', meta.thoi_gian));
+  if (meta.don_vi_chu_tri) khoi.push(biaDong('Đơn vị chủ trì', meta.don_vi_chu_tri));
+  if (meta.thoi_gian) khoi.push(biaDong('Thời gian thực hiện', meta.thoi_gian));
 
   khoi.push(bia(meta.dia_danh || '', { nghieng: true, truoc: 1000 }));
   khoi.push(new Paragraph({ children: [new PageBreak()] }));
