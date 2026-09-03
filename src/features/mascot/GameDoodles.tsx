@@ -12,6 +12,21 @@ import { Box } from '@mui/material';
 
 const THU_MUC = '/mascot/game/';
 
+/* Web này có chế độ tối. Bảy hoạ tiết là ảnh đen tuyền — để nguyên thì nền
+   tối nuốt mất. Đảo màu thì đen thành trắng, trắng thành đen, đọc rõ trên nền
+   tối. Riêng Mario và nấm là ảnh MÀU nên không đảo, đảo vào là sai hết màu
+   áo quần. */
+/* Phải viết `html[data-theme=...]`, KHÔNG viết `:root[data-theme=...]`.
+   Bộ xử lý CSS của Emotion thấy selector mở đầu bằng dấu `:` thì hiểu là
+   trạng thái của chính phần tử (kiểu `:hover`), nên nó dán class của thẻ ảnh
+   vào trước và sinh ra `.css-abc:root[data-theme="dark"] .css-abc` — đòi thẻ
+   ảnh phải là thẻ gốc của trang, không bao giờ khớp. */
+const DAO_MAU_KHI_TOI = {
+  'html[data-theme="dark"] &': { filter: 'invert(1)' },
+};
+const ANH_CO_MAU = new Set(['mario.png', 'nam.png']);
+const theoNen = (tep: string) => (ANH_CO_MAU.has(tep) ? null : DAO_MAU_KHI_TOI);
+
 interface Mon {
   tep: string;
   ten: string;
@@ -154,6 +169,7 @@ export const GameDoodles: React.FC = () => (
             width: m.rong,
             height: 'auto',
             transform: m.xoay ? `rotate(${m.xoay}deg)` : undefined,
+            ...theoNen(m.tep),
           }}
         />
       </Box>
@@ -193,7 +209,13 @@ export const GameDoodlesTren: React.FC = () => (
           src={THU_MUC + m.tep}
           alt=""
           draggable={false}
-          sx={{ display: 'block', width: m.rong, height: 'auto', transform: m.xoay ? `rotate(${m.xoay}deg)` : undefined }}
+          sx={{
+            display: 'block',
+            width: m.rong,
+            height: 'auto',
+            transform: m.xoay ? `rotate(${m.xoay}deg)` : undefined,
+            ...theoNen(m.tep),
+          }}
         />
       </Box>
     ))}
@@ -225,7 +247,9 @@ export const GameDoodlesDuoi: React.FC = () => (
           left: v.left,
           right: v.right,
           width: v.rong,
-          color: '#101828',
+          /* Bám biến màu chữ của web thay vì màu cứng: chế độ tối đổi biến
+             này thành màu sáng nên hình tự đọc được, khỏi cần đảo màu. */
+          color: 'var(--chu-dam)',
           display: { xs: 'none', md: 'block' },
         }}
       >
