@@ -1,11 +1,20 @@
 ---
-title: "ĐỀ CƯƠNG NGHIÊN CỨU KHOA HỌC CẤP CƠ SỞ"
-lang: vi
+# Thông tin dựng trang bìa. Sửa ở đây rồi chạy `npm run word` là bìa đổi theo.
+co_quan: "SỞ GIÁO DỤC VÀ ĐÀO TẠO"
+don_vi: "TRƯỜNG THPT"
+loai: "ĐỀ CƯƠNG NGHIÊN CỨU KHOA HỌC CẤP CƠ SỞ"
+ten_de_tai: "Neo mô hình ngôn ngữ lớn vào Chương trình giáo dục phổ thông 2018: kiểm chứng tự động và thực nghiệm sư phạm trên môn Hoá học 11"
+ten_tieng_anh: "Grounding Large Language Models in Vietnam's 2018 National Curriculum: Automated Verification and a Controlled Classroom Study in Grade-11 Chemistry"
+linh_vuc: "Khoa học máy tính — Trí tuệ nhân tạo ứng dụng và Công nghệ phần mềm"
+chu_nhiem: "(bổ sung họ tên)"
+thanh_vien: "(bổ sung, nếu có)"
+don_vi_chu_tri: "(bổ sung)"
+thoi_gian: "Tháng 9 – tháng 10 năm 2026"
+dia_danh: "(địa phương), tháng 9 năm 2026"
+muc_luc: true
 ---
 
-# Neo mô hình ngôn ngữ lớn vào Chương trình giáo dục phổ thông 2018: kiểm chứng tự động và thực nghiệm sư phạm trên môn Hoá học 11
-
-**Tên tiếng Anh:** *Grounding Large Language Models in Vietnam's 2018 National Curriculum: Automated Verification and a Controlled Classroom Study in Grade-11 Chemistry*
+# THÔNG TIN CHUNG VỀ ĐỀ TÀI
 
 | | |
 |---|---|

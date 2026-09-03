@@ -19,7 +19,7 @@ const path = require('path');
 const {
   Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType,
   Table, TableRow, TableCell, WidthType, ShadingType, BorderStyle,
-  LevelFormat, TableOfContents, PageBreak,
+  LevelFormat, TableOfContents, PageBreak, Footer, PageNumber,
 } = require('docx');
 
 const VAO = process.argv[2];
@@ -28,10 +28,44 @@ const BE_NGANG = 9026;   // A4 trừ lề hai bên, đơn vị DXA
 
 const src = fs.readFileSync(VAO, 'utf8').replace(/\r\n/g, '\n');
 
-// Bỏ phần frontmatter YAML
-const than = src.startsWith('---\n')
-  ? src.slice(src.indexOf('\n---\n', 4) + 5)
-  : src;
+/* Đọc frontmatter YAML để dựng trang bìa.
+   CỐ Ý đọc bằng tay chứ không kéo thêm thư viện YAML: ở đây chỉ có các dòng
+   `khoá: "giá trị"` đơn giản, thêm phụ thuộc chỉ để đọc chừng ấy là thừa. */
+let meta = {};
+let than = src;
+if (src.startsWith('---\n')) {
+  const het = src.indexOf('\n---\n', 4);
+  for (const d of src.slice(4, het).split('\n')) {
+    const m = d.match(/^([a-z_]+):\s*(.*)$/);
+    if (m) meta[m[1]] = m[2].trim().replace(/^["']|["']$/g, '');
+  }
+  than = src.slice(het + 5);
+}
+
+/** Một dòng trên bìa. */
+function bia(text, { co = 26, dam = false, hoa = false, truoc = 0, sau = 0, nghieng = false } = {}) {
+  return new Paragraph({
+    alignment: AlignmentType.CENTER,
+    spacing: { before: truoc, after: sau, line: 300 },
+    children: [new TextRun({
+      text: hoa ? text.toUpperCase() : text,
+      bold: dam, italics: nghieng, size: co, font: 'Times New Roman',
+    })],
+  });
+}
+
+/** Dòng "Nhãn: giá trị" căn trái ở khối thông tin cuối bìa. */
+function biaDong(nhan, giaTri) {
+  return new Paragraph({
+    alignment: AlignmentType.LEFT,
+    spacing: { after: 120, line: 300 },
+    indent: { left: 2200 },
+    children: [
+      new TextRun({ text: nhan + ': ', bold: true, size: 26 }),
+      new TextRun({ text: giaTri || '(bổ sung)', size: 26 }),
+    ],
+  });
+}
 
 /** Tách **đậm** / *nghiêng* / `mã` thành các TextRun. */
 function chay(s, dam = false) {
@@ -60,8 +94,57 @@ function oBang(noiDung, dam, rong) {
 }
 
 const khoi = [];
+
+/* ── TRANG BÌA ─────────────────────────────────────────────────────────────
+   Bố cục theo lối trình bày quen thuộc của đề cương nghiên cứu cấp cơ sở:
+   cơ quan chủ quản ở trên cùng, tên đề tài ở giữa trang, khối thông tin chủ
+   nhiệm ở dưới, địa danh và thời gian ở cuối. */
+if (meta.ten_de_tai) {
+  khoi.push(bia(meta.co_quan || '', { dam: true, co: 26 }));
+  khoi.push(bia(meta.don_vi || '', { dam: true, co: 26, sau: 60 }));
+  khoi.push(new Paragraph({
+    alignment: AlignmentType.CENTER, spacing: { after: 900 },
+    children: [new TextRun({ text: '\u2E3B\u2E3B\u2E3B', size: 24, color: '888888' })],
+  }));
+
+  khoi.push(bia(meta.loai || 'ĐỀ CƯƠNG NGHIÊN CỨU KHOA HỌC',
+    { dam: true, co: 32, sau: 700 }));
+
+  khoi.push(bia('Tên đề tài', { dam: true, co: 24, sau: 160 }));
+  khoi.push(bia(meta.ten_de_tai, { dam: true, co: 34, hoa: true, sau: 200 }));
+  if (meta.ten_tieng_anh)
+    khoi.push(bia(meta.ten_tieng_anh, { co: 22, nghieng: true, sau: 700 }));
+
+  khoi.push(biaDong('Lĩnh vực', meta.linh_vuc));
+  khoi.push(biaDong('Chủ nhiệm đề tài', meta.chu_nhiem));
+  if (meta.thanh_vien) khoi.push(biaDong('Thành viên tham gia', meta.thanh_vien));
+  khoi.push(biaDong('Đơn vị chủ trì', meta.don_vi_chu_tri));
+  khoi.push(biaDong('Thời gian thực hiện', meta.thoi_gian));
+
+  khoi.push(bia(meta.dia_danh || '', { nghieng: true, truoc: 1000 }));
+  khoi.push(new Paragraph({ children: [new PageBreak()] }));
+}
+
+/* ── MỤC LỤC ──────────────────────────────────────────────────────────────
+   Word điền nội dung mục lục bằng trường (field), không phải văn bản tĩnh.
+   Tệp đặt `updateFields: true` nên khi mở lần đầu Word sẽ hỏi có cập nhật
+   không — chọn Có là mục lục hiện ra kèm số trang. Nếu lỡ chọn Không thì bấm
+   chuột phải vào mục lục rồi chọn Update Field.
+
+   Chỉ lấy tiêu đề cấp 1 và cấp 2; cấp 3 quá vụn cho một đề cương. */
+if (String(meta.muc_luc) === 'true') {
+  khoi.push(new Paragraph({
+    alignment: AlignmentType.CENTER,
+    spacing: { after: 300 },
+    children: [new TextRun({ text: 'MỤC LỤC', bold: true, size: 32, font: 'Times New Roman' })],
+  }));
+  khoi.push(new TableOfContents('Mục lục', { hyperlink: true, headingStyleRange: '1-2' }));
+  khoi.push(new Paragraph({ children: [new PageBreak()] }));
+}
+
 const dong = than.split('\n');
 let i = 0;
+let daCoMucLon = false;
 
 while (i < dong.length) {
   const d = dong[i];
@@ -113,8 +196,11 @@ while (i < dong.length) {
       heading: [HeadingLevel.HEADING_1, HeadingLevel.HEADING_1,
                 HeadingLevel.HEADING_2, HeadingLevel.HEADING_3][cap - 1],
       spacing: { before: cap <= 2 ? 320 : 240, after: 140 },
-      pageBreakBefore: cap === 1 && khoi.length > 0 && /^\d\./.test(h[2]),
+      /* Mỗi mục lớn bắt đầu một trang mới, TRỪ mục đầu tiên — nó đã nằm ngay
+         sau ngắt trang của mục lục rồi, thêm nữa là thừa một trang trắng. */
+      pageBreakBefore: cap === 1 && /^\d\./.test(h[2]) && daCoMucLon,
     }));
+    if (cap === 1 && /^\d\./.test(h[2])) daCoMucLon = true;
     i++; continue;
   }
 
@@ -171,8 +257,17 @@ const doc = new Document({
       heading3: { run: { font: 'Times New Roman', size: 26, bold: true, color: '333333' } },
     },
   },
+  features: { updateFields: true },   // Word tự hỏi cập nhật mục lục khi mở
   sections: [{
     properties: { page: { margin: { top: 1440, bottom: 1440, left: 1440, right: 1440 } } },
+    footers: {
+      default: new Footer({
+        children: [new Paragraph({
+          alignment: AlignmentType.CENTER,
+          children: [new TextRun({ children: [PageNumber.CURRENT], size: 22 })],
+        })],
+      }),
+    },
     children: khoi,
   }],
 });
