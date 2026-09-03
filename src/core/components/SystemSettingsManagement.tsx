@@ -24,8 +24,8 @@ export const SystemSettingsManagement: React.FC = () => {
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Box>
-          <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#0f172a', display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Settings size={22} color="#ea580c" />
+          <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)', display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Settings size={22} color="var(--cam)" />
             Cài đặt Hệ thống
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
@@ -36,15 +36,15 @@ export const SystemSettingsManagement: React.FC = () => {
 
       {error && <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>{error}</Alert>}
 
-      <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid #e2e8f0', boxShadow: 'none' }}>
+      <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid var(--vien)', boxShadow: 'none' }}>
         <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-          <ShieldAlert size={18} color="#0f766e" />
+          <ShieldAlert size={18} color="var(--teal)" />
           Giới hạn sử dụng & API Key
         </Typography>
 
-        <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', p: 2, bgcolor: '#f8fafc', borderRadius: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', p: 2, bgcolor: 'var(--nen-trang)', borderRadius: 2 }}>
           <Box sx={{ pr: 3 }}>
-            <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: '#1e293b' }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--chu-dam-2)' }}>
               Cho phép người dùng tự cung cấp Gemini API Key
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
@@ -65,7 +65,7 @@ export const SystemSettingsManagement: React.FC = () => {
               }
               label={systemSettings?.allowUserApiKey ? 'Đang bật' : 'Đã tắt'}
               labelPlacement="start"
-              sx={{ m: 0, '& .MuiFormControlLabel-label': { fontSize: '0.875rem', fontWeight: 'bold', color: '#475569', mr: 1 } }}
+              sx={{ m: 0, '& .MuiFormControlLabel-label': { fontSize: '0.875rem', fontWeight: 'bold', color: 'var(--chu)', mr: 1 } }}
             />
           </Box>
         </Box>

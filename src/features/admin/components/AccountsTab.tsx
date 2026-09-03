@@ -42,7 +42,7 @@ export const AccountsTab: React.FC<AccountsTabProps> = ({
     <Box id="admin-tab-accounts" sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
       {/* Sub Tabs: Chuyển đổi giữa Firestore Manager và Local Accounts */}
       {!hideFirestoreTab && (
-      <Paper elevation={0} sx={{ p: 0.5, borderRadius: 3, border: '1px solid #e2e8f0', backgroundColor: '#ffffff' }}>
+      <Paper elevation={0} sx={{ p: 0.5, borderRadius: 3, border: '1px solid var(--vien)', backgroundColor: 'var(--nen-the)' }}>
         <Tabs
           value={subTab}
           onChange={(_, val) => setSubTab(val)}
@@ -55,13 +55,13 @@ export const AccountsTab: React.FC<AccountsTabProps> = ({
               minHeight: 38,
               px: 2,
               mr: 0.5,
-              color: '#475569',
+              color: 'var(--chu)',
               transition: 'all 0.2s',
               fontSize: '0.88rem',
-              '&:hover': { backgroundColor: '#f1f5f9', color: '#0f172a' },
-              '&.Mui-selected': { color: '#ea580c', backgroundColor: 'rgba(234, 88, 12, 0.08)' }
+              '&:hover': { backgroundColor: 'var(--nen-nhat)', color: 'var(--chu-dam)' },
+              '&.Mui-selected': { color: 'var(--cam)', backgroundColor: 'rgba(234, 88, 12, 0.08)' }
             },
-            '& .MuiTabs-indicator': { backgroundColor: '#ea580c' }
+            '& .MuiTabs-indicator': { backgroundColor: 'var(--cam-nen)' }
           }}
         >
           <Tab
@@ -85,11 +85,11 @@ export const AccountsTab: React.FC<AccountsTabProps> = ({
 
       {/* Danh sách Local Accounts cũ */}
       {subTab === 'local' && (
-        <Card sx={{ borderRadius: 3, boxShadow: '0 1px 3px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0', backgroundColor: '#ffffff' }}>
+        <Card sx={{ borderRadius: 3, boxShadow: '0 1px 3px rgba(0,0,0,0.05)', border: '1px solid var(--vien)', backgroundColor: 'var(--nen-the)' }}>
           <CardContent sx={{ p: 0 }}>
             <TableContainer>
               <Table>
-                <TableHead sx={{ backgroundColor: '#f8fafc' }}>
+                <TableHead sx={{ backgroundColor: 'var(--nen-trang)' }}>
                   <TableRow>
                     <TableCell sx={{ fontWeight: 'bold', color: 'text.secondary' }}>Học sinh</TableCell>
                     <TableCell sx={{ fontWeight: 'bold', color: 'text.secondary' }}>Email</TableCell>
@@ -120,7 +120,7 @@ export const AccountsTab: React.FC<AccountsTabProps> = ({
                       }
 
                       return (
-                        <TableRow key={student.email} hover sx={{ '& td': { borderColor: '#e2e8f0' } }}>
+                        <TableRow key={student.email} hover sx={{ '& td': { borderColor: 'var(--vien)' } }}>
                           <TableCell>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                               <Avatar
@@ -129,7 +129,7 @@ export const AccountsTab: React.FC<AccountsTabProps> = ({
                                     student.status === 'active'
                                       ? 'rgba(15, 118, 110, 0.08)'
                                       : 'rgba(234, 88, 12, 0.08)',
-                                  color: student.status === 'active' ? '#0f766e' : '#ea580c',
+                                  color: student.status === 'active' ? 'var(--teal)' : 'var(--cam)',
                                   fontWeight: 'bold',
                                   fontSize: '0.9rem',
                                 }}

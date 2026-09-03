@@ -67,7 +67,7 @@ const BongBong: React.FC<{ loi: string; huong: 'duoi' | 'trai'; xuongDong?: bool
   <Box
     sx={{
       position: 'relative',
-      bgcolor: '#ffffff',
+      bgcolor: 'var(--nen-the)',
       border: '2px solid #0062b8',
       borderRadius: 3,
       px: 2,
@@ -84,7 +84,7 @@ const BongBong: React.FC<{ loi: string; huong: 'duoi' | 'trai'; xuongDong?: bool
         position: 'absolute',
         width: 12,
         height: 12,
-        bgcolor: '#ffffff',
+        bgcolor: 'var(--nen-the)',
         borderRight: '2px solid #0062b8',
         borderBottom: '2px solid #0062b8',
         ...(huong === 'duoi'
@@ -98,7 +98,7 @@ const BongBong: React.FC<{ loi: string; huong: 'duoi' | 'trai'; xuongDong?: bool
         fontWeight: 700,
         fontSize: { xs: 13, md: 14.5 },
         lineHeight: 1.35,
-        color: '#0f172a',
+        color: 'var(--chu-dam)',
         whiteSpace: 'normal',
       }}
     >

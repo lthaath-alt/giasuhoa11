@@ -34,14 +34,40 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
   const [error, setError]       = useState<string | null>(null);
   const [successInfo, setSuccessInfo] = useState<{ className?: string } | null>(null);
 
+  /* Kiểm ngay tại chỗ trước khi gọi Firebase.
+
+     Bản trước CHỈ so hai ô mật khẩu. Để trống hết rồi bấm Đăng ký thì form gọi
+     thẳng registerWithOptionalClass('', '', '') — đo được: màn hình không hiện
+     báo lỗi nào, em ngồi bấm mãi mà không hiểu vì sao. Email sai định dạng cũng
+     lọt xuống tận Firebase rồi trả về thông báo tiếng Anh.
+
+     Yêu cầu "ít nhất 8 ký tự, gồm cả chữ và số" vốn chỉ được ghi làm chú thích
+     dưới ô mật khẩu, chưa bao giờ được kiểm — dán vào đây cho khớp lời hứa. */
+  const kiemDuLieu = (): string | null => {
+    if (!name.trim()) return 'Em chưa nhập họ và tên.';
+    if (!email.trim()) return 'Em chưa nhập email.';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim()))
+      return 'Email chưa đúng định dạng. Ví dụ đúng: ten@gmail.com';
+    if (!password) return 'Em chưa nhập mật khẩu.';
+    if (password.length < 8) return 'Mật khẩu phải có ít nhất 8 ký tự.';
+    if (!/[A-Za-z]/.test(password) || !/\d/.test(password))
+      return 'Mật khẩu phải có cả chữ cái và chữ số.';
+    if (password !== confirmPw) return 'Mật khẩu xác nhận không khớp. Vui lòng kiểm tra lại.';
+    return null;
+  };
+
+  /* Xoá báo lỗi ngay khi em sửa lại ô nhập.
+
+     Bản trước chỉ xoá lúc bấm Đăng ký, nên câu "Mật khẩu xác nhận không khớp"
+     vẫn nằm đó cả sau khi em đã gõ lại cho khớp — em tưởng mình vẫn sai. */
+  const goLai = <T,>(dat: (v: T) => void) => (v: T) => { setError(null); dat(v); };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
-    if (password !== confirmPw) {
-      setError('Mật khẩu xác nhận không khớp. Vui lòng kiểm tra lại.');
-      return;
-    }
+    const sai = kiemDuLieu();
+    if (sai) { setError(sai); return; }
 
     setLoading(true);
     const res = await registerWithOptionalClass(
@@ -71,9 +97,9 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
           bgcolor: 'rgba(16,185,129,0.12)', display: 'flex',
           alignItems: 'center', justifyContent: 'center', mx: 'auto', mb: 2,
         }}>
-          <CheckCircle size={36} color="#10b981" />
+          <CheckCircle size={36} color="var(--luc)" />
         </Box>
-        <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#10b981', mb: 1 }}>
+        <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--luc)', mb: 1 }}>
           Đăng ký thành công!
         </Typography>
         <Typography variant="body2" color="text.secondary">
@@ -88,8 +114,8 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
   return (
     <Box id="student-register-form-container">
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-        <UserPlus size={22} color="#ea580c" />
-        <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#0f172a' }}>
+        <UserPlus size={22} color="var(--cam)" />
+        <Typography variant="h5" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)' }}>
           Đăng ký học sinh
         </Typography>
       </Box>
@@ -113,14 +139,14 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
             fullWidth
             required
             value={name}
-            onChange={e => setName(e.target.value)}
+            onChange={e => goLai(setName)(e.target.value)}
             disabled={loading}
             placeholder="Nguyễn Văn An"
             slotProps={{
               input: {
                 startAdornment: (
                   <InputAdornment position="start">
-                    <User size={16} color="#94a3b8" />
+                    <User size={16} color="var(--chu-mo)" />
                   </InputAdornment>
                 ),
               },
@@ -137,14 +163,14 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
             fullWidth
             required
             value={email}
-            onChange={e => setEmail(e.target.value)}
+            onChange={e => goLai(setEmail)(e.target.value)}
             disabled={loading}
             placeholder="example@gmail.com"
             slotProps={{
               input: {
                 startAdornment: (
                   <InputAdornment position="start">
-                    <Mail size={16} color="#94a3b8" />
+                    <Mail size={16} color="var(--chu-mo)" />
                   </InputAdornment>
                 ),
               },
@@ -161,14 +187,14 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
             fullWidth
             required
             value={password}
-            onChange={e => setPassword(e.target.value)}
+            onChange={e => goLai(setPassword)(e.target.value)}
             disabled={loading}
             helperText="Ít nhất 8 ký tự, gồm cả chữ cái và chữ số"
             slotProps={{
               input: {
                 startAdornment: (
                   <InputAdornment position="start">
-                    <Key size={16} color="#94a3b8" />
+                    <Key size={16} color="var(--chu-mo)" />
                   </InputAdornment>
                 ),
                 endAdornment: (
@@ -192,7 +218,7 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
             fullWidth
             required
             value={confirmPw}
-            onChange={e => setConfirmPw(e.target.value)}
+            onChange={e => goLai(setConfirmPw)(e.target.value)}
             disabled={loading}
             error={confirmPw.length > 0 && password !== confirmPw}
             helperText={confirmPw.length > 0 && password !== confirmPw ? 'Mật khẩu không khớp' : ''}
@@ -200,7 +226,7 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
               input: {
                 startAdornment: (
                   <InputAdornment position="start">
-                    <Key size={16} color="#94a3b8" />
+                    <Key size={16} color="var(--chu-mo)" />
                   </InputAdornment>
                 ),
                 endAdornment: (
@@ -218,8 +244,8 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
           {/* Mã lớp (tùy chọn) */}
           <Box sx={{
             p: 2, borderRadius: 3,
-            border: '1px dashed #94a3b8',
-            bgcolor: inviteCode ? 'rgba(15,118,110,0.04)' : '#f8fafc',
+            border: '1px dashed var(--chu-mo)',
+            bgcolor: inviteCode ? 'rgba(15,118,110,0.04)' : 'var(--nen-trang)',
             transition: 'all 0.2s',
           }}>
             <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, display: 'block', mb: 1 }}>
@@ -239,7 +265,7 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
                 input: {
                   startAdornment: (
                     <InputAdornment position="start">
-                      <School size={16} color={inviteCode ? '#0f766e' : '#94a3b8'} />
+                      <School size={16} color={inviteCode ? 'var(--teal)' : 'var(--chu-mo)'} />
                     </InputAdornment>
                   ),
                 },
@@ -247,14 +273,14 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
               sx={{
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 2.5,
-                  ...(inviteCode && { borderColor: '#0f766e' }),
+                  ...(inviteCode && { borderColor: 'var(--teal)' }),
                 },
                 '& .MuiInputBase-input': {
                   fontFamily: 'monospace',
                   fontSize: '1.1rem',
                   letterSpacing: '0.2em',
                   fontWeight: 'bold',
-                  color: inviteCode ? '#0f766e' : 'inherit',
+                  color: inviteCode ? 'var(--teal)' : 'inherit',
                 },
               }}
             />
@@ -295,7 +321,7 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
           size="small"
           startIcon={<ArrowLeft size={14} />}
           onClick={onBackToLogin}
-          sx={{ textTransform: 'none', color: '#64748b', fontWeight: 600 }}
+          sx={{ textTransform: 'none', color: 'var(--chu-2)', fontWeight: 600 }}
         >
           Quay lại đăng nhập
         </Button>

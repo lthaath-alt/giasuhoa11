@@ -176,7 +176,7 @@ export const CurriculumTab: React.FC = () => {
       {/* Header khu vực */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Box>
-          <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#0062b8' }}>
+          <Typography variant="h5" sx={{ fontWeight: 'bold', color: 'var(--xanh)' }}>
             Quản lý Bài học & Chương trình
           </Typography>
           <Typography variant="body2" color="text.secondary">
@@ -207,7 +207,7 @@ export const CurriculumTab: React.FC = () => {
               id={`curriculum-accordion-${chapter.id}`}
               sx={{
                 borderRadius: '12px !important',
-                border: '1px solid #e2e8f0',
+                border: '1px solid var(--vien)',
                 boxShadow: 'none',
                 overflow: 'hidden',
                 '&:before': { display: 'none' }
@@ -217,8 +217,8 @@ export const CurriculumTab: React.FC = () => {
               <AccordionSummary
                 expandIcon={<ChevronDown size={20} />}
                 sx={{
-                  backgroundColor: '#f8fafc',
-                  borderBottom: '1px solid #e2e8f0',
+                  backgroundColor: 'var(--nen-trang)',
+                  borderBottom: '1px solid var(--vien)',
                   '& .MuiAccordionSummary-content': {
                     display: 'flex',
                     alignItems: 'center',
@@ -229,11 +229,11 @@ export const CurriculumTab: React.FC = () => {
                 }}
               >
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                  <BookOpen size={20} color="#0062b8" />
-                  <Typography sx={{ fontWeight: 'bold', color: '#1e293b' }}>
+                  <BookOpen size={20} color="var(--xanh)" />
+                  <Typography sx={{ fontWeight: 'bold', color: 'var(--chu-dam-2)' }}>
                     {chapter.title}
                   </Typography>
-                  <Typography variant="caption" sx={{ color: 'text.secondary', ml: 1, bgcolor: '#e2e8f0', px: 1, py: 0.3, borderRadius: 1.5 }}>
+                  <Typography variant="caption" sx={{ color: 'text.secondary', ml: 1, bgcolor: 'var(--vien)', px: 1, py: 0.3, borderRadius: 1.5 }}>
                     {chapter.lessons.length} bài học
                   </Typography>
                 </Box>
@@ -262,9 +262,9 @@ export const CurriculumTab: React.FC = () => {
               </AccordionSummary>
 
               {/* Chi tiết Accordion: Danh sách bài học */}
-              <AccordionDetails sx={{ p: 3, backgroundColor: '#ffffff' }}>
+              <AccordionDetails sx={{ p: 3, backgroundColor: 'var(--nen-the)' }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: '#475569' }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--chu)' }}>
                     Danh sách các bài học chi tiết:
                   </Typography>
                   <Button
@@ -289,11 +289,11 @@ export const CurriculumTab: React.FC = () => {
                       <Paper
                         key={les.id}
                         variant="outlined"
-                        sx={{ p: 2, borderRadius: 2.5, borderColor: '#e2e8f0' }}
+                        sx={{ p: 2, borderRadius: 2.5, borderColor: 'var(--vien)' }}
                       >
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
                           <Box>
-                            <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#0f172a' }}>
+                            <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)' }}>
                               {les.title}
                             </Typography>
                           </Box>
@@ -325,7 +325,7 @@ export const CurriculumTab: React.FC = () => {
 
                         {/* Lý thuyết tóm tắt */}
                         <Box sx={{ mb: 1.5 }}>
-                          <Typography variant="caption" sx={{ fontWeight: 'bold', color: '#0f766e', display: 'block', mb: 0.5 }}>
+                          <Typography variant="caption" sx={{ fontWeight: 'bold', color: 'var(--teal)', display: 'block', mb: 0.5 }}>
                             Lý thuyết cốt lõi (Tóm tắt):
                           </Typography>
                           <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem', lineHeight: 1.5 }}>
@@ -336,12 +336,12 @@ export const CurriculumTab: React.FC = () => {
                         {/* Công thức quan trọng */}
                         {les.formulae.length > 0 && (
                           <Box sx={{ mb: 1.5 }}>
-                            <Typography variant="caption" sx={{ fontWeight: 'bold', color: '#ea580c', display: 'block', mb: 0.5 }}>
+                            <Typography variant="caption" sx={{ fontWeight: 'bold', color: 'var(--cam)', display: 'block', mb: 0.5 }}>
                               Công thức cần nhớ:
                             </Typography>
                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, pl: 1 }}>
                               {les.formulae.map((form, fIdx) => (
-                                <Typography key={fIdx} variant="caption" sx={{ display: 'block', color: '#334155', fontStyle: 'italic' }}>
+                                <Typography key={fIdx} variant="caption" sx={{ display: 'block', color: 'var(--chu-dam-3)', fontStyle: 'italic' }}>
                                   • {form}
                                 </Typography>
                               ))}
@@ -351,7 +351,7 @@ export const CurriculumTab: React.FC = () => {
 
                         {/* Số lượng câu hỏi gợi ý */}
                         <Box>
-                          <Typography variant="caption" sx={{ fontWeight: 'bold', color: '#0062b8', display: 'inline-block' }}>
+                          <Typography variant="caption" sx={{ fontWeight: 'bold', color: 'var(--xanh)', display: 'inline-block' }}>
                             Câu hỏi gợi ý Gia sư AI hỗ trợ tư duy:{' '}
                           </Typography>
                           <Typography variant="caption" color="text.primary" sx={{ fontWeight: 'bold', ml: 0.5 }}>
@@ -445,12 +445,12 @@ export const CurriculumTab: React.FC = () => {
 
             {/* Cột phải: Câu hỏi gợi ý và giải đáp */}
             <Box>
-              <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1, color: '#334155' }}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1, color: 'var(--chu-dam-3)' }}>
                 Danh sách Câu hỏi hướng dẫn gợi mở (Gia sư AI):
               </Typography>
 
               {lessonQuestions.length === 0 ? (
-                <Box sx={{ p: 2, bgcolor: '#f8fafc', borderRadius: 2, border: '1px dashed #cbd5e1', mb: 2 }}>
+                <Box sx={{ p: 2, bgcolor: 'var(--nen-trang)', borderRadius: 2, border: '1px dashed var(--vien)', mb: 2 }}>
                   <Typography variant="caption" color="text.secondary" sx={{ display: 'block', textAlign: 'center' }}>
                     Chưa có câu hỏi định hướng nào. Soạn thảo form phía dưới để thêm câu hỏi giúp Gia sư định hình phong cách phản hồi.
                   </Typography>
@@ -467,7 +467,7 @@ export const CurriculumTab: React.FC = () => {
                       >
                         <Trash2 size={12} />
                       </IconButton>
-                      <Typography variant="caption" sx={{ fontWeight: 'bold', color: '#0062b8', display: 'block', pr: 2 }}>
+                      <Typography variant="caption" sx={{ fontWeight: 'bold', color: 'var(--xanh)', display: 'block', pr: 2 }}>
                         CH: {q.question}
                       </Typography>
                       <Typography variant="caption" sx={{ display: 'block', color: 'text.secondary', fontStyle: 'italic', mt: 0.5 }}>
@@ -479,8 +479,8 @@ export const CurriculumTab: React.FC = () => {
               )}
 
               {/* Form thêm câu hỏi nhanh */}
-              <Paper variant="outlined" sx={{ p: 2, bgcolor: '#f8fafc', borderRadius: 2.5 }}>
-                <Typography variant="caption" sx={{ fontWeight: 'bold', color: '#475569', display: 'block', mb: 1 }}>
+              <Paper variant="outlined" sx={{ p: 2, bgcolor: 'var(--nen-trang)', borderRadius: 2.5 }}>
+                <Typography variant="caption" sx={{ fontWeight: 'bold', color: 'var(--chu)', display: 'block', mb: 1 }}>
                   Soạn câu hỏi dẫn dắt mẫu cho bài này:
                 </Typography>
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>

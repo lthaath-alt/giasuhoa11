@@ -15,10 +15,10 @@ export const WelcomeWorkspace: React.FC<WelcomeWorkspaceProps> = ({ setSelectedL
       sx={{
         p: { xs: 4, sm: 8 },
         borderRadius: 4,
-        border: '1px solid #e2e8f0',
+        border: '1px solid var(--vien)',
         boxShadow: '0 4px 20px rgba(0, 0, 0, 0.03)',
         textAlign: 'center',
-        background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+        background: 'linear-gradient(135deg, var(--nen-the) 0%, var(--nen-trang) 100%)',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -26,11 +26,11 @@ export const WelcomeWorkspace: React.FC<WelcomeWorkspaceProps> = ({ setSelectedL
         minHeight: 480,
       }}
     >
-      <Avatar sx={{ width: 80, height: 80, bgcolor: 'rgba(234, 88, 12, 0.08)', color: '#ea580c', mb: 3 }}>
+      <Avatar sx={{ width: 80, height: 80, bgcolor: 'rgba(234, 88, 12, 0.08)', color: 'var(--cam)', mb: 3 }}>
         <Sparkles size={40} />
       </Avatar>
 
-      <Typography variant="h4" color="#0f172a" sx={{ mb: 2, fontWeight: 'bold' }}>
+      <Typography variant="h4" color="var(--chu-dam)" sx={{ mb: 2, fontWeight: 'bold' }}>
         Chào mừng em đến với không gian Gia sư AI!
       </Typography>
 
@@ -64,12 +64,12 @@ export const WelcomeWorkspace: React.FC<WelcomeWorkspaceProps> = ({ setSelectedL
               cursor: 'pointer',
               textAlign: 'left',
               borderRadius: 3,
-              border: '1px solid #e2e8f0',
+              border: '1px solid var(--vien)',
               transition: 'all 0.2s',
-              backgroundColor: '#ffffff',
+              backgroundColor: 'var(--nen-the)',
               '&:hover': {
                 transform: 'translateY(-3px)',
-                borderColor: '#ea580c',
+                borderColor: 'var(--cam)',
                 boxShadow: '0 6px 16px rgba(234, 88, 12, 0.12)',
               },
             }}
@@ -86,8 +86,8 @@ export const WelcomeWorkspace: React.FC<WelcomeWorkspaceProps> = ({ setSelectedL
                       : 'rgba(15, 118, 110, 0.08)',
                   color:
                     idx % 2 === 0
-                      ? '#ea580c'
-                      : '#0f766e',
+                      ? 'var(--cam)'
+                      : 'var(--teal)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -98,14 +98,14 @@ export const WelcomeWorkspace: React.FC<WelcomeWorkspaceProps> = ({ setSelectedL
                 {idx + 1}
               </Box>
               <Box>
-                <Typography variant="subtitle2" noWrap sx={{ maxWidth: 220, fontWeight: 'bold', color: '#0f172a' }}>
+                <Typography variant="subtitle2" noWrap sx={{ maxWidth: 220, fontWeight: 'bold', color: 'var(--chu-dam)' }}>
                   {ch.title.split(':')[1] || ch.title}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
                   {ch.lessons.length} bài học tự luyện
                 </Typography>
               </Box>
-              <ArrowRight size={14} style={{ marginLeft: 'auto', color: '#64748b' }} />
+              <ArrowRight size={14} style={{ marginLeft: 'auto', color: 'var(--chu-2)' }} />
             </Box>
           </Card>
         ))}

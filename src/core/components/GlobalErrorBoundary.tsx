@@ -35,9 +35,9 @@ export class GlobalErrorBoundary extends Component<Props, State> {
   public render() {
     if (this.state.hasError) {
       return (
-        <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', bgcolor: '#f8fafc', p: 3, textAlign: 'center' }}>
-          <AlertTriangle size={64} color="#ef4444" style={{ marginBottom: 16 }} />
-          <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#0f172a', mb: 2 }}>
+        <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', bgcolor: 'var(--nen-trang)', p: 3, textAlign: 'center' }}>
+          <AlertTriangle size={64} color="var(--do)" style={{ marginBottom: 16 }} />
+          <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)', mb: 2 }}>
             Đã xảy ra lỗi giao diện
           </Typography>
           <Typography color="text.secondary" sx={{ mb: 4, maxWidth: 500 }}>

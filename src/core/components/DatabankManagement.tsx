@@ -92,11 +92,11 @@ export const DatabankManagement: React.FC = () => {
 
   const getLevelColor = (level: string) => {
     switch (level) {
-      case 'Nhận biết': return { bg: '#dbeafe', color: '#2563eb' };
-      case 'Thông hiểu': return { bg: '#dcfce7', color: '#16a34a' };
-      case 'Vận dụng': return { bg: '#fef3c7', color: '#d97706' };
-      case 'Vận dụng cao': return { bg: '#fee2e2', color: '#dc2626' };
-      default: return { bg: '#f1f5f9', color: '#475569' };
+      case 'Nhận biết': return { bg: 'var(--nen-xanh-nhat)', color: 'var(--xanh-troi)' };
+      case 'Thông hiểu': return { bg: 'var(--nen-luc-nhat)', color: 'var(--luc)' };
+      case 'Vận dụng': return { bg: 'var(--nen-vang-nhat)', color: 'var(--vang-dam)' };
+      case 'Vận dụng cao': return { bg: 'var(--nen-do-nhat)', color: 'var(--do)' };
+      default: return { bg: 'var(--nen-nhat)', color: 'var(--chu)' };
     }
   };
 
@@ -169,8 +169,8 @@ export const DatabankManagement: React.FC = () => {
   return (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#0f172a', display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Database size={22} color="#0f766e" />
+        <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)', display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Database size={22} color="var(--teal)" />
           Ngân hàng dữ liệu Hóa học thông minh
         </Typography>
         <Button
@@ -191,35 +191,35 @@ export const DatabankManagement: React.FC = () => {
       {/* 3 Stat Cards */}
       <Grid container spacing={2} sx={{ mb: 4 }}>
         <Grid size={{ xs: 12, md: 4 }}>
-          <Paper elevation={0} sx={{ p: 2, border: '1px solid #e2e8f0', borderRadius: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Box sx={{ p: 1.5, bgcolor: '#e0e7ff', borderRadius: 2 }}>
-              <FileText size={24} color="#4f46e5" />
+          <Paper elevation={0} sx={{ p: 2, border: '1px solid var(--vien)', borderRadius: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Box sx={{ p: 1.5, bgcolor: 'var(--nen-tim-nhat)', borderRadius: 2 }}>
+              <FileText size={24} color="var(--tim)" />
             </Box>
             <Box>
-              <Typography variant="overline" sx={{ color: '#64748b', fontWeight: 'bold', lineHeight: 1 }}>TỔNG SỐ CÂU HỎI</Typography>
-              <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#1e293b' }}>{bankQuestionCount} câu trong kho</Typography>
+              <Typography variant="overline" sx={{ color: 'var(--chu-2)', fontWeight: 'bold', lineHeight: 1 }}>TỔNG SỐ CÂU HỎI</Typography>
+              <Typography variant="h5" sx={{ fontWeight: 'bold', color: 'var(--chu-dam-2)' }}>{bankQuestionCount} câu trong kho</Typography>
             </Box>
           </Paper>
         </Grid>
         <Grid size={{ xs: 12, md: 4 }}>
-          <Paper elevation={0} sx={{ p: 2, border: '1px solid #e2e8f0', borderRadius: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Box sx={{ p: 1.5, bgcolor: '#dcfce7', borderRadius: 2 }}>
-              <FlaskConical size={24} color="#16a34a" />
+          <Paper elevation={0} sx={{ p: 2, border: '1px solid var(--vien)', borderRadius: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Box sx={{ p: 1.5, bgcolor: 'var(--nen-luc-nhat)', borderRadius: 2 }}>
+              <FlaskConical size={24} color="var(--luc)" />
             </Box>
             <Box>
-              <Typography variant="overline" sx={{ color: '#64748b', fontWeight: 'bold', lineHeight: 1 }}>NGÂN HÀNG PHƯƠNG TRÌNH</Typography>
-              <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#1e293b' }}>{equations.length} phương trình</Typography>
+              <Typography variant="overline" sx={{ color: 'var(--chu-2)', fontWeight: 'bold', lineHeight: 1 }}>NGÂN HÀNG PHƯƠNG TRÌNH</Typography>
+              <Typography variant="h5" sx={{ fontWeight: 'bold', color: 'var(--chu-dam-2)' }}>{equations.length} phương trình</Typography>
             </Box>
           </Paper>
         </Grid>
         <Grid size={{ xs: 12, md: 4 }}>
-          <Paper elevation={0} sx={{ p: 2, border: '1px solid #e2e8f0', borderRadius: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Box sx={{ p: 1.5, bgcolor: '#fef3c7', borderRadius: 2 }}>
-              <Database size={24} color="#d97706" />
+          <Paper elevation={0} sx={{ p: 2, border: '1px solid var(--vien)', borderRadius: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Box sx={{ p: 1.5, bgcolor: 'var(--nen-vang-nhat)', borderRadius: 2 }}>
+              <Database size={24} color="var(--vang-dam)" />
             </Box>
             <Box>
-              <Typography variant="overline" sx={{ color: '#64748b', fontWeight: 'bold', lineHeight: 1 }}>TÀI NGUYÊN MA TRẬN .DOCX</Typography>
-              <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#1e293b' }}>{matrixResources.length} tệp tin mẫu</Typography>
+              <Typography variant="overline" sx={{ color: 'var(--chu-2)', fontWeight: 'bold', lineHeight: 1 }}>TÀI NGUYÊN MA TRẬN .DOCX</Typography>
+              <Typography variant="h5" sx={{ fontWeight: 'bold', color: 'var(--chu-dam-2)' }}>{matrixResources.length} tệp tin mẫu</Typography>
             </Box>
           </Paper>
         </Grid>
@@ -242,15 +242,15 @@ export const DatabankManagement: React.FC = () => {
       {/* TAB 2 */}
       <CustomTabPanel value={tabValue} index={1}>
         {equations.length === 0 ? (
-          <Box sx={{ textAlign: 'center', p: 4, bgcolor: '#f8fafc', borderRadius: 3, border: '1px dashed #cbd5e1' }}>
-            <FlaskConical size={48} color="#94a3b8" style={{ marginBottom: 16 }} />
+          <Box sx={{ textAlign: 'center', p: 4, bgcolor: 'var(--nen-trang)', borderRadius: 3, border: '1px dashed var(--vien)' }}>
+            <FlaskConical size={48} color="var(--chu-mo)" style={{ marginBottom: 16 }} />
             <Typography color="text.secondary">Chưa có phương trình nào trong kho. Nhấn 'Thêm Phương Trình' để tạo.</Typography>
           </Box>
         ) : (
-          <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid #e2e8f0', borderRadius: 3 }}>
+          <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid var(--vien)', borderRadius: 3 }}>
             <Table>
               <TableHead>
-                <TableRow sx={{ bgcolor: '#f8fafc' }}>
+                <TableRow sx={{ bgcolor: 'var(--nen-trang)' }}>
                   <TableCell sx={{ fontWeight: 'bold' }}>Phương trình hóa học</TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>Điều kiện phản ứng</TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>Loại phản ứng</TableCell>
@@ -261,9 +261,9 @@ export const DatabankManagement: React.FC = () => {
               <TableBody>
                 {equations.map(eq => (
                   <TableRow key={eq.id}>
-                    <TableCell><Typography variant="body2" sx={{ fontWeight: 'bold', color: '#0f766e', fontFamily: 'monospace' }}>{eq.equation}</Typography></TableCell>
+                    <TableCell><Typography variant="body2" sx={{ fontWeight: 'bold', color: 'var(--teal)', fontFamily: 'monospace' }}>{eq.equation}</Typography></TableCell>
                     <TableCell><Typography variant="body2">{eq.condition}</Typography></TableCell>
-                    <TableCell><Chip size="small" label={eq.type || 'Chung'} sx={{ bgcolor: '#f1f5f9' }} /></TableCell>
+                    <TableCell><Chip size="small" label={eq.type || 'Chung'} sx={{ bgcolor: 'var(--nen-nhat)' }} /></TableCell>
                     <TableCell><Typography variant="body2" color="text.secondary">{eq.notes}</Typography></TableCell>
                     <TableCell align="right">
                       {canEditOrDelete(eq.createdBy) && (
@@ -281,15 +281,15 @@ export const DatabankManagement: React.FC = () => {
       {/* TAB 3 */}
       <CustomTabPanel value={tabValue} index={2}>
         {matrixResources.length === 0 ? (
-           <Box sx={{ textAlign: 'center', p: 4, bgcolor: '#f8fafc', borderRadius: 3, border: '1px dashed #cbd5e1' }}>
-             <FileText size={48} color="#94a3b8" style={{ marginBottom: 16 }} />
+           <Box sx={{ textAlign: 'center', p: 4, bgcolor: 'var(--nen-trang)', borderRadius: 3, border: '1px dashed var(--vien)' }}>
+             <FileText size={48} color="var(--chu-mo)" style={{ marginBottom: 16 }} />
              <Typography color="text.secondary">Chưa có tài nguyên ma trận mẫu nào. Nhấn 'Thêm Ma Trận' để tạo.</Typography>
            </Box>
         ) : (
           <Grid container spacing={3}>
             {matrixResources.map(res => (
               <Grid size={{ xs: 12, md: 6 }} key={res.id}>
-                <Paper elevation={0} sx={{ p: 3, border: '1px solid #e2e8f0', borderRadius: 3 }}>
+                <Paper elevation={0} sx={{ p: 3, border: '1px solid var(--vien)', borderRadius: 3 }}>
                   <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>{res.title}</Typography>
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>{res.description}</Typography>
                   <Typography variant="body2" sx={{ mb: 2 }}>Số câu: <strong>{res.questionCount}</strong> câu</Typography>
@@ -334,7 +334,7 @@ export const DatabankManagement: React.FC = () => {
             </Grid>
 
             <FormControl>
-              <FormLabel sx={{ fontWeight: 'bold', color: '#0f172a', mb: 1 }}>Loại câu hỏi</FormLabel>
+              <FormLabel sx={{ fontWeight: 'bold', color: 'var(--chu-dam)', mb: 1 }}>Loại câu hỏi</FormLabel>
               <RadioGroup row value={qForm.type} onChange={e => setQForm({...qForm, type: e.target.value, correctAnswer: '', optionA: '', optionB: '', optionC: '', optionD: '', essayAnswer: ''})}>
                 <FormControlLabel value="Trắc nghiệm" control={<Radio />} label="Trắc nghiệm" />
                 <FormControlLabel value="Tự luận" control={<Radio />} label="Tự luận" />
@@ -345,7 +345,7 @@ export const DatabankManagement: React.FC = () => {
 
             {qForm.type === 'Trắc nghiệm' ? (
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: '#475569' }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--chu)' }}>
                   Nhập 4 phương án — chọn đáp án đúng bằng nút radio
                 </Typography>
                 {(['A','B','C','D'] as const).map(opt => (
@@ -361,9 +361,9 @@ export const DatabankManagement: React.FC = () => {
                       sx={{
                         minWidth: 32,
                         fontWeight: 'bold',
-                        bgcolor: qForm.correctAnswer === opt ? '#dcfce7' : '#f1f5f9',
-                        color: qForm.correctAnswer === opt ? '#16a34a' : '#475569',
-                        border: `1px solid ${qForm.correctAnswer === opt ? '#86efac' : '#e2e8f0'}`,
+                        bgcolor: qForm.correctAnswer === opt ? 'var(--nen-luc-nhat)' : 'var(--nen-nhat)',
+                        color: qForm.correctAnswer === opt ? 'var(--luc)' : 'var(--chu)',
+                        border: `1px solid ${qForm.correctAnswer === opt ? '#86efac' : 'var(--vien)'}`,
                       }}
                     />
                     <TextField
@@ -374,7 +374,7 @@ export const DatabankManagement: React.FC = () => {
                       onChange={e => setQForm({...qForm,
                         [opt === 'A' ? 'optionA' : opt === 'B' ? 'optionB' : opt === 'C' ? 'optionC' : 'optionD']: e.target.value
                       })}
-                      sx={{ '& .MuiOutlinedInput-root': { bgcolor: qForm.correctAnswer === opt ? '#f0fdf4' : 'white' } }}
+                      sx={{ '& .MuiOutlinedInput-root': { bgcolor: qForm.correctAnswer === opt ? 'var(--nen-luc-nhat2)' : 'var(--nen-the)' } }}
                     />
                   </Box>
                 ))}

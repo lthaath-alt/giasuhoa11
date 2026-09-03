@@ -1,6 +1,8 @@
 import React from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useMemo } from 'react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { useCheDoMau } from './core/hooks/useCheDoMau';
 import { CssBaseline } from '@mui/material';
 import { AppProvider } from './core/contexts/AppContext';
 
@@ -15,7 +17,12 @@ import QuizPage from './pages/QuizPage';
 import NotFoundPage from './pages/NotFoundPage';
 
 // Tạo theme Material-UI cao cấp theo tone màu Giáo Viên Đổi Mới (Sáng, Cam & Teal)
-const theme = createTheme({
+const themeGoc = {
+  /* CHÚ Ý: palette của MUI phải là MÀU THẬT, không dùng var(--…).
+     MUI tự tính sắc độ đậm/nhạt và màu chữ tương phản từ các giá trị này bằng
+     hàm darken/lighten — đưa biến CSS vào thì nó không đọc ra số nào để tính và
+     hỏng cả bảng màu. Phần nền tối được xử lý bằng cách dựng lại theme ở dưới,
+     chứ không phải bằng biến CSS. */
   palette: {
     mode: 'light',
     primary: {
@@ -107,8 +114,8 @@ const theme = createTheme({
         root: {
           borderRadius: 16,
           boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05)',
-          border: '1px solid #e2e8f0', // Viền mỏng tinh tế
-          backgroundColor: '#ffffff',
+          border: '1px solid var(--vien)', // Viền mỏng tinh tế
+          backgroundColor: 'var(--nen-the)',
         },
       },
     },
@@ -117,8 +124,8 @@ const theme = createTheme({
         root: {
           borderRadius: 16,
           boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05)',
-          border: '1px solid #e2e8f0',
-          backgroundColor: '#ffffff',
+          border: '1px solid var(--vien)',
+          backgroundColor: 'var(--nen-the)',
         },
       },
     },
@@ -128,24 +135,65 @@ const theme = createTheme({
           '& .MuiOutlinedInput-root': {
             borderRadius: 12,
             '& fieldset': {
-              borderColor: '#e2e8f0',
+              borderColor: 'var(--vien)',
             },
             '&:hover fieldset': {
-              borderColor: '#ea580c',
+              borderColor: 'var(--cam)',
             },
             '&.Mui-focused fieldset': {
-              borderColor: '#ea580c',
+              borderColor: 'var(--cam)',
             },
           },
         },
       },
     },
   },
-});
+};
+
+const theme = createTheme(themeGoc as any);
 
 export default function App() {
+  /* Cho các thành phần MUI (hộp thoại, ô nhập, bảng…) đổi theo nền tối.
+     Phần giao diện tự viết đã dùng biến màu trong index.css rồi, nhưng MUI tự
+     vẽ nền trắng của riêng nó — không đổi mode thì hộp thoại vẫn trắng loá
+     giữa trang tối. */
+  const { laToi } = useCheDoMau();
+  const themeDangDung = useMemo(
+    () => (laToi
+      ? createTheme({
+          ...themeGoc,
+          palette: {
+            ...(themeGoc as any).palette,
+            mode: 'dark',
+            background: { default: '#0f151d', paper: '#18212c' },
+            text: { primary: '#e8eef5', secondary: '#a8b8c8' },
+            divider: '#2c3947',
+            /* PHẢI đặt lại `light` cho từng màu, không được để nguyên bản sáng.
+               Ở bản sáng, `light` là rgba trong suốt 8% — dùng làm nền phớt cho
+               các vùng nhấn, đúng vai. Nhưng ở nền tối MUI lại lấy CHÍNH `light`
+               làm MÀU CHỮ cho <Alert>, <Chip>, nút outlined… Chữ màu rgba 8%
+               nghĩa là gần như trong suốt: băng "Em đang dùng bản dùng thử" mờ
+               tới mức không đọc nổi. Đây là lỗi ăn vào 66 chỗ dùng <Alert>, sửa
+               một chỗ này là hết. */
+            /* Cam ở nền tối đậm hơn một bậc (#ea580c → #c2410c, chính là
+               primary.dark của bản sáng). Chữ trắng trên #ea580c chỉ đạt
+               3,56 — dưới mức đọc được cho cỡ chữ 14px; đổi sang #c2410c
+               lên 5,18 mà vẫn đúng màu cam thương hiệu, lại đỡ chói trên
+               nền đậm. CỐ Ý chỉ đổi ở nền tối: nền sáng giữ nguyên. */
+            primary:   { ...(themeGoc as any).palette.primary,   main: '#c2410c', light: '#ff9a5c' },
+            secondary: { ...(themeGoc as any).palette.secondary, light: '#5fc8bd' },
+            warning:   { ...(themeGoc as any).palette.warning,   light: '#fbbf24' },
+            success:   { ...(themeGoc as any).palette.success,   light: '#5fc8bd' },
+            error:     { main: '#ef4444', light: '#ff9a9a', dark: '#b91c1c' },
+            info:      { main: '#4da3ec', light: '#8ec5f5', dark: '#1e6fb8' },
+          },
+        })
+      : theme),
+    [laToi],
+  );
+
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={themeDangDung}>
       <CssBaseline />
       <AppProvider>
         <HashRouter>

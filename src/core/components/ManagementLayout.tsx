@@ -58,7 +58,7 @@ const StatCard: React.FC<StatCardProps> = ({ topLabel, mainContent, description,
       p: 2.5,
       borderRadius: 3,
       cursor: 'pointer',
-      border: '1px solid #e2e8f0',
+      border: '1px solid var(--vien)',
       position: 'relative',
       overflow: 'hidden',
       transition: 'all 0.2s ease-in-out',
@@ -98,7 +98,7 @@ const StatCard: React.FC<StatCardProps> = ({ topLabel, mainContent, description,
           variant="overline"
           sx={{
             fontWeight: 'bold',
-            color: '#64748b',
+            color: 'var(--chu-2)',
             fontSize: '0.65rem',
             letterSpacing: '0.08em',
             lineHeight: 1.2,
@@ -112,7 +112,7 @@ const StatCard: React.FC<StatCardProps> = ({ topLabel, mainContent, description,
           variant="h6"
           sx={{
             fontWeight: 800,
-            color: '#0f172a',
+            color: 'var(--chu-dam)',
             lineHeight: 1.2,
             fontSize: { xs: '1rem', md: '1.15rem' },
           }}
@@ -121,7 +121,7 @@ const StatCard: React.FC<StatCardProps> = ({ topLabel, mainContent, description,
         </Typography>
         <Typography
           variant="caption"
-          sx={{ color: '#94a3b8', fontSize: '0.7rem', mt: 0.3, display: 'block' }}
+          sx={{ color: 'var(--chu-mo)', fontSize: '0.7rem', mt: 0.3, display: 'block' }}
         >
           {description}
         </Typography>
@@ -142,14 +142,14 @@ const PlaceholderContent: React.FC<{ title: string }> = ({ title }) => (
       minHeight: 350,
       gap: 2,
       borderRadius: 3,
-      border: '2px dashed #e2e8f0',
-      bgcolor: '#f8fafc',
+      border: '2px dashed var(--vien)',
+      bgcolor: 'var(--nen-trang)',
     }}
   >
     <Box sx={{ p: 2, bgcolor: 'rgba(234,88,12,0.06)', borderRadius: '50%' }}>
-      <Construction size={36} color="#ea580c" />
+      <Construction size={36} color="var(--cam)" />
     </Box>
-    <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#475569' }}>
+    <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--chu)' }}>
       {title}
     </Typography>
     <Typography variant="body2" color="text.secondary">
@@ -245,7 +245,7 @@ export const ManagementLayout: React.FC<ManagementLayoutProps> = ({
           mb: 1,
           display: 'block',
           fontWeight: 'bold',
-          color: '#94a3b8',
+          color: 'var(--chu-mo)',
           fontSize: '0.65rem',
           letterSpacing: '0.12em',
         }}
@@ -272,11 +272,11 @@ export const ManagementLayout: React.FC<ManagementLayoutProps> = ({
               position: 'relative',
               transition: 'all 0.15s ease',
               bgcolor: isActive ? 'rgba(234, 88, 12, 0.06)' : 'transparent',
-              color: isActive ? '#ea580c' : '#475569',
+              color: isActive ? 'var(--cam)' : 'var(--chu)',
               fontWeight: isActive ? 700 : 500,
               '&:hover': {
-                bgcolor: isActive ? 'rgba(234, 88, 12, 0.08)' : '#f1f5f9',
-                color: isActive ? '#ea580c' : '#0f172a',
+                bgcolor: isActive ? 'rgba(234, 88, 12, 0.08)' : 'var(--nen-nhat)',
+                color: isActive ? 'var(--cam)' : 'var(--chu-dam)',
               },
               '&::before': isActive
                 ? {
@@ -287,7 +287,7 @@ export const ManagementLayout: React.FC<ManagementLayoutProps> = ({
                     bottom: '15%',
                     width: '3.5px',
                     borderRadius: '0 4px 4px 0',
-                    backgroundColor: '#ea580c',
+                    backgroundColor: 'var(--cam-nen)',
                   }
                 : {},
             }}
@@ -328,32 +328,32 @@ export const ManagementLayout: React.FC<ManagementLayoutProps> = ({
           topLabel="QUYỀN TRUY CẬP"
           mainContent={roleName}
           description="Nhấp để đổi mật khẩu bảo mật"
-          accentColor="#ea580c"
-          icon={<Shield size={20} color="#ea580c" />}
+          accentColor="var(--cam)"
+          icon={<Shield size={20} color="var(--cam)" />}
           onClick={() => handleStatClick('password')}
         />
         <StatCard
           topLabel="QUẢN LÝ LỚP HỌC"
           mainContent={`${classCount} Lớp học`}
           description="Nhấp để đi nhanh tới quản lý lớp"
-          accentColor="#0f766e"
-          icon={<GraduationCap size={20} color="#0f766e" />}
+          accentColor="var(--teal)"
+          icon={<GraduationCap size={20} color="var(--teal)" />}
           onClick={() => handleStatClick('classes')}
         />
         <StatCard
           topLabel="QUẢN LÝ TÀI KHOẢN"
           mainContent={`${accountCount} Tài khoản`}
           description="Nhấp để đi nhanh tới quản lý tài khoản"
-          accentColor="#6366f1"
-          icon={<Users size={20} color="#6366f1" />}
+          accentColor="var(--tim-2)"
+          icon={<Users size={20} color="var(--tim-2)" />}
           onClick={() => handleStatClick('accounts')}
         />
         <StatCard
           topLabel="NGÂN HÀNG DỮ LIỆU"
           mainContent={`${questionCount} Câu hỏi & ${examCount} Đề`}
           description="Nhấp để đi nhanh tới ngân hàng dữ liệu"
-          accentColor="#f59e0b"
-          icon={<Database size={20} color="#f59e0b" />}
+          accentColor="var(--vang)"
+          icon={<Database size={20} color="var(--vang)" />}
           onClick={() => handleStatClick('databank')}
         />
       </Box>
@@ -365,14 +365,14 @@ export const ManagementLayout: React.FC<ManagementLayoutProps> = ({
             <IconButton
               onClick={() => setMobileOpen(true)}
               sx={{
-                bgcolor: '#f1f5f9',
+                bgcolor: 'var(--nen-nhat)',
                 borderRadius: 2,
-                '&:hover': { bgcolor: '#e2e8f0' },
+                '&:hover': { bgcolor: 'var(--vien)' },
               }}
             >
               <Menu size={20} />
             </IconButton>
-            <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: '#475569' }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--chu)' }}>
               {SIDEBAR_ITEMS.find((i) => i.id === activeItem)?.label || 'Menu'}
             </Typography>
           </Box>
@@ -410,7 +410,7 @@ export const ManagementLayout: React.FC<ManagementLayoutProps> = ({
               width: 240,
               flexShrink: 0,
               borderRadius: 3,
-              border: '1px solid #e2e8f0',
+              border: '1px solid var(--vien)',
               alignSelf: 'flex-start',
               position: 'sticky',
               top: 16,

@@ -108,7 +108,7 @@ export const ClassManagement: React.FC<ClassManagementProps> = ({
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Box>
-          <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#0f172a' }}>
+          <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)' }}>
             Danh sách Lớp học và Giáo viên phụ trách
           </Typography>
           <Typography variant="body2" color="text.secondary">
@@ -128,14 +128,14 @@ export const ClassManagement: React.FC<ClassManagementProps> = ({
         )}
       </Box>
 
-      <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid #e2e8f0', borderRadius: 3 }}>
+      <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid var(--vien)', borderRadius: 3 }}>
         <Table>
           <TableHead>
-            <TableRow sx={{ bgcolor: '#f8fafc' }}>
-              <TableCell sx={{ fontWeight: 'bold', color: '#475569' }}>Tên Lớp Học</TableCell>
-              <TableCell sx={{ fontWeight: 'bold', color: '#475569' }}>Giáo Viên Phụ Trách</TableCell>
-              <TableCell sx={{ fontWeight: 'bold', color: '#475569' }}>Sĩ Số Học Sinh</TableCell>
-              <TableCell sx={{ fontWeight: 'bold', color: '#475569', align: 'right' }}>Hành Động</TableCell>
+            <TableRow sx={{ bgcolor: 'var(--nen-trang)' }}>
+              <TableCell sx={{ fontWeight: 'bold', color: 'var(--chu)' }}>Tên Lớp Học</TableCell>
+              <TableCell sx={{ fontWeight: 'bold', color: 'var(--chu)' }}>Giáo Viên Phụ Trách</TableCell>
+              <TableCell sx={{ fontWeight: 'bold', color: 'var(--chu)' }}>Sĩ Số Học Sinh</TableCell>
+              <TableCell sx={{ fontWeight: 'bold', color: 'var(--chu)', align: 'right' }}>Hành Động</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -147,19 +147,19 @@ export const ClassManagement: React.FC<ClassManagementProps> = ({
               </TableRow>
             ) : (
               classes.map((cls) => (
-                <TableRow key={cls.id} sx={{ '&:hover': { bgcolor: '#f8fafc' } }}>
+                <TableRow key={cls.id} sx={{ '&:hover': { bgcolor: 'var(--nen-trang)' } }}>
                   <TableCell>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: '#0f172a' }}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)' }}>
                       {cls.name}
                     </Typography>
                     {cls.inviteCode && (
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
-                        <Typography variant="caption" sx={{ fontFamily: 'monospace', color: '#0f766e', fontWeight: 'bold', bgcolor: 'rgba(15,118,110,0.1)', px: 1, borderRadius: 1 }}>
+                        <Typography variant="caption" sx={{ fontFamily: 'monospace', color: 'var(--teal)', fontWeight: 'bold', bgcolor: 'rgba(15,118,110,0.1)', px: 1, borderRadius: 1 }}>
                           Mã: {cls.inviteCode}
                         </Typography>
                         <Tooltip title={codeCopied === cls.inviteCode ? 'Đã sao chép!' : 'Sao chép mã'}>
                           <IconButton size="small" onClick={() => handleCopyCode(cls.inviteCode)} sx={{ p: 0.2 }}>
-                            <Copy size={12} color="#0f766e" />
+                            <Copy size={12} color="var(--teal)" />
                           </IconButton>
                         </Tooltip>
                       </Box>
@@ -171,7 +171,7 @@ export const ClassManagement: React.FC<ClassManagementProps> = ({
                       size="small"
                       icon={<GraduationCap size={14} />}
                       label={getTeacherName(cls.teacherEmail)}
-                      sx={{ fontWeight: 600, color: '#475569' }}
+                      sx={{ fontWeight: 600, color: 'var(--chu)' }}
                     />
                   </TableCell>
                   <TableCell>
@@ -181,24 +181,24 @@ export const ClassManagement: React.FC<ClassManagementProps> = ({
                       sx={{
                         fontWeight: 'bold',
                         bgcolor: 'rgba(59, 130, 246, 0.1)',
-                        color: '#2563eb'
+                        color: 'var(--xanh-troi)'
                       }}
                     />
                   </TableCell>
                   <TableCell align="right">
                     <Tooltip title="Sửa thông tin">
-                      <IconButton size="small" onClick={() => openEdit(cls)} sx={{ color: '#64748b' }}>
+                      <IconButton size="small" onClick={() => openEdit(cls)} sx={{ color: 'var(--chu-2)' }}>
                         <Edit size={16} />
                       </IconButton>
                     </Tooltip>
                     <Tooltip title="Xuất danh sách tài khoản lớp (reset mật khẩu)">
-                      <IconButton size="small" onClick={() => setExportClassId(cls.id)} sx={{ color: '#0f766e' }}>
+                      <IconButton size="small" onClick={() => setExportClassId(cls.id)} sx={{ color: 'var(--teal)' }}>
                         <Download size={16} />
                       </IconButton>
                     </Tooltip>
                     {currentUserRole !== 'teacher' && (
                       <Tooltip title="Xóa lớp học">
-                        <IconButton size="small" onClick={() => setDeleteId(cls.id)} sx={{ color: '#ef4444' }}>
+                        <IconButton size="small" onClick={() => setDeleteId(cls.id)} sx={{ color: 'var(--do)' }}>
                           <Trash2 size={16} />
                         </IconButton>
                       </Tooltip>
@@ -222,7 +222,7 @@ export const ClassManagement: React.FC<ClassManagementProps> = ({
               return (
                 <>
                   Bạn có chắc chắn muốn xóa lớp <strong>{cls.name}</strong> không?<br /><br />
-                  <span style={{ color: '#ef4444', fontWeight: 'bold' }}>Cảnh báo:</span> Lớp này hiện có <strong>{cls.studentIdentifiers.length} học sinh</strong>. 
+                  <span style={{ color: 'var(--do)', fontWeight: 'bold' }}>Cảnh báo:</span> Lớp này hiện có <strong>{cls.studentIdentifiers.length} học sinh</strong>. 
                   Nếu xóa, tất cả học sinh này sẽ bị gỡ khỏi lớp và trở thành học sinh tự do.
                   Hành động này không thể hoàn tác.
                 </>
@@ -294,7 +294,7 @@ export const ClassManagement: React.FC<ClassManagementProps> = ({
 
       {/* Dialog xác nhận xuất danh sách (reset mật khẩu) */}
       <Dialog open={Boolean(exportClassId)} onClose={() => !exporting && setExportClassId(null)} maxWidth="sm" fullWidth>
-        <DialogTitle sx={{ fontWeight: 'bold', color: '#ea580c' }}>
+        <DialogTitle sx={{ fontWeight: 'bold', color: 'var(--cam)' }}>
           ⚠️ Xác nhận xuất danh sách tài khoản lớp
         </DialogTitle>
         <DialogContent>
@@ -309,8 +309,8 @@ export const ClassManagement: React.FC<ClassManagementProps> = ({
               return (
                 <>
                   Thao tác này sẽ đặt lại mật khẩu của <strong>{count} học sinh</strong> trong lớp <strong>{cls.name}</strong>.<br /><br />
-                  <span style={{ color: '#ef4444', fontWeight: 'bold' }}>Mật khẩu cũ sẽ không dùng được nữa.</span> Hệ thống sẽ sinh mật khẩu mới theo format:<br />
-                  <code style={{ background: '#f1f5f9', padding: '2px 6px', borderRadius: 4 }}>{cls.name.replace(/\s/g, '')}_SBD_4ký_tự</code><br /><br />
+                  <span style={{ color: 'var(--do)', fontWeight: 'bold' }}>Mật khẩu cũ sẽ không dùng được nữa.</span> Hệ thống sẽ sinh mật khẩu mới theo format:<br />
+                  <code style={{ background: 'var(--nen-nhat)', padding: '2px 6px', borderRadius: 4 }}>{cls.name.replace(/\s/g, '')}_SBD_4ký_tự</code><br /><br />
                   Bạn sẽ tải xuống file CSV chứa thông tin đăng nhập mới để phát cho học sinh.
                   Hãy chắc rằng bạn đã in/gửi cho tất cả học sinh ngay sau khi xuất.
                 </>

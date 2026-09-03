@@ -56,7 +56,7 @@ export const ChemDoodles: React.FC = () => (
       overflow: 'hidden',      // hình thò ra ngoài không được đẻ ra thanh cuộn ngang
       pointerEvents: 'none',   // không chặn click vào nội dung phía sau
       userSelect: 'none',
-      color: '#0f172a',
+      color: 'var(--chu-dam)',
       /* Hình nằm ngoài lề, không bao giờ đè lên chữ, nên đậm được mà không
          làm rối mắt lúc đọc. */
       opacity: 0.42,

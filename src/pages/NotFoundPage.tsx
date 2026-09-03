@@ -8,8 +8,8 @@ export const NotFoundPage: React.FC = () => {
 
   return (
     <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#0A0C10', p: 3 }}>
-      <Paper sx={{ p: 5, textAlign: 'center', maxWidth: 450, borderRadius: 4, boxShadow: 'none', backgroundColor: '#11141D', border: '1px solid #1e293b' }}>
-        <Box sx={{ color: '#10b981', mb: 2, display: 'flex', justifyContent: 'center' }}>
+      <Paper sx={{ p: 5, textAlign: 'center', maxWidth: 450, borderRadius: 4, boxShadow: 'none', backgroundColor: '#11141D', border: '1px solid var(--chu-dam-2)' }}>
+        <Box sx={{ color: 'var(--luc)', mb: 2, display: 'flex', justifyContent: 'center' }}>
           <HelpCircle size={64} />
         </Box>
         <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 1 }}>

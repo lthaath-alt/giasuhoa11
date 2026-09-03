@@ -1,4 +1,5 @@
 import { Quiz, QuizQuestionResult } from './types';
+import { chonCauChoDeChuong } from './deChuong';
 import { QuizStorage } from './quizStorage';
 import { Question, QuestionType, DifficultyLevel } from '../library/types';
 import {
@@ -231,61 +232,23 @@ export const QuizService = {
   },
 
   /**
-   * Tạo bài kiểm tra TỔNG HỢP một chương từ ngân hàng câu hỏi.
+   * Tạo bài kiểm tra TỔNG HỢP một chương.
    *
-   * Khác `createQuiz` cũ ở hai điểm quan trọng:
-   *  - Nguồn là ngân hàng thật (Firestore `bank_questions`, truyền vào đây đã
-   *    đọc sẵn), không phải kho localStorage `h11_library` cũ. Kho cũ đã được
-   *    migrate đi nên gần như rỗng, khiến bài kiểm tra rơi xuống bộ câu dự
-   *    phòng viết cứng trong mã — học sinh làm bài không dính gì tới ngân hàng
-   *    của giáo viên.
-   *  - Lấy câu của CẢ CHƯƠNG chứ không riêng một bài, vì đây là bài tổng hợp
-   *    sau khi gia sư đã rà xong chương.
-   *
-   * Cơ cấu 10 câu: 3 nhận biết · 3 thông hiểu · 3 vận dụng · 1 vận dụng cao.
-   * Mức nào thiếu thì bù bằng mức gần nhất, chứ không bỏ trống — thà đề lệch
-   * một chút còn hơn trả về đề 4 câu mà không nói gì.
+   * Phần chọn câu nằm ở `deChuong.ts` — thuần logic, không đọc ghi gì, nên viết
+   * được bài kiểm tra tự động cho nó mà không phải dựng Firebase giả. Ở đây chỉ
+   * còn phần lấy lịch sử làm bài và ghi đề xuống kho.
    */
   createChapterQuiz(chapterId: string, userEmail: string, bankQuestions: Question[]): Quiz | null {
-    if (!bankQuestions.length) return null;
-
-    const CO_CAU: { muc: DifficultyLevel; can: number }[] = [
-      { muc: 'Thấp', can: 3 },
-      { muc: 'Trung bình', can: 3 },
-      { muc: 'Cao', can: 4 },   // gộp vận dụng + vận dụng cao: mô hình cũ chỉ có 3 mức
-    ];
-
-    /* Ưu tiên câu chưa từng làm, rồi câu từng làm sai, cuối cùng mới tới câu đã
-       làm đúng — giống logic chống trùng đề của createQuiz, nhưng xét trên cả
-       chương nên dùng chapterId làm khoá. */
-    const doneIds = QuizStorage.getQuestionsDone(userEmail, chapterId);
-    const failedIds = QuizStorage.getQuestionsFailed(userEmail, chapterId);
-    const uuTien = (q: Question) =>
-      !doneIds.includes(q.id) ? 0 : failedIds.includes(q.id) ? 1 : 2;
-
-    const chon: Question[] = [];
-    const daLay = new Set<string>();
-
-    for (const { muc, can } of CO_CAU) {
-      const nhom = bankQuestions
-        .filter(q => q.difficulty === muc && !daLay.has(q.id))
-        .sort((a, b) => uuTien(a) - uuTien(b));
-      this.shuffleArray(nhom.filter(q => uuTien(q) === 0));
-      nhom.slice(0, can).forEach(q => { chon.push(q); daLay.add(q.id); });
-    }
-
-    // Chưa đủ 10 thì bù bằng bất kỳ câu nào còn lại
-    if (chon.length < 10) {
-      const conLai = this.shuffleArray(bankQuestions.filter(q => !daLay.has(q.id)));
-      conLai.slice(0, 10 - chon.length).forEach(q => { chon.push(q); daLay.add(q.id); });
-    }
-
-    const trongSo: Record<DifficultyLevel, number> = { 'Thấp': 1, 'Trung bình': 2, 'Cao': 3 };
-    chon.sort((a, b) => trongSo[a.difficulty] - trongSo[b.difficulty]);
+    const chon = chonCauChoDeChuong(
+      bankQuestions,
+      QuizStorage.getQuestionsDone(userEmail, chapterId),
+      QuizStorage.getQuestionsFailed(userEmail, chapterId),
+    );
+    if (!chon.length) return null;
 
     const quiz: Quiz = {
       id: `quiz_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
-      // lessonId dùng chính chapterId: bài này là của cả chương, không của bài nào
+      // lessonId dùng chính chapterId: đề của cả chương, không của bài nào
       lessonId: chapterId,
       chapterId,
       userEmail,

@@ -14,6 +14,16 @@
     var t = (p === 'light' || p === 'dark') ? p : localStorage.getItem('theme');
     if (t) document.documentElement.setAttribute('data-theme', t);
   } catch (e) { /* localStorage bị chặn thì dùng giao diện hệ thống */ }
+
+  /* Web chính đổi nền giữa chừng thì nhắn sang đây. CỐ Ý nghe tin nhắn thay vì
+     để web đổi ?theme= trên địa chỉ: đổi địa chỉ là nạp lại trang, người đang
+     xem dở bài nào sẽ bị đá về đầu danh sách. */
+  window.addEventListener('message', function (e) {
+    if (e.origin !== location.origin) return;
+    var d = e.data;
+    if (!d || d.loai !== 'hoa11:che-do-mau') return;
+    document.documentElement.setAttribute('data-theme', d.toi ? 'dark' : 'light');
+  });
 })();
 </script>
 <style>

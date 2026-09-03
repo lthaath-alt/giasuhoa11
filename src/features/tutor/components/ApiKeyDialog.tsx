@@ -69,6 +69,23 @@ export const ApiKeyDialog: React.FC<ApiKeyDialogProps> = ({ open, onClose }) => 
   };
 
   const handleSave = () => {
+    /* KHÔNG lưu một key vừa bị kiểm tra và báo là hỏng.
+
+       Key của người dùng ĐÈ LÊN key của web (xem getEffectiveApiKey), nên lưu
+       nhầm một key sai là tắt luôn gia sư — mà học sinh sẽ không hiểu vì sao,
+       chỉ thấy thầy im lặng. Bản trước nút "Lưu Key" vẫn bật ngay sau khi hộp
+       thoại báo "API Key không hợp lệ".
+
+       Chưa bấm kiểm tra thì vẫn cho lưu: có thể em dán key đúng mà mạng trường
+       chặn lúc kiểm, chặn cứng thì lại thành cản trở. */
+    if (testResult && !testResult.success) {
+      setTestResult({
+        success: false,
+        message: 'Key này vừa kiểm tra và không dùng được nên thầy chưa lưu. '
+          + 'Em kiểm tra lại key rồi bấm Lưu, hoặc bấm Hủy để giữ nguyên như cũ.',
+      });
+      return;
+    }
     if (apiKey.trim()) {
       localStorage.setItem('gemini_api_key_user', apiKey.trim());
     }
@@ -84,7 +101,7 @@ export const ApiKeyDialog: React.FC<ApiKeyDialogProps> = ({ open, onClose }) => 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1, fontWeight: 'bold' }}>
-        <Key size={20} color="#0f766e" />
+        <Key size={20} color="var(--teal)" />
         Cài đặt Gemini API Key
       </DialogTitle>
       
@@ -162,7 +179,7 @@ export const ApiKeyDialog: React.FC<ApiKeyDialogProps> = ({ open, onClose }) => 
             <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1 }}>
               Hướng dẫn lấy API Key miễn phí
             </Typography>
-            <ol style={{ paddingLeft: '20px', margin: 0, fontSize: '0.875rem', color: '#475569' }}>
+            <ol style={{ paddingLeft: '20px', margin: 0, fontSize: '0.875rem', color: 'var(--chu)' }}>
               <li>Truy cập <Link href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, fontWeight: 'bold' }}>Google AI Studio <ExternalLink size={12} /></Link></li>
               <li>Đăng nhập bằng tài khoản Google của bạn.</li>
               <li>Bấm nút <strong>"Create API Key"</strong>.</li>

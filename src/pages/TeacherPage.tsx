@@ -46,7 +46,7 @@ const CredentialDialog: React.FC<CredentialDialogProps> = ({ open, onClose, cred
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle sx={{ bgcolor: '#0f766e', color: '#fff', fontWeight: 'bold' }}>
+      <DialogTitle sx={{ bgcolor: 'var(--teal-nen)', color: 'var(--chu-nguoc)', fontWeight: 'bold' }}>
         ✅ Tài khoản đã được tạo thành công!
       </DialogTitle>
       <DialogContent sx={{ pt: 3 }}>
@@ -55,7 +55,7 @@ const CredentialDialog: React.FC<CredentialDialogProps> = ({ open, onClose, cred
         </Alert>
 
         {credentials && (
-          <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 3, bgcolor: '#f8fafc' }}>
+          <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 3, bgcolor: 'var(--nen-trang)' }}>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
               <Box>
                 <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'bold' }}>HỌ TÊN</Typography>
@@ -64,7 +64,7 @@ const CredentialDialog: React.FC<CredentialDialogProps> = ({ open, onClose, cred
               <Divider />
               <Box>
                 <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'bold' }}>TÀI KHOẢN ĐĂNG NHẬP</Typography>
-                <Typography variant="body1" sx={{ fontWeight: 'bold', fontFamily: 'monospace', color: '#0f766e' }}>
+                <Typography variant="body1" sx={{ fontWeight: 'bold', fontFamily: 'monospace', color: 'var(--teal)' }}>
                   {credentials.identifier}
                 </Typography>
               </Box>
@@ -72,7 +72,7 @@ const CredentialDialog: React.FC<CredentialDialogProps> = ({ open, onClose, cred
               <Box>
                 <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'bold' }}>MẬT KHẨU</Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Typography variant="body1" sx={{ fontWeight: 'bold', fontFamily: 'monospace', color: '#ea580c', letterSpacing: showPassword ? 0 : 4 }}>
+                  <Typography variant="body1" sx={{ fontWeight: 'bold', fontFamily: 'monospace', color: 'var(--cam)', letterSpacing: showPassword ? 0 : 4 }}>
                     {showPassword ? credentials.password : '••••••••••'}
                   </Typography>
                   <IconButton size="small" onClick={() => setShowPassword(v => !v)}>
@@ -168,7 +168,7 @@ const CreateStudentDialog: React.FC<CreateStudentDialogProps> = ({
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
       <DialogTitle sx={{ fontWeight: 'bold' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <UserPlus size={20} color="#0f766e" />
+          <UserPlus size={20} color="var(--teal)" />
           Thêm học sinh vào lớp
         </Box>
       </DialogTitle>
@@ -283,20 +283,20 @@ export const TeacherPage: React.FC = () => {
   };
 
   return (
-    <Box id="teacher-page" sx={{ minHeight: '100vh', backgroundColor: '#f1f5f9', display: 'flex', flexDirection: 'column' }}>
+    <Box id="teacher-page" sx={{ minHeight: '100vh', backgroundColor: 'var(--nen-nhat)', display: 'flex', flexDirection: 'column' }}>
 
       {/* NAVBAR — giữ nguyên */}
       <AppBar id="teacher-app-bar" position="static" color="inherit" elevation={0}
-        sx={{ backgroundColor: '#ffffff', borderBottom: '1px solid #e2e8f0' }}>
+        sx={{ backgroundColor: 'var(--nen-the)', borderBottom: '1px solid var(--vien)' }}>
         <Container maxWidth="xl">
           <Toolbar sx={{ justifyContent: 'space-between', py: 1, px: { xs: 0 } }}>
 
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
               <Box sx={{ p: 1, backgroundColor: 'rgba(15, 118, 110, 0.1)', borderRadius: 2, display: 'flex' }}>
-                <GraduationCap size={22} color="#0f766e" />
+                <GraduationCap size={22} color="var(--teal)" />
               </Box>
               <Box>
-                <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#0f172a', lineHeight: 1.2 }}>
+                <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)', lineHeight: 1.2 }}>
                   {myClass ? `Lớp ${myClass.name}` : 'Không gian Giáo viên'}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
@@ -307,14 +307,14 @@ export const TeacherPage: React.FC = () => {
 
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center', gap: 1.5 }}>
-                <Avatar sx={{ bgcolor: 'rgba(15, 118, 110, 0.1)', color: '#0f766e', width: 36, height: 36, fontWeight: 'bold' }}>
+                <Avatar sx={{ bgcolor: 'rgba(15, 118, 110, 0.1)', color: 'var(--teal)', width: 36, height: 36, fontWeight: 'bold' }}>
                   {currentUser?.name.charAt(0).toUpperCase()}
                 </Avatar>
                 <Box>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: '#0f172a' }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)' }}>
                     {currentUser?.name}
                   </Typography>
-                  <Chip label="GIÁO VIÊN" size="small" sx={{ height: 16, fontSize: '0.6rem', fontWeight: 'bold', bgcolor: '#0f766e', color: '#fff' }} />
+                  <Chip label="GIÁO VIÊN" size="small" sx={{ height: 16, fontSize: '0.6rem', fontWeight: 'bold', bgcolor: 'var(--teal-nen)', color: 'var(--chu-nguoc)' }} />
                 </Box>
               </Box>
 
@@ -324,7 +324,7 @@ export const TeacherPage: React.FC = () => {
                 size="small"
                 startIcon={<BookOpen size={14} />}
                 onClick={() => navigate('/dashboard')}
-                sx={{ textTransform: 'none', borderRadius: 2, fontWeight: 'bold', color: '#0f766e', borderColor: '#0f766e', '&:hover': { bgcolor: 'rgba(15,118,110,0.05)' } }}
+                sx={{ textTransform: 'none', borderRadius: 2, fontWeight: 'bold', color: 'var(--teal)', borderColor: 'var(--teal)', '&:hover': { bgcolor: 'rgba(15,118,110,0.05)' } }}
               >
                 Vào học tập
               </Button>

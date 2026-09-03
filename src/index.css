@@ -1,11 +1,157 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
+/* ─── Bảng màu hai chế độ ────────────────────────────────────────────────────
+   Web có hơn 1000 mã màu viết cứng rải khắp các tệp .tsx. Thay vì sửa từng chỗ
+   một, gom về ~20 biến ở đây rồi định nghĩa lại chúng cho nền tối — sửa một
+   chỗ là cả web đổi theo, và sau này thêm màn mới chỉ cần dùng biến.
+
+   Màu thương hiệu (cam, teal, xanh) giữ gần như nguyên ở nền tối, chỉ sáng lên
+   một chút cho đủ tương phản trên nền đậm. Đổi hẳn tông thì học sinh không
+   nhận ra đây vẫn là web cũ.
+
+   CỐ Ý không đụng tới các tệp hình minh hoạ (GameArt, doodles, Mascot): đó là
+   tranh vẽ, đảo màu theo nền chỉ làm hỏng hình. */
+:root {
+  --nen-trang: #f8fafc;   /* nền toàn trang */
+  --nen-the:   #ffffff;   /* nền thẻ, hộp thoại */
+  --nen-nhat:  #f1f5f9;   /* nền phụ, vùng nhấn nhẹ */
+  --nen-xam:   #f7f9fc;   /* nền khu vực lớn */
+  --vien:      #e2e8f0;
+  --chu-dam:   #0f172a;
+  --chu-dam-2: #1e293b;
+  --chu:       #475569;
+  --chu-2:     #64748b;
+  --chu-mo:    #94a3b8;
+  --cam:       #ea580c;
+  --teal:      #0f766e;
+  --xanh:      #0062b8;
+  --xanh-dam:  #1e50a2;
+  --do:        #ef4444;
+  --luc:       #10b981;
+  --tim:       #4f46e5;
+  --nen-cam-nhat:  #fff7ed;
+  --nen-cam-nhat2: #ffedd5;
+  --nen-luc-nhat:  #dcfce7;
+  --nen-luc-nhat2: #f0fdf4;
+  --nen-vang-nhat: #fef3c7;
+  --nen-xanh-nhat: #dbeafe;
+  --nen-tim-nhat:  #e0e7ff;
+  --nen-do-nhat:   #fee2e2;
+  --chu-dam-3:     #334155;
+  --nen-xanh-nhat2:#eff6ff;
+  --vien-xanh:     #bfdbfe;
+  --vang:        #f59e0b;
+  --vang-dam:    #d97706;
+  --cam-dam:     #c2410c;
+  --cam-nhat:    #fb923c;
+  --cam-nhat2:   #fdba74;
+  --cam-vien:    #fed7aa;
+  --luc-dam:     #15803d;
+  --luc-dam2:    #166534;
+  --xanh-troi:   #2563eb;
+  --xanh-troi2:  #0369a1;
+  --do-dam:      #b91c1c;
+  --tim-2:       #6366f1;
+  --nen-do-nhat2:#fef2f2;
+  --nen-tim-nhat2:#f5f3ff;
+  --nen-rat-nhat:#fafafa;
+  --vien-2:      #e5e7eb;
+  --xanh-chu:    #1e40af;
+  --xanh-chu2:   #1e3a8a;
+  --chu-nguoc:   #ffffff;  /* chữ trên nền màu — GIỮ TRẮNG ở cả hai chế độ */
+  /* ── Màu thương hiệu dùng làm NỀN (nút, thanh menu, chip) ─────────────────
+     Phải tách khỏi --cam/--teal/--xanh vì hai vai trái ngược nhau:
+       · dùng làm CHỮ trên nền tối  -> phải SÁNG lên mới đọc được
+       · dùng làm NỀN mang chữ trắng -> phải ĐẬM lại mới đọc được
+     Một biến không gánh nổi cả hai. Bản đầu chỉ có một biến, làm sáng cho vai
+     chữ, thế là thanh menu xanh nhạt + chữ trắng, tương phản tụt còn 2,7. */
+  --xanh-nen:     #0062b8;
+  --xanh-dam-nen: #1e50a2;
+  --teal-nen:     #0f766e;
+  --cam-nen:      #ea580c;
+  --do-nen:       #ef4444;
+  --tim-nen:      #4f46e5;
+  --luc-nen:      #0f766e;
+  --vang-nen:     #ff9900;
+  /* Khối mã / công thức: cố ý nền tối ở CẢ hai chế độ, như mọi trình soạn mã */
+  --nen-ma:       #1e293b;
+  --chu-ma:       #e2e8f0;
+  /* Chữ trên nền VÀNG. Vàng quá sáng nên chữ trắng chỉ đạt tương phản 2,8 —
+     dưới mức đọc được. Chữ nâu đậm trên vàng đạt hơn 8 mà vẫn giữ đúng
+     màu nút. Giữ nguyên ở cả hai chế độ vì nút vàng cũng giữ nguyên. */
+  --chu-tren-vang:#3a2400;
+}
+
+:root[data-theme="dark"] {
+  --nen-trang: #0f151d;
+  --nen-the:   #18212c;
+  --nen-nhat:  #1f2a37;
+  --nen-xam:   #151d27;
+  --vien:      #2c3947;
+  --chu-dam:   #e8eef5;
+  --chu-dam-2: #d3dde8;
+  --chu:       #a8b8c8;
+  --chu-2:     #93a3b4;
+  --chu-mo:    #6d7d8d;
+  --cam:       #ff7a33;
+  --teal:      #3fb3a6;
+  --xanh:      #4da3ec;
+  --xanh-dam:  #5b95d6;
+  --do:        #ff6b6b;
+  --luc:       #34d399;
+  --tim:       #8b85f0;
+  --nen-cam-nhat:  #2e1f14;
+  --nen-cam-nhat2: #3a2617;
+  --nen-luc-nhat:  #14281f;
+  --nen-luc-nhat2: #101f18;
+  --nen-vang-nhat: #2f2713;
+  --nen-xanh-nhat: #15243a;
+  --nen-tim-nhat:  #1d1d3a;
+  --nen-do-nhat:   #33191b;
+  --chu-dam-3:     #c3cedb;
+  --nen-xanh-nhat2:#13223a;
+  --vien-xanh:     #2b4468;
+  --vang:        #fbbf24;
+  --vang-dam:    #f0a13a;
+  --cam-dam:     #ff8f4d;
+  --cam-nhat:    #ff9a5c;
+  --cam-nhat2:   #ffb27f;
+  --cam-vien:    #5a3a22;
+  --luc-dam:     #4ade80;
+  --luc-dam2:    #6ee7a8;
+  --xanh-troi:   #60a5fa;
+  --xanh-troi2:  #38bdf8;
+  --do-dam:      #ff8080;
+  --tim-2:       #a5a1f5;
+  --nen-do-nhat2:#2a1719;
+  --nen-tim-nhat2:#1e1b33;
+  --nen-rat-nhat:#161d26;
+  --vien-2:      #313d4b;
+  --xanh-chu:    #8ab8f0;
+  --xanh-chu2:   #a9c9f5;
+  --chu-nguoc:   #ffffff;
+  /* Nền màu ở chế độ tối: hạ độ sáng một chút cho đỡ chói, nhưng vẫn phải đủ
+     tối để chữ trắng trên đó đạt tương phản ≥ 4,5. */
+  --xanh-nen:     #0a5aa8;
+  --xanh-dam-nen: #1c4a95;
+  --teal-nen:     #0d6b64;
+  --cam-nen:      #d4500b;
+  --do-nen:       #cf3b3b;
+  --tim-nen:      #453ecc;
+  --luc-nen:      #0d6b64;
+  --vang-nen:     #d98600;
+  --nen-ma:       #111a24;
+  --chu-ma:       #dfe7ef;
+  --chu-tren-vang:#3a2400;
+}
+
 body {
-  background-color: #f8fafc;
-  color: #0f172a;
+  background-color: var(--nen-trang);
+  color: var(--chu-dam);
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   margin: 0;
+  transition: background-color .18s ease, color .18s ease;
 }
 
 /* Custom Scrollbars to match GiaoVienDoiMoi light theme */

@@ -43,19 +43,19 @@ export const SchoolAdminPage: React.FC = () => {
   const schoolUsers = users.filter(u => u.schoolId === currentUser?.schoolId);
 
   return (
-    <Box id="school-admin-page-layout" sx={{ minHeight: '100vh', backgroundColor: '#f8fafc', display: 'flex', flexDirection: 'column' }}>
+    <Box id="school-admin-page-layout" sx={{ minHeight: '100vh', backgroundColor: 'var(--nen-trang)', display: 'flex', flexDirection: 'column' }}>
       
       {/* ADMIN NAVIGATION BAR */}
-      <AppBar id="admin-app-bar" position="static" elevation={0} sx={{ backgroundColor: '#0f172a', borderBottom: '1px solid #1e293b' }}>
+      <AppBar id="admin-app-bar" position="static" elevation={0} sx={{ backgroundColor: 'var(--chu-dam)', borderBottom: '1px solid var(--chu-dam-2)' }}>
         <Container maxWidth="xl">
           <Toolbar sx={{ justifyContent: 'space-between', py: 1, px: { xs: 0 } }}>
             
             {/* Logo */}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, cursor: 'pointer' }} onClick={handleBackToStudy}>
               <Box sx={{ p: 1, backgroundColor: 'rgba(234, 88, 12, 0.15)', borderRadius: 2.5, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <GraduationCap size={24} color="#ea580c" />
+                <GraduationCap size={24} color="var(--cam)" />
               </Box>
-              <Typography variant="h6" sx={{ letterSpacing: '-0.5px', fontWeight: 'bold', color: '#ffffff' }}>
+              <Typography variant="h6" sx={{ letterSpacing: '-0.5px', fontWeight: 'bold', color: 'var(--chu-nguoc)' }}>
                 Quản trị Trường học
               </Typography>
             </Box>
@@ -64,14 +64,14 @@ export const SchoolAdminPage: React.FC = () => {
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               
               <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center', gap: 1.5 }}>
-                <Avatar sx={{ bgcolor: '#ea580c', color: '#ffffff', width: 36, height: 36, fontWeight: 'bold', fontSize: '0.9rem' }}>
+                <Avatar sx={{ bgcolor: 'var(--cam-nen)', color: 'var(--chu-nguoc)', width: 36, height: 36, fontWeight: 'bold', fontSize: '0.9rem' }}>
                   S
                 </Avatar>
                 <Box sx={{ textAlign: 'left' }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: '#f8fafc', lineHeight: 1.2 }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--chu-nguoc)', lineHeight: 1.2 }}>
                     {currentUser?.name || 'Quản trị trường'}
                   </Typography>
-                  <Chip label="SCHOOL ADMIN" size="small" sx={{ height: 18, fontSize: '0.6rem', fontWeight: 'bold', backgroundColor: 'rgba(234, 88, 12, 0.2)', color: '#fb923c', border: '1px solid rgba(234, 88, 12, 0.4)' }} />
+                  <Chip label="SCHOOL ADMIN" size="small" sx={{ height: 18, fontSize: '0.6rem', fontWeight: 'bold', backgroundColor: 'rgba(234, 88, 12, 0.2)', color: 'var(--cam-nhat)', border: '1px solid rgba(234, 88, 12, 0.4)' }} />
                 </Box>
               </Box>
 
@@ -86,11 +86,11 @@ export const SchoolAdminPage: React.FC = () => {
                   textTransform: 'none',
                   borderRadius: 2.5,
                   fontWeight: 'bold',
-                  color: '#10b981',
+                  color: 'var(--luc)',
                   borderColor: 'rgba(16, 185, 129, 0.4)',
                   backgroundColor: 'rgba(16, 185, 129, 0.08)',
                   '&:hover': {
-                    borderColor: '#10b981',
+                    borderColor: 'var(--luc)',
                     backgroundColor: 'rgba(16, 185, 129, 0.15)',
                   }
                 }}
@@ -110,8 +110,8 @@ export const SchoolAdminPage: React.FC = () => {
                   borderRadius: 2.5,
                   fontWeight: 'bold',
                   boxShadow: 'none',
-                  backgroundColor: '#ef4444',
-                  '&:hover': { backgroundColor: '#dc2626' }
+                  backgroundColor: 'var(--do-nen)',
+                  '&:hover': { backgroundColor: 'var(--do-nen)' }
                 }}
               >
                 Đăng xuất

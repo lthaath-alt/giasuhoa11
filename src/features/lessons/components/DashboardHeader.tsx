@@ -34,7 +34,11 @@ import {
   Building2,
   Presentation,
   Gamepad2,
+  Moon,
+  Sun,
 } from 'lucide-react';
+import { useCheDoMau } from '../../../core/hooks/useCheDoMau';
+import { LINK_ZALO } from '../../../core/constants';
 import { User } from '../../auth/types';
 import { useApp } from '../../../core/hooks/useApp';
 import { Lesson } from '../types';
@@ -71,6 +75,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   onSelectLesson,
 }) => {
   const { curriculum, hasAdvancedStudentTitle } = useApp();
+  const { laToi, doiCheDo } = useCheDoMau();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchAnchorEl, setSearchAnchorEl] = useState<null | HTMLElement>(null);
@@ -110,8 +115,8 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
       color="inherit"
       elevation={0}
       sx={{
-        backgroundColor: '#ffffff',
-        borderBottom: '1px solid #e2e8f0',
+        backgroundColor: 'var(--nen-the)',
+        borderBottom: '1px solid var(--vien)',
         boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
       }}
     >
@@ -140,7 +145,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             <Box
               sx={{
                 p: 1,
-                backgroundColor: '#0062b8',
+                backgroundColor: 'var(--xanh-nen)',
                 borderRadius: '50% 12px 50% 12px',
                 display: 'flex',
                 alignItems: 'center',
@@ -148,7 +153,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 boxShadow: '0 4px 10px rgba(0, 98, 184, 0.25)',
               }}
             >
-              <BookOpen size={24} color="#ffffff" />
+              <BookOpen size={24} color="var(--chu-nguoc)" />
             </Box>
             <Box>
               <Typography
@@ -156,7 +161,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 sx={{
                   fontWeight: 900,
                   letterSpacing: '-0.5px',
-                  color: '#0062b8',
+                  color: 'var(--xanh)',
                   lineHeight: 1.1,
                   display: 'flex',
                   alignItems: 'center',
@@ -169,7 +174,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 variant="caption"
                 sx={{
                   fontWeight: 'bold',
-                  color: '#ea580c',
+                  color: 'var(--cam)',
                   letterSpacing: '0.5px',
                   textTransform: 'uppercase',
                   fontSize: '0.68rem',
@@ -188,17 +193,17 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 alignItems: 'center',
                 gap: 1,
                 borderRadius: 20,
-                backgroundColor: '#f1f5f9',
+                backgroundColor: 'var(--nen-nhat)',
                 px: 2,
                 py: 0.8,
                 border: '1px solid transparent',
                 '&:focus-within': {
-                  borderColor: '#0062b8',
-                  backgroundColor: '#ffffff',
+                  borderColor: 'var(--xanh)',
+                  backgroundColor: 'var(--nen-the)',
                 },
               }}
             >
-              <Search size={16} color="#0062b8" style={{ marginLeft: 6 }} />
+              <Search size={16} color="var(--xanh)" style={{ marginLeft: 6 }} />
               <input
                 id="hocmai-search-bar"
                 placeholder="Tìm kiếm bài học hóa học 11..."
@@ -213,7 +218,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                   background: 'transparent',
                   width: '100%',
                   fontSize: '0.85rem',
-                  color: '#1e293b',
+                  color: 'var(--chu-dam-2)',
                 }}
               />
             </Box>
@@ -232,7 +237,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                   overflowY: 'auto',
                   borderRadius: 3,
                   boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
-                  border: '1px solid #e2e8f0',
+                  border: '1px solid var(--vien)',
                 }}
               >
                 {filteredLessons.length > 0 ? (
@@ -243,17 +248,17 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                       sx={{
                         py: 1.2,
                         px: 2,
-                        borderBottom: '1px solid #f1f5f9',
+                        borderBottom: '1px solid var(--nen-nhat)',
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'flex-start',
                         cursor: 'pointer',
                         '&:hover': {
-                          backgroundColor: '#f1f5f9',
+                          backgroundColor: 'var(--nen-nhat)',
                         },
                       }}
                     >
-                      <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: '#0062b8' }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--xanh)' }}>
                         {l.title}
                       </Typography>
                       <Typography variant="caption" color="text.secondary" noWrap sx={{ width: '100%' }}>
@@ -288,10 +293,13 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 id="zalo-contact-btn"
                 variant="contained"
                 size="small"
-                onClick={() => window.open('https://zalo.me', '_blank')}
+                onClick={() => window.open(LINK_ZALO, '_blank', 'noopener,noreferrer')}
                 sx={{
-                  backgroundColor: '#0084ff',
-                  color: '#ffffff',
+                  /* Trước là #0084ff: chữ trắng trên đó chỉ đạt 3,66, hơi chói và
+                     khó đọc. Dùng luôn màu xanh nền chuẩn của web (#0062b8) —
+                     tương phản lên 5,9 và ăn nhập với thanh menu. */
+                  backgroundColor: 'var(--xanh-nen)',
+                  color: 'var(--chu-nguoc)',
                   borderRadius: 20,
                   fontSize: '0.75rem',
                   fontWeight: 'bold',
@@ -307,11 +315,25 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               </Button>
             </Tooltip>
 
+            {/* Nút đổi nền sáng / tối. Đặt cạnh nhóm nút đăng nhập để ai cũng
+                thấy, kể cả khách chưa có tài khoản. */}
+            <Tooltip title={laToi ? 'Chuyển sang nền sáng' : 'Chuyển sang nền tối'}>
+              <IconButton
+                id="header-theme-btn"
+                onClick={doiCheDo}
+                size="small"
+                aria-label={laToi ? 'Chuyển sang nền sáng' : 'Chuyển sang nền tối'}
+                sx={{ color: 'var(--chu-2)', '&:hover': { color: 'var(--cam)' } }}
+              >
+                {laToi ? <Sun size={18} /> : <Moon size={18} />}
+              </IconButton>
+            </Tooltip>
+
             {/* Auth section */}
             {currentUser ? (
               // ── Đã đăng nhập: Avatar + Tên + Chip vai trò + Đăng xuất
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                <Avatar sx={{ bgcolor: '#0062b8', color: '#ffffff', width: 34, height: 34, fontWeight: 'bold', fontSize: '0.9rem' }}>
+                <Avatar sx={{ bgcolor: 'var(--xanh-nen)', color: 'var(--chu-nguoc)', width: 34, height: 34, fontWeight: 'bold', fontSize: '0.9rem' }}>
                   {currentUser.name.charAt(0).toUpperCase()}
                 </Avatar>
                 <Box sx={{ display: { xs: 'none', sm: 'block' }, textAlign: 'left' }}>
@@ -333,10 +355,10 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                       fontWeight: 'bold',
                       bgcolor:
                         currentUser.role === 'admin' ? '#7c3aed'
-                        : currentUser.role === 'school_admin' ? '#0369a1'
+                        : currentUser.role === 'school_admin' ? 'var(--xanh-troi2)'
                         : currentUser.role === 'teacher' ? '#059669'
-                        : '#ea580c',
-                      color: '#fff',
+                        : 'var(--cam)',
+                      color: 'var(--chu-nguoc)',
                     }}
                   />
                   {currentUser.role === 'student' && hasAdvancedStudentTitle(currentUser.email) && (
@@ -347,8 +369,8 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                         height: 18,
                         fontSize: '0.6rem',
                         fontWeight: 'bold',
-                        bgcolor: 'linear-gradient(135deg, #f59e0b 0%, #ea580c 100%)',
-                        color: '#fff',
+                        bgcolor: 'linear-gradient(135deg, var(--vang) 0%, var(--cam) 100%)',
+                        color: 'var(--chu-nguoc)',
                         ml: 0.5,
                         boxShadow: '0 2px 4px rgba(234,88,12,0.3)',
                       }}
@@ -366,9 +388,9 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                     borderRadius: 20,
                     fontSize: '0.72rem',
                     fontWeight: 'bold',
-                    borderColor: '#dc2626',
-                    color: '#dc2626',
-                    '&:hover': { bgcolor: '#fef2f2' },
+                    borderColor: 'var(--do)',
+                    color: 'var(--do)',
+                    '&:hover': { bgcolor: 'var(--nen-do-nhat2)' },
                   }}
                 >
                   Đăng xuất
@@ -383,7 +405,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                   variant="outlined"
                   size="small"
                   onClick={() => navigate('/login')}
-                  sx={{ textTransform: 'none', borderRadius: 20, fontSize: '0.75rem', fontWeight: 'bold', borderColor: '#0062b8', color: '#0062b8' }}
+                  sx={{ textTransform: 'none', borderRadius: 20, fontSize: '0.75rem', fontWeight: 'bold', borderColor: 'var(--xanh)', color: 'var(--xanh)' }}
                 >
                   Đăng Nhập
                 </Button>
@@ -398,8 +420,8 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                     borderRadius: 20,
                     fontSize: '0.75rem',
                     fontWeight: 'bold',
-                    backgroundColor: '#ff9900',
-                    color: '#ffffff',
+                    backgroundColor: 'var(--vang-nen)',
+                    color: 'var(--chu-tren-vang)',
                     '&:hover': { backgroundColor: '#e68a00' },
                   }}
                 >
@@ -416,8 +438,8 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                     borderRadius: 20,
                     fontSize: '0.75rem',
                     fontWeight: 'bold',
-                    backgroundColor: '#0f766e',
-                    color: '#ffffff',
+                    backgroundColor: 'var(--teal-nen)',
+                    color: 'var(--chu-nguoc)',
                     '&:hover': { backgroundColor: '#0d635c' },
                   }}
                 >
@@ -430,7 +452,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
       </Container>
 
       {/* 2. DÒNG DƯỚI: THANH NAVIGATE MENU CHÍNH (GIỐNG HOCMAI.VN TRONG HÌNH) */}
-      <Box sx={{ backgroundColor: '#0062b8', color: '#ffffff' }}>
+      <Box sx={{ backgroundColor: 'var(--xanh-nen)', color: 'var(--chu-nguoc)' }}>
         <Container maxWidth="xl">
           <Box
             sx={{
@@ -457,13 +479,13 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               }}
               startIcon={<Layers size={16} />}
               sx={{
-                color: '#ffffff',
+                color: 'var(--chu-nguoc)',
                 textTransform: 'none',
                 fontWeight: 'bold',
                 px: 2,
                 py: 1,
                 borderRadius: 0,
-                borderBottom: activeTab === 'hocmai' ? '3px solid #ff9900' : '3px solid transparent',
+                borderBottom: activeTab === 'hocmai' ? '3px solid var(--vang)' : '3px solid transparent',
                 backgroundColor: activeTab === 'hocmai' ? 'rgba(255,255,255,0.1)' : 'transparent',
                 '&:hover': { backgroundColor: 'rgba(255,255,255,0.15)' },
               }}
@@ -480,13 +502,13 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               }}
               startIcon={<Info size={16} />}
               sx={{
-                color: '#ffffff',
+                color: 'var(--chu-nguoc)',
                 textTransform: 'none',
                 fontWeight: 'bold',
                 px: 2,
                 py: 1,
                 borderRadius: 0,
-                borderBottom: activeTab === 'gioithieu' ? '3px solid #ff9900' : '3px solid transparent',
+                borderBottom: activeTab === 'gioithieu' ? '3px solid var(--vang)' : '3px solid transparent',
                 backgroundColor: activeTab === 'gioithieu' ? 'rgba(255,255,255,0.1)' : 'transparent',
                 '&:hover': { backgroundColor: 'rgba(255,255,255,0.15)' },
               }}
@@ -502,14 +524,14 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               }}
               startIcon={<Presentation size={16} />}
               sx={{
-                color: '#ffffff',
+                color: 'var(--chu-nguoc)',
                 textTransform: 'none',
                 fontWeight: 'bold',
                 px: 2,
                 py: 1,
                 borderRadius: 0,
                 whiteSpace: 'nowrap',
-                borderBottom: activeTab === 'baigiang' ? '3px solid #ff9900' : '3px solid transparent',
+                borderBottom: activeTab === 'baigiang' ? '3px solid var(--vang)' : '3px solid transparent',
                 backgroundColor: activeTab === 'baigiang' ? 'rgba(255,255,255,0.1)' : 'transparent',
                 '&:hover': { backgroundColor: 'rgba(255,255,255,0.15)' },
               }}
@@ -525,14 +547,14 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               }}
               startIcon={<Gamepad2 size={16} />}
               sx={{
-                color: '#ffffff',
+                color: 'var(--chu-nguoc)',
                 textTransform: 'none',
                 fontWeight: 'bold',
                 px: 2,
                 py: 1,
                 borderRadius: 0,
                 whiteSpace: 'nowrap',
-                borderBottom: activeTab === 'trochoi' ? '3px solid #ff9900' : '3px solid transparent',
+                borderBottom: activeTab === 'trochoi' ? '3px solid var(--vang)' : '3px solid transparent',
                 backgroundColor: activeTab === 'trochoi' ? 'rgba(255,255,255,0.1)' : 'transparent',
                 '&:hover': { backgroundColor: 'rgba(255,255,255,0.15)' },
               }}
@@ -548,13 +570,13 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               }}
               startIcon={<MessageSquare size={16} />}
               sx={{
-                color: '#ffffff',
+                color: 'var(--chu-nguoc)',
                 textTransform: 'none',
                 fontWeight: 'bold',
                 px: 2,
                 py: 1,
                 borderRadius: 0,
-                borderBottom: activeTab === 'ichat' ? '3px solid #ff9900' : '3px solid transparent',
+                borderBottom: activeTab === 'ichat' ? '3px solid var(--vang)' : '3px solid transparent',
                 backgroundColor: activeTab === 'ichat' ? 'rgba(255,255,255,0.1)' : 'transparent',
                 '&:hover': { backgroundColor: 'rgba(255,255,255,0.15)' },
               }}
@@ -568,13 +590,13 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               onClick={() => setActiveTab('hotro')}
               startIcon={<HelpCircle size={16} />}
               sx={{
-                color: '#ffffff',
+                color: 'var(--chu-nguoc)',
                 textTransform: 'none',
                 fontWeight: 'bold',
                 px: 2,
                 py: 1,
                 borderRadius: 0,
-                borderBottom: activeTab === 'hotro' ? '3px solid #ff9900' : '3px solid transparent',
+                borderBottom: activeTab === 'hotro' ? '3px solid var(--vang)' : '3px solid transparent',
                 backgroundColor: activeTab === 'hotro' ? 'rgba(255,255,255,0.1)' : 'transparent',
                 '&:hover': { backgroundColor: 'rgba(255,255,255,0.15)' },
               }}
@@ -591,13 +613,13 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 onClick={() => setActiveTab('hocsinh')}
                 startIcon={<UserIcon size={16} />}
                 sx={{
-                  color: '#ffffff',
+                  color: 'var(--chu-nguoc)',
                   textTransform: 'none',
                   fontWeight: 'bold',
                   px: 2,
                   py: 1,
                   borderRadius: 0,
-                  borderBottom: activeTab === 'hocsinh' ? '3px solid #ff9900' : '3px solid transparent',
+                  borderBottom: activeTab === 'hocsinh' ? '3px solid var(--vang)' : '3px solid transparent',
                   backgroundColor: activeTab === 'hocsinh' ? 'rgba(255,255,255,0.1)' : 'transparent',
                   '&:hover': { backgroundColor: 'rgba(255,255,255,0.15)' },
                 }}
@@ -613,7 +635,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 onClick={() => navigate('/teacher')}
                 startIcon={<GraduationCap size={16} />}
                 sx={{
-                  color: '#ff9900',
+                  color: 'var(--vang)',
                   textTransform: 'none',
                   fontWeight: 'bold',
                   px: 2,
@@ -634,7 +656,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 onClick={() => navigate('/school-admin')}
                 startIcon={<Building2 size={16} />}
                 sx={{
-                  color: '#ff9900',
+                  color: 'var(--vang)',
                   textTransform: 'none',
                   fontWeight: 'bold',
                   px: 2,
@@ -655,7 +677,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 onClick={() => navigate('/admin')}
                 startIcon={<ShieldCheck size={16} />}
                 sx={{
-                  color: '#ff9900',
+                  color: 'var(--vang)',
                   textTransform: 'none',
                   fontWeight: 'bold',
                   px: 2,

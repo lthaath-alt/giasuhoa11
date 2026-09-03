@@ -160,7 +160,7 @@ export const QuizProgressTab: React.FC<QuizProgressTabProps> = ({ students, isAd
     >
       {/* ── CỘT TRÁI: DANH SÁCH HỌC SINH ── */}
       <Box>
-        <Card sx={{ borderRadius: 3.5, border: '1px solid #e2e8f0', boxShadow: 'none' }}>
+        <Card sx={{ borderRadius: 3.5, border: '1px solid var(--vien)', boxShadow: 'none' }}>
           <CardContent sx={{ p: 2.5 }}>
             <Typography variant="subtitle1" sx={{ fontWeight: 'black', display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
               <Users size={18} /> Học sinh trong lớp
@@ -224,20 +224,20 @@ export const QuizProgressTab: React.FC<QuizProgressTabProps> = ({ students, isAd
                       sx={{
                         borderRadius: 2.5,
                         border: '1px solid',
-                        borderColor: active ? '#0f766e' : '#e2e8f0',
-                        bgcolor: active ? 'rgba(15,118,110,0.05)' : '#ffffff',
+                        borderColor: active ? 'var(--teal)' : 'var(--vien)',
+                        bgcolor: active ? 'rgba(15,118,110,0.05)' : 'var(--nen-the)',
                         cursor: 'pointer',
                         transition: 'all 0.15s',
                         '&:hover': {
-                          borderColor: '#0f766e',
+                          borderColor: 'var(--teal)',
                           bgcolor: 'rgba(15,118,110,0.02)',
                         },
                       }}
                     >
                       <Avatar
                         sx={{
-                          bgcolor: active ? '#0f766e' : 'rgba(15,118,110,0.08)',
-                          color: active ? '#fff' : '#0f766e',
+                          bgcolor: active ? 'var(--teal)' : 'rgba(15,118,110,0.08)',
+                          color: active ? 'var(--nen-the)' : 'var(--teal)',
                           width: 32, height: 32, fontSize: '0.8rem', mr: 1.5,
                         }}
                       >
@@ -287,8 +287,8 @@ export const QuizProgressTab: React.FC<QuizProgressTabProps> = ({ students, isAd
               borderStyle: 'dashed',
             }}
           >
-            <Award size={48} color="#94a3b8" />
-            <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#64748b' }}>
+            <Award size={48} color="var(--chu-mo)" />
+            <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: 'var(--chu-2)' }}>
               Chưa chọn học sinh
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 420 }}>
@@ -299,10 +299,10 @@ export const QuizProgressTab: React.FC<QuizProgressTabProps> = ({ students, isAd
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
             
             {/* THẺ THỐNG KÊ TỔNG QUAN */}
-            <Card sx={{ borderRadius: 3.5, border: '1px solid #e2e8f0', boxShadow: 'none' }}>
+            <Card sx={{ borderRadius: 3.5, border: '1px solid var(--vien)', boxShadow: 'none' }}>
               <CardContent sx={{ p: 3 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, flexWrap: 'wrap', gap: 2 }}>
-                  <Typography variant="h6" sx={{ fontWeight: 'black', color: '#1e293b' }}>
+                  <Typography variant="h6" sx={{ fontWeight: 'black', color: 'var(--chu-dam-2)' }}>
                     Tiến độ & Kết quả học tập: {selectedStudent.name}
                   </Typography>
                   <Button
@@ -319,8 +319,8 @@ export const QuizProgressTab: React.FC<QuizProgressTabProps> = ({ students, isAd
 
                 <Grid container spacing={2}>
                   <Grid size={{ xs: 12, sm: 4 }}>
-                    <Paper variant="outlined" sx={{ p: 2, borderRadius: 3, textAlign: 'center', bgcolor: '#f8fafc' }}>
-                      <Typography variant="h4" sx={{ fontWeight: 800, color: '#0f766e' }}>
+                    <Paper variant="outlined" sx={{ p: 2, borderRadius: 3, textAlign: 'center', bgcolor: 'var(--nen-trang)' }}>
+                      <Typography variant="h4" sx={{ fontWeight: 800, color: 'var(--teal)' }}>
                         {quizzes.length}
                       </Typography>
                       <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
@@ -329,8 +329,8 @@ export const QuizProgressTab: React.FC<QuizProgressTabProps> = ({ students, isAd
                     </Paper>
                   </Grid>
                   <Grid size={{ xs: 12, sm: 4 }}>
-                    <Paper variant="outlined" sx={{ p: 2, borderRadius: 3, textAlign: 'center', bgcolor: '#f8fafc' }}>
-                      <Typography variant="h4" sx={{ fontWeight: 800, color: '#ea580c' }}>
+                    <Paper variant="outlined" sx={{ p: 2, borderRadius: 3, textAlign: 'center', bgcolor: 'var(--nen-trang)' }}>
+                      <Typography variant="h4" sx={{ fontWeight: 800, color: 'var(--cam)' }}>
                         {avgScore > 0 ? `${avgScore}/10` : 'N/A'}
                       </Typography>
                       <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
@@ -339,8 +339,8 @@ export const QuizProgressTab: React.FC<QuizProgressTabProps> = ({ students, isAd
                     </Paper>
                   </Grid>
                   <Grid size={{ xs: 12, sm: 4 }}>
-                    <Paper variant="outlined" sx={{ p: 2, borderRadius: 3, textAlign: 'center', bgcolor: '#f8fafc' }}>
-                      <Typography variant="h4" sx={{ fontWeight: 800, color: '#475569' }}>
+                    <Paper variant="outlined" sx={{ p: 2, borderRadius: 3, textAlign: 'center', bgcolor: 'var(--nen-trang)' }}>
+                      <Typography variant="h4" sx={{ fontWeight: 800, color: 'var(--chu)' }}>
                         {reviewQuestions.length}
                       </Typography>
                       <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
@@ -356,7 +356,7 @@ export const QuizProgressTab: React.FC<QuizProgressTabProps> = ({ students, isAd
                     <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'bold', display: 'block', mb: 1.5 }}>
                       BIỂU ĐỒ ĐIỂM SỐ CÁC BÀI KIỂM TRA GẦN ĐÂY:
                     </Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'flex-end', height: 120, gap: 2, p: 2, bgcolor: '#f8fafc', borderRadius: 3, border: '1px solid #f1f5f9' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'flex-end', height: 120, gap: 2, p: 2, bgcolor: 'var(--nen-trang)', borderRadius: 3, border: '1px solid var(--nen-nhat)' }}>
                       {quizzes.slice(0, 8).reverse().map((q, i) => {
                         const scoreRatio = (q.score / q.maxScore) * 100;
                         const height = `${Math.max(10, scoreRatio)}%`;
@@ -368,7 +368,7 @@ export const QuizProgressTab: React.FC<QuizProgressTabProps> = ({ students, isAd
                                 sx={{
                                   width: '100%',
                                   height,
-                                  bgcolor: scoreRatio >= 70 ? '#0f766e' : '#ea580c',
+                                  bgcolor: scoreRatio >= 70 ? 'var(--teal)' : 'var(--cam)',
                                   borderRadius: '4px 4px 0 0',
                                   transition: 'height 0.3s ease',
                                 }}
@@ -390,7 +390,7 @@ export const QuizProgressTab: React.FC<QuizProgressTabProps> = ({ students, isAd
             {reviewQuestions.length > 0 && (
               <Card sx={{ borderRadius: 3.5, border: '1px solid rgba(234, 88, 12, 0.3)', bgcolor: 'rgba(234, 88, 12, 0.01)', boxShadow: 'none' }}>
                 <CardContent sx={{ p: 3 }}>
-                  <Typography variant="h6" color="#ea580c" sx={{ fontWeight: 'black', display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                  <Typography variant="h6" color="var(--cam)" sx={{ fontWeight: 'black', display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                     <AlertTriangle size={20} />
                     🚩 Danh sách câu cần xem lại ({reviewQuestions.length})
                   </Typography>
@@ -416,29 +416,29 @@ export const QuizProgressTab: React.FC<QuizProgressTabProps> = ({ students, isAd
                           </Box>
 
                           {/* Đề câu hỏi */}
-                          <Typography variant="body2" sx={{ fontWeight: 600, color: '#1e293b', mb: 1.5 }}>
+                          <Typography variant="body2" sx={{ fontWeight: 600, color: 'var(--chu-dam-2)', mb: 1.5 }}>
                             <ChemicalText html={questionObj.content} />
                           </Typography>
 
                           <Grid container spacing={2} sx={{ mb: 2 }}>
                             {/* Câu trả lời của học sinh */}
                             <Grid size={{ xs: 12, md: 6 }}>
-                              <Box sx={{ p: 1.5, bgcolor: '#f8fafc', borderRadius: 2, height: '100%' }}>
+                              <Box sx={{ p: 1.5, bgcolor: 'var(--nen-trang)', borderRadius: 2, height: '100%' }}>
                                 <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'bold', display: 'block', mb: 0.5 }}>
                                   HỌC SINH TRẢ LỜI:
                                 </Typography>
-                                <Typography variant="body2" sx={{ color: '#1e293b', whiteSpace: 'pre-line' }}>
+                                <Typography variant="body2" sx={{ color: 'var(--chu-dam-2)', whiteSpace: 'pre-line' }}>
                                   {result.studentAnswer}
                                 </Typography>
                               </Box>
                             </Grid>
                             {/* Đáp án chuẩn */}
                             <Grid size={{ xs: 12, md: 6 }}>
-                              <Box sx={{ p: 1.5, bgcolor: '#f1f5f9', borderRadius: 2, height: '100%' }}>
+                              <Box sx={{ p: 1.5, bgcolor: 'var(--nen-nhat)', borderRadius: 2, height: '100%' }}>
                                 <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'bold', display: 'block', mb: 0.5 }}>
                                   ĐÁP ÁN MẪU TỪ THƯ VIỆN:
                                 </Typography>
-                                <Typography variant="body2" sx={{ color: '#475569', whiteSpace: 'pre-line' }}>
+                                <Typography variant="body2" sx={{ color: 'var(--chu)', whiteSpace: 'pre-line' }}>
                                   {questionObj.essayPoints?.map(p => `${p.label}: ${p.content}`).join('\n')}
                                 </Typography>
                               </Box>
@@ -447,7 +447,7 @@ export const QuizProgressTab: React.FC<QuizProgressTabProps> = ({ students, isAd
 
                           {/* Nhận xét AI */}
                           <Box sx={{ p: 1.5, bgcolor: 'rgba(234, 88, 12, 0.03)', borderRadius: 2, mb: 2 }}>
-                            <Typography variant="caption" color="#ea580c" sx={{ fontWeight: 'bold', display: 'block', mb: 0.5 }}>
+                            <Typography variant="caption" color="var(--cam)" sx={{ fontWeight: 'bold', display: 'block', mb: 0.5 }}>
                               🤖 AI NHẬN XÉT:
                             </Typography>
                             <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'pre-line' }}>
@@ -457,8 +457,8 @@ export const QuizProgressTab: React.FC<QuizProgressTabProps> = ({ students, isAd
 
                           {/* Thay đổi điểm số */}
                           <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
-                            <Typography variant="body2" sx={{ fontWeight: 'bold', color: '#1e293b' }}>
-                              AI chấm sơ bộ: <span style={{ color: '#ea580c' }}>{result.score}đ</span> / {result.maxScore}đ.
+                            <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'var(--chu-dam-2)' }}>
+                              AI chấm sơ bộ: <span style={{ color: 'var(--cam)' }}>{result.score}đ</span> / {result.maxScore}đ.
                             </Typography>
                             <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', ml: 'auto' }}>
                               <TextField
@@ -476,7 +476,7 @@ export const QuizProgressTab: React.FC<QuizProgressTabProps> = ({ students, isAd
                                 size="small"
                                 startIcon={<Check size={14} />}
                                 onClick={() => handleSaveScore(qz.id, questionId, result.maxScore)}
-                                sx={{ textTransform: 'none', borderRadius: 2, fontWeight: 'bold', bgcolor: '#ea580c' }}
+                                sx={{ textTransform: 'none', borderRadius: 2, fontWeight: 'bold', bgcolor: 'var(--cam-nen)' }}
                               >
                                 Xác nhận điểm
                               </Button>
@@ -491,9 +491,9 @@ export const QuizProgressTab: React.FC<QuizProgressTabProps> = ({ students, isAd
             )}
 
             {/* THẺ 3: LỊCH SỬ TẤT CẢ BÀI KIỂM TRA ĐÃ LÀM */}
-            <Card sx={{ borderRadius: 3.5, border: '1px solid #e2e8f0', boxShadow: 'none' }}>
+            <Card sx={{ borderRadius: 3.5, border: '1px solid var(--vien)', boxShadow: 'none' }}>
               <CardContent sx={{ p: 3 }}>
-                <Typography variant="h6" sx={{ fontWeight: 'black', mb: 2.5, color: '#1e293b' }}>
+                <Typography variant="h6" sx={{ fontWeight: 'black', mb: 2.5, color: 'var(--chu-dam-2)' }}>
                   Lịch sử làm bài kiểm tra ({quizzes.length})
                 </Typography>
 
@@ -527,20 +527,20 @@ export const QuizProgressTab: React.FC<QuizProgressTabProps> = ({ students, isAd
                               </Typography>
                             </Box>
                           </AccordionSummary>
-                          <AccordionDetails sx={{ borderTop: '1px solid #e2e8f0', bgcolor: '#f8fafc', p: 3 }}>
+                          <AccordionDetails sx={{ borderTop: '1px solid var(--vien)', bgcolor: 'var(--nen-trang)', p: 3 }}>
                             {/* Chi tiết từng câu hỏi trong bài thi */}
                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                               {qz.questions.map((q, qidx) => {
                                 const res = qz.results?.[q.id];
                                 const isCorrect = res?.correct;
                                 return (
-                                  <Paper key={q.id} variant="outlined" sx={{ p: 2, borderRadius: 2, bgcolor: '#fff' }}>
+                                  <Paper key={q.id} variant="outlined" sx={{ p: 2, borderRadius: 2, bgcolor: 'var(--nen-the)' }}>
                                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                                       <Box sx={{ display: 'flex', gap: 1 }}>
                                         <Chip label={`Câu ${qidx + 1}`} size="small" variant="outlined" />
                                         <Chip label={q.type} size="small" />
                                       </Box>
-                                      <Typography variant="caption" sx={{ fontWeight: 'bold', color: isCorrect ? '#10b981' : '#ef4444' }}>
+                                      <Typography variant="caption" sx={{ fontWeight: 'bold', color: isCorrect ? 'var(--luc)' : 'var(--do)' }}>
                                         Điểm: {res?.score}/{q.points}đ
                                       </Typography>
                                     </Box>

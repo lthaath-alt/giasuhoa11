@@ -14,7 +14,7 @@ export const StudyProgressBar: React.FC<StudyProgressBarProps> = ({
   totalLessonsCount,
 }) => {
   return (
-    <Box id="student-progress-bar" sx={{ backgroundColor: '#ffffff', borderBottom: '1px solid #e2e8f0', py: 1.5 }}>
+    <Box id="student-progress-bar" sx={{ backgroundColor: 'var(--nen-the)', borderBottom: '1px solid var(--vien)', py: 1.5 }}>
       <Container maxWidth="xl">
         <Box
           sx={{
@@ -26,7 +26,7 @@ export const StudyProgressBar: React.FC<StudyProgressBarProps> = ({
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Award size={18} color="#ea580c" />
+            <Award size={18} color="var(--cam)" />
             <Typography variant="body2" sx={{ fontWeight: 'bold' }} color="text.primary">
               Tiến trình tự học SGK Hóa học 11:
             </Typography>
@@ -36,7 +36,7 @@ export const StudyProgressBar: React.FC<StudyProgressBarProps> = ({
               variant="determinate"
               value={progressPercent}
               color="primary"
-              sx={{ height: 6, borderRadius: 3, backgroundColor: '#e2e8f0' }}
+              sx={{ height: 6, borderRadius: 3, backgroundColor: 'var(--vien)' }}
             />
           </Box>
           <Typography variant="body2" sx={{ fontWeight: 'bold' }} color="primary.main">

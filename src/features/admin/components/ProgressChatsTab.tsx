@@ -65,7 +65,7 @@ export const ProgressChatsTab: React.FC<ProgressChatsTabProps> = ({
     >
       {/* CỘT TRÁI: CHỌN HỌC SINH */}
       <Box>
-        <Card sx={{ borderRadius: 3, height: '100%', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0', backgroundColor: '#ffffff' }}>
+        <Card sx={{ borderRadius: 3, height: '100%', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', border: '1px solid var(--vien)', backgroundColor: 'var(--nen-the)' }}>
           <CardContent>
             <Typography variant="h6" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1, fontWeight: 'bold' }}>
               <Users size={18} /> Danh sách học sinh
@@ -90,20 +90,20 @@ export const ProgressChatsTab: React.FC<ProgressChatsTabProps> = ({
                       sx={{
                         borderRadius: 2,
                         border: '1px solid',
-                        borderColor: active ? '#ea580c' : '#e2e8f0',
-                        backgroundColor: active ? 'rgba(234, 88, 12, 0.08)' : '#ffffff',
+                        borderColor: active ? 'var(--cam)' : 'var(--vien)',
+                        backgroundColor: active ? 'rgba(234, 88, 12, 0.08)' : 'var(--nen-the)',
                         cursor: 'pointer',
                         transition: 'all 0.2s',
                         '&:hover': {
-                          borderColor: '#ea580c',
+                          borderColor: 'var(--cam)',
                           backgroundColor: 'rgba(234, 88, 12, 0.04)',
                         },
                       }}
                     >
                       <Avatar
                         sx={{
-                          bgcolor: active ? '#ea580c' : 'rgba(234, 88, 12, 0.08)',
-                          color: active ? '#ffffff' : '#ea580c',
+                          bgcolor: active ? 'var(--cam)' : 'rgba(234, 88, 12, 0.08)',
+                          color: active ? 'var(--nen-the)' : 'var(--cam)',
                           mr: 2,
                           width: 32,
                           height: 32,
@@ -148,12 +148,12 @@ export const ProgressChatsTab: React.FC<ProgressChatsTabProps> = ({
               justifyContent: 'center',
               height: '100%',
               gap: 1,
-              border: '1px dashed #e2e8f0',
-              backgroundColor: '#ffffff',
+              border: '1px dashed var(--vien)',
+              backgroundColor: 'var(--nen-the)',
               boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
             }}
           >
-            <MessageSquare size={48} color="#64748b" />
+            <MessageSquare size={48} color="var(--chu-2)" />
             <Typography variant="subtitle1" color="text.secondary" sx={{ fontWeight: 'bold' }}>
               Chưa chọn học sinh
             </Typography>
@@ -164,7 +164,7 @@ export const ProgressChatsTab: React.FC<ProgressChatsTabProps> = ({
         ) : (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
             {/* 1. Phần Trực quan hóa Tiến độ */}
-            <Card sx={{ borderRadius: 3, boxShadow: '0 1px 3px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0', backgroundColor: '#ffffff' }}>
+            <Card sx={{ borderRadius: 3, boxShadow: '0 1px 3px rgba(0,0,0,0.05)', border: '1px solid var(--vien)', backgroundColor: 'var(--nen-the)' }}>
               <CardContent sx={{ p: 3 }}>
                 <Typography variant="h6" color="text.primary" sx={{ mb: 2, fontWeight: 'bold' }}>
                   Tiến độ tự học: {selectedStudent?.name}
@@ -175,7 +175,7 @@ export const ProgressChatsTab: React.FC<ProgressChatsTabProps> = ({
                     <Typography variant="body2" color="text.secondary">
                       Tỷ lệ hoàn thành bài học sách giáo khoa:
                     </Typography>
-                    <Typography variant="body2" color="#0f766e" sx={{ fontWeight: 'bold' }}>
+                    <Typography variant="body2" color="var(--teal)" sx={{ fontWeight: 'bold' }}>
                       {progressPercent}% ({completedCount}/{allLessons.length} bài học)
                     </Typography>
                   </Box>
@@ -183,7 +183,7 @@ export const ProgressChatsTab: React.FC<ProgressChatsTabProps> = ({
                     variant="determinate"
                     value={progressPercent}
                     color="primary"
-                    sx={{ height: 8, borderRadius: 4, backgroundColor: '#e2e8f0' }}
+                    sx={{ height: 8, borderRadius: 4, backgroundColor: 'var(--vien)' }}
                   />
                 </Box>
 
@@ -210,7 +210,7 @@ export const ProgressChatsTab: React.FC<ProgressChatsTabProps> = ({
             </Card>
 
             {/* 2. Phần Lịch sử cuộc trò chuyện */}
-            <Card sx={{ borderRadius: 3, boxShadow: '0 1px 3px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0', backgroundColor: '#ffffff' }}>
+            <Card sx={{ borderRadius: 3, boxShadow: '0 1px 3px rgba(0,0,0,0.05)', border: '1px solid var(--vien)', backgroundColor: 'var(--nen-the)' }}>
               <CardContent sx={{ p: 3 }}>
                 <Box
                   sx={{
@@ -254,7 +254,7 @@ export const ProgressChatsTab: React.FC<ProgressChatsTabProps> = ({
                     maxHeight: 350,
                     overflowY: 'auto',
                     p: 1.5,
-                    backgroundColor: '#f8fafc',
+                    backgroundColor: 'var(--nen-trang)',
                     borderRadius: 2,
                   }}
                 >
@@ -275,16 +275,16 @@ export const ProgressChatsTab: React.FC<ProgressChatsTabProps> = ({
                           <Paper
                             sx={{
                               p: 1.5,
-                              bgcolor: isAi ? '#ffffff' : 'rgba(15, 118, 110, 0.08)',
+                              bgcolor: isAi ? 'var(--nen-the)' : 'rgba(15, 118, 110, 0.08)',
                               color: 'text.primary',
                               borderRadius: 2,
-                              border: isAi ? '1px solid #e2e8f0' : '1px solid rgba(15, 118, 110, 0.15)',
+                              border: isAi ? '1px solid var(--vien)' : '1px solid rgba(15, 118, 110, 0.15)',
                               boxShadow: 'none',
                             }}
                           >
                             <Typography
                               variant="caption"
-                              sx={{ display: 'block', mb: 0.5, fontWeight: 'bold', color: isAi ? '#0f766e' : '#ea580c' }}
+                              sx={{ display: 'block', mb: 0.5, fontWeight: 'bold', color: isAi ? 'var(--teal)' : 'var(--cam)' }}
                             >
                               {isAi ? '🤖 Gia sư AI' : `👤 ${selectedStudent?.name}`}
                             </Typography>

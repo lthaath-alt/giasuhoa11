@@ -58,8 +58,8 @@ export const TeacherClassManager: React.FC<TeacherClassManagerProps> = ({ onClas
         sx={{ p: 3, borderRadius: 3, borderColor: 'rgba(15,118,110,0.3)', bgcolor: 'rgba(15,118,110,0.02)' }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
-          <CheckCircle size={22} color="#0f766e" />
-          <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#0f766e' }}>
+          <CheckCircle size={22} color="var(--teal)" />
+          <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--teal)' }}>
             Lớp "{created.name}" đã được tạo!
           </Typography>
         </Box>
@@ -74,7 +74,7 @@ export const TeacherClassManager: React.FC<TeacherClassManagerProps> = ({ onClas
           sx={{
             display: 'inline-flex', alignItems: 'center', gap: 2,
             p: 2, px: 3, borderRadius: 3,
-            border: '2px dashed #0f766e',
+            border: '2px dashed var(--teal)',
             bgcolor: 'rgba(15,118,110,0.06)',
             cursor: 'pointer',
             transition: 'all 0.15s',
@@ -89,7 +89,7 @@ export const TeacherClassManager: React.FC<TeacherClassManagerProps> = ({ onClas
               fontFamily: 'monospace',
               fontWeight: 900,
               letterSpacing: '0.3em',
-              color: '#0f766e',
+              color: 'var(--teal)',
               userSelect: 'all',
             }}
           >
@@ -120,10 +120,10 @@ export const TeacherClassManager: React.FC<TeacherClassManagerProps> = ({ onClas
     >
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1 }}>
         <Box sx={{ p: 1, bgcolor: 'rgba(15,118,110,0.08)', borderRadius: 2, display: 'flex' }}>
-          <School size={20} color="#0f766e" />
+          <School size={20} color="var(--teal)" />
         </Box>
         <Box>
-          <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#0f172a', lineHeight: 1.2 }}>
+          <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)', lineHeight: 1.2 }}>
             Tạo lớp của riêng bạn
           </Typography>
           <Typography variant="caption" color="text.secondary">
@@ -167,11 +167,11 @@ export const TeacherClassManager: React.FC<TeacherClassManagerProps> = ({ onClas
             textTransform: 'none',
             fontWeight: 'bold',
             borderRadius: 2.5,
-            bgcolor: '#0f766e',
+            bgcolor: 'var(--teal-nen)',
             boxShadow: 'none',
             whiteSpace: 'nowrap',
             '&:hover': { bgcolor: '#0d9488', boxShadow: '0 2px 8px rgba(15,118,110,0.25)' },
-            '&:disabled': { bgcolor: '#94a3b8' },
+            '&:disabled': { bgcolor: 'var(--chu-mo)' },
           }}
         >
           {loading ? 'Đang tạo...' : 'Tạo lớp'}
