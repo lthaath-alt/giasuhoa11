@@ -49,7 +49,7 @@ import { JoinClassForm } from '../features/auth/components/JoinClassForm';
 import { StudentArea } from '../features/student/components/StudentArea';
 import { GameHubSection } from '../features/games/GameHubSection';
 import { SlidesSection } from '../features/lessons/components/SlidesSection';
-import { ChemDoodles, MascotToanThan, MascotDauVai } from '../features/mascot';
+import { ChemDoodles, GameDoodles, GameDoodlesDuoi, MascotToanThan, MascotDauVai } from '../features/mascot';
 import { RichText } from '../core/components/RichText';
 import { ApiKeyDialog } from '../features/tutor/components/ApiKeyDialog';
 import { getEffectiveApiKey } from '../features/tutor/services/geminiTutorService';
@@ -419,10 +419,17 @@ export const DashboardPage: React.FC = () => {
               tách ra thành mục menu riêng để vẫn vào chơi được. */}
           {activeTab === 'trochoi' && (
             <Box id="tab-content-games">
-              <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 1 }}>
-                <MascotDauVai tab="trochoi" />
+              {/* Lớp trong phải bọc đúng hàng nhân vật + khu thẻ game. Nếu để
+                  GameDoodles bám thẳng khối ngoài thì nó phủ luôn cả dải trang
+                  trí bên dưới, kéo tay cầm / nấm / máy cầm tay tụt khỏi thẻ. */}
+              <Box sx={{ position: 'relative' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 1 }}>
+                  <MascotDauVai tab="trochoi" />
+                </Box>
+                <GameHubSection />
+                <GameDoodles />
               </Box>
-              <GameHubSection />
+              <GameDoodlesDuoi />
             </Box>
           )}
 
