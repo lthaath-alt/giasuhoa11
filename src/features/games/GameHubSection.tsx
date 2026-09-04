@@ -81,8 +81,18 @@ export const GameHubSection: React.FC = () => {
      dùng. Chấp nhận được vì trò chơi không gửi điểm về máy chủ, gian lận chỉ
      ảnh hưởng lượt chơi của chính em đó. Ngày nào điểm được ghi lại thật thì
      phải kiểm ở phía máy chủ. */
-  const choPhepThu = currentUser?.role === 'admin'
-                  || currentUser?.role === 'school_admin';
+  /* Hai MỨC chứ không phải bật/tắt:
+       'thuong' — quản trị trường: bất tử, bay, nhảy màn. Đủ để đi hết các màn
+                  mà kiểm nội dung câu hỏi, nhưng vẫn phải chơi đúng luật.
+       'day-du' — quản trị hệ thống: bỏ qua MỌI ràng buộc, kể cả điều kiện qua
+                  màn và câu hỏi. Dùng để soi nhanh mọi ngóc ngách khi dựng bài.
+     Tách hai mức vì mức đầy đủ làm hỏng cả ý nghĩa của trò chơi — không nên
+     đưa cho người chỉ cần kiểm nội dung. */
+  const mucThu: 'khong' | 'thuong' | 'day-du' =
+    currentUser?.role === 'admin' ? 'day-du'
+      : currentUser?.role === 'school_admin' ? 'thuong'
+        : 'khong';
+  const choPhepThu = mucThu !== 'khong';
 
   useEffect(() => {
     const traLoi = (e: MessageEvent) => {
@@ -90,13 +100,14 @@ export const GameHubSection: React.FC = () => {
       if (e.origin !== window.location.origin) return;
       if (!e.data || e.data.loai !== 'hoa11:xin-che-do-thu') return;
       (e.source as Window | null)?.postMessage(
-        { loai: 'hoa11:tra-loi-che-do-thu', cho: choPhepThu },
+        /* Giữ `cho` cho trò cũ đọc được, thêm `muc` cho trò biết phân biệt. */
+        { loai: 'hoa11:tra-loi-che-do-thu', cho: choPhepThu, muc: mucThu },
         window.location.origin,
       );
     };
     window.addEventListener('message', traLoi);
     return () => window.removeEventListener('message', traLoi);
-  }, [choPhepThu]);
+  }, [choPhepThu, mucThu]);
 
   /* Báo cho trò chơi biết web đang ở nền sáng hay tối.
 

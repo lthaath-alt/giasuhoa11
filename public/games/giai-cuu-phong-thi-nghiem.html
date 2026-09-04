@@ -388,6 +388,13 @@ body.touch .shell{max-width:calc((100vh - 104px) * 16 / 9)}
         <button class="thu-nut" id="thu-kho">Đầy kho nguyên tử</button>
         <button class="thu-nut" id="thu-mang">+3 mạng</button>
       </div>
+      <div class="thu-hang hide" id="thu-daydu">
+        <button class="thu-nut" id="thu-mocua">Mở hết cửa &amp; tường</button>
+        <button class="thu-nut" id="thu-haboss">Hạ boss ngay</button>
+      </div>
+      <div class="thu-hang hide" id="thu-daydu2">
+        <button class="thu-nut" id="thu-luot">+99 lượt nhặt</button>
+      </div>
       <p class="thu-ghi">Chỉ ảnh hưởng lượt chơi này, không ghi vào đâu cả.</p>
     </div>
   </div>
@@ -3584,9 +3591,10 @@ docNganHangWeb(function(kho){
    phía máy chủ. */
 const CHE_DO_THU = { bat:false, batTu:false, bay:false };
 
-function batCheDoThu(){
+function batCheDoThu(muc){
   if(CHE_DO_THU.bat) return;
   CHE_DO_THU.bat = true;
+  CHE_DO_THU.muc = muc || 'thuong';
   $('thu').classList.remove('hide');
 
   const oBatTu = $('thu-batu'), oBay = $('thu-bay');
@@ -3621,6 +3629,43 @@ function batCheDoThu(){
     ['N','H','O','S'].forEach(k => { TOTAL.kho[k] = (TOTAL.kho[k] || 0) + 10; });
     toast('Chế độ thử — đã thêm 10 nguyên tử mỗi loại');
   });
+  /* ── Mức ĐẦY ĐỦ: bỏ qua mọi ràng buộc ────────────────────────────────
+     Chỉ hiện với quản trị hệ thống. Ba nút dưới đây phá vỡ hẳn ý nghĩa trò
+     chơi — mở cửa mà không phải ghép phân tử, hạ boss mà không phải đánh — nên
+     KHÔNG đưa cho người chỉ cần đi hết màn để kiểm nội dung câu hỏi. */
+  if(muc === 'day-du'){
+    $('thu-daydu').classList.remove('hide');
+    $('thu-daydu2').classList.remove('hide');
+
+    $('thu-mocua').addEventListener('click', () => {
+      if(!G) return;
+      let n = 0;
+      /* Chép mảng ra trước: moCuaKho có thể đụng vào chính mảng đang duyệt. */
+      [...(G.kgates || []), ...(G.gates || [])].forEach(g => {
+        if(!g.open){ moCuaKho(g); n++; }
+      });
+      /* Tường chắn trận boss cũng phải hạ, nếu không vẫn kẹt ở đó. */
+      if(G.def && G.def.wall != null){
+        for(let y = 0; y <= 12; y++) G.grid[y][G.def.wall] = T.EMPTY;
+      }
+      toast(n ? ('Đã mở ' + n + ' cửa và hạ tường') : 'Màn này không có cửa nào');
+    });
+
+    $('thu-haboss').addEventListener('click', () => {
+      if(!G || !G.boss){ toast('Màn này không có boss'); return; }
+      if(G.boss.dead){ toast('Boss đã bị hạ rồi'); return; }
+      G.boss.hp = 0;
+      G.boss.dead = true;
+      toast('Đã hạ boss');
+    });
+
+    $('thu-luot').addEventListener('click', () => {
+      if(!G) return;
+      G.luotNhat = 99;
+      toast('Lượt nhặt: 99 — khỏi phải trả lời câu hỏi để lấy tài nguyên');
+    });
+  }
+
   $('thu-mang').addEventListener('click', () => {
     TOTAL.lives += 3;
     toast('Chế độ thử — mạng hiện có: ' + TOTAL.lives);
@@ -3645,7 +3690,9 @@ function batCheDoThu(){
     // trò chơi vào rồi tự trả lời "có" cũng bật được chế độ thử.
     if(e.origin !== window.location.origin) return;
     if(!e.data || e.data.loai !== 'hoa11:tra-loi-che-do-thu') return;
-    if(e.data.cho === true) batCheDoThu();
+    /* `muc` mới có, trò cũ hơn chỉ gửi `cho`. Thiếu `muc` thì coi là mức thường
+       — không bao giờ tự nâng lên mức đầy đủ khi không chắc. */
+    if(e.data.cho === true) batCheDoThu(e.data.muc === 'day-du' ? 'day-du' : 'thuong');
   });
 
   window.parent.postMessage({ loai:'hoa11:xin-che-do-thu' }, window.location.origin);

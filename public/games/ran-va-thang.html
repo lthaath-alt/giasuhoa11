@@ -239,6 +239,27 @@ h1,h2,h3{font-family:var(--f-tieu); margin:0; line-height:1.15}
 .giai{margin-top:12px; padding:11px 13px; border-radius:11px; background:var(--xanh-nhat); border:2px solid var(--xanh); font-size:14px}
 
 .hang{display:flex; gap:9px; flex-wrap:wrap; align-items:center}
+
+/* ── Bảng chế độ thử (chỉ quản trị mới thấy) ─────────────────────────── */
+#thu{
+  position:fixed; left:12px; bottom:12px; z-index:60; width:216px;
+  background:var(--the); border:2px solid var(--tim); border-radius:13px;
+  box-shadow:var(--bong); font-size:12.5px; overflow:hidden;
+}
+#thu .dau{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:7px 10px; background:var(--tim); color:#fff; font-weight:700;
+}
+#thu .dau button{background:none; border:none; color:#fff; cursor:pointer; font-size:15px; line-height:1}
+#thu .than{padding:9px 10px; display:grid; gap:6px}
+#thu .than.gon{display:none}
+#thu button.tn{
+  font:inherit; font-weight:600; padding:6px 9px; border-radius:9px; cursor:pointer;
+  border:2px solid var(--vien); background:var(--the-2); color:inherit; text-align:left;
+}
+#thu button.tn:hover{border-color:var(--tim)}
+#thu label{display:flex; align-items:center; gap:6px; cursor:pointer}
+#thu .ghi{margin:2px 0 0; font-size:10.5px; color:var(--chu-mo); line-height:1.45}
 .giua{text-align:center}
 .mo{color:var(--chu-mo)}
 .nho{font-size:13px}
@@ -320,6 +341,19 @@ h1,h2,h3{font-family:var(--f-tieu); margin:0; line-height:1.15}
     </div>
   </section>
 
+</div>
+
+<!-- Bảng chế độ thử — ẩn cho tới khi web xác nhận quyền quản trị -->
+<div id="thu" class="an">
+  <div class="dau"><span>Chế độ thử</span><button id="thu-gon" title="Thu gọn">–</button></div>
+  <div class="than" id="thu-than">
+    <label><input type="checkbox" id="thu-bocauhoi"> Bỏ qua câu hỏi</label>
+    <button class="tn" id="thu-mokhoa">Mở khoá cả 25 màn</button>
+    <button class="tn" id="thu-gandich">Nhảy tới ô 49</button>
+    <button class="tn" id="thu-ducau">Cho đủ số câu đúng</button>
+    <button class="tn" id="thu-quaman">Qua màn ngay</button>
+    <p class="ghi">Chỉ quản trị hệ thống thấy bảng này. "Mở khoá" có ghi vào máy; các nút khác chỉ ảnh hưởng ván đang chơi.</p>
+  </div>
 </div>
 
 <!-- Lớp phủ câu hỏi -->
@@ -4291,6 +4325,15 @@ var TEN_MAY = ['Máy', 'Người 2', 'Người 3', 'Người 4'];
 
 // ═══ Trạng thái ══════════════════════════════════════════════════════════
 var duLieu = { ranThang: null, uuTien: null, nganHang: null };
+
+/* Chế độ thử. Mặc định TẮT và không có cách nào tự bật từ trong trò chơi —
+   phải do web trả lời là tài khoản đang đăng nhập có quyền. Sửa địa chỉ trang
+   không ăn thua vì câu trả lời không nhìn địa chỉ.
+
+   Giới hạn còn lại, nói cho đúng: ai mở được công cụ lập trình của trình duyệt
+   thì vẫn sửa được biến trong bộ nhớ. Không cách nào chặn ở phía máy người
+   dùng. Chấp nhận được vì trò chơi không chấm điểm chính thức. */
+var THU = { bat: false, boCauHoi: false };
 var G = null;             // ván đang chơi
 var cheDo = 'tuhoc';      // 'tuhoc' | 'lophoc'
 var soNguoi = 2;
@@ -4675,7 +4718,16 @@ $('nut-tung').onclick = function () {
   G.khoa = true;
   $('nut-tung').disabled = true;
   var n = tungXX();
-  hienXX(n, function () { hoiCau(n); });
+  hienXX(n, function () {
+    /* Chế độ thử: đi thẳng, khỏi hỏi. Vẫn tính là một câu đúng để còn kiểm được
+       điều kiện qua màn — nếu không thì bật lên là không bao giờ qua màn nổi. */
+    if (THU.boCauHoi) {
+      G.doi[G.luot].dung++;
+      di(G.luot, n + THUONG, function () { if (!G.xong) doiLuot(); });
+      return;
+    }
+    hoiCau(n);
+  });
 };
 
 function luotMay() {
@@ -4921,6 +4973,73 @@ $('dong-nguoi').querySelectorAll('button').forEach(function (b) {
     });
   };
 });
+
+// ═══ Chế độ thử ══════════════════════════════════════════════════════════
+function batCheDoThu() {
+  if (THU.bat) return;
+  THU.bat = true;
+  $('thu').classList.remove('an');
+
+  $('thu-gon').onclick = function () {
+    var t = $('thu-than');
+    t.classList.toggle('gon');
+    $('thu-gon').textContent = t.classList.contains('gon') ? '+' : '–';
+  };
+
+  $('thu-bocauhoi').onchange = function () { THU.boCauHoi = this.checked; };
+
+  $('thu-mokhoa').onclick = function () {
+    danhSachBai().forEach(function (ma) {
+      if (!tienDo[ma]) tienDo[ma] = { xong: true, cauDung: CAN_DUNG };
+    });
+    try { localStorage.setItem(KHOA_TD, JSON.stringify(tienDo)); } catch (e) {}
+    if (!$('m-chonbai').classList.contains('an')) veLuoiBai();
+    noiThu('Đã mở khoá cả 25 màn.');
+  };
+
+  $('thu-gandich').onclick = function () {
+    if (!G) return noiThu('Chưa vào màn nào.');
+    G.doi[0].o = SO_O - 1;
+    datQuan(); veBen();
+    noiThu('Quân của em đã ở ô ' + (SO_O - 1) + '.');
+  };
+
+  $('thu-ducau').onclick = function () {
+    if (!G) return noiThu('Chưa vào màn nào.');
+    G.doi[0].dung = CAN_DUNG;
+    veBen();
+    noiThu('Đã tính đủ ' + CAN_DUNG + ' câu đúng.');
+  };
+
+  $('thu-quaman').onclick = function () {
+    if (!G) return noiThu('Chưa vào màn nào.');
+    if (G.xong) return noiThu('Màn này kết thúc rồi.');
+    G.doi[0].dung = Math.max(G.doi[0].dung, CAN_DUNG);
+    G.doi[0].o = SO_O;
+    datQuan(); veBen();
+    thang(0);
+  };
+}
+
+/** Báo ngắn trong bảng bên phải, hoặc alert khi chưa vào màn. */
+function noiThu(t) {
+  if ($('bao') && !$('m-choi').classList.contains('an')) noi(t);
+  else alert(t);
+}
+
+/* Hỏi xin quyền. Web trả lời dựa trên VAI TRÒ của tài khoản đang đăng nhập,
+   không dựa vào địa chỉ trang. Chỉ mức 'day-du' (quản trị hệ thống) mới được
+   bảng này — mức 'thuong' của quản trị trường thì bỏ qua. */
+window.addEventListener('message', function (e) {
+  if (e.origin !== location.origin) return;
+  var d = e.data;
+  if (!d || d.loai !== 'hoa11:tra-loi-che-do-thu') return;
+  if (d.cho === true && d.muc === 'day-du') batCheDoThu();
+});
+try {
+  if (window.parent && window.parent !== window)
+    window.parent.postMessage({ loai: 'hoa11:xin-che-do-thu' }, location.origin);
+} catch (e) {}
 
 // ═══ Khởi động ═══════════════════════════════════════════════════════════
 docTienDo();
