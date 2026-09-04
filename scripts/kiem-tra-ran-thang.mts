@@ -106,5 +106,31 @@ console.log('\n== Gán câu hỏi theo bài ==');
   ok(saiThuTu.length === 0, 'câu sát bài được xếp lên trước', saiThuTu.join(', '));
 }
 
+console.log('\n== Bản nhúng trong tệp trò chơi ==');
+{
+  /* Trò chơi dùng bản NHÚNG trong chính tệp HTML chứ không tải JSON qua mạng —
+     vì máy chủ không tìm thấy tệp thì trả về index.html, và trò chơi báo
+     "Unexpected token '<'" mà không ai hiểu vì sao. Đổi lại, phải canh bản
+     nhúng đừng lạc hậu so với hai tệp .json: sinh lại dữ liệu mà quên nhúng thì
+     trò chơi vẫn chạy ngon lành với nội dung cũ, không có dấu hiệu gì. */
+  const html = readFileSync('public/games/ran-va-thang.html', 'utf8');
+  const lay = (ten: string) => {
+    const mo = 'var ' + ten + ' = ';
+    const i = html.indexOf(mo);
+    if (i < 0) return null;
+    const j = html.indexOf(';' + '\n', i);
+    try { return JSON.parse(html.slice(i + mo.length, j)); } catch { return null; }
+  };
+  const nRt = lay('NHUNG_RAN_THANG');
+  const nUt = lay('NHUNG_UU_TIEN');
+  ok(!!nRt && !!nUt, 'tệp trò chơi có đủ hai khối dữ liệu nhúng');
+  ok(JSON.stringify(nRt) === JSON.stringify(rt),
+     'bản nhúng rắn/thang khớp tệp .json', 'chạy lại: npm run nhung:ran-thang');
+  ok(JSON.stringify(nUt) === JSON.stringify(ch),
+     'bản nhúng câu hỏi khớp tệp .json', 'chạy lại: npm run nhung:ran-thang');
+  ok(!html.includes("nap('du-lieu/"),
+     'trò chơi KHÔNG còn tải hai tệp đó qua mạng');
+}
+
 console.log('\n' + (hong === 0 ? '>>> TẤT CẢ ĐẠT' : `>>> CÓ ${hong} MỤC KHÔNG ĐẠT`) + '\n');
 process.exit(hong === 0 ? 0 : 1);

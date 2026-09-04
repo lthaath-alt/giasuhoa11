@@ -24,8 +24,9 @@
     "phan-tich": "tsx scripts/phan-tich-thuc-nghiem.mts",
     "word": "node scripts/md-sang-word.cjs",
     "do-chi-phi": "tsx scripts/do-chi-phi.mts",
-    "sinh:ran-thang": "tsx scripts/sinh-ran-thang.mts",
-    "gan:cau-hoi": "tsx scripts/gan-cau-hoi-theo-bai.mts"
+    "sinh:ran-thang": "tsx scripts/sinh-ran-thang.mts && npm run nhung:ran-thang",
+    "nhung:ran-thang": "tsx scripts/nhung-du-lieu-ran-thang.mts",
+    "gan:cau-hoi": "tsx scripts/gan-cau-hoi-theo-bai.mts && npm run nhung:ran-thang"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
