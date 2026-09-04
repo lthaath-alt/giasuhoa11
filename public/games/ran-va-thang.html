@@ -85,13 +85,23 @@ mất ván.
 <style>
 :root{
   --nen:#eef4f8; --the:#ffffff; --the-2:#f5f9fc;
-  --chu:#12242e; --chu-mo:#5a7183; --vien:#cfdde7;
-  --cam:#e2680f; --cam-nhat:#fde8d6;
+  --chu:#12242e; --chu-mo:#506777; --vien:#cfdde7;
+  /* Cam ở nền sáng phải ĐẬM, vì ở đây nó làm CHỮ NHỎ trên nền trắng (nhãn
+     "Màn 1", dòng chương). Để #e2680f thì tương phản chỉ 3,38 — dưới mức đọc
+     được. #b04708 lên 5,05 mà vẫn là cam. Ở nền tối thì ngược lại: --cam phải
+     SÁNG để đọc được trên nền đậm, nên hai chế độ mang hai giá trị khác hẳn. */
+  --cam:#b04708; --cam-nhat:#fde8d6;
   --luc:#12855f; --luc-nhat:#d9f2e7;
   --do:#c2372a; --do-nhat:#fbe0dc;
   --xanh:#1668b5; --xanh-nhat:#dcebf9;
   --tim:#6b3fa0;
   --vang:#e8a417;
+  /* Màu NỀN của nút, tách khỏi --cam/--tim vốn dùng làm màu CHỮ.
+     Một biến không gánh nổi hai vai: làm chữ trên nền tối thì phải SÁNG lên,
+     làm nền nút mang chữ trắng thì phải ĐẬM lại. Đo được lúc dùng chung: chữ
+     trắng trên nút "Tung xúc xắc" chỉ đạt tương phản 2,33. Hai màu dưới đây
+     giữ nguyên ở cả hai chế độ, vì chữ trên chúng luôn là chữ trắng. */
+  --cam-nen:#c2510a; --tim-nen:#5b3590;
   --bong:0 2px 0 rgba(18,36,46,.10), 0 10px 24px -16px rgba(18,36,46,.5);
   --f-tieu:'Baloo 2', system-ui, sans-serif;
   --f-chu:'Be Vietnam Pro', system-ui, sans-serif;
@@ -105,6 +115,7 @@ mất ván.
   --xanh:#57a8ee; --xanh-nhat:#122436;
   --tim:#a98be0;
   --vang:#f5bd45;
+  --cam-nen:#c2510a; --tim-nen:#5b3590;
   --bong:0 2px 0 rgba(0,0,0,.3), 0 10px 24px -16px rgba(0,0,0,.9);
 }
 
@@ -128,8 +139,8 @@ h1,h2,h3{font-family:var(--f-tieu); margin:0; line-height:1.15}
 .nut{
   font-family:var(--f-tieu); font-size:17px; font-weight:700;
   padding:11px 22px; border-radius:12px; cursor:pointer;
-  border:2px solid var(--cam); border-bottom-width:4px;
-  background:var(--cam); color:#fff; transition:transform .08s;
+  border:2px solid var(--cam-nen); border-bottom-width:4px;
+  background:var(--cam-nen); color:#fff; transition:transform .08s;
 }
 .nut:hover{filter:brightness(1.06)}
 .nut:active{transform:translateY(2px); border-bottom-width:2px}
@@ -146,6 +157,13 @@ h1,h2,h3{font-family:var(--f-tieu); margin:0; line-height:1.15}
 .cd{
   text-align:left; padding:16px 18px; border-radius:14px; cursor:pointer;
   border:2px solid var(--vien); background:var(--the-2);
+  /* PHẢI đặt color. Đây là thẻ <button>: thiếu color thì nó dùng màu chữ mặc
+     định của trình duyệt (đen), và trên nền tối thành chữ đen trên nền đen —
+     đo được tương phản 1,47, tức là không đọc được gì. Dòng mô tả bên trong có
+     màu riêng nên vẫn hiện, khiến lỗi càng khó nhận ra: nhìn vào chỉ thấy mất
+     mỗi dòng tiêu đề. */
+  color:var(--chu);
+  font-family:inherit; font-size:inherit;
   transition:border-color .15s, transform .1s;
 }
 .cd:hover,.cd:focus-visible{border-color:var(--cam); transform:translateY(-2px); outline:none}
@@ -160,8 +178,10 @@ h1,h2,h3{font-family:var(--f-tieu); margin:0; line-height:1.15}
 }
 .o-bai:hover:not(:disabled){border-color:var(--cam); transform:translateY(-2px)}
 .o-bai:disabled{opacity:.5; cursor:not-allowed}
-.o-bai .so{font-family:var(--f-tieu); font-size:13px; color:var(--cam); font-weight:700}
-.o-bai .ten{font-size:13.5px; font-weight:600; line-height:1.35; margin-top:2px}
+/* PHẢI cho xuống hàng: cả hai là <span>, mặc định nằm cùng dòng nên nhãn màn
+   dính liền tên bài — "Màn 1Khái niệm về cân bằng hoá học". */
+.o-bai .so{display:block; font-family:var(--f-tieu); font-size:13px; color:var(--cam); font-weight:700}
+.o-bai .ten{display:block; font-size:13.5px; font-weight:600; line-height:1.35; margin-top:2px}
 .o-bai .dau{position:absolute; top:9px; right:10px; font-size:15px}
 .o-bai.xong{border-color:var(--luc); background:var(--luc-nhat)}
 
@@ -268,7 +288,7 @@ h1,h2,h3{font-family:var(--f-tieu); margin:0; line-height:1.15}
 }
 #thu .dau{
   display:flex; align-items:center; justify-content:space-between;
-  padding:7px 10px; background:var(--tim); color:#fff; font-weight:700;
+  padding:7px 10px; background:var(--tim-nen); color:#fff; font-weight:700;
 }
 #thu .dau button{background:none; border:none; color:#fff; cursor:pointer; font-size:15px; line-height:1}
 #thu .than{padding:9px 10px; display:grid; gap:6px}
