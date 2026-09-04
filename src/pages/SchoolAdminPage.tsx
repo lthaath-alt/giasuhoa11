@@ -46,7 +46,7 @@ export const SchoolAdminPage: React.FC = () => {
     <Box id="school-admin-page-layout" sx={{ minHeight: '100vh', backgroundColor: 'var(--nen-trang)', display: 'flex', flexDirection: 'column' }}>
       
       {/* ADMIN NAVIGATION BAR */}
-      <AppBar id="admin-app-bar" position="static" elevation={0} sx={{ backgroundColor: 'var(--chu-dam)', borderBottom: '1px solid var(--chu-dam-2)' }}>
+      <AppBar id="admin-app-bar" position="static" elevation={0} sx={{ backgroundColor: 'var(--nen-dam)', borderBottom: '1px solid var(--vien-dam)' }}>
         <Container maxWidth="xl">
           <Toolbar sx={{ justifyContent: 'space-between', py: 1, px: { xs: 0 } }}>
             

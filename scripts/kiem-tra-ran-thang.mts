@@ -113,7 +113,12 @@ console.log('\n== Bản nhúng trong tệp trò chơi ==');
      "Unexpected token '<'" mà không ai hiểu vì sao. Đổi lại, phải canh bản
      nhúng đừng lạc hậu so với hai tệp .json: sinh lại dữ liệu mà quên nhúng thì
      trò chơi vẫn chạy ngon lành với nội dung cũ, không có dấu hiệu gì. */
-  const html = readFileSync('public/games/ran-va-thang.html', 'utf8');
+  /* Chuẩn hoá xuống dòng trước khi tìm. Git trên Windows đổi cả tệp sang CRLF,
+     và phép tìm `;` kèm xuống dòng khi đó không khớp — phép kiểm báo hỏng trong
+     khi nội dung không sai một chữ nào. Đã mắc đúng lỗi này ở bộ kiểm thực
+     nghiệm, nay lặp lại ở đây. */
+  const html = readFileSync('public/games/ran-va-thang.html', 'utf8')
+    .replace(/\r\n/g, '\n');
   const lay = (ten: string) => {
     const mo = 'var ' + ten + ' = ';
     const i = html.indexOf(mo);

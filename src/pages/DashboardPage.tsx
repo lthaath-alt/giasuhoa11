@@ -270,7 +270,7 @@ export const DashboardPage: React.FC = () => {
                             fontSize: '0.82rem',
                             px: 1.5,
                             ...(studyMode === 'sgk'
-                              ? { bgcolor: 'var(--xanh-troi2)', color: 'var(--chu-nguoc)', boxShadow: '0 2px 8px rgba(3,105,161,0.3)', '&:hover': { bgcolor: '#0284c7' } }
+                              ? { bgcolor: 'var(--xanh-nen)', color: 'var(--chu-nguoc)', boxShadow: '0 2px 8px rgba(3,105,161,0.3)', '&:hover': { bgcolor: '#0284c7' } }
                               : { color: 'var(--chu-2)', '&:hover': { bgcolor: 'var(--vien)', color: 'var(--xanh-troi2)' } }
                             ),
                           }}
@@ -544,7 +544,7 @@ export const DashboardPage: React.FC = () => {
                         tải gì — vì thế trạng thái luôn là "đã sẵn sàng". */}
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, p: 1.5, bgcolor: 'var(--nen-trang)', borderRadius: 2 }}>
                       <Box sx={{ position: 'relative', display: 'flex' }}>
-                        <Box sx={{ width: 10, height: 10, bgcolor: 'var(--teal)', borderRadius: '50%' }} />
+                        <Box sx={{ width: 10, height: 10, bgcolor: 'var(--teal-nen)', borderRadius: '50%' }} />
                       </Box>
                       <Box>
                         <Typography variant="caption" sx={{ fontWeight: 'bold', display: 'block' }}>

@@ -171,7 +171,7 @@ export const TeacherClassManager: React.FC<TeacherClassManagerProps> = ({ onClas
             boxShadow: 'none',
             whiteSpace: 'nowrap',
             '&:hover': { bgcolor: '#0d9488', boxShadow: '0 2px 8px rgba(15,118,110,0.25)' },
-            '&:disabled': { bgcolor: 'var(--chu-mo)' },
+            '&:disabled': { bgcolor: 'var(--nen-tat)' },
           }}
         >
           {loading ? 'Đang tạo...' : 'Tạo lớp'}

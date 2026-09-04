@@ -187,7 +187,7 @@ export const TextbookViewer: React.FC<TextbookViewerProps> = ({ lesson, onOpenCh
                     <Box sx={{ p: 2.5, bgcolor: 'var(--nen-rat-nhat)', borderRadius: 2, border: '1px solid #f3f4f6' }}>
                       <Typography
                         variant="body2"
-                        sx={{ lineHeight: 2, color: '#1f2937', whiteSpace: 'pre-line', fontFamily: '"Georgia", serif', fontSize: '0.95rem' }}
+                        sx={{ lineHeight: 2, color: 'var(--chu-dam-2)', whiteSpace: 'pre-line', fontFamily: '"Georgia", serif', fontSize: '0.95rem' }}
                       >
                         {section.content}
                       </Typography>
@@ -215,10 +215,10 @@ export const TextbookViewer: React.FC<TextbookViewerProps> = ({ lesson, onOpenCh
 
                     {/* Công thức */}
                     {section.formulae && section.formulae.length > 0 && (
-                      <Box sx={{ p: 2, borderRadius: 2, bgcolor: 'var(--chu-dam)', border: '1px solid var(--chu-dam-2)' }}>
+                      <Box sx={{ p: 2, borderRadius: 2, bgcolor: 'var(--nen-dam)', border: '1px solid var(--vien-dam)' }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
-                          <Calculator size={16} color="var(--chu-mo)" />
-                          <Typography variant="caption" sx={{ fontWeight: 700, color: 'var(--chu-mo)', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                          <Calculator size={16} color="var(--chu-tren-nen-dam)" />
+                          <Typography variant="caption" sx={{ fontWeight: 700, color: 'var(--chu-tren-nen-dam)', textTransform: 'uppercase', letterSpacing: 0.5 }}>
                             Công thức cần nhớ
                           </Typography>
                         </Box>
@@ -283,7 +283,7 @@ export const TextbookViewer: React.FC<TextbookViewerProps> = ({ lesson, onOpenCh
                     <Box sx={{ width: 28, height: 28, borderRadius: '50%', bgcolor: colors.primary, color: 'var(--chu-nguoc)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', fontWeight: 700, flexShrink: 0, mt: 0.2 }}>
                       {qIdx + 1}
                     </Box>
-                    <Typography variant="body1" sx={{ fontWeight: 600, color: '#1f2937', lineHeight: 1.7 }}>{q.question}</Typography>
+                    <Typography variant="body1" sx={{ fontWeight: 600, color: 'var(--chu-dam-2)', lineHeight: 1.7 }}>{q.question}</Typography>
                   </Box>
                   {q.hint && (
                     <Box sx={{ mt: 1.5, ml: 4.5, p: 1.5, bgcolor: '#fefce8', borderRadius: 1.5, border: '1px solid #fde68a', display: 'flex', gap: 1 }}>

@@ -163,7 +163,7 @@ export const JoinClassForm: React.FC<JoinClassFormProps> = ({ onJoined, onDismis
                   bgcolor: 'var(--teal-nen)',
                   boxShadow: 'none',
                   '&:hover': { bgcolor: '#0d9488', boxShadow: '0 2px 8px rgba(15,118,110,0.25)' },
-                  '&:disabled': { bgcolor: 'var(--chu-mo)' },
+                  '&:disabled': { bgcolor: 'var(--nen-tat)' },
                 }}
               >
                 {loading ? 'Đang xử lý...' : 'Tham gia lớp'}

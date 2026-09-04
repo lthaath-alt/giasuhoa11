@@ -60,6 +60,20 @@
   --xanh-chu:    #1e40af;
   --xanh-chu2:   #1e3a8a;
   --chu-nguoc:   #ffffff;  /* chữ trên nền màu — GIỮ TRẮNG ở cả hai chế độ */
+  /* Mặt nền CỐ Ý TỐI ở cả hai chế độ: thanh quản trị, khung công thức.
+     Trước đây mấy chỗ này dùng --chu-dam làm nền — tức là mượn một biến MÀU CHỮ
+     làm NỀN. Ở chế độ sáng nó là gần đen nên chữ trắng đọc được; sang chế độ
+     tối nó lật thành gần trắng, và cả thanh quản trị thành chữ trắng trên nền
+     trắng. Người dùng báo "không thấy gì hết" đúng chỗ này. */
+  --nen-dam:   #0f172a;
+  --vien-dam:  #1e293b;
+  /* Nền nút đã bị vô hiệu hoá — không phải màu chữ. */
+  --nen-tat:   #cbd5e1;
+  /* Chữ mờ ĐẶT TRÊN --nen-dam. Không dùng lại --chu-mo được: nền đó cố ý
+     tối ở cả hai chế độ, mà --chu-mo thì lật màu theo chế độ — sang nền tối
+     nó sẫm lại và tụt còn 4,22. Biến này giữ nguyên ở cả hai chế độ (6,96). */
+  --chu-tren-nen-dam: #94a3b8;
+
   /* ── Màu thương hiệu dùng làm NỀN (nút, thanh menu, chip) ─────────────────
      Phải tách khỏi --cam/--teal/--xanh vì hai vai trái ngược nhau:
        · dùng làm CHỮ trên nền tối  -> phải SÁNG lên mới đọc được
@@ -131,6 +145,10 @@
   --xanh-chu:    #8ab8f0;
   --xanh-chu2:   #a9c9f5;
   --chu-nguoc:   #ffffff;
+  --nen-dam:   #0f172a;
+  --vien-dam:  #1e293b;
+  --nen-tat:   #3a4756;
+  --chu-tren-nen-dam: #94a3b8;
   /* Nền màu ở chế độ tối: hạ độ sáng một chút cho đỡ chói, nhưng vẫn phải đủ
      tối để chữ trắng trên đó đạt tương phản ≥ 4,5. */
   --xanh-nen:     #0a5aa8;

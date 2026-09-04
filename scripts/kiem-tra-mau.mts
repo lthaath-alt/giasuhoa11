@@ -85,13 +85,43 @@ console.log('\n== Không dùng lẫn vai NỀN và vai CHỮ ==');
       .split(/\r?\n/).filter(d => !d.includes('mau-ok')).join('\n');
     for (const m of n.matchAll(/(^|[^a-zA-Z-])color(?:=|: ?)["']var\((--[a-z0-9-]+)\)["']/g))
       if (/^--(nen|vien)/.test(m[2])) lanNen.push(`${basename(f)}: color → ${m[2]}`);
+    /* Nhóm bắt ở đây là m[1], KHÔNG phải m[2]: phần đầu là (?:...) không bắt.
+       Bản trước đọc nhầm m[2] nên luôn là undefined, và phép kiểm này chưa bao
+       giờ chạy — nó báo ĐẠT suốt mà không hề soi dòng nào. Đúng vì thế mà lỗi
+       "nền thanh quản trị dùng --chu-dam" lọt tới tận tay người dùng. */
     for (const m of n.matchAll(/(?:bgcolor|backgroundColor|background)(?:=|: ?)["']var\((--[a-z0-9-]+)\)["']/g))
-      if (/^--chu/.test(m[2])) lanChu.push(`${basename(f)}: nền → ${m[2]}`);
+      if (/^--chu/.test(m[1])) lanChu.push(`${basename(f)}: nền → ${m[1]}`);
   }
   if (lanNen.length) truot('không lấy biến NỀN làm màu chữ', lanNen.slice(0, 6).join(' | ') + (lanNen.length > 6 ? ` … (${lanNen.length} chỗ)` : ''));
   else dat('không lấy biến NỀN làm màu chữ');
   if (lanChu.length) truot('không lấy biến CHỮ làm màu nền', lanChu.slice(0, 6).join(' | ') + (lanChu.length > 6 ? ` … (${lanChu.length} chỗ)` : ''));
   else dat('không lấy biến CHỮ làm màu nền');
+}
+
+console.log('\n== Màu nhấn có bản NỀN riêng thì không được dùng làm nền ==');
+{
+  /* Luật tự bảo trì: HỄ có biến `--X-nen` thì `--X` chỉ dành cho vai CHỮ, và
+     dùng `--X` làm nền là sai — vì ở chế độ tối `--X` đã được làm SÁNG lên cho
+     dễ đọc trên nền đậm, đem làm nền nút mang chữ trắng thì trắng trên sáng.
+
+     Thêm luật này sau khi lọt hai lỗi cùng kiểu tới tận tay người dùng: nút
+     "Tung xúc xắc" trong trò chơi (tương phản 2,33) và nút "Xem SGK" ở trình
+     đọc SGK (2,14). Hai phép kiểm cũ không bắt được vì chúng chỉ soi biến
+     --chu* và --nen*, không soi màu nhấn. */
+  const coBanNen = [...sang].filter(v => sang.has(v + '-nen')).map(v => v.replace(/^--/, ''));
+  const pham: string[] = [];
+  for (const f of dsTep) {
+    const n = readFileSync(f, 'utf8')
+      .split(/\r?\n/).filter(d => !d.includes('mau-ok')).join('\n');
+    for (const m of n.matchAll(/(?:bgcolor|backgroundColor|background)(?:=|: ?)["']var\((--[a-z0-9-]+)\)["']/g)) {
+      const ten = m[1].replace(/^--/, '');
+      if (coBanNen.includes(ten)) pham.push(`${basename(f)}: nền → ${m[1]} (phải dùng --${ten}-nen)`);
+    }
+  }
+  if (coBanNen.length === 0) truot('có biến màu nhấn kèm bản nền riêng', 'chưa khai biến nào');
+  else dat(`có ${coBanNen.length} màu nhấn kèm bản nền riêng — ` + coBanNen.map(x => '--' + x).join(', '));
+  if (pham.length) truot('không lấy màu nhấn (vai chữ) làm nền', pham.slice(0, 6).join(' | '));
+  else dat('không lấy màu nhấn (vai chữ) làm nền');
 }
 
 console.log('\n== Không còn mã màu viết cứng ==');
