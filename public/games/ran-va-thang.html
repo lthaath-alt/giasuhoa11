@@ -169,6 +169,7 @@ h1,h2,h3{font-family:var(--f-tieu); margin:0; line-height:1.15}
 .san{display:grid; grid-template-columns:minmax(0,1fr) 300px; gap:16px; align-items:start}
 @media (max-width:900px){ .san{grid-template-columns:1fr} }
 
+.cot-ban{display:flex; flex-direction:column; gap:12px; min-width:0}
 .ban-boc{position:relative}
 .ban{
   display:grid; grid-template-columns:repeat(10,1fr); gap:3px;
@@ -184,7 +185,26 @@ h1,h2,h3{font-family:var(--f-tieu); margin:0; line-height:1.15}
 .o.co-thang{background:var(--luc-nhat); box-shadow:inset 0 0 0 2px var(--luc)}
 .o.co-ran{background:var(--do-nhat); box-shadow:inset 0 0 0 2px var(--do)}
 .o .bieu{position:absolute; inset:0; display:grid; place-items:center; font-size:clamp(13px,2.2vw,19px)}
-#lop-noi{position:absolute; inset:3px; pointer-events:none}
+
+/* ── Chú thích thang/rắn, đặt DƯỚI bàn cờ ────────────────────────────
+   Trước đây vẽ cung nối hai đầu đường ngay trên mặt bàn. Bàn đánh số kiểu rắn
+   bò nên hai đầu thường nằm chéo hẳn qua bàn: bảy tám đường cắt nhau giữa bàn,
+   che số ô mà vẫn không đọc ra đường nào đi tới đâu. Liệt kê thành chữ ở dưới
+   thì tra được chính xác, còn mặt bàn giữ nguyên sạch sẽ. */
+.chu-thich{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+@media (max-width:560px){ .chu-thich{grid-template-columns:1fr} }
+.ct-nhom{padding:10px 12px; border-radius:12px; border:2px solid var(--vien); background:var(--the)}
+.ct-nhom.thang{border-color:var(--luc); background:var(--luc-nhat)}
+.ct-nhom.ran{border-color:var(--do); background:var(--do-nhat)}
+.ct-tieu{font-size:13px; font-weight:800}
+.ct-ds{display:flex; flex-wrap:wrap; gap:6px; margin-top:8px}
+.ct-muc{
+  font-size:12.5px; font-weight:700; white-space:nowrap;
+  padding:3px 9px; border-radius:999px; background:var(--the); border:1.5px solid var(--vien);
+}
+.ct-nhom.thang .ct-muc{border-color:var(--luc)}
+.ct-nhom.ran .ct-muc{border-color:var(--do)}
+.ct-trong{font-size:12.5px; color:var(--chu-mo); margin-top:8px}
 
 .quan{
   position:absolute; width:clamp(17px,3.1vw,25px); height:clamp(17px,3.1vw,25px);
@@ -320,9 +340,20 @@ h1,h2,h3{font-family:var(--f-tieu); margin:0; line-height:1.15}
       <button class="nut phu" id="ve-chonbai">← Chọn màn khác</button>
     </div>
     <div class="san">
-      <div class="ban-boc">
-        <div class="ban" id="ban"></div>
-        <svg id="lop-noi"></svg>
+      <div class="cot-ban">
+        <div class="ban-boc">
+          <div class="ban" id="ban"></div>
+        </div>
+        <div class="chu-thich">
+          <div class="ct-nhom thang">
+            <div class="ct-tieu">🪜 Thang — leo lên</div>
+            <div class="ct-ds" id="ct-thang"></div>
+          </div>
+          <div class="ct-nhom ran">
+            <div class="ct-tieu">🐍 Rắn — tụt xuống</div>
+            <div class="ct-ds" id="ct-ran"></div>
+          </div>
+        </div>
       </div>
       <div class="ben">
         <div class="the" style="padding:14px">
@@ -4557,53 +4588,38 @@ function veBan() {
     }
   }
   G.doi.forEach(function (_, i) { taoQuan(i); });
-  /* Đặt quân và vẽ đường nối SAU khi bàn cờ đã có kích thước thật.
+  veChuThich();
+  /* Đặt quân SAU khi bàn cờ đã có kích thước thật.
      Ô cờ dùng aspect-ratio nên chiều cao chỉ tính xong sau một nhịp vẽ, và phông
      chữ Google Fonts về muộn còn làm bàn xê dịch thêm lần nữa. Đo một lần ngay
      sau khi dựng thì ra toạ độ của bàn CHƯA ổn định — đúng lỗi đã mắc: quân báo
      ô 1 mà nằm ở hàng ô 20, phải kéo giãn cửa sổ mới về đúng chỗ. */
   requestAnimationFrame(function () {
-    requestAnimationFrame(function () { veDuongNoi(); datQuan(); });
+    requestAnimationFrame(function () { datQuan(); });
   });
   if (document.fonts && document.fonts.ready)
-    document.fonts.ready.then(function () { veDuongNoi(); datQuan(); });
+    document.fonts.ready.then(function () { datQuan(); });
 }
 
-/** Vẽ đường nối giữa hai đầu của thang/rắn, để nhìn là biết nó dẫn tới đâu. */
-function veDuongNoi() {
-  var svg = $('lop-noi');
-  var ban = $('ban');
-  svg.innerHTML = '';
-  var r = ban.getBoundingClientRect();
-  if (!r.width) return;
-  svg.setAttribute('viewBox', '0 0 ' + r.width + ' ' + r.height);
-  svg.setAttribute('width', r.width);
-  svg.setAttribute('height', r.height);
-
-  G.duong.forEach(function (d) {
-    var a = tamO(d.tu), b = tamO(d.den);
-    if (!a || !b) return;
-    /* Vẽ CUNG chứ không vẽ đoạn thẳng.
-       Bàn đánh số kiểu rắn bò nên hai đầu của một đường thường nằm chéo hẳn qua
-       bàn. Bốn đường thẳng cắt nhau giữa bàn nhìn rất rối và che mất số ô. Cung
-       cong ra ngoài thì mắt lần theo được từng đường một. */
-    var giua = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
-    var dx = b.x - a.x, dy = b.y - a.y;
-    var dai = Math.sqrt(dx * dx + dy * dy) || 1;
-    var phong = Math.min(46, dai * 0.16);          // độ cong theo chiều dài
-    var huong = d.loai === 'thang' ? -1 : 1;       // thang cong lên, rắn cong xuống
-    var cx = giua.x + (-dy / dai) * phong * huong;
-    var cy = giua.y + (dx / dai) * phong * huong;
-
-    var l = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    l.setAttribute('d', 'M' + a.x + ' ' + a.y + ' Q' + cx + ' ' + cy + ' ' + b.x + ' ' + b.y);
-    l.setAttribute('fill', 'none');
-    l.setAttribute('stroke', d.loai === 'thang' ? 'var(--luc)' : 'var(--do)');
-    l.setAttribute('stroke-width', '3');
-    l.setAttribute('stroke-linecap', 'round');
-    l.setAttribute('opacity', '.32');
-    if (d.loai === 'ran') l.setAttribute('stroke-dasharray', '6 6');
-    svg.appendChild(l);
+/** Liệt kê thang/rắn thành chữ ở dưới bàn: "Ô 16 → ô 31".
+    Sắp theo ô xuất phát tăng dần để người chơi dò được nhanh. */
+function veChuThich() {
+  [['thang', 'ct-thang'], ['ran', 'ct-ran']].forEach(function (c) {
+    var hop = $(c[1]);
+    if (!hop) return;
+    hop.innerHTML = '';
+    var ds = G.duong.filter(function (d) { return d.loai === c[0]; })
+                    .sort(function (a, b) { return a.tu - b.tu; });
+    if (!ds.length) {
+      hop.innerHTML = '<div class="ct-trong">Màn này không có.</div>';
+      return;
+    }
+    ds.forEach(function (d) {
+      var m = document.createElement('span');
+      m.className = 'ct-muc';
+      m.textContent = 'Ô ' + d.tu + ' → ô ' + d.den;
+      hop.appendChild(m);
+    });
   });
 }
 
@@ -4637,7 +4653,7 @@ function datQuan() {
     q.style.top = (t.y - q.offsetHeight / 2 - cung * 5) + 'px';
   });
 }
-window.addEventListener('resize', function () { if (G) { veDuongNoi(); datQuan(); } });
+window.addEventListener('resize', function () { if (G) { datQuan(); } });
 
 // ═══ Bảng bên phải ═══════════════════════════════════════════════════════
 function veBen() {
