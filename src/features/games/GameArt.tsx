@@ -162,3 +162,42 @@ export const BoardGameArt = () => (
     <path d="M 254 78 H 276 L 270 85 L 276 92 H 254 Z" fill={ORANGE} stroke={BLUE} strokeWidth="3" strokeLinejoin="round" />
   </ArtFrame>
 );
+
+
+/** Hình cho trò Rắn và Thang: bàn cờ ô vuông, một cái thang và một con rắn. */
+export const SnakeLadderArt = () => (
+  <svg viewBox="0 0 320 150" xmlns="http://www.w3.org/2000/svg" role="img"
+       aria-label="Bàn cờ rắn và thang">
+    <rect width="320" height="150" fill="#f3f7fb" />
+    {Array.from({ length: 30 }, (_, i) => {
+      const c = i % 10, h = Math.floor(i / 10);
+      return (
+        <rect key={i} x={12 + c * 29.5} y={22 + h * 34} width={27} height={31} rx={4}
+              fill={(c + h) % 2 ? '#e2ebf3' : '#ffffff'} stroke="#cbd8e4" strokeWidth="1.5" />
+      );
+    })}
+    {/* Thang */}
+    <g stroke="#12855f" strokeWidth="4" strokeLinecap="round">
+      <line x1="56" y1="118" x2="86" y2="34" />
+      <line x1="72" y1="120" x2="102" y2="36" />
+      <line x1="62" y1="98" x2="78" y2="100" />
+      <line x1="68" y1="76" x2="84" y2="78" />
+      <line x1="74" y1="54" x2="90" y2="56" />
+    </g>
+    {/* Rắn */}
+    <path d="M232 34 C 205 52, 262 74, 232 94 C 208 110, 246 118, 246 126"
+          fill="none" stroke="#c2372a" strokeWidth="9" strokeLinecap="round" />
+    <circle cx="232" cy="32" r="8" fill="#c2372a" />
+    <circle cx="229" cy="30" r="1.8" fill="#fff" />
+    <circle cx="235" cy="30" r="1.8" fill="#fff" />
+    {/* Xúc xắc */}
+    <g transform="translate(140 96)">
+      <rect width="34" height="34" rx="7" fill="#ffffff" stroke="#12242e" strokeWidth="3" />
+      <circle cx="10" cy="10" r="3.2" fill="#12242e" />
+      <circle cx="24" cy="10" r="3.2" fill="#12242e" />
+      <circle cx="17" cy="17" r="3.2" fill="#12242e" />
+      <circle cx="10" cy="24" r="3.2" fill="#12242e" />
+      <circle cx="24" cy="24" r="3.2" fill="#12242e" />
+    </g>
+  </svg>
+);

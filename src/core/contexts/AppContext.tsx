@@ -220,6 +220,8 @@ export interface AppContextType {
   updateLessonProgress: (lessonId: string, updates: Partial<import('../../features/auth/types').LessonProgress>) => Promise<void>;
   clearLessonHistory: (lessonId: string) => void;
   getUserProgress: (email: string) => LearningProgress | null;
+  luuTienDoTroChoi: (email: string, tro: string, bai: string,
+                     ketQua: { xong: boolean; cauDung: number }) => Promise<void>;
   getLessonProgress: (lessonId: string) => import('../../features/auth/types').LessonProgress | null;
   isLessonCompleted: (lessonId: string) => boolean;
   hasAdvancedStudentTitle: (email: string) => boolean;
@@ -1292,6 +1294,43 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     }
   };
 
+  /**
+   * Ghi lại việc học sinh qua một màn trò chơi.
+   *
+   * Trò chơi là tệp tĩnh, không biết ai đang đăng nhập, nên nó chỉ nhắn ra
+   * ngoài; chỗ này mới là nơi biết tài khoản và ghi xuống Firestore.
+   *
+   * Chỉ ghi khi kết quả TỐT HƠN lần trước. Em chơi lại màn cũ cho vui mà bị
+   * ghi đè số câu đúng thấp hơn thì thành phạt em vì đã chơi lại.
+   */
+  const luuTienDoTroChoi = async (
+    email: string, tro: string, bai: string,
+    ketQua: { xong: boolean; cauDung: number },
+  ): Promise<void> => {
+    if (!email || email === 'guest') return;   // khách vãng lai không có chỗ lưu
+    const hienCo = progressCache[email]
+      || await FirestoreService.getUserProgress(email)
+      || { userEmail: email, completedLessons: [], details: {} };
+
+    const troChoi = { ...(hienCo.troChoi || {}) };
+    const cuaTro = { ...(troChoi[tro] || {}) };
+    const cu = cuaTro[bai];
+    if (cu && cu.xong && cu.cauDung >= ketQua.cauDung) return;   // không có gì mới
+    cuaTro[bai] = { xong: ketQua.xong || !!(cu && cu.xong),
+                    cauDung: Math.max(ketQua.cauDung, cu ? cu.cauDung : 0) };
+    troChoi[tro] = cuaTro;
+
+    const moi: LearningProgress = { ...hienCo, troChoi };
+    setProgressCache(p => ({ ...p, [email]: moi }));
+    try {
+      await FirestoreService.saveUserProgress(moi);
+    } catch (err) {
+      /* Mất mạng thì thôi — trò chơi đã tự lưu vào máy rồi, lần sau mở lại
+         vẫn còn, chỉ là chưa đồng bộ sang máy khác. */
+      console.warn('Chưa lưu được tiến độ trò chơi:', err);
+    }
+  };
+
   const getUserProgress = (email: string): LearningProgress | null => {
     return progressCache[email] || null;
   };
@@ -1655,7 +1694,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         toggleLessonCompletion,
         updateLessonProgress,
         clearLessonHistory,
-        getUserProgress,
+        luuTienDoTroChoi,
+    getUserProgress,
         getLessonProgress,
         isLessonCompleted,
         hasAdvancedStudentTitle,

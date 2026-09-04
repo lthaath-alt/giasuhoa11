@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Box, Typography, Card, Button, Dialog, IconButton } from '@mui/material';
 import { Gamepad2, Play, X } from 'lucide-react';
-import { DetectiveArt, BoardGameArt, RescueArt } from './GameArt';
+import { DetectiveArt, BoardGameArt, RescueArt, SnakeLadderArt } from './GameArt';
 import { BankFirestore, pushToGame } from '../bank/bankStore';
 import { useApp } from '../../core/hooks/useApp';
 import { useCheDoMau } from '../../core/hooks/useCheDoMau';
@@ -34,6 +34,16 @@ const GAMES: GameData[] = [
     art: <RescueArt />,
   },
   {
+    id: 'ran-va-thang',
+    title: 'Rắn và Thang Hoá 11',
+    chapter: '25 màn — 25 bài của chương trình',
+    description:
+      'Cờ rắn và thang: tung xúc xắc rồi trả lời câu hỏi để đi. Leo thang khi nhớ đúng, '
+      + 'gặp rắn khi mắc lỗi quen thuộc. Về đích và đúng đủ 6 câu mới qua màn — xong bài 1 mới mở bài 2.',
+    path: '/games/ran-va-thang.html',
+    art: <SnakeLadderArt />,
+  },
+  {
     id: 'vong-quanh-hoa-11',
     title: 'Vòng Quanh Hóa 11',
     chapter: 'Ôn tổng hợp 6 chương',
@@ -51,7 +61,7 @@ export const GameHubSection: React.FC = () => {
      đổi theo → iframe nạp lại → ván cờ đang chơi dở mất sạch. Đổi nền giữa
      chừng được xử lý bằng postMessage ở dưới, không đụng tới địa chỉ. */
   const [diaChiKhung, datDiaChiKhung] = useState('');
-  const { currentUser } = useApp();
+  const { currentUser, luuTienDoTroChoi, getUserProgress } = useApp();
   const { laToi } = useCheDoMau();
   const khungRef = useRef<HTMLIFrameElement>(null);
 
@@ -108,6 +118,41 @@ export const GameHubSection: React.FC = () => {
     const hen = window.setTimeout(gui, 400);
     return () => window.clearTimeout(hen);
   }, [laToi, activeGame]);
+
+  /* Tiến độ trò chơi có chia màn.
+
+     Trò chơi là tệp tĩnh nên không biết ai đang đăng nhập — nó tự lưu vào
+     localStorage của trình duyệt rồi nhắn ra đây. Chỗ này biết tài khoản nên
+     mới ghi được xuống Firestore, và nhờ vậy em đổi máy vẫn còn tiến độ.
+
+     Hai chiều:
+       · trò chơi báo vừa qua màn  -> ghi xuống Firestore
+       · trò chơi hỏi xin tiến độ  -> gửi bản đã lưu sang để nó gộp vào */
+  useEffect(() => {
+    const nghe = async (e: MessageEvent) => {
+      if (e.origin !== window.location.origin) return;
+      const d = e.data;
+      if (!d || !d.tro) return;
+      const email = currentUser?.email;
+
+      if (d.loai === 'hoa11:tien-do-tro-choi' && email) {
+        await luuTienDoTroChoi(email, String(d.tro), String(d.bai),
+          { xong: !!d.xong, cauDung: Number(d.cauDung) || 0 });
+        return;
+      }
+
+      if (d.loai === 'hoa11:xin-tien-do-tro-choi') {
+        const td = email ? (getUserProgress(email)?.troChoi || {}) : {};
+        (e.source as Window | null)?.postMessage({
+          loai: 'hoa11:nap-tien-do-tro-choi',
+          tro: d.tro,
+          tienDo: td[String(d.tro)] || {},
+        }, window.location.origin);
+      }
+    };
+    window.addEventListener('message', nghe);
+    return () => window.removeEventListener('message', nghe);
+  }, [currentUser, luuTienDoTroChoi, getUserProgress]);
 
   /**
    * Đưa ngân hàng câu hỏi từ web sang trò chơi ngay khi mở mục này.

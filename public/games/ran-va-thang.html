@@ -1,0 +1,1016 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rắn và Thang Hoá 11 — 25 màn theo 25 bài</title>
+
+<!-- ===== MÔ TẢ CHO NGƯỜI SỬA SAU =====
+
+# Rắn và Thang Hoá 11
+
+Trò cờ Rắn và Thang (Snakes and Ladders) ôn tập Hoá học 11 theo chương trình
+Kết nối tri thức 2018. Một tệp duy nhất, không thư viện ngoài, không bước build.
+
+## Luật
+
+Bàn 50 ô. Tung xúc xắc TRƯỚC, rồi hiện câu hỏi — trả lời đúng mới được đi.
+  · đúng ngay lần đầu  → đi đủ số vừa tung, CỘNG THÊM 1 ô thưởng
+  · sai lần đầu        → hiện gợi ý (bỏ bớt 2 đáp án sai), cho trả lời lại
+  · đúng ở lần hai     → đi đủ số vừa tung, không có thưởng
+  · sai lần hai        → đứng yên, hiện lời giải, mất lượt
+
+Thưởng 1 ô cho câu đúng ngay là chỗ để em nắm bài đi nhanh hơn máy. Máy tung
+xúc xắc như người nhưng không phải trả lời, nên nếu bỏ phần thưởng đó thì em
+luôn chậm hơn máy và không bao giờ thắng nổi.
+
+Leo thang thì lên, gặp rắn thì tụt. Nội dung thang và rắn lấy theo TỪNG BÀI
+(xem `du-lieu/ran-thang.json`).
+
+QUA MÀN cần ĐỦ HAI ĐIỀU: về tới ô 50 **và** trả lời đúng ít nhất 6 câu. Tới ô
+50 mà chưa đủ 6 câu thì đứng đó trả lời tiếp cho đủ. Nếu chỉ cần về đích thì em
+may xúc xắc là qua, chẳng học được gì.
+
+## Hai chế độ
+
+  · Tự học  — một mình đấu máy, 25 màn mở khoá lần lượt, xong bài 1 mới sang 2.
+  · Lớp học — 2–4 người cùng máy, chọn bài tự do, không khoá. Dùng cho tiết ôn
+              tập trên máy chiếu.
+
+## Nguồn dữ liệu
+
+  · `du-lieu/ran-thang.json`       — nội dung thang/rắn từng bài (npm run sinh:ran-thang)
+  · `du-lieu/cau-hoi-theo-bai.json`— thứ tự ưu tiên câu hỏi cho từng bài (npm run gan:cau-hoi)
+  · Ngân hàng câu hỏi              — IndexedDB "hoa11" / kho "kv" / khoá "bank",
+                                     do web bơm sang. Không có thì tự tải
+                                     `../bank/seed-160.json` để vẫn chơi được
+                                     khi mở tệp trực tiếp.
+
+CHỈ dùng câu trắc nghiệm (dạng `mc`). Ngân hàng có thêm dạng đúng/sai và trả
+lời ngắn, nhưng chúng làm chậm nhịp một trò cờ xúc xắc — 148 trên 160 câu là
+trắc nghiệm nên vẫn thừa câu.
+
+## Tiến độ
+
+Lưu hai nơi: localStorage của trình duyệt (để không mất khi mất mạng), và nhắn
+về web qua postMessage để web lưu theo tài khoản. Nhờ vậy em đổi máy vẫn còn.
+
+## Giao diện sáng/tối
+
+Theo web qua `?theme=dark|light` lúc mở, và qua postMessage khi người dùng đổi
+giữa chừng. CỐ Ý không nạp lại trang khi đổi nền — đang chơi dở mà nạp lại là
+mất ván.
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap">
+
+<script>
+/* Giao diện sáng/tối — đặt trước khi vẽ để không nháy màu. */
+(function () {
+  function apDung(t) {
+    if (t === 'dark' || t === 'light') document.documentElement.setAttribute('data-theme', t);
+    else document.documentElement.removeAttribute('data-theme');
+  }
+  try { apDung(new URLSearchParams(location.search).get('theme')); } catch (e) {}
+  window.addEventListener('message', function (e) {
+    if (e.origin !== location.origin) return;
+    var d = e.data;
+    if (d && d.loai === 'hoa11:che-do-mau') apDung(d.toi ? 'dark' : 'light');
+  });
+})();
+</script>
+
+<style>
+:root{
+  --nen:#eef4f8; --the:#ffffff; --the-2:#f5f9fc;
+  --chu:#12242e; --chu-mo:#5a7183; --vien:#cfdde7;
+  --cam:#e2680f; --cam-nhat:#fde8d6;
+  --luc:#12855f; --luc-nhat:#d9f2e7;
+  --do:#c2372a; --do-nhat:#fbe0dc;
+  --xanh:#1668b5; --xanh-nhat:#dcebf9;
+  --tim:#6b3fa0;
+  --vang:#e8a417;
+  --bong:0 2px 0 rgba(18,36,46,.10), 0 10px 24px -16px rgba(18,36,46,.5);
+  --f-tieu:'Baloo 2', system-ui, sans-serif;
+  --f-chu:'Be Vietnam Pro', system-ui, sans-serif;
+}
+:root[data-theme="dark"]{
+  --nen:#0d1620; --the:#152230; --the-2:#1b2c3c;
+  --chu:#e6eff6; --chu-mo:#94aabd; --vien:#2a3f52;
+  --cam:#ff8b3d; --cam-nhat:#33230f;
+  --luc:#3ecf9a; --luc-nhat:#0f2b22;
+  --do:#ff7a6b; --do-nhat:#2e1714;
+  --xanh:#57a8ee; --xanh-nhat:#122436;
+  --tim:#a98be0;
+  --vang:#f5bd45;
+  --bong:0 2px 0 rgba(0,0,0,.3), 0 10px 24px -16px rgba(0,0,0,.9);
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;min-height:100%}
+body{
+  background:var(--nen); color:var(--chu);
+  font-family:var(--f-chu); font-size:15px; line-height:1.55;
+  padding:14px; overflow-x:hidden;
+}
+.an{display:none !important}
+h1,h2,h3{font-family:var(--f-tieu); margin:0; line-height:1.15}
+
+.khung{max-width:1080px; margin:0 auto}
+
+.the{
+  background:var(--the); border:2px solid var(--vien); border-radius:16px;
+  padding:18px 20px; box-shadow:var(--bong);
+}
+
+.nut{
+  font-family:var(--f-tieu); font-size:17px; font-weight:700;
+  padding:11px 22px; border-radius:12px; cursor:pointer;
+  border:2px solid var(--cam); border-bottom-width:4px;
+  background:var(--cam); color:#fff; transition:transform .08s;
+}
+.nut:hover{filter:brightness(1.06)}
+.nut:active{transform:translateY(2px); border-bottom-width:2px}
+.nut:disabled{opacity:.45; cursor:not-allowed; transform:none}
+.nut.phu{background:var(--the); color:var(--chu); border-color:var(--vien)}
+
+/* ── Màn chọn chế độ ─────────────────────────────────────────────── */
+#m-chedo .the{max-width:640px; margin:40px auto; text-align:center}
+.nhan-tren{
+  font-family:var(--f-chu); font-size:12.5px; font-weight:700; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--cam);
+}
+.chon-cd{display:grid; gap:14px; margin-top:22px}
+.cd{
+  text-align:left; padding:16px 18px; border-radius:14px; cursor:pointer;
+  border:2px solid var(--vien); background:var(--the-2);
+  transition:border-color .15s, transform .1s;
+}
+.cd:hover,.cd:focus-visible{border-color:var(--cam); transform:translateY(-2px); outline:none}
+.cd b{font-family:var(--f-tieu); font-size:19px; display:block}
+.cd span{color:var(--chu-mo); font-size:14px}
+
+/* ── Màn chọn bài ────────────────────────────────────────────────── */
+.luoi-bai{display:grid; grid-template-columns:repeat(auto-fill,minmax(178px,1fr)); gap:11px; margin-top:14px}
+.o-bai{
+  position:relative; text-align:left; padding:12px 13px; border-radius:13px; cursor:pointer;
+  border:2px solid var(--vien); background:var(--the); font:inherit; color:inherit;
+}
+.o-bai:hover:not(:disabled){border-color:var(--cam); transform:translateY(-2px)}
+.o-bai:disabled{opacity:.5; cursor:not-allowed}
+.o-bai .so{font-family:var(--f-tieu); font-size:13px; color:var(--cam); font-weight:700}
+.o-bai .ten{font-size:13.5px; font-weight:600; line-height:1.35; margin-top:2px}
+.o-bai .dau{position:absolute; top:9px; right:10px; font-size:15px}
+.o-bai.xong{border-color:var(--luc); background:var(--luc-nhat)}
+
+/* ── Bàn cờ ──────────────────────────────────────────────────────── */
+.san{display:grid; grid-template-columns:minmax(0,1fr) 300px; gap:16px; align-items:start}
+@media (max-width:900px){ .san{grid-template-columns:1fr} }
+
+.ban-boc{position:relative}
+.ban{
+  display:grid; grid-template-columns:repeat(10,1fr); gap:3px;
+  background:var(--vien); padding:3px; border-radius:12px;
+}
+.o{
+  position:relative; aspect-ratio:1; border-radius:7px; background:var(--the);
+  display:flex; align-items:flex-start; justify-content:flex-start;
+  font-size:10.5px; color:var(--chu-mo); padding:3px 0 0 4px; font-weight:600;
+}
+.o.chan{background:var(--the-2)}
+.o.dich{background:var(--vang); color:#3a2a00}
+.o.co-thang{background:var(--luc-nhat); box-shadow:inset 0 0 0 2px var(--luc)}
+.o.co-ran{background:var(--do-nhat); box-shadow:inset 0 0 0 2px var(--do)}
+.o .bieu{position:absolute; inset:0; display:grid; place-items:center; font-size:clamp(13px,2.2vw,19px)}
+#lop-noi{position:absolute; inset:3px; pointer-events:none}
+
+.quan{
+  position:absolute; width:clamp(17px,3.1vw,25px); height:clamp(17px,3.1vw,25px);
+  border-radius:50%; border:2px solid rgba(0,0,0,.28);
+  display:grid; place-items:center; font-size:11px; font-weight:800; color:#fff;
+  transition:left .32s cubic-bezier(.34,1.3,.64,1), top .32s cubic-bezier(.34,1.3,.64,1);
+  z-index:3; pointer-events:none;
+}
+
+/* ── Bảng bên phải ───────────────────────────────────────────────── */
+.ben{display:flex; flex-direction:column; gap:12px}
+.doi{display:flex; align-items:center; gap:9px; padding:8px 11px; border-radius:11px; border:2px solid var(--vien)}
+.doi.luot{border-color:var(--cam); background:var(--cam-nhat)}
+.cham{width:15px; height:15px; border-radius:50%; flex:0 0 15px; border:2px solid rgba(0,0,0,.25)}
+.doi .ten{font-weight:700; flex:1; font-size:14px}
+.doi .diem{font-family:var(--f-tieu); font-size:13px; color:var(--chu-mo)}
+
+.xx{
+  width:74px; height:74px; margin:0 auto; border-radius:15px;
+  background:var(--the); border:3px solid var(--chu); display:grid; place-items:center;
+  font-family:var(--f-tieu); font-size:38px; font-weight:800;
+}
+.xx.lan{animation:lan .5s linear}
+@keyframes lan{ 50%{transform:rotate(180deg) scale(.85)} 100%{transform:rotate(360deg)} }
+
+.bao{padding:10px 12px; border-radius:11px; font-size:13.5px; border:2px solid var(--vien); background:var(--the-2)}
+.bao.tot{border-color:var(--luc); background:var(--luc-nhat)}
+.bao.xau{border-color:var(--do); background:var(--do-nhat)}
+
+/* ── Lớp phủ câu hỏi ─────────────────────────────────────────────── */
+/* PHAI dat ten khac ".phu": lop do da dung cho kieu NUT PHU (class="nut phu").
+   Trung ten thi moi nut phu nhan luon position:fixed + inset:0 va phu kin man
+   hinh — dung loi da mac: ca ban co ve du, do toa do dung, ma nhin vao chi
+   thay mot trang trang voi moi cai nut. */
+.lop-phu{
+  position:fixed; inset:0; z-index:50; background:rgba(6,16,24,.72);
+  display:flex; align-items:flex-start; justify-content:center; padding:20px; overflow:auto;
+}
+.hop{
+  background:var(--the); border:2px solid var(--vien); border-radius:18px;
+  padding:22px 24px; max-width:660px; width:100%; margin:auto; box-shadow:var(--bong);
+}
+.dap{display:grid; gap:9px; margin:14px 0 4px}
+.dap button{
+  text-align:left; padding:11px 14px; border-radius:11px; font:inherit; cursor:pointer;
+  border:2px solid var(--vien); background:var(--the-2); color:inherit;
+}
+.dap button:hover:not(:disabled){border-color:var(--cam)}
+.dap button:disabled{opacity:.35; cursor:not-allowed}
+.dap button.dung{border-color:var(--luc); background:var(--luc-nhat)}
+.dap button.sai{border-color:var(--do); background:var(--do-nhat)}
+.giai{margin-top:12px; padding:11px 13px; border-radius:11px; background:var(--xanh-nhat); border:2px solid var(--xanh); font-size:14px}
+
+.hang{display:flex; gap:9px; flex-wrap:wrap; align-items:center}
+.giua{text-align:center}
+.mo{color:var(--chu-mo)}
+.nho{font-size:13px}
+</style>
+</head>
+<body>
+
+<div class="khung">
+
+  <!-- ══ MÀN 1: CHỌN CHẾ ĐỘ ══ -->
+  <section id="m-chedo">
+    <div class="the">
+      <div class="nhan-tren">Hoá học 11 · Kết nối tri thức</div>
+      <h1 style="font-size:34px;margin:6px 0 4px">Rắn và Thang</h1>
+      <p class="mo" style="margin:0">25 màn, mỗi màn một bài. Tung xúc xắc rồi trả lời câu hỏi để đi.
+        Về tới đích <b>và</b> trả lời đúng đủ 6 câu thì qua màn.</p>
+      <div class="chon-cd">
+        <button class="cd" id="cd-tuhoc">
+          <b>Tự học — một mình đấu máy</b>
+          <span>25 màn mở khoá lần lượt: xong bài 1 mới sang bài 2. Tiến độ được ghi nhớ.</span>
+        </button>
+        <button class="cd" id="cd-lophoc">
+          <b>Lớp học — 2 đến 4 người cùng máy</b>
+          <span>Chọn bài tự do, không khoá màn. Dùng cho tiết ôn tập trên máy chiếu.</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ MÀN 2: CHỌN BÀI ══ -->
+  <section id="m-chonbai" class="an">
+    <div class="the">
+      <div class="hang" style="justify-content:space-between">
+        <div>
+          <div class="nhan-tren" id="nhan-chedo"></div>
+          <h2 style="font-size:26px">Chọn màn</h2>
+        </div>
+        <button class="nut phu" id="ve-chedo">← Đổi chế độ</button>
+      </div>
+      <div id="dong-nguoi" class="hang an" style="margin-top:12px">
+        <span class="nho mo">Số người chơi:</span>
+        <button class="nut phu nho" data-nguoi="2">2</button>
+        <button class="nut phu nho" data-nguoi="3">3</button>
+        <button class="nut phu nho" data-nguoi="4">4</button>
+      </div>
+      <p class="mo nho" id="loi-chonbai" style="margin:10px 0 0"></p>
+      <div class="luoi-bai" id="luoi-bai"></div>
+    </div>
+  </section>
+
+  <!-- ══ MÀN 3: CHƠI ══ -->
+  <section id="m-choi" class="an">
+    <div class="hang" style="justify-content:space-between; margin-bottom:12px">
+      <div>
+        <div class="nhan-tren" id="nhan-bai"></div>
+        <h2 style="font-size:23px" id="ten-bai"></h2>
+      </div>
+      <button class="nut phu" id="ve-chonbai">← Chọn màn khác</button>
+    </div>
+    <div class="san">
+      <div class="ban-boc">
+        <div class="ban" id="ban"></div>
+        <svg id="lop-noi"></svg>
+      </div>
+      <div class="ben">
+        <div class="the" style="padding:14px">
+          <div id="ds-doi" style="display:grid;gap:7px"></div>
+          <div class="xx" id="xx" style="margin-top:14px">–</div>
+          <button class="nut" id="nut-tung" style="width:100%;margin-top:12px">Tung xúc xắc</button>
+          <div class="bao" id="bao" style="margin-top:11px">Bấm nút để bắt đầu.</div>
+        </div>
+        <div class="the nho" style="padding:12px">
+          <b>Cách qua màn</b>
+          <div class="mo" style="margin-top:5px">Về tới ô 50 <b>và</b> trả lời đúng ít nhất
+            <b id="can-dung">6</b> câu.</div>
+          <div class="mo" style="margin-top:7px">🪜 leo thang · 🐍 tụt xuống</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- Lớp phủ câu hỏi -->
+<div class="lop-phu an" id="phu-hoi">
+  <div class="hop">
+    <div class="nhan-tren" id="hoi-nhan"></div>
+    <h3 style="font-size:19px;margin:5px 0 2px" id="hoi-de"></h3>
+    <div class="dap" id="hoi-dap"></div>
+    <div class="giai an" id="hoi-giai"></div>
+    <div class="hang" style="margin-top:14px;justify-content:flex-end">
+      <button class="nut an" id="hoi-tiep">Đi tiếp</button>
+    </div>
+  </div>
+</div>
+
+<!-- Lớp phủ thông báo (thang / rắn / kết màn) -->
+<div class="lop-phu an" id="phu-bao">
+  <div class="hop giua">
+    <div style="font-size:46px" id="bao-hinh"></div>
+    <h3 style="font-size:22px;margin:8px 0 6px" id="bao-tieu"></h3>
+    <p id="bao-noi" style="margin:0"></p>
+    <div class="giai an" id="bao-sua"></div>
+    <div class="hang" style="margin-top:16px;justify-content:center">
+      <button class="nut" id="bao-tiep">Tiếp tục</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+'use strict';
+
+// ═══ Hằng số luật chơi ═══════════════════════════════════════════════════
+var SO_O       = 50;   // số ô trên bàn
+var COT        = 10;   // số cột — 50 ô xếp 5 hàng × 10 cột
+var CAN_DUNG   = 6;    // số câu đúng tối thiểu để qua màn
+var THUONG     = 1;    // số ô thưởng khi trả lời đúng ngay lần đầu
+var SO_THANG   = 4;
+var SO_RAN     = 4;
+
+var MAU = ['#e2680f', '#1668b5', '#12855f', '#6b3fa0'];
+var TEN_MAY = ['Máy', 'Người 2', 'Người 3', 'Người 4'];
+
+// ═══ Trạng thái ══════════════════════════════════════════════════════════
+var duLieu = { ranThang: null, uuTien: null, nganHang: null };
+var G = null;             // ván đang chơi
+var cheDo = 'tuhoc';      // 'tuhoc' | 'lophoc'
+var soNguoi = 2;
+var tienDo = {};          // { 'bai-4': {xong:true, cauDung:6} }
+
+// ═══ Tiện ích ════════════════════════════════════════════════════════════
+function $(id) { return document.getElementById(id); }
+function hien(id, co) { $(id).classList.toggle('an', !co); }
+function tron(a, hat) {
+  var b = a.slice(), h = hat >>> 0;
+  function ke() { h = (Math.imul(h, 1664525) + 1013904223) >>> 0; return h / 4294967296; }
+  for (var i = b.length - 1; i > 0; i--) {
+    var j = Math.floor(ke() * (i + 1)); var t = b[i]; b[i] = b[j]; b[j] = t;
+  }
+  return b;
+}
+/* Băm chuỗi thành số, để mỗi bài có bàn cờ RIÊNG nhưng LUÔN GIỐNG NHAU giữa
+   các lần chơi. Đặt rắn thang ngẫu nhiên thật thì mỗi lần vào lại một bàn khác,
+   học sinh không nhớ được đường và cũng không so sánh được với bạn. */
+function bam(s) {
+  var h = 2166136261;
+  for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
+  return h >>> 0;
+}
+
+// ═══ Tiến độ: localStorage + nhắn về web ═════════════════════════════════
+var KHOA_TD = 'h11_ran_thang_tien_do';
+
+function docTienDo() {
+  try { tienDo = JSON.parse(localStorage.getItem(KHOA_TD) || '{}') || {}; }
+  catch (e) { tienDo = {}; }
+}
+function luuTienDo(maBai, cauDung) {
+  var cu = tienDo[maBai] || { xong: false, cauDung: 0 };
+  tienDo[maBai] = { xong: true, cauDung: Math.max(cu.cauDung, cauDung) };
+  try { localStorage.setItem(KHOA_TD, JSON.stringify(tienDo)); } catch (e) {}
+  /* Nhắn về web để lưu theo TÀI KHOẢN. localStorage chỉ nằm trong một trình
+     duyệt: em học ở trường rồi về nhà là mất sạch, phải chơi lại từ màn 1. */
+  try {
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({
+        loai: 'hoa11:tien-do-tro-choi',
+        tro: 'ran-va-thang',
+        bai: maBai,
+        xong: true,
+        cauDung: cauDung,
+      }, location.origin);
+    }
+  } catch (e) {}
+}
+/* Web gửi ngược tiến độ đã lưu theo tài khoản — gộp vào bản trong máy.
+   Gộp chứ không ghi đè: em có thể đã chơi thêm vài màn lúc mất mạng. */
+window.addEventListener('message', function (e) {
+  if (e.origin !== location.origin) return;
+  var d = e.data;
+  if (!d || d.loai !== 'hoa11:nap-tien-do-tro-choi' || d.tro !== 'ran-va-thang') return;
+  var ngoai = d.tienDo || {};
+  for (var k in ngoai) if (Object.prototype.hasOwnProperty.call(ngoai, k)) {
+    var a = tienDo[k], b = ngoai[k];
+    if (!a || (b && b.cauDung > a.cauDung)) tienDo[k] = b;
+  }
+  try { localStorage.setItem(KHOA_TD, JSON.stringify(tienDo)); } catch (err) {}
+  if (!$('m-chonbai').classList.contains('an')) veLuoiBai();
+});
+
+// ═══ Nạp dữ liệu ═════════════════════════════════════════════════════════
+function nap(duong) {
+  return fetch(duong, { cache: 'no-store' }).then(function (r) {
+    if (!r.ok) throw new Error(duong + ' → HTTP ' + r.status);
+    return r.json();
+  });
+}
+
+/** Ngân hàng câu hỏi: ưu tiên kho web đã bơm sang, không có thì tự tải bản gốc. */
+function napNganHang() {
+  return new Promise(function (xong) {
+    if (!window.indexedDB) return xong(null);
+    var rq;
+    try { rq = indexedDB.open('hoa11', 1); } catch (e) { return xong(null); }
+    rq.onupgradeneeded = function () { try { rq.result.createObjectStore('kv'); } catch (e) {} };
+    rq.onerror = function () { xong(null); };
+    rq.onblocked = function () { xong(null); };
+    rq.onsuccess = function () {
+      try {
+        var tx = rq.result.transaction('kv', 'readonly');
+        var g = tx.objectStore('kv').get('bank');
+        g.onsuccess = function () { xong(g.result || null); };
+        g.onerror = function () { xong(null); };
+      } catch (e) { xong(null); }
+    };
+  }).then(function (ds) {
+    if (ds && ds.length) return ds;
+    /* Mở tệp trực tiếp (không qua web) thì IndexedDB trống. Tải bản gốc để trò
+       chơi vẫn dùng được — giáo viên hay mở thẳng tệp lúc soạn bài. */
+    return nap('../bank/seed-160.json');
+  });
+}
+
+// ═══ Chọn câu hỏi cho một bài ════════════════════════════════════════════
+/**
+ * Trả về danh sách câu TRẮC NGHIỆM cho bài, xếp câu sát bài lên trước.
+ *
+ * `cau-hoi-theo-bai.json` đã xếp sẵn theo điểm khớp từ khoá. Ở đây chỉ việc
+ * lấy theo thứ tự đó, bỏ những câu không phải trắc nghiệm, rồi trộn nhẹ trong
+ * từng nhóm điểm để hai lần chơi không ra y hệt thứ tự.
+ */
+function cauChoBai(maBai) {
+  var bang = {};
+  duLieu.nganHang.forEach(function (q) { bang[q.id] = q; });
+
+  var uu = (duLieu.uuTien[maBai] || {}).cau || [];
+  var ra = [];
+  var nhom = {};
+  uu.forEach(function (x) {
+    var q = bang[x.id];
+    if (!q) return;
+    var loai = q.t || 'mc';                 // thiếu `t` thì mặc định trắc nghiệm
+    if (loai !== 'mc' || !q.o || q.o.length < 2) return;
+    (nhom[x.diem] = nhom[x.diem] || []).push(q);
+  });
+  Object.keys(nhom).map(Number).sort(function (a, b) { return b - a; })
+    .forEach(function (d, i) { ra = ra.concat(tron(nhom[d], bam(maBai) + i)); });
+  return ra;
+}
+
+// ═══ Đặt thang và rắn ════════════════════════════════════════════════════
+/**
+ * Đặt 4 thang và 4 rắn cho một bài.
+ *
+ * Ràng buộc, và mỗi cái đều vì một lỗi cụ thể nếu bỏ qua:
+ *   · Không đụng ô 1 và ô cuối — rơi vào đó là vào vòng lặp vô lý.
+ *   · Một ô chỉ giữ MỘT đầu của MỘT đường — hai đường chung một ô thì người
+ *     chơi không biết mình sẽ đi đâu.
+ *   · Đích của đường này không được là đầu của đường khác — nếu không sẽ trượt
+ *     dây chuyền, tụt từ ô 45 về ô 3 chỉ trong một lượt.
+ */
+function datRanThang(maBai) {
+  var nd = duLieu.ranThang[maBai] || { thang: [], ran: [] };
+  var hat = bam(maBai);
+  var duong = [];
+  var dungRoi = {};   // ô đã có một đầu của đường nào đó
+
+  function trong(o) { return o > 1 && o < SO_O && !dungRoi[o]; }
+  function ghi(a, b, loai, mau) {
+    dungRoi[a] = dungRoi[b] = true;
+    duong.push({ tu: a, den: b, loai: loai, noi: mau ? mau.noi : '', sua: mau ? mau.sua : '' });
+  }
+
+  var ke = (function () { var h = hat; return function () {
+    h = (Math.imul(h, 1664525) + 1013904223) >>> 0; return h / 4294967296; }; })();
+  function ngau(a, b) { return a + Math.floor(ke() * (b - a + 1)); }
+
+  var i, tu, den, thu;
+
+  // Thang: đi lên, cách nhau ít nhất 6 ô để đáng leo
+  for (i = 0; i < SO_THANG; i++) {
+    for (thu = 0; thu < 60; thu++) {
+      tu = ngau(2, SO_O - 12);
+      den = tu + ngau(6, 14);
+      if (den < SO_O && trong(tu) && trong(den)) { ghi(tu, den, 'thang', nd.thang[i]); break; }
+    }
+  }
+  // Rắn: đi xuống
+  for (i = 0; i < SO_RAN; i++) {
+    for (thu = 0; thu < 60; thu++) {
+      tu = ngau(10, SO_O - 2);
+      den = tu - ngau(5, 13);
+      if (den > 1 && trong(tu) && trong(den)) { ghi(tu, den, 'ran', nd.ran[i]); break; }
+    }
+  }
+  return duong;
+}
+
+// ═══ Vẽ bàn cờ ═══════════════════════════════════════════════════════════
+/** Ô số n nằm ở hàng/cột nào. Bàn đi kiểu rắn bò: hàng dưới cùng trái→phải,
+ *  hàng trên phải→trái, để đường đi liền mạch như bàn cờ thật. */
+function viTri(n) {
+  var idx = n - 1;
+  var hang = Math.floor(idx / COT);
+  var trongHang = idx % COT;
+  var cot = (hang % 2 === 0) ? trongHang : (COT - 1 - trongHang);
+  return { hang: hang, cot: cot };
+}
+
+function veBan() {
+  var ban = $('ban');
+  ban.innerHTML = '';
+  var soHang = Math.ceil(SO_O / COT);
+  var dau = {};
+  G.duong.forEach(function (d) { dau[d.tu] = d.loai; });
+
+  // Hàng trên cùng vẽ trước → hàng có chỉ số lớn nhất nằm trên
+  for (var h = soHang - 1; h >= 0; h--) {
+    for (var c = 0; c < COT; c++) {
+      var trongHang = (h % 2 === 0) ? c : (COT - 1 - c);
+      var n = h * COT + trongHang + 1;
+      var o = document.createElement('div');
+      o.className = 'o' + ((h + c) % 2 ? ' chan' : '') + (n === SO_O ? ' dich' : '');
+      if (dau[n] === 'thang') o.className += ' co-thang';
+      if (dau[n] === 'ran') o.className += ' co-ran';
+      o.dataset.o = String(n);
+      o.textContent = n;
+      if (dau[n] || n === SO_O) {
+        var b = document.createElement('div');
+        b.className = 'bieu';
+        b.textContent = n === SO_O ? '🏁' : (dau[n] === 'thang' ? '🪜' : '🐍');
+        o.appendChild(b);
+      }
+      ban.appendChild(o);
+    }
+  }
+  G.doi.forEach(function (_, i) { taoQuan(i); });
+  /* Đặt quân và vẽ đường nối SAU khi bàn cờ đã có kích thước thật.
+     Ô cờ dùng aspect-ratio nên chiều cao chỉ tính xong sau một nhịp vẽ, và phông
+     chữ Google Fonts về muộn còn làm bàn xê dịch thêm lần nữa. Đo một lần ngay
+     sau khi dựng thì ra toạ độ của bàn CHƯA ổn định — đúng lỗi đã mắc: quân báo
+     ô 1 mà nằm ở hàng ô 20, phải kéo giãn cửa sổ mới về đúng chỗ. */
+  requestAnimationFrame(function () {
+    requestAnimationFrame(function () { veDuongNoi(); datQuan(); });
+  });
+  if (document.fonts && document.fonts.ready)
+    document.fonts.ready.then(function () { veDuongNoi(); datQuan(); });
+}
+
+/** Vẽ đường nối giữa hai đầu của thang/rắn, để nhìn là biết nó dẫn tới đâu. */
+function veDuongNoi() {
+  var svg = $('lop-noi');
+  var ban = $('ban');
+  svg.innerHTML = '';
+  var r = ban.getBoundingClientRect();
+  if (!r.width) return;
+  svg.setAttribute('viewBox', '0 0 ' + r.width + ' ' + r.height);
+  svg.setAttribute('width', r.width);
+  svg.setAttribute('height', r.height);
+
+  G.duong.forEach(function (d) {
+    var a = tamO(d.tu), b = tamO(d.den);
+    if (!a || !b) return;
+    /* Vẽ CUNG chứ không vẽ đoạn thẳng.
+       Bàn đánh số kiểu rắn bò nên hai đầu của một đường thường nằm chéo hẳn qua
+       bàn. Bốn đường thẳng cắt nhau giữa bàn nhìn rất rối và che mất số ô. Cung
+       cong ra ngoài thì mắt lần theo được từng đường một. */
+    var giua = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+    var dx = b.x - a.x, dy = b.y - a.y;
+    var dai = Math.sqrt(dx * dx + dy * dy) || 1;
+    var phong = Math.min(46, dai * 0.16);          // độ cong theo chiều dài
+    var huong = d.loai === 'thang' ? -1 : 1;       // thang cong lên, rắn cong xuống
+    var cx = giua.x + (-dy / dai) * phong * huong;
+    var cy = giua.y + (dx / dai) * phong * huong;
+
+    var l = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    l.setAttribute('d', 'M' + a.x + ' ' + a.y + ' Q' + cx + ' ' + cy + ' ' + b.x + ' ' + b.y);
+    l.setAttribute('fill', 'none');
+    l.setAttribute('stroke', d.loai === 'thang' ? 'var(--luc)' : 'var(--do)');
+    l.setAttribute('stroke-width', '3');
+    l.setAttribute('stroke-linecap', 'round');
+    l.setAttribute('opacity', '.32');
+    if (d.loai === 'ran') l.setAttribute('stroke-dasharray', '6 6');
+    svg.appendChild(l);
+  });
+}
+
+function tamO(n) {
+  var el = $('ban').querySelector('[data-o="' + n + '"]');
+  if (!el) return null;
+  var ro = el.getBoundingClientRect(), rb = $('ban').getBoundingClientRect();
+  return { x: ro.left - rb.left + ro.width / 2, y: ro.top - rb.top + ro.height / 2 };
+}
+
+function taoQuan(i) {
+  var q = document.createElement('div');
+  q.className = 'quan';
+  q.id = 'quan' + i;
+  q.style.background = MAU[i];
+  q.textContent = String(i + 1);
+  $('ban-boc') || 0;
+  document.querySelector('.ban-boc').appendChild(q);
+}
+
+function datQuan() {
+  G.doi.forEach(function (d, i) {
+    var q = $('quan' + i);
+    if (!q) return;
+    var t = tamO(Math.max(1, d.o));
+    if (!t) return;
+    /* Nhiều quân cùng ô thì lệch nhau một chút, không thì quân sau che quân
+       trước và người chơi tưởng mình biến mất. */
+    var cung = G.doi.filter(function (x, j) { return x.o === d.o && j < i; }).length;
+    q.style.left = (t.x - q.offsetWidth / 2 + cung * 7 - 3) + 'px';
+    q.style.top = (t.y - q.offsetHeight / 2 - cung * 5) + 'px';
+  });
+}
+window.addEventListener('resize', function () { if (G) { veDuongNoi(); datQuan(); } });
+
+// ═══ Bảng bên phải ═══════════════════════════════════════════════════════
+function veBen() {
+  var h = '';
+  G.doi.forEach(function (d, i) {
+    h += '<div class="doi' + (i === G.luot ? ' luot' : '') + '">'
+      + '<span class="cham" style="background:' + MAU[i] + '"></span>'
+      + '<span class="ten">' + d.ten + '</span>'
+      + '<span class="diem">ô ' + d.o + (d.nguoi ? ' · ' + d.dung + '/' + CAN_DUNG + ' câu' : '') + '</span>'
+      + '</div>';
+  });
+  $('ds-doi').innerHTML = h;
+}
+function noi(t, kieu) {
+  var b = $('bao');
+  b.className = 'bao' + (kieu ? ' ' + kieu : '');
+  b.innerHTML = t;
+}
+
+// ═══ Vòng chơi ═══════════════════════════════════════════════════════════
+function batDauMan(maBai) {
+  var duong = datRanThang(maBai);
+  var ds = cauChoBai(maBai);
+  if (!ds.length) {
+    alert('Bài này chưa có câu hỏi trắc nghiệm trong ngân hàng.');
+    return;
+  }
+  var doi = [];
+  if (cheDo === 'tuhoc') {
+    doi.push({ ten: 'Em', o: 1, dung: 0, nguoi: true });
+    doi.push({ ten: TEN_MAY[0], o: 1, dung: 0, nguoi: false });
+  } else {
+    for (var i = 0; i < soNguoi; i++)
+      doi.push({ ten: 'Người ' + (i + 1), o: 1, dung: 0, nguoi: true });
+  }
+
+  G = { bai: maBai, duong: duong, cau: ds, iCau: 0, doi: doi, luot: 0, xong: false, khoa: false };
+
+  var nd = duLieu.ranThang[maBai];
+  $('nhan-bai').textContent = nd.chuong;
+  $('ten-bai').textContent = nd.tenBai;
+  $('can-dung').textContent = String(CAN_DUNG);
+
+  hien('m-chedo', false); hien('m-chonbai', false); hien('m-choi', true);
+  veBan(); veBen();
+  noi(cheDo === 'tuhoc'
+    ? 'Bấm <b>Tung xúc xắc</b>. Trả lời đúng ngay lần đầu được thưởng thêm 1 ô.'
+    : '<b>' + G.doi[0].ten + '</b> tung trước.');
+  $('nut-tung').disabled = false;
+  $('xx').textContent = '–';
+}
+
+function doiLuot() {
+  G.luot = (G.luot + 1) % G.doi.length;
+  veBen();
+  var d = G.doi[G.luot];
+  if (!d.nguoi) { setTimeout(luotMay, 700); }
+  else { $('nut-tung').disabled = false; noi('Tới lượt <b>' + d.ten + '</b>.'); }
+}
+
+function tungXX() {
+  return 1 + Math.floor(Math.random() * 6);
+}
+
+function hienXX(n, xong) {
+  var x = $('xx');
+  x.classList.add('lan');
+  x.textContent = '?';
+  setTimeout(function () {
+    x.classList.remove('lan');
+    x.textContent = String(n);
+    xong();
+  }, 480);
+}
+
+$('nut-tung').onclick = function () {
+  if (G.khoa || G.xong) return;
+  G.khoa = true;
+  $('nut-tung').disabled = true;
+  var n = tungXX();
+  hienXX(n, function () { hoiCau(n); });
+};
+
+function luotMay() {
+  if (G.xong) return;
+  var n = tungXX();
+  hienXX(n, function () {
+    noi('<b>Máy</b> tung được ' + n + '.');
+    di(G.luot, n, function () {
+      if (!G.xong) doiLuot();
+    });
+  });
+}
+
+// ═══ Câu hỏi ═════════════════════════════════════════════════════════════
+var cauHienTai = null;
+
+function layCau() {
+  if (G.iCau >= G.cau.length) G.iCau = 0;   // hết thì quay vòng
+  return G.cau[G.iCau++];
+}
+
+function hoiCau(soDi) {
+  var q = layCau();
+  cauHienTai = { q: q, soDi: soDi, lan: 0 };
+
+  $('hoi-nhan').textContent = 'Tung được ' + soDi + ' — trả lời đúng để đi';
+  $('hoi-de').textContent = q.q;
+  $('hoi-giai').className = 'giai an';
+  hien('hoi-tiep', false);
+
+  var d = $('hoi-dap');
+  d.innerHTML = '';
+  q.o.forEach(function (noiDung, i) {
+    var b = document.createElement('button');
+    b.textContent = String.fromCharCode(65 + i) + '. ' + noiDung;
+    b.onclick = function () { chonDap(i, b); };
+    d.appendChild(b);
+  });
+  hien('phu-hoi', true);
+}
+
+function chonDap(i, nut) {
+  var c = cauHienTai;
+  var dung = (i === c.q.a);
+  var cacNut = $('hoi-dap').querySelectorAll('button');
+
+  if (dung) {
+    nut.className = 'dung';
+    cacNut.forEach(function (b) { b.disabled = true; });
+    var thuong = (c.lan === 0) ? THUONG : 0;
+    G.doi[G.luot].dung++;
+    $('hoi-giai').className = 'giai';
+    $('hoi-giai').innerHTML = '<b>Đúng rồi!</b> '
+      + (thuong ? 'Đúng ngay lần đầu — được thưởng thêm ' + thuong + ' ô. ' : '')
+      + (c.q.e ? '<br>' + c.q.e : '');
+    hien('hoi-tiep', true);
+    $('hoi-tiep').onclick = function () {
+      hien('phu-hoi', false);
+      di(G.luot, c.soDi + thuong, function () { if (!G.xong) doiLuot(); });
+    };
+    return;
+  }
+
+  // Sai lần đầu: bỏ bớt hai đáp án sai rồi cho trả lời lại
+  if (c.lan === 0) {
+    c.lan = 1;
+    nut.className = 'sai';
+    nut.disabled = true;
+    var conSai = [];
+    cacNut.forEach(function (b, j) { if (j !== c.q.a && j !== i) conSai.push(b); });
+    tron(conSai, 7).slice(0, Math.max(0, conSai.length - 1)).forEach(function (b) {
+      b.disabled = true; b.style.textDecoration = 'line-through';
+    });
+    $('hoi-nhan').textContent = 'Chưa đúng — thầy bỏ bớt phương án sai, em chọn lại';
+    return;
+  }
+
+  // Sai lần hai: mất lượt, hiện lời giải
+  nut.className = 'sai';
+  cacNut.forEach(function (b, j) {
+    b.disabled = true;
+    if (j === c.q.a) b.className = 'dung';
+  });
+  $('hoi-giai').className = 'giai';
+  $('hoi-giai').innerHTML = '<b>Đáp án đúng: ' + String.fromCharCode(65 + c.q.a) + '.</b>'
+    + (c.q.e ? '<br>' + c.q.e : '');
+  hien('hoi-tiep', true);
+  $('hoi-tiep').onclick = function () {
+    hien('phu-hoi', false);
+    noi('Lượt này đứng yên. Lần sau cố lên!', 'xau');
+    G.khoa = false;
+    doiLuot();
+  };
+}
+
+// ═══ Di chuyển ═══════════════════════════════════════════════════════════
+function di(iDoi, so, xong) {
+  var d = G.doi[iDoi];
+  var dich = Math.min(SO_O, d.o + so);
+  var b = d.o;
+
+  (function buoc() {
+    if (b >= dich) { toiNoi(); return; }
+    b++;
+    d.o = b;
+    datQuan(); veBen();
+    setTimeout(buoc, 130);
+  })();
+
+  function toiNoi() {
+    var duong = null;
+    for (var i = 0; i < G.duong.length; i++)
+      if (G.duong[i].tu === d.o) { duong = G.duong[i]; break; }
+
+    if (duong) {
+      setTimeout(function () {
+        baoDuong(duong, function () {
+          d.o = duong.den;
+          datQuan(); veBen();
+          setTimeout(function () { ketThucLuot(); }, 380);
+        });
+      }, 280);
+    } else {
+      ketThucLuot();
+    }
+  }
+
+  function ketThucLuot() {
+    G.khoa = false;
+    if (d.o >= SO_O) {
+      // Về đích rồi nhưng còn phải đủ số câu đúng
+      if (d.nguoi && d.dung < CAN_DUNG) {
+        noi('Tới đích rồi, nhưng còn thiếu <b>' + (CAN_DUNG - d.dung)
+          + '</b> câu đúng nữa mới qua màn. Tung tiếp để trả lời thêm.', 'xau');
+        xong();
+        return;
+      }
+      thang(iDoi);
+      return;
+    }
+    xong();
+  }
+}
+
+function baoDuong(duong, xong) {
+  $('bao-hinh').textContent = duong.loai === 'thang' ? '🪜' : '🐍';
+  $('bao-tieu').textContent = duong.loai === 'thang'
+    ? 'Leo thang! Lên ô ' + duong.den
+    : 'Gặp rắn — tụt về ô ' + duong.den;
+  $('bao-noi').textContent = duong.noi || '';
+  if (duong.sua) {
+    $('bao-sua').className = 'giai';
+    $('bao-sua').innerHTML = duong.loai === 'ran'
+      ? '<b>Nhớ cho đúng:</b> ' + duong.sua
+      : duong.sua;
+  } else {
+    $('bao-sua').className = 'giai an';
+  }
+  hien('phu-bao', true);
+  $('bao-tiep').onclick = function () { hien('phu-bao', false); xong(); };
+}
+
+function thang(iDoi) {
+  G.xong = true;
+  var d = G.doi[iDoi];
+  var laEm = d.nguoi && (cheDo === 'tuhoc');
+
+  if (laEm) luuTienDo(G.bai, d.dung);
+  else if (d.nguoi) luuTienDo(G.bai, d.dung);   // chế độ lớp học vẫn ghi nhận
+
+  $('bao-hinh').textContent = d.nguoi ? '🏆' : '😅';
+  $('bao-tieu').textContent = d.nguoi
+    ? (cheDo === 'tuhoc' ? 'Qua màn!' : d.ten + ' thắng!')
+    : 'Máy về đích trước';
+  $('bao-noi').innerHTML = d.nguoi
+    ? 'Về đích với <b>' + d.dung + '</b> câu trả lời đúng.'
+      + (cheDo === 'tuhoc' ? '<br>Màn tiếp theo đã mở khoá.' : '')
+    : 'Chưa sao cả — bấm chơi lại để thử lần nữa.';
+  $('bao-sua').className = 'giai an';
+  hien('phu-bao', true);
+  $('bao-tiep').textContent = 'Về chọn màn';
+  $('bao-tiep').onclick = function () {
+    hien('phu-bao', false);
+    $('bao-tiep').textContent = 'Tiếp tục';
+    moChonBai();
+  };
+}
+
+// ═══ Màn chọn bài ════════════════════════════════════════════════════════
+function danhSachBai() {
+  return Object.keys(duLieu.ranThang);
+}
+
+function moKhoaToi() {
+  /* Màn đầu luôn mở. Từ màn hai trở đi phải xong màn trước. */
+  var ds = danhSachBai();
+  for (var i = 0; i < ds.length; i++)
+    if (!(tienDo[ds[i]] && tienDo[ds[i]].xong)) return i;
+  return ds.length - 1;
+}
+
+function veLuoiBai() {
+  var ds = danhSachBai();
+  var toi = moKhoaToi();
+  var l = $('luoi-bai');
+  l.innerHTML = '';
+  ds.forEach(function (ma, i) {
+    var nd = duLieu.ranThang[ma];
+    var xong = !!(tienDo[ma] && tienDo[ma].xong);
+    var khoa = (cheDo === 'tuhoc') && (i > toi);
+    var b = document.createElement('button');
+    b.className = 'o-bai' + (xong ? ' xong' : '');
+    b.disabled = khoa;
+    b.innerHTML = '<span class="dau">' + (xong ? '✅' : (khoa ? '🔒' : '▶')) + '</span>'
+      + '<span class="so">Màn ' + (i + 1) + '</span>'
+      + '<span class="ten">' + nd.tenBai.replace(/^Bài \d+:\s*/, '') + '</span>';
+    b.onclick = function () { batDauMan(ma); };
+    l.appendChild(b);
+  });
+  $('loi-chonbai').textContent = cheDo === 'tuhoc'
+    ? 'Xong màn nào thì màn kế mở ra. Đã qua ' + ds.filter(function (m) {
+        return tienDo[m] && tienDo[m].xong; }).length + ' trên ' + ds.length + ' màn.'
+    : 'Chế độ lớp học: chọn màn nào cũng được.';
+}
+
+function moChonBai() {
+  hien('m-chedo', false); hien('m-choi', false); hien('m-chonbai', true);
+  $('nhan-chedo').textContent = cheDo === 'tuhoc' ? 'Chế độ tự học' : 'Chế độ lớp học';
+  hien('dong-nguoi', cheDo === 'lophoc');
+  veLuoiBai();
+}
+
+// ═══ Nối nút ═════════════════════════════════════════════════════════════
+$('cd-tuhoc').onclick = function () { cheDo = 'tuhoc'; moChonBai(); };
+$('cd-lophoc').onclick = function () { cheDo = 'lophoc'; moChonBai(); };
+$('ve-chedo').onclick = function () { hien('m-chonbai', false); hien('m-chedo', true); };
+$('ve-chonbai').onclick = function () { G = null; moChonBai(); };
+$('dong-nguoi').querySelectorAll('button').forEach(function (b) {
+  b.onclick = function () {
+    soNguoi = Number(b.dataset.nguoi);
+    $('dong-nguoi').querySelectorAll('button').forEach(function (x) {
+      x.classList.toggle('phu', x !== b);
+    });
+  };
+});
+
+// ═══ Khởi động ═══════════════════════════════════════════════════════════
+docTienDo();
+Promise.all([
+  nap('du-lieu/ran-thang.json'),
+  nap('du-lieu/cau-hoi-theo-bai.json'),
+  napNganHang(),
+]).then(function (r) {
+  duLieu.ranThang = r[0];
+  duLieu.uuTien = r[1];
+  duLieu.nganHang = r[2] || [];
+  if (!duLieu.nganHang.length) throw new Error('không đọc được ngân hàng câu hỏi');
+  /* Báo cho web biết trò đã sẵn sàng, để web gửi tiến độ của tài khoản sang. */
+  try {
+    if (window.parent && window.parent !== window)
+      window.parent.postMessage({ loai: 'hoa11:xin-tien-do-tro-choi', tro: 'ran-va-thang' },
+        location.origin);
+  } catch (e) {}
+}).catch(function (e) {
+  document.querySelector('#m-chedo .the').innerHTML =
+    '<h2 style="font-size:22px">Chưa mở được trò chơi</h2>'
+    + '<p class="mo">' + (e && e.message ? e.message : 'lỗi không rõ') + '</p>'
+    + '<p class="mo nho">Nếu đang mở tệp trực tiếp bằng cách nhấp đúp, hãy mở qua web '
+    + 'hoặc chạy một máy chủ tĩnh — trình duyệt chặn đọc tệp dữ liệu khi mở kiểu đó.</p>';
+});
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,2820 @@
+{
+ "bai-1": {
+  "tenBai": "Bài 1: Khái niệm về cân bằng hoá học",
+  "ch": 1,
+  "cau": [
+   {
+    "id": "b:1:nb:1",
+    "diem": 14
+   },
+   {
+    "id": "b:1:th:7",
+    "diem": 14
+   },
+   {
+    "id": "b:1:th:0",
+    "diem": 13
+   },
+   {
+    "id": "b:1:vdc:2",
+    "diem": 13
+   },
+   {
+    "id": "b:1:vd:1",
+    "diem": 12
+   },
+   {
+    "id": "b:1:th:1",
+    "diem": 10
+   },
+   {
+    "id": "b:1:vd:0",
+    "diem": 10
+   },
+   {
+    "id": "b:1:vd:5",
+    "diem": 10
+   },
+   {
+    "id": "b:1:vdc:0",
+    "diem": 10
+   },
+   {
+    "id": "b:1:nb:0",
+    "diem": 7
+   },
+   {
+    "id": "b:1:th:2",
+    "diem": 7
+   },
+   {
+    "id": "b:1:th:5",
+    "diem": 7
+   },
+   {
+    "id": "b:1:vd:2",
+    "diem": 7
+   },
+   {
+    "id": "b:1:vdc:1",
+    "diem": 7
+   },
+   {
+    "id": "b:1:vdc:3",
+    "diem": 7
+   },
+   {
+    "id": "b:1:nb:6",
+    "diem": 6
+   },
+   {
+    "id": "b:1:nb:2",
+    "diem": 5
+   },
+   {
+    "id": "b:1:nb:5",
+    "diem": 4
+   },
+   {
+    "id": "b:1:th:4",
+    "diem": 4
+   },
+   {
+    "id": "b:1:nb:3",
+    "diem": 3
+   },
+   {
+    "id": "b:1:th:3",
+    "diem": 3
+   },
+   {
+    "id": "b:1:vd:3",
+    "diem": 2
+   },
+   {
+    "id": "b:1:nb:4",
+    "diem": 1
+   },
+   {
+    "id": "b:1:th:6",
+    "diem": 1
+   },
+   {
+    "id": "b:1:vd:4",
+    "diem": 1
+   },
+   {
+    "id": "b:1:nb:7",
+    "diem": 0
+   }
+  ]
+ },
+ "bai-2": {
+  "tenBai": "Bài 2: Cân bằng trong dung dịch nước và thuyết acid – base",
+  "ch": 1,
+  "cau": [
+   {
+    "id": "b:1:nb:3",
+    "diem": 20
+   },
+   {
+    "id": "b:1:th:5",
+    "diem": 18
+   },
+   {
+    "id": "b:1:nb:6",
+    "diem": 17
+   },
+   {
+    "id": "b:1:vd:0",
+    "diem": 13
+   },
+   {
+    "id": "b:1:vd:2",
+    "diem": 13
+   },
+   {
+    "id": "b:1:vdc:0",
+    "diem": 13
+   },
+   {
+    "id": "b:1:vdc:1",
+    "diem": 13
+   },
+   {
+    "id": "b:1:vdc:3",
+    "diem": 13
+   },
+   {
+    "id": "b:1:vd:1",
+    "diem": 11
+   },
+   {
+    "id": "b:1:vd:4",
+    "diem": 10
+   },
+   {
+    "id": "b:1:th:7",
+    "diem": 9
+   },
+   {
+    "id": "b:1:nb:5",
+    "diem": 8
+   },
+   {
+    "id": "b:1:th:0",
+    "diem": 8
+   },
+   {
+    "id": "b:1:th:6",
+    "diem": 8
+   },
+   {
+    "id": "b:1:nb:0",
+    "diem": 7
+   },
+   {
+    "id": "b:1:th:4",
+    "diem": 7
+   },
+   {
+    "id": "b:1:th:3",
+    "diem": 6
+   },
+   {
+    "id": "b:1:nb:4",
+    "diem": 5
+   },
+   {
+    "id": "b:1:vd:5",
+    "diem": 5
+   },
+   {
+    "id": "b:1:vdc:2",
+    "diem": 5
+   },
+   {
+    "id": "b:1:nb:1",
+    "diem": 4
+   },
+   {
+    "id": "b:1:nb:2",
+    "diem": 4
+   },
+   {
+    "id": "b:1:nb:7",
+    "diem": 4
+   },
+   {
+    "id": "b:1:th:1",
+    "diem": 2
+   },
+   {
+    "id": "b:1:th:2",
+    "diem": 2
+   },
+   {
+    "id": "b:1:vd:3",
+    "diem": 1
+   }
+  ]
+ },
+ "bai-3": {
+  "tenBai": "Bài 3: Ôn tập cân bằng hoá học và cân bằng trong dung dịch nước",
+  "ch": 1,
+  "cau": [
+   {
+    "id": "b:1:nb:0",
+    "diem": 10
+   },
+   {
+    "id": "b:1:vdc:0",
+    "diem": 7
+   },
+   {
+    "id": "b:1:th:7",
+    "diem": 6
+   },
+   {
+    "id": "b:1:nb:1",
+    "diem": 5
+   },
+   {
+    "id": "b:1:th:1",
+    "diem": 5
+   },
+   {
+    "id": "b:1:th:2",
+    "diem": 5
+   },
+   {
+    "id": "b:1:th:0",
+    "diem": 4
+   },
+   {
+    "id": "b:1:vd:0",
+    "diem": 4
+   },
+   {
+    "id": "b:1:vdc:2",
+    "diem": 4
+   },
+   {
+    "id": "b:1:nb:5",
+    "diem": 3
+   },
+   {
+    "id": "b:1:nb:6",
+    "diem": 3
+   },
+   {
+    "id": "b:1:vd:2",
+    "diem": 3
+   },
+   {
+    "id": "b:1:vd:5",
+    "diem": 3
+   },
+   {
+    "id": "b:1:vdc:1",
+    "diem": 3
+   },
+   {
+    "id": "b:1:vdc:3",
+    "diem": 3
+   },
+   {
+    "id": "b:1:nb:2",
+    "diem": 2
+   },
+   {
+    "id": "b:1:th:5",
+    "diem": 2
+   },
+   {
+    "id": "b:1:th:6",
+    "diem": 2
+   },
+   {
+    "id": "b:1:nb:3",
+    "diem": 1
+   },
+   {
+    "id": "b:1:vd:1",
+    "diem": 1
+   },
+   {
+    "id": "b:1:vd:3",
+    "diem": 1
+   },
+   {
+    "id": "b:1:nb:4",
+    "diem": 0
+   },
+   {
+    "id": "b:1:nb:7",
+    "diem": 0
+   },
+   {
+    "id": "b:1:th:3",
+    "diem": 0
+   },
+   {
+    "id": "b:1:th:4",
+    "diem": 0
+   },
+   {
+    "id": "b:1:vd:4",
+    "diem": 0
+   }
+  ]
+ },
+ "bai-4": {
+  "tenBai": "Bài 4: Nitrogen",
+  "ch": 2,
+  "cau": [
+   {
+    "id": "b:2:nb:2",
+    "diem": 15
+   },
+   {
+    "id": "b:2:nb:1",
+    "diem": 14
+   },
+   {
+    "id": "b:2:th:1",
+    "diem": 14
+   },
+   {
+    "id": "b:2:th:0",
+    "diem": 12
+   },
+   {
+    "id": "b:2:nb:0",
+    "diem": 11
+   },
+   {
+    "id": "b:2:nb:7",
+    "diem": 10
+   },
+   {
+    "id": "b:2:vd:4",
+    "diem": 10
+   },
+   {
+    "id": "b:2:vd:6",
+    "diem": 10
+   },
+   {
+    "id": "b:2:nb:6",
+    "diem": 8
+   },
+   {
+    "id": "b:2:th:7",
+    "diem": 8
+   },
+   {
+    "id": "b:2:th:2",
+    "diem": 7
+   },
+   {
+    "id": "b:2:th:3",
+    "diem": 7
+   },
+   {
+    "id": "b:2:nb:5",
+    "diem": 6
+   },
+   {
+    "id": "b:2:vd:5",
+    "diem": 6
+   },
+   {
+    "id": "b:2:nb:3",
+    "diem": 4
+   },
+   {
+    "id": "b:2:nb:4",
+    "diem": 4
+   },
+   {
+    "id": "b:2:th:6",
+    "diem": 4
+   },
+   {
+    "id": "b:2:vd:0",
+    "diem": 4
+   },
+   {
+    "id": "b:2:vdc:1",
+    "diem": 4
+   },
+   {
+    "id": "b:2:vdc:3",
+    "diem": 4
+   },
+   {
+    "id": "b:2:th:4",
+    "diem": 3
+   },
+   {
+    "id": "b:2:vd:1",
+    "diem": 3
+   },
+   {
+    "id": "b:2:th:5",
+    "diem": 2
+   },
+   {
+    "id": "b:2:vdc:0",
+    "diem": 2
+   },
+   {
+    "id": "b:2:vdc:2",
+    "diem": 2
+   },
+   {
+    "id": "b:2:vd:2",
+    "diem": 1
+   },
+   {
+    "id": "b:2:vd:3",
+    "diem": 0
+   }
+  ]
+ },
+ "bai-5": {
+  "tenBai": "Bài 5: Ammonia và muối ammonium",
+  "ch": 2,
+  "cau": [
+   {
+    "id": "b:2:nb:2",
+    "diem": 9
+   },
+   {
+    "id": "b:2:nb:7",
+    "diem": 4
+   },
+   {
+    "id": "b:2:th:0",
+    "diem": 4
+   },
+   {
+    "id": "b:2:th:1",
+    "diem": 4
+   },
+   {
+    "id": "b:2:vd:6",
+    "diem": 4
+   },
+   {
+    "id": "b:2:vdc:2",
+    "diem": 4
+   },
+   {
+    "id": "b:2:vdc:0",
+    "diem": 3
+   },
+   {
+    "id": "b:2:nb:0",
+    "diem": 2
+   },
+   {
+    "id": "b:2:nb:1",
+    "diem": 2
+   },
+   {
+    "id": "b:2:nb:4",
+    "diem": 2
+   },
+   {
+    "id": "b:2:nb:6",
+    "diem": 2
+   },
+   {
+    "id": "b:2:th:3",
+    "diem": 2
+   },
+   {
+    "id": "b:2:th:7",
+    "diem": 2
+   },
+   {
+    "id": "b:2:vd:5",
+    "diem": 2
+   },
+   {
+    "id": "b:2:th:2",
+    "diem": 1
+   },
+   {
+    "id": "b:2:vd:0",
+    "diem": 1
+   },
+   {
+    "id": "b:2:vd:2",
+    "diem": 1
+   },
+   {
+    "id": "b:2:vd:3",
+    "diem": 1
+   },
+   {
+    "id": "b:2:vd:4",
+    "diem": 1
+   },
+   {
+    "id": "b:2:vdc:1",
+    "diem": 1
+   },
+   {
+    "id": "b:2:vdc:3",
+    "diem": 1
+   },
+   {
+    "id": "b:2:nb:3",
+    "diem": 0
+   },
+   {
+    "id": "b:2:nb:5",
+    "diem": 0
+   },
+   {
+    "id": "b:2:th:4",
+    "diem": 0
+   },
+   {
+    "id": "b:2:th:5",
+    "diem": 0
+   },
+   {
+    "id": "b:2:th:6",
+    "diem": 0
+   },
+   {
+    "id": "b:2:vd:1",
+    "diem": 0
+   }
+  ]
+ },
+ "bai-6": {
+  "tenBai": "Bài 6: Một số hợp chất của nitrogen với oxygen",
+  "ch": 2,
+  "cau": [
+   {
+    "id": "b:2:nb:6",
+    "diem": 24
+   },
+   {
+    "id": "b:2:th:5",
+    "diem": 23
+   },
+   {
+    "id": "b:2:vdc:2",
+    "diem": 22
+   },
+   {
+    "id": "b:2:th:1",
+    "diem": 18
+   },
+   {
+    "id": "b:2:vd:5",
+    "diem": 15
+   },
+   {
+    "id": "b:2:nb:1",
+    "diem": 14
+   },
+   {
+    "id": "b:2:th:2",
+    "diem": 13
+   },
+   {
+    "id": "b:2:th:6",
+    "diem": 13
+   },
+   {
+    "id": "b:2:nb:5",
+    "diem": 12
+   },
+   {
+    "id": "b:2:vd:0",
+    "diem": 12
+   },
+   {
+    "id": "b:2:nb:2",
+    "diem": 10
+   },
+   {
+    "id": "b:2:th:3",
+    "diem": 10
+   },
+   {
+    "id": "b:2:vdc:0",
+    "diem": 10
+   },
+   {
+    "id": "b:2:th:4",
+    "diem": 9
+   },
+   {
+    "id": "b:2:vd:4",
+    "diem": 9
+   },
+   {
+    "id": "b:2:vdc:1",
+    "diem": 8
+   },
+   {
+    "id": "b:2:th:7",
+    "diem": 7
+   },
+   {
+    "id": "b:2:vd:1",
+    "diem": 7
+   },
+   {
+    "id": "b:2:vd:3",
+    "diem": 7
+   },
+   {
+    "id": "b:2:vdc:3",
+    "diem": 7
+   },
+   {
+    "id": "b:2:nb:0",
+    "diem": 5
+   },
+   {
+    "id": "b:2:nb:4",
+    "diem": 5
+   },
+   {
+    "id": "b:2:nb:7",
+    "diem": 5
+   },
+   {
+    "id": "b:2:th:0",
+    "diem": 4
+   },
+   {
+    "id": "b:2:vd:2",
+    "diem": 4
+   },
+   {
+    "id": "b:2:vd:6",
+    "diem": 4
+   },
+   {
+    "id": "b:2:nb:3",
+    "diem": 2
+   }
+  ]
+ },
+ "bai-7": {
+  "tenBai": "Bài 7: Sulfur và sulfur dioxide",
+  "ch": 2,
+  "cau": [
+   {
+    "id": "b:2:th:3",
+    "diem": 13
+   },
+   {
+    "id": "b:2:th:2",
+    "diem": 10
+   },
+   {
+    "id": "b:2:th:6",
+    "diem": 7
+   },
+   {
+    "id": "b:2:vd:5",
+    "diem": 7
+   },
+   {
+    "id": "b:2:vd:0",
+    "diem": 6
+   },
+   {
+    "id": "b:2:vd:1",
+    "diem": 6
+   },
+   {
+    "id": "b:2:vdc:1",
+    "diem": 5
+   },
+   {
+    "id": "b:2:nb:2",
+    "diem": 4
+   },
+   {
+    "id": "b:2:nb:3",
+    "diem": 4
+   },
+   {
+    "id": "b:2:nb:6",
+    "diem": 4
+   },
+   {
+    "id": "b:2:th:7",
+    "diem": 4
+   },
+   {
+    "id": "b:2:vd:3",
+    "diem": 4
+   },
+   {
+    "id": "b:2:vdc:3",
+    "diem": 4
+   },
+   {
+    "id": "b:2:nb:0",
+    "diem": 3
+   },
+   {
+    "id": "b:2:nb:5",
+    "diem": 3
+   },
+   {
+    "id": "b:2:vd:2",
+    "diem": 3
+   },
+   {
+    "id": "b:2:vd:4",
+    "diem": 3
+   },
+   {
+    "id": "b:2:vdc:0",
+    "diem": 3
+   },
+   {
+    "id": "b:2:vdc:2",
+    "diem": 3
+   },
+   {
+    "id": "b:2:nb:1",
+    "diem": 2
+   },
+   {
+    "id": "b:2:th:1",
+    "diem": 2
+   },
+   {
+    "id": "b:2:vd:6",
+    "diem": 1
+   },
+   {
+    "id": "b:2:nb:4",
+    "diem": 0
+   },
+   {
+    "id": "b:2:nb:7",
+    "diem": 0
+   },
+   {
+    "id": "b:2:th:0",
+    "diem": 0
+   },
+   {
+    "id": "b:2:th:4",
+    "diem": 0
+   },
+   {
+    "id": "b:2:th:5",
+    "diem": 0
+   }
+  ]
+ },
+ "bai-8": {
+  "tenBai": "Bài 8: Sulfuric acid và muối sulfate",
+  "ch": 2,
+  "cau": [
+   {
+    "id": "b:2:vdc:2",
+    "diem": 19
+   },
+   {
+    "id": "b:2:th:5",
+    "diem": 17
+   },
+   {
+    "id": "b:2:vd:5",
+    "diem": 16
+   },
+   {
+    "id": "b:2:nb:5",
+    "diem": 14
+   },
+   {
+    "id": "b:2:th:6",
+    "diem": 13
+   },
+   {
+    "id": "b:2:vd:0",
+    "diem": 13
+   },
+   {
+    "id": "b:2:nb:2",
+    "diem": 10
+   },
+   {
+    "id": "b:2:vdc:0",
+    "diem": 9
+   },
+   {
+    "id": "b:2:nb:3",
+    "diem": 8
+   },
+   {
+    "id": "b:2:nb:4",
+    "diem": 8
+   },
+   {
+    "id": "b:2:th:1",
+    "diem": 7
+   },
+   {
+    "id": "b:2:th:2",
+    "diem": 7
+   },
+   {
+    "id": "b:2:th:4",
+    "diem": 7
+   },
+   {
+    "id": "b:2:vdc:3",
+    "diem": 7
+   },
+   {
+    "id": "b:2:nb:6",
+    "diem": 6
+   },
+   {
+    "id": "b:2:vd:2",
+    "diem": 6
+   },
+   {
+    "id": "b:2:nb:0",
+    "diem": 4
+   },
+   {
+    "id": "b:2:th:3",
+    "diem": 4
+   },
+   {
+    "id": "b:2:vd:1",
+    "diem": 4
+   },
+   {
+    "id": "b:2:vd:4",
+    "diem": 3
+   },
+   {
+    "id": "b:2:vdc:1",
+    "diem": 3
+   },
+   {
+    "id": "b:2:nb:7",
+    "diem": 2
+   },
+   {
+    "id": "b:2:vd:3",
+    "diem": 2
+   },
+   {
+    "id": "b:2:nb:1",
+    "diem": 1
+   },
+   {
+    "id": "b:2:th:0",
+    "diem": 1
+   },
+   {
+    "id": "b:2:vd:6",
+    "diem": 1
+   },
+   {
+    "id": "b:2:th:7",
+    "diem": 0
+   }
+  ]
+ },
+ "bai-9": {
+  "tenBai": "Bài 9: Hệ thống hoá kiến thức về nitrogen và sulfur",
+  "ch": 2,
+  "cau": [
+   {
+    "id": "b:2:nb:1",
+    "diem": 5
+   },
+   {
+    "id": "b:2:th:7",
+    "diem": 5
+   },
+   {
+    "id": "b:2:th:2",
+    "diem": 4
+   },
+   {
+    "id": "b:2:th:3",
+    "diem": 4
+   },
+   {
+    "id": "b:2:nb:6",
+    "diem": 2
+   },
+   {
+    "id": "b:2:nb:3",
+    "diem": 1
+   },
+   {
+    "id": "b:2:th:4",
+    "diem": 1
+   },
+   {
+    "id": "b:2:vd:1",
+    "diem": 1
+   },
+   {
+    "id": "b:2:vdc:0",
+    "diem": 1
+   },
+   {
+    "id": "b:2:nb:0",
+    "diem": 0
+   },
+   {
+    "id": "b:2:nb:2",
+    "diem": 0
+   },
+   {
+    "id": "b:2:nb:4",
+    "diem": 0
+   },
+   {
+    "id": "b:2:nb:5",
+    "diem": 0
+   },
+   {
+    "id": "b:2:nb:7",
+    "diem": 0
+   },
+   {
+    "id": "b:2:th:0",
+    "diem": 0
+   },
+   {
+    "id": "b:2:th:1",
+    "diem": 0
+   },
+   {
+    "id": "b:2:th:5",
+    "diem": 0
+   },
+   {
+    "id": "b:2:th:6",
+    "diem": 0
+   },
+   {
+    "id": "b:2:vd:0",
+    "diem": 0
+   },
+   {
+    "id": "b:2:vd:2",
+    "diem": 0
+   },
+   {
+    "id": "b:2:vd:3",
+    "diem": 0
+   },
+   {
+    "id": "b:2:vd:4",
+    "diem": 0
+   },
+   {
+    "id": "b:2:vd:5",
+    "diem": 0
+   },
+   {
+    "id": "b:2:vd:6",
+    "diem": 0
+   },
+   {
+    "id": "b:2:vdc:1",
+    "diem": 0
+   },
+   {
+    "id": "b:2:vdc:2",
+    "diem": 0
+   },
+   {
+    "id": "b:2:vdc:3",
+    "diem": 0
+   }
+  ]
+ },
+ "bai-10": {
+  "tenBai": "Bài 10: Hợp chất hữu cơ và hoá học hữu cơ",
+  "ch": 3,
+  "cau": [
+   {
+    "id": "b:3:vdc:0",
+    "diem": 18
+   },
+   {
+    "id": "b:3:nb:0",
+    "diem": 14
+   },
+   {
+    "id": "b:3:vd:1",
+    "diem": 14
+   },
+   {
+    "id": "b:3:nb:6",
+    "diem": 13
+   },
+   {
+    "id": "b:3:vd:4",
+    "diem": 11
+   },
+   {
+    "id": "b:3:nb:1",
+    "diem": 10
+   },
+   {
+    "id": "b:3:nb:3",
+    "diem": 10
+   },
+   {
+    "id": "b:3:nb:5",
+    "diem": 9
+   },
+   {
+    "id": "b:3:vd:5",
+    "diem": 9
+   },
+   {
+    "id": "b:3:nb:4",
+    "diem": 8
+   },
+   {
+    "id": "b:3:nb:2",
+    "diem": 7
+   },
+   {
+    "id": "b:3:nb:7",
+    "diem": 6
+   },
+   {
+    "id": "b:3:vd:2",
+    "diem": 6
+   },
+   {
+    "id": "b:3:th:0",
+    "diem": 5
+   },
+   {
+    "id": "b:3:vdc:2",
+    "diem": 5
+   },
+   {
+    "id": "b:3:vdc:3",
+    "diem": 5
+   },
+   {
+    "id": "b:3:vd:0",
+    "diem": 4
+   },
+   {
+    "id": "b:3:th:7",
+    "diem": 3
+   },
+   {
+    "id": "b:3:vd:3",
+    "diem": 3
+   },
+   {
+    "id": "b:3:th:5",
+    "diem": 2
+   },
+   {
+    "id": "b:3:th:1",
+    "diem": 1
+   },
+   {
+    "id": "b:3:th:2",
+    "diem": 1
+   },
+   {
+    "id": "b:3:th:3",
+    "diem": 1
+   },
+   {
+    "id": "b:3:th:4",
+    "diem": 1
+   },
+   {
+    "id": "b:3:th:6",
+    "diem": 1
+   },
+   {
+    "id": "b:3:vdc:1",
+    "diem": 1
+   }
+  ]
+ },
+ "bai-11": {
+  "tenBai": "Bài 11: Phương pháp tách và tinh chế hợp chất hữu cơ",
+  "ch": 3,
+  "cau": [
+   {
+    "id": "b:3:nb:2",
+    "diem": 15
+   },
+   {
+    "id": "b:3:nb:3",
+    "diem": 15
+   },
+   {
+    "id": "b:3:th:7",
+    "diem": 8
+   },
+   {
+    "id": "b:3:nb:4",
+    "diem": 6
+   },
+   {
+    "id": "b:3:th:3",
+    "diem": 6
+   },
+   {
+    "id": "b:3:th:4",
+    "diem": 6
+   },
+   {
+    "id": "b:3:vdc:2",
+    "diem": 6
+   },
+   {
+    "id": "b:3:nb:5",
+    "diem": 4
+   },
+   {
+    "id": "b:3:nb:6",
+    "diem": 3
+   },
+   {
+    "id": "b:3:nb:7",
+    "diem": 3
+   },
+   {
+    "id": "b:3:th:0",
+    "diem": 3
+   },
+   {
+    "id": "b:3:th:5",
+    "diem": 3
+   },
+   {
+    "id": "b:3:nb:0",
+    "diem": 2
+   },
+   {
+    "id": "b:3:nb:1",
+    "diem": 2
+   },
+   {
+    "id": "b:3:vdc:0",
+    "diem": 2
+   },
+   {
+    "id": "b:3:vdc:3",
+    "diem": 1
+   },
+   {
+    "id": "b:3:th:1",
+    "diem": 0
+   },
+   {
+    "id": "b:3:th:2",
+    "diem": 0
+   },
+   {
+    "id": "b:3:th:6",
+    "diem": 0
+   },
+   {
+    "id": "b:3:vd:0",
+    "diem": 0
+   },
+   {
+    "id": "b:3:vd:1",
+    "diem": 0
+   },
+   {
+    "id": "b:3:vd:2",
+    "diem": 0
+   },
+   {
+    "id": "b:3:vd:3",
+    "diem": 0
+   },
+   {
+    "id": "b:3:vd:4",
+    "diem": 0
+   },
+   {
+    "id": "b:3:vd:5",
+    "diem": 0
+   },
+   {
+    "id": "b:3:vdc:1",
+    "diem": 0
+   }
+  ]
+ },
+ "bai-12": {
+  "tenBai": "Bài 12: Công thức phân tử hợp chất hữu cơ",
+  "ch": 3,
+  "cau": [
+   {
+    "id": "b:3:vd:1",
+    "diem": 7
+   },
+   {
+    "id": "b:3:vd:2",
+    "diem": 7
+   },
+   {
+    "id": "b:3:nb:3",
+    "diem": 6
+   },
+   {
+    "id": "b:3:vdc:0",
+    "diem": 6
+   },
+   {
+    "id": "b:3:nb:5",
+    "diem": 5
+   },
+   {
+    "id": "b:3:nb:6",
+    "diem": 5
+   },
+   {
+    "id": "b:3:vdc:3",
+    "diem": 5
+   },
+   {
+    "id": "b:3:nb:1",
+    "diem": 4
+   },
+   {
+    "id": "b:3:nb:2",
+    "diem": 4
+   },
+   {
+    "id": "b:3:nb:4",
+    "diem": 4
+   },
+   {
+    "id": "b:3:th:3",
+    "diem": 3
+   },
+   {
+    "id": "b:3:vd:0",
+    "diem": 3
+   },
+   {
+    "id": "b:3:vdc:2",
+    "diem": 3
+   },
+   {
+    "id": "b:3:nb:7",
+    "diem": 2
+   },
+   {
+    "id": "b:3:th:4",
+    "diem": 2
+   },
+   {
+    "id": "b:3:th:7",
+    "diem": 2
+   },
+   {
+    "id": "b:3:vd:3",
+    "diem": 2
+   },
+   {
+    "id": "b:3:nb:0",
+    "diem": 1
+   },
+   {
+    "id": "b:3:th:1",
+    "diem": 1
+   },
+   {
+    "id": "b:3:th:2",
+    "diem": 1
+   },
+   {
+    "id": "b:3:th:6",
+    "diem": 1
+   },
+   {
+    "id": "b:3:vd:4",
+    "diem": 1
+   },
+   {
+    "id": "b:3:vd:5",
+    "diem": 1
+   },
+   {
+    "id": "b:3:vdc:1",
+    "diem": 1
+   },
+   {
+    "id": "b:3:th:0",
+    "diem": 0
+   },
+   {
+    "id": "b:3:th:5",
+    "diem": 0
+   }
+  ]
+ },
+ "bai-13": {
+  "tenBai": "Bài 13: Thuyết cấu tạo hoá học và công thức cấu tạo hợp chất hữu cơ",
+  "ch": 3,
+  "cau": [
+   {
+    "id": "b:3:nb:6",
+    "diem": 8
+   },
+   {
+    "id": "b:3:nb:7",
+    "diem": 8
+   },
+   {
+    "id": "b:3:nb:1",
+    "diem": 7
+   },
+   {
+    "id": "b:3:vd:1",
+    "diem": 4
+   },
+   {
+    "id": "b:3:vd:2",
+    "diem": 4
+   },
+   {
+    "id": "b:3:nb:4",
+    "diem": 3
+   },
+   {
+    "id": "b:3:nb:3",
+    "diem": 2
+   },
+   {
+    "id": "b:3:th:1",
+    "diem": 2
+   },
+   {
+    "id": "b:3:th:2",
+    "diem": 2
+   },
+   {
+    "id": "b:3:th:6",
+    "diem": 2
+   },
+   {
+    "id": "b:3:vd:4",
+    "diem": 2
+   },
+   {
+    "id": "b:3:vdc:0",
+    "diem": 2
+   },
+   {
+    "id": "b:3:vdc:1",
+    "diem": 2
+   },
+   {
+    "id": "b:3:vdc:3",
+    "diem": 2
+   },
+   {
+    "id": "b:3:nb:0",
+    "diem": 1
+   },
+   {
+    "id": "b:3:nb:2",
+    "diem": 1
+   },
+   {
+    "id": "b:3:nb:5",
+    "diem": 1
+   },
+   {
+    "id": "b:3:th:7",
+    "diem": 1
+   },
+   {
+    "id": "b:3:vd:0",
+    "diem": 1
+   },
+   {
+    "id": "b:3:vd:3",
+    "diem": 1
+   },
+   {
+    "id": "b:3:vd:5",
+    "diem": 1
+   },
+   {
+    "id": "b:3:vdc:2",
+    "diem": 1
+   },
+   {
+    "id": "b:3:th:0",
+    "diem": 0
+   },
+   {
+    "id": "b:3:th:3",
+    "diem": 0
+   },
+   {
+    "id": "b:3:th:4",
+    "diem": 0
+   },
+   {
+    "id": "b:3:th:5",
+    "diem": 0
+   }
+  ]
+ },
+ "bai-14": {
+  "tenBai": "Bài 14: Ôn tập công thức và cấu tạo phân tử hợp chất hữu cơ",
+  "ch": 3,
+  "cau": [
+   {
+    "id": "b:3:nb:3",
+    "diem": 15
+   },
+   {
+    "id": "b:3:nb:2",
+    "diem": 14
+   },
+   {
+    "id": "b:3:th:7",
+    "diem": 9
+   },
+   {
+    "id": "b:3:th:3",
+    "diem": 8
+   },
+   {
+    "id": "b:3:vdc:2",
+    "diem": 8
+   },
+   {
+    "id": "b:3:th:4",
+    "diem": 7
+   },
+   {
+    "id": "b:3:nb:4",
+    "diem": 6
+   },
+   {
+    "id": "b:3:nb:5",
+    "diem": 5
+   },
+   {
+    "id": "b:3:nb:6",
+    "diem": 3
+   },
+   {
+    "id": "b:3:nb:7",
+    "diem": 3
+   },
+   {
+    "id": "b:3:th:0",
+    "diem": 3
+   },
+   {
+    "id": "b:3:th:5",
+    "diem": 3
+   },
+   {
+    "id": "b:3:nb:1",
+    "diem": 2
+   },
+   {
+    "id": "b:3:nb:0",
+    "diem": 1
+   },
+   {
+    "id": "b:3:th:1",
+    "diem": 1
+   },
+   {
+    "id": "b:3:th:2",
+    "diem": 1
+   },
+   {
+    "id": "b:3:th:6",
+    "diem": 1
+   },
+   {
+    "id": "b:3:vd:0",
+    "diem": 1
+   },
+   {
+    "id": "b:3:vd:1",
+    "diem": 1
+   },
+   {
+    "id": "b:3:vd:2",
+    "diem": 1
+   },
+   {
+    "id": "b:3:vd:3",
+    "diem": 1
+   },
+   {
+    "id": "b:3:vd:5",
+    "diem": 1
+   },
+   {
+    "id": "b:3:vdc:0",
+    "diem": 1
+   },
+   {
+    "id": "b:3:vdc:1",
+    "diem": 1
+   },
+   {
+    "id": "b:3:vdc:3",
+    "diem": 1
+   },
+   {
+    "id": "b:3:vd:4",
+    "diem": 0
+   }
+  ]
+ },
+ "bai-15": {
+  "tenBai": "Bài 15: Alkane",
+  "ch": 4,
+  "cau": [
+   {
+    "id": "b:4:th:4",
+    "diem": 18
+   },
+   {
+    "id": "b:4:nb:2",
+    "diem": 15
+   },
+   {
+    "id": "b:4:th:5",
+    "diem": 15
+   },
+   {
+    "id": "b:4:vdc:1",
+    "diem": 13
+   },
+   {
+    "id": "b:4:nb:0",
+    "diem": 12
+   },
+   {
+    "id": "b:4:nb:5",
+    "diem": 11
+   },
+   {
+    "id": "b:4:vd:6",
+    "diem": 11
+   },
+   {
+    "id": "b:4:nb:1",
+    "diem": 10
+   },
+   {
+    "id": "b:4:vd:3",
+    "diem": 9
+   },
+   {
+    "id": "b:4:th:2",
+    "diem": 8
+   },
+   {
+    "id": "b:4:vdc:0",
+    "diem": 7
+   },
+   {
+    "id": "b:4:vd:0",
+    "diem": 6
+   },
+   {
+    "id": "b:4:nb:7",
+    "diem": 4
+   },
+   {
+    "id": "b:4:th:3",
+    "diem": 4
+   },
+   {
+    "id": "b:4:vd:5",
+    "diem": 4
+   },
+   {
+    "id": "b:4:th:1",
+    "diem": 3
+   },
+   {
+    "id": "b:4:vd:2",
+    "diem": 3
+   },
+   {
+    "id": "b:4:nb:4",
+    "diem": 2
+   },
+   {
+    "id": "b:4:nb:6",
+    "diem": 2
+   },
+   {
+    "id": "b:4:th:0",
+    "diem": 2
+   },
+   {
+    "id": "b:4:th:7",
+    "diem": 2
+   },
+   {
+    "id": "b:4:vdc:2",
+    "diem": 2
+   },
+   {
+    "id": "b:4:nb:3",
+    "diem": 1
+   },
+   {
+    "id": "b:4:th:6",
+    "diem": 0
+   },
+   {
+    "id": "b:4:vd:1",
+    "diem": 0
+   },
+   {
+    "id": "b:4:vd:4",
+    "diem": 0
+   },
+   {
+    "id": "b:4:vdc:3",
+    "diem": 0
+   }
+  ]
+ },
+ "bai-16": {
+  "tenBai": "Bài 16: Hydrocarbon không no",
+  "ch": 4,
+  "cau": [
+   {
+    "id": "b:4:nb:2",
+    "diem": 15
+   },
+   {
+    "id": "b:4:vdc:3",
+    "diem": 14
+   },
+   {
+    "id": "b:4:th:2",
+    "diem": 13
+   },
+   {
+    "id": "b:4:vd:4",
+    "diem": 12
+   },
+   {
+    "id": "b:4:vdc:0",
+    "diem": 12
+   },
+   {
+    "id": "b:4:nb:5",
+    "diem": 11
+   },
+   {
+    "id": "b:4:nb:0",
+    "diem": 10
+   },
+   {
+    "id": "b:4:nb:3",
+    "diem": 10
+   },
+   {
+    "id": "b:4:vd:1",
+    "diem": 10
+   },
+   {
+    "id": "b:4:nb:1",
+    "diem": 9
+   },
+   {
+    "id": "b:4:vd:2",
+    "diem": 9
+   },
+   {
+    "id": "b:4:nb:6",
+    "diem": 8
+   },
+   {
+    "id": "b:4:th:0",
+    "diem": 8
+   },
+   {
+    "id": "b:4:vd:6",
+    "diem": 8
+   },
+   {
+    "id": "b:4:vdc:2",
+    "diem": 8
+   },
+   {
+    "id": "b:4:th:3",
+    "diem": 7
+   },
+   {
+    "id": "b:4:th:4",
+    "diem": 6
+   },
+   {
+    "id": "b:4:th:6",
+    "diem": 5
+   },
+   {
+    "id": "b:4:vd:5",
+    "diem": 5
+   },
+   {
+    "id": "b:4:nb:7",
+    "diem": 4
+   },
+   {
+    "id": "b:4:vd:3",
+    "diem": 4
+   },
+   {
+    "id": "b:4:th:5",
+    "diem": 3
+   },
+   {
+    "id": "b:4:th:7",
+    "diem": 3
+   },
+   {
+    "id": "b:4:nb:4",
+    "diem": 2
+   },
+   {
+    "id": "b:4:th:1",
+    "diem": 2
+   },
+   {
+    "id": "b:4:vd:0",
+    "diem": 1
+   },
+   {
+    "id": "b:4:vdc:1",
+    "diem": 1
+   }
+  ]
+ },
+ "bai-17": {
+  "tenBai": "Bài 17: Arene (hydrocarbon thơm)",
+  "ch": 4,
+  "cau": [
+   {
+    "id": "b:4:nb:7",
+    "diem": 10
+   },
+   {
+    "id": "b:4:nb:4",
+    "diem": 9
+   },
+   {
+    "id": "b:4:nb:2",
+    "diem": 8
+   },
+   {
+    "id": "b:4:th:0",
+    "diem": 7
+   },
+   {
+    "id": "b:4:th:6",
+    "diem": 6
+   },
+   {
+    "id": "b:4:vdc:2",
+    "diem": 5
+   },
+   {
+    "id": "b:4:nb:1",
+    "diem": 4
+   },
+   {
+    "id": "b:4:nb:6",
+    "diem": 4
+   },
+   {
+    "id": "b:4:th:4",
+    "diem": 4
+   },
+   {
+    "id": "b:4:vd:4",
+    "diem": 4
+   },
+   {
+    "id": "b:4:vdc:0",
+    "diem": 4
+   },
+   {
+    "id": "b:4:nb:3",
+    "diem": 3
+   },
+   {
+    "id": "b:4:th:7",
+    "diem": 3
+   },
+   {
+    "id": "b:4:vd:1",
+    "diem": 3
+   },
+   {
+    "id": "b:4:vd:2",
+    "diem": 3
+   },
+   {
+    "id": "b:4:th:1",
+    "diem": 2
+   },
+   {
+    "id": "b:4:th:3",
+    "diem": 2
+   },
+   {
+    "id": "b:4:nb:0",
+    "diem": 1
+   },
+   {
+    "id": "b:4:vd:0",
+    "diem": 1
+   },
+   {
+    "id": "b:4:vd:3",
+    "diem": 1
+   },
+   {
+    "id": "b:4:vd:6",
+    "diem": 1
+   },
+   {
+    "id": "b:4:vdc:3",
+    "diem": 1
+   },
+   {
+    "id": "b:4:nb:5",
+    "diem": 0
+   },
+   {
+    "id": "b:4:th:2",
+    "diem": 0
+   },
+   {
+    "id": "b:4:th:5",
+    "diem": 0
+   },
+   {
+    "id": "b:4:vd:5",
+    "diem": 0
+   },
+   {
+    "id": "b:4:vdc:1",
+    "diem": 0
+   }
+  ]
+ },
+ "bai-18": {
+  "tenBai": "Bài 18: Ôn tập hệ thống kiến thức về hydrocarbon",
+  "ch": 4,
+  "cau": [
+   {
+    "id": "b:4:nb:2",
+    "diem": 5
+   },
+   {
+    "id": "b:4:nb:0",
+    "diem": 4
+   },
+   {
+    "id": "b:4:nb:5",
+    "diem": 4
+   },
+   {
+    "id": "b:4:nb:4",
+    "diem": 3
+   },
+   {
+    "id": "b:4:nb:7",
+    "diem": 3
+   },
+   {
+    "id": "b:4:th:0",
+    "diem": 3
+   },
+   {
+    "id": "b:4:th:2",
+    "diem": 3
+   },
+   {
+    "id": "b:4:th:3",
+    "diem": 3
+   },
+   {
+    "id": "b:4:th:4",
+    "diem": 3
+   },
+   {
+    "id": "b:4:vdc:1",
+    "diem": 2
+   },
+   {
+    "id": "b:4:nb:1",
+    "diem": 1
+   },
+   {
+    "id": "b:4:nb:3",
+    "diem": 1
+   },
+   {
+    "id": "b:4:nb:6",
+    "diem": 1
+   },
+   {
+    "id": "b:4:th:1",
+    "diem": 1
+   },
+   {
+    "id": "b:4:th:6",
+    "diem": 1
+   },
+   {
+    "id": "b:4:th:7",
+    "diem": 1
+   },
+   {
+    "id": "b:4:vd:0",
+    "diem": 1
+   },
+   {
+    "id": "b:4:vd:3",
+    "diem": 1
+   },
+   {
+    "id": "b:4:vd:6",
+    "diem": 1
+   },
+   {
+    "id": "b:4:vdc:2",
+    "diem": 1
+   },
+   {
+    "id": "b:4:th:5",
+    "diem": 0
+   },
+   {
+    "id": "b:4:vd:1",
+    "diem": 0
+   },
+   {
+    "id": "b:4:vd:2",
+    "diem": 0
+   },
+   {
+    "id": "b:4:vd:4",
+    "diem": 0
+   },
+   {
+    "id": "b:4:vd:5",
+    "diem": 0
+   },
+   {
+    "id": "b:4:vdc:0",
+    "diem": 0
+   },
+   {
+    "id": "b:4:vdc:3",
+    "diem": 0
+   }
+  ]
+ },
+ "bai-19": {
+  "tenBai": "Bài 19: Dẫn xuất halogen",
+  "ch": 5,
+  "cau": [
+   {
+    "id": "b:5:nb:5",
+    "diem": 5
+   },
+   {
+    "id": "b:5:th:2",
+    "diem": 5
+   },
+   {
+    "id": "b:5:th:5",
+    "diem": 5
+   },
+   {
+    "id": "b:5:nb:1",
+    "diem": 4
+   },
+   {
+    "id": "b:5:nb:4",
+    "diem": 4
+   },
+   {
+    "id": "b:5:nb:6",
+    "diem": 4
+   },
+   {
+    "id": "b:5:th:1",
+    "diem": 4
+   },
+   {
+    "id": "b:5:th:4",
+    "diem": 4
+   },
+   {
+    "id": "b:5:th:6",
+    "diem": 4
+   },
+   {
+    "id": "b:5:vd:3",
+    "diem": 4
+   },
+   {
+    "id": "b:5:vdc:0",
+    "diem": 4
+   },
+   {
+    "id": "b:5:vdc:1",
+    "diem": 4
+   },
+   {
+    "id": "b:5:th:3",
+    "diem": 3
+   },
+   {
+    "id": "b:5:th:7",
+    "diem": 3
+   },
+   {
+    "id": "b:5:vd:2",
+    "diem": 3
+   },
+   {
+    "id": "b:5:vdc:2",
+    "diem": 3
+   },
+   {
+    "id": "b:5:nb:2",
+    "diem": 2
+   },
+   {
+    "id": "b:5:nb:0",
+    "diem": 1
+   },
+   {
+    "id": "b:5:nb:7",
+    "diem": 1
+   },
+   {
+    "id": "b:5:th:0",
+    "diem": 1
+   },
+   {
+    "id": "b:5:vd:1",
+    "diem": 1
+   },
+   {
+    "id": "b:5:vd:4",
+    "diem": 1
+   },
+   {
+    "id": "b:5:vd:5",
+    "diem": 1
+   },
+   {
+    "id": "b:5:vd:6",
+    "diem": 1
+   },
+   {
+    "id": "b:5:vdc:3",
+    "diem": 1
+   },
+   {
+    "id": "b:5:nb:3",
+    "diem": 0
+   },
+   {
+    "id": "b:5:vd:0",
+    "diem": 0
+   }
+  ]
+ },
+ "bai-20": {
+  "tenBai": "Bài 20: Alcohol",
+  "ch": 5,
+  "cau": [
+   {
+    "id": "b:5:nb:2",
+    "diem": 14
+   },
+   {
+    "id": "b:5:nb:0",
+    "diem": 13
+   },
+   {
+    "id": "b:5:th:0",
+    "diem": 13
+   },
+   {
+    "id": "b:5:th:2",
+    "diem": 13
+   },
+   {
+    "id": "b:5:th:5",
+    "diem": 12
+   },
+   {
+    "id": "b:5:vd:6",
+    "diem": 12
+   },
+   {
+    "id": "b:5:vdc:0",
+    "diem": 12
+   },
+   {
+    "id": "b:5:nb:4",
+    "diem": 10
+   },
+   {
+    "id": "b:5:nb:6",
+    "diem": 10
+   },
+   {
+    "id": "b:5:th:4",
+    "diem": 10
+   },
+   {
+    "id": "b:5:vd:0",
+    "diem": 10
+   },
+   {
+    "id": "b:5:th:3",
+    "diem": 9
+   },
+   {
+    "id": "b:5:vdc:1",
+    "diem": 9
+   },
+   {
+    "id": "b:5:nb:1",
+    "diem": 8
+   },
+   {
+    "id": "b:5:vd:4",
+    "diem": 8
+   },
+   {
+    "id": "b:5:nb:3",
+    "diem": 7
+   },
+   {
+    "id": "b:5:vd:2",
+    "diem": 4
+   },
+   {
+    "id": "b:5:vd:3",
+    "diem": 4
+   },
+   {
+    "id": "b:5:vdc:2",
+    "diem": 4
+   },
+   {
+    "id": "b:5:th:1",
+    "diem": 3
+   },
+   {
+    "id": "b:5:th:6",
+    "diem": 3
+   },
+   {
+    "id": "b:5:th:7",
+    "diem": 3
+   },
+   {
+    "id": "b:5:vd:5",
+    "diem": 3
+   },
+   {
+    "id": "b:5:nb:7",
+    "diem": 2
+   },
+   {
+    "id": "b:5:vd:1",
+    "diem": 2
+   },
+   {
+    "id": "b:5:nb:5",
+    "diem": 1
+   },
+   {
+    "id": "b:5:vdc:3",
+    "diem": 1
+   }
+  ]
+ },
+ "bai-21": {
+  "tenBai": "Bài 21: Phenol",
+  "ch": 5,
+  "cau": [
+   {
+    "id": "b:5:nb:6",
+    "diem": 23
+   },
+   {
+    "id": "b:5:nb:1",
+    "diem": 16
+   },
+   {
+    "id": "b:5:nb:0",
+    "diem": 12
+   },
+   {
+    "id": "b:5:th:4",
+    "diem": 8
+   },
+   {
+    "id": "b:5:th:3",
+    "diem": 7
+   },
+   {
+    "id": "b:5:nb:4",
+    "diem": 6
+   },
+   {
+    "id": "b:5:nb:3",
+    "diem": 5
+   },
+   {
+    "id": "b:5:th:0",
+    "diem": 5
+   },
+   {
+    "id": "b:5:th:2",
+    "diem": 5
+   },
+   {
+    "id": "b:5:th:5",
+    "diem": 5
+   },
+   {
+    "id": "b:5:th:7",
+    "diem": 5
+   },
+   {
+    "id": "b:5:vd:3",
+    "diem": 5
+   },
+   {
+    "id": "b:5:vd:6",
+    "diem": 5
+   },
+   {
+    "id": "b:5:vdc:2",
+    "diem": 5
+   },
+   {
+    "id": "b:5:nb:2",
+    "diem": 4
+   },
+   {
+    "id": "b:5:th:1",
+    "diem": 4
+   },
+   {
+    "id": "b:5:vdc:0",
+    "diem": 4
+   },
+   {
+    "id": "b:5:vd:2",
+    "diem": 3
+   },
+   {
+    "id": "b:5:vdc:1",
+    "diem": 3
+   },
+   {
+    "id": "b:5:nb:5",
+    "diem": 2
+   },
+   {
+    "id": "b:5:vd:5",
+    "diem": 2
+   },
+   {
+    "id": "b:5:vdc:3",
+    "diem": 2
+   },
+   {
+    "id": "b:5:nb:7",
+    "diem": 1
+   },
+   {
+    "id": "b:5:vd:1",
+    "diem": 1
+   },
+   {
+    "id": "b:5:vd:4",
+    "diem": 1
+   },
+   {
+    "id": "b:5:th:6",
+    "diem": 0
+   },
+   {
+    "id": "b:5:vd:0",
+    "diem": 0
+   }
+  ]
+ },
+ "bai-22": {
+  "tenBai": "Bài 22: Hệ thống hoá kiến thức về dẫn xuất halogen, alcohol và phenol",
+  "ch": 5,
+  "cau": [
+   {
+    "id": "b:5:th:0",
+    "diem": 12
+   },
+   {
+    "id": "b:5:th:5",
+    "diem": 11
+   },
+   {
+    "id": "b:5:vd:6",
+    "diem": 10
+   },
+   {
+    "id": "b:5:nb:1",
+    "diem": 9
+   },
+   {
+    "id": "b:5:nb:4",
+    "diem": 9
+   },
+   {
+    "id": "b:5:th:4",
+    "diem": 9
+   },
+   {
+    "id": "b:5:vdc:0",
+    "diem": 9
+   },
+   {
+    "id": "b:5:nb:0",
+    "diem": 8
+   },
+   {
+    "id": "b:5:nb:2",
+    "diem": 8
+   },
+   {
+    "id": "b:5:nb:6",
+    "diem": 8
+   },
+   {
+    "id": "b:5:th:3",
+    "diem": 8
+   },
+   {
+    "id": "b:5:th:6",
+    "diem": 7
+   },
+   {
+    "id": "b:5:nb:3",
+    "diem": 6
+   },
+   {
+    "id": "b:5:vd:0",
+    "diem": 6
+   },
+   {
+    "id": "b:5:th:1",
+    "diem": 5
+   },
+   {
+    "id": "b:5:th:7",
+    "diem": 5
+   },
+   {
+    "id": "b:5:vdc:2",
+    "diem": 5
+   },
+   {
+    "id": "b:5:th:2",
+    "diem": 4
+   },
+   {
+    "id": "b:5:nb:5",
+    "diem": 2
+   },
+   {
+    "id": "b:5:nb:7",
+    "diem": 2
+   },
+   {
+    "id": "b:5:vd:1",
+    "diem": 2
+   },
+   {
+    "id": "b:5:vd:4",
+    "diem": 2
+   },
+   {
+    "id": "b:5:vd:3",
+    "diem": 1
+   },
+   {
+    "id": "b:5:vd:5",
+    "diem": 1
+   },
+   {
+    "id": "b:5:vdc:3",
+    "diem": 1
+   },
+   {
+    "id": "b:5:vd:2",
+    "diem": 0
+   },
+   {
+    "id": "b:5:vdc:1",
+    "diem": 0
+   }
+  ]
+ },
+ "bai-23": {
+  "tenBai": "Bài 23: Hợp chất carbonyl (aldehyde – ketone)",
+  "ch": 6,
+  "cau": [
+   {
+    "id": "b:6:th:7",
+    "diem": 15
+   },
+   {
+    "id": "b:6:th:3",
+    "diem": 14
+   },
+   {
+    "id": "b:6:nb:3",
+    "diem": 13
+   },
+   {
+    "id": "b:6:th:1",
+    "diem": 12
+   },
+   {
+    "id": "b:6:nb:0",
+    "diem": 11
+   },
+   {
+    "id": "b:6:nb:7",
+    "diem": 10
+   },
+   {
+    "id": "b:6:nb:1",
+    "diem": 9
+   },
+   {
+    "id": "b:6:vd:0",
+    "diem": 9
+   },
+   {
+    "id": "b:6:vdc:1",
+    "diem": 9
+   },
+   {
+    "id": "b:6:vdc:2",
+    "diem": 9
+   },
+   {
+    "id": "b:6:th:6",
+    "diem": 8
+   },
+   {
+    "id": "b:6:vd:3",
+    "diem": 8
+   },
+   {
+    "id": "b:6:vd:4",
+    "diem": 8
+   },
+   {
+    "id": "b:6:nb:2",
+    "diem": 7
+   },
+   {
+    "id": "b:6:th:2",
+    "diem": 7
+   },
+   {
+    "id": "b:6:vdc:0",
+    "diem": 7
+   },
+   {
+    "id": "b:6:th:5",
+    "diem": 6
+   },
+   {
+    "id": "b:6:vd:1",
+    "diem": 5
+   },
+   {
+    "id": "b:6:vd:6",
+    "diem": 5
+   },
+   {
+    "id": "b:6:th:0",
+    "diem": 4
+   },
+   {
+    "id": "b:6:th:4",
+    "diem": 4
+   },
+   {
+    "id": "b:6:vd:2",
+    "diem": 3
+   },
+   {
+    "id": "b:6:vd:5",
+    "diem": 2
+   },
+   {
+    "id": "b:6:nb:4",
+    "diem": 1
+   },
+   {
+    "id": "b:6:nb:5",
+    "diem": 1
+   },
+   {
+    "id": "b:6:nb:6",
+    "diem": 1
+   },
+   {
+    "id": "b:6:vdc:3",
+    "diem": 0
+   }
+  ]
+ },
+ "bai-24": {
+  "tenBai": "Bài 24: Carboxylic acid",
+  "ch": 6,
+  "cau": [
+   {
+    "id": "b:6:th:1",
+    "diem": 17
+   },
+   {
+    "id": "b:6:vd:1",
+    "diem": 13
+   },
+   {
+    "id": "b:6:vd:6",
+    "diem": 11
+   },
+   {
+    "id": "b:6:vdc:1",
+    "diem": 11
+   },
+   {
+    "id": "b:6:nb:0",
+    "diem": 10
+   },
+   {
+    "id": "b:6:nb:6",
+    "diem": 10
+   },
+   {
+    "id": "b:6:nb:7",
+    "diem": 10
+   },
+   {
+    "id": "b:6:th:7",
+    "diem": 10
+   },
+   {
+    "id": "b:6:vd:3",
+    "diem": 9
+   },
+   {
+    "id": "b:6:nb:1",
+    "diem": 8
+   },
+   {
+    "id": "b:6:th:2",
+    "diem": 8
+   },
+   {
+    "id": "b:6:th:4",
+    "diem": 8
+   },
+   {
+    "id": "b:6:th:6",
+    "diem": 7
+   },
+   {
+    "id": "b:6:vd:5",
+    "diem": 7
+   },
+   {
+    "id": "b:6:nb:2",
+    "diem": 6
+   },
+   {
+    "id": "b:6:th:5",
+    "diem": 6
+   },
+   {
+    "id": "b:6:vdc:2",
+    "diem": 6
+   },
+   {
+    "id": "b:6:vd:0",
+    "diem": 5
+   },
+   {
+    "id": "b:6:vd:2",
+    "diem": 5
+   },
+   {
+    "id": "b:6:th:3",
+    "diem": 4
+   },
+   {
+    "id": "b:6:vd:4",
+    "diem": 4
+   },
+   {
+    "id": "b:6:vdc:0",
+    "diem": 4
+   },
+   {
+    "id": "b:6:nb:3",
+    "diem": 3
+   },
+   {
+    "id": "b:6:nb:5",
+    "diem": 3
+   },
+   {
+    "id": "b:6:th:0",
+    "diem": 2
+   },
+   {
+    "id": "b:6:vdc:3",
+    "diem": 2
+   },
+   {
+    "id": "b:6:nb:4",
+    "diem": 1
+   }
+  ]
+ },
+ "bai-25": {
+  "tenBai": "Bài 25: Ôn tập hợp chất carbonyl và carboxylic acid",
+  "ch": 6,
+  "cau": [
+   {
+    "id": "b:6:nb:3",
+    "diem": 20
+   },
+   {
+    "id": "b:6:th:3",
+    "diem": 17
+   },
+   {
+    "id": "b:6:th:7",
+    "diem": 17
+   },
+   {
+    "id": "b:6:th:1",
+    "diem": 14
+   },
+   {
+    "id": "b:6:vd:4",
+    "diem": 14
+   },
+   {
+    "id": "b:6:vd:0",
+    "diem": 13
+   },
+   {
+    "id": "b:6:th:0",
+    "diem": 12
+   },
+   {
+    "id": "b:6:vd:1",
+    "diem": 12
+   },
+   {
+    "id": "b:6:vdc:0",
+    "diem": 12
+   },
+   {
+    "id": "b:6:th:5",
+    "diem": 10
+   },
+   {
+    "id": "b:6:vdc:1",
+    "diem": 10
+   },
+   {
+    "id": "b:6:nb:0",
+    "diem": 9
+   },
+   {
+    "id": "b:6:nb:1",
+    "diem": 9
+   },
+   {
+    "id": "b:6:nb:2",
+    "diem": 9
+   },
+   {
+    "id": "b:6:vd:3",
+    "diem": 9
+   },
+   {
+    "id": "b:6:th:2",
+    "diem": 8
+   },
+   {
+    "id": "b:6:th:6",
+    "diem": 8
+   },
+   {
+    "id": "b:6:vdc:2",
+    "diem": 8
+   },
+   {
+    "id": "b:6:nb:7",
+    "diem": 7
+   },
+   {
+    "id": "b:6:nb:6",
+    "diem": 6
+   },
+   {
+    "id": "b:6:vd:6",
+    "diem": 6
+   },
+   {
+    "id": "b:6:th:4",
+    "diem": 5
+   },
+   {
+    "id": "b:6:vd:2",
+    "diem": 3
+   },
+   {
+    "id": "b:6:vdc:3",
+    "diem": 3
+   },
+   {
+    "id": "b:6:nb:4",
+    "diem": 2
+   },
+   {
+    "id": "b:6:nb:5",
+    "diem": 2
+   },
+   {
+    "id": "b:6:vd:5",
+    "diem": 2
+   }
+  ]
+ }
+}

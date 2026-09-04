@@ -201,4 +201,9 @@ export interface LearningProgress {
   userEmail: string;
   completedLessons: string[]; // Danh sách các lessonId đã hoàn thành (legacy, fallback)
   details?: Record<string, LessonProgress>; // Map lessonId -> LessonProgress
+  /* Tiến độ các trò chơi có chia màn: { 'ran-va-thang': { 'bai-4': {...} } }.
+     CỐ Ý tách khỏi completedLessons — đó là tiến độ ĐỌC BÀI trên web, hai thứ
+     khác nhau: em có thể qua màn trò chơi mà chưa đọc bài, và ngược lại. Trộn
+     chung thì thanh tiến độ học tập bị trò chơi làm sai lệch. */
+  troChoi?: Record<string, Record<string, { xong: boolean; cauDung: number }>>;
 }
