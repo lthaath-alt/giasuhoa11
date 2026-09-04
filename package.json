@@ -22,7 +22,8 @@
     "kiem-tra:thuc-nghiem": "tsx scripts/kiem-tra-thuc-nghiem.mts",
     "phan-tich": "tsx scripts/phan-tich-thuc-nghiem.mts",
     "word": "node scripts/md-sang-word.cjs",
-    "do-chi-phi": "tsx scripts/do-chi-phi.mts"
+    "do-chi-phi": "tsx scripts/do-chi-phi.mts",
+    "sinh:ran-thang": "tsx scripts/sinh-ran-thang.mts"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

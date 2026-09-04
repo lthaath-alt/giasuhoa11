@@ -125,6 +125,14 @@ console.log('\n== Công thức hoá học phải có chỉ số dưới ==');
   const tho = [...new Set(tatCa.match(/\b(?:[A-Z][a-z]?\d+)+[A-Za-z]*\b(?![+-])/g) ?? [])];
   ok(tho.length === 0, 'không còn công thức viết thô kiểu N2 / H2SO4', tho.slice(0, 10).join(', '));
 
+  /* Hệ số cân bằng đứng ngay trước công thức — "4NH3", "5O2" — từng làm cả cụm
+     bị bỏ sót, vì giữa chữ số và chữ cái không có ranh giới từ nên neo  trượt.
+     Đo được 7 công thức lọt kiểu này. Hệ số phải là chữ số thường, phần sau ký
+     hiệu nguyên tố mới hạ xuống: "4NH₃". */
+  const dinhHeSo = [...new Set(tatCa.match(/\d+(?:[A-Z][a-z]?\d+)+/g) ?? [])];
+  ok(dinhHeSo.length === 0, 'công thức dính sau hệ số cân bằng cũng được hạ chỉ số',
+     dinhHeSo.slice(0, 8).join(', '));
+
   const soChiSo = (tatCa.match(/[₀-₉]/g) ?? []).length;
   ok(soChiSo > 300, 'có đủ chỉ số dưới trong nội dung bài', soChiSo + ' ký tự');
 

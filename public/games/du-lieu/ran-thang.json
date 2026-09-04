@@ -1,0 +1,1102 @@
+{
+ "bai-1": {
+  "tenBai": "Bài 1: Khái niệm về cân bằng hoá học",
+  "chuong": "Chương 1: Cân bằng hoá học",
+  "thang": [
+   {
+    "loai": "thang",
+    "noi": "Le Chatelier: Hệ cân bằng chống lại sự thay đổi từ bên ngoài"
+   },
+   {
+    "loai": "thang",
+    "noi": "Nhớ đúng công thức: Ví dụ: Cl₂ + H₂O ⇌ HCl + HClO"
+   },
+   {
+    "loai": "thang",
+    "noi": "Chất xúc tác KHÔNG ảnh hưởng đến vị trí cân bằng"
+   },
+   {
+    "loai": "thang",
+    "noi": "Không đưa chất rắn vào biểu thức Kc"
+   }
+  ],
+  "ran": [
+   {
+    "loai": "ran",
+    "noi": "Chỉ nhớ mỗi công thức, quên mất bản chất",
+    "sua": "Chất xúc tác KHÔNG ảnh hưởng đến vị trí cân bằng"
+   },
+   {
+    "loai": "ran",
+    "noi": "Viết số thập phân bằng dấu chấm: 24.79",
+    "sua": "Tiếng Việt dùng dấu phẩy: 24,79."
+   },
+   {
+    "loai": "ran",
+    "noi": "Đọc lướt nên trượt mất một ý của bài",
+    "sua": "Kc > 1: ưu tiên tạo sản phẩm; Kc < 1: ưu tiên chất đầu"
+   },
+   {
+    "loai": "ran",
+    "noi": "Ghi kết quả mà quên đơn vị",
+    "sua": "Một đáp số không có đơn vị thì chưa phải đáp số."
+   }
+  ]
+ },
+ "bai-2": {
+  "tenBai": "Bài 2: Cân bằng trong dung dịch nước và thuyết acid – base",
+  "chuong": "Chương 1: Cân bằng hoá học",
+  "thang": [
+   {
+    "loai": "thang",
+    "noi": "Nhớ đúng công thức: pH + pOH = 14"
+   },
+   {
+    "loai": "thang",
+    "noi": "Chất điện li mạnh phân li hoàn toàn (→ một chiều)"
+   },
+   {
+    "loai": "thang",
+    "noi": "Acid mạnh: HCl, HNO₃, H₂SO₄. Base mạnh: NaOH, KOH, Ba(OH)₂"
+   },
+   {
+    "loai": "thang",
+    "noi": "pH < 7: acid | pH = 7: trung tính | pH > 7: base"
+   }
+  ],
+  "ran": [
+   {
+    "loai": "ran",
+    "noi": "Dùng \"đktc\" và 22,4 L/mol cho bài toán khí",
+    "sua": "Sách Kết nối tri thức dùng đkc: 25 °C, 1 bar, 24,79 L/mol."
+   },
+   {
+    "loai": "ran",
+    "noi": "Dùng mũi tên một chiều → cho phản ứng thuận nghịch",
+    "sua": "Phản ứng thuận nghịch phải viết bằng mũi tên hai chiều ⇌."
+   },
+   {
+    "loai": "ran",
+    "noi": "Đọc lướt nên trượt mất một ý của bài",
+    "sua": "Chất điện li mạnh phân li hoàn toàn (→ một chiều)"
+   },
+   {
+    "loai": "ran",
+    "noi": "Chỉ nhớ mỗi công thức, quên mất bản chất",
+    "sua": "pH < 7: acid | pH = 7: trung tính | pH > 7: base"
+   }
+  ]
+ },
+ "bai-3": {
+  "tenBai": "Bài 3: Ôn tập cân bằng hoá học và cân bằng trong dung dịch nước",
+  "chuong": "Chương 1: Cân bằng hoá học",
+  "thang": [
+   {
+    "loai": "thang",
+    "noi": "2. Cân bằng trong dung dịch nước"
+   },
+   {
+    "loai": "thang",
+    "noi": "Nhớ đúng công thức: pH = -log[H+] hoặc [H+] = 10-pH"
+   },
+   {
+    "loai": "thang",
+    "noi": "Nhớ đúng công thức: aA + bB → cC + dD"
+   },
+   {
+    "loai": "thang",
+    "noi": "Nhớ đúng công thức: KC=(C)c(D)d(A)a(B)b"
+   }
+  ],
+  "ran": [
+   {
+    "loai": "ran",
+    "noi": "Viết số thập phân bằng dấu chấm: 24.79",
+    "sua": "Tiếng Việt dùng dấu phẩy: 24,79."
+   },
+   {
+    "loai": "ran",
+    "noi": "Học vội, bỏ sót một ý quan trọng",
+    "sua": "2. Cân bằng trong dung dịch nước"
+   },
+   {
+    "loai": "ran",
+    "noi": "Gọi tên chất theo lối cũ: \"natri hiđroxit\", \"ancol\", \"anđehit\"",
+    "sua": "Chương trình 2018 gọi theo IUPAC: sodium hydroxide, alcohol, aldehyde."
+   },
+   {
+    "loai": "ran",
+    "noi": "Dùng \"đktc\" và 22,4 L/mol cho bài toán khí",
+    "sua": "Sách Kết nối tri thức dùng đkc: 25 °C, 1 bar, 24,79 L/mol."
+   }
+  ]
+ },
+ "bai-4": {
+  "tenBai": "Bài 4: Nitrogen",
+  "chuong": "Chương 2: Nitrogen – Sulfur",
+  "thang": [
+   {
+    "loai": "thang",
+    "noi": "Viết được phương trình hóa học minh họa các tính chất của N₂ và NH₃"
+   },
+   {
+    "loai": "thang",
+    "noi": "NH₃ có tính khử mạnh (N: −3)"
+   },
+   {
+    "loai": "thang",
+    "noi": "NH₃ tan rất nhiều trong nước → dung dịch có tính base yếu"
+   },
+   {
+    "loai": "thang",
+    "noi": "Nhớ đúng công thức: Phản ứng oxi hóa NH₃ bởi O₂ có xúc tác Pt: 4NH₃ + 5O₂ -(t°, Pt)→ 4NO + 6H₂O"
+   }
+  ],
+  "ran": [
+   {
+    "loai": "ran",
+    "noi": "Đọc lướt nên trượt mất một ý của bài",
+    "sua": "N₂ có liên kết ba N≡N rất bền (945 kJ/mol) → trơ ở điều kiện thường"
+   },
+   {
+    "loai": "ran",
+    "noi": "Gọi tên chất theo lối cũ: \"natri hiđroxit\", \"ancol\", \"anđehit\"",
+    "sua": "Chương trình 2018 gọi theo IUPAC: sodium hydroxide, alcohol, aldehyde."
+   },
+   {
+    "loai": "ran",
+    "noi": "Dùng mũi tên một chiều → cho phản ứng thuận nghịch",
+    "sua": "Phản ứng thuận nghịch phải viết bằng mũi tên hai chiều ⇌."
+   },
+   {
+    "loai": "ran",
+    "noi": "Ghi kết quả mà quên đơn vị",
+    "sua": "Một đáp số không có đơn vị thì chưa phải đáp số."
+   }
+  ]
+ },
+ "bai-5": {
+  "tenBai": "Bài 5: Ammonia và muối ammonium",
+  "chuong": "Chương 2: Nitrogen – Sulfur",
+  "thang": [
+   {
+    "loai": "thang",
+    "noi": "2. Tác dụng với kiềm – Nhận biết ion ammonium"
+   },
+   {
+    "loai": "thang",
+    "noi": "3. Tính chất hoá học"
+   },
+   {
+    "loai": "thang",
+    "noi": "1. Tính tan, sự điện li"
+   },
+   {
+    "loai": "thang",
+    "noi": "5. Sản xuất"
+   }
+  ],
+  "ran": [
+   {
+    "loai": "ran",
+    "noi": "Học vội, bỏ sót một ý quan trọng",
+    "sua": "2. Tác dụng với kiềm – Nhận biết ion ammonium"
+   },
+   {
+    "loai": "ran",
+    "noi": "Dùng mũi tên một chiều → cho phản ứng thuận nghịch",
+    "sua": "Phản ứng thuận nghịch phải viết bằng mũi tên hai chiều ⇌."
+   },
+   {
+    "loai": "ran",
+    "noi": "Ghi kết quả mà quên đơn vị",
+    "sua": "Một đáp số không có đơn vị thì chưa phải đáp số."
+   },
+   {
+    "loai": "ran",
+    "noi": "Dùng \"đktc\" và 22,4 L/mol cho bài toán khí",
+    "sua": "Sách Kết nối tri thức dùng đkc: 25 °C, 1 bar, 24,79 L/mol."
+   }
+  ]
+ },
+ "bai-6": {
+  "tenBai": "Bài 6: Một số hợp chất của nitrogen với oxygen",
+  "chuong": "Chương 2: Nitrogen – Sulfur",
+  "thang": [
+   {
+    "loai": "thang",
+    "noi": "Nhận biết ion NO₃⁻: dùng Cu + H₂SO₄ loãng → khí NO không màu, hóa nâu ngoài không khí"
+   },
+   {
+    "loai": "thang",
+    "noi": "Viết được PTHH của HNO₃ với kim loại, phi kim, hợp chất"
+   },
+   {
+    "loai": "thang",
+    "noi": "Nhớ đúng công thức: N₂ + O₂ ⇌ 2NO"
+   },
+   {
+    "loai": "thang",
+    "noi": "Giải thích được HNO₃ vừa là acid mạnh vừa là chất oxi hóa mạnh"
+   }
+  ],
+  "ran": [
+   {
+    "loai": "ran",
+    "noi": "Gọi tên chất theo lối cũ: \"natri hiđroxit\", \"ancol\", \"anđehit\"",
+    "sua": "Chương trình 2018 gọi theo IUPAC: sodium hydroxide, alcohol, aldehyde."
+   },
+   {
+    "loai": "ran",
+    "noi": "Đọc lướt nên trượt mất một ý của bài",
+    "sua": "HNO₃ đặc + kim loại → NO₂ (nâu đỏ)"
+   },
+   {
+    "loai": "ran",
+    "noi": "Dùng mũi tên một chiều → cho phản ứng thuận nghịch",
+    "sua": "Phản ứng thuận nghịch phải viết bằng mũi tên hai chiều ⇌."
+   },
+   {
+    "loai": "ran",
+    "noi": "Chỉ nhớ mỗi công thức, quên mất bản chất",
+    "sua": "Fe, Al thụ động hóa trong HNO₃ đặc nguội"
+   }
+  ]
+ },
+ "bai-7": {
+  "tenBai": "Bài 7: Sulfur và sulfur dioxide",
+  "chuong": "Chương 2: Nitrogen – Sulfur",
+  "thang": [
+   {
+    "loai": "thang",
+    "noi": "2. Tính chất hoá học"
+   },
+   {
+    "loai": "thang",
+    "noi": "Nhớ đúng công thức: S(s) + 3F₂(g) → SF₆(g) =−1220,5kJ"
+   },
+   {
+    "loai": "thang",
+    "noi": "4. Tính chất hoá học"
+   },
+   {
+    "loai": "thang",
+    "noi": "3. Ứng dụng"
+   }
+  ],
+  "ran": [
+   {
+    "loai": "ran",
+    "noi": "Học vội, bỏ sót một ý quan trọng",
+    "sua": "4. Sulfur dioxide và ô nhiễm môi trường"
+   },
+   {
+    "loai": "ran",
+    "noi": "Viết số thập phân bằng dấu chấm: 24.79",
+    "sua": "Tiếng Việt dùng dấu phẩy: 24,79."
+   },
+   {
+    "loai": "ran",
+    "noi": "Gọi tên chất theo lối cũ: \"natri hiđroxit\", \"ancol\", \"anđehit\"",
+    "sua": "Chương trình 2018 gọi theo IUPAC: sodium hydroxide, alcohol, aldehyde."
+   },
+   {
+    "loai": "ran",
+    "noi": "Dùng \"đktc\" và 22,4 L/mol cho bài toán khí",
+    "sua": "Sách Kết nối tri thức dùng đkc: 25 °C, 1 bar, 24,79 L/mol."
+   }
+  ]
+ },
+ "bai-8": {
+  "tenBai": "Bài 8: Sulfuric acid và muối sulfate",
+  "chuong": "Chương 2: Nitrogen – Sulfur",
+  "thang": [
+   {
+    "loai": "thang",
+    "noi": "2. Tính chất vật lí"
+   },
+   {
+    "loai": "thang",
+    "noi": "6. Sản xuất"
+   },
+   {
+    "loai": "thang",
+    "noi": "Nhớ đúng công thức: · H₂SO₄ + 2KOH → K₂SO₄ + 2H₂O"
+   },
+   {
+    "loai": "thang",
+    "noi": "3. Quy tắc an toàn"
+   }
+  ],
+  "ran": [
+   {
+    "loai": "ran",
+    "noi": "Gọi tên chất theo lối cũ: \"natri hiđroxit\", \"ancol\", \"anđehit\"",
+    "sua": "Chương trình 2018 gọi theo IUPAC: sodium hydroxide, alcohol, aldehyde."
+   },
+   {
+    "loai": "ran",
+    "noi": "Ghi kết quả mà quên đơn vị",
+    "sua": "Một đáp số không có đơn vị thì chưa phải đáp số."
+   },
+   {
+    "loai": "ran",
+    "noi": "Dùng \"đktc\" và 22,4 L/mol cho bài toán khí",
+    "sua": "Sách Kết nối tri thức dùng đkc: 25 °C, 1 bar, 24,79 L/mol."
+   },
+   {
+    "loai": "ran",
+    "noi": "Viết phương trình mà quên cân bằng hệ số",
+    "sua": "Cân bằng xong mới dùng được tỉ lệ mol để tính."
+   }
+  ]
+ },
+ "bai-9": {
+  "tenBai": "Bài 9: Hệ thống hoá kiến thức về nitrogen và sulfur",
+  "chuong": "Chương 2: Nitrogen – Sulfur",
+  "thang": [
+   {
+    "loai": "thang",
+    "noi": "2. Tác dụng với kiềm – Nhận biết ion ammonium"
+   },
+   {
+    "loai": "thang",
+    "noi": "Fe, Al thụ động hóa trong HNO₃ đặc nguội"
+   },
+   {
+    "loai": "thang",
+    "noi": "HNO₃ đặc + kim loại → NO₂ (nâu đỏ)"
+   },
+   {
+    "loai": "thang",
+    "noi": "NH₃ tan rất nhiều trong nước → dung dịch có tính base yếu"
+   }
+  ],
+  "ran": [
+   {
+    "loai": "ran",
+    "noi": "Ghi kết quả mà quên đơn vị",
+    "sua": "Một đáp số không có đơn vị thì chưa phải đáp số."
+   },
+   {
+    "loai": "ran",
+    "noi": "Gọi tên chất theo lối cũ: \"natri hiđroxit\", \"ancol\", \"anđehit\"",
+    "sua": "Chương trình 2018 gọi theo IUPAC: sodium hydroxide, alcohol, aldehyde."
+   },
+   {
+    "loai": "ran",
+    "noi": "Viết số thập phân bằng dấu chấm: 24.79",
+    "sua": "Tiếng Việt dùng dấu phẩy: 24,79."
+   },
+   {
+    "loai": "ran",
+    "noi": "Dùng \"đktc\" và 22,4 L/mol cho bài toán khí",
+    "sua": "Sách Kết nối tri thức dùng đkc: 25 °C, 1 bar, 24,79 L/mol."
+   }
+  ]
+ },
+ "bai-10": {
+  "tenBai": "Bài 10: Hợp chất hữu cơ và hoá học hữu cơ",
+  "chuong": "Chương 3: Đại cương hoá học hữu cơ",
+  "thang": [
+   {
+    "loai": "thang",
+    "noi": "Lập được công thức phân tử hợp chất hữu cơ từ kết quả phân tích nguyên tố"
+   },
+   {
+    "loai": "thang",
+    "noi": "x:y:z = (%C/12) : (%H/1) : (%O/16) → CTTN"
+   },
+   {
+    "loai": "thang",
+    "noi": "Nêu được khái niệm hợp chất hữu cơ và hóa học hữu cơ"
+   },
+   {
+    "loai": "thang",
+    "noi": "Nhớ đúng công thức: Ví dụ: CH₄; CH₂ = CH₂; CH ≡ CH; C₆H₆…"
+   }
+  ],
+  "ran": [
+   {
+    "loai": "ran",
+    "noi": "Ghi kết quả mà quên đơn vị",
+    "sua": "Một đáp số không có đơn vị thì chưa phải đáp số."
+   },
+   {
+    "loai": "ran",
+    "noi": "Viết phương trình mà quên cân bằng hệ số",
+    "sua": "Cân bằng xong mới dùng được tỉ lệ mol để tính."
+   },
+   {
+    "loai": "ran",
+    "noi": "Học vội, bỏ sót một ý quan trọng",
+    "sua": "Tan trong dung môi hữu cơ"
+   },
+   {
+    "loai": "ran",
+    "noi": "Đọc lướt nên trượt mất một ý của bài",
+    "sua": "Liên kết cộng hóa trị → không dẫn điện"
+   }
+  ]
+ },
+ "bai-11": {
+  "tenBai": "Bài 11: Phương pháp tách và tinh chế hợp chất hữu cơ",
+  "chuong": "Chương 3: Đại cương hoá học hữu cơ",
+  "thang": [
+   {
+    "loai": "thang",
+    "noi": "1. Nguyên tắc"
+   },
+   {
+    "loai": "thang",
+    "noi": "2. Cách tiến hành"
+   },
+   {
+    "loai": "thang",
+    "noi": "2. Cách tiến hành"
+   },
+   {
+    "loai": "thang",
+    "noi": "2. Cách tiến hành"
+   }
+  ],
+  "ran": [
+   {
+    "loai": "ran",
+    "noi": "Gọi tên chất theo lối cũ: \"natri hiđroxit\", \"ancol\", \"anđehit\"",
+    "sua": "Chương trình 2018 gọi theo IUPAC: sodium hydroxide, alcohol, aldehyde."
+   },
+   {
+    "loai": "ran",
+    "noi": "Ghi kết quả mà quên đơn vị",
+    "sua": "Một đáp số không có đơn vị thì chưa phải đáp số."
+   },
+   {
+    "loai": "ran",
+    "noi": "Viết phương trình mà quên cân bằng hệ số",
+    "sua": "Cân bằng xong mới dùng được tỉ lệ mol để tính."
+   },
+   {
+    "loai": "ran",
+    "noi": "Viết số thập phân bằng dấu chấm: 24.79",
+    "sua": "Tiếng Việt dùng dấu phẩy: 24,79."
+   }
+  ]
+ },
+ "bai-12": {
+  "tenBai": "Bài 12: Công thức phân tử hợp chất hữu cơ",
+  "chuong": "Chương 3: Đại cương hoá học hữu cơ",
+  "thang": [
+   {
+    "loai": "thang",
+    "noi": "2. Cách biểu diễn công thức phân tử hợp chất hữu cơ"
+   },
+   {
+    "loai": "thang",
+    "noi": "Nhớ đúng công thức: x : y : z = : : = p : q : r"
+   },
+   {
+    "loai": "thang",
+    "noi": "2. Lập công thức phân tử hợp chất hữu cơ"
+   },
+   {
+    "loai": "thang",
+    "noi": "1. Xác định phân tử khối bằng phương pháp phổ khối lượng"
+   }
+  ],
+  "ran": [
+   {
+    "loai": "ran",
+    "noi": "Chỉ nhớ mỗi công thức, quên mất bản chất",
+    "sua": "2. Cách biểu diễn công thức phân tử hợp chất hữu cơ"
+   },
+   {
+    "loai": "ran",
+    "noi": "Viết phương trình mà quên cân bằng hệ số",
+    "sua": "Cân bằng xong mới dùng được tỉ lệ mol để tính."
+   },
+   {
+    "loai": "ran",
+    "noi": "Học vội, bỏ sót một ý quan trọng",
+    "sua": "2. Lập công thức phân tử hợp chất hữu cơ"
+   },
+   {
+    "loai": "ran",
+    "noi": "Đọc lướt nên trượt mất một ý của bài",
+    "sua": "1. Xác định phân tử khối bằng phương pháp phổ khối lượng"
+   }
+  ]
+ },
+ "bai-13": {
+  "tenBai": "Bài 13: Thuyết cấu tạo hoá học và công thức cấu tạo hợp chất hữu cơ",
+  "chuong": "Chương 3: Đại cương hoá học hữu cơ",
+  "thang": [
+   {
+    "loai": "thang",
+    "noi": "x:y:z = (%C/12) : (%H/1) : (%O/16) → CTTN"
+   },
+   {
+    "loai": "thang",
+    "noi": "2. Cách biểu diễn công thức phân tử hợp chất hữu cơ"
+   },
+   {
+    "loai": "thang",
+    "noi": "2. Lập công thức phân tử hợp chất hữu cơ"
+   },
+   {
+    "loai": "thang",
+    "noi": "Liên kết cộng hóa trị → không dẫn điện"
+   }
+  ],
+  "ran": [
+   {
+    "loai": "ran",
+    "noi": "Dùng \"đktc\" và 22,4 L/mol cho bài toán khí",
+    "sua": "Sách Kết nối tri thức dùng đkc: 25 °C, 1 bar, 24,79 L/mol."
+   },
+   {
+    "loai": "ran",
+    "noi": "Học vội, bỏ sót một ý quan trọng",
+    "sua": "2. Cách biểu diễn cấu tạo phân tử hợp chất hữu cơ"
+   },
+   {
+    "loai": "ran",
+    "noi": "Viết số thập phân bằng dấu chấm: 24.79",
+    "sua": "Tiếng Việt dùng dấu phẩy: 24,79."
+   },
+   {
+    "loai": "ran",
+    "noi": "Viết phương trình mà quên cân bằng hệ số",
+    "sua": "Cân bằng xong mới dùng được tỉ lệ mol để tính."
+   }
+  ]
+ },
+ "bai-14": {
+  "tenBai": "Bài 14: Ôn tập công thức và cấu tạo phân tử hợp chất hữu cơ",
+  "chuong": "Chương 3: Đại cương hoá học hữu cơ",
+  "thang": [
+   {
+    "loai": "thang",
+    "noi": "Hợp chất hữu cơ là hợp chất của C (trừ CO, CO₂, carbonate, cyanide, carbide)"
+   },
+   {
+    "loai": "thang",
+    "noi": "1. Xác định phân tử khối bằng phương pháp phổ khối lượng"
+   },
+   {
+    "loai": "thang",
+    "noi": "Đốt cháy hữu cơ → CO₂ + H₂O → tính %C, %H, %O"
+   },
+   {
+    "loai": "thang",
+    "noi": "2. Lập công thức phân tử hợp chất hữu cơ"
+   }
+  ],
+  "ran": [
+   {
+    "loai": "ran",
+    "noi": "Viết số thập phân bằng dấu chấm: 24.79",
+    "sua": "Tiếng Việt dùng dấu phẩy: 24,79."
+   },
+   {
+    "loai": "ran",
+    "noi": "Gọi tên chất theo lối cũ: \"natri hiđroxit\", \"ancol\", \"anđehit\"",
+    "sua": "Chương trình 2018 gọi theo IUPAC: sodium hydroxide, alcohol, aldehyde."
+   },
+   {
+    "loai": "ran",
+    "noi": "Dùng \"đktc\" và 22,4 L/mol cho bài toán khí",
+    "sua": "Sách Kết nối tri thức dùng đkc: 25 °C, 1 bar, 24,79 L/mol."
+   },
+   {
+    "loai": "ran",
+    "noi": "Dùng mũi tên một chiều → cho phản ứng thuận nghịch",
+    "sua": "Phản ứng thuận nghịch phải viết bằng mũi tên hai chiều ⇌."
+   }
+  ]
+ },
+ "bai-15": {
+  "tenBai": "Bài 15: Alkane",
+  "chuong": "Chương 4: Hydrocarbon",
+  "thang": [
+   {
+    "loai": "thang",
+    "noi": "Danh pháp: nhánh + tên mạch chính + ane"
+   },
+   {
+    "loai": "thang",
+    "noi": "Phản ứng đặc trưng của alkane: phản ứng thế (SR)"
+   },
+   {
+    "loai": "thang",
+    "noi": "Nhớ đúng công thức: Công thức chung của Alkane: CnH2n+2 (n ≥ 1)"
+   },
+   {
+    "loai": "thang",
+    "noi": "Nhớ đúng công thức: Phản ứng thế halogen (chlorine hoá): CnH2n+2 + Cl₂ -(as)→ CnH2n+1Cl + HCl"
+   }
+  ],
+  "ran": [
+   {
+    "loai": "ran",
+    "noi": "Viết số thập phân bằng dấu chấm: 24.79",
+    "sua": "Tiếng Việt dùng dấu phẩy: 24,79."
+   },
+   {
+    "loai": "ran",
+    "noi": "Đọc lướt nên trượt mất một ý của bài",
+    "sua": "Đốt cháy: nH₂O > nCO₂ → nhận biết alkane"
+   },
+   {
+    "loai": "ran",
+    "noi": "Viết phương trình mà quên cân bằng hệ số",
+    "sua": "Cân bằng xong mới dùng được tỉ lệ mol để tính."
+   },
+   {
+    "loai": "ran",
+    "noi": "Chỉ nhớ mỗi công thức, quên mất bản chất",
+    "sua": "Halogen thế vào C bậc cao hơn → sản phẩm chính"
+   }
+  ]
+ },
+ "bai-16": {
+  "tenBai": "Bài 16: Hydrocarbon không no",
+  "chuong": "Chương 4: Hydrocarbon",
+  "thang": [
+   {
+    "loai": "thang",
+    "noi": "3. Danh pháp"
+   },
+   {
+    "loai": "thang",
+    "noi": "2. Phản ứng trùng hợp của alkene"
+   },
+   {
+    "loai": "thang",
+    "noi": "3. Phản ứng của alk – 1 – yne với AgNO₃ trong NH₃"
+   },
+   {
+    "loai": "thang",
+    "noi": "4. Phản ứng oxi hoá"
+   }
+  ],
+  "ran": [
+   {
+    "loai": "ran",
+    "noi": "Ghi kết quả mà quên đơn vị",
+    "sua": "Một đáp số không có đơn vị thì chưa phải đáp số."
+   },
+   {
+    "loai": "ran",
+    "noi": "Gọi tên chất theo lối cũ: \"natri hiđroxit\", \"ancol\", \"anđehit\"",
+    "sua": "Chương trình 2018 gọi theo IUPAC: sodium hydroxide, alcohol, aldehyde."
+   },
+   {
+    "loai": "ran",
+    "noi": "Chỉ nhớ mỗi công thức, quên mất bản chất",
+    "sua": "1. Khái niệm và công thức chung của alkene, alkyne"
+   },
+   {
+    "loai": "ran",
+    "noi": "Đọc lướt nên trượt mất một ý của bài",
+    "sua": "2. Phản ứng trùng hợp của alkene"
+   }
+  ]
+ },
+ "bai-17": {
+  "tenBai": "Bài 17: Arene (hydrocarbon thơm)",
+  "chuong": "Chương 4: Hydrocarbon",
+  "thang": [
+   {
+    "loai": "thang",
+    "noi": "1. Phản ứng thế"
+   },
+   {
+    "loai": "thang",
+    "noi": "2. Phản ứng cộng"
+   },
+   {
+    "loai": "thang",
+    "noi": "2. Công thức cấu tạo và danh pháp"
+   },
+   {
+    "loai": "thang",
+    "noi": "Nhớ đúng công thức: C₆H₅COOK + HCl → C₆H₅COOH + KCl"
+   }
+  ],
+  "ran": [
+   {
+    "loai": "ran",
+    "noi": "Viết phương trình mà quên cân bằng hệ số",
+    "sua": "Cân bằng xong mới dùng được tỉ lệ mol để tính."
+   },
+   {
+    "loai": "ran",
+    "noi": "Dùng \"đktc\" và 22,4 L/mol cho bài toán khí",
+    "sua": "Sách Kết nối tri thức dùng đkc: 25 °C, 1 bar, 24,79 L/mol."
+   },
+   {
+    "loai": "ran",
+    "noi": "Học vội, bỏ sót một ý quan trọng",
+    "sua": "2. Công thức cấu tạo và danh pháp"
+   },
+   {
+    "loai": "ran",
+    "noi": "Gọi tên chất theo lối cũ: \"natri hiđroxit\", \"ancol\", \"anđehit\"",
+    "sua": "Chương trình 2018 gọi theo IUPAC: sodium hydroxide, alcohol, aldehyde."
+   }
+  ]
+ },
+ "bai-18": {
+  "tenBai": "Bài 18: Ôn tập hệ thống kiến thức về hydrocarbon",
+  "chuong": "Chương 4: Hydrocarbon",
+  "thang": [
+   {
+    "loai": "thang",
+    "noi": "3. Phản ứng của alk – 1 – yne với AgNO₃ trong NH₃"
+   },
+   {
+    "loai": "thang",
+    "noi": "Danh pháp: nhánh + tên mạch chính + ane"
+   },
+   {
+    "loai": "thang",
+    "noi": "2. Công thức cấu tạo và danh pháp"
+   },
+   {
+    "loai": "thang",
+    "noi": "2. Phản ứng trùng hợp của alkene"
+   }
+  ],
+  "ran": [
+   {
+    "loai": "ran",
+    "noi": "Gọi tên chất theo lối cũ: \"natri hiđroxit\", \"ancol\", \"anđehit\"",
+    "sua": "Chương trình 2018 gọi theo IUPAC: sodium hydroxide, alcohol, aldehyde."
+   },
+   {
+    "loai": "ran",
+    "noi": "Ghi kết quả mà quên đơn vị",
+    "sua": "Một đáp số không có đơn vị thì chưa phải đáp số."
+   },
+   {
+    "loai": "ran",
+    "noi": "Viết phương trình mà quên cân bằng hệ số",
+    "sua": "Cân bằng xong mới dùng được tỉ lệ mol để tính."
+   },
+   {
+    "loai": "ran",
+    "noi": "Dùng \"đktc\" và 22,4 L/mol cho bài toán khí",
+    "sua": "Sách Kết nối tri thức dùng đkc: 25 °C, 1 bar, 24,79 L/mol."
+   }
+  ]
+ },
+ "bai-19": {
+  "tenBai": "Bài 19: Dẫn xuất halogen",
+  "chuong": "Chương 5: Dẫn xuất halogen – Alcohol – Phenol",
+  "thang": [
+   {
+    "loai": "thang",
+    "noi": "1. Khái niệm"
+   },
+   {
+    "loai": "thang",
+    "noi": "2. Dẫn xuất halogen với sức khoẻ và môi trường"
+   },
+   {
+    "loai": "thang",
+    "noi": "Nhớ đúng công thức: CH₃Cl; CH₃Br; CH₂Cl₂; CH₂ = CH – Cl; C₆H₅Br…"
+   },
+   {
+    "loai": "thang",
+    "noi": "1. Phản ứng thế nguyên tử halogen"
+   }
+  ],
+  "ran": [
+   {
+    "loai": "ran",
+    "noi": "Đọc lướt nên trượt mất một ý của bài",
+    "sua": "1. Một số ứng dụng tiêu biểu của dẫn xuất halogen"
+   },
+   {
+    "loai": "ran",
+    "noi": "Dùng mũi tên một chiều → cho phản ứng thuận nghịch",
+    "sua": "Phản ứng thuận nghịch phải viết bằng mũi tên hai chiều ⇌."
+   },
+   {
+    "loai": "ran",
+    "noi": "Dùng \"đktc\" và 22,4 L/mol cho bài toán khí",
+    "sua": "Sách Kết nối tri thức dùng đkc: 25 °C, 1 bar, 24,79 L/mol."
+   },
+   {
+    "loai": "ran",
+    "noi": "Chỉ nhớ mỗi công thức, quên mất bản chất",
+    "sua": "1. Phản ứng thế nguyên tử halogen"
+   }
+  ]
+ },
+ "bai-20": {
+  "tenBai": "Bài 20: Alcohol",
+  "chuong": "Chương 5: Dẫn xuất halogen – Alcohol – Phenol",
+  "thang": [
+   {
+    "loai": "thang",
+    "noi": "3. Điều chế glycerol"
+   },
+   {
+    "loai": "thang",
+    "noi": "5. Phản ứng riêng của polyalcohol với Cu(OH)2"
+   },
+   {
+    "loai": "thang",
+    "noi": "Nhớ đúng công thức: CH₃CH₂OH CH₂ = CH₂ + H₂O"
+   },
+   {
+    "loai": "thang",
+    "noi": "Nhớ đúng công thức: C₂H₅OH(l) + 3O₂(g) (g) + 3H₂O(g) Δ =−1367kJ"
+   }
+  ],
+  "ran": [
+   {
+    "loai": "ran",
+    "noi": "Chỉ nhớ mỗi công thức, quên mất bản chất",
+    "sua": "1. Phản ứng thế nguyên tử H của nhóm – OH"
+   },
+   {
+    "loai": "ran",
+    "noi": "Ghi kết quả mà quên đơn vị",
+    "sua": "Một đáp số không có đơn vị thì chưa phải đáp số."
+   },
+   {
+    "loai": "ran",
+    "noi": "Viết phương trình mà quên cân bằng hệ số",
+    "sua": "Cân bằng xong mới dùng được tỉ lệ mol để tính."
+   },
+   {
+    "loai": "ran",
+    "noi": "Dùng \"đktc\" và 22,4 L/mol cho bài toán khí",
+    "sua": "Sách Kết nối tri thức dùng đkc: 25 °C, 1 bar, 24,79 L/mol."
+   }
+  ]
+ },
+ "bai-21": {
+  "tenBai": "Bài 21: Phenol",
+  "chuong": "Chương 5: Dẫn xuất halogen – Alcohol – Phenol",
+  "thang": [
+   {
+    "loai": "thang",
+    "noi": "1. Phản ứng thế nguyên tử H của nhóm – OH (tính acid của phenol)"
+   },
+   {
+    "loai": "thang",
+    "noi": "2. Phản ứng thế ở vòng thơm"
+   },
+   {
+    "loai": "thang",
+    "noi": "Nhớ đúng công thức: C₆H₅OH + Na₂CO₃ ⇌ C₆H₅ONa + NaHCO₃"
+   },
+   {
+    "loai": "thang",
+    "noi": "Nhớ đúng công thức: C₆H₅OH+H₂O⇌C₆H₅O−+H₃O+"
+   }
+  ],
+  "ran": [
+   {
+    "loai": "ran",
+    "noi": "Viết phương trình mà quên cân bằng hệ số",
+    "sua": "Cân bằng xong mới dùng được tỉ lệ mol để tính."
+   },
+   {
+    "loai": "ran",
+    "noi": "Dùng mũi tên một chiều → cho phản ứng thuận nghịch",
+    "sua": "Phản ứng thuận nghịch phải viết bằng mũi tên hai chiều ⇌."
+   },
+   {
+    "loai": "ran",
+    "noi": "Ghi kết quả mà quên đơn vị",
+    "sua": "Một đáp số không có đơn vị thì chưa phải đáp số."
+   },
+   {
+    "loai": "ran",
+    "noi": "Gọi tên chất theo lối cũ: \"natri hiđroxit\", \"ancol\", \"anđehit\"",
+    "sua": "Chương trình 2018 gọi theo IUPAC: sodium hydroxide, alcohol, aldehyde."
+   }
+  ]
+ },
+ "bai-22": {
+  "tenBai": "Bài 22: Hệ thống hoá kiến thức về dẫn xuất halogen, alcohol và phenol",
+  "chuong": "Chương 5: Dẫn xuất halogen – Alcohol – Phenol",
+  "thang": [
+   {
+    "loai": "thang",
+    "noi": "Nhớ đúng công thức: 2R – OH + 2Na → 2RONa + H₂"
+   },
+   {
+    "loai": "thang",
+    "noi": "1. Phản ứng thế nguyên tử H của nhóm – OH (tính acid của phenol)"
+   },
+   {
+    "loai": "thang",
+    "noi": "2. Phản ứng tạo ether"
+   },
+   {
+    "loai": "thang",
+    "noi": "4. Phản ứng oxi hoá"
+   }
+  ],
+  "ran": [
+   {
+    "loai": "ran",
+    "noi": "Viết phương trình mà quên cân bằng hệ số",
+    "sua": "Cân bằng xong mới dùng được tỉ lệ mol để tính."
+   },
+   {
+    "loai": "ran",
+    "noi": "Học vội, bỏ sót một ý quan trọng",
+    "sua": "5. Phản ứng riêng của polyalcohol với Cu(OH)2"
+   },
+   {
+    "loai": "ran",
+    "noi": "Dùng mũi tên một chiều → cho phản ứng thuận nghịch",
+    "sua": "Phản ứng thuận nghịch phải viết bằng mũi tên hai chiều ⇌."
+   },
+   {
+    "loai": "ran",
+    "noi": "Đọc lướt nên trượt mất một ý của bài",
+    "sua": "1. Phản ứng thế nguyên tử H của nhóm – OH (tính acid của phenol)"
+   }
+  ]
+ },
+ "bai-23": {
+  "tenBai": "Bài 23: Hợp chất carbonyl (aldehyde – ketone)",
+  "chuong": "Chương 6: Hợp chất carbonyl – Carboxylic acid",
+  "thang": [
+   {
+    "loai": "thang",
+    "noi": "Nhớ đúng công thức: RCHO + 2Cu(OH)2 + NaOH to→ RCOONa + Cu₂O + 3H₂O"
+   },
+   {
+    "loai": "thang",
+    "noi": "Nhớ đúng công thức: CH₃CHO + Br₂ + H₂O → CH₃COOH + 2HBr"
+   },
+   {
+    "loai": "thang",
+    "noi": "1. Phản ứng khử"
+   },
+   {
+    "loai": "thang",
+    "noi": "Nhớ đúng công thức: Tên hydrocarbon (bỏ e ở cuối) – vị trí nhóm C = O – one"
+   }
+  ],
+  "ran": [
+   {
+    "loai": "ran",
+    "noi": "Viết số thập phân bằng dấu chấm: 24.79",
+    "sua": "Tiếng Việt dùng dấu phẩy: 24,79."
+   },
+   {
+    "loai": "ran",
+    "noi": "Học vội, bỏ sót một ý quan trọng",
+    "sua": "2. Phản ứng oxi hoá aldehyde"
+   },
+   {
+    "loai": "ran",
+    "noi": "Viết phương trình mà quên cân bằng hệ số",
+    "sua": "Cân bằng xong mới dùng được tỉ lệ mol để tính."
+   },
+   {
+    "loai": "ran",
+    "noi": "Ghi kết quả mà quên đơn vị",
+    "sua": "Một đáp số không có đơn vị thì chưa phải đáp số."
+   }
+  ]
+ },
+ "bai-24": {
+  "tenBai": "Bài 24: Carboxylic acid",
+  "chuong": "Chương 6: Hợp chất carbonyl – Carboxylic acid",
+  "thang": [
+   {
+    "loai": "thang",
+    "noi": "Nhớ đúng công thức: 2CH₃COOH + ZnO → (CH₃COO)2Zn + H₂O"
+   },
+   {
+    "loai": "thang",
+    "noi": "Nhớ đúng công thức: 2CH₃COOH + Zn → (CH₃COO)2Zn + H₂"
+   },
+   {
+    "loai": "thang",
+    "noi": "1. Phương pháp lên men giấm"
+   },
+   {
+    "loai": "thang",
+    "noi": "2. Phản ứng ester hoá"
+   }
+  ],
+  "ran": [
+   {
+    "loai": "ran",
+    "noi": "Chỉ nhớ mỗi công thức, quên mất bản chất",
+    "sua": "2. Phương pháp oxi hoá alkane"
+   },
+   {
+    "loai": "ran",
+    "noi": "Dùng mũi tên một chiều → cho phản ứng thuận nghịch",
+    "sua": "Phản ứng thuận nghịch phải viết bằng mũi tên hai chiều ⇌."
+   },
+   {
+    "loai": "ran",
+    "noi": "Viết số thập phân bằng dấu chấm: 24.79",
+    "sua": "Tiếng Việt dùng dấu phẩy: 24,79."
+   },
+   {
+    "loai": "ran",
+    "noi": "Ghi kết quả mà quên đơn vị",
+    "sua": "Một đáp số không có đơn vị thì chưa phải đáp số."
+   }
+  ]
+ },
+ "bai-25": {
+  "tenBai": "Bài 25: Ôn tập hợp chất carbonyl và carboxylic acid",
+  "chuong": "Chương 6: Hợp chất carbonyl – Carboxylic acid",
+  "thang": [
+   {
+    "loai": "thang",
+    "noi": "1. Tính acid"
+   },
+   {
+    "loai": "thang",
+    "noi": "Nhớ đúng công thức: 2CH₃COOH + ZnO → (CH₃COO)2Zn + H₂O"
+   },
+   {
+    "loai": "thang",
+    "noi": "Nhớ đúng công thức: CH₃CHO + Br₂ + H₂O → CH₃COOH + 2HBr"
+   },
+   {
+    "loai": "thang",
+    "noi": "4. Phản ứng tạo iodoform"
+   }
+  ],
+  "ran": [
+   {
+    "loai": "ran",
+    "noi": "Học vội, bỏ sót một ý quan trọng",
+    "sua": "2. Phản ứng oxi hoá aldehyde"
+   },
+   {
+    "loai": "ran",
+    "noi": "Dùng mũi tên một chiều → cho phản ứng thuận nghịch",
+    "sua": "Phản ứng thuận nghịch phải viết bằng mũi tên hai chiều ⇌."
+   },
+   {
+    "loai": "ran",
+    "noi": "Viết phương trình mà quên cân bằng hệ số",
+    "sua": "Cân bằng xong mới dùng được tỉ lệ mol để tính."
+   },
+   {
+    "loai": "ran",
+    "noi": "Ghi kết quả mà quên đơn vị",
+    "sua": "Một đáp số không có đơn vị thì chưa phải đáp số."
+   }
+  ]
+ }
+}

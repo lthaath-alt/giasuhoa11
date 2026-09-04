@@ -130,7 +130,13 @@ SO_DUOI = str.maketrans('0123456789', '\u2080\u2081\u2082\u2083\u2084\u2085\u208
 # Bắt buộc chữ số phải đứng NGAY SAU một ký hiệu nguyên tố (chữ hoa, có thể kèm
 # một chữ thường). Nhờ vậy "lớp 11", "Bài 2", "Chương 3", "25 °C" không dính —
 # ở đó chữ số đứng sau dấu cách chứ không sau ký hiệu nguyên tố.
-CONG_THUC = re.compile(r'\b((?:[A-Z][a-z]?\d*)+)\b')
+# Neo bang "ky tu truoc khong phai chu cai" chu KHONG dung \b.
+# Ly do: he so can bang dung ngay truoc cong thuc — "4NH3", "5O2" — thi giua
+# chu so va chu cai KHONG co ranh gioi tu, nen \b lam ca cum truot khong khop
+# va cong thuc do khong bao gio duoc ha chi so. Da do: 7 cong thuc bi bo sot
+# kieu nay. Nay he so van la chu so thuong, chi phan sau ky hieu nguyen to moi
+# ha xuong: "4NH3" -> "4NH₃", dung nhu cach viet trong sach.
+CONG_THUC = re.compile(r'(?<![A-Za-zÀ-ỹ])((?:[A-Z][a-z]?\d*)+)(?![A-Za-zÀ-ỹ])')
 
 
 def ha_chi_so(s):
