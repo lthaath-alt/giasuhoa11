@@ -81,17 +81,20 @@ export const GameHubSection: React.FC = () => {
      dùng. Chấp nhận được vì trò chơi không gửi điểm về máy chủ, gian lận chỉ
      ảnh hưởng lượt chơi của chính em đó. Ngày nào điểm được ghi lại thật thì
      phải kiểm ở phía máy chủ. */
-  /* Hai MỨC chứ không phải bật/tắt:
-       'thuong' — quản trị trường: bất tử, bay, nhảy màn. Đủ để đi hết các màn
-                  mà kiểm nội dung câu hỏi, nhưng vẫn phải chơi đúng luật.
-       'day-du' — quản trị hệ thống: bỏ qua MỌI ràng buộc, kể cả điều kiện qua
-                  màn và câu hỏi. Dùng để soi nhanh mọi ngóc ngách khi dựng bài.
-     Tách hai mức vì mức đầy đủ làm hỏng cả ý nghĩa của trò chơi — không nên
-     đưa cho người chỉ cần kiểm nội dung. */
+  /* Chế độ thử có hai MỨC, và HIỆN TẠI cả hai vai quản trị đều được mức đầy đủ:
+       'thuong' — bất tử, bay, nhảy màn. Vẫn phải chơi đúng luật.
+       'day-du' — bỏ qua MỌI ràng buộc, kể cả điều kiện qua màn và câu hỏi.
+
+     Ban đầu tôi để quản trị trường ở mức 'thuong', vì mức đầy đủ làm hỏng cả ý
+     nghĩa trò chơi — mở cửa mà không phải ghép phân tử, hạ boss mà không phải
+     đánh. Giáo viên quyết định cho quản trị trường dùng luôn mức đầy đủ: người
+     dựng bài ở trường cũng cần soi nhanh mọi ngóc ngách như quản trị hệ thống.
+
+     GIỮ NGUYÊN kiểu ba mức thay vì rút gọn thành bật/tắt: muốn tách lại thì
+     chỉ sửa đúng một dòng dưới đây, không phải dựng lại cả cơ chế. */
   const mucThu: 'khong' | 'thuong' | 'day-du' =
-    currentUser?.role === 'admin' ? 'day-du'
-      : currentUser?.role === 'school_admin' ? 'thuong'
-        : 'khong';
+    (currentUser?.role === 'admin' || currentUser?.role === 'school_admin')
+      ? 'day-du' : 'khong';
   const choPhepThu = mucThu !== 'khong';
 
   useEffect(() => {
