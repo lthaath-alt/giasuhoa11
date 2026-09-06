@@ -14,7 +14,7 @@ Kết nối tri thức 2018. Một tệp duy nhất, không thư viện ngoài, 
 
 ## Luật
 
-Bàn 50 ô. Tung xúc xắc TRƯỚC, rồi hiện câu hỏi — trả lời đúng mới được đi.
+Bàn 30 ô. Tung xúc xắc TRƯỚC, rồi hiện câu hỏi — trả lời đúng mới được đi.
   · đúng ngay lần đầu  → đi đủ số vừa tung, CỘNG THÊM 1 ô thưởng
   · sai lần đầu        → hiện gợi ý (bỏ bớt 2 đáp án sai), cho trả lời lại
   · đúng ở lần hai     → đi đủ số vừa tung, không có thưởng
@@ -27,7 +27,7 @@ luôn chậm hơn máy và không bao giờ thắng nổi.
 Leo thang thì lên, gặp rắn thì tụt. Nội dung thang và rắn lấy theo TỪNG BÀI
 (xem `du-lieu/ran-thang.json`).
 
-QUA MÀN cần ĐỦ HAI ĐIỀU: về tới ô 50 **và** trả lời đúng ít nhất 6 câu. Tới ô
+QUA MÀN cần ĐỦ HAI ĐIỀU: về tới ô cuối **và** trả lời đúng ít nhất 6 câu. Tới ô
 50 mà chưa đủ 6 câu thì đứng đó trả lời tiếp cho đủ. Nếu chỉ cần về đích thì em
 may xúc xắc là qua, chẳng học được gì.
 
@@ -102,6 +102,31 @@ mất ván.
      trắng trên nút "Tung xúc xắc" chỉ đạt tương phản 2,33. Hai màu dưới đây
      giữ nguyên ở cả hai chế độ, vì chữ trên chúng luôn là chữ trắng. */
   --cam-nen:#c2510a; --tim-nen:#5b3590;
+  /* Hai màu nền nữa cùng vai với hai màu trên: chữ đặt lên chúng LUÔN là chữ
+     trắng, nên giá trị giữ nguyên ở cả hai chế độ. */
+  --luc-nen:#12855f; --xanh-nen:#1668b5;
+
+  /* ── Bảng màu áp phích ────────────────────────────────────────────────
+     Sáu màu pastel cho ô cờ, tô xoay vòng theo vị trí VẼ (hàng, cột) chứ không
+     theo số ô. Tô theo số ô thì bàn 6 cột hoá ra sáu vệt dọc cùng màu, vì
+     n % 6 lặp đúng theo cột. Theo vị trí vẽ thì hai ô kề nhau — ngang hay dọc
+     — không bao giờ trùng màu.
+
+     --chu-o là màu chữ ĐẶT TRÊN ô pastel: nền sáng thì ô nhạt nên chữ phải
+     đậm, nền tối thì ô trầm nên chữ phải sáng. Hai giá trị ngược hẳn nhau,
+     không có cách nào dùng chung một biến với --chu. */
+  --o1:#ffdfb0; --o2:#c8ecbf; --o3:#cbe3ff; --o4:#f8d3e6; --o5:#e0d5f7; --o6:#fff0b0;
+  --chu-o:#12242e;
+  --o-vien:#ffffff;        /* viền ô, dùng luôn cho viền huy hiệu số */
+  --vang-o:#ffdc7a;        /* ô về đích */
+  /* Nền áp phích: trời ở trên, dải cỏ ở dưới cùng. */
+  --troi-1:#bfe6fb; --troi-2:#e6f5fe;
+  --co-1:#cdeeaf;   --co-2:#a6da84;
+  --vien-co:#a9d7ee;
+  --may:rgba(255,255,255,.92);
+  /* Chữ tiêu đề lớn: ruột và viền chữ. Nền sáng thì ruột ĐẬM viền TRẮNG; nền
+     tối thì đảo hẳn lại, nếu không chữ cam đậm nằm trên trời đêm là mất hút. */
+  --tieu-mau:#c2510a; --vien-chu:#ffffff;
   --bong:0 2px 0 rgba(18,36,46,.10), 0 10px 24px -16px rgba(18,36,46,.5);
   --f-tieu:'Baloo 2', system-ui, sans-serif;
   --f-chu:'Be Vietnam Pro', system-ui, sans-serif;
@@ -116,6 +141,16 @@ mất ván.
   --tim:#a98be0;
   --vang:#f5bd45;
   --cam-nen:#c2510a; --tim-nen:#5b3590;
+  --luc-nen:#12855f; --xanh-nen:#1668b5;
+  --o1:#4b3520; --o2:#22402e; --o3:#1f3450; --o4:#452638; --o5:#372a52; --o6:#4a3f1c;
+  --chu-o:#eaf3fa;
+  --o-vien:#25384b;
+  --vang-o:#584711;
+  --troi-1:#0e1a2c; --troi-2:#17253c;
+  --co-1:#153020;   --co-2:#0e2417;
+  --vien-co:#22344a;
+  --may:rgba(150,180,215,.13);
+  --tieu-mau:#ffa95e; --vien-chu:#0d1620;
   --bong:0 2px 0 rgba(0,0,0,.3), 0 10px 24px -16px rgba(0,0,0,.9);
 }
 
@@ -148,7 +183,7 @@ h1,h2,h3{font-family:var(--f-tieu); margin:0; line-height:1.15}
 .nut.phu{background:var(--the); color:var(--chu); border-color:var(--vien)}
 
 /* ── Màn chọn chế độ ─────────────────────────────────────────────── */
-#m-chedo .the{max-width:640px; margin:40px auto; text-align:center}
+#m-chedo .the{max-width:640px; margin:8px auto; text-align:center}
 .nhan-tren{
   font-family:var(--f-chu); font-size:12.5px; font-weight:700; letter-spacing:.14em;
   text-transform:uppercase; color:var(--cam);
@@ -185,53 +220,196 @@ h1,h2,h3{font-family:var(--f-tieu); margin:0; line-height:1.15}
 .o-bai .dau{position:absolute; top:9px; right:10px; font-size:15px}
 .o-bai.xong{border-color:var(--luc); background:var(--luc-nhat)}
 
-/* ── Bàn cờ ──────────────────────────────────────────────────────── */
-.san{display:grid; grid-template-columns:minmax(0,1fr) 300px; gap:16px; align-items:start}
-@media (max-width:900px){ .san{grid-template-columns:1fr} }
+/* ── Áp phích: nền trời và dải cỏ ─────────────────────────────────────
+   Cả ba màn đặt chung một nền để trò chơi trông như một tấm áp phích liền chứ
+   không phải ba trang rời. Trang trí (mây, cây, trường) chỉ nằm ở dải cỏ dưới
+   cùng và hai góc trên — là vùng đệm bàn cờ không với tới. Đặt trang trí vào
+   giữa thì nó nằm dưới ô cờ, vừa không ai thấy vừa che số nếu ô đổi cỡ. */
+.poster{
+  position:relative; overflow:hidden; border-radius:24px;
+  border:3px solid var(--vien-co); box-shadow:var(--bong);
+  padding:18px 18px 80px;
+  background:linear-gradient(180deg, var(--troi-1), var(--troi-2));
+}
+.poster::after{
+  content:''; position:absolute; left:-8%; right:-8%; bottom:-34px; height:120px;
+  background:linear-gradient(180deg, var(--co-1), var(--co-2));
+  border-radius:50% 50% 0 0 / 48px 48px 0 0;
+  z-index:0;
+}
+.poster > *{position:relative; z-index:1}
+/* Trang tri phai NAM TREN dai co. ::after la noi dung sinh ra sau moi phan tu
+   con nen mac dinh ve de len chung: de trang tri o z-index 0 thi cay voi
+   truong bien mat sach duoi tham co, ma nhin vao chi thay ap phich tron tron.
+   Trang tri khong bat chuot nen dat cung muc voi noi dung cung khong sao. */
+.trang-tri{position:absolute; inset:0; z-index:1; pointer-events:none}
+.trang-tri span{position:absolute; font-size:30px; line-height:1}
+/* Mây: một viên thuốc bo tròn cộng hai cục tròn nổi lên, đủ ra hình đám mây mà
+   không cần tải ảnh — trò chơi phải chạy được cả khi không có mạng. */
+.trang-tri i{position:absolute; display:block; height:20px; background:var(--may); border-radius:999px}
+.trang-tri i::before,.trang-tri i::after{content:''; position:absolute; background:var(--may); border-radius:50%}
+.trang-tri i::before{left:12%; bottom:5px; width:24px; height:24px}
+.trang-tri i::after{left:42%; bottom:5px; width:32px; height:32px}
+@media (max-width:620px){ .trang-tri{display:none} }
 
-.cot-ban{display:flex; flex-direction:column; gap:12px; min-width:0}
+/* ── Bàn cờ ──────────────────────────────────────────────────────── */
+.san{display:grid; grid-template-columns:minmax(0,1fr) 306px; gap:16px; align-items:start}
+@media (max-width:980px){ .san{grid-template-columns:1fr} }
+
+.cot-ban{display:flex; flex-direction:column; gap:14px; min-width:0}
 .ban-boc{position:relative}
+/* Số cột do JS đặt qua --cot, lấy thẳng từ hằng COT. Viết cứng repeat(10,1fr)
+   ở đây rồi đổi COT trong JS là bàn cờ xô lệch mà không có lỗi nào báo ra. */
 .ban{
-  display:grid; grid-template-columns:repeat(10,1fr); gap:3px;
-  background:var(--vien); padding:3px; border-radius:12px;
+  /* minmax(0,1fr) chứ KHÔNG phải 1fr. `1fr` nghĩa là minmax(auto,1fr), mà cận
+     dưới `auto` là bề rộng tối thiểu của nội dung ô — chữ "Bắt đầu", "Về đích"
+     và huy hiệu số. Trên điện thoại, sáu ô cộng lại rộng hơn khung nên cột
+     cuối tràn ra ngoài; .poster lại có overflow:hidden nên nó bị CẮT CỤT chứ
+     không sinh thanh cuộn. Đo được ở màn 375px: ô cuối vượt mép áp phích 38px
+     mà scrollWidth vẫn đúng bằng bề rộng cửa sổ, tức là không có dấu hiệu gì
+     báo ra. minmax(0,1fr) cho phép cột co nhỏ hơn nội dung. */
+  display:grid; grid-template-columns:repeat(var(--cot,6),minmax(0,1fr)); gap:11px;
+  padding:12px; background:none; overflow:hidden;
 }
 .o{
-  position:relative; aspect-ratio:1; border-radius:7px; background:var(--the);
-  display:flex; align-items:flex-start; justify-content:flex-start;
-  font-size:10.5px; color:var(--chu-mo); padding:3px 0 0 4px; font-weight:600;
+  position:relative; aspect-ratio:1/.9; border-radius:17px; padding:2px;
+  background:var(--o-nen,var(--the)); border:3px solid var(--o-vien);
+  box-shadow:0 3px 0 rgba(18,36,46,.14), 0 10px 18px -14px rgba(18,36,46,.85);
+  display:grid; place-items:center; text-align:center;
+  color:var(--chu-o); font-weight:700;
 }
-.o.chan{background:var(--the-2)}
-.o.dich{background:var(--vang); color:#3a2a00}
-.o.co-thang{background:var(--luc-nhat); box-shadow:inset 0 0 0 2px var(--luc)}
-.o.co-ran{background:var(--do-nhat); box-shadow:inset 0 0 0 2px var(--do)}
-.o .bieu{position:absolute; inset:0; display:grid; place-items:center; font-size:clamp(13px,2.2vw,19px)}
+.o.mau0{--o-nen:var(--o1)}
+.o.mau1{--o-nen:var(--o2)}
+.o.mau2{--o-nen:var(--o3)}
+.o.mau3{--o-nen:var(--o4)}
+.o.mau4{--o-nen:var(--o5)}
+.o.mau5{--o-nen:var(--o6)}
+/* Viền dùng --luc/--do (đổi theo chế độ) chứ không dùng --luc-nen: trên ô nền
+   trầm của chế độ tối, viền xanh đậm cố định gần như biến mất. */
+.o.co-thang{--o-vien:var(--luc)}
+.o.co-ran{--o-vien:var(--do)}
+.o.batdau{--o-nen:var(--o2); --o-vien:var(--luc)}
+.o.dich{--o-nen:var(--vang-o); --o-vien:#d99a10}
+/* Huy hiệu số nhô ra khỏi góc ô 8px — nằm gọn trong 12px padding của bàn cờ,
+   nên hàng ngoài cùng không bị cắt mất. */
+.o .so-o{
+  position:absolute; top:-8px; left:-8px; z-index:2;
+  min-width:26px; height:26px; padding:0 5px; border-radius:999px;
+  background:var(--the); border:3px solid var(--o-vien);
+  display:grid; place-items:center;
+  font-family:var(--f-tieu); font-size:14px; font-weight:800; color:var(--chu);
+}
+.o .bieu{font-size:clamp(19px,4vw,34px); line-height:1}
+.o .nhan-o{
+  display:block; font-family:var(--f-tieu); font-weight:800; line-height:1.1;
+  font-size:clamp(9px,1.5vw,12px); letter-spacing:.04em; text-transform:uppercase;
+}
+/* Mũi tên chỉ hướng đi. Bàn đánh số kiểu rắn bò nên hàng chẵn chạy sang phải,
+   hàng lẻ chạy sang trái — không có mũi tên thì người chơi lần đầu hay đi
+   ngược ở hàng lẻ. */
+.o .mui{position:absolute; font-size:11px; color:var(--chu-o); opacity:.42; line-height:1}
+.o .mui.phai{right:6px; bottom:5px}
+.o .mui.trai{left:6px; bottom:5px}
+.o .mui.len{top:4px; left:50%; transform:translateX(-50%)}
+@media (max-width:520px){
+  .ban{gap:7px; padding:9px}
+  .o{border-radius:13px}
+  .o .so-o{min-width:21px; height:21px; font-size:11px; border-width:2px; top:-6px; left:-6px}
+  .o .mui{display:none}
+  /* Ô "Về đích" chứa cả lá cờ lẫn chữ. Trên màn 375px ô chỉ cao 38px, mà cờ
+     19px cộng chữ hai dòng 20px là 39px — chữ thò hẳn ra ngoài góc bo. Không
+     đặt overflow:hidden lên .o được, vì huy hiệu số cố ý nhô ra ngoài ô và sẽ
+     bị cắt mất theo. Thu nhỏ nội dung là cách duy nhất giữ được cả hai. */
+  .o .bieu{font-size:17px}
+  .o .nhan-o{font-size:8.5px; letter-spacing:0; line-height:1}
+}
+
+.quan{
+  position:absolute; width:clamp(20px,3.4vw,30px); height:clamp(20px,3.4vw,30px);
+  border-radius:50%; border:3px solid #fff; box-shadow:0 2px 7px rgba(0,0,0,.45);
+  display:grid; place-items:center; font-size:12px; font-weight:800; color:#fff;
+  transition:left .32s cubic-bezier(.34,1.3,.64,1), top .32s cubic-bezier(.34,1.3,.64,1);
+  z-index:4; pointer-events:none;
+}
 
 /* ── Chú thích thang/rắn, đặt DƯỚI bàn cờ ────────────────────────────
    Trước đây vẽ cung nối hai đầu đường ngay trên mặt bàn. Bàn đánh số kiểu rắn
    bò nên hai đầu thường nằm chéo hẳn qua bàn: bảy tám đường cắt nhau giữa bàn,
    che số ô mà vẫn không đọc ra đường nào đi tới đâu. Liệt kê thành chữ ở dưới
    thì tra được chính xác, còn mặt bàn giữ nguyên sạch sẽ. */
-.chu-thich{display:grid; grid-template-columns:1fr 1fr; gap:10px}
-@media (max-width:560px){ .chu-thich{grid-template-columns:1fr} }
-.ct-nhom{padding:10px 12px; border-radius:12px; border:2px solid var(--vien); background:var(--the)}
-.ct-nhom.thang{border-color:var(--luc); background:var(--luc-nhat)}
-.ct-nhom.ran{border-color:var(--do); background:var(--do-nhat)}
-.ct-tieu{font-size:13px; font-weight:800}
+.chu-thich{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+@media (max-width:620px){ .chu-thich{grid-template-columns:1fr} }
+.ct-nhom{
+  padding:12px 14px; border-radius:16px; border:3px solid var(--vien);
+  background:var(--the); box-shadow:var(--bong);
+}
+.ct-nhom.thang{border-color:var(--luc)}
+.ct-nhom.ran{border-color:var(--do)}
+.ct-tieu{font-family:var(--f-tieu); font-size:15px; font-weight:800}
 .ct-ds{display:flex; flex-wrap:wrap; gap:6px; margin-top:8px}
 .ct-muc{
   font-size:12.5px; font-weight:700; white-space:nowrap;
-  padding:3px 9px; border-radius:999px; background:var(--the); border:1.5px solid var(--vien);
+  padding:3px 9px; border-radius:999px; background:var(--the-2); border:2px solid var(--vien);
 }
 .ct-nhom.thang .ct-muc{border-color:var(--luc)}
 .ct-nhom.ran .ct-muc{border-color:var(--do)}
 .ct-trong{font-size:12.5px; color:var(--chu-mo); margin-top:8px}
 
-.quan{
-  position:absolute; width:clamp(17px,3.1vw,25px); height:clamp(17px,3.1vw,25px);
-  border-radius:50%; border:2px solid rgba(0,0,0,.28);
-  display:grid; place-items:center; font-size:11px; font-weight:800; color:#fff;
-  transition:left .32s cubic-bezier(.34,1.3,.64,1), top .32s cubic-bezier(.34,1.3,.64,1);
-  z-index:3; pointer-events:none;
+/* ── Bảng có dải tên, kiểu các khung trong áp phích ─────────────────── */
+.bang{
+  position:relative; background:var(--the); border:3px solid var(--vien);
+  border-radius:18px; padding:21px 15px 14px; box-shadow:var(--bong);
+}
+.bang .ten-bang{
+  position:absolute; top:-14px; left:50%; transform:translateX(-50%);
+  background:var(--ribbon,var(--cam-nen)); color:#fff;
+  font-family:var(--f-tieu); font-weight:800; font-size:13.5px;
+  letter-spacing:.08em; text-transform:uppercase; white-space:nowrap;
+  padding:3px 16px; border-radius:999px; border:3px solid var(--the);
+}
+.bang.cam{--ribbon:var(--cam-nen)}
+.bang.luc{--ribbon:var(--luc-nen)}
+.bang.xanh{--ribbon:var(--xanh-nen)}
+.bang.tim{--ribbon:var(--tim-nen)}
+
+.ds-muc{display:grid; gap:8px; margin:0; padding:0; list-style:none}
+.ds-muc li{display:flex; gap:9px; align-items:flex-start; font-size:13px; line-height:1.45}
+.ds-muc .bi{flex:0 0 20px; font-size:16px; line-height:1.3; text-align:center}
+
+.thuong-muc{
+  display:flex; gap:10px; align-items:center;
+  padding:8px 10px; border-radius:13px; border:2px solid var(--vien); background:var(--the-2);
+}
+.thuong-muc .huy{font-size:24px; flex:0 0 auto; line-height:1}
+.thuong-muc .ten-h{font-family:var(--f-tieu); font-size:15px; font-weight:800; display:block}
+.thuong-muc .mo-h{font-size:12px; color:var(--chu-mo); display:block; line-height:1.35}
+.thuong-muc.vang{border-color:#d99a10}
+.thuong-muc.bac{border-color:#8e9cab}
+.thuong-muc.dong{border-color:#c07b3a}
+
+/* Chữ tiêu đề lớn: viền chữ vẽ bằng tám bóng đổ. Dùng -webkit-text-stroke thì
+   nét bị ăn vào ruột chữ, phông Baloo 2 vốn tròn mập lại càng khó đọc. */
+.tieu-lon{
+  /* line-height phai chua cho cho bong do 4px ben duoi. De 1.06 thi ten bai
+     dai xuong hai dong la bong cua dong tren do dung vao than chu dong duoi,
+     trong nhu chu bi in lem hai lop. Chi lo ra khi ten bai du dai de xuong
+     dong -- tren may tinh ban khong bao gio thay. */
+  font-family:var(--f-tieu); font-weight:800; color:var(--tieu-mau); line-height:1.3;
+  /* Đo bằng em chứ không phải px. Cùng một lớp .tieu-lon dùng cho tên trò
+     chơi cỡ 50px lẫn tên bài cỡ 19px. Đặt cứng 2px viền + 4px bóng thì ở cỡ
+     50px trông nhạt, còn ở cỡ 19px cái bóng 4px lại đủ lớn để đọc ra thành
+     một bản chữ thứ hai — nhìn như in lem hai lớp. Theo em thì tỉ lệ giữ
+     nguyên ở mọi cỡ. */
+  text-shadow:
+    .105em 0 0 var(--vien-chu), -.105em 0 0 var(--vien-chu),
+    0 .105em 0 var(--vien-chu), 0 -.105em 0 var(--vien-chu),
+    .105em .105em 0 var(--vien-chu), -.105em .105em 0 var(--vien-chu),
+    .105em -.105em 0 var(--vien-chu), -.105em -.105em 0 var(--vien-chu),
+    0 .07em 0 rgba(18,36,46,.18);
+}
+.bang-ten-bai{
+  background:var(--the); border:3px solid var(--vien); border-radius:16px;
+  padding:7px 16px; box-shadow:var(--bong); display:inline-block;
 }
 
 /* ── Bảng bên phải ───────────────────────────────────────────────── */
@@ -311,9 +489,19 @@ h1,h2,h3{font-family:var(--f-tieu); margin:0; line-height:1.15}
 
   <!-- ══ MÀN 1: CHỌN CHẾ ĐỘ ══ -->
   <section id="m-chedo">
+   <div class="poster">
+      <div class="trang-tri" aria-hidden="true">
+        <i style="top:16px; left:7%;  width:96px"></i>
+        <i style="top:38px; right:10%; width:72px"></i>
+        <span style="left:1.5%; bottom:9px">🌳</span>
+        <span style="left:15%;  bottom:5px; font-size:21px">🌼</span>
+        <span style="left:47%;  bottom:4px; font-size:22px">⚗️</span>
+        <span style="right:18%; bottom:5px; font-size:21px">🌷</span>
+        <span style="right:3%;  bottom:7px">🏫</span>
+      </div>
     <div class="the">
       <div class="nhan-tren">Hoá học 11 · Kết nối tri thức</div>
-      <h1 style="font-size:34px;margin:6px 0 4px">Rắn và Thang</h1>
+      <h1 class="tieu-lon" style="font-size:clamp(30px,6.4vw,50px);margin:4px 0 8px">Rắn và Thang</h1>
       <p class="mo" style="margin:0">25 màn, mỗi màn một bài. Tung xúc xắc rồi trả lời câu hỏi để đi.
         Về tới đích <b>và</b> trả lời đúng đủ 6 câu thì qua màn.</p>
       <div class="chon-cd">
@@ -327,10 +515,21 @@ h1,h2,h3{font-family:var(--f-tieu); margin:0; line-height:1.15}
         </button>
       </div>
     </div>
+   </div>
   </section>
 
   <!-- ══ MÀN 2: CHỌN BÀI ══ -->
   <section id="m-chonbai" class="an">
+   <div class="poster">
+      <div class="trang-tri" aria-hidden="true">
+        <i style="top:16px; left:7%;  width:96px"></i>
+        <i style="top:38px; right:10%; width:72px"></i>
+        <span style="left:1.5%; bottom:9px">🌳</span>
+        <span style="left:15%;  bottom:5px; font-size:21px">🌼</span>
+        <span style="left:47%;  bottom:4px; font-size:22px">⚗️</span>
+        <span style="right:18%; bottom:5px; font-size:21px">🌷</span>
+        <span style="right:3%;  bottom:7px">🏫</span>
+      </div>
     <div class="the">
       <div class="hang" style="justify-content:space-between">
         <div>
@@ -348,14 +547,25 @@ h1,h2,h3{font-family:var(--f-tieu); margin:0; line-height:1.15}
       <p class="mo nho" id="loi-chonbai" style="margin:10px 0 0"></p>
       <div class="luoi-bai" id="luoi-bai"></div>
     </div>
+   </div>
   </section>
 
   <!-- ══ MÀN 3: CHƠI ══ -->
   <section id="m-choi" class="an">
-    <div class="hang" style="justify-content:space-between; margin-bottom:12px">
-      <div>
+   <div class="poster">
+      <div class="trang-tri" aria-hidden="true">
+        <i style="top:16px; left:7%;  width:96px"></i>
+        <i style="top:38px; right:10%; width:72px"></i>
+        <span style="left:1.5%; bottom:9px">🌳</span>
+        <span style="left:15%;  bottom:5px; font-size:21px">🌼</span>
+        <span style="left:47%;  bottom:4px; font-size:22px">⚗️</span>
+        <span style="right:18%; bottom:5px; font-size:21px">🌷</span>
+        <span style="right:3%;  bottom:7px">🏫</span>
+      </div>
+    <div class="hang" style="justify-content:space-between; margin-bottom:16px; gap:12px">
+      <div class="bang-ten-bai">
         <div class="nhan-tren" id="nhan-bai"></div>
-        <h2 style="font-size:23px" id="ten-bai"></h2>
+        <h2 class="tieu-lon" style="font-size:clamp(19px,2.6vw,26px)" id="ten-bai"></h2>
       </div>
       <button class="nut phu" id="ve-chonbai">← Chọn màn khác</button>
     </div>
@@ -376,20 +586,47 @@ h1,h2,h3{font-family:var(--f-tieu); margin:0; line-height:1.15}
         </div>
       </div>
       <div class="ben">
-        <div class="the" style="padding:14px">
+        <div class="bang cam">
+          <span class="ten-bang">Lượt chơi</span>
           <div id="ds-doi" style="display:grid;gap:7px"></div>
           <div class="xx" id="xx" style="margin-top:14px">–</div>
           <button class="nut" id="nut-tung" style="width:100%;margin-top:12px">Tung xúc xắc</button>
           <div class="bao" id="bao" style="margin-top:11px">Bấm nút để bắt đầu.</div>
         </div>
-        <div class="the nho" style="padding:12px">
-          <b>Cách qua màn</b>
-          <div class="mo" style="margin-top:5px">Về tới ô 50 <b>và</b> trả lời đúng ít nhất
-            <b id="can-dung">6</b> câu.</div>
-          <div class="mo" style="margin-top:7px">🪜 leo thang · 🐍 tụt xuống</div>
+
+        <div class="bang xanh">
+          <span class="ten-bang">Cách chơi</span>
+          <ul class="ds-muc">
+            <li><span class="bi">🎲</span><span>Tung xúc xắc.</span></li>
+            <li><span class="bi">❓</span><span>Trả lời câu hỏi hiện ra rồi mới được đi.</span></li>
+            <li><span class="bi">✅</span><span>Đúng ngay lần đầu: đi thêm <b>1 ô</b> thưởng.</span></li>
+            <li><span class="bi">❌</span><span>Sai hai lần: mất lượt, đứng yên.</span></li>
+            <li><span class="bi">🪜</span><span>Gặp thang thì leo lên.</span></li>
+            <li><span class="bi">🐍</span><span>Gặp rắn thì tụt xuống.</span></li>
+            <li><span class="bi">🏁</span><span>Về ô <b id="o-cuoi">30</b> <b>và</b> đúng ít nhất
+              <b id="can-dung">6</b> câu thì qua màn.</span></li>
+          </ul>
+        </div>
+
+        <div class="bang luc">
+          <span class="ten-bang">Khen thưởng</span>
+          <div style="display:grid; gap:8px">
+            <div class="thuong-muc vang"><span class="huy">🥇</span><div>
+              <span class="ten-h">Xuất sắc</span>
+              <span class="mo-h">Về đích mà không sai câu nào</span></div></div>
+            <div class="thuong-muc bac"><span class="huy">🥈</span><div>
+              <span class="ten-h">Giỏi</span>
+              <span class="mo-h">Đúng từ 3/4 số câu đã hỏi trở lên</span></div></div>
+            <div class="thuong-muc dong"><span class="huy">🥉</span><div>
+              <span class="ten-h">Khá</span>
+              <span class="mo-h">Về đích và đúng đủ số câu tối thiểu</span></div></div>
+          </div>
+          <p class="mo" style="font-size:11.5px;margin:9px 0 0">Danh hiệu cao nhất từng đạt
+            được ghi theo tài khoản và hiện lại ở bảng chọn màn.</p>
         </div>
       </div>
     </div>
+   </div>
   </section>
 
 </div>
@@ -400,7 +637,7 @@ h1,h2,h3{font-family:var(--f-tieu); margin:0; line-height:1.15}
   <div class="than" id="thu-than">
     <label><input type="checkbox" id="thu-bocauhoi"> Bỏ qua câu hỏi</label>
     <button class="tn" id="thu-mokhoa">Mở khoá cả 25 màn</button>
-    <button class="tn" id="thu-gandich">Nhảy tới ô 49</button>
+    <button class="tn" id="thu-gandich">Nhảy tới sát đích</button>
     <button class="tn" id="thu-ducau">Cho đủ số câu đúng</button>
     <button class="tn" id="thu-quaman">Qua màn ngay</button>
     <p class="ghi">Chỉ quản trị hệ thống thấy bảng này. "Mở khoá" có ghi vào máy; các nút khác chỉ ảnh hưởng ván đang chơi.</p>
@@ -4364,8 +4601,8 @@ var NHUNG_UU_TIEN = {
 
 
 // ═══ Hằng số luật chơi ═══════════════════════════════════════════════════
-var SO_O       = 50;   // số ô trên bàn
-var COT        = 10;   // số cột — 50 ô xếp 5 hàng × 10 cột
+var SO_O       = 30;   // số ô trên bàn
+var COT        = 6;    // số cột — 30 ô xếp 5 hàng × 6 cột
 var CAN_DUNG   = 6;    // số câu đúng tối thiểu để qua màn
 var THUONG     = 1;    // số ô thưởng khi trả lời đúng ngay lần đầu
 var SO_THANG   = 4;
@@ -4410,6 +4647,28 @@ function bam(s) {
   return h >>> 0;
 }
 
+// ═══ Xếp loại danh hiệu ══════════════════════════════════════════════════
+/* Xếp theo TỈ LỆ đúng chứ không theo số câu đúng. Số câu hỏi mỗi ván không cố
+   định — gặp rắn nhiều thì đi lâu, bị hỏi nhiều hơn — nên lấy mốc "đúng 10 câu"
+   là phạt em nào đi nhanh và thưởng em nào đi vòng. Tỉ lệ thì công bằng ở mọi
+   độ dài ván. */
+var HANG = {
+  xuatsac: { huy: '🥇', ten: 'Xuất sắc' },
+  gioi:    { huy: '🥈', ten: 'Giỏi' },
+  kha:     { huy: '🥉', ten: 'Khá' },
+};
+var BAC_HANG = { kha: 1, gioi: 2, xuatsac: 3 };
+
+function xepLoai(dung, hoi) {
+  if (dung < CAN_DUNG) return null;         // chưa qua màn thì chưa có danh hiệu
+  if (!hoi || dung >= hoi) return 'xuatsac';
+  if (dung / hoi >= 0.75) return 'gioi';
+  return 'kha';
+}
+function totHon(a, b) {
+  return (BAC_HANG[a] || 0) >= (BAC_HANG[b] || 0) ? a : b;
+}
+
 // ═══ Tiến độ: localStorage + nhắn về web ═════════════════════════════════
 var KHOA_TD = 'h11_ran_thang_tien_do';
 
@@ -4417,9 +4676,12 @@ function docTienDo() {
   try { tienDo = JSON.parse(localStorage.getItem(KHOA_TD) || '{}') || {}; }
   catch (e) { tienDo = {}; }
 }
-function luuTienDo(maBai, cauDung) {
+function luuTienDo(maBai, cauDung, hang) {
   var cu = tienDo[maBai] || { xong: false, cauDung: 0 };
-  tienDo[maBai] = { xong: true, cauDung: Math.max(cu.cauDung, cauDung) };
+  /* Giữ danh hiệu CAO NHẤT từng đạt. Em chơi lại màn cũ cho vui mà bị hạ từ
+     🥇 xuống 🥉 thì hoá ra phạt em vì đã chơi lại. */
+  var hangTot = totHon(hang, cu.hang);
+  tienDo[maBai] = { xong: true, cauDung: Math.max(cu.cauDung, cauDung), hang: hangTot };
   try { localStorage.setItem(KHOA_TD, JSON.stringify(tienDo)); } catch (e) {}
   /* Nhắn về web để lưu theo TÀI KHOẢN. localStorage chỉ nằm trong một trình
      duyệt: em học ở trường rồi về nhà là mất sạch, phải chơi lại từ màn 1. */
@@ -4431,6 +4693,7 @@ function luuTienDo(maBai, cauDung) {
         bai: maBai,
         xong: true,
         cauDung: cauDung,
+        hang: hangTot,
       }, location.origin);
     }
   } catch (e) {}
@@ -4444,7 +4707,15 @@ window.addEventListener('message', function (e) {
   var ngoai = d.tienDo || {};
   for (var k in ngoai) if (Object.prototype.hasOwnProperty.call(ngoai, k)) {
     var a = tienDo[k], b = ngoai[k];
-    if (!a || (b && b.cauDung > a.cauDung)) tienDo[k] = b;
+    if (!a) { tienDo[k] = b; continue; }
+    if (!b) continue;
+    /* Gộp từng phần: máy này có thể giữ số câu đúng cao hơn, còn máy kia giữ
+       danh hiệu cao hơn. Lấy cả cụm bên nào là mất phần tốt của bên còn lại. */
+    tienDo[k] = {
+      xong: a.xong || b.xong,
+      cauDung: Math.max(a.cauDung || 0, b.cauDung || 0),
+      hang: totHon(a.hang, b.hang),
+    };
   }
   try { localStorage.setItem(KHOA_TD, JSON.stringify(tienDo)); } catch (err) {}
   if (!$('m-chonbai').classList.contains('an')) veLuoiBai();
@@ -4550,19 +4821,32 @@ function datRanThang(maBai) {
 
   var i, tu, den, thu;
 
-  // Thang: đi lên, cách nhau ít nhất 6 ô để đáng leo
+  /* Độ dài bước nhảy tính theo TỈ LỆ bàn cờ chứ không viết số cứng. Bàn từng là
+     50 ô với bước nhảy 6–14 ô; rút xuống 30 ô mà giữ nguyên con số đó thì một
+     cái thang nuốt gần nửa bàn. Theo tỉ lệ thì sau này đổi SO_O lúc nào cũng
+     còn cân, không phải dò lại mấy con số này. */
+  var NHAY_IT = Math.max(3, Math.round(SO_O * 0.12));
+  var NHAY_NHIEU = Math.max(NHAY_IT + 2, Math.round(SO_O * 0.27));
+
+  /* 400 lượt thử chứ không phải 60. Bàn 30 ô đặt 8 đường là chiếm mất 16 trên
+     28 ô dùng được — hơn một nửa. Ở mật độ đó, 60 lượt thử thỉnh thoảng không
+     tìm ra chỗ trống, và hậu quả là màn ấy lặng lẽ thiếu một cái thang mà
+     không có lỗi nào báo ra. */
+  var THU_TOI_DA = 400;
+
+  // Thang: đi lên
   for (i = 0; i < SO_THANG; i++) {
-    for (thu = 0; thu < 60; thu++) {
-      tu = ngau(2, SO_O - 12);
-      den = tu + ngau(6, 14);
+    for (thu = 0; thu < THU_TOI_DA; thu++) {
+      tu = ngau(2, SO_O - NHAY_IT - 1);
+      den = tu + ngau(NHAY_IT, NHAY_NHIEU);
       if (den < SO_O && trong(tu) && trong(den)) { ghi(tu, den, 'thang', nd.thang[i]); break; }
     }
   }
   // Rắn: đi xuống
   for (i = 0; i < SO_RAN; i++) {
-    for (thu = 0; thu < 60; thu++) {
-      tu = ngau(10, SO_O - 2);
-      den = tu - ngau(5, 13);
+    for (thu = 0; thu < THU_TOI_DA; thu++) {
+      tu = ngau(NHAY_IT + 2, SO_O - 1);
+      den = tu - ngau(NHAY_IT, NHAY_NHIEU);
       if (den > 1 && trong(tu) && trong(den)) { ghi(tu, den, 'ran', nd.ran[i]); break; }
     }
   }
@@ -4580,9 +4864,23 @@ function viTri(n) {
   return { hang: hang, cot: cot };
 }
 
+/** Mũi tên chỉ hướng đi tiếp của ô n (nằm ở hàng h, hàng 0 là hàng dưới cùng).
+ *  Bàn đánh số kiểu rắn bò: hàng chẵn chạy sang phải, hàng lẻ chạy sang trái,
+ *  hết hàng thì lên. Không có mũi tên thì người chơi lần đầu hay đi ngược ở
+ *  hàng lẻ rồi tưởng quân cờ chạy sai. */
+function muiTen(n, h) {
+  if (n >= SO_O) return '';
+  if ((n - 1) % COT === COT - 1) return '<span class="mui len">▲</span>';
+  return (h % 2 === 0) ? '<span class="mui phai">▶</span>'
+                       : '<span class="mui trai">◀</span>';
+}
+
 function veBan() {
   var ban = $('ban');
   ban.innerHTML = '';
+  /* Đưa số cột sang CSS. Viết cứng repeat(10,1fr) trong bảng kiểu rồi đổi COT
+     ở đây là bàn xô lệch mà không có lỗi nào báo ra. */
+  ban.style.setProperty('--cot', String(COT));
   var soHang = Math.ceil(SO_O / COT);
   var dau = {};
   G.duong.forEach(function (d) { dau[d.tu] = d.loai; });
@@ -4593,20 +4891,26 @@ function veBan() {
       var trongHang = (h % 2 === 0) ? c : (COT - 1 - c);
       var n = h * COT + trongHang + 1;
       var o = document.createElement('div');
-      o.className = 'o' + ((h + c) % 2 ? ' chan' : '') + (n === SO_O ? ' dich' : '');
-      if (dau[n] === 'thang') o.className += ' co-thang';
-      if (dau[n] === 'ran') o.className += ' co-ran';
+      /* Màu tô theo VỊ TRÍ VẼ (h, c) chứ không theo số ô. Lấy n % 6 trên bàn 6
+         cột thì mỗi cột ra đúng một màu, thành sáu vệt dọc. h*2+c lệch hai bậc
+         mỗi hàng nên hai ô kề nhau — ngang lẫn dọc — không bao giờ trùng. */
+      var lop = ['o', 'mau' + ((h * 2 + c) % 6)];
+      if (n === 1) lop.push('batdau');
+      if (n === SO_O) lop.push('dich');
+      if (dau[n] === 'thang') lop.push('co-thang');
+      if (dau[n] === 'ran') lop.push('co-ran');
+      o.className = lop.join(' ');
       o.dataset.o = String(n);
-      o.textContent = n;
-      if (dau[n] || n === SO_O) {
-        var b = document.createElement('div');
-        b.className = 'bieu';
-        b.textContent = n === SO_O ? '🏁' : (dau[n] === 'thang' ? '🪜' : '🐍');
-        o.appendChild(b);
-      }
+
+      var ruot = '<span class="so-o">' + n + '</span>';
+      if (n === SO_O) ruot += '<span class="bieu">🏁</span><span class="nhan-o">Về đích</span>';
+      else if (n === 1) ruot += '<span class="nhan-o">Bắt đầu</span>';
+      else if (dau[n]) ruot += '<span class="bieu">' + (dau[n] === 'thang' ? '🪜' : '🐍') + '</span>';
+      o.innerHTML = ruot + muiTen(n, h);
       ban.appendChild(o);
     }
   }
+  xoaQuanCu();
   G.doi.forEach(function (_, i) { taoQuan(i); });
   veChuThich();
   /* Đặt quân SAU khi bàn cờ đã có kích thước thật.
@@ -4656,8 +4960,20 @@ function taoQuan(i) {
   q.id = 'quan' + i;
   q.style.background = MAU[i];
   q.textContent = String(i + 1);
-  $('ban-boc') || 0;
   document.querySelector('.ban-boc').appendChild(q);
+}
+
+/** Xoá quân cờ của ván trước.
+ *
+ *  Quân cờ nằm trong .ban-boc chứ không trong #ban, nên `ban.innerHTML = ''`
+ *  ở đầu veBan() không đụng tới chúng. Thiếu hàm này thì mỗi lần vào màn mới
+ *  lại thêm hai quân nữa, và tệ hơn: chúng mang TRÙNG id với quân mới, nên
+ *  $('quan0') trả về quân cũ còn quân mới không bao giờ được đặt toạ độ —
+ *  nó đứng nguyên ở vị trí mặc định, tức là ngay dưới bàn cờ, chồng lên bảng
+ *  chú thích. Nhìn vào chỉ thấy "có mấy cái chấm lạ dưới bàn cờ". */
+function xoaQuanCu() {
+  var cu = document.querySelectorAll('.ban-boc .quan');
+  for (var i = 0; i < cu.length; i++) cu[i].remove();
 }
 
 function datQuan() {
@@ -4703,11 +5019,11 @@ function batDauMan(maBai) {
   }
   var doi = [];
   if (cheDo === 'tuhoc') {
-    doi.push({ ten: 'Em', o: 1, dung: 0, nguoi: true });
-    doi.push({ ten: TEN_MAY[0], o: 1, dung: 0, nguoi: false });
+    doi.push({ ten: 'Em', o: 1, dung: 0, hoi: 0, nguoi: true });
+    doi.push({ ten: TEN_MAY[0], o: 1, dung: 0, hoi: 0, nguoi: false });
   } else {
     for (var i = 0; i < soNguoi; i++)
-      doi.push({ ten: 'Người ' + (i + 1), o: 1, dung: 0, nguoi: true });
+      doi.push({ ten: 'Người ' + (i + 1), o: 1, dung: 0, hoi: 0, nguoi: true });
   }
 
   G = { bai: maBai, duong: duong, cau: ds, iCau: 0, doi: doi, luot: 0, xong: false, khoa: false };
@@ -4716,6 +5032,7 @@ function batDauMan(maBai) {
   $('nhan-bai').textContent = nd.chuong;
   $('ten-bai').textContent = nd.tenBai;
   $('can-dung').textContent = String(CAN_DUNG);
+  $('o-cuoi').textContent = String(SO_O);
 
   hien('m-chedo', false); hien('m-chonbai', false); hien('m-choi', true);
   veBan(); veBen();
@@ -4758,6 +5075,7 @@ $('nut-tung').onclick = function () {
     /* Chế độ thử: đi thẳng, khỏi hỏi. Vẫn tính là một câu đúng để còn kiểm được
        điều kiện qua màn — nếu không thì bật lên là không bao giờ qua màn nổi. */
     if (THU.boCauHoi) {
+      G.doi[G.luot].hoi++;
       G.doi[G.luot].dung++;
       di(G.luot, n + THUONG, function () { if (!G.xong) doiLuot(); });
       return;
@@ -4787,6 +5105,7 @@ function layCau() {
 
 function hoiCau(soDi) {
   var q = layCau();
+  G.doi[G.luot].hoi++;
   cauHienTai = { q: q, soDi: soDi, lan: 0 };
 
   $('hoi-nhan').textContent = 'Tung được ' + soDi + ' — trả lời đúng để đi';
@@ -4929,17 +5248,16 @@ function baoDuong(duong, xong) {
 function thang(iDoi) {
   G.xong = true;
   var d = G.doi[iDoi];
-  var laEm = d.nguoi && (cheDo === 'tuhoc');
+  var hang = d.nguoi ? xepLoai(d.dung, d.hoi) : null;
+  if (d.nguoi) luuTienDo(G.bai, d.dung, hang);   // chế độ lớp học cũng ghi nhận
 
-  if (laEm) luuTienDo(G.bai, d.dung);
-  else if (d.nguoi) luuTienDo(G.bai, d.dung);   // chế độ lớp học vẫn ghi nhận
-
-  $('bao-hinh').textContent = d.nguoi ? '🏆' : '😅';
+  $('bao-hinh').textContent = d.nguoi ? (hang ? HANG[hang].huy : '🏆') : '😅';
   $('bao-tieu').textContent = d.nguoi
     ? (cheDo === 'tuhoc' ? 'Qua màn!' : d.ten + ' thắng!')
     : 'Máy về đích trước';
   $('bao-noi').innerHTML = d.nguoi
-    ? 'Về đích với <b>' + d.dung + '</b> câu trả lời đúng.'
+    ? 'Đúng <b>' + d.dung + '</b> trên <b>' + (d.hoi || d.dung) + '</b> câu đã hỏi.'
+      + (hang ? '<br>Danh hiệu: <b>' + HANG[hang].huy + ' ' + HANG[hang].ten + '</b>' : '')
       + (cheDo === 'tuhoc' ? '<br>Màn tiếp theo đã mở khoá.' : '')
     : 'Chưa sao cả — bấm chơi lại để thử lần nữa.';
   $('bao-sua').className = 'giai an';
@@ -4972,12 +5290,16 @@ function veLuoiBai() {
   l.innerHTML = '';
   ds.forEach(function (ma, i) {
     var nd = duLieu.ranThang[ma];
-    var xong = !!(tienDo[ma] && tienDo[ma].xong);
+    var td = tienDo[ma] || {};
+    var xong = !!td.xong;
     var khoa = (cheDo === 'tuhoc') && (i > toi);
+    var hang = HANG[td.hang];
     var b = document.createElement('button');
     b.className = 'o-bai' + (xong ? ' xong' : '');
     b.disabled = khoa;
-    b.innerHTML = '<span class="dau">' + (xong ? '✅' : (khoa ? '🔒' : '▶')) + '</span>'
+    if (hang) b.title = 'Danh hiệu đã đạt: ' + hang.ten;
+    b.innerHTML = '<span class="dau">'
+      + (hang ? hang.huy : (xong ? '✅' : (khoa ? '🔒' : '▶'))) + '</span>'
       + '<span class="so">Màn ' + (i + 1) + '</span>'
       + '<span class="ten">' + nd.tenBai.replace(/^Bài \d+:\s*/, '') + '</span>';
     b.onclick = function () { batDauMan(ma); };

@@ -151,7 +151,8 @@ export const GameHubSection: React.FC = () => {
 
       if (d.loai === 'hoa11:tien-do-tro-choi' && email) {
         await luuTienDoTroChoi(email, String(d.tro), String(d.bai),
-          { xong: !!d.xong, cauDung: Number(d.cauDung) || 0 });
+          { xong: !!d.xong, cauDung: Number(d.cauDung) || 0,
+            hang: d.hang ? String(d.hang) : undefined });
         return;
       }
 

@@ -221,7 +221,7 @@ export interface AppContextType {
   clearLessonHistory: (lessonId: string) => void;
   getUserProgress: (email: string) => LearningProgress | null;
   luuTienDoTroChoi: (email: string, tro: string, bai: string,
-                     ketQua: { xong: boolean; cauDung: number }) => Promise<void>;
+                     ketQua: { xong: boolean; cauDung: number; hang?: string }) => Promise<void>;
   getLessonProgress: (lessonId: string) => import('../../features/auth/types').LessonProgress | null;
   isLessonCompleted: (lessonId: string) => boolean;
   hasAdvancedStudentTitle: (email: string) => boolean;
@@ -1305,7 +1305,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
    */
   const luuTienDoTroChoi = async (
     email: string, tro: string, bai: string,
-    ketQua: { xong: boolean; cauDung: number },
+    ketQua: { xong: boolean; cauDung: number; hang?: string },
   ): Promise<void> => {
     if (!email || email === 'guest') return;   // khách vãng lai không có chỗ lưu
     const hienCo = progressCache[email]
@@ -1315,9 +1315,22 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     const troChoi = { ...(hienCo.troChoi || {}) };
     const cuaTro = { ...(troChoi[tro] || {}) };
     const cu = cuaTro[bai];
-    if (cu && cu.xong && cu.cauDung >= ketQua.cauDung) return;   // không có gì mới
-    cuaTro[bai] = { xong: ketQua.xong || !!(cu && cu.xong),
-                    cauDung: Math.max(ketQua.cauDung, cu ? cu.cauDung : 0) };
+
+    /* Danh hiệu là một thước đo RIÊNG, không suy ra được từ số câu đúng: ván
+       ngắn không sai câu nào (🥇) vẫn ít câu đúng hơn ván dài sai mấy câu (🥉).
+       Nên phải so cả hai mặt, và chỉ bỏ qua khi lần này không hơn ở mặt nào. */
+    const bac = (h?: string) => (h === 'xuatsac' ? 3 : h === 'gioi' ? 2 : h === 'kha' ? 1 : 0);
+    if (cu && cu.xong && cu.cauDung >= ketQua.cauDung && bac(cu.hang) >= bac(ketQua.hang)) return;
+
+    const ghi: { xong: boolean; cauDung: number; hang?: string } = {
+      xong: ketQua.xong || !!(cu && cu.xong),
+      cauDung: Math.max(ketQua.cauDung, cu ? cu.cauDung : 0),
+    };
+    /* Firestore từ chối thẳng giá trị undefined, nên phải BỎ HẲN khoá chứ không
+       gán undefined vào — gán thì cả lệnh ghi hỏng, mất luôn cả số câu đúng. */
+    const hangTot = bac(ketQua.hang) >= bac(cu?.hang) ? ketQua.hang : cu?.hang;
+    if (hangTot) ghi.hang = hangTot;
+    cuaTro[bai] = ghi;
     troChoi[tro] = cuaTro;
 
     const moi: LearningProgress = { ...hienCo, troChoi };

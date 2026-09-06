@@ -205,5 +205,8 @@ export interface LearningProgress {
      CỐ Ý tách khỏi completedLessons — đó là tiến độ ĐỌC BÀI trên web, hai thứ
      khác nhau: em có thể qua màn trò chơi mà chưa đọc bài, và ngược lại. Trộn
      chung thì thanh tiến độ học tập bị trò chơi làm sai lệch. */
-  troChoi?: Record<string, Record<string, { xong: boolean; cauDung: number }>>;
+  /* `hang` là danh hiệu cao nhất từng đạt ở màn đó: 'xuatsac' | 'gioi' | 'kha'.
+     Để dạng chuỗi tự do chứ không dựng kiểu chung, vì trò chơi là tệp HTML tĩnh
+     nằm ngoài phần biên dịch của web — hai bên không dùng chung được kiểu nào. */
+  troChoi?: Record<string, Record<string, { xong: boolean; cauDung: number; hang?: string }>>;
 }
