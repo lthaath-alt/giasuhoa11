@@ -6,7 +6,7 @@ BƯỚC 1 — trích lý thuyết từ các tệp .docx của giáo viên.
 
 Nguồn:
   - <thư mục>/BAI *.docx        → lý thuyết, chia theo đề mục La Mã có sẵn
-  - public/bank/seed-160.json   → câu hỏi thường gặp, lọc theo chương
+  - public/bank/ngan-hang.json   → câu hỏi thường gặp, lọc theo chương
 
 Đích: scripts/du-lieu/trich-tu-docx.json — bước 2 đọc tệp này.
 
@@ -27,7 +27,7 @@ GOC = os.path.dirname(os.path.dirname(HERE))          # thư mục gốc của d
 # trường HOA11_DOCX. CỐ Ý không viết cứng đường dẫn máy của ai vào mã nguồn.
 DOCX_DIR = (sys.argv[1] if len(sys.argv) > 1 else '') or os.environ.get('HOA11_DOCX', '')
 
-BANK = os.path.join(GOC, 'public', 'bank', 'seed-160.json')
+BANK = os.path.join(GOC, 'public', 'bank', 'ngan-hang.json')
 DICH = os.path.join(GOC, 'scripts', 'du-lieu', 'trich-tu-docx.json')
 
 if not DOCX_DIR or not os.path.isdir(DOCX_DIR):

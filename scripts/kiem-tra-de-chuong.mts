@@ -3,7 +3,7 @@
  *
  * Chạy:  npm run kiem-tra:de-chuong
  *
- * Không gọi mạng. Dùng 160 câu thật trong public/bank/seed-160.json làm ngân
+ * Không gọi mạng. Dùng ngân hàng thật trong public/bank/ngan-hang.json làm ngân
  * hàng, đi qua đúng đường mà web đi: chuanHoaCau → toLegacy → chonCauChoDeChuong.
  *
  * CỐ Ý chỉ import `deChuong.ts` chứ không import `quizService.ts`: quizService
@@ -29,7 +29,7 @@ const ok = (dieu: boolean, ten: string, chiTiet = '') => {
 };
 
 const seed: BankQuestion[] = JSON.parse(
-  readFileSync(join(GOC, 'public/bank/seed-160.json'), 'utf8')).map(chuanHoaCau);
+  readFileSync(join(GOC, 'public/bank/ngan-hang.json'), 'utf8')).map(chuanHoaCau);
 
 console.log('\n== Đề tổng hợp từng chương ==');
 const MUC = ['Thấp', 'Trung bình', 'Cao'] as const;

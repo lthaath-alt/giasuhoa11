@@ -22,7 +22,7 @@ cả hai bước và kiểm tra luôn).
 | Bước | Việc | Đọc | Ghi |
 |---|---|---|---|
 | `soan:trich` | Trích lý thuyết từ `.docx`, cắt theo đề mục La Mã có sẵn | 25 tệp `.docx` | `du-lieu/trich-tu-docx.json` |
-| `soan:sinh` | Ghép với ngân hàng câu hỏi và phần soạn tay | `du-lieu/*.json`, `public/bank/seed-160.json` | `src/features/lessons/constants.ts` |
+| `soan:sinh` | Ghép với ngân hàng câu hỏi và phần soạn tay | `du-lieu/*.json`, `public/bank/ngan-hang.json` | `src/features/lessons/constants.ts` |
 
 Vài điểm hai script này xử lý sẵn, đừng gỡ bỏ:
 
@@ -54,7 +54,37 @@ npm run thu:ai            # thử gia sư AI thật (tốn 8 lượt API)
 | `npm run kiem-tra:ngan-hang` | Chuyển đổi ngân hàng câu hỏi web ↔ trò chơi | không |
 | `npm run kiem-tra:de-chuong` | Sinh đề kiểm tra tổng hợp một chương | không |
 | `npm run kiem-tra:het-luot` | Cách diễn giải lỗi 429 của Gemini | không |
+| `npm run kiem-tra:dong-bo` | Ngân hàng trong git còn khớp Firestore không | **có** (mất mạng thì bỏ qua) |
 | `npm run thu:ai` | Gia sư AI trả lời có đúng kiến thức không | **có** |
+
+## Ngân hàng câu hỏi nằm ở đâu
+
+Ngân hàng **thật** nằm ở Firestore, collection `bank_questions`. Web đọc thẳng
+từ đó, nên trang web luôn đúng. Trong repo chỉ có `public/bank/ngan-hang.json`
+— một **bản chụp**, và mọi thứ chạy ngoài trình duyệt đều dùng bản chụp này:
+
+* `npm run gan:cau-hoi` dựng bảng câu hỏi theo bài cho trò Rắn và Thang;
+* `npm run soan:sinh` lấy câu cho phần luyện tập cuối mỗi bài giảng;
+* các bộ kiểm `kiem-tra:ngan-hang`, `kiem-tra:de-chuong`, `kiem-tra:ran-thang`;
+* trò chơi khi mở lúc mất mạng, và `migrate.ts` khi cần gạo lại Firestore trống.
+
+Thêm hay sửa câu trên web **không** tự chảy về repo. Sau khi soạn xong trên web:
+
+```
+npm run xuat:ngan-hang    # Firestore -> public/bank/ngan-hang.json
+npm run gan:cau-hoi       # gán câu theo bài rồi nhúng vào Rắn và Thang
+npm run kiem-tra
+git add public/bank/ngan-hang.json public/games && git commit
+```
+
+Quên bước đó là hai bên lệch dần mà **không có dấu hiệu nào**: web vẫn chạy
+đúng vì nó đọc Firestore, chỉ trò chơi và các bộ kiểm âm thầm dùng dữ liệu cũ.
+Đã lệch đúng như thế một lần — tệp trong git đứng ở 160 câu suốt trong khi
+Firestore đã lên 252. `kiem-tra:dong-bo` sinh ra để chặn việc đó lặp lại; nó so
+bằng **vân tay** chứ không chỉ đếm, nên sửa nội dung một câu cũng bắt được.
+
+Máy mới `git clone` về cần thêm `.env.local` (chép từ `.env.example`) mới nối
+được Firestore — tệp đó nằm trong `.gitignore` vì có `GEMINI_API_KEY`.
 
 ## `kiem-tra:chuong-trinh`
 
@@ -90,7 +120,7 @@ rộng thêm thì biết ngay: mức `vdc` (vận dụng cao) hạ về `vd` vì
 Bài kiểm tra tổng hợp chương phải lấy câu từ **ngân hàng thật trên Firestore**,
 lọc đúng chương, 10 câu chia 3 nhận biết · 3 thông hiểu · 4 vận dụng.
 
-Bài này dựng đề cho cả 6 chương từ `public/bank/seed-160.json` và kiểm: đủ số
+Bài này dựng đề cho cả 6 chương từ `public/bank/ngan-hang.json` và kiểm: đủ số
 câu, không câu nào lặp, mọi câu thuộc đúng chương, câu trắc nghiệm còn đủ phương
 án và đáp án, đề xếp từ dễ đến khó, và ngân hàng rỗng thì trả về `null` để web
 báo cho học sinh chứ không dựng đề rỗng.

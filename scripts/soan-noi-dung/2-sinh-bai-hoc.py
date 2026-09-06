@@ -8,7 +8,7 @@ chương trình.
 Nguồn chữ:
   du-lieu/trich-tu-docx.json  — lý thuyết trích từ .docx (do bước 1 tạo ra)
   du-lieu/soan-tay-goc.json   — 6 bài giáo viên soạn tay, KHÔNG được làm mất
-  public/bank/seed-160.json   — ngân hàng câu hỏi, dùng cho phần luyện tập
+  public/bank/ngan-hang.json   — ngân hàng câu hỏi, dùng cho phần luyện tập
 
 CỐ Ý không bịa nội dung hóa học. Bài nào thiếu nguồn thì để trống và ghi rõ,
 không đoán thay giáo viên.
@@ -252,7 +252,7 @@ def main():
     noi = json.load(io.open(os.path.join(DU_LIEU, 'trich-tu-docx.json'), encoding='utf8'))
     tay = {l['id']: l for l in
            json.load(io.open(os.path.join(DU_LIEU, 'soan-tay-goc.json'), encoding='utf8'))}
-    bank = json.load(io.open(os.path.join(DU_AN, 'public', 'bank', 'seed-160.json'), encoding='utf8'))
+    bank = json.load(io.open(os.path.join(DU_AN, 'public', 'bank', 'ngan-hang.json'), encoding='utf8'))
 
     theo_ch = {}
     for q in bank:

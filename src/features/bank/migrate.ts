@@ -22,7 +22,7 @@ import { fromLegacy } from './convert';
 import { BankFirestore } from './bankStore';
 
 /** 160 câu mẫu vốn nằm trong hằng số BANK của trò chơi, nay dọn về ngân hàng web */
-const SEED_URL = '/bank/seed-160.json';
+const SEED_URL = '/bank/ngan-hang.json';
 
 export interface MigrateReport {
   /** Đã chuyển từ Firestore `questions` */

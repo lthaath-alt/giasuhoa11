@@ -21,7 +21,7 @@ const ok = (dieu: boolean, ten: string, chiTiet = '') => {
 const doc = (p: string) => JSON.parse(readFileSync(p, 'utf8'));
 const rt = doc('public/games/du-lieu/ran-thang.json') as Record<string, any>;
 const ch = doc('public/games/du-lieu/cau-hoi-theo-bai.json') as Record<string, any>;
-const bank = doc('public/bank/seed-160.json') as any[];
+const bank = doc('public/bank/ngan-hang.json') as any[];
 
 const baiThat = CT.flatMap(c => c.lessons.map(l => l.id));
 

@@ -45,8 +45,8 @@ for (const [vao, mong] of [[1, 1], [6, 6], ['3', 3], [0, 1], [7, 1], [99, 1],
 }
 
 console.log('\n== Khứ hồi web → trò chơi → web ==');
-const seed: any[] = JSON.parse(readFileSync(join(GOC, 'public/bank/seed-160.json'), 'utf8'));
-console.log(`  (dùng ${seed.length} câu thật trong public/bank/seed-160.json)`);
+const seed: any[] = JSON.parse(readFileSync(join(GOC, 'public/bank/ngan-hang.json'), 'utf8'));
+console.log(`  (dùng ${seed.length} câu thật trong public/bank/ngan-hang.json)`);
 
 /* 148/160 câu mẫu không có trường `t`. Web đọc ngân hàng qua BankFirestore
    .getAll(), vốn đã chạy chuanHoaCau() cho từng câu, nên phép thử cũng phải đi
@@ -100,7 +100,7 @@ for (const l of LEVELS) {
   ok(pointsOf(q) > 0, `câu mức "${l.key}" có điểm dương`, String(pointsOf(q)));
 }
 
-console.log('\n== Dữ liệu seed-160 có hợp lệ không ==');
+console.log('\n== Dữ liệu ngân hàng có hợp lệ không ==');
 const xau = seed.filter((q: any) =>
   !q.q || !q.id ||
   !(q.ch >= 1 && q.ch <= 6) ||

@@ -5,8 +5,9 @@
  * Ra:    public/games/du-lieu/cau-hoi-theo-bai.json
  *
  * ─── Vì sao cần ─────────────────────────────────────────────────────────────
- * Ngân hàng 160 câu chỉ gắn theo CHƯƠNG (trường `ch` = 1…6), không gắn theo
- * bài. Mà trò Rắn và Thang chia 25 màn theo 25 bài. Nếu mỗi màn cứ rút bừa một
+ * Ngân hàng gắn chắc chắn theo CHƯƠNG (trường `ch` = 1…6); trường `lessonId`
+ * thì có câu có câu không — thầy gắn tay trên web nên còn sót lại một phần.
+ * Mà trò Rắn và Thang chia 25 màn theo 25 bài. Nếu mỗi màn cứ rút bừa một
  * câu trong chương thì màn "Bài 4: Nitrogen" và màn "Bài 8: Sulfuric acid" rút
  * từ chung một rổ — chơi thấy y hệt nhau, và câu hỏi thường lệch hẳn bài.
  *
@@ -25,7 +26,7 @@
 import { writeFileSync, mkdirSync, readFileSync } from 'node:fs';
 import { CHEMISTRY_11_CURRICULUM as CT } from '../src/features/lessons/constants';
 
-const bank = JSON.parse(readFileSync('public/bank/seed-160.json', 'utf8')) as any[];
+const bank = JSON.parse(readFileSync('public/bank/ngan-hang.json', 'utf8')) as any[];
 
 /* Từ quá phổ biến thì có mặt ở mọi câu, giữ lại chỉ làm nhiễu điểm. */
 const BO_QUA = new Set(('của và các là có trong cho với khi một những được không '
@@ -71,6 +72,11 @@ for (const c of CT) {
     const cham = cuaChuong.map(q => {
       const tq = gop(q.q, ...(q.o ?? []), q.e);
       let diem = 0;
+      /* Câu thầy đã TỰ GẮN vào bài này thì luôn xếp trước mọi câu đoán bằng từ
+         khoá — cộng thẳng 100 điểm, cao hơn mọi điểm khớp có thể đạt được.
+         Trước đây script bỏ qua hẳn trường `lessonId`, tức là vứt đi phần thẩm
+         định của người dạy để tin vào phép đếm từ trùng. */
+      if (q.lessonId && q.lessonId === l.id) diem += 100;
       for (const t of tq) {
         if (!kho.has(t)) continue;
         /* Trùng một công thức hoá học nói lên nhiều hơn trùng một từ thường:
@@ -84,8 +90,9 @@ for (const c of CT) {
     ket[l.id] = { tenBai: l.title, ch, cau: cham };
 
     const khop = cham.filter(x => x.diem >= 3).length;
-    thongKe.push(`${l.id.padEnd(7)} ${String(khop).padStart(2)} câu khớp rõ / ${cham.length} câu cùng chương`
-      + `   ${l.title.slice(0, 40)}`);
+    const ganTay = cham.filter(x => x.diem >= 100).length;
+    thongKe.push(`${l.id.padEnd(7)} ${String(ganTay).padStart(2)} gắn tay + ${String(khop - ganTay).padStart(2)} khớp rõ`
+      + ` / ${String(cham.length).padStart(2)} câu cùng chương   ${l.title.slice(0, 38)}`);
   }
 }
 
@@ -93,7 +100,7 @@ mkdirSync('public/games/du-lieu', { recursive: true });
 writeFileSync('public/games/du-lieu/cau-hoi-theo-bai.json', JSON.stringify(ket, null, 1), 'utf8');
 
 console.log('Đã gán → public/games/du-lieu/cau-hoi-theo-bai.json\n');
-console.log('bài     khớp rõ (điểm ≥ 3)');
+console.log('bài     câu thầy gắn tay + câu máy thấy khớp rõ (điểm ≥ 3)');
 console.log('─'.repeat(74));
 thongKe.forEach(x => console.log('  ' + x));
 
