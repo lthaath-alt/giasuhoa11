@@ -158,12 +158,17 @@ const hop: Record<string, any> = { console, Math, Object, JSON, String, Number, 
 createContext(hop);
 runInContext([
   catMa('var NHUNG_RAN_THANG = ', '\n// ═══'),
-  'var duLieu = { ranThang: NHUNG_RAN_THANG };',
+  'var duLieu = { ranThang: NHUNG_RAN_THANG, uuTien: NHUNG_UU_TIEN, nganHang: [] };',
   catMa('var SO_O       =', '// ═══ Trạng thái'),
-  catMa('function bam(s)', '\n// ═══'),
+  /* Cắt từ `tron` chứ không từ `bam`: hai hàm nằm liền nhau trong mục Tiện ích
+     và cauChoBai cần cả hai. */
+  catMa('function tron(a, hat)', '\n// ═══'),
   catMa('var HANG = {', '// ═══ Tiến độ'),
+  catMa('function cauChoBai(maBai)', '\n// ═══ Đặt thang'),
   catMa('function datRanThang(maBai)', '\n// ═══ Vẽ bàn cờ'),
 ].join('\n'), hop);
+/* Ngân hàng "sống" mà trò chơi đọc từ IndexedDB — ở đây thay bằng bản chụp. */
+hop.duLieu.nganHang = bank;
 
 console.log('\n== Bàn cờ ==');
 {
@@ -201,6 +206,50 @@ console.log('\n== Bàn cờ ==');
   ok(xa <= Math.round(hop.SO_O / 3), 'bước nhảy dài nhất không quá một phần ba bàn',
      `dài nhất ${xa} ô trên ${hop.SO_O}`);
   ok(gan >= 3, 'bước nhảy ngắn nhất vẫn đáng đi', `ngắn nhất ${gan} ô`);
+}
+
+console.log('\n== Chọn câu hỏi cho một màn ==');
+{
+  const bangCau: Record<string, any> = {};
+  bank.forEach(q => { bangCau[q.id] = q; });
+
+  let itNhat = Infinity, itNhatBai = '';
+  const loi = { khongPhaiMc: [] as string[], trung: [] as string[], sai: [] as string[] };
+  for (const ma of baiThat) {
+    const ds = hop.cauChoBai(ma) as any[];
+    if (ds.length < itNhat) { itNhat = ds.length; itNhatBai = ma; }
+    if (ds.some(q => (q.t || 'mc') !== 'mc' || !Array.isArray(q.o) || q.o.length < 2))
+      loi.khongPhaiMc.push(ma);
+    if (new Set(ds.map(q => q.id)).size !== ds.length) loi.trung.push(ma);
+    if (ds.some(q => q.ch !== ch[ma].ch)) loi.sai.push(ma);
+  }
+  /* Một màn cần 6 câu đúng, mà trả lời sai thì không được tính — nên phải dư
+     ra kha khá, nếu không cuối màn học sinh gặp lại đúng câu vừa làm. */
+  ok(itNhat >= 15, 'màn nào cũng có từ 15 câu trở lên', `ít nhất ${itNhat} câu (${itNhatBai})`);
+  ok(loi.khongPhaiMc.length === 0, 'chỉ trả về câu trắc nghiệm', loi.khongPhaiMc.join(', '));
+  ok(loi.trung.length === 0, 'không câu nào lặp trong cùng một màn', loi.trung.join(', '));
+  ok(loi.sai.length === 0, 'câu nào cũng đúng chương của bài', loi.sai.join(', '));
+
+  /* Câu MỚI trong ngân hàng mà chưa có tên trong bảng gán vẫn phải được hỏi.
+     Đây là chỗ từng hỏng âm thầm: bảng gán là tệp nhúng, nó đứng yên cho tới
+     khi có người chạy lại `npm run gan:cau-hoi`, nên 92 câu soạn thêm trên web
+     không bao giờ tới tay học sinh mà nhìn vào không thấy dấu hiệu gì. */
+  const maBai = baiThat[0];
+  const chuong = ch[maBai].ch;
+  const cauLa = {
+    id: 'THU:cau-moi-chua-gan', ch: chuong, lv: 'nb', t: 'mc',
+    q: 'Câu thử — vừa soạn trên web, chưa qua bước gán theo bài',
+    o: ['A', 'B'], a: 0,
+  };
+  const truoc = (hop.cauChoBai(maBai) as any[]).length;
+  hop.duLieu.nganHang = [...bank, cauLa];
+  const sau = hop.cauChoBai(maBai) as any[];
+  hop.duLieu.nganHang = bank;
+  ok(sau.some(q => q.id === cauLa.id) && sau.length === truoc + 1,
+     'câu mới chưa có trong bảng gán vẫn được đưa vào màn',
+     `trước ${truoc} câu, sau ${sau.length} câu`);
+  ok(sau[0] && sau[0].id !== cauLa.id,
+     'câu chưa gán xếp SAU câu đã chấm điểm khớp bài', 'câu đầu: ' + (sau[0] || {}).id);
 }
 
 console.log('\n== Xếp loại danh hiệu ==');

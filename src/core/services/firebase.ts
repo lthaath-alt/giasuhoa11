@@ -1,15 +1,21 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
+import { FIREBASE_CONG_KHAI } from './firebaseCongKhai';
 
-// 1. Firebase Config đọc từ biến môi trường
+// 1. Cấu hình Firebase: ưu tiên biến môi trường, thiếu thì lấy bản công khai
+//    trong git. Trước đây thiếu là rơi về chuỗi rỗng, và ứng dụng chạy tiếp
+//    với một dự án Firebase không tồn tại — máy vừa clone về sẽ thấy "ngân
+//    hàng trống", "chưa có lớp nào", tưởng mất dữ liệu chứ không hiểu là chưa
+//    có cấu hình. Xem chú thích trong firebaseCongKhai.ts.
 export const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "",
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "",
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "",
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "",
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "",
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || "",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || FIREBASE_CONG_KHAI.apiKey,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || FIREBASE_CONG_KHAI.authDomain,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || FIREBASE_CONG_KHAI.projectId,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || FIREBASE_CONG_KHAI.storageBucket,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID
+    || FIREBASE_CONG_KHAI.messagingSenderId,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || FIREBASE_CONG_KHAI.appId,
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || ""
 };
 

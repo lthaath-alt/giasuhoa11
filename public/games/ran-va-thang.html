@@ -6441,26 +6441,57 @@ function napNganHang() {
 /**
  * Trả về danh sách câu TRẮC NGHIỆM cho bài, xếp câu sát bài lên trước.
  *
- * `cau-hoi-theo-bai.json` đã xếp sẵn theo điểm khớp từ khoá. Ở đây chỉ việc
- * lấy theo thứ tự đó, bỏ những câu không phải trắc nghiệm, rồi trộn nhẹ trong
- * từng nhóm điểm để hai lần chơi không ra y hệt thứ tự.
+ * Hai nguồn, nối đuôi nhau:
+ *
+ *   1. Bảng gán `cau-hoi-theo-bai.json` — đã xếp sẵn theo điểm khớp từ khoá và
+ *      theo `lessonId` thầy gắn tay. Lấy đúng thứ tự đó, chỉ trộn nhẹ trong
+ *      từng nhóm cùng điểm để hai lần chơi không ra y hệt.
+ *
+ *   2. Phần CÒN LẠI cùng chương trong ngân hàng sống, xếp xuống cuối.
+ *
+ * Nguồn 2 là chỗ đón những câu thầy vừa soạn trên web sau lần
+ * `npm run gan:cau-hoi` gần nhất. Bảng gán là tệp nhúng sẵn, nó đứng yên cho
+ * tới khi có người chạy lại lệnh sinh dữ liệu; chỉ đọc mỗi bảng gán thì câu
+ * mới soạn KHÔNG BAO GIỜ được hỏi, mà nhìn vào trò chơi không thấy dấu hiệu
+ * gì cả. Đã xảy ra đúng như thế: ngân hàng lên 252 câu từ 31/08 mà trò chơi
+ * vẫn chỉ hỏi trong 160 câu cũ tới 06/09.
+ *
+ * Xếp cuối chứ không trộn lẫn: câu ở nguồn 2 chưa qua bước chấm điểm khớp bài
+ * nên có thể lệch nội dung, để lên trước là hỏng ý "ưu tiên câu sát bài".
  */
 function cauChoBai(maBai) {
   var bang = {};
   duLieu.nganHang.forEach(function (q) { bang[q.id] = q; });
 
+  function dungDuoc(q) {
+    // thiếu `t` thì mặc định trắc nghiệm
+    return q && (q.t || 'mc') === 'mc' && q.o && q.o.length >= 2;
+  }
+
   var uu = (duLieu.uuTien[maBai] || {}).cau || [];
   var ra = [];
   var nhom = {};
+  var daXet = {};
   uu.forEach(function (x) {
-    var q = bang[x.id];
-    if (!q) return;
-    var loai = q.t || 'mc';                 // thiếu `t` thì mặc định trắc nghiệm
-    if (loai !== 'mc' || !q.o || q.o.length < 2) return;
-    (nhom[x.diem] = nhom[x.diem] || []).push(q);
+    daXet[x.id] = true;
+    if (!dungDuoc(bang[x.id])) return;
+    (nhom[x.diem] = nhom[x.diem] || []).push(bang[x.id]);
   });
   Object.keys(nhom).map(Number).sort(function (a, b) { return b - a; })
     .forEach(function (d, i) { ra = ra.concat(tron(nhom[d], bam(maBai) + i)); });
+
+  /* Câu cùng chương chưa có tên trong bảng gán. `ch` do bảng gán ghi kèm; thiếu
+     nó thì không biết bài này thuộc chương nào, khi đó không bù gì cả còn hơn
+     bù nhầm câu của chương khác. */
+  var ch = (duLieu.uuTien[maBai] || {}).ch;
+  if (ch != null) {
+    var them = [];
+    duLieu.nganHang.forEach(function (q) {
+      if (daXet[q.id] || q.ch !== ch || !dungDuoc(q)) return;
+      them.push(q);
+    });
+    ra = ra.concat(tron(them, bam(maBai) + 101));
+  }
   return ra;
 }
 

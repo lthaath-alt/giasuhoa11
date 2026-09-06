@@ -1,0 +1,76 @@
+# Tự kéo ngân hàng câu hỏi từ Firestore về repo.
+#
+# VÌ SAO CÓ TỆP NÀY.  Ngân hàng thật nằm ở Firestore. Trong repo chỉ có bản
+# chụp `public/bank/ngan-hang.json`, và mọi thứ chạy ngoài trình duyệt đều dùng
+# bản chụp đó. Thầy soạn thêm câu trên web mà quên chạy `npm run xuat:ngan-hang`
+# thì hai bên lệch dần MÀ KHÔNG CÓ DẤU HIỆU NÀO — web vẫn đúng vì nó đọc thẳng
+# Firestore. Đã lệch đúng như thế suốt từ 31/08 tới 06/09/2026: repo đứng ở 160
+# câu trong khi Firestore đã lên 252.
+#
+# Không cần cài secret nào: cấu hình Firebase là khoá công khai, nằm sẵn trong
+# `src/core/services/firebaseCongKhai.ts`. Collection `bank_questions` cho đọc
+# công khai nên bước xuất không phải đăng nhập. Job này CHỈ ĐỌC Firestore.
+#
+# Lưu ý về lịch chạy: GitHub tự tắt workflow theo lịch ở repo không có hoạt
+# động nào suốt 60 ngày. Nghỉ hè dài thì vào tab Actions bật lại.
+
+name: Đồng bộ ngân hàng câu hỏi
+
+on:
+  schedule:
+    # 19:00 UTC = 02:00 giờ Việt Nam hôm sau. Chọn giờ đó để nếu có commit thì
+    # Netlify dựng lại lúc không ai đang dùng.
+    - cron: '0 19 * * *'
+  workflow_dispatch:        # nút "Run workflow" trong tab Actions, chạy ngay
+
+permissions:
+  contents: write           # cần để đẩy commit đồng bộ lên main
+
+# Không để hai lần chạy chồng nhau, tránh hai commit đá nhau.
+concurrency:
+  group: dong-bo-ngan-hang
+  cancel-in-progress: false
+
+jobs:
+  dong-bo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci
+
+      - name: Xuất ngân hàng từ Firestore
+        # Script tự dừng với mã lỗi khi Firestore trả về 0 câu, nên mất mạng
+        # hay sai cấu hình sẽ làm job đỏ chứ không lặng lẽ ghi đè bằng tệp rỗng.
+        run: npm run xuat:ngan-hang
+
+      - name: Gán câu theo bài rồi nhúng vào trò chơi
+        run: npm run gan:cau-hoi
+
+      - name: Kiểm lại dữ liệu trò chơi
+        # Chỉ chạy bộ kiểm liên quan tới dữ liệu vừa sinh. Chạy cả `npm run
+        # kiem-tra` thì một phép kiểm hỏng vì lý do không liên quan cũng chặn
+        # mất việc đồng bộ.
+        run: npm run kiem-tra:ran-thang
+
+      - name: Commit nếu có thay đổi
+        run: |
+          if git diff --quiet -- public/bank public/games; then
+            echo "Ngân hàng không đổi so với lần trước — không commit gì."
+            exit 0
+          fi
+          SO=$(node -e "console.log(require('./public/bank/ngan-hang.json').length)")
+          git config user.name  'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/bank/ngan-hang.json public/games
+          git commit -m "Dong bo ngan hang cau hoi tu Firestore: ${SO} cau
+
+          Chay tu dong boi .github/workflows/dong-bo-ngan-hang.yml.
+          Nguon that la Firestore; tep trong repo chi la ban chup."
+          git push
+          echo "Đã đẩy bản đồng bộ: ${SO} câu."

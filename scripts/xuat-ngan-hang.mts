@@ -22,7 +22,8 @@
  */
 import { writeFileSync } from 'node:fs';
 import {
-  TEP_NGAN_HANG, docEnv, thieuCauHinh, taiTuFirestore, chuanHoa, vanTay, docTepNganHang,
+  TEP_NGAN_HANG, docEnv, thieuCauHinh, cauHinh, taiTuFirestore, chuanHoa, vanTay,
+  docTepNganHang,
 } from './ngan-hang-chung.mts';
 
 const env = docEnv();
@@ -33,7 +34,7 @@ if (thieu.length) {
   process.exit(1);
 }
 
-console.log('Đang đọc bank_questions của dự án ' + env.VITE_FIREBASE_PROJECT_ID + ' …');
+console.log('Đang đọc bank_questions của dự án ' + cauHinh(env).projectId + ' …');
 const cau = await taiTuFirestore(env);
 
 if (!cau.length) {

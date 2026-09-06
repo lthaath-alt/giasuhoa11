@@ -11,6 +11,7 @@ import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getFirestore, collection, getDocs } from 'firebase/firestore';
+import { FIREBASE_CONG_KHAI } from '../src/core/services/firebaseCongKhai';
 
 export const GOC = join(dirname(fileURLToPath(import.meta.url)), '..');
 export const TEP_NGAN_HANG = join(GOC, 'public/bank/ngan-hang.json');
@@ -37,9 +38,29 @@ export function docEnv(): Record<string, string> {
   return ra;
 }
 
+/**
+ * Cấu hình dùng để nối Firestore: .env.local thắng, thiếu thì lấy bản công
+ * khai trong git.
+ *
+ * Nhờ bản dự phòng này mà GitHub Actions chạy được `xuat:ngan-hang` mà không
+ * cần cài secret nào, và máy vừa clone về cũng chạy được ngay.
+ */
+export function cauHinh(env: Record<string, string>) {
+  return {
+    apiKey: env.VITE_FIREBASE_API_KEY || FIREBASE_CONG_KHAI.apiKey,
+    authDomain: env.VITE_FIREBASE_AUTH_DOMAIN || FIREBASE_CONG_KHAI.authDomain,
+    projectId: env.VITE_FIREBASE_PROJECT_ID || FIREBASE_CONG_KHAI.projectId,
+    storageBucket: env.VITE_FIREBASE_STORAGE_BUCKET || FIREBASE_CONG_KHAI.storageBucket,
+    messagingSenderId: env.VITE_FIREBASE_MESSAGING_SENDER_ID
+      || FIREBASE_CONG_KHAI.messagingSenderId,
+    appId: env.VITE_FIREBASE_APP_ID || FIREBASE_CONG_KHAI.appId,
+  };
+}
+
+/** Còn thiếu gì thì không nối được. Có bản công khai nên hầu như luôn rỗng. */
 export function thieuCauHinh(env: Record<string, string>): string[] {
-  return ['VITE_FIREBASE_API_KEY', 'VITE_FIREBASE_PROJECT_ID', 'VITE_FIREBASE_APP_ID']
-    .filter(k => !env[k]);
+  const c = cauHinh(env);
+  return (['apiKey', 'projectId', 'appId'] as const).filter(k => !c[k]);
 }
 
 /**
@@ -52,14 +73,7 @@ export function thieuCauHinh(env: Record<string, string>): string[] {
 export async function taiTuFirestore(
   env: Record<string, string>, hetGioMs = 25000,
 ): Promise<Record<string, unknown>[]> {
-  const app = getApps().length ? getApp() : initializeApp({
-    apiKey: env.VITE_FIREBASE_API_KEY,
-    authDomain: env.VITE_FIREBASE_AUTH_DOMAIN,
-    projectId: env.VITE_FIREBASE_PROJECT_ID,
-    storageBucket: env.VITE_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-    appId: env.VITE_FIREBASE_APP_ID,
-  });
+  const app = getApps().length ? getApp() : initializeApp(cauHinh(env));
   /* Mất mạng thì Firestore không báo lỗi mà ngồi thử lại mãi. Không có hạn giờ
      thì `npm run kiem-tra` treo vô hạn, đúng lúc người chạy nó đang offline. */
   const tai = getDocs(collection(getFirestore(app), COL))

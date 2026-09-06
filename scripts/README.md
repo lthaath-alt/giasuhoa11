@@ -68,7 +68,19 @@ từ đó, nên trang web luôn đúng. Trong repo chỉ có `public/bank/ngan-h
 * các bộ kiểm `kiem-tra:ngan-hang`, `kiem-tra:de-chuong`, `kiem-tra:ran-thang`;
 * trò chơi khi mở lúc mất mạng, và `migrate.ts` khi cần gạo lại Firestore trống.
 
-Thêm hay sửa câu trên web **không** tự chảy về repo. Sau khi soạn xong trên web:
+### Đồng bộ tự động — thầy không phải làm gì
+
+`.github/workflows/dong-bo-ngan-hang.yml` chạy **02:00 giờ Việt Nam mỗi đêm**:
+xuất ngân hàng từ Firestore, gán lại câu theo bài, kiểm, rồi commit vào `main`
+nếu có gì đổi. Cần gấp thì vào tab **Actions → Đồng bộ ngân hàng câu hỏi →
+Run workflow**. Không cần cài secret nào, xem mục dưới.
+
+Trò chơi cũng **không còn phải đợi** lần đồng bộ kế tiếp: `cauChoBai` trong
+`ran-va-thang.html` lấy hết bảng gán rồi lấy tiếp mọi câu cùng chương trong
+ngân hàng sống (đọc từ IndexedDB, do web bơm sang từ Firestore). Câu vừa soạn
+trên web là học sinh gặp được ngay, chỉ xếp sau các câu đã chấm điểm khớp bài.
+
+Làm tay khi cần:
 
 ```
 npm run xuat:ngan-hang    # Firestore -> public/bank/ngan-hang.json
@@ -77,14 +89,22 @@ npm run kiem-tra
 git add public/bank/ngan-hang.json public/games && git commit
 ```
 
-Quên bước đó là hai bên lệch dần mà **không có dấu hiệu nào**: web vẫn chạy
-đúng vì nó đọc Firestore, chỉ trò chơi và các bộ kiểm âm thầm dùng dữ liệu cũ.
-Đã lệch đúng như thế một lần — tệp trong git đứng ở 160 câu suốt trong khi
-Firestore đã lên 252. `kiem-tra:dong-bo` sinh ra để chặn việc đó lặp lại; nó so
-bằng **vân tay** chứ không chỉ đếm, nên sửa nội dung một câu cũng bắt được.
+`kiem-tra:dong-bo` so bằng **vân tay** chứ không chỉ đếm số câu, nên sửa nội
+dung một câu cũng bắt được. Mất mạng thì nó bỏ qua, không báo hỏng.
 
-Máy mới `git clone` về cần thêm `.env.local` (chép từ `.env.example`) mới nối
-được Firestore — tệp đó nằm trong `.gitignore` vì có `GEMINI_API_KEY`.
+### Máy mới cần gì
+
+```
+git clone … && npm install && npm run dev
+```
+
+Chỉ vậy. Cấu hình Firebase nằm sẵn trong `src/core/services/firebaseCongKhai.ts`
+— sáu giá trị công khai theo thiết kế của Firebase, vốn đã nằm trong bản dựng
+trên Netlify. Biến `VITE_FIREBASE_*` trong `.env.local` vẫn được ưu tiên nếu
+có, để còn trỏ sang dự án Firebase khác lúc thử nghiệm.
+
+Thứ **duy nhất** còn phải chép tay là `GEMINI_API_KEY` trong `.env.local`, và
+chỉ phần gia sư AI cần tới nó. Đã kiểm: khoá đó không bị đóng vào bản dựng.
 
 ## `kiem-tra:chuong-trinh`
 
