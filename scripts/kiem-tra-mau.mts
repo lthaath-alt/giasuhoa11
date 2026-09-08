@@ -138,5 +138,86 @@ console.log('\n== Không còn mã màu viết cứng ==');
   else dat(`mã màu cứng còn ${TONG} (ngưỡng ${NGUONG}) — phần lớn là màu nhấn chỉ dùng một chỗ`);
 }
 
+console.log('\n== Tương phản chữ trên nền ==');
+{
+  /* Luật là 4,5 — mức WCAG AA cho chữ thường. Trước khi có mục này, hiến chương
+     dự án đã ghi con số đó như thể đang có hiệu lực trong khi KHÔNG PHÉP KIỂM
+     NÀO đo nó: đo tay ra 14 cặp không đạt, trong đó `--luc` làm chữ chỉ được
+     2,32 mà đang dùng ở 11 chỗ. Một luật không ai canh thì chỉ là lời chúc. */
+  const NGUONG = 4.5;
+
+  function giaTri(chon: string): Record<string, string> {
+    const i = css.indexOf(chon);
+    const than = css.slice(css.indexOf('{', i) + 1, css.indexOf('}', i));
+    const r: Record<string, string> = {};
+    for (const m of than.matchAll(/(--[a-z0-9-]+)\s*:\s*(#[0-9a-fA-F]{6})\s*;/g)) r[m[1]] = m[2];
+    return r;
+  }
+  const BANG = { 'sáng': giaTri(':root {'), 'tối': giaTri(':root[data-theme="dark"]') };
+
+  const doSang = (hex: string) => {
+    const [r, g, b] = hex.slice(1).match(/../g)!.map(x => {
+      const c = parseInt(x, 16) / 255;
+      return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+    });
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  };
+  const tuongPhan = (a: string, b: string) => {
+    const [x, y] = [doSang(a), doSang(b)].sort((p, q) => q - p);
+    return (x + 0.05) / (y + 0.05);
+  };
+
+  const CHU_THAN = ['--chu-dam', '--chu-dam-2', '--chu-dam-3', '--chu', '--chu-2', '--chu-mo'];
+  const NEN_CHINH = ['--nen-trang', '--nen-the', '--nen-nhat', '--nen-xam', '--nen-rat-nhat'];
+  const NEN_NHAT = ['--nen-cam-nhat', '--nen-cam-nhat2', '--nen-luc-nhat', '--nen-luc-nhat2',
+                    '--nen-vang-nhat', '--nen-xanh-nhat', '--nen-xanh-nhat2', '--nen-tim-nhat',
+                    '--nen-tim-nhat2', '--nen-do-nhat', '--nen-do-nhat2'];
+  const NHAN_LAM_CHU = ['--cam', '--teal', '--xanh', '--xanh-dam', '--do', '--luc', '--tim',
+                        '--vang', '--vang-dam', '--cam-dam', '--luc-dam', '--luc-dam2',
+                        '--xanh-troi', '--xanh-troi2', '--do-dam', '--tim-2', '--xanh-chu',
+                        '--xanh-chu2'];
+  /* Nền nút mang chữ trắng. --vang-nen CỐ Ý không nằm đây: chữ trắng trên vàng
+     chỉ được 2,14, nên nó đi cùng --chu-tren-vang (xem cặp cố định bên dưới).
+     Tra trong src/ thì --vang-nen chỉ làm thanh chỉ báo tab và nền khối, không
+     có chữ trắng nào đặt lên. */
+  const NEN_NUT = ['--xanh-nen', '--xanh-dam-nen', '--teal-nen', '--cam-nen', '--do-nen',
+                   '--tim-nen', '--luc-nen'];
+  const CO_DINH: [string, string][] = [
+    ['--chu-ma', '--nen-ma'],
+    ['--chu-tren-nen-dam', '--nen-dam'],
+    ['--chu-tren-vang', '--vang-nen'],
+    ['--chu-nguoc', '--nen-dam'],
+  ];
+
+  /* Danh sách miễn: cặp nào chấp nhận dưới ngưỡng thì phải ghi ra đây kèm LÝ DO,
+     để món nợ đếm được chứ không nằm khuất. Hiện đang rỗng — mọi cặp đều đạt sau
+     đợt làm đậm bảng màu chế độ sáng ngày 08/09/2026. */
+  const MIEN: { chu: string; nen: string; vi_sao: string }[] = [];
+  const duocMien = (c: string, n: string) => MIEN.some(m => m.chu === c && m.nen === n);
+
+  const cap: [string, string][] = [
+    ...CHU_THAN.flatMap(c => NEN_CHINH.map(n => [c, n] as [string, string])),
+    ...NEN_NHAT.map(n => ['--chu-dam', n] as [string, string]),
+    ...NHAN_LAM_CHU.map(c => [c, '--nen-the'] as [string, string]),
+    ...NEN_NUT.map(n => ['--chu-nguoc', n] as [string, string]),
+    ...CO_DINH,
+  ];
+
+  for (const [che, b] of Object.entries(BANG)) {
+    const rot: string[] = [];
+    let soCap = 0;
+    for (const [c, n] of cap) {
+      if (!b[c] || !b[n] || duocMien(c, n)) continue;
+      soCap++;
+      const t = tuongPhan(b[c], b[n]);
+      if (t < NGUONG) rot.push(`${c} trên ${n} = ${t.toFixed(2)}`);
+    }
+    if (rot.length) truot(`chế độ ${che}: mọi cặp chữ/nền đạt ${NGUONG}`,
+      `${rot.length}/${soCap} cặp chưa đạt — ${rot.slice(0, 6).join('; ')}`);
+    else dat(`chế độ ${che}: cả ${soCap} cặp chữ/nền đều đạt ${NGUONG}`);
+  }
+  if (MIEN.length) console.log(`  GHI   còn ${MIEN.length} cặp trong danh sách miễn`);
+}
+
 console.log(soLoi === 0 ? '\n>>> TẤT CẢ ĐẠT\n' : `\n>>> CÓ ${soLoi} MỤC KHÔNG ĐẠT\n`);
 process.exit(soLoi === 0 ? 0 : 1);

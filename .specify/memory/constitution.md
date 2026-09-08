@@ -24,12 +24,23 @@ liệu này.
 
 ### II. Tiếng Việt là ngôn ngữ của cả sản phẩm lẫn mã nguồn
 
-Giao diện, thông báo lỗi, chú thích trong mã và thông điệp commit: tiếng Việt. Tên hàm
-và biến mới đặt bằng tiếng Việt không dấu theo lối đã có trong dự án (`cauChoBai`,
-`veBan`, `xepLoai`, `kiemTra`). Giữ nguyên tiếng Anh cho API của thư viện bên ngoài và
-cho tên tệp, tên lệnh.
+Giao diện, thông báo lỗi, **chú thích trong mã** và thông điệp commit: tiếng Việt. Lý
+do: người bảo trì dự án này là giáo viên Việt Nam, không phải kỹ sư nói tiếng Anh.
 
-Lý do: người bảo trì dự án này là giáo viên Việt Nam, không phải kỹ sư nói tiếng Anh.
+Còn **cách đặt tên hàm và biến thì tuỳ vùng**, và đây là mô tả hiện trạng chứ không
+phải mệnh lệnh:
+
+- `src/` — chủ yếu tiếng Anh (`getUserProgress`, `handleSubmit`, `useCheDoMau`). Đếm
+  ngày 08/09/2026: **154 tên kiểu tiếng Anh so với 35 tên kiểu tiếng Việt**.
+- Trò chơi (`public/games/*.html`) và `scripts/` — chủ yếu tiếng Việt không dấu
+  (`cauChoBai`, `veBan`, `xepLoai`, `datRanThang`).
+
+Viết thêm vào vùng nào thì theo lối của vùng đó. Đừng đổi tên hàng loạt cho "thống
+nhất" — công sức lớn, rủi ro cao, lợi ích không rõ.
+
+> Bản nháp đầu tiên của mục này ghi "đặt tên tiếng Việt **theo lối đã có trong dự án**".
+> Sai: tôi lấy ấn tượng từ mấy tệp vừa sửa rồi khái quát cho cả repo, trong khi `src/`
+> dùng tiếng Anh áp đảo 4 ăn 1. Đúng nguyên tắc III — đáng ra phải đếm trước khi viết.
 
 ### III. Đo trước khi sửa (KHÔNG THƯƠNG LƯỢNG)
 
@@ -58,8 +69,20 @@ Một biến màu chỉ gánh một vai: `--cam` làm **chữ** thì nền dùng
 giờ mượn biến màu chữ làm nền — ở chế độ sáng trông vẫn ổn, sang chế độ tối nó lật
 thành chữ trắng trên nền trắng.
 
-Tương phản chữ trên nền tối thiểu **4,5**. Mọi thay đổi giao diện phải thử ở **cả hai
-chế độ màu**: mọi lỗi loại này trong dự án đều chỉ lộ ra ở một trong hai.
+Tương phản chữ trên nền tối thiểu **4,5** (mức WCAG AA cho chữ thường).
+`npm run kiem-tra:mau` đo thật 70 cặp chữ/nền ở **mỗi** chế độ màu và báo đỏ kèm số đo
+khi có cặp nào tụt xuống dưới. Cặp nào cố ý chấp nhận thấp hơn thì phải ghi vào danh
+sách `MIEN` trong bộ kiểm **kèm lý do** — để món nợ đếm được chứ không nằm khuất; danh
+sách đó hiện đang rỗng.
+
+Mọi thay đổi giao diện vẫn phải thử ở **cả hai chế độ màu**: mọi lỗi loại này trong dự
+án đều chỉ lộ ra ở một trong hai.
+
+> Mục này từng ghi con số 4,5 như thể đang có hiệu lực, trong khi **không phép kiểm nào
+> đo nó**. Đo tay ngày 08/09/2026 ra 14 cặp không đạt, tệ nhất là `--luc` làm màu chữ
+> chỉ được 2,32 mà đang dùng ở 11 chỗ, và `--vang` được 1,96. Đã làm đậm 12 biến ở
+> chế độ sáng và sáng/đậm lại 2 biến ở chế độ tối cho đạt chuẩn, rồi mới viết phép đo.
+> Đúng cái bẫy nguyên tắc IV cảnh báo: một luật không ai canh thì chỉ là lời chúc.
 
 ## Ràng buộc kỹ thuật
 
@@ -89,6 +112,10 @@ chế độ màu**: mọi lỗi loại này trong dự án đều chỉ lộ ra 
 - Trước khi commit: xem `git status` và `git diff`. **Không `git add -A` một cách mù
   quáng** — đã có lần tệp thử lọt vào commit vì thế.
 - **Không push khi chưa được đồng ý.** Commit tại chỗ thì lùi được, đẩy lên rồi thì khó.
+- **Không tự chạy `npm run build`, không tự deploy, không dùng lệnh git phá huỷ**
+  (`reset --hard`, xoá nhánh, ghi đè). Đây là luật sẵn có trong `CLAUDE.md`; chép vào
+  đây vì bản nháp đầu tiên bỏ sót nó, và chính tôi đã chạy `npm run build` nhiều lần
+  trong lúc soạn tài liệu này.
 - Báo cáo trung thực: phép kiểm hỏng thì nói là hỏng kèm nguyên văn; bỏ qua bước nào thì
   nói rõ đã bỏ qua.
 - Việc tự mình không kiểm chứng được (phải đăng nhập, phải nhìn trên máy thật) thì nói
@@ -104,4 +131,4 @@ Sửa hiến chương phải ghi lý do trong thông điệp commit và tăng s�
 khi bỏ hay thay hẳn một nguyên tắc, chữ số giữa khi thêm nguyên tắc hoặc mục mới, chữ số
 cuối khi chỉ làm rõ câu chữ.
 
-**Phiên bản**: 1.0.0 | **Thông qua**: chờ thầy Paul duyệt | **Sửa lần cuối**: 2026-09-06
+**Phiên bản**: 1.0.0 (bản nháp) | **Thông qua**: chờ thầy Paul duyệt | **Sửa lần cuối**: 2026-09-08
