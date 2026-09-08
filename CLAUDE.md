@@ -1,6 +1,12 @@
-# CLAUDE.md — Edu Quiz
+# CLAUDE.md — Gia sư Hóa 11
 
-Nền tảng tạo quiz + trò chơi học tập tích hợp AI (Gemini). Dự án mẫu của khoá học "Tạo website bằng AI".
+Nền tảng tự học Hoá học 11 theo chương trình Kết nối tri thức 2018: 25 bài giảng,
+gia sư AI (Gemini), ngân hàng câu hỏi, đề kiểm tra và hai trò chơi ôn tập. Người dùng
+là học sinh lớp 11 và giáo viên phổ thông. Dùng cho một đề tài nghiên cứu khoa học,
+nên tính đúng đắn của nội dung hoá học quan trọng hơn mọi thứ khác.
+
+Nguyên tắc dài hạn của dự án nằm ở `.specify/memory/constitution.md`; tệp này là
+hướng dẫn vận hành hằng ngày và không được mâu thuẫn với tệp đó.
 
 > File này mô tả dự án ĐANG như thế nào, để bạn (AI) khỏi phải dò lại toàn bộ code mỗi phiên.
 > Đây là mặc định, KHÔNG phải xiềng: nếu user muốn đổi UI/Auth/nhà cung cấp AI/cấu trúc, cứ làm theo user — chỉ cần báo trước là sẽ lệch khỏi mô tả dưới đây.
@@ -16,51 +22,107 @@ Nền tảng tạo quiz + trò chơi học tập tích hợp AI (Gemini). Dự �
 ## Hiện trạng dự án (mặc định — đổi được)
 | Thành phần | Đang dùng |
 |---|---|
-| Framework | React 19 + Vite 6 + TypeScript |
-| UI | MUI v9 (`@mui/material`) + Tailwind v4 + emotion |
-| Icons / Animation / Charts | `lucide-react`, `@mui/icons-material` / `motion` / `recharts` |
-| Backend | Firebase (Auth + Firestore) |
-| Auth | Firebase Auth: Email/Password + Google Sign-In |
+| Framework | React 19 + Vite 6 + TypeScript 5.8 |
+| UI | MUI v9 (`@mui/material`) + Tailwind v4 (nạp bằng `@import "tailwindcss"` trong `index.css`, KHÔNG có tệp cấu hình) + emotion |
+| Icons / Animation | `lucide-react`, `@mui/icons-material` / `motion` |
+| Backend | Firebase Firestore |
+| Auth | **Hệ TỰ VIẾT**, không dùng Firebase Auth — xem mục "Vài điểm dễ vấp" |
 | AI | `@google/genai` (Gemini), key qua `GEMINI_API_KEY` ở `.env.local` |
-| Form | `react-hook-form` + `zod` |
 | Routing | `react-router-dom` v7 |
+| Form | Không có thư viện form — viết tay bằng state |
+
+> Ba gói `react-hook-form`, `zod`, `recharts` từng được ghi ở đây nhưng **chưa bao giờ
+> được cài**. Đừng `import` chúng.
 
 Khi thêm code MỚI mà user không nói khác: bám stack trên cho nhất quán (vd cần UI thì dùng MUI, cần AI thì dùng `@google/genai`). Khi user muốn thêm/đổi công nghệ: làm theo user.
 
 ## Cấu trúc & quy ước
 ```
 src/
-├── core/      # theme/AppThemeProvider, contexts/AuthContext
-├── lib/       # firebase.ts (khởi tạo Firebase: auth, db)
-├── services/  # gọi Firestore/Storage (vd classroomService.ts)
-├── features/  # module theo tính năng (vd dashboard/components/*)
-├── components/# layout dùng chung (MainLayout, Header)
-├── guards/    # ProtectedRoute
-├── pages/     # trang ghép nối, chia theo role: teacher/, student/
-├── App.tsx    # khai báo toàn bộ <Routes>
+├── core/
+│   ├── components/   # khối dùng chung + RouteGuards.tsx + GlobalErrorBoundary
+│   ├── contexts/     # AppContext.tsx — kho trạng thái toàn ứng dụng
+│   ├── hooks/        # useApp.ts, useCheDoMau.ts
+│   └── services/     # firebase.ts, firestoreAuth.ts, firestoreService.ts, googleAuth.ts…
+├── features/         # 12 module: admin, auth, bank, games, lessons, library,
+│                     #   mascot, quiz, research, student, teacher, tutor
+├── pages/            # AdminPage, DashboardPage, LoginPage, NotFoundPage,
+│                     #   QuizPage, SchoolAdminPage, TeacherPage
+├── App.tsx           # 14 <Route>, và khối `palette` của MUI
+├── index.css         # TOÀN BỘ biến màu, hai chế độ sáng/tối
 └── main.tsx
 ```
-- Import 1 chiều: `pages → features/components → core/services/lib`.
-- Logic Firestore/AI để trong `services/`, KHÔNG viết trực tiếp trong component (component chỉ gọi service). Đây là quy tắc giúp thêm feature sau này gọn và dễ sửa.
-- Đặt tên: `*Service.ts` (gọi backend), component React `PascalCase.tsx`, trang trong `pages/`.
+KHÔNG có `src/lib/`, `src/services/`, `src/components/`, `src/guards/` — bốn thư mục
+này từng được ghi ở đây nhưng chưa bao giờ tồn tại.
+
+- Import 1 chiều: `pages → features → core`.
+- Logic Firestore/AI để trong `core/services/` hoặc `features/{tên}/services/`, KHÔNG
+  viết thẳng trong component. Quy tắc này giúp thêm tính năng sau gọn và dễ sửa.
+- Đặt tên: component React `PascalCase.tsx`; trong `src/` phần lớn hàm đặt tên tiếng
+  Anh, còn trong `scripts/` và `public/games/` đặt tên tiếng Việt không dấu. Viết thêm
+  vào vùng nào thì theo lối của vùng đó.
 
 ## Thêm một feature/trang mới — checklist
 1. Component/trang mới đặt đúng chỗ: trang → `pages/` (theo role nếu có), khối tính năng → `features/{tên}/components/`.
-2. Việc gọi Firestore/AI → tách ra hàm trong `services/`, component chỉ gọi hàm đó.
-3. Nối route trong `App.tsx`, bọc `<ProtectedRoute allowedRoles={[...]}>` nếu trang cần đăng nhập, thường bọc thêm `<MainLayout />`.
+2. Việc gọi Firestore/AI → tách ra hàm trong `core/services/`, component chỉ gọi hàm đó.
+3. Nối route trong `App.tsx`, bọc bằng thẻ canh phù hợp lấy từ
+   `core/components/RouteGuards.tsx`: `PublicRoute`, `ProtectedRoute`,
+   `TeacherRoute`, `SchoolAdminRoute`, `SuperAdminRoute`.
 4. Cần UI → dùng MUI cho khớp theme; layout nhanh có thể dùng Tailwind class.
 5. Chạy `npm run lint` kiểm tra sạch trước khi báo xong.
 
 ## Vài điểm dễ vấp (đọc trước khi sửa vùng liên quan)
-- Auth ở `core/contexts/AuthContext.tsx`: `useAuth()` → `{ user, loading, loginWithEmail, registerWithEmail, loginWithGoogle, logout }`. `Role = 'Teacher' | 'Student'`; đăng nhập lần đầu tự tạo `users/{uid}`, Google mặc định role `Student`. Biến module-level `pendingProfile`/`isRegistering` xử lý một race condition — đừng xoá khi dọn code, trừ khi thay hẳn luồng Auth.
+- **Auth là hệ tự viết, KHÔNG phải Firebase Auth.** Trạng thái nằm ở
+  `core/contexts/AppContext.tsx`, lấy ra bằng `useApp()` (khai ở `core/hooks/useApp.ts`,
+  không phải `useAuth`) → `{ currentUser, users, loading, login, register, logout,
+  loginWithGoogle, forgotPassword, … }`.
+  Vai trò: `UserRole = 'admin' | 'school_admin' | 'teacher' | 'student'` (bốn vai, chữ
+  thường, gạch dưới — không phải `'Teacher' | 'Student'`).
+  Đăng nhập chạy qua `core/services/firestoreAuth.ts`: nó đọc thẳng collection `users`
+  rồi **so mật khẩu dạng chữ thường ngay trên trình duyệt**. Đây là lỗ hổng đã biết,
+  không phải chỗ để "dọn code" — muốn siết thì phải thay hẳn sang Firebase Auth và
+  bàn trước với user.
 - `Grid` MUI v9 dùng `size={{ xs, sm, md }}` (không phải `item`/`xs=` kiểu bản cũ).
-- Theme ở `core/theme/AppThemeProvider.tsx`: primary indigo `#4f46e5`, có sẵn dark/light. Thêm component nên theo phong cách này để đồng bộ (không bắt buộc).
+- Theme MUI khai ngay trong `src/App.tsx` (không có `core/theme/`): primary là **cam
+  `#ea580c`**, secondary teal `#0f766e`; phần nền tối được dựng lại bằng một theme thứ
+  hai ở cuối tệp. Khối `palette` phải giữ mã màu THẬT — đưa biến CSS vào là hỏng cả
+  bảng màu, vì MUI cần màu thật để tự tính sắc độ đậm/nhạt.
 - Đừng sửa `vite.config.ts` phần `hmr`/`watch` (do AI Studio điều khiển, sửa gây nhấp nháy khi edit).
 - Đừng commit `.env.local` / API key.
 
 ## Lệnh
-- Kiểm tra type (barrier chính, chưa có test): `npm run lint`.
-- Dev: `npm run dev` (port 3000). Build: `npm run build` — chỉ khi user yêu cầu.
+
+Hằng ngày:
+
+| Lệnh | Làm gì |
+|---|---|
+| `npm run dev` | Máy chủ phát triển, cổng 3000 |
+| `npm run lint` | `tsc --noEmit` — hàng rào chính, chạy MỘT LẦN trước khi báo xong |
+| `npm run kiem-tra` | Chạy cả 8 bộ kiểm, 184 mục. Chạy trước khi commit |
+| `npm run build` | **Chỉ khi user yêu cầu** |
+
+Bộ kiểm chạy riêng khi cần: `kiem-tra:chuong-trinh` (dữ liệu 25 bài),
+`kiem-tra:ngan-hang`, `kiem-tra:de-chuong`, `kiem-tra:het-luot`, `kiem-tra:mau`
+(biến màu + tương phản), `kiem-tra:thuc-nghiem`, `kiem-tra:ran-thang`,
+`kiem-tra:dong-bo` (cần mạng, mất mạng thì tự bỏ qua).
+
+Sinh lại dữ liệu — đọc `scripts/README.md` trước khi dùng:
+`soan` (từ tệp .docx sang `constants.ts`), `xuat:ngan-hang` (Firestore sang repo),
+`gan:cau-hoi`, `sinh:ran-thang`, `nhung:ran-thang`, `word`, `phan-tich`, `do-chi-phi`,
+`thu:ai`.
+
+## Ngân hàng câu hỏi nằm ở Firestore, không nằm trong repo
+
+Bản thật ở collection `bank_questions`. Trong repo chỉ có bản chụp
+`public/bank/ngan-hang.json`, và mọi thứ chạy ngoài trình duyệt đều dùng bản chụp đó:
+trò chơi lúc mất mạng, `npm run soan:sinh`, `npm run gan:cau-hoi`, các bộ kiểm.
+
+Việc đồng bộ **tự chạy**: `.github/workflows/dong-bo-ngan-hang.yml` xuất lại lúc 02:00
+mỗi đêm rồi commit nếu có gì đổi. Làm tay thì `npm run xuat:ngan-hang` rồi
+`npm run gan:cau-hoi`. Quên đồng bộ thì hai bên lệch dần mà **không có dấu hiệu nào** —
+web vẫn đúng vì nó đọc thẳng Firestore; `kiem-tra:dong-bo` sinh ra để chặn điều đó.
+
+`src/features/lessons/constants.ts` **do máy sinh ra**, sửa tay sẽ bị ghi đè.
 
 ## Deploy lên Netlify (kéo thả thư mục `dist/`)
 - Học viên deploy bằng cách `npm run build` rồi kéo-thả thư mục `dist/` lên Netlify (KHÔNG qua git).
@@ -69,8 +131,15 @@ src/
 - Nếu user báo "F5 bị 404 trên Netlify" hoặc "vào link con bị Page not found": kiểm tra `public/_redirects` còn không, và nó có nằm trong `dist/` sau khi build không.
 
 ## Biến môi trường & lỗi trắng trang
-- **Firebase config đang HARDCODE** trong `src/lib/firebase.ts` (không đọc từ env) — nên app luôn chạy được ngay dù chưa có `.env.local`. Nếu app trắng trang, ĐỪNG đi sửa Firebase config trước; xem lỗi thật trong Console trình duyệt (F12) rồi mới chẩn đoán.
-  - (Firebase web API key không phải bí mật — bảo mật dựa vào Firestore Rules. Học viên nên tự đổi sang project Firebase của mình khi làm thật, nhưng không bắt buộc để chạy demo.)
+- **Cấu hình Firebase nằm trong git** ở `src/core/services/firebaseCongKhai.ts`, và
+  `src/core/services/firebase.ts` lấy nó làm bản dự phòng khi không có biến
+  `VITE_FIREBASE_*`. Nhờ vậy máy vừa `git clone` về chạy được ngay. Nếu app trắng
+  trang, ĐỪNG đi sửa Firebase config trước; xem lỗi thật trong Console trình duyệt
+  (F12) rồi mới chẩn đoán.
+  - (Khoá web của Firebase không phải bí mật — nó vốn nằm trong mã JavaScript đã dựng
+    trên Netlify, ai bấm F12 cũng đọc được. An toàn dựa vào Firestore Rules. Hiện
+    `bank_questions` để `allow write: if true`, tức ai cũng ghi được — đây là lỗ hổng
+    đã biết, siết lại cần Firebase Auth.)
 - **`.env.local` chỉ cần cho tính năng AI**: biến `GEMINI_API_KEY` (xem `.env.example`). Thiếu nó thì các phần KHÁC vẫn chạy, chỉ màn hình gọi Gemini mới lỗi.
 - Nếu user báo "màn hình AI trắng trang / báo lỗi API key": kiểm tra đã tạo file `.env.local` (copy từ `.env.example`) và điền `GEMINI_API_KEY` thật chưa, rồi chạy lại `npm run dev`. Đây là nguyên nhân số 1 khiến người mới tưởng "hỏng app".
 - ĐỪNG commit `.env.local` (đã nằm trong `.gitignore`).
@@ -113,8 +182,23 @@ mang chữ trắng, tương phản tụt còn 2,7 — nhìn là biết sai nhưn
 **Và một bài học về chính bộ kiểm tra:** phép kiểm "không lấy biến CHỮ làm màu nền" đã báo ĐẠT suốt nhiều tuần mà chưa hề soi dòng nào — regex dùng nhóm không-bắt `(?:...)` nên biến nằm ở `m[1]`, mà mã lại đọc `m[2]`, luôn `undefined`. Vì thế lỗi "nền thanh quản trị dùng `--chu-dam`" lọt tới tận tay người dùng. Một phép kiểm luôn xanh mà chưa bao giờ bắt được gì thì đáng ngờ hơn là đáng mừng: thỉnh thoảng phải cố tình làm hỏng một chỗ để xem nó có kêu không.
 
 Chạy `npm run kiem-tra:mau` sau khi đụng vào màu. Bộ này bắt: biến khai thiếu ở
-một chế độ, gõ nhầm tên biến, dùng lẫn vai nền/chữ, và mã màu cứng còn sót. Chỗ
-nào đã xem tay và xác nhận đúng thì ghi `// mau-ok` ở CUỐI dòng đó.
+một chế độ, gõ nhầm tên biến, dùng lẫn vai nền/chữ, mã màu cứng còn sót, và **tương
+phản dưới 4,5** — đo thật 70 cặp chữ/nền ở mỗi chế độ màu. Chỗ nào đã xem tay và xác
+nhận đúng thì ghi `// mau-ok` ở CUỐI dòng đó.
+
+Hai điều về phép đo tương phản, thêm ngày 08/09/2026:
+
+- Trước đó ngưỡng 4,5 chỉ được *nói* chứ không ai đo. Đo tay ra 14 cặp không đạt, tệ
+  nhất là `--luc` làm màu chữ chỉ được 2,32 mà đang dùng ở 11 chỗ. Đã làm đậm 12 biến
+  cho đạt chuẩn rồi mới viết phép đo.
+- Phép đo chỉ soi **biến CSS**. Màu viết cứng trong `.tsx` chỉ bị ĐẾM chứ không bị đo,
+  nên vẫn lọt lỗi: trang 404 từng có tương phản 1,03 vì viết cứng nền tối. Và cẩn thận
+  chỗ màu chữ đến từ bảng màu MUI còn màu nền đến từ biến CSS — hai hệ khác nhau, chỉ
+  cần một bên đổi trước là chữ biến mất. Gặp trường hợp đó thì đặt màu chữ tường minh
+  bằng `color: 'var(--...)'`.
+
+Chú ý khi viết chú thích: bộ đếm "mã màu cứng" quét cả chú thích, nên đừng viết lại mã
+màu dạng `#rrggbb` trong đó — làm vậy là tự đẩy con số nợ lên.
 
 Cố ý KHÔNG đụng tới `GameArt.tsx`, `doodles.tsx`, `ChemDoodles.tsx`,
 `Mascot.tsx` (tranh vẽ — đảo màu theo nền là hỏng hình) và khối `palette` trong
