@@ -27,24 +27,29 @@ const themeGoc = {
     mode: 'light',
     primary: {
       main: '#ea580c', // Cam đổi mới (Orange 600)
-      light: 'rgba(234, 88, 12, 0.08)',
+      // MUI lay `light` lam GOC de tinh mau cho <Alert>: chu la darken(light,0.6),
+      // nen la lighten(light,0.9). De `light` la mot mau co ALPHA thi ca hai deu
+      // ke thua do trong suot -- do duoc chu ra rgba(98,63,4,0.08), tuc mo 8%,
+      // gan nhu vo hinh. Bang mau TOI da sua tu truoc; bang SANG con sot.
+      // Phai la mau DAC. Xem chu thich dau khoi palette.
+      light: '#fb923c', // Orange 400
       dark: '#c2410c', // Cam sẫm (Orange 700)
       contrastText: '#ffffff',
     },
     secondary: {
       main: '#0f766e', // Teal 700 (Màu tri thức giáo dục)
-      light: 'rgba(15, 118, 110, 0.08)',
+      light: '#14b8a6', // Teal 500
       dark: '#115e59', // Teal 800
       contrastText: '#ffffff',
     },
     warning: {
       main: '#f59e0b', // Amber 500
-      light: 'rgba(245, 158, 11, 0.08)',
+      light: '#fbbf24', // Amber 400
       dark: '#d97706',
     },
     success: {
       main: '#0f766e', // Sử dụng Teal làm màu thành công thay vì xanh lá thông thường
-      light: 'rgba(15, 118, 110, 0.08)',
+      light: '#14b8a6', // Teal 500
       dark: '#115e59',
     },
     background: {
