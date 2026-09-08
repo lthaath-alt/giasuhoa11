@@ -25,6 +25,15 @@ firebase-*.json
 secrets/
 credentials/
 
-# Cấu hình cục bộ của công cụ lập trình (Claude Code), không liên quan tới dự án
-.claude/
+# Cấu hình cục bộ của công cụ lập trình (Claude Code), không liên quan tới dự án.
+#
+# Viết `.claude/*` chứ KHÔNG phải `.claude/`: git không bao giờ đi vào một THƯ MỤC
+# đã bị loại, nên dòng `!.claude/skills/` bên dưới sẽ vô tác dụng nếu để `.claude/`.
+.claude/*
+#
+# ...trừ kỹ năng. Mười kỹ năng speckit-* do Spec Kit sinh ra thuộc về dự án chứ
+# không phải cấu hình riêng máy: thiếu chúng thì máy khác git pull về sẽ không có
+# lệnh /speckit-* nào. Phần còn lại của .claude/ vẫn bị chặn — chính Spec Kit cũng
+# cảnh báo thư mục này có thể chứa thông tin đăng nhập.
+!.claude/skills/
 __pycache__/
