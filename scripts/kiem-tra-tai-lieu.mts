@@ -36,6 +36,9 @@ const ok = (dieu: boolean, ten: string, chiTiet = '') => {
 const CO_Y_VANG = new Set([
   'src/lib/', 'src/services/', 'src/components/', 'src/guards/', 'core/theme/',
   'core/services/', 'react-hook-form', 'zod', 'recharts',
+  // Tệp cấu hình riêng từng máy: nhắc tới để nói rõ nó VẪN bị .gitignore chặn,
+  // nên trên máy chưa sinh ra nó thì đường dẫn này không tồn tại là đúng.
+  'settings.local.json',
 ]);
 /* Không phải đường dẫn: mẫu đặt tên, đường dẫn URL, đuôi tệp đứng một mình. */
 const KHONG_PHAI_DUONG_DAN = new Set(['PascalCase.tsx', '.tsx', '.json', 'pages/', '/login', '/*']);
@@ -61,7 +64,11 @@ for (const tep of TAI_LIEU) {
   const nhac = [...new Set([...md.matchAll(/`([^`\n]+)`/g)].map(m => m[1])
     .filter(t => /^[\w./@-]+$/.test(t))
     .filter(t => t.includes('/') || /\.(tsx?|css|json|md|yml|html|mts|py)$/.test(t))
-    .filter(t => !t.startsWith('npm ') && !CO_Y_VANG.has(t) && !KHONG_PHAI_DUONG_DAN.has(t)))];
+    .filter(t => !t.startsWith('npm ') && !CO_Y_VANG.has(t) && !KHONG_PHAI_DUONG_DAN.has(t))
+    // Địa chỉ web, không phải đường dẫn tệp.
+    .filter(t => !/^(https?:\/\/|[\w-]+\.(com|org|io|dev|net)\/)/.test(t))
+    // Tên lệnh gạch chéo của trợ lý (/speckit-plan), cũng không phải đường dẫn.
+    .filter(t => !/^\/[\w-]+$/.test(t)))];
 
   const thieu: string[] = [];
   for (const d of nhac) {
