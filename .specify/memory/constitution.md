@@ -3,9 +3,12 @@
 Nền tảng tự học Hóa học 11 (Kết nối tri thức 2018): bài giảng, gia sư AI, ngân hàng
 câu hỏi và hai trò chơi ôn tập. Người dùng là học sinh lớp 11 và giáo viên phổ thông.
 
-Bản nháp do Claude soạn ngày 06/09/2026 từ những gì dự án đã dạy trong quá trình làm.
-**Thầy Paul đọc lại và sửa** — mỗi điều dưới đây đều rút từ một lỗi có thật, nhưng
-người quyết định vẫn là người dạy.
+Claude soạn bản đầu ngày 06/09/2026 từ những gì dự án đã dạy trong quá trình làm.
+Ngày 08/09/2026 đối chiếu lại với mã nguồn, sửa hai chỗ ghi sai sự thật (xem hai khung
+trích dẫn ở nguyên tắc II và V), rồi **thầy Paul thông qua**.
+
+Mỗi điều dưới đây đều rút từ một lỗi CÓ THẬT trong dự án, không phải nguyên tắc chung
+chung mượn ở đâu về.
 
 ## Nguyên tắc cốt lõi
 
@@ -131,4 +134,4 @@ Sửa hiến chương phải ghi lý do trong thông điệp commit và tăng s�
 khi bỏ hay thay hẳn một nguyên tắc, chữ số giữa khi thêm nguyên tắc hoặc mục mới, chữ số
 cuối khi chỉ làm rõ câu chữ.
 
-**Phiên bản**: 1.0.0 (bản nháp) | **Thông qua**: chờ thầy Paul duyệt | **Sửa lần cuối**: 2026-09-08
+**Phiên bản**: 1.0.0 | **Thông qua**: 2026-09-08 (thầy Paul) | **Sửa lần cuối**: 2026-09-08
