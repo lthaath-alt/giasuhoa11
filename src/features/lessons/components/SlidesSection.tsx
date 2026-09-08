@@ -108,7 +108,7 @@ export const SlidesSection: React.FC = () => {
             textTransform: 'none',
             fontWeight: 'bold',
             borderRadius: 5,
-            background: 'linear-gradient(90deg, var(--xanh-dam-nen) 0%, var(--xanh-nen) 100%)',
+            background: 'var(--nen-dam)',
             color: 'var(--chu-nguoc)',
             '&:hover': {
               background: 'linear-gradient(90deg, #16407e 0%, #0056a3 100%)',

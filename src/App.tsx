@@ -26,57 +26,68 @@ const themeGoc = {
   palette: {
     mode: 'light',
     primary: {
-      main: '#ea580c', // Cam đổi mới (Orange 600)
+      main: '#C4000E', // Đỏ tín hiệu — màu viền thoi trên nhãn cảnh báo hoá chất.
+                       // CHỈ dùng cho hành động chính và lỗi thật, không trang trí.
       // MUI lay `light` lam GOC de tinh mau cho <Alert>: chu la darken(light,0.6),
       // nen la lighten(light,0.9). De `light` la mot mau co ALPHA thi ca hai deu
       // ke thua do trong suot -- do duoc chu ra rgba(98,63,4,0.08), tuc mo 8%,
       // gan nhu vo hinh. Bang mau TOI da sua tu truoc; bang SANG con sot.
       // Phai la mau DAC. Xem chu thich dau khoi palette.
-      light: '#fb923c', // Orange 400
-      dark: '#c2410c', // Cam sẫm (Orange 700)
+      light: '#E85D5D',
+      dark: '#8C000C',
       contrastText: '#ffffff',
     },
     secondary: {
-      main: '#0f766e', // Teal 700 (Màu tri thức giáo dục)
-      light: '#14b8a6', // Teal 500
-      dark: '#115e59', // Teal 800
+      main: '#0F5A44', // Lục phòng thí nghiệm — vai phụ, dùng cho trạng thái an toàn
+      light: '#2E8B6D',
+      dark: '#0A4231',
       contrastText: '#ffffff',
     },
     warning: {
-      main: '#f59e0b', // Amber 500
-      light: '#fbbf24', // Amber 400
-      dark: '#d97706',
+      main: '#F5C400', // Vàng cảnh báo — băng kẻ chéo trong phòng thí nghiệm
+      light: '#FFD640',
+      dark: '#B38F00',
     },
     success: {
-      main: '#0f766e', // Sử dụng Teal làm màu thành công thay vì xanh lá thông thường
-      light: '#14b8a6', // Teal 500
-      dark: '#115e59',
+      main: '#17603A',
+      light: '#2E8B5A',
+      dark: '#0F4527',
     },
     background: {
-      default: '#f8fafc', // Nền sáng Slate 50 tinh khiết của GiaoVienDoiMoi
-      paper: '#ffffff', // Nền các card/panel màu trắng tinh tế
+      default: '#F2F1ED', // Giấy nhãn
+      paper: '#FFFFFF',   // Mặt nhãn
     },
     text: {
-      primary: '#0f172a', // Slate 900 cho độ tương phản đọc cực cao
-      secondary: '#475569', // Slate 600 cho chữ phụ đề rõ ràng
+      primary: '#121210',  // Mực
+      secondary: '#4D4D47',
     },
-    divider: '#e2e8f0', // Viền Slate 200 mềm mại, tinh sạch
+    divider: '#CBC9C0', // Đường kẻ — thế giới này dựng bằng nét kẻ, không bằng bóng đổ
   },
   typography: {
-    fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+    // Inter cho chữ thân bài; Archivo cho GIỌNG HIỂN THỊ. Archivo là grotesque
+    // công nghiệp gốc từ chữ biển báo — đúng thế giới nhãn cảnh báo, và Impeccable
+    // cấm lấy Inter làm giọng hiển thị vì nó là phông giao diện, không có quan điểm.
+    fontFamily: '"Inter", system-ui, sans-serif',
+    h1: { fontFamily: '"Archivo", system-ui, sans-serif', fontWeight: 800, letterSpacing: '-0.02em' },
+    h2: { fontFamily: '"Archivo", system-ui, sans-serif', fontWeight: 800, letterSpacing: '-0.02em' },
+    overline: { fontFamily: '"Archivo", system-ui, sans-serif', fontWeight: 700, letterSpacing: '0.12em' },
     h3: {
+      fontFamily: '"Archivo", system-ui, sans-serif',
       fontWeight: 800,
-      letterSpacing: '-1px',
+      letterSpacing: '-0.02em',
     },
     h4: {
+      fontFamily: '"Archivo", system-ui, sans-serif',
       fontWeight: 800,
       letterSpacing: '-0.5px',
     },
     h5: {
+      fontFamily: '"Archivo", system-ui, sans-serif',
       fontWeight: 700,
-      letterSpacing: '-0.3px',
+      letterSpacing: '-0.01em',
     },
     h6: {
+      fontFamily: '"Archivo", system-ui, sans-serif',
       fontWeight: 700,
     },
     subtitle1: {
@@ -92,8 +103,10 @@ const themeGoc = {
       lineHeight: 1.6,
     },
     button: {
+      fontFamily: '"Archivo", system-ui, sans-serif',
       textTransform: 'none',
-      fontWeight: 600,
+      fontWeight: 700,
+      letterSpacing: '0.01em',
     },
   },
   components: {

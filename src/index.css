@@ -1,4 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+/* Archivo là grotesque công nghiệp gốc từ chữ biển báo — đúng thế giới nhãn
+   cảnh báo hoá chất, và có đủ dấu tiếng Việt. Dùng cho GIỌNG HIỂN THỊ: tiêu đề,
+   nhãn hoa, mã số. Inter ở lại làm chữ thân bài, nơi cần đọc lâu.
+   Sàn chất lượng của Impeccable cấm lấy Inter làm giọng hiển thị — nó là phông
+   giao diện, không phải phông có quan điểm. */
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
 /* ─── Bảng màu hai chế độ ────────────────────────────────────────────────────
@@ -13,66 +18,68 @@
    CỐ Ý không đụng tới các tệp hình minh hoạ (GameArt, doodles, Mascot): đó là
    tranh vẽ, đảo màu theo nền chỉ làm hỏng hình. */
 :root {
-  --nen-trang: #f8fafc;   /* nền toàn trang */
-  --nen-the:   #ffffff;   /* nền thẻ, hộp thoại */
-  --nen-nhat:  #f1f5f9;   /* nền phụ, vùng nhấn nhẹ */
-  --nen-xam:   #f7f9fc;   /* nền khu vực lớn */
-  --vien:      #e2e8f0;
-  --chu-dam:   #0f172a;
-  --chu-dam-2: #1e293b;
-  --chu:       #475569;
-  --chu-2:     #56687f;
-  --chu-mo:    #5d718d;
-  --cam:       #c2410c;
-  --teal:      #0f766e;
-  --xanh:      #0062b8;
-  --xanh-dam:  #1e50a2;
-  --do:        #d32f2f;
-  --luc:       #047857;
-  --tim:       #4f46e5;
-  --nen-cam-nhat:  #fff7ed;
-  --nen-cam-nhat2: #ffedd5;
-  --nen-luc-nhat:  #dcfce7;
-  --nen-luc-nhat2: #f0fdf4;
-  --nen-vang-nhat: #fef3c7;
-  --nen-xanh-nhat: #dbeafe;
-  --nen-tim-nhat:  #e0e7ff;
-  --nen-do-nhat:   #fee2e2;
-  --chu-dam-3:     #334155;
-  --nen-xanh-nhat2:#eff6ff;
-  --vien-xanh:     #bfdbfe;
-  --vang:        #b45309;
-  --vang-dam:    #92400e;
-  --cam-dam:     #c2410c;
-  --cam-nhat:    #fb923c;
-  --cam-nhat2:   #fdba74;
-  --cam-vien:    #fed7aa;
-  --luc-dam:     #15803d;
-  --luc-dam2:    #166534;
-  --xanh-troi:   #2563eb;
-  --xanh-troi2:  #0369a1;
-  --do-dam:      #b91c1c;
-  --tim-2:       #4338ca;
-  --nen-do-nhat2:#fef2f2;
-  --nen-tim-nhat2:#f5f3ff;
-  --nen-rat-nhat:#fafafa;
-  --vien-2:      #e5e7eb;
-  --xanh-chu:    #1e40af;
-  --xanh-chu2:   #1e3a8a;
-  --chu-nguoc:   #ffffff;  /* chữ trên nền màu — GIỮ TRẮNG ở cả hai chế độ */
+  --f-hien-thi: 'Archivo', system-ui, sans-serif;
+  --f-than-bai: 'Inter', system-ui, sans-serif;
+  --nen-trang: #F2F1ED;   /* nền toàn trang */
+  --nen-the:   #FFFFFF;   /* nền thẻ, hộp thoại */
+  --nen-nhat:  #E7E6E0;   /* nền phụ, vùng nhấn nhẹ */
+  --nen-xam:   #EDECE7;   /* nền khu vực lớn */
+  --vien:      #CBC9C0;
+  --chu-dam:   #121210;
+  --chu-dam-2: #292926;
+  --chu:       #4D4D47;
+  --chu-2:     #5A5A53;
+  --chu-mo:    #63635B;
+  --cam:       #B3000F;
+  --teal:      #0F5A44;
+  --xanh:      #14508C;
+  --xanh-dam:  #0E3A66;
+  --do:        #B3000F;
+  --luc:       #1B6B3A;
+  --tim:       #4A2E7A;
+  --nen-cam-nhat:  #FAE8E8;
+  --nen-cam-nhat2: #F4D7D7;
+  --nen-luc-nhat:  #E1EFE6;
+  --nen-luc-nhat2: #EFF6F1;
+  --nen-vang-nhat: #FCF1D4;
+  --nen-xanh-nhat: #E1EBF6;
+  --nen-tim-nhat:  #EBE6F4;
+  --nen-do-nhat:   #FAE8E8;
+  --chu-dam-3:     #3C3C37;
+  --nen-xanh-nhat2:#EFF4FA;
+  --vien-xanh:     #B4C8DE;
+  --vang:        #7A5A00;
+  --vang-dam:    #5E4500;
+  --cam-dam:     #8C000C;
+  --cam-nhat:    #D02A2A;
+  --cam-nhat2:   #DE5555;
+  --cam-vien:    #EFC7C7;
+  --luc-dam:     #17603A;
+  --luc-dam2:    #124D2E;
+  --xanh-troi:   #14508C;
+  --xanh-troi2:  #0E3A66;
+  --do-dam:      #8C000C;
+  --tim-2:       #3E2668;
+  --nen-do-nhat2:#FDF3F3;
+  --nen-tim-nhat2:#F4F1F9;
+  --nen-rat-nhat:#F8F7F4;
+  --vien-2:      #DEDCD4;
+  --xanh-chu:    #14508C;
+  --xanh-chu2:   #0E3A66;
+  --chu-nguoc:   #FFFFFF;  /* chữ trên nền màu — GIỮ TRẮNG ở cả hai chế độ */
   /* Mặt nền CỐ Ý TỐI ở cả hai chế độ: thanh quản trị, khung công thức.
      Trước đây mấy chỗ này dùng --chu-dam làm nền — tức là mượn một biến MÀU CHỮ
      làm NỀN. Ở chế độ sáng nó là gần đen nên chữ trắng đọc được; sang chế độ
      tối nó lật thành gần trắng, và cả thanh quản trị thành chữ trắng trên nền
      trắng. Người dùng báo "không thấy gì hết" đúng chỗ này. */
-  --nen-dam:   #0f172a;
-  --vien-dam:  #1e293b;
+  --nen-dam:   #121210;
+  --vien-dam:  #2A2A26;
   /* Nền nút đã bị vô hiệu hoá — không phải màu chữ. */
-  --nen-tat:   #cbd5e1;
+  --nen-tat:   #CBC9C0;
   /* Chữ mờ ĐẶT TRÊN --nen-dam. Không dùng lại --chu-mo được: nền đó cố ý
      tối ở cả hai chế độ, mà --chu-mo thì lật màu theo chế độ — sang nền tối
      nó sẫm lại và tụt còn 4,22. Biến này giữ nguyên ở cả hai chế độ (6,96). */
-  --chu-tren-nen-dam: #94a3b8;
+  --chu-tren-nen-dam: #A9A89F;
 
   /* ── Màu thương hiệu dùng làm NỀN (nút, thanh menu, chip) ─────────────────
      Phải tách khỏi --cam/--teal/--xanh vì hai vai trái ngược nhau:
@@ -80,94 +87,96 @@
        · dùng làm NỀN mang chữ trắng -> phải ĐẬM lại mới đọc được
      Một biến không gánh nổi cả hai. Bản đầu chỉ có một biến, làm sáng cho vai
      chữ, thế là thanh menu xanh nhạt + chữ trắng, tương phản tụt còn 2,7. */
-  --xanh-nen:     #0062b8;
-  --xanh-dam-nen: #1e50a2;
-  --teal-nen:     #0f766e;
-  --cam-nen:      #c2410c;
-  --do-nen:       #dc2626;
-  --tim-nen:      #4f46e5;
-  --luc-nen:      #0f766e;
-  --vang-nen:     #ff9900;
+  --xanh-nen:     #14508C;
+  --xanh-dam-nen: #0E3A66;
+  --teal-nen:     #0F5A44;
+  --cam-nen:      #C4000E;
+  --do-nen:       #C4000E;
+  --tim-nen:      #4A2E7A;
+  --luc-nen:      #17603A;
+  --vang-nen:     #F5C400;
   /* Khối mã / công thức: cố ý nền tối ở CẢ hai chế độ, như mọi trình soạn mã */
-  --nen-ma:       #1e293b;
-  --chu-ma:       #e2e8f0;
+  --nen-ma:       #1A1A16;
+  --chu-ma:       #E8E7E1;
   /* Chữ trên nền VÀNG. Vàng quá sáng nên chữ trắng chỉ đạt tương phản 2,8 —
      dưới mức đọc được. Chữ nâu đậm trên vàng đạt hơn 8 mà vẫn giữ đúng
      màu nút. Giữ nguyên ở cả hai chế độ vì nút vàng cũng giữ nguyên. */
-  --chu-tren-vang:#3a2400;
+  --chu-tren-vang:#1A1400;
 }
 
 :root[data-theme="dark"] {
-  --nen-trang: #0f151d;
-  --nen-the:   #18212c;
-  --nen-nhat:  #1f2a37;
-  --nen-xam:   #151d27;
-  --vien:      #2c3947;
-  --chu-dam:   #e8eef5;
-  --chu-dam-2: #d3dde8;
-  --chu:       #a8b8c8;
-  --chu-2:     #93a3b4;
-  --chu-mo:    #8493a3;
-  --cam:       #ff7a33;
-  --teal:      #3fb3a6;
-  --xanh:      #4da3ec;
-  --xanh-dam:  #5b95d6;
-  --do:        #ff6b6b;
-  --luc:       #34d399;
-  --tim:       #8b85f0;
-  --nen-cam-nhat:  #2e1f14;
-  --nen-cam-nhat2: #3a2617;
-  --nen-luc-nhat:  #14281f;
-  --nen-luc-nhat2: #101f18;
-  --nen-vang-nhat: #2f2713;
-  --nen-xanh-nhat: #15243a;
-  --nen-tim-nhat:  #1d1d3a;
-  --nen-do-nhat:   #33191b;
-  --chu-dam-3:     #c3cedb;
-  --nen-xanh-nhat2:#13223a;
-  --vien-xanh:     #2b4468;
-  --vang:        #fbbf24;
-  --vang-dam:    #f0a13a;
-  --cam-dam:     #ff8f4d;
-  --cam-nhat:    #ff9a5c;
-  --cam-nhat2:   #ffb27f;
-  --cam-vien:    #5a3a22;
-  --luc-dam:     #4ade80;
-  --luc-dam2:    #6ee7a8;
-  --xanh-troi:   #60a5fa;
-  --xanh-troi2:  #38bdf8;
-  --do-dam:      #ff8080;
-  --tim-2:       #a5a1f5;
-  --nen-do-nhat2:#2a1719;
-  --nen-tim-nhat2:#1e1b33;
-  --nen-rat-nhat:#161d26;
-  --vien-2:      #313d4b;
-  --xanh-chu:    #8ab8f0;
-  --xanh-chu2:   #a9c9f5;
-  --chu-nguoc:   #ffffff;
-  --nen-dam:   #0f172a;
-  --vien-dam:  #1e293b;
-  --nen-tat:   #3a4756;
-  --chu-tren-nen-dam: #94a3b8;
+  --f-hien-thi: 'Archivo', system-ui, sans-serif;
+  --f-than-bai: 'Inter', system-ui, sans-serif;
+  --nen-trang: #0D0D0B;
+  --nen-the:   #161613;
+  --nen-nhat:  #1F1F1B;
+  --nen-xam:   #131310;
+  --vien:      #34342E;
+  --chu-dam:   #F3F2ED;
+  --chu-dam-2: #DFDED7;
+  --chu:       #AEADA5;
+  --chu-2:     #98978F;
+  --chu-mo:    #8B8A82;
+  --cam:       #FF5A50;
+  --teal:      #4FC9A5;
+  --xanh:      #6BA9EE;
+  --xanh-dam:  #7FB6F2;
+  --do:        #FF5A50;
+  --luc:       #4ADE80;
+  --tim:       #A78BFA;
+  --nen-cam-nhat:  #2C1512;
+  --nen-cam-nhat2: #381915;
+  --nen-luc-nhat:  #13291D;
+  --nen-luc-nhat2: #101F17;
+  --nen-vang-nhat: #2A2312;
+  --nen-xanh-nhat: #132234;
+  --nen-tim-nhat:  #1D1833;
+  --nen-do-nhat:   #2C1512;
+  --chu-dam-3:     #C7C6BF;
+  --nen-xanh-nhat2:#111E2E;
+  --vien-xanh:     #2C4362;
+  --vang:        #F0BE2E;
+  --vang-dam:    #E5B01C;
+  --cam-dam:     #FF7A6E;
+  --cam-nhat:    #FF8C82;
+  --cam-nhat2:   #FFA79E;
+  --cam-vien:    #5A2320;
+  --luc-dam:     #5FE694;
+  --luc-dam2:    #7BEDA9;
+  --xanh-troi:   #6BA9EE;
+  --xanh-troi2:  #7FB6F2;
+  --do-dam:      #FF7A6E;
+  --tim-2:       #B9A3FB;
+  --nen-do-nhat2:#231311;
+  --nen-tim-nhat2:#181428;
+  --nen-rat-nhat:#151513;
+  --vien-2:      #3B3B34;
+  --xanh-chu:    #8DBBF2;
+  --xanh-chu2:   #A6CBF6;
+  --chu-nguoc:   #FFFFFF;
+  --nen-dam:   #121210;
+  --vien-dam:  #2A2A26;
+  --nen-tat:   #3A3A33;
+  --chu-tren-nen-dam: #A9A89F;
   /* Nền màu ở chế độ tối: hạ độ sáng một chút cho đỡ chói, nhưng vẫn phải đủ
      tối để chữ trắng trên đó đạt tương phản ≥ 4,5. */
-  --xanh-nen:     #0a5aa8;
-  --xanh-dam-nen: #1c4a95;
-  --teal-nen:     #0d6b64;
-  --cam-nen:      #c2410c;
-  --do-nen:       #cf3b3b;
-  --tim-nen:      #453ecc;
-  --luc-nen:      #0d6b64;
-  --vang-nen:     #d98600;
-  --nen-ma:       #111a24;
-  --chu-ma:       #dfe7ef;
-  --chu-tren-vang:#3a2400;
+  --xanh-nen:     #14508C;
+  --xanh-dam-nen: #0E3A66;
+  --teal-nen:     #0F5A44;
+  --cam-nen:      #C4000E;
+  --do-nen:       #C4000E;
+  --tim-nen:      #4A2E7A;
+  --luc-nen:      #17603A;
+  --vang-nen:     #D9A600;
+  --nen-ma:       #101010;
+  --chu-ma:       #E8E7E1;
+  --chu-tren-vang:#1A1400;
 }
 
 body {
   background-color: var(--nen-trang);
   color: var(--chu-dam);
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: var(--f-than-bai);
   margin: 0;
   transition: background-color .18s ease, color .18s ease;
 }
@@ -178,22 +187,45 @@ body {
   height: 8px;
 }
 
+/* Những mặt do TRÌNH DUYỆT vẽ vẫn phải mang thiết kế. Thanh cuộn trước đây viết
+   cứng #f1f5f9 — màu chế độ sáng — nên ở chế độ tối nó là một vệt trắng nằm giữa
+   nền đen. Đây là chỗ dễ bỏ sót nhất và cũng là dấu hiệu rẻ nhất cho thấy trang
+   được DỰNG chứ không phải lắp ghép. */
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: var(--nen-nhat);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
+  background: var(--vien);
+  border-radius: 0;          /* thế giới nhãn dựng bằng đường kẻ thẳng */
+  border: 1px solid var(--nen-nhat);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #ea580c;
+  background: var(--chu-mo);
 }
 
-/* Override selection colors */
+* {
+  scrollbar-color: var(--vien) var(--nen-nhat);   /* Firefox */
+}
+
 ::selection {
-  background-color: rgba(234, 88, 12, 0.15);
-  color: #c2410c;
+  background-color: var(--vang-nen);
+  color: var(--chu-tren-vang);
+}
+
+/* Con trỏ nhập và vòng tiêu điểm lấy màu tín hiệu — cùng một màu chỉ đạo. */
+input, textarea, [contenteditable] {
+  caret-color: var(--cam);
+}
+
+:focus-visible {
+  outline: 2px solid var(--cam);
+  outline-offset: 2px;
+}
+
+/* Số trong bảng phải thẳng cột: điểm số, số câu, mã bài đều là dữ liệu đo được. */
+table, [data-so], .so-lieu {
+  font-variant-numeric: tabular-nums;
 }
 

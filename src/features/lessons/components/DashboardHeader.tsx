@@ -116,8 +116,11 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
       elevation={0}
       sx={{
         backgroundColor: 'var(--nen-the)',
-        borderBottom: '1px solid var(--vien)',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+        /* Thế giới nhãn dựng bằng NÉT KẺ, không bằng bóng đổ mềm. Một đường mực
+           đậm dưới thanh thay cho vệt mờ toả — đó là cách một cái nhãn thật kết
+           thúc ở mép giấy. */
+        borderBottom: '2px solid var(--chu-dam)',
+        boxShadow: 'none',
       }}
     >
       {/* 1. DÒNG TRÊN CÙNG: LOGO - TÌM KIẾM - HOTLINE & LIÊN HỆ - ĐĂNG NHẬP */}
@@ -145,12 +148,15 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             <Box
               sx={{
                 p: 1,
-                backgroundColor: 'var(--xanh-nen)',
-                borderRadius: '50% 12px 50% 12px',
+                /* Mực đen, không xanh dương: ô nhận diện là con dấu trên nhãn.
+                   Góc vuông và không bóng đổ — hình thoi bo tròn nửa vời là di
+                   sản của thế giới cũ. */
+                backgroundColor: 'var(--nen-dam)',
+                borderRadius: 0,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 4px 10px rgba(0, 98, 184, 0.25)',
+                boxShadow: 'none',
               }}
             >
               <BookOpen size={24} color="var(--chu-nguoc)" />
@@ -295,19 +301,21 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 size="small"
                 onClick={() => window.open(LINK_ZALO, '_blank', 'noopener,noreferrer')}
                 sx={{
-                  /* Trước là #0084ff: chữ trắng trên đó chỉ đạt 3,66, hơi chói và
-                     khó đọc. Dùng luôn màu xanh nền chuẩn của web (#0062b8) —
-                     tương phản lên 5,9 và ăn nhập với thanh menu. */
-                  backgroundColor: 'var(--xanh-nen)',
-                  color: 'var(--chu-nguoc)',
-                  borderRadius: 20,
+                  /* Zalo là đường liên hệ, không phải hành động chính. Trong thế
+                     giới nhãn chỉ có MỘT màu tín hiệu, và nó dành cho việc học —
+                     nên nút này hạ xuống dạng khung kẻ. */
+                  backgroundColor: 'transparent',
+                  color: 'var(--chu-dam)',
+                  border: '1px solid var(--chu-dam)',
+                  borderRadius: 0,
                   fontSize: '0.75rem',
-                  fontWeight: 'bold',
+                  fontWeight: 700,
                   textTransform: 'none',
                   px: 2,
                   py: 0.6,
                   '&:hover': {
-                    backgroundColor: '#006ed4',
+                    backgroundColor: 'var(--nen-dam)',
+                    color: 'var(--chu-nguoc)',
                   },
                 }}
               >
@@ -416,13 +424,17 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                   size="small"
                   onClick={handleRegisterRedirect}
                   sx={{
+                    /* Hành động chính DUY NHẤT trên thanh này. Đỏ tín hiệu chỉ
+                       xuất hiện ở đây và ở lỗi thật — dùng thêm chỗ nữa là màu
+                       mất nghĩa. */
                     textTransform: 'none',
-                    borderRadius: 20,
+                    borderRadius: 0,
                     fontSize: '0.75rem',
-                    fontWeight: 'bold',
-                    backgroundColor: 'var(--vang-nen)',
-                    color: 'var(--chu-tren-vang)',
-                    '&:hover': { backgroundColor: '#e68a00' },
+                    fontWeight: 700,
+                    backgroundColor: 'var(--cam-nen)',
+                    color: 'var(--chu-nguoc)',
+                    boxShadow: 'none',
+                    '&:hover': { backgroundColor: 'var(--cam-dam)', boxShadow: 'none' },
                   }}
                 >
                   Đăng Ký
@@ -435,12 +447,18 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                   onClick={() => navigate('/dashboard')}
                   sx={{
                     textTransform: 'none',
-                    borderRadius: 20,
+                    borderRadius: 0,
                     fontSize: '0.75rem',
-                    fontWeight: 'bold',
-                    backgroundColor: 'var(--teal-nen)',
-                    color: 'var(--chu-nguoc)',
-                    '&:hover': { backgroundColor: '#0d635c' },
+                    fontWeight: 700,
+                    backgroundColor: 'transparent',
+                    color: 'var(--chu-dam)',
+                    border: '1px solid var(--chu-dam)',
+                    boxShadow: 'none',
+                    '&:hover': {
+                      backgroundColor: 'var(--nen-dam)',
+                      color: 'var(--chu-nguoc)',
+                      boxShadow: 'none',
+                    },
                   }}
                 >
                   Dùng Thử
@@ -452,7 +470,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
       </Container>
 
       {/* 2. DÒNG DƯỚI: THANH NAVIGATE MENU CHÍNH (GIỐNG HOCMAI.VN TRONG HÌNH) */}
-      <Box sx={{ backgroundColor: 'var(--xanh-nen)', color: 'var(--chu-nguoc)' }}>
+      <Box sx={{ backgroundColor: 'var(--nen-dam)', color: 'var(--chu-nguoc)' }}>
         <Container maxWidth="xl">
           <Box
             sx={{

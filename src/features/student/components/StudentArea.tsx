@@ -94,7 +94,7 @@ export const StudentArea: React.FC = () => {
 
   return (
     <Box>
-      <Paper sx={{ mb: 4, px: 3, py: 2, borderRadius: 3, display: 'flex', alignItems: 'center', gap: 2, background: 'linear-gradient(to right, var(--xanh-nen), var(--xanh))', color: 'var(--chu-nguoc)' }}>
+      <Paper sx={{ mb: 4, px: 3, py: 2, borderRadius: 3, display: 'flex', alignItems: 'center', gap: 2, backgroundColor: 'var(--nen-dam)', color: 'var(--chu-nguoc)' }}>
         <Avatar sx={{ width: 56, height: 56, bgcolor: 'rgba(255,255,255,0.2)' }}>
           {currentUser.name.charAt(0).toUpperCase()}
         </Avatar>
