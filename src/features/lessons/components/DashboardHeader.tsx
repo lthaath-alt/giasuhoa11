@@ -182,7 +182,8 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 variant="caption"
                 sx={{
                   fontWeight: 'bold',
-                  color: 'var(--tin-hieu)',
+                  /* Nhan thuong hieu, khong phai tin hieu. */
+                  color: 'var(--chu-2)',
                   letterSpacing: '0.5px',
                   textTransform: 'uppercase',
                   fontSize: '0.68rem',
@@ -380,7 +381,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                         fontSize: '0.6rem',
                         fontWeight: 'bold',
                         bgcolor: 'var(--vang-nen)',
-                        color: 'var(--chu-nguoc)',
+                        color: 'var(--chu-tren-vang)',
                         ml: 0.5,
                         boxShadow: 'none',
                       }}
@@ -415,7 +416,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                   variant="outlined"
                   size="small"
                   onClick={() => navigate('/login')}
-                  sx={{ textTransform: 'none', borderRadius: 0, fontSize: '0.75rem', fontWeight: 'bold', borderColor: 'var(--xanh)', color: 'var(--xanh)' }}
+                  sx={{ textTransform: 'none', borderRadius: 0, fontSize: '0.75rem', fontWeight: 'bold', borderColor: 'var(--chu-dam)', color: 'var(--chu-dam)' }}
                 >
                   Đăng Nhập
                 </Button>
@@ -505,7 +506,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 px: 2,
                 py: 1,
                 borderRadius: 0,
-                borderBottom: activeTab === 'hocmai' ? '3px solid var(--vang)' : '3px solid transparent',
+                borderBottom: activeTab === 'hocmai' ? '3px solid var(--vang-nen)' : '3px solid transparent',
                 backgroundColor: activeTab === 'hocmai' ? 'rgba(255,255,255,0.1)' : 'transparent',
                 '&:hover': { backgroundColor: 'rgba(255,255,255,0.15)' },
               }}
@@ -528,7 +529,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 px: 2,
                 py: 1,
                 borderRadius: 0,
-                borderBottom: activeTab === 'gioithieu' ? '3px solid var(--vang)' : '3px solid transparent',
+                borderBottom: activeTab === 'gioithieu' ? '3px solid var(--vang-nen)' : '3px solid transparent',
                 backgroundColor: activeTab === 'gioithieu' ? 'rgba(255,255,255,0.1)' : 'transparent',
                 '&:hover': { backgroundColor: 'rgba(255,255,255,0.15)' },
               }}
@@ -551,7 +552,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 py: 1,
                 borderRadius: 0,
                 whiteSpace: 'nowrap',
-                borderBottom: activeTab === 'baigiang' ? '3px solid var(--vang)' : '3px solid transparent',
+                borderBottom: activeTab === 'baigiang' ? '3px solid var(--vang-nen)' : '3px solid transparent',
                 backgroundColor: activeTab === 'baigiang' ? 'rgba(255,255,255,0.1)' : 'transparent',
                 '&:hover': { backgroundColor: 'rgba(255,255,255,0.15)' },
               }}
@@ -574,7 +575,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 py: 1,
                 borderRadius: 0,
                 whiteSpace: 'nowrap',
-                borderBottom: activeTab === 'trochoi' ? '3px solid var(--vang)' : '3px solid transparent',
+                borderBottom: activeTab === 'trochoi' ? '3px solid var(--vang-nen)' : '3px solid transparent',
                 backgroundColor: activeTab === 'trochoi' ? 'rgba(255,255,255,0.1)' : 'transparent',
                 '&:hover': { backgroundColor: 'rgba(255,255,255,0.15)' },
               }}
@@ -596,7 +597,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 px: 2,
                 py: 1,
                 borderRadius: 0,
-                borderBottom: activeTab === 'ichat' ? '3px solid var(--vang)' : '3px solid transparent',
+                borderBottom: activeTab === 'ichat' ? '3px solid var(--vang-nen)' : '3px solid transparent',
                 backgroundColor: activeTab === 'ichat' ? 'rgba(255,255,255,0.1)' : 'transparent',
                 '&:hover': { backgroundColor: 'rgba(255,255,255,0.15)' },
               }}
@@ -616,7 +617,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 px: 2,
                 py: 1,
                 borderRadius: 0,
-                borderBottom: activeTab === 'hotro' ? '3px solid var(--vang)' : '3px solid transparent',
+                borderBottom: activeTab === 'hotro' ? '3px solid var(--vang-nen)' : '3px solid transparent',
                 backgroundColor: activeTab === 'hotro' ? 'rgba(255,255,255,0.1)' : 'transparent',
                 '&:hover': { backgroundColor: 'rgba(255,255,255,0.15)' },
               }}
@@ -639,7 +640,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                   px: 2,
                   py: 1,
                   borderRadius: 0,
-                  borderBottom: activeTab === 'hocsinh' ? '3px solid var(--vang)' : '3px solid transparent',
+                  borderBottom: activeTab === 'hocsinh' ? '3px solid var(--vang-nen)' : '3px solid transparent',
                   backgroundColor: activeTab === 'hocsinh' ? 'rgba(255,255,255,0.1)' : 'transparent',
                   '&:hover': { backgroundColor: 'rgba(255,255,255,0.15)' },
                 }}
@@ -655,7 +656,8 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 onClick={() => navigate('/teacher')}
                 startIcon={<GraduationCap size={16} />}
                 sx={{
-                  color: 'var(--vang)',
+                  /* Tren dai muc: phai la --vang-nen (11,4), khong phai --vang (2,94). */
+                  color: 'var(--vang-nen)',
                   textTransform: 'none',
                   fontWeight: 'bold',
                   px: 2,
@@ -676,7 +678,8 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 onClick={() => navigate('/school-admin')}
                 startIcon={<Building2 size={16} />}
                 sx={{
-                  color: 'var(--vang)',
+                  /* Tren dai muc: phai la --vang-nen (11,4), khong phai --vang (2,94). */
+                  color: 'var(--vang-nen)',
                   textTransform: 'none',
                   fontWeight: 'bold',
                   px: 2,
@@ -697,7 +700,8 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 onClick={() => navigate('/admin')}
                 startIcon={<ShieldCheck size={16} />}
                 sx={{
-                  color: 'var(--vang)',
+                  /* Tren dai muc: phai la --vang-nen (11,4), khong phai --vang (2,94). */
+                  color: 'var(--vang-nen)',
                   textTransform: 'none',
                   fontWeight: 'bold',
                   px: 2,

@@ -54,6 +54,10 @@ const GAMES: GameData[] = [
   },
 ];
 
+/* Doc tu chinh danh sach GAMES o tren. Truoc day trang chu go tay "2 tro"
+   trong khi thuc te ship 4 — mot cai nhan ghi sai so thi te hon la khong ghi. */
+export const SO_TRO_CHOI = GAMES.length;
+
 export const GameHubSection: React.FC = () => {
   const [activeGame, setActiveGame] = useState<GameData | null>(null);
   /* Địa chỉ iframe chốt lại NGAY LÚC MỞ và không đổi nữa.
@@ -384,7 +388,7 @@ export const GameHubSection: React.FC = () => {
                 justifyContent: 'space-between',
                 px: 2,
                 py: 1,
-                bgcolor: 'var(--xanh-dam-nen)',
+                bgcolor: 'var(--nen-dam)',
                 color: 'var(--chu-nguoc)',
                 boxShadow: 'none',
               }}

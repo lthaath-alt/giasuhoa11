@@ -195,7 +195,10 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                 onClick={onForgotPassword}
                 sx={{
                   textTransform: 'none',
-                  color: accentColor,
+                  /* Lien ket phu, khong phai hanh dong chinh — mot man chi co
+                     MOT cho duoc mang mau tin hieu, va do la nut Dang nhap. */
+                  color: 'var(--chu-dam)',
+                  textDecoration: 'underline',
                   fontWeight: 600,
                   p: 0,
                   minWidth: 'auto',
@@ -247,7 +250,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             id="switch-to-register-btn"
             variant="text"
             onClick={onToggleForm}
-            sx={{ fontWeight: 'bold', p: 0, minWidth: 'auto', textTransform: 'none', color: accentColor }}
+            sx={{ fontWeight: 'bold', p: 0, minWidth: 'auto', textTransform: 'none', color: 'var(--chu-dam)', textDecoration: 'underline' }}
           >
             Đăng ký ngay
           </Button>

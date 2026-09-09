@@ -218,9 +218,14 @@ console.log('\n== Tương phản chữ trên nền ==');
                         '--xanh-troi', '--xanh-troi2', '--do-dam', '--tim-2', '--xanh-chu',
                         '--xanh-chu2'];
   /* Nền nút mang chữ trắng. --vang-nen CỐ Ý không nằm đây: chữ trắng trên vàng
-     chỉ được 2,14, nên nó đi cùng --chu-tren-vang (xem cặp cố định bên dưới).
-     Tra trong src/ thì --vang-nen chỉ làm thanh chỉ báo tab và nền khối, không
-     có chữ trắng nào đặt lên. */
+     chỉ được 1,64, nên nó đi cùng --chu-tren-vang (xem cặp cố định bên dưới).
+
+     Câu tiếp theo ở đây TRƯỚC ĐÂY viết: "tra trong src/ thì --vang-nen chỉ làm
+     thanh chỉ báo tab và nền khối, không có chữ trắng nào đặt lên". Câu đó SAI,
+     và không ai tra lại: chip "HS Nâng cao" ở DashboardHeader đặt đúng chữ
+     trắng lên nền ấy. Một lời khẳng định trong chú thích không phải là một phép
+     đo — nếu cần biết điều gì đó đúng thì để MÁY tra, và đó là lý do có mục
+     "Cặp chữ/nền viết cùng một chỗ" bên dưới. */
   const NEN_NUT = ['--xanh-nen', '--xanh-dam-nen', '--luc-tham-nen', '--tin-hieu-nen', '--do-nen',
                    '--tim-nen', '--luc-nen'];
   const CO_DINH: [string, string][] = [
@@ -228,6 +233,18 @@ console.log('\n== Tương phản chữ trên nền ==');
     ['--chu-tren-nen-dam', '--nen-dam'],
     ['--chu-tren-vang', '--vang-nen'],
     ['--chu-nguoc', '--nen-dam'],
+    /* Mặt MỰC là một bề mặt thật, không phải trường hợp lẻ: thanh menu chính
+       chạy trên nó. Danh sách cặp ở trên chỉ đặt màu nhấn lên nền TRẮNG, nên
+       mọi thứ ngồi trên dải mực chưa bao giờ được đo — và `--vang` làm chữ ở
+       đó chỉ được 2,94 trong khi bộ kiểm vẫn báo xanh suốt. Ba biến dưới đây
+       là những gì được phép xuất hiện trên mặt mực.
+
+       CHỈ ghi những cặp CÓ THẬT. Lần đầu viết mục này tôi thêm luôn
+       `--tin-hieu-nen` trên `--nen-dam` cho "đủ bộ" — nó rớt ngay ở 2,99, và
+       tra lại thì không có nút đỏ nào đặt trên dải mực cả. Thêm một cặp không
+       tồn tại thì hoặc là báo động giả, hoặc tệ hơn, là ép đi sửa một chỗ
+       không hỏng. */
+    ['--vang-nen', '--nen-dam'],
   ];
 
   /* Danh sách miễn: cặp nào chấp nhận dưới ngưỡng thì phải ghi ra đây kèm LÝ DO,
@@ -258,6 +275,81 @@ console.log('\n== Tương phản chữ trên nền ==');
     else dat(`chế độ ${che}: cả ${soCap} cặp chữ/nền đều đạt ${NGUONG}`);
   }
   if (MIEN.length) console.log(`  GHI   còn ${MIEN.length} cặp trong danh sách miễn`);
+
+  /* ── Cặp chữ/nền VIẾT CÙNG MỘT CHỖ ────────────────────────────────────────
+     Phép đo ở trên soi một danh sách cặp GÕ TAY. Danh sách gõ tay chỉ đúng tới
+     lúc ai đó viết một cặp không có trong đó — và đúng chuyện ấy đã xảy ra: chip
+     "HS Nâng cao" đặt `color: --chu-nguoc` lên `bgcolor: --vang-nen` ngay trong
+     một khối `sx`, ra 1,64, mà cả 70 cặp vẫn báo đạt vì cặp đó không ai liệt kê.
+
+     Phép đo dưới đây không hỏi ai cặp nào cần đo: nó đọc từng khối `sx={{…}}`
+     trong mã, thấy khối nào tự khai CẢ nền lẫn chữ thì đo đúng khối đó. Cặp nào
+     lập trình viên viết ra là cặp được đo.
+
+     Phải tách theo TRẠNG THÁI, không gộp cả khối. Bản đầu của phép kiểm này gộp,
+     và nó ghép nền của `'&:hover'` với màu chữ của trạng thái thường — ra 15 báo
+     động, gần hết là giả, vì khi rê chuột thì cả hai đổi cùng lúc. Mỗi khối
+     `{…}` con là một trạng thái riêng và được đo riêng. */
+  const capThat = new Map<string, string>();   // "chu|nen" -> nơi gặp đầu tiên
+
+  /** Tách một đoạn mã thành từng PHẠM VI: thuộc tính của chính nó, không kèm
+      thuộc tính của các khối con. Mỗi khối con thành một phạm vi riêng. */
+  function phamVi(ma: string, ra: string[] = []): string[] {
+    let rieng = '', k = 0;
+    while (k < ma.length) {
+      if (ma[k] === '{') {
+        let sau = 1, j = k + 1;
+        for (; j < ma.length && sau > 0; j++) {
+          if (ma[j] === '{') sau++;
+          else if (ma[j] === '}') sau--;
+        }
+        phamVi(ma.slice(k + 1, j - 1), ra);   // khối con: phạm vi riêng
+        k = j;
+      } else {
+        rieng += ma[k];
+        k++;
+      }
+    }
+    ra.push(rieng);
+    return ra;
+  }
+
+  for (const f of dsTep) {
+    const n = readFileSync(f, 'utf8')
+      .split(/\r?\n/).filter(d => !d.includes('mau-ok')).join('\n');
+    let i = n.indexOf('sx={{');
+    while (i >= 0) {
+      let sau = 0, ket = n.length;
+      for (let k = i + 4; k < n.length; k++) {
+        if (n[k] === '{') sau++;
+        else if (n[k] === '}') { sau--; if (sau === 0) { ket = k + 1; break; } }
+      }
+      for (const pv of phamVi(n.slice(i + 4, ket))) {
+        const nen = [...pv.matchAll(/(?:bgcolor|backgroundColor):\s*'var\((--[a-z0-9-]+)\)'/g)].map(m => m[1]);
+        const chu = [...pv.matchAll(/(?<![a-zA-Z-])color:\s*'var\((--[a-z0-9-]+)\)'/g)].map(m => m[1]);
+        for (const b of nen) for (const c of chu) {
+          const khoa = `${c}|${b}`;
+          if (!capThat.has(khoa)) capThat.set(khoa, basename(f));
+        }
+      }
+      i = n.indexOf('sx={{', ket);
+    }
+  }
+
+  for (const [che, b] of Object.entries(BANG)) {
+    const rot: string[] = [];
+    let so = 0;
+    for (const [khoa, tep] of capThat) {
+      const [c, n] = khoa.split('|');
+      if (!b[c] || !b[n] || duocMien(c, n)) continue;
+      so++;
+      const t = tuongPhan(b[c], b[n]);
+      if (t < NGUONG) rot.push(`${c} trên ${n} = ${t.toFixed(2)} (${tep})`);
+    }
+    if (rot.length) truot(`chế độ ${che}: cặp viết cùng chỗ đạt ${NGUONG}`,
+      `${rot.length}/${so} cặp chưa đạt — ${rot.slice(0, 6).join('; ')}`);
+    else dat(`chế độ ${che}: cả ${so} cặp viết cùng chỗ đều đạt ${NGUONG}`);
+  }
 }
 
 console.log(soLoi === 0 ? '\n>>> TẤT CẢ ĐẠT\n' : `\n>>> CÓ ${soLoi} MỤC KHÔNG ĐẠT\n`);

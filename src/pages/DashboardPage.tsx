@@ -48,7 +48,7 @@ import { LessonSidebar } from '../features/lessons/components/LessonSidebar';
 import { TextbookViewer } from '../features/lessons/components/TextbookViewer';
 import { JoinClassForm } from '../features/auth/components/JoinClassForm';
 import { StudentArea } from '../features/student/components/StudentArea';
-import { GameHubSection } from '../features/games/GameHubSection';
+import { GameHubSection, SO_TRO_CHOI } from '../features/games/GameHubSection';
 import { SlidesSection } from '../features/lessons/components/SlidesSection';
 import { ActivityFields, type Truong } from '../features/lessons/components/ActivityFields';
 import {
@@ -155,7 +155,7 @@ export const DashboardPage: React.FC = () => {
     {
       ma: 'TC',
       ten: 'Trò chơi ôn tập',
-      trangThai: `2 trò · Rắn và Thang mở khoá lần lượt ${allLessons.length} màn`,
+      trangThai: `${SO_TRO_CHOI} trò · Rắn và Thang mở khoá lần lượt ${allLessons.length} màn`,
       moKhi: () => setActiveTab('trochoi'),
       nhanNut: 'Chơi',
     },

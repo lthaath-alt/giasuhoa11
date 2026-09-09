@@ -75,7 +75,7 @@ export const AdminPage: React.FC = () => {
                   <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--chu-nguoc)', lineHeight: 1.2 }}>
                     {currentUser?.name || 'Quản trị viên'}
                   </Typography>
-                  <Chip label="ADMINISTRATOR" size="small" sx={{ height: 18, fontSize: '0.6rem', fontWeight: 'bold', backgroundColor: 'var(--tin-hieu-vien)', color: 'var(--tin-hieu-nhat)', border: '1px solid var(--tin-hieu-vien)' }} />
+                  <Chip label="ADMINISTRATOR" size="small" sx={{ height: 18, fontSize: '0.6rem', fontWeight: 'bold', backgroundColor: 'var(--tin-hieu-vien)', color: 'var(--tin-hieu-dam)', border: '1px solid var(--tin-hieu-vien)' }} />
                 </Box>
               </Box>
 
