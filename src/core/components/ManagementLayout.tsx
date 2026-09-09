@@ -142,7 +142,7 @@ const PlaceholderContent: React.FC<{ title: string }> = ({ title }) => (
       bgcolor: 'var(--nen-trang)',
     }}
   >
-    <Box sx={{ p: 2, bgcolor: 'var(--nen-cam-nhat2)', borderRadius: '50%' }}>
+    <Box sx={{ p: 2, bgcolor: 'var(--nen-tin-hieu-nhat2)', borderRadius: '50%' }}>
       <Construction size={36} color="var(--chu-dam)" />
     </Box>
     <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--chu)' }}>
@@ -267,12 +267,12 @@ export const ManagementLayout: React.FC<ManagementLayoutProps> = ({
               cursor: 'pointer',
               position: 'relative',
               transition: 'all 0.15s ease',
-              bgcolor: isActive ? 'var(--nen-cam-nhat2)' : 'transparent',
-              color: isActive ? 'var(--cam)' : 'var(--chu)',
+              bgcolor: isActive ? 'var(--nen-tin-hieu-nhat2)' : 'transparent',
+              color: isActive ? 'var(--tin-hieu)' : 'var(--chu)',
               fontWeight: isActive ? 700 : 500,
               '&:hover': {
-                bgcolor: isActive ? 'var(--nen-cam-nhat2)' : 'var(--nen-nhat)',
-                color: isActive ? 'var(--cam)' : 'var(--chu-dam)',
+                bgcolor: isActive ? 'var(--nen-tin-hieu-nhat2)' : 'var(--nen-nhat)',
+                color: isActive ? 'var(--tin-hieu)' : 'var(--chu-dam)',
               },
               '&::before': isActive
                 ? {
@@ -283,7 +283,7 @@ export const ManagementLayout: React.FC<ManagementLayoutProps> = ({
                     bottom: '15%',
                     width: '3.5px',
                     borderRadius: 0,
-                    backgroundColor: 'var(--cam-nen)',
+                    backgroundColor: 'var(--tin-hieu-nen)',
                   }
                 : {},
             }}
@@ -324,7 +324,7 @@ export const ManagementLayout: React.FC<ManagementLayoutProps> = ({
           topLabel="QUYỀN TRUY CẬP"
           mainContent={roleName}
           description="Nhấp để đổi mật khẩu bảo mật"
-          accentColor="var(--cam)"
+          accentColor="var(--tin-hieu)"
           icon={<Shield size={20} color="var(--chu-dam)" />}
           onClick={() => handleStatClick('password')}
         />
@@ -332,8 +332,8 @@ export const ManagementLayout: React.FC<ManagementLayoutProps> = ({
           topLabel="QUẢN LÝ LỚP HỌC"
           mainContent={`${classCount} Lớp học`}
           description="Nhấp để đi nhanh tới quản lý lớp"
-          accentColor="var(--teal)"
-          icon={<GraduationCap size={20} color="var(--teal)" />}
+          accentColor="var(--luc-tham)"
+          icon={<GraduationCap size={20} color="var(--luc-tham)" />}
           onClick={() => handleStatClick('classes')}
         />
         <StatCard

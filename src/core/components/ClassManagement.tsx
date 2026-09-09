@@ -154,12 +154,12 @@ export const ClassManagement: React.FC<ClassManagementProps> = ({
                     </Typography>
                     {cls.inviteCode && (
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
-                        <Typography variant="caption" sx={{ fontFamily: 'monospace', color: 'var(--teal)', fontWeight: 'bold', bgcolor: 'var(--nen-luc-nhat2)', px: 1, borderRadius: 0 }}>
+                        <Typography variant="caption" sx={{ fontFamily: 'monospace', color: 'var(--luc-tham)', fontWeight: 'bold', bgcolor: 'var(--nen-luc-nhat2)', px: 1, borderRadius: 0 }}>
                           Mã: {cls.inviteCode}
                         </Typography>
                         <Tooltip title={codeCopied === cls.inviteCode ? 'Đã sao chép!' : 'Sao chép mã'}>
                           <IconButton size="small" onClick={() => handleCopyCode(cls.inviteCode)} sx={{ p: 0.2 }}>
-                            <Copy size={12} color="var(--teal)" />
+                            <Copy size={12} color="var(--luc-tham)" />
                           </IconButton>
                         </Tooltip>
                       </Box>
@@ -192,7 +192,7 @@ export const ClassManagement: React.FC<ClassManagementProps> = ({
                       </IconButton>
                     </Tooltip>
                     <Tooltip title="Xuất danh sách tài khoản lớp (reset mật khẩu)">
-                      <IconButton size="small" onClick={() => setExportClassId(cls.id)} sx={{ color: 'var(--teal)' }}>
+                      <IconButton size="small" onClick={() => setExportClassId(cls.id)} sx={{ color: 'var(--luc-tham)' }}>
                         <Download size={16} />
                       </IconButton>
                     </Tooltip>

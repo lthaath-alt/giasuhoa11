@@ -222,7 +222,7 @@ export const FirestoreAccountManager: React.FC = () => {
       {/* Tiêu đề phần quản lý */}
       <Paper elevation={0} sx={{ p: 2.5, borderRadius: 0, border: '1px solid var(--vien)', bgcolor: 'var(--nen-trang)' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-          <ShieldCheck color="var(--teal)" size={24} />
+          <ShieldCheck color="var(--luc-tham)" size={24} />
           <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)' }}>
             Quản lý Tài khoản Firestore (Trực tiếp từ Client)
           </Typography>
@@ -314,7 +314,7 @@ export const FirestoreAccountManager: React.FC = () => {
             <CardContent sx={{ p: 3 }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                 <Typography variant="subtitle1" sx={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <User size={18} color="var(--teal)" /> Danh sách Collection "users"
+                  <User size={18} color="var(--luc-tham)" /> Danh sách Collection "users"
                 </Typography>
                 <Button
                   size="small"

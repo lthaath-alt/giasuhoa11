@@ -62,14 +62,14 @@ export const AdminDashboard: React.FC = () => {
                 color: 'var(--chu-dam)',
               },
               '&.Mui-selected': {
-                color: 'var(--cam)',
-                backgroundColor: 'var(--nen-cam-nhat2)',
+                color: 'var(--tin-hieu)',
+                backgroundColor: 'var(--nen-tin-hieu-nhat2)',
               }
             },
             '& .MuiTabs-indicator': {
               height: 3,
               borderRadius: 0,
-              backgroundColor: 'var(--cam-nen)',
+              backgroundColor: 'var(--tin-hieu-nen)',
             }
           }}
         >

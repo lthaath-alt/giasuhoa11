@@ -59,9 +59,9 @@ export const AccountsTab: React.FC<AccountsTabProps> = ({
               transition: 'all 0.2s',
               fontSize: '0.88rem',
               '&:hover': { backgroundColor: 'var(--nen-nhat)', color: 'var(--chu-dam)' },
-              '&.Mui-selected': { color: 'var(--cam)', backgroundColor: 'var(--nen-cam-nhat2)' }
+              '&.Mui-selected': { color: 'var(--tin-hieu)', backgroundColor: 'var(--nen-tin-hieu-nhat2)' }
             },
-            '& .MuiTabs-indicator': { backgroundColor: 'var(--cam-nen)' }
+            '& .MuiTabs-indicator': { backgroundColor: 'var(--tin-hieu-nen)' }
           }}
         >
           <Tab
@@ -128,8 +128,8 @@ export const AccountsTab: React.FC<AccountsTabProps> = ({
                                   bgcolor:
                                     student.status === 'active'
                                       ? 'var(--nen-luc-nhat2)'
-                                      : 'var(--nen-cam-nhat2)',
-                                  color: student.status === 'active' ? 'var(--teal)' : 'var(--cam)',
+                                      : 'var(--nen-tin-hieu-nhat2)',
+                                  color: student.status === 'active' ? 'var(--luc-tham)' : 'var(--tin-hieu)',
                                   fontWeight: 'bold',
                                   fontSize: '0.9rem',
                                 }}

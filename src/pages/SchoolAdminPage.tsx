@@ -52,7 +52,7 @@ export const SchoolAdminPage: React.FC = () => {
             
             {/* Logo */}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, cursor: 'pointer' }} onClick={handleBackToStudy}>
-              <Box sx={{ p: 1, backgroundColor: 'var(--nen-cam-nhat2)', borderRadius: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Box sx={{ p: 1, backgroundColor: 'var(--nen-tin-hieu-nhat2)', borderRadius: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <GraduationCap size={24} color="var(--chu-dam)" />
               </Box>
               <Typography variant="h6" sx={{ letterSpacing: '-0.5px', fontWeight: 'bold', color: 'var(--chu-nguoc)' }}>
@@ -64,14 +64,14 @@ export const SchoolAdminPage: React.FC = () => {
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               
               <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center', gap: 1.5 }}>
-                <Avatar sx={{ bgcolor: 'var(--cam-nen)', color: 'var(--chu-nguoc)', width: 36, height: 36, fontWeight: 'bold', fontSize: '0.9rem' }}>
+                <Avatar sx={{ bgcolor: 'var(--tin-hieu-nen)', color: 'var(--chu-nguoc)', width: 36, height: 36, fontWeight: 'bold', fontSize: '0.9rem' }}>
                   S
                 </Avatar>
                 <Box sx={{ textAlign: 'left' }}>
                   <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--chu-nguoc)', lineHeight: 1.2 }}>
                     {currentUser?.name || 'Quản trị trường'}
                   </Typography>
-                  <Chip label="SCHOOL ADMIN" size="small" sx={{ height: 18, fontSize: '0.6rem', fontWeight: 'bold', backgroundColor: 'var(--cam-vien)', color: 'var(--cam-nhat)', border: '1px solid var(--cam-vien)' }} />
+                  <Chip label="SCHOOL ADMIN" size="small" sx={{ height: 18, fontSize: '0.6rem', fontWeight: 'bold', backgroundColor: 'var(--tin-hieu-vien)', color: 'var(--tin-hieu-nhat)', border: '1px solid var(--tin-hieu-vien)' }} />
                 </Box>
               </Box>
 

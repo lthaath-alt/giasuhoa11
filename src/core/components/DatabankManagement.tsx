@@ -170,7 +170,7 @@ export const DatabankManagement: React.FC = () => {
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)', display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Database size={22} color="var(--teal)" />
+          <Database size={22} color="var(--luc-tham)" />
           Ngân hàng dữ liệu Hóa học thông minh
         </Typography>
         <Button
@@ -261,7 +261,7 @@ export const DatabankManagement: React.FC = () => {
               <TableBody>
                 {equations.map(eq => (
                   <TableRow key={eq.id}>
-                    <TableCell><Typography variant="body2" sx={{ fontWeight: 'bold', color: 'var(--teal)', fontFamily: 'monospace' }}>{eq.equation}</Typography></TableCell>
+                    <TableCell><Typography variant="body2" sx={{ fontWeight: 'bold', color: 'var(--luc-tham)', fontFamily: 'monospace' }}>{eq.equation}</Typography></TableCell>
                     <TableCell><Typography variant="body2">{eq.condition}</Typography></TableCell>
                     <TableCell><Chip size="small" label={eq.type || 'Chung'} sx={{ bgcolor: 'var(--nen-nhat)' }} /></TableCell>
                     <TableCell><Typography variant="body2" color="text.secondary">{eq.notes}</Typography></TableCell>

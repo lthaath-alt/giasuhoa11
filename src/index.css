@@ -30,15 +30,15 @@
   --chu:       #4D4D47;
   --chu-2:     #5A5A53;
   --chu-mo:    #63635B;
-  --cam:       #B3000F;
-  --teal:      #0F5A44;
+  --tin-hieu:       #B3000F;
+  --luc-tham:      #0F5A44;
   --xanh:      #14508C;
   --xanh-dam:  #0E3A66;
   --do:        #B3000F;
   --luc:       #1B6B3A;
   --tim:       #4A2E7A;
-  --nen-cam-nhat:  #FAE8E8;
-  --nen-cam-nhat2: #F4D7D7;
+  --nen-tin-hieu-nhat:  #FAE8E8;
+  --nen-tin-hieu-nhat2: #F4D7D7;
   --nen-luc-nhat:  #E1EFE6;
   --nen-luc-nhat2: #EFF6F1;
   --nen-vang-nhat: #FCF1D4;
@@ -50,10 +50,10 @@
   --vien-xanh:     #B4C8DE;
   --vang:        #7A5A00;
   --vang-dam:    #5E4500;
-  --cam-dam:     #8C000C;
-  --cam-nhat:    #D02A2A;
-  --cam-nhat2:   #DE5555;
-  --cam-vien:    #EFC7C7;
+  --tin-hieu-dam:     #8C000C;
+  --tin-hieu-nhat:    #D02A2A;
+  --tin-hieu-nhat2:   #DE5555;
+  --tin-hieu-vien:    #EFC7C7;
   --luc-dam:     #17603A;
   --luc-dam2:    #124D2E;
   --xanh-troi:   #14508C;
@@ -82,15 +82,15 @@
   --chu-tren-nen-dam: #A9A89F;
 
   /* ── Màu thương hiệu dùng làm NỀN (nút, thanh menu, chip) ─────────────────
-     Phải tách khỏi --cam/--teal/--xanh vì hai vai trái ngược nhau:
+     Phải tách khỏi --tin-hieu/--luc-tham/--xanh vì hai vai trái ngược nhau:
        · dùng làm CHỮ trên nền tối  -> phải SÁNG lên mới đọc được
        · dùng làm NỀN mang chữ trắng -> phải ĐẬM lại mới đọc được
      Một biến không gánh nổi cả hai. Bản đầu chỉ có một biến, làm sáng cho vai
      chữ, thế là thanh menu xanh nhạt + chữ trắng, tương phản tụt còn 2,7. */
   --xanh-nen:     #14508C;
   --xanh-dam-nen: #0E3A66;
-  --teal-nen:     #0F5A44;
-  --cam-nen:      #C4000E;
+  --luc-tham-nen:     #0F5A44;
+  --tin-hieu-nen:      #C4000E;
   --do-nen:       #C4000E;
   --tim-nen:      #4A2E7A;
   --luc-nen:      #17603A;
@@ -117,15 +117,15 @@
   --chu:       #AEADA5;
   --chu-2:     #98978F;
   --chu-mo:    #8B8A82;
-  --cam:       #FF5A50;
-  --teal:      #4FC9A5;
+  --tin-hieu:       #FF5A50;
+  --luc-tham:      #4FC9A5;
   --xanh:      #6BA9EE;
   --xanh-dam:  #7FB6F2;
   --do:        #FF5A50;
   --luc:       #4ADE80;
   --tim:       #A78BFA;
-  --nen-cam-nhat:  #2C1512;
-  --nen-cam-nhat2: #381915;
+  --nen-tin-hieu-nhat:  #2C1512;
+  --nen-tin-hieu-nhat2: #381915;
   --nen-luc-nhat:  #13291D;
   --nen-luc-nhat2: #101F17;
   --nen-vang-nhat: #2A2312;
@@ -137,10 +137,10 @@
   --vien-xanh:     #2C4362;
   --vang:        #F0BE2E;
   --vang-dam:    #E5B01C;
-  --cam-dam:     #FF7A6E;
-  --cam-nhat:    #FF8C82;
-  --cam-nhat2:   #FFA79E;
-  --cam-vien:    #5A2320;
+  --tin-hieu-dam:     #FF7A6E;
+  --tin-hieu-nhat:    #FF8C82;
+  --tin-hieu-nhat2:   #FFA79E;
+  --tin-hieu-vien:    #5A2320;
   --luc-dam:     #5FE694;
   --luc-dam2:    #7BEDA9;
   --xanh-troi:   #6BA9EE;
@@ -162,8 +162,8 @@
      tối để chữ trắng trên đó đạt tương phản ≥ 4,5. */
   --xanh-nen:     #14508C;
   --xanh-dam-nen: #0E3A66;
-  --teal-nen:     #0F5A44;
-  --cam-nen:      #C4000E;
+  --luc-tham-nen:     #0F5A44;
+  --tin-hieu-nen:      #C4000E;
   --do-nen:       #C4000E;
   --tim-nen:      #4A2E7A;
   --luc-nen:      #17603A;
@@ -216,11 +216,11 @@ body {
 
 /* Con trỏ nhập và vòng tiêu điểm lấy màu tín hiệu — cùng một màu chỉ đạo. */
 input, textarea, [contenteditable] {
-  caret-color: var(--cam);
+  caret-color: var(--tin-hieu);
 }
 
 :focus-visible {
-  outline: 2px solid var(--cam);
+  outline: 2px solid var(--tin-hieu);
   outline-offset: 2px;
 }
 

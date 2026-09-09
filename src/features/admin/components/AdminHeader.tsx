@@ -57,11 +57,11 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
           }}
           sx={{
             textTransform: 'none',
-            borderColor: 'var(--teal)',
-            color: 'var(--teal)',
+            borderColor: 'var(--luc-tham)',
+            color: 'var(--luc-tham)',
             fontWeight: 'bold',
             '&:hover': {
-              borderColor: 'var(--teal)',
+              borderColor: 'var(--luc-tham)',
               backgroundColor: 'var(--nen-luc-nhat2)',
             },
           }}

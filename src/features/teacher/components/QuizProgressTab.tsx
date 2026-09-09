@@ -224,20 +224,20 @@ export const QuizProgressTab: React.FC<QuizProgressTabProps> = ({ students, isAd
                       sx={{
                         borderRadius: 0,
                         border: '1px solid',
-                        borderColor: active ? 'var(--teal)' : 'var(--vien)',
+                        borderColor: active ? 'var(--luc-tham)' : 'var(--vien)',
                         bgcolor: active ? 'var(--nen-luc-nhat2)' : 'var(--nen-the)',
                         cursor: 'pointer',
                         transition: 'all 0.15s',
                         '&:hover': {
-                          borderColor: 'var(--teal)',
+                          borderColor: 'var(--luc-tham)',
                           bgcolor: 'var(--nen-luc-nhat2)',
                         },
                       }}
                     >
                       <Avatar
                         sx={{
-                          bgcolor: active ? 'var(--teal-nen)' : 'var(--nen-luc-nhat2)',
-                          color: active ? 'var(--chu-nguoc)' : 'var(--teal)',
+                          bgcolor: active ? 'var(--luc-tham-nen)' : 'var(--nen-luc-nhat2)',
+                          color: active ? 'var(--chu-nguoc)' : 'var(--luc-tham)',
                           width: 32, height: 32, fontSize: '0.8rem', mr: 1.5,
                         }}
                       >
@@ -320,7 +320,7 @@ export const QuizProgressTab: React.FC<QuizProgressTabProps> = ({ students, isAd
                 <Grid container spacing={2}>
                   <Grid size={{ xs: 12, sm: 4 }}>
                     <Paper variant="outlined" sx={{ p: 2, borderRadius: 0, textAlign: 'center', bgcolor: 'var(--nen-trang)' }}>
-                      <Typography variant="h4" sx={{ fontWeight: 800, color: 'var(--teal)' }}>
+                      <Typography variant="h4" sx={{ fontWeight: 800, color: 'var(--luc-tham)' }}>
                         {quizzes.length}
                       </Typography>
                       <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
@@ -368,7 +368,7 @@ export const QuizProgressTab: React.FC<QuizProgressTabProps> = ({ students, isAd
                                 sx={{
                                   width: '100%',
                                   height,
-                                  bgcolor: scoreRatio >= 70 ? 'var(--teal-nen)' : 'var(--cam-nen)',
+                                  bgcolor: scoreRatio >= 70 ? 'var(--luc-tham-nen)' : 'var(--tin-hieu-nen)',
                                   borderRadius: 0,
                                   transition: 'height 0.3s ease',
                                 }}
@@ -388,7 +388,7 @@ export const QuizProgressTab: React.FC<QuizProgressTabProps> = ({ students, isAd
 
             {/* THÈ 2: DANH SÁCH CÁC CÂU HỎI TỰ LUẬN CẦN CHẤM LẠI (🚩 FLAGGED) */}
             {reviewQuestions.length > 0 && (
-              <Card sx={{ borderRadius: 0, border: '1px solid var(--cam-vien)', bgcolor: 'var(--nen-cam-nhat2)', boxShadow: 'none' }}>
+              <Card sx={{ borderRadius: 0, border: '1px solid var(--tin-hieu-vien)', bgcolor: 'var(--nen-tin-hieu-nhat2)', boxShadow: 'none' }}>
                 <CardContent sx={{ p: 3 }}>
                   <Typography variant="h6" color="var(--chu-dam)" sx={{ fontWeight: 'black', display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                     <AlertTriangle size={20} />
@@ -408,7 +408,7 @@ export const QuizProgressTab: React.FC<QuizProgressTabProps> = ({ students, isAd
                       const currentVal = editingScore[scoreKey] !== undefined ? editingScore[scoreKey] : result.score;
 
                       return (
-                        <Paper key={scoreKey} variant="outlined" sx={{ p: 2.5, borderRadius: 0, borderColor: 'var(--cam-vien)' }}>
+                        <Paper key={scoreKey} variant="outlined" sx={{ p: 2.5, borderRadius: 0, borderColor: 'var(--tin-hieu-vien)' }}>
                           <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1, flexWrap: 'wrap', gap: 1 }}>
                             <Chip label={`Bài thi ngày ${new Date(qz.createdAt).toLocaleDateString('vi-VN')}`} size="small" variant="outlined" />
                             <Chip label={`Câu ${qIndex + 1} • Tự luận`} size="small" color="warning" />
@@ -446,7 +446,7 @@ export const QuizProgressTab: React.FC<QuizProgressTabProps> = ({ students, isAd
                           </Grid>
 
                           {/* Nhận xét AI */}
-                          <Box sx={{ p: 1.5, bgcolor: 'var(--nen-cam-nhat2)', borderRadius: 0, mb: 2 }}>
+                          <Box sx={{ p: 1.5, bgcolor: 'var(--nen-tin-hieu-nhat2)', borderRadius: 0, mb: 2 }}>
                             <Typography variant="caption" color="var(--chu-dam)" sx={{ fontWeight: 'bold', display: 'block', mb: 0.5 }}>
                               🤖 AI NHẬN XÉT:
                             </Typography>
@@ -476,7 +476,7 @@ export const QuizProgressTab: React.FC<QuizProgressTabProps> = ({ students, isAd
                                 size="small"
                                 startIcon={<Check size={14} />}
                                 onClick={() => handleSaveScore(qz.id, questionId, result.maxScore)}
-                                sx={{ textTransform: 'none', borderRadius: 0, fontWeight: 'bold', bgcolor: 'var(--cam-nen)' }}
+                                sx={{ textTransform: 'none', borderRadius: 0, fontWeight: 'bold', bgcolor: 'var(--tin-hieu-nen)' }}
                               >
                                 Xác nhận điểm
                               </Button>

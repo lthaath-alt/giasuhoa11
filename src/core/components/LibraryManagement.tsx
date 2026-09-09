@@ -56,7 +56,7 @@ export const LibraryManagement: React.FC = () => {
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)', display: 'flex', alignItems: 'center', gap: 1 }}>
-          <BookOpen size={22} color="var(--teal)" />
+          <BookOpen size={22} color="var(--luc-tham)" />
           Thư viện đề thi & kho câu hỏi hệ thống
         </Typography>
         <Button
@@ -107,7 +107,7 @@ export const LibraryManagement: React.FC = () => {
                 </Typography>
                 
                 {exam.driveLink ? (
-                  <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'var(--teal)', mb: 3 }}>
+                  <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'var(--luc-tham)', mb: 3 }}>
                     <ExternalLink size={16} /> Tệp đính kèm (Google Drive)
                   </Typography>
                 ) : (

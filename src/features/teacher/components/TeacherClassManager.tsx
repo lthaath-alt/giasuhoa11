@@ -58,8 +58,8 @@ export const TeacherClassManager: React.FC<TeacherClassManagerProps> = ({ onClas
         sx={{ p: 3, borderRadius: 0, borderColor: 'var(--vien-2)', bgcolor: 'var(--nen-luc-nhat2)' }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
-          <CheckCircle size={22} color="var(--teal)" />
-          <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--teal)' }}>
+          <CheckCircle size={22} color="var(--luc-tham)" />
+          <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--luc-tham)' }}>
             Lớp "{created.name}" đã được tạo!
           </Typography>
         </Box>
@@ -74,7 +74,7 @@ export const TeacherClassManager: React.FC<TeacherClassManagerProps> = ({ onClas
           sx={{
             display: 'inline-flex', alignItems: 'center', gap: 2,
             p: 2, px: 3, borderRadius: 0,
-            border: '2px dashed var(--teal)',
+            border: '2px dashed var(--luc-tham)',
             bgcolor: 'var(--nen-luc-nhat2)',
             cursor: 'pointer',
             transition: 'all 0.15s',
@@ -89,7 +89,7 @@ export const TeacherClassManager: React.FC<TeacherClassManagerProps> = ({ onClas
               fontFamily: 'monospace',
               fontWeight: 900,
               letterSpacing: '0.3em',
-              color: 'var(--teal)',
+              color: 'var(--luc-tham)',
               userSelect: 'all',
             }}
           >
@@ -120,7 +120,7 @@ export const TeacherClassManager: React.FC<TeacherClassManagerProps> = ({ onClas
     >
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1 }}>
         <Box sx={{ p: 1, bgcolor: 'var(--nen-luc-nhat2)', borderRadius: 0, display: 'flex' }}>
-          <School size={20} color="var(--teal)" />
+          <School size={20} color="var(--luc-tham)" />
         </Box>
         <Box>
           <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)', lineHeight: 1.2 }}>
@@ -167,7 +167,7 @@ export const TeacherClassManager: React.FC<TeacherClassManagerProps> = ({ onClas
             textTransform: 'none',
             fontWeight: 'bold',
             borderRadius: 0,
-            bgcolor: 'var(--teal-nen)',
+            bgcolor: 'var(--luc-tham-nen)',
             boxShadow: 'none',
             whiteSpace: 'nowrap',
             '&:hover': { bgcolor: 'var(--nen-dam)', boxShadow: 'none' },

@@ -43,13 +43,13 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleForm }) => {
         variant="outlined"
         sx={{
           p: 2.5, borderRadius: 0, mb: 2,
-          borderColor: 'var(--cam-vien)',
-          backgroundColor: 'var(--nen-cam-nhat2)',
+          borderColor: 'var(--tin-hieu-vien)',
+          backgroundColor: 'var(--nen-tin-hieu-nhat2)',
           cursor: 'pointer',
           transition: 'all 0.2s',
           '&:hover': {
-            backgroundColor: 'var(--nen-cam-nhat2)',
-            borderColor: 'var(--cam-vien)',
+            backgroundColor: 'var(--nen-tin-hieu-nhat2)',
+            borderColor: 'var(--tin-hieu-vien)',
             transform: 'translateY(-1px)',
           }
         }}
@@ -66,7 +66,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleForm }) => {
         }}
       >
         <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
-          <Box sx={{ p: 1, bgcolor: 'var(--nen-cam-nhat2)', borderRadius: 0, display: 'flex' }}>
+          <Box sx={{ p: 1, bgcolor: 'var(--nen-tin-hieu-nhat2)', borderRadius: 0, display: 'flex' }}>
             <UserPlus size={22} color="var(--chu-dam)" />
           </Box>
           <Box>
@@ -93,7 +93,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleForm }) => {
       >
         <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
           <Box sx={{ p: 1, bgcolor: 'var(--nen-luc-nhat2)', borderRadius: 0, display: 'flex' }}>
-            <GraduationCap size={22} color="var(--teal)" />
+            <GraduationCap size={22} color="var(--luc-tham)" />
           </Box>
           <Box>
             <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)', mb: 0.5 }}>
@@ -118,8 +118,8 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleForm }) => {
         onClick={onToggleForm}
         sx={{
           py: 1.3, borderRadius: 0, fontWeight: 'bold', textTransform: 'none',
-          borderColor: 'var(--cam)', color: 'var(--cam)',
-          '&:hover': { backgroundColor: 'var(--nen-cam-nhat2)', borderColor: 'var(--cam)' }
+          borderColor: 'var(--tin-hieu)', color: 'var(--tin-hieu)',
+          '&:hover': { backgroundColor: 'var(--nen-tin-hieu-nhat2)', borderColor: 'var(--tin-hieu)' }
         }}
       >
         Quay lại Đăng nhập

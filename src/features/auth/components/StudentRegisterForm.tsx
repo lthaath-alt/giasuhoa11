@@ -265,7 +265,7 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
                 input: {
                   startAdornment: (
                     <InputAdornment position="start">
-                      <School size={16} color={inviteCode ? 'var(--teal)' : 'var(--chu-mo)'} />
+                      <School size={16} color={inviteCode ? 'var(--luc-tham)' : 'var(--chu-mo)'} />
                     </InputAdornment>
                   ),
                 },
@@ -273,14 +273,14 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
               sx={{
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 0,
-                  ...(inviteCode && { borderColor: 'var(--teal)' }),
+                  ...(inviteCode && { borderColor: 'var(--luc-tham)' }),
                 },
                 '& .MuiInputBase-input': {
                   fontFamily: 'monospace',
                   fontSize: '1.1rem',
                   letterSpacing: '0.2em',
                   fontWeight: 'bold',
-                  color: inviteCode ? 'var(--teal)' : 'inherit',
+                  color: inviteCode ? 'var(--luc-tham)' : 'inherit',
                 },
               }}
             />

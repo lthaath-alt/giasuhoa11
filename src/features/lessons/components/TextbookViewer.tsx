@@ -312,7 +312,7 @@ export const TextbookViewer: React.FC<TextbookViewerProps> = ({ lesson, onOpenCh
                     size="small" variant="outlined"
                     startIcon={<MessageSquare size={14} />}
                     onClick={onOpenChat}
-                    sx={{ textTransform: 'none', fontWeight: 600, borderRadius: 0, fontSize: '0.8rem', borderColor: 'var(--cam)', color: 'var(--cam)', '&:hover': { bgcolor: 'var(--nen-cam-nhat)' } }}
+                    sx={{ textTransform: 'none', fontWeight: 600, borderRadius: 0, fontSize: '0.8rem', borderColor: 'var(--tin-hieu)', color: 'var(--tin-hieu)', '&:hover': { bgcolor: 'var(--nen-tin-hieu-nhat)' } }}
                   >
                     Hỏi Gia sư AI
                   </Button>
@@ -350,7 +350,7 @@ export const TextbookViewer: React.FC<TextbookViewerProps> = ({ lesson, onOpenCh
           startIcon={<MessageSquare size={18} />}
           onClick={onOpenChat}
           sx={{
-            backgroundColor: 'var(--cam-nen)',
+            backgroundColor: 'var(--tin-hieu-nen)',
             color: 'var(--chu-nguoc)', textTransform: 'none', fontWeight: 700, borderRadius: 0, px: 3, py: 1.2,
             boxShadow: 'none', whiteSpace: 'nowrap', flexShrink: 0,
             '&:hover': { backgroundColor: VAI.nenDam },

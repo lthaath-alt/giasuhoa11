@@ -51,9 +51,9 @@ export const SchoolAdminDashboard: React.FC = () => {
               transition: 'all 0.2s',
               fontSize: '0.92rem',
               '&:hover': { backgroundColor: 'var(--nen-nhat)', color: 'var(--chu-dam)' },
-              '&.Mui-selected': { color: 'var(--cam)', backgroundColor: 'var(--nen-cam-nhat2)' }
+              '&.Mui-selected': { color: 'var(--tin-hieu)', backgroundColor: 'var(--nen-tin-hieu-nhat2)' }
             },
-            '& .MuiTabs-indicator': { height: 3, borderRadius: 0, backgroundColor: 'var(--cam-nen)' }
+            '& .MuiTabs-indicator': { height: 3, borderRadius: 0, backgroundColor: 'var(--tin-hieu-nen)' }
           }}
         >
           <Tab
@@ -95,7 +95,7 @@ export const SchoolAdminDashboard: React.FC = () => {
           ) : (
             <Paper sx={{ p: 3, borderRadius: 0, border: '1px solid var(--vien)', boxShadow: 'none' }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-                <Box sx={{ p: 1, bgcolor: 'var(--nen-cam-nhat2)', borderRadius: 0 }}>
+                <Box sx={{ p: 1, bgcolor: 'var(--nen-tin-hieu-nhat2)', borderRadius: 0 }}>
                   <Building2 size={24} color="var(--chu-dam)" />
                 </Box>
                 <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{mySchool.name}</Typography>
@@ -120,7 +120,7 @@ export const SchoolAdminDashboard: React.FC = () => {
                   return (
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                       {schoolTeachers.map(t => (
-                        <Chip key={t.email} avatar={<Avatar sx={{ bgcolor: 'var(--nen-cam-nhat2)', color: 'var(--cam)' }}>{t.name.charAt(0)}</Avatar>}
+                        <Chip key={t.email} avatar={<Avatar sx={{ bgcolor: 'var(--nen-tin-hieu-nhat2)', color: 'var(--tin-hieu)' }}>{t.name.charAt(0)}</Avatar>}
                           label={`${t.name} – ${t.email}`} variant="outlined" sx={{ fontWeight: 600 }} />
                       ))}
                     </Box>
@@ -135,7 +135,7 @@ export const SchoolAdminDashboard: React.FC = () => {
                     <GraduationCap size={18} /> Lớp học
                   </Typography>
                   <Button size="small" variant="outlined" color="secondary" startIcon={<Plus size={14} />}
-                    onClick={() => setCreateClassSchool(mySchool.id)} sx={{ textTransform: 'none', borderRadius: 0, fontWeight: 'bold', color: 'var(--teal)', borderColor: 'var(--teal)' }}>
+                    onClick={() => setCreateClassSchool(mySchool.id)} sx={{ textTransform: 'none', borderRadius: 0, fontWeight: 'bold', color: 'var(--luc-tham)', borderColor: 'var(--luc-tham)' }}>
                     Tạo lớp
                   </Button>
                 </Box>
@@ -148,7 +148,7 @@ export const SchoolAdminDashboard: React.FC = () => {
                         const teacher = users.find(u => u.email.toLowerCase() === cls.teacherEmail.toLowerCase());
                         return (
                           <Paper key={cls.id} variant="outlined" sx={{ p: 1.5, borderRadius: 0, minWidth: 160 }}>
-                            <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--teal)' }}>Lớp {cls.name}</Typography>
+                            <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--luc-tham)' }}>Lớp {cls.name}</Typography>
                             <Typography variant="caption" color="text.secondary">GVCN: {teacher?.name || cls.teacherEmail}</Typography><br />
                             <Typography variant="caption" color="text.secondary">{cls.studentIdentifiers.length} học sinh</Typography>
                           </Paper>

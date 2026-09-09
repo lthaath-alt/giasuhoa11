@@ -56,7 +56,7 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onBackTo
           bgcolor: 'var(--nen-luc-nhat2)', border: '2px solid var(--vien-2)',
           mx: 'auto', mb: 2
         }}>
-          <KeyRound size={28} color="var(--teal)" />
+          <KeyRound size={28} color="var(--luc-tham)" />
         </Box>
 
         <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)', mb: 0.5 }}>
@@ -83,7 +83,7 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onBackTo
             <Typography
               variant="h6"
               sx={{
-                fontFamily: 'monospace', fontWeight: 'bold', color: 'var(--teal)',
+                fontFamily: 'monospace', fontWeight: 'bold', color: 'var(--luc-tham)',
                 letterSpacing: showPassword ? 2 : 6,
                 mt: 0.5
               }}
@@ -132,7 +132,7 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onBackTo
   return (
     <Box id="forgot-password-form">
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
-        <Box sx={{ p: 1, bgcolor: 'var(--nen-cam-nhat2)', borderRadius: 0 }}>
+        <Box sx={{ p: 1, bgcolor: 'var(--nen-tin-hieu-nhat2)', borderRadius: 0 }}>
           <RefreshCw size={20} color="var(--chu-dam)" />
         </Box>
         <Box>

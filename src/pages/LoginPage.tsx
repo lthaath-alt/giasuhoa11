@@ -30,7 +30,7 @@ const BrandPanel: React.FC = () => (
       minHeight: '100vh',
       px: { md: 5, lg: 7 },
       py: 6,
-      backgroundColor: 'var(--teal-nen)', // Teal đậm — màu thương hiệu đã có sẵn trong theme
+      backgroundColor: 'var(--luc-tham-nen)', // Teal đậm — màu thương hiệu đã có sẵn trong theme
       backgroundImage: 'none',
       color: 'var(--chu-nguoc)',
     }}
@@ -199,8 +199,8 @@ export const LoginPage: React.FC = () => {
           >
             {/* Logo mobile (chỉ hiện khi màn hình nhỏ, vì cột trái đã ẩn) */}
             <Box sx={{ display: { xs: 'flex', md: 'none' }, alignItems: 'center', gap: 1, mb: 3, justifyContent: 'center' }}>
-              <BookOpen size={24} color="var(--teal)" />
-              <Typography variant="h5" color="var(--teal)" sx={{ fontWeight: 'bold' }}>
+              <BookOpen size={24} color="var(--luc-tham)" />
+              <Typography variant="h5" color="var(--luc-tham)" sx={{ fontWeight: 'bold' }}>
                 Gia sư Hóa học 11 AI
               </Typography>
             </Box>
@@ -242,11 +242,11 @@ export const LoginPage: React.FC = () => {
                     borderRadius: 0,
                     textTransform: 'none',
                     fontWeight: 'bold',
-                    borderColor: 'var(--cam)',
-                    color: 'var(--cam)',
+                    borderColor: 'var(--tin-hieu)',
+                    color: 'var(--tin-hieu)',
                     '&:hover': {
-                      backgroundColor: 'var(--nen-cam-nhat2)',
-                      borderColor: 'var(--cam)',
+                      backgroundColor: 'var(--nen-tin-hieu-nhat2)',
+                      borderColor: 'var(--tin-hieu)',
                     },
                   }}
                 >

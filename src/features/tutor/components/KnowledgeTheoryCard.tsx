@@ -44,7 +44,7 @@ export const KnowledgeTheoryCard: React.FC<KnowledgeTheoryCardProps> = ({ lesson
             <Paper key={i} sx={{ p: 1.5, backgroundColor: 'var(--nen-trang)', border: '1px solid var(--vien)', borderRadius: 0 }}>
               <Typography
                 variant="caption"
-                sx={{ fontFamily: 'monospace', fontWeight: 600, color: 'var(--teal)', display: 'block', wordBreak: 'break-word' }}
+                sx={{ fontFamily: 'monospace', fontWeight: 600, color: 'var(--luc-tham)', display: 'block', wordBreak: 'break-word' }}
               >
                 {f}
               </Typography>

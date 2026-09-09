@@ -90,20 +90,20 @@ export const ProgressChatsTab: React.FC<ProgressChatsTabProps> = ({
                       sx={{
                         borderRadius: 0,
                         border: '1px solid',
-                        borderColor: active ? 'var(--cam)' : 'var(--vien)',
-                        backgroundColor: active ? 'var(--nen-cam-nhat2)' : 'var(--nen-the)',
+                        borderColor: active ? 'var(--tin-hieu)' : 'var(--vien)',
+                        backgroundColor: active ? 'var(--nen-tin-hieu-nhat2)' : 'var(--nen-the)',
                         cursor: 'pointer',
                         transition: 'all 0.2s',
                         '&:hover': {
-                          borderColor: 'var(--cam)',
-                          backgroundColor: 'var(--nen-cam-nhat2)',
+                          borderColor: 'var(--tin-hieu)',
+                          backgroundColor: 'var(--nen-tin-hieu-nhat2)',
                         },
                       }}
                     >
                       <Avatar
                         sx={{
-                          bgcolor: active ? 'var(--cam-nen)' : 'var(--nen-cam-nhat2)',
-                          color: active ? 'var(--chu-nguoc)' : 'var(--cam)',
+                          bgcolor: active ? 'var(--tin-hieu-nen)' : 'var(--nen-tin-hieu-nhat2)',
+                          color: active ? 'var(--chu-nguoc)' : 'var(--tin-hieu)',
                           mr: 2,
                           width: 32,
                           height: 32,
@@ -175,7 +175,7 @@ export const ProgressChatsTab: React.FC<ProgressChatsTabProps> = ({
                     <Typography variant="body2" color="text.secondary">
                       Tỷ lệ hoàn thành bài học sách giáo khoa:
                     </Typography>
-                    <Typography variant="body2" color="var(--teal)" sx={{ fontWeight: 'bold' }}>
+                    <Typography variant="body2" color="var(--luc-tham)" sx={{ fontWeight: 'bold' }}>
                       {progressPercent}% ({completedCount}/{allLessons.length} bài học)
                     </Typography>
                   </Box>
@@ -284,7 +284,7 @@ export const ProgressChatsTab: React.FC<ProgressChatsTabProps> = ({
                           >
                             <Typography
                               variant="caption"
-                              sx={{ display: 'block', mb: 0.5, fontWeight: 'bold', color: isAi ? 'var(--teal)' : 'var(--cam)' }}
+                              sx={{ display: 'block', mb: 0.5, fontWeight: 'bold', color: isAi ? 'var(--luc-tham)' : 'var(--tin-hieu)' }}
                             >
                               {isAi ? '🤖 Gia sư AI' : `👤 ${selectedStudent?.name}`}
                             </Typography>

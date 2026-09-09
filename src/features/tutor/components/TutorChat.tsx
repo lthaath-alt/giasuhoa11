@@ -255,7 +255,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-            <Avatar sx={{ bgcolor: 'var(--cam-nen)', color: 'var(--chu-nguoc)' }}>
+            <Avatar sx={{ bgcolor: 'var(--tin-hieu-nen)', color: 'var(--chu-nguoc)' }}>
               <Sparkles size={20} />
             </Avatar>
             <Box>
@@ -370,7 +370,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
                 textAlign: 'center',
               }}
             >
-              <Avatar sx={{ width: 64, height: 64, bgcolor: 'var(--nen-luc-nhat2)', color: 'var(--teal)' }}>
+              <Avatar sx={{ width: 64, height: 64, bgcolor: 'var(--nen-luc-nhat2)', color: 'var(--luc-tham)' }}>
                 <Key size={32} />
               </Avatar>
               <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
@@ -402,7 +402,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
                 textAlign: 'center',
               }}
             >
-              <Avatar sx={{ width: 64, height: 64, bgcolor: 'var(--nen-cam-nhat2)', color: 'var(--cam)' }}>
+              <Avatar sx={{ width: 64, height: 64, bgcolor: 'var(--nen-tin-hieu-nhat2)', color: 'var(--tin-hieu)' }}>
                 <Sparkles size={32} />
               </Avatar>
               <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
@@ -438,9 +438,9 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
                       sx={{
                         width: 32,
                         height: 32,
-                        bgcolor: 'var(--nen-cam-nhat2)',
-                        color: 'var(--cam)',
-                        border: '1px solid var(--nen-cam-nhat2)',
+                        bgcolor: 'var(--nen-tin-hieu-nhat2)',
+                        color: 'var(--tin-hieu)',
+                        border: '1px solid var(--nen-tin-hieu-nhat2)',
                       }}
                     >
                       <Sparkles size={16} />
@@ -452,7 +452,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
                       sx={{
                         p: 2,
                         borderRadius: 0,
-                        backgroundColor: isAi ? 'var(--nen-nhat)' : 'var(--teal-nen)',
+                        backgroundColor: isAi ? 'var(--nen-nhat)' : 'var(--luc-tham-nen)',
                         color: isAi ? 'text.primary' : 'var(--chu-nguoc)',
                         border: isAi ? '1px solid var(--vien)' : 'none',
                         boxShadow: 'none',
@@ -482,9 +482,9 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
                 sx={{
                   width: 32,
                   height: 32,
-                  bgcolor: 'var(--nen-cam-nhat2)',
-                  color: 'var(--cam)',
-                  border: '1px solid var(--nen-cam-nhat2)',
+                  bgcolor: 'var(--nen-tin-hieu-nhat2)',
+                  color: 'var(--tin-hieu)',
+                  border: '1px solid var(--nen-tin-hieu-nhat2)',
                 }}
               >
                 <Sparkles size={16} />

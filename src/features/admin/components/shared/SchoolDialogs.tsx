@@ -23,7 +23,7 @@ export const CredentialDialog: React.FC<{ open: boolean; onClose: () => void; cr
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle sx={{ bgcolor: 'var(--cam-nen)', color: 'var(--chu-nguoc)', fontWeight: 'bold' }}>
+      <DialogTitle sx={{ bgcolor: 'var(--tin-hieu-nen)', color: 'var(--chu-nguoc)', fontWeight: 'bold' }}>
         ✅ Tài khoản Giáo viên đã được tạo!
       </DialogTitle>
       <DialogContent sx={{ pt: 3 }}>
@@ -46,7 +46,7 @@ export const CredentialDialog: React.FC<{ open: boolean; onClose: () => void; cr
               <Box>
                 <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'bold' }}>MẬT KHẨU</Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Typography variant="body1" sx={{ fontWeight: 'bold', fontFamily: 'monospace', color: 'var(--teal)', letterSpacing: showPassword ? 0 : 4 }}>
+                  <Typography variant="body1" sx={{ fontWeight: 'bold', fontFamily: 'monospace', color: 'var(--luc-tham)', letterSpacing: showPassword ? 0 : 4 }}>
                     {showPassword ? credentials.password : '••••••••••'}
                   </Typography>
                   <IconButton size="small" onClick={() => setShowPassword(v => !v)}>

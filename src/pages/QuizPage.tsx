@@ -298,9 +298,9 @@ export const QuizPage: React.FC = () => {
               bgcolor: 'var(--nen-luc-nhat2)', display: 'flex',
               alignItems: 'center', justifyContent: 'center', mx: 'auto', mb: 2,
             }}>
-              <Award size={36} color="var(--teal)" />
+              <Award size={36} color="var(--luc-tham)" />
             </Box>
-            <Typography variant="h4" sx={{ fontWeight: 'black', color: 'var(--teal)', mb: 1 }}>
+            <Typography variant="h4" sx={{ fontWeight: 'black', color: 'var(--luc-tham)', mb: 1 }}>
               KẾT QUẢ BÀI KIỂM TRA
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
@@ -318,7 +318,7 @@ export const QuizPage: React.FC = () => {
               </Grid>
               <Grid size={{ xs: 6, sm: 4 }}>
                 <Paper variant="outlined" sx={{ p: 2, borderRadius: 0 }}>
-                  <Typography variant="h4" sx={{ fontWeight: 800, color: 'var(--teal)' }}>
+                  <Typography variant="h4" sx={{ fontWeight: 800, color: 'var(--luc-tham)' }}>
                     {percent}%
                   </Typography>
                   <Typography variant="caption" color="text.secondary">Tỉ lệ chính xác</Typography>
@@ -384,7 +384,7 @@ export const QuizPage: React.FC = () => {
                     </Typography>
                     <Typography variant="body2" sx={{
                       fontWeight: 600,
-                      color: isCorrect ? 'var(--teal)' : 'var(--do-dam)',
+                      color: isCorrect ? 'var(--luc-tham)' : 'var(--do-dam)',
                       display: 'flex', alignItems: 'center', gap: 0.5
                     }}>
                       {isCorrect ? <CheckCircle size={16} /> : <XCircle size={16} />}
@@ -394,8 +394,8 @@ export const QuizPage: React.FC = () => {
 
                   {/* Nhận xét từ AI */}
                   {res?.feedback && (
-                    <Box sx={{ p: 2, bgcolor: 'var(--nen-luc-nhat2)', borderRadius: 0, mb: 2, border: '1px solid var(--teal-nen)' }}>
-                      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5, fontWeight: 'bold', color: 'var(--teal)' }}>
+                    <Box sx={{ p: 2, bgcolor: 'var(--nen-luc-nhat2)', borderRadius: 0, mb: 2, border: '1px solid var(--luc-tham-nen)' }}>
+                      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5, fontWeight: 'bold', color: 'var(--luc-tham)' }}>
                         🤖 NHẬN XÉT CỦA GIA SƯ AI:
                       </Typography>
                       <Typography variant="body2" sx={{ whiteSpace: 'pre-line', color: 'var(--chu-dam-3)' }}>
@@ -535,7 +535,7 @@ export const QuizPage: React.FC = () => {
 
         {/* Tiêu đề đề bài */}
         <Paper variant="outlined" sx={{ p: 4, mb: 4, borderRadius: 0 }}>
-          <Typography variant="h5" sx={{ fontWeight: 900, color: 'var(--teal)', mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Typography variant="h5" sx={{ fontWeight: 900, color: 'var(--luc-tham)', mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
             <GraduationCap size={24} />
             BÀI KIỂM TRA TỰ HỌC PHẢN XẠ HÓA 11
           </Typography>
@@ -592,9 +592,9 @@ export const QuizPage: React.FC = () => {
                                   borderRadius: 0,
                                   cursor: 'pointer',
                                   transition: 'all 0.15s',
-                                  borderColor: isSelected ? 'var(--cam)' : 'var(--vien)',
-                                  bgcolor: isSelected ? 'var(--nen-cam-nhat2)' : 'var(--nen-the)',
-                                  '&:hover': { borderColor: 'var(--cam)', bgcolor: 'var(--nen-cam-nhat2)' }
+                                  borderColor: isSelected ? 'var(--tin-hieu)' : 'var(--vien)',
+                                  bgcolor: isSelected ? 'var(--nen-tin-hieu-nhat2)' : 'var(--nen-the)',
+                                  '&:hover': { borderColor: 'var(--tin-hieu)', bgcolor: 'var(--nen-tin-hieu-nhat2)' }
                                 }}
                               >
                                 <CardContent sx={{ py: 1.5, px: 2, display: 'flex', alignItems: 'center', gap: 1, '&:last-child': { pb: 1.5 } }}>

@@ -290,7 +290,7 @@ export const DashboardPage: React.FC = () => {
                             fontSize: '0.82rem',
                             px: 1.5,
                             ...(studyMode === 'chat'
-                              ? { bgcolor: 'var(--cam-nen)', color: 'var(--chu-nguoc)', boxShadow: 'none', '&:hover': { bgcolor: 'var(--do-nen)' } }
+                              ? { bgcolor: 'var(--tin-hieu-nen)', color: 'var(--chu-nguoc)', boxShadow: 'none', '&:hover': { bgcolor: 'var(--do-nen)' } }
                               : { color: 'var(--chu-2)', '&:hover': { bgcolor: 'var(--vien)', color: 'var(--chu-dam)' } }
                             ),
                           }}
@@ -304,7 +304,7 @@ export const DashboardPage: React.FC = () => {
                         size="small"
                         startIcon={<ArrowRight size={15} />}
                         onClick={() => { setSelectedLesson(null); setStudyMode('sgk'); }}
-                        sx={{ textTransform: 'none', fontWeight: 'bold', borderRadius: 0, fontSize: '0.82rem', borderColor: 'var(--vien)', color: 'var(--chu-2)', '&:hover': { borderColor: 'var(--cam)', color: 'var(--chu-dam)', bgcolor: 'var(--nen-cam-nhat)' } }}
+                        sx={{ textTransform: 'none', fontWeight: 'bold', borderRadius: 0, fontSize: '0.82rem', borderColor: 'var(--vien)', color: 'var(--chu-2)', '&:hover': { borderColor: 'var(--tin-hieu)', color: 'var(--chu-dam)', bgcolor: 'var(--nen-tin-hieu-nhat)' } }}
                       >
                         Quay lại
                       </Button>
@@ -360,8 +360,8 @@ export const DashboardPage: React.FC = () => {
                           px: 4,
                           py: 3,
                           borderRadius: 0,
-                          backgroundColor: 'var(--nen-cam-nhat)',
-                          border: '1px solid var(--cam-vien)',
+                          backgroundColor: 'var(--nen-tin-hieu-nhat)',
+                          border: '1px solid var(--tin-hieu-vien)',
                           display: 'flex',
                           flexDirection: { xs: 'column', sm: 'row' },
                           alignItems: 'center',
@@ -371,7 +371,7 @@ export const DashboardPage: React.FC = () => {
                         }}
                       >
                         <Box sx={{ flex: 1 }}>
-                          <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--cam-dam)', mb: 0.5 }}>
+                          <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--tin-hieu-dam)', mb: 0.5 }}>
                             Chơi Xong Rồi, Học Tiếp Thôi!
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
@@ -561,14 +561,14 @@ export const DashboardPage: React.FC = () => {
                         tải gì — vì thế trạng thái luôn là "đã sẵn sàng". */}
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, p: 1.5, bgcolor: 'var(--nen-trang)', borderRadius: 0 }}>
                       <Box sx={{ position: 'relative', display: 'flex' }}>
-                        <Box sx={{ width: 10, height: 10, bgcolor: 'var(--teal-nen)', borderRadius: '50%' }} />
+                        <Box sx={{ width: 10, height: 10, bgcolor: 'var(--luc-tham-nen)', borderRadius: '50%' }} />
                       </Box>
                       <Box>
                         <Typography variant="caption" sx={{ fontWeight: 'bold', display: 'block' }}>
                           Nguồn kiến thức: {allLessons.length} bài Hóa 11 (KNTT 2018)
                         </Typography>
                         <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.68rem', display: 'block' }}>
-                          <span style={{ color: 'var(--teal)', fontWeight: 'bold' }}>Đã nạp sẵn trong web ⚡</span>
+                          <span style={{ color: 'var(--luc-tham)', fontWeight: 'bold' }}>Đã nạp sẵn trong web ⚡</span>
                           {' '}— Thầy luôn có danh mục cả 25 bài; mở một bài cụ thể thì có thêm toàn văn bài đó.
                         </Typography>
                       </Box>
@@ -600,8 +600,8 @@ export const DashboardPage: React.FC = () => {
                             fontSize: '0.8rem',
                             transition: 'all 0.2s',
                             '&:hover': {
-                              borderColor: 'var(--cam)',
-                              bgcolor: 'var(--nen-cam-nhat2)',
+                              borderColor: 'var(--tin-hieu)',
+                              bgcolor: 'var(--nen-tin-hieu-nhat2)',
                             },
                           }}
                         >
@@ -782,7 +782,7 @@ export const DashboardPage: React.FC = () => {
             <Box id="tab-content-support" sx={{ maxWidth: 850, mx: 'auto' }}>
               <Paper sx={{ p: 4, borderRadius: 0, border: '1px solid var(--vien)', boxShadow: 'none' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 4 }}>
-                  <Avatar sx={{ bgcolor: 'var(--cam-nen)', color: 'var(--chu-nguoc)', width: 56, height: 56 }}>
+                  <Avatar sx={{ bgcolor: 'var(--tin-hieu-nen)', color: 'var(--chu-nguoc)', width: 56, height: 56 }}>
                     <HelpCircle size={32} />
                   </Avatar>
                   <Box>
@@ -842,7 +842,7 @@ export const DashboardPage: React.FC = () => {
                   </Accordion>
                 </Box>
 
-                <Box sx={{ mt: 5, p: 3, bgcolor: 'var(--nen-cam-nhat)', borderRadius: 0, border: '1px solid var(--nen-cam-nhat2)', textAlign: 'center' }}>
+                <Box sx={{ mt: 5, p: 3, bgcolor: 'var(--nen-tin-hieu-nhat)', borderRadius: 0, border: '1px solid var(--nen-tin-hieu-nhat2)', textAlign: 'center' }}>
                   <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)', mb: 1 }}>
                     Học viên vẫn còn thắc mắc khác cần hỗ trợ nhanh?
                   </Typography>

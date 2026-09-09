@@ -38,7 +38,7 @@ export const SystemSettingsManagement: React.FC = () => {
 
       <Paper sx={{ p: 3, borderRadius: 0, border: '1px solid var(--vien)', boxShadow: 'none' }}>
         <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-          <ShieldAlert size={18} color="var(--teal)" />
+          <ShieldAlert size={18} color="var(--luc-tham)" />
           Giới hạn sử dụng & API Key
         </Typography>
 

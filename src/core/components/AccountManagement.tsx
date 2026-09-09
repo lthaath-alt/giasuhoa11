@@ -96,7 +96,7 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({
     switch (role) {
       case 'admin': return <Chip size="small" label="Quản trị Website" sx={{ bgcolor: 'var(--nen-vang-nhat)', color: 'var(--vang-dam)', fontWeight: 'bold' }} />;
       case 'school_admin': return <Chip size="small" label="Quản trị Trường học" sx={{ bgcolor: 'var(--nen-tim-nhat)', color: 'var(--tim)', fontWeight: 'bold' }} />;
-      case 'teacher': return <Chip size="small" label="Giáo viên" sx={{ bgcolor: 'var(--nen-luc-nhat)', color: 'var(--teal)', fontWeight: 'bold' }} />;
+      case 'teacher': return <Chip size="small" label="Giáo viên" sx={{ bgcolor: 'var(--nen-luc-nhat)', color: 'var(--luc-tham)', fontWeight: 'bold' }} />;
       case 'student': return <Chip size="small" label="Học sinh" sx={{ bgcolor: 'var(--nen-xanh-nhat)', color: 'var(--xanh-troi)', fontWeight: 'bold' }} />;
       default: return <Chip size="small" label={role} />;
     }
@@ -115,7 +115,7 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, flexWrap: 'wrap', gap: 2 }}>
           <Box>
             <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)', display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Users size={20} color="var(--teal)" />
+              <Users size={20} color="var(--luc-tham)" />
               Danh sách người dùng hệ thống ({users.length} tài khoản)
             </Typography>
           </Box>
@@ -169,7 +169,7 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({
                     <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>{user.name}</Typography>
                   </TableCell>
                   <TableCell>
-                    <Typography variant="body2" sx={{ fontFamily: 'monospace', color: 'var(--teal)' }}>
+                    <Typography variant="body2" sx={{ fontFamily: 'monospace', color: 'var(--luc-tham)' }}>
                       {user.username || user.email}
                     </Typography>
                   </TableCell>

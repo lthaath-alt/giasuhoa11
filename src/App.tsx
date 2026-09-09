@@ -198,7 +198,7 @@ const themeGoc = {
             borderRadius: 0,
             '& fieldset': { borderColor: 'var(--vien)' },
             '&:hover fieldset': { borderColor: 'var(--chu-dam)' },
-            '&.Mui-focused fieldset': { borderColor: 'var(--cam)', borderWidth: '2px' },
+            '&.Mui-focused fieldset': { borderColor: 'var(--tin-hieu)', borderWidth: '2px' },
           },
         },
       },
@@ -212,7 +212,7 @@ const themeGoc = {
       },
     },
     /* Gạch chân tab là một nét mực dày, không phải vệt màu mờ. */
-    MuiTabs: { styleOverrides: { indicator: { height: 3, backgroundColor: 'var(--cam-nen)' } } },
+    MuiTabs: { styleOverrides: { indicator: { height: 3, backgroundColor: 'var(--tin-hieu-nen)' } } },
     MuiTab: { styleOverrides: { root: { textTransform: 'none', fontWeight: 700, minHeight: 44 } } },
     MuiAlert: { styleOverrides: { root: { borderRadius: 0 } } },
   },

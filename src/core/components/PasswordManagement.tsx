@@ -35,7 +35,7 @@ const CredentialDialog: React.FC<CredentialDialogProps> = ({ open, onClose, cred
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle sx={{ bgcolor: 'var(--teal-nen)', color: 'var(--chu-nguoc)', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1 }}>
+      <DialogTitle sx={{ bgcolor: 'var(--luc-tham-nen)', color: 'var(--chu-nguoc)', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1 }}>
         <ShieldCheck size={24} />
         Mật khẩu đã được cấp lại!
       </DialogTitle>
@@ -54,7 +54,7 @@ const CredentialDialog: React.FC<CredentialDialogProps> = ({ open, onClose, cred
               <Divider />
               <Box>
                 <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'bold' }}>TÀI KHOẢN ĐĂNG NHẬP</Typography>
-                <Typography variant="body1" sx={{ fontWeight: 'bold', fontFamily: 'monospace', color: 'var(--teal)' }}>
+                <Typography variant="body1" sx={{ fontWeight: 'bold', fontFamily: 'monospace', color: 'var(--luc-tham)' }}>
                   {credentials.identifier}
                 </Typography>
               </Box>
@@ -132,7 +132,7 @@ export const PasswordManagement: React.FC<Props> = ({ users }) => {
     switch (role) {
       case 'admin': return <Chip size="small" label="Quản trị Website" sx={{ bgcolor: 'var(--nen-vang-nhat)', color: 'var(--vang-dam)', fontWeight: 'bold' }} />;
       case 'school_admin': return <Chip size="small" label="Quản trị Trường học" sx={{ bgcolor: 'var(--nen-tim-nhat)', color: 'var(--tim)', fontWeight: 'bold' }} />;
-      case 'teacher': return <Chip size="small" label="Giáo viên" sx={{ bgcolor: 'var(--nen-luc-nhat)', color: 'var(--teal)', fontWeight: 'bold' }} />;
+      case 'teacher': return <Chip size="small" label="Giáo viên" sx={{ bgcolor: 'var(--nen-luc-nhat)', color: 'var(--luc-tham)', fontWeight: 'bold' }} />;
       case 'student': return <Chip size="small" label="Học sinh" sx={{ bgcolor: 'var(--nen-xanh-nhat)', color: 'var(--xanh-troi)', fontWeight: 'bold' }} />;
       default: return <Chip size="small" label={role} />;
     }
@@ -182,12 +182,12 @@ export const PasswordManagement: React.FC<Props> = ({ users }) => {
           
           {/* Hộp 3 */}
           <Grid size={{ xs: 12, md: 4 }}>
-            <Paper elevation={0} sx={{ p: 3, borderRadius: 0, border: '1px solid var(--cam-vien)', bgcolor: 'var(--nen-cam-nhat)', height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <Paper elevation={0} sx={{ p: 3, borderRadius: 0, border: '1px solid var(--tin-hieu-vien)', bgcolor: 'var(--nen-tin-hieu-nhat)', height: '100%', display: 'flex', flexDirection: 'column' }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Typography variant="h6" sx={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1, color: 'var(--cam-dam)' }}>
+                <Typography variant="h6" sx={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1, color: 'var(--tin-hieu-dam)' }}>
                   <ShieldAlert size={20} color="var(--chu-dam)" /> Khôi phục mật khẩu
                 </Typography>
-                <Chip label="Khẩn cấp" size="small" sx={{ bgcolor: 'var(--nen-cam-nhat2)', color: 'var(--cam-dam)', fontWeight: 'bold' }} />
+                <Chip label="Khẩn cấp" size="small" sx={{ bgcolor: 'var(--nen-tin-hieu-nhat2)', color: 'var(--tin-hieu-dam)', fontWeight: 'bold' }} />
               </Box>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 3, flexGrow: 1 }}>
                 Xử lý yêu cầu khôi phục mật khẩu từ học sinh.
@@ -232,7 +232,7 @@ export const PasswordManagement: React.FC<Props> = ({ users }) => {
                   <TableRow key={req.id}>
                     <TableCell>
                       <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>{req.name}</Typography>
-                      <Typography variant="caption" sx={{ fontFamily: 'monospace', color: 'var(--teal)' }}>{req.username || req.email}</Typography>
+                      <Typography variant="caption" sx={{ fontFamily: 'monospace', color: 'var(--luc-tham)' }}>{req.username || req.email}</Typography>
                     </TableCell>
                     <TableCell>{getRoleChip(req.role)}</TableCell>
                     <TableCell>
@@ -244,7 +244,7 @@ export const PasswordManagement: React.FC<Props> = ({ users }) => {
                         size="small"
                         startIcon={<KeyRound size={14} />}
                         onClick={() => handleResetPassword(req)}
-                        sx={{ textTransform: 'none', borderRadius: 0, borderColor: 'var(--cam)', color: 'var(--chu-dam)', fontWeight: 'bold' }}
+                        sx={{ textTransform: 'none', borderRadius: 0, borderColor: 'var(--tin-hieu)', color: 'var(--chu-dam)', fontWeight: 'bold' }}
                       >
                         Cấp lại mật khẩu
                       </Button>

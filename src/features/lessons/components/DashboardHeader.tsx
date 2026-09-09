@@ -182,7 +182,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 variant="caption"
                 sx={{
                   fontWeight: 'bold',
-                  color: 'var(--cam)',
+                  color: 'var(--tin-hieu)',
                   letterSpacing: '0.5px',
                   textTransform: 'uppercase',
                   fontSize: '0.68rem',
@@ -333,7 +333,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 onClick={doiCheDo}
                 size="small"
                 aria-label={laToi ? 'Chuyển sang nền sáng' : 'Chuyển sang nền tối'}
-                sx={{ color: 'var(--chu-2)', '&:hover': { color: 'var(--cam)' } }}
+                sx={{ color: 'var(--chu-2)', '&:hover': { color: 'var(--tin-hieu)' } }}
               >
                 {laToi ? <Sun size={18} /> : <Moon size={18} />}
               </IconButton>
@@ -367,7 +367,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                         currentUser.role === 'admin' ? 'var(--tim-nen)'
                         : currentUser.role === 'school_admin' ? 'var(--xanh-troi2)'
                         : currentUser.role === 'teacher' ? 'var(--luc-nen)'
-                        : 'var(--cam-nen)',
+                        : 'var(--tin-hieu-nen)',
                       color: 'var(--chu-nguoc)',
                     }}
                   />
@@ -433,7 +433,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                     borderRadius: 0,
                     fontSize: '0.75rem',
                     fontWeight: 700,
-                    backgroundColor: 'var(--cam-nen)',
+                    backgroundColor: 'var(--tin-hieu-nen)',
                     color: 'var(--chu-nguoc)',
                     boxShadow: 'none',
                     '&:hover': { backgroundColor: 'var(--nen-dam)', boxShadow: 'none' },

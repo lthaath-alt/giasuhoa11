@@ -23,7 +23,7 @@ import { ImportFromFile } from './ImportFromFile';
  */
 
 const LV_COLOR: Record<Level, string> = {
-  nb: 'var(--teal)', th: 'var(--xanh)', vd: 'var(--cam)', vdc: 'var(--do-dam)',
+  nb: 'var(--luc-tham)', th: 'var(--xanh)', vd: 'var(--tin-hieu)', vdc: 'var(--do-dam)',
 };
 
 function blank(): BankQuestion {
@@ -362,7 +362,7 @@ export const BankManager: React.FC = () => {
                     size="small"
                     label="Chưa gắn bài"
                     variant="outlined"
-                    sx={{ bgcolor: 'var(--nen-cam-nhat)', color: 'var(--cam-dam)', borderColor: 'var(--nen-cam-nhat2)', fontWeight: 600 }}
+                    sx={{ bgcolor: 'var(--nen-tin-hieu-nhat)', color: 'var(--tin-hieu-dam)', borderColor: 'var(--nen-tin-hieu-nhat2)', fontWeight: 600 }}
                   />
                 )}
                 {q.topic && <Chip size="small" label={q.topic} variant="outlined" />}
@@ -380,7 +380,7 @@ export const BankManager: React.FC = () => {
                 <Stack sx={{ mt: 1 }}>
                   {(q.o || []).map((o, i) => (
                     <Typography key={i} variant="body2"
-                      sx={{ color: i === q.a ? 'var(--teal)' : 'text.secondary', fontWeight: i === q.a ? 700 : 400 }}>
+                      sx={{ color: i === q.a ? 'var(--luc-tham)' : 'text.secondary', fontWeight: i === q.a ? 700 : 400 }}>
                       {String.fromCharCode(65 + i)}. {o}{i === q.a ? '  ✓' : ''}
                     </Typography>
                   ))}
@@ -396,7 +396,7 @@ export const BankManager: React.FC = () => {
                 </Stack>
               )}
               {q.t === 'tn' && (
-                <Typography variant="body2" sx={{ mt: 1, color: 'var(--teal)' }}>
+                <Typography variant="body2" sx={{ mt: 1, color: 'var(--luc-tham)' }}>
                   Đáp án: {q.ansText}{q.unit ? ` ${q.unit}` : ''}{q.tol ? ` (sai số ±${q.tol})` : ''}
                 </Typography>
               )}

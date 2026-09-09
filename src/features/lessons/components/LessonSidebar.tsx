@@ -46,7 +46,7 @@ export const LessonSidebar: React.FC<LessonSidebarProps> = ({
             boxShadow: 'none',
             '&:hover': {
               backgroundColor: 'var(--nen-trang)',
-              borderColor: 'var(--cam)',
+              borderColor: 'var(--tin-hieu)',
               color: 'var(--chu-dam)',
             },
             position: 'sticky',
@@ -170,11 +170,11 @@ export const LessonSidebar: React.FC<LessonSidebarProps> = ({
                           opacity: isLocked ? 0.6 : 1,
                         transition: 'all 0.2s',
                         border: '1px solid',
-                        borderColor: isSelected ? 'var(--cam-vien)' : 'transparent',
-                        backgroundColor: isSelected ? 'var(--nen-cam-nhat2)' : 'transparent',
+                        borderColor: isSelected ? 'var(--tin-hieu-vien)' : 'transparent',
+                        backgroundColor: isSelected ? 'var(--nen-tin-hieu-nhat2)' : 'transparent',
                         '&:hover': {
                           backgroundColor: isSelected
-                            ? 'var(--nen-cam-nhat2)'
+                            ? 'var(--nen-tin-hieu-nhat2)'
                             : 'var(--nen-luc-nhat2)',
                         },
                       }}

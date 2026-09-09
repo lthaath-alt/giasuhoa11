@@ -20,7 +20,7 @@ export const SuggestedQuestionsCard: React.FC<SuggestedQuestionsCardProps> = ({
     <Card
       id="suggested-questions-card"
       sx={{
-        borderLeft: '5px solid var(--teal)',
+        borderLeft: '5px solid var(--luc-tham)',
         boxShadow: 'none',
         backgroundColor: 'var(--nen-the)',
         border: '1px solid var(--vien)',
@@ -29,7 +29,7 @@ export const SuggestedQuestionsCard: React.FC<SuggestedQuestionsCardProps> = ({
     >
       <CardContent>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
-          <HelpCircle size={20} color="var(--teal)" />
+          <HelpCircle size={20} color="var(--luc-tham)" />
           <Typography variant="h6" sx={{ fontWeight: 'bold' }} color="text.primary">
             Câu hỏi tự luyện mẫu
           </Typography>
@@ -55,11 +55,11 @@ export const SuggestedQuestionsCard: React.FC<SuggestedQuestionsCardProps> = ({
                 borderRadius: 0,
                 fontSize: '0.8rem',
                 lineHeight: 1.4,
-                color: 'var(--teal)',
+                color: 'var(--luc-tham)',
                 fontWeight: '600',
                 '&:hover': {
                   backgroundColor: 'var(--nen-luc-nhat2)',
-                  borderColor: 'var(--teal)',
+                  borderColor: 'var(--luc-tham)',
                 },
               }}
               onClick={() => onQuestionClick(q.question)}

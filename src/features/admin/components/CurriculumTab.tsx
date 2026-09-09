@@ -325,7 +325,7 @@ export const CurriculumTab: React.FC = () => {
 
                         {/* Lý thuyết tóm tắt */}
                         <Box sx={{ mb: 1.5 }}>
-                          <Typography variant="caption" sx={{ fontWeight: 'bold', color: 'var(--teal)', display: 'block', mb: 0.5 }}>
+                          <Typography variant="caption" sx={{ fontWeight: 'bold', color: 'var(--luc-tham)', display: 'block', mb: 0.5 }}>
                             Lý thuyết cốt lõi (Tóm tắt):
                           </Typography>
                           <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem', lineHeight: 1.5 }}>

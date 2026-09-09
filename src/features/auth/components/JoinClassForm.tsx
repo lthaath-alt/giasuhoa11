@@ -100,7 +100,7 @@ export const JoinClassForm: React.FC<JoinClassFormProps> = ({ onJoined, onDismis
             p: 1, bgcolor: 'var(--nen-luc-nhat2)',
             borderRadius: 0, display: 'flex', flexShrink: 0, mt: 0.5,
           }}>
-            <School size={18} color="var(--teal)" />
+            <School size={18} color="var(--luc-tham)" />
           </Box>
 
           <Box sx={{ flex: 1 }}>
@@ -129,7 +129,7 @@ export const JoinClassForm: React.FC<JoinClassFormProps> = ({ onJoined, onDismis
                   input: {
                     startAdornment: (
                       <InputAdornment position="start">
-                        <School size={14} color="var(--teal)" />
+                        <School size={14} color="var(--luc-tham)" />
                       </InputAdornment>
                     ),
                   },
@@ -138,14 +138,14 @@ export const JoinClassForm: React.FC<JoinClassFormProps> = ({ onJoined, onDismis
                   width: 200,
                   '& .MuiOutlinedInput-root': {
                     borderRadius: 0,
-                    '&.Mui-focused fieldset': { borderColor: 'var(--teal)' },
+                    '&.Mui-focused fieldset': { borderColor: 'var(--luc-tham)' },
                   },
                   '& .MuiInputBase-input': {
                     fontFamily: 'monospace',
                     fontSize: '0.95rem',
                     letterSpacing: '0.15em',
                     fontWeight: 700,
-                    color: 'var(--teal)',
+                    color: 'var(--luc-tham)',
                   },
                 }}
               />
@@ -160,7 +160,7 @@ export const JoinClassForm: React.FC<JoinClassFormProps> = ({ onJoined, onDismis
                   textTransform: 'none',
                   fontWeight: 'bold',
                   borderRadius: 0,
-                  bgcolor: 'var(--teal-nen)',
+                  bgcolor: 'var(--luc-tham-nen)',
                   boxShadow: 'none',
                   '&:hover': { bgcolor: 'var(--nen-dam)', boxShadow: 'none' },
                   '&:disabled': { bgcolor: 'var(--nen-tat)' },

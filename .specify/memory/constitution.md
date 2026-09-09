@@ -68,7 +68,7 @@ thì nghi ngờ dụng cụ trước khi kết luận về sản phẩm.
 
 ### V. Một biến một vai, và chữ luôn phải đọc được
 
-Một biến màu chỉ gánh một vai: `--cam` làm **chữ** thì nền dùng `--cam-nen`. Không bao
+Một biến màu chỉ gánh một vai: `--tin-hieu` làm **chữ** thì nền dùng `--tin-hieu-nen`. Không bao
 giờ mượn biến màu chữ làm nền — ở chế độ sáng trông vẫn ổn, sang chế độ tối nó lật
 thành chữ trắng trên nền trắng.
 

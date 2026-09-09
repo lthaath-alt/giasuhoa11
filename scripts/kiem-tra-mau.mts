@@ -129,7 +129,7 @@ console.log('\n== Màu nhấn có bản NỀN riêng thì không được dùng 
        nằm ngay sát sau dấu hai chấm.
 
        Bản đầu của luật này đòi `var(--x)` đứng liền sau, nên mọi chỗ viết dạng
-       ba ngôi (`active ? 'var(--teal)' : 'var(--nen-nhat)'`) đều lọt — và đó
+       ba ngôi (`active ? 'var(--luc-tham)' : 'var(--nen-nhat)'`) đều lọt — và đó
        chính là dạng người ta hay viết cho trạng thái ĐANG CHỌN, tức đúng chỗ
        nút mang chữ trắng. Sáu chỗ lọt kiểu này: hai nút chọn vai và nút Đăng
        nhập ở màn đăng nhập, hai ảnh đại diện "đang chọn", cột biểu đồ điểm, và
@@ -137,8 +137,8 @@ console.log('\n== Màu nhấn có bản NỀN riêng thì không được dùng 
        nền sáng.
 
        Cắt ở dấu phẩy đầu tiên, tức hết GIÁ TRỊ của thuộc tính này. Không cắt
-       thì `bgcolor: 'var(--nen-luc-nhat)', color: 'var(--teal)'` bị báo oan —
-       `--teal` ở đó đang làm chữ, đúng vai. Biểu thức ba ngôi không chứa dấu
+       thì `bgcolor: 'var(--nen-luc-nhat)', color: 'var(--luc-tham)'` bị báo oan —
+       `--luc-tham` ở đó đang làm chữ, đúng vai. Biểu thức ba ngôi không chứa dấu
        phẩy nên vẫn lọt vào tầm soi. */
     for (const d of n.split('\n')) {
       const m0 = d.match(/(?:bgcolor|backgroundColor|background)(?:=\{?|: ?)([^,]*)/);
@@ -210,18 +210,18 @@ console.log('\n== Tương phản chữ trên nền ==');
 
   const CHU_THAN = ['--chu-dam', '--chu-dam-2', '--chu-dam-3', '--chu', '--chu-2', '--chu-mo'];
   const NEN_CHINH = ['--nen-trang', '--nen-the', '--nen-nhat', '--nen-xam', '--nen-rat-nhat'];
-  const NEN_NHAT = ['--nen-cam-nhat', '--nen-cam-nhat2', '--nen-luc-nhat', '--nen-luc-nhat2',
+  const NEN_NHAT = ['--nen-tin-hieu-nhat', '--nen-tin-hieu-nhat2', '--nen-luc-nhat', '--nen-luc-nhat2',
                     '--nen-vang-nhat', '--nen-xanh-nhat', '--nen-xanh-nhat2', '--nen-tim-nhat',
                     '--nen-tim-nhat2', '--nen-do-nhat', '--nen-do-nhat2'];
-  const NHAN_LAM_CHU = ['--cam', '--teal', '--xanh', '--xanh-dam', '--do', '--luc', '--tim',
-                        '--vang', '--vang-dam', '--cam-dam', '--luc-dam', '--luc-dam2',
+  const NHAN_LAM_CHU = ['--tin-hieu', '--luc-tham', '--xanh', '--xanh-dam', '--do', '--luc', '--tim',
+                        '--vang', '--vang-dam', '--tin-hieu-dam', '--luc-dam', '--luc-dam2',
                         '--xanh-troi', '--xanh-troi2', '--do-dam', '--tim-2', '--xanh-chu',
                         '--xanh-chu2'];
   /* Nền nút mang chữ trắng. --vang-nen CỐ Ý không nằm đây: chữ trắng trên vàng
      chỉ được 2,14, nên nó đi cùng --chu-tren-vang (xem cặp cố định bên dưới).
      Tra trong src/ thì --vang-nen chỉ làm thanh chỉ báo tab và nền khối, không
      có chữ trắng nào đặt lên. */
-  const NEN_NUT = ['--xanh-nen', '--xanh-dam-nen', '--teal-nen', '--cam-nen', '--do-nen',
+  const NEN_NUT = ['--xanh-nen', '--xanh-dam-nen', '--luc-tham-nen', '--tin-hieu-nen', '--do-nen',
                    '--tim-nen', '--luc-nen'];
   const CO_DINH: [string, string][] = [
     ['--chu-ma', '--nen-ma'],

@@ -134,7 +134,7 @@ export const StudentArea: React.FC = () => {
             </Typography>
 
             {!myClass ? (
-              <Paper sx={{ p: 4, textAlign: 'center', bgcolor: 'var(--nen-cam-nhat)', borderRadius: 0, border: '1px dashed var(--cam-nhat2)' }}>
+              <Paper sx={{ p: 4, textAlign: 'center', bgcolor: 'var(--nen-tin-hieu-nhat)', borderRadius: 0, border: '1px dashed var(--tin-hieu-nhat2)' }}>
                 <Typography variant="body1" sx={{ color: 'var(--chu-dam)', fontWeight: 'bold', mb: 1 }}>
                   Chưa tham gia lớp học nào.
                 </Typography>

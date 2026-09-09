@@ -28,7 +28,7 @@ function checkPasswordStrength(pw: string): { score: number; label: string; colo
 
   if (score <= 2) return { score: 20, label: 'Yếu',     color: 'var(--do)' };
   if (score === 3) return { score: 55, label: 'Trung bình', color: 'var(--vang)' };
-  if (score === 4) return { score: 80, label: 'Tốt',     color: 'var(--teal)' };
+  if (score === 4) return { score: 80, label: 'Tốt',     color: 'var(--luc-tham)' };
   return               { score: 100, label: 'Rất mạnh', color: 'var(--luc-dam)' };
 }
 
@@ -87,7 +87,7 @@ export const GoogleSetPasswordForm: React.FC<GoogleSetPasswordFormProps> = ({
         {googleInfo.picture ? (
           <img src={googleInfo.picture} alt="avatar" style={{ width: 40, height: 40, borderRadius: '50%' }} />
         ) : (
-          <Box sx={{ width: 40, height: 40, borderRadius: '50%', bgcolor: 'var(--teal-nen)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Box sx={{ width: 40, height: 40, borderRadius: '50%', bgcolor: 'var(--luc-tham-nen)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Typography sx={{ color: 'var(--chu-nguoc)', fontWeight: 'bold' }}>{googleInfo.name.charAt(0)}</Typography>
           </Box>
         )}
@@ -97,7 +97,7 @@ export const GoogleSetPasswordForm: React.FC<GoogleSetPasswordFormProps> = ({
           </Typography>
           <Typography variant="caption" color="text.secondary">{googleInfo.email}</Typography>
         </Box>
-        <ShieldCheck size={18} color="var(--teal)" style={{ marginLeft: 'auto' }} />
+        <ShieldCheck size={18} color="var(--luc-tham)" style={{ marginLeft: 'auto' }} />
       </Box>
 
       <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)', mb: 0.5 }}>

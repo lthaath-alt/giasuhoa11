@@ -26,7 +26,7 @@ export const WelcomeWorkspace: React.FC<WelcomeWorkspaceProps> = ({ setSelectedL
         minHeight: 480,
       }}
     >
-      <Avatar sx={{ width: 80, height: 80, bgcolor: 'var(--nen-cam-nhat2)', color: 'var(--cam)', mb: 3 }}>
+      <Avatar sx={{ width: 80, height: 80, bgcolor: 'var(--nen-tin-hieu-nhat2)', color: 'var(--tin-hieu)', mb: 3 }}>
         <Sparkles size={40} />
       </Avatar>
 
@@ -69,7 +69,7 @@ export const WelcomeWorkspace: React.FC<WelcomeWorkspaceProps> = ({ setSelectedL
               backgroundColor: 'var(--nen-the)',
               '&:hover': {
                 transform: 'translateY(-3px)',
-                borderColor: 'var(--cam)',
+                borderColor: 'var(--tin-hieu)',
                 boxShadow: 'none',
               },
             }}
@@ -82,12 +82,12 @@ export const WelcomeWorkspace: React.FC<WelcomeWorkspaceProps> = ({ setSelectedL
                   borderRadius: '50%',
                   backgroundColor:
                     idx % 2 === 0
-                      ? 'var(--nen-cam-nhat2)'
+                      ? 'var(--nen-tin-hieu-nhat2)'
                       : 'var(--nen-luc-nhat2)',
                   color:
                     idx % 2 === 0
-                      ? 'var(--cam)'
-                      : 'var(--teal)',
+                      ? 'var(--tin-hieu)'
+                      : 'var(--luc-tham)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',

@@ -101,7 +101,7 @@ export const ApiKeyDialog: React.FC<ApiKeyDialogProps> = ({ open, onClose }) => 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1, fontWeight: 'bold' }}>
-        <Key size={20} color="var(--teal)" />
+        <Key size={20} color="var(--luc-tham)" />
         Cài đặt Gemini API Key
       </DialogTitle>
       

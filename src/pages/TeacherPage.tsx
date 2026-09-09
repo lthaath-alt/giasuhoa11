@@ -46,7 +46,7 @@ const CredentialDialog: React.FC<CredentialDialogProps> = ({ open, onClose, cred
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle sx={{ bgcolor: 'var(--teal-nen)', color: 'var(--chu-nguoc)', fontWeight: 'bold' }}>
+      <DialogTitle sx={{ bgcolor: 'var(--luc-tham-nen)', color: 'var(--chu-nguoc)', fontWeight: 'bold' }}>
         ✅ Tài khoản đã được tạo thành công!
       </DialogTitle>
       <DialogContent sx={{ pt: 3 }}>
@@ -64,7 +64,7 @@ const CredentialDialog: React.FC<CredentialDialogProps> = ({ open, onClose, cred
               <Divider />
               <Box>
                 <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'bold' }}>TÀI KHOẢN ĐĂNG NHẬP</Typography>
-                <Typography variant="body1" sx={{ fontWeight: 'bold', fontFamily: 'monospace', color: 'var(--teal)' }}>
+                <Typography variant="body1" sx={{ fontWeight: 'bold', fontFamily: 'monospace', color: 'var(--luc-tham)' }}>
                   {credentials.identifier}
                 </Typography>
               </Box>
@@ -168,7 +168,7 @@ const CreateStudentDialog: React.FC<CreateStudentDialogProps> = ({
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
       <DialogTitle sx={{ fontWeight: 'bold' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <UserPlus size={20} color="var(--teal)" />
+          <UserPlus size={20} color="var(--luc-tham)" />
           Thêm học sinh vào lớp
         </Box>
       </DialogTitle>
@@ -293,7 +293,7 @@ export const TeacherPage: React.FC = () => {
 
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
               <Box sx={{ p: 1, backgroundColor: 'var(--nen-luc-nhat2)', borderRadius: 0, display: 'flex' }}>
-                <GraduationCap size={22} color="var(--teal)" />
+                <GraduationCap size={22} color="var(--luc-tham)" />
               </Box>
               <Box>
                 <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)', lineHeight: 1.2 }}>
@@ -307,14 +307,14 @@ export const TeacherPage: React.FC = () => {
 
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center', gap: 1.5 }}>
-                <Avatar sx={{ bgcolor: 'var(--nen-luc-nhat2)', color: 'var(--teal)', width: 36, height: 36, fontWeight: 'bold' }}>
+                <Avatar sx={{ bgcolor: 'var(--nen-luc-nhat2)', color: 'var(--luc-tham)', width: 36, height: 36, fontWeight: 'bold' }}>
                   {currentUser?.name.charAt(0).toUpperCase()}
                 </Avatar>
                 <Box>
                   <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)' }}>
                     {currentUser?.name}
                   </Typography>
-                  <Chip label="GIÁO VIÊN" size="small" sx={{ height: 16, fontSize: '0.6rem', fontWeight: 'bold', bgcolor: 'var(--teal-nen)', color: 'var(--chu-nguoc)' }} />
+                  <Chip label="GIÁO VIÊN" size="small" sx={{ height: 16, fontSize: '0.6rem', fontWeight: 'bold', bgcolor: 'var(--luc-tham-nen)', color: 'var(--chu-nguoc)' }} />
                 </Box>
               </Box>
 
@@ -324,7 +324,7 @@ export const TeacherPage: React.FC = () => {
                 size="small"
                 startIcon={<BookOpen size={14} />}
                 onClick={() => navigate('/dashboard')}
-                sx={{ textTransform: 'none', borderRadius: 0, fontWeight: 'bold', color: 'var(--teal)', borderColor: 'var(--teal)', '&:hover': { bgcolor: 'var(--nen-luc-nhat2)' } }}
+                sx={{ textTransform: 'none', borderRadius: 0, fontWeight: 'bold', color: 'var(--luc-tham)', borderColor: 'var(--luc-tham)', '&:hover': { bgcolor: 'var(--nen-luc-nhat2)' } }}
               >
                 Vào học tập
               </Button>

@@ -66,8 +66,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   const isStudent = selectedRole === 'student';
   /* Hai bien, hai vai. `accentColor` chi duoc lam CHU/VIEN; muon to nen thi
      phai dung `accentNen`. Giu chung canh nhau de lan sau khong lay nham. */
-  const accentColor = isStudent ? 'var(--cam)' : 'var(--teal)';
-  const accentNen = isStudent ? 'var(--cam-nen)' : 'var(--teal-nen)';
+  const accentColor = isStudent ? 'var(--tin-hieu)' : 'var(--luc-tham)';
+  const accentNen = isStudent ? 'var(--tin-hieu-nen)' : 'var(--luc-tham-nen)';
 
   return (
     <Box id="login-form-container">
@@ -103,7 +103,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
               fontWeight: 'bold',
               transition: 'all 0.2s',
               color: isStudent ? 'var(--chu-nguoc)' : 'var(--chu-2)',
-              backgroundColor: isStudent ? 'var(--cam-nen)' : 'transparent',
+              backgroundColor: isStudent ? 'var(--tin-hieu-nen)' : 'transparent',
               boxShadow: 'none',
               '&:hover': {
                 backgroundColor: isStudent ? 'var(--nen-dam)' : 'var(--nen-rat-nhat)',
@@ -126,7 +126,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
               fontWeight: 'bold',
               transition: 'all 0.2s',
               color: !isStudent ? 'var(--chu-nguoc)' : 'var(--chu-2)',
-              backgroundColor: !isStudent ? 'var(--teal-nen)' : 'transparent',
+              backgroundColor: !isStudent ? 'var(--luc-tham-nen)' : 'transparent',
               boxShadow: 'none',
               '&:hover': {
                 backgroundColor: !isStudent ? 'var(--nen-dam)' : 'var(--nen-rat-nhat)',
