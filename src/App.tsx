@@ -72,10 +72,10 @@ const themeGoc = {
      Sửa ở đây rẻ hơn nhiều so với đi đổi từng chỗ. */
   shape: { borderRadius: 0 },
   typography: {
-    // Inter cho chữ thân bài; Archivo cho GIỌNG HIỂN THỊ. Archivo là grotesque
+    // IBM Plex Sans cho chữ thân bài; Archivo cho GIỌNG HIỂN THỊ. Archivo là grotesque
     // công nghiệp gốc từ chữ biển báo — đúng thế giới nhãn cảnh báo, và Impeccable
-    // cấm lấy Inter làm giọng hiển thị vì nó là phông giao diện, không có quan điểm.
-    fontFamily: '"Inter", system-ui, sans-serif',
+    // gọi Inter là phông đã bị dùng tới mức mất cá tính — xem chú thích ở index.css.
+    fontFamily: '"IBM Plex Sans", system-ui, sans-serif',
     h1: { fontFamily: '"Archivo", system-ui, sans-serif', fontWeight: 800, letterSpacing: '-0.02em' },
     h2: { fontFamily: '"Archivo", system-ui, sans-serif', fontWeight: 800, letterSpacing: '-0.02em' },
     overline: { fontFamily: '"Archivo", system-ui, sans-serif', fontWeight: 700, letterSpacing: '0.12em' },

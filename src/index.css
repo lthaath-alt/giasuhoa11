@@ -1,9 +1,14 @@
 /* Archivo là grotesque công nghiệp gốc từ chữ biển báo — đúng thế giới nhãn
    cảnh báo hoá chất, và có đủ dấu tiếng Việt. Dùng cho GIỌNG HIỂN THỊ: tiêu đề,
-   nhãn hoa, mã số. Inter ở lại làm chữ thân bài, nơi cần đọc lâu.
-   Sàn chất lượng của Impeccable cấm lấy Inter làm giọng hiển thị — nó là phông
-   giao diện, không phải phông có quan điểm. */
-@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
+   nhãn hoa, mã số. IBM Plex Sans làm chữ thân bài: cũng là một grotesque kỹ thuật
+   (phông doanh nghiệp của IBM, dựng cho tài liệu máy móc), đủ dấu tiếng Việt, và
+   đứng cạnh Archivo thì cùng một họ giọng.
+
+   Trước đây chỗ này là Inter. Bộ dò của Impeccable gọi thẳng tên nó: Inter nằm trong
+   nhúm phông bị dùng tới mức mất hết cá tính, và mỗi đợt giao diện do máy sinh lại đổ
+   về đúng nhúm đó. Đổi giọng hiển thị sang Archivo mà giữ Inter cho thân bài thì dấu
+   vết ấy vẫn còn nguyên ở chỗ chiếm nhiều diện tích nhất. */
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
 /* ─── Bảng màu hai chế độ ────────────────────────────────────────────────────
@@ -19,7 +24,7 @@
    tranh vẽ, đảo màu theo nền chỉ làm hỏng hình. */
 :root {
   --f-hien-thi: 'Archivo', system-ui, sans-serif;
-  --f-than-bai: 'Inter', system-ui, sans-serif;
+  --f-than-bai: 'IBM Plex Sans', system-ui, sans-serif;
   --nen-trang: #F2F1ED;   /* nền toàn trang */
   --nen-the:   #FFFFFF;   /* nền thẻ, hộp thoại */
   --nen-nhat:  #E7E6E0;   /* nền phụ, vùng nhấn nhẹ */
@@ -106,7 +111,7 @@
 
 :root[data-theme="dark"] {
   --f-hien-thi: 'Archivo', system-ui, sans-serif;
-  --f-than-bai: 'Inter', system-ui, sans-serif;
+  --f-than-bai: 'IBM Plex Sans', system-ui, sans-serif;
   --nen-trang: #0D0D0B;
   --nen-the:   #161613;
   --nen-nhat:  #1F1F1B;

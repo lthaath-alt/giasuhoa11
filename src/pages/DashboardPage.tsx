@@ -50,6 +50,7 @@ import { JoinClassForm } from '../features/auth/components/JoinClassForm';
 import { StudentArea } from '../features/student/components/StudentArea';
 import { GameHubSection } from '../features/games/GameHubSection';
 import { SlidesSection } from '../features/lessons/components/SlidesSection';
+import { ActivityFields, type Truong } from '../features/lessons/components/ActivityFields';
 import {
   ChemDoodles, GameDoodles, GameDoodlesTren, GameDoodlesDuoi,
   MascotToanThan, MascotDauVai,
@@ -108,6 +109,57 @@ export const DashboardPage: React.FC = () => {
   const completedCount = progress ? progress.completedLessons.length : 0;
   const progressPercent =
     allLessons.length > 0 ? Math.round((completedCount / allLessons.length) * 100) : 0;
+
+  /* Bon viec lam duoc, dung theo FIRST VIEWPORT cua hop dong huong.
+     Moi dong trang thai la SO THAT doc tu du lieu dang chay:
+       - so bai va so chuong tu `curriculum`;
+       - so bai da hoc tu tien do that cua nguoi dang dang nhap;
+       - so cau hoi thu con lai tu `guestChatCount` (tran 25, cung con so
+         khu quan tri hien o "Reset Khach thu (n/25)").
+     Cho nao chua co so that thi ghi nang luc CO THAT, khong dat mot con so
+     vao cho trong. */
+  const laHocSinh = currentUser?.role === 'student';
+  const truongViec: Truong[] = [
+    {
+      ma: 'BG',
+      ten: 'Bài giảng',
+      trangThai: currentUser
+        ? `đã học ${completedCount}/${allLessons.length} bài`
+        : `${allLessons.length} bài · ${curriculum.length} chương`,
+      moKhi: () => setActiveTab('baigiang'),
+      nhanNut: currentUser ? 'Học tiếp' : 'Vào học',
+      chinh: true,
+    },
+    {
+      ma: 'AI',
+      ten: 'Gia sư AI',
+      trangThai: currentUser
+        ? 'Thầy Hùng gợi mở từng bước, không đưa đáp số'
+        : `còn ${Math.max(0, 25 - guestChatCount)}/25 câu hỏi thử`,
+      moKhi: () => setActiveTab('ichat'),
+      nhanNut: 'Hỏi bài',
+    },
+    {
+      ma: 'ĐK',
+      ten: 'Đề kiểm tra',
+      trangThai: laHocSinh
+        ? 'Đề thầy giao, làm và xem điểm ngay'
+        : `Đề sinh theo từng chương — ${curriculum.length} chương`,
+      /* Khu de kiem tra nam trong "Khu vuc Hoc sinh", chi mo cho vai student.
+         Khach va giao vien khong vao duoc — noi thang ly do thay vi giau muc
+         di, vi giau di thi hop dong huong hua bon viec ma chi thay ba. */
+      moKhi: laHocSinh ? () => setActiveTab('hocsinh') : undefined,
+      nhanNut: 'Mở đề',
+      khoa: 'Cần tài khoản học sinh',
+    },
+    {
+      ma: 'TC',
+      ten: 'Trò chơi ôn tập',
+      trangThai: `2 trò · Rắn và Thang mở khoá lần lượt ${allLessons.length} màn`,
+      moKhi: () => setActiveTab('trochoi'),
+      nhanNut: 'Chơi',
+    },
+  ];
 
   // Lấy lịch sử iChat toàn cục (chúng ta dùng lessonId là 'global-advisor' cho cuộc chat tư vấn chung)
   const userEmail = currentUser ? currentUser.email : 'guest';
@@ -430,6 +482,10 @@ export const DashboardPage: React.FC = () => {
           {/* ================= TAB 2: GIỚI THIỆU ================= */}
           {activeTab === 'gioithieu' && (
             <Box id="tab-content-about" sx={{ maxWidth: 900, mx: 'auto', position: 'relative' }}>
+              {/* Khung hinh dau: bon viec lam duoc, truoc moi doan chu. Hop dong
+                  huong doi hoc sinh bam duoc viec can lam ngay trong man dau,
+                  khong phai cuon tim. */}
+              <ActivityFields truongs={truongViec} />
               {/* Nhân vật đứng ngoài lề trái, sát mép khối chữ. Cần khoảng
                   215px + 16px lề nên chỉ bật từ 1440px trở lên; hẹp hơn thì
                   rơi xuống kiểu ló đầu nằm trong khối chữ bên dưới. */}
