@@ -31,7 +31,7 @@ interface Props {
 
 const o_chon = {
   font: 'inherit', fontSize: '0.85rem', padding: '6px 8px',
-  border: '1px solid var(--vien)', borderRadius: '6px', background: 'var(--nen-the)', minWidth: 120,
+  border: '1px solid var(--vien)', borderRadius: 0, background: 'var(--nen-the)', minWidth: 120,
 };
 
 export const ImportFromFile: React.FC<Props> = ({ mo, dong, daCo, duyet }) => {
@@ -273,7 +273,7 @@ export const ImportFromFile: React.FC<Props> = ({ mo, dong, daCo, duyet }) => {
                           <input hidden type="file" accept="image/*"
                             onChange={e => ganAnh(q, e.target.files?.[0])} />
                         </Button>
-                        {q.img && <Box component="img" src={q.img} sx={{ height: 42, borderRadius: 1 }} />}
+                        {q.img && <Box component="img" src={q.img} sx={{ height: 42, borderRadius: 0 }} />}
                         {q.img && (
                           <IconButton size="small" onClick={() => capNhat(q.id, { img: undefined })}>
                             <X size={14} />

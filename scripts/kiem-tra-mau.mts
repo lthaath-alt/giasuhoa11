@@ -113,9 +113,28 @@ console.log('\n== Màu nhấn có bản NỀN riêng thì không được dùng 
   for (const f of dsTep) {
     const n = readFileSync(f, 'utf8')
       .split(/\r?\n/).filter(d => !d.includes('mau-ok')).join('\n');
-    for (const m of n.matchAll(/(?:bgcolor|backgroundColor|background)(?:=|: ?)["']var\((--[a-z0-9-]+)\)["']/g)) {
-      const ten = m[1].replace(/^--/, '');
-      if (coBanNen.includes(ten)) pham.push(`${basename(f)}: nền → ${m[1]} (phải dùng --${ten}-nen)`);
+    /* Bắt CẢ BIỂU THỨC sau `backgroundColor:`, không chỉ trường hợp `var(--x)`
+       nằm ngay sát sau dấu hai chấm.
+
+       Bản đầu của luật này đòi `var(--x)` đứng liền sau, nên mọi chỗ viết dạng
+       ba ngôi (`active ? 'var(--teal)' : 'var(--nen-nhat)'`) đều lọt — và đó
+       chính là dạng người ta hay viết cho trạng thái ĐANG CHỌN, tức đúng chỗ
+       nút mang chữ trắng. Sáu chỗ lọt kiểu này: hai nút chọn vai và nút Đăng
+       nhập ở màn đăng nhập, hai ảnh đại diện "đang chọn", cột biểu đồ điểm, và
+       bong bóng chat của học sinh. Ở chế độ tối tất cả đều là chữ trắng trên
+       nền sáng.
+
+       Cắt ở dấu phẩy đầu tiên, tức hết GIÁ TRỊ của thuộc tính này. Không cắt
+       thì `bgcolor: 'var(--nen-luc-nhat)', color: 'var(--teal)'` bị báo oan —
+       `--teal` ở đó đang làm chữ, đúng vai. Biểu thức ba ngôi không chứa dấu
+       phẩy nên vẫn lọt vào tầm soi. */
+    for (const d of n.split('\n')) {
+      const m0 = d.match(/(?:bgcolor|backgroundColor|background)(?:=\{?|: ?)([^,]*)/);
+      if (!m0) continue;
+      for (const m of m0[1].matchAll(/var\((--[a-z0-9-]+)\)/g)) {
+        const ten = m[1].replace(/^--/, '');
+        if (coBanNen.includes(ten)) pham.push(`${basename(f)}: nền → ${m[1]} (phải dùng --${ten}-nen)`);
+      }
     }
   }
   if (coBanNen.length === 0) truot('có biến màu nhấn kèm bản nền riêng', 'chưa khai biến nào');

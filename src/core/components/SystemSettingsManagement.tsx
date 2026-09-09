@@ -25,7 +25,7 @@ export const SystemSettingsManagement: React.FC = () => {
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Box>
           <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)', display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Settings size={22} color="var(--cam)" />
+            <Settings size={22} color="var(--chu-dam)" />
             Cài đặt Hệ thống
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
@@ -34,15 +34,15 @@ export const SystemSettingsManagement: React.FC = () => {
         </Box>
       </Box>
 
-      {error && <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>{error}</Alert>}
+      {error && <Alert severity="error" sx={{ mb: 3, borderRadius: 0 }}>{error}</Alert>}
 
-      <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid var(--vien)', boxShadow: 'none' }}>
+      <Paper sx={{ p: 3, borderRadius: 0, border: '1px solid var(--vien)', boxShadow: 'none' }}>
         <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
           <ShieldAlert size={18} color="var(--teal)" />
           Giới hạn sử dụng & API Key
         </Typography>
 
-        <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', p: 2, bgcolor: 'var(--nen-trang)', borderRadius: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', p: 2, bgcolor: 'var(--nen-trang)', borderRadius: 0 }}>
           <Box sx={{ pr: 3 }}>
             <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--chu-dam-2)' }}>
               Cho phép người dùng tự cung cấp Gemini API Key

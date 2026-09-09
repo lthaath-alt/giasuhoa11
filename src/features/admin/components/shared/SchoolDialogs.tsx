@@ -27,11 +27,11 @@ export const CredentialDialog: React.FC<{ open: boolean; onClose: () => void; cr
         ✅ Tài khoản Giáo viên đã được tạo!
       </DialogTitle>
       <DialogContent sx={{ pt: 3 }}>
-        <Alert severity="warning" sx={{ mb: 2, borderRadius: 2 }}>
+        <Alert severity="warning" sx={{ mb: 2, borderRadius: 0 }}>
           Cấp thông tin này cho giáo viên ngay. Mật khẩu sẽ không hiển thị lại!
         </Alert>
         {credentials && (
-          <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 3, bgcolor: 'var(--nen-trang)' }}>
+          <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 0, bgcolor: 'var(--nen-trang)' }}>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
               <Box>
                 <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'bold' }}>HỌ TÊN</Typography>
@@ -40,7 +40,7 @@ export const CredentialDialog: React.FC<{ open: boolean; onClose: () => void; cr
               <Divider />
               <Box>
                 <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'bold' }}>EMAIL ĐĂNG NHẬP</Typography>
-                <Typography variant="body1" sx={{ fontWeight: 'bold', fontFamily: 'monospace', color: 'var(--cam)' }}>{credentials.identifier}</Typography>
+                <Typography variant="body1" sx={{ fontWeight: 'bold', fontFamily: 'monospace', color: 'var(--chu-dam)' }}>{credentials.identifier}</Typography>
               </Box>
               <Divider />
               <Box>
@@ -59,10 +59,10 @@ export const CredentialDialog: React.FC<{ open: boolean; onClose: () => void; cr
         )}
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2.5, gap: 1 }}>
-        <Button variant="outlined" startIcon={<Copy size={16} />} onClick={copyAll} sx={{ borderRadius: 2, textTransform: 'none' }}>
+        <Button variant="outlined" startIcon={<Copy size={16} />} onClick={copyAll} sx={{ borderRadius: 0, textTransform: 'none' }}>
           {copied ? '✓ Đã sao chép!' : 'Sao chép'}
         </Button>
-        <Button variant="contained" color="primary" onClick={onClose} sx={{ borderRadius: 2, textTransform: 'none' }}>Đóng</Button>
+        <Button variant="contained" color="primary" onClick={onClose} sx={{ borderRadius: 0, textTransform: 'none' }}>Đóng</Button>
       </DialogActions>
     </Dialog>
   );
@@ -94,20 +94,20 @@ export const CreateTeacherDialog: React.FC<{ open: boolean; onClose: () => void;
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
       <DialogTitle sx={{ fontWeight: 'bold' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <UserPlus size={20} color="var(--cam)" /> Tạo tài khoản Giáo viên
+          <UserPlus size={20} color="var(--chu-dam)" /> Tạo tài khoản Giáo viên
         </Box>
       </DialogTitle>
       <DialogContent>
-        {error && <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>{error}</Alert>}
+        {error && <Alert severity="error" sx={{ mb: 2, borderRadius: 0 }}>{error}</Alert>}
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
-          <TextField label="Họ và tên *" fullWidth value={name} onChange={e => setName(e.target.value)} disabled={loading} sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }} />
-          <TextField label="Email *" type="email" fullWidth value={email} onChange={e => setEmail(e.target.value)} disabled={loading} sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }} />
-          <TextField label="Mật khẩu (để trống để tạo tự động)" type="password" fullWidth value={password} onChange={e => setPassword(e.target.value)} disabled={loading} helperText="Để trống sẽ tạo mật khẩu ngẫu nhiên." sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }} />
+          <TextField label="Họ và tên *" fullWidth value={name} onChange={e => setName(e.target.value)} disabled={loading} sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }} />
+          <TextField label="Email *" type="email" fullWidth value={email} onChange={e => setEmail(e.target.value)} disabled={loading} sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }} />
+          <TextField label="Mật khẩu (để trống để tạo tự động)" type="password" fullWidth value={password} onChange={e => setPassword(e.target.value)} disabled={loading} helperText="Để trống sẽ tạo mật khẩu ngẫu nhiên." sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }} />
         </Box>
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2.5, gap: 1 }}>
-        <Button onClick={handleClose} disabled={loading} sx={{ textTransform: 'none', borderRadius: 2 }}>Hủy</Button>
-        <Button variant="contained" color="primary" onClick={handleCreate} disabled={loading} startIcon={<UserPlus size={16} />} sx={{ textTransform: 'none', borderRadius: 2, boxShadow: 'none' }}>
+        <Button onClick={handleClose} disabled={loading} sx={{ textTransform: 'none', borderRadius: 0 }}>Hủy</Button>
+        <Button variant="contained" color="primary" onClick={handleCreate} disabled={loading} startIcon={<UserPlus size={16} />} sx={{ textTransform: 'none', borderRadius: 0, boxShadow: 'none' }}>
           {loading ? 'Đang tạo...' : 'Tạo giáo viên'}
         </Button>
       </DialogActions>
@@ -138,12 +138,12 @@ export const CreateClassDialog: React.FC<{ open: boolean; onClose: () => void; s
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
       <DialogTitle sx={{ fontWeight: 'bold' }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}><GraduationCap size={20} color="var(--cam)" /> Tạo lớp học mới</Box>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}><GraduationCap size={20} color="var(--chu-dam)" /> Tạo lớp học mới</Box>
       </DialogTitle>
       <DialogContent>
-        {error && <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>{error}</Alert>}
+        {error && <Alert severity="error" sx={{ mb: 2, borderRadius: 0 }}>{error}</Alert>}
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
-          <TextField label="Tên lớp *" fullWidth value={className} onChange={e => setClassName(e.target.value)} disabled={loading} placeholder="VD: 11A1, 11 Toán" sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }} />
+          <TextField label="Tên lớp *" fullWidth value={className} onChange={e => setClassName(e.target.value)} disabled={loading} placeholder="VD: 11A1, 11 Toán" sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }} />
           {teachers.length > 0 ? (
             <Box>
               <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: 'block', fontWeight: 'bold' }}>CHỌN GIÁO VIÊN CHỦ NHIỆM</Typography>
@@ -156,13 +156,13 @@ export const CreateClassDialog: React.FC<{ open: boolean; onClose: () => void; s
               {teacherEmail && <Typography variant="caption" color="primary" sx={{ mt: 1, display: 'block' }}>✓ {teacherEmail}</Typography>}
             </Box>
           ) : (
-            <TextField label="Email Giáo viên chủ nhiệm *" type="email" fullWidth value={teacherEmail} onChange={e => setTeacherEmail(e.target.value)} disabled={loading} helperText="Chưa có giáo viên, nhập email trực tiếp." sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }} />
+            <TextField label="Email Giáo viên chủ nhiệm *" type="email" fullWidth value={teacherEmail} onChange={e => setTeacherEmail(e.target.value)} disabled={loading} helperText="Chưa có giáo viên, nhập email trực tiếp." sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }} />
           )}
         </Box>
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2.5, gap: 1 }}>
-        <Button onClick={handleClose} disabled={loading} sx={{ textTransform: 'none', borderRadius: 2 }}>Hủy</Button>
-        <Button variant="contained" color="primary" onClick={handleCreate} disabled={loading} startIcon={<Plus size={16} />} sx={{ textTransform: 'none', borderRadius: 2, boxShadow: 'none' }}>
+        <Button onClick={handleClose} disabled={loading} sx={{ textTransform: 'none', borderRadius: 0 }}>Hủy</Button>
+        <Button variant="contained" color="primary" onClick={handleCreate} disabled={loading} startIcon={<Plus size={16} />} sx={{ textTransform: 'none', borderRadius: 0, boxShadow: 'none' }}>
           {loading ? 'Đang tạo...' : 'Tạo lớp'}
         </Button>
       </DialogActions>
@@ -191,22 +191,22 @@ export const CreateSchoolDialog: React.FC<{ open: boolean; onClose: () => void; 
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle sx={{ fontWeight: 'bold' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Building2 size={20} color="var(--cam)" />  Thêm trường học mới
+          <Building2 size={20} color="var(--chu-dam)" />  Thêm trường học mới
         </Box>
       </DialogTitle>
       <DialogContent>
-        {error && <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>{error}</Alert>}
+        {error && <Alert severity="error" sx={{ mb: 2, borderRadius: 0 }}>{error}</Alert>}
         <TextField
           autoFocus label="Tên trường học *" fullWidth value={name}
           onChange={e => setName(e.target.value)} disabled={loading}
-          sx={{ mt: 1, '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
+          sx={{ mt: 1, '& .MuiOutlinedInput-root': { borderRadius: 0 } }}
           placeholder="VD: THPT Nguyễn Du"
         />
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2.5, gap: 1 }}>
-        <Button onClick={onClose} disabled={loading} sx={{ textTransform: 'none', borderRadius: 2 }}>Hủy</Button>
+        <Button onClick={onClose} disabled={loading} sx={{ textTransform: 'none', borderRadius: 0 }}>Hủy</Button>
         <Button variant="contained" color="primary" onClick={handleCreate} disabled={loading}
-          startIcon={<Plus size={16} />} sx={{ textTransform: 'none', borderRadius: 2, boxShadow: 'none' }}>
+          startIcon={<Plus size={16} />} sx={{ textTransform: 'none', borderRadius: 0, boxShadow: 'none' }}>
           {loading ? 'Đang tạo...' : 'Tạo trường'}
         </Button>
       </DialogActions>
@@ -240,20 +240,20 @@ export const CreateSchoolAdminDialog: React.FC<{ open: boolean; onClose: () => v
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
       <DialogTitle sx={{ fontWeight: 'bold' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <ShieldCheck size={20} color="var(--cam)" /> Tạo tài khoản Admin Trường
+          <ShieldCheck size={20} color="var(--chu-dam)" /> Tạo tài khoản Admin Trường
         </Box>
       </DialogTitle>
       <DialogContent>
-        {error && <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>{error}</Alert>}
+        {error && <Alert severity="error" sx={{ mb: 2, borderRadius: 0 }}>{error}</Alert>}
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
-          <TextField label="Họ và tên *" fullWidth value={name} onChange={e => setName(e.target.value)} disabled={loading} sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }} />
-          <TextField label="Email *" type="email" fullWidth value={email} onChange={e => setEmail(e.target.value)} disabled={loading} sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }} />
-          <TextField label="Mật khẩu (để trống để tạo tự động)" type="password" fullWidth value={password} onChange={e => setPassword(e.target.value)} disabled={loading} helperText="Để trống sẽ tạo mật khẩu ngẫu nhiên." sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }} />
+          <TextField label="Họ và tên *" fullWidth value={name} onChange={e => setName(e.target.value)} disabled={loading} sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }} />
+          <TextField label="Email *" type="email" fullWidth value={email} onChange={e => setEmail(e.target.value)} disabled={loading} sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }} />
+          <TextField label="Mật khẩu (để trống để tạo tự động)" type="password" fullWidth value={password} onChange={e => setPassword(e.target.value)} disabled={loading} helperText="Để trống sẽ tạo mật khẩu ngẫu nhiên." sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }} />
         </Box>
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2.5, gap: 1 }}>
-        <Button onClick={handleClose} disabled={loading} sx={{ textTransform: 'none', borderRadius: 2 }}>Hủy</Button>
-        <Button variant="contained" color="primary" onClick={handleCreate} disabled={loading} startIcon={<ShieldCheck size={16} />} sx={{ textTransform: 'none', borderRadius: 2, boxShadow: 'none' }}>
+        <Button onClick={handleClose} disabled={loading} sx={{ textTransform: 'none', borderRadius: 0 }}>Hủy</Button>
+        <Button variant="contained" color="primary" onClick={handleCreate} disabled={loading} startIcon={<ShieldCheck size={16} />} sx={{ textTransform: 'none', borderRadius: 0, boxShadow: 'none' }}>
           {loading ? 'Đang tạo...' : 'Tạo Admin'}
         </Button>
       </DialogActions>

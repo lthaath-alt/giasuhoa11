@@ -183,10 +183,10 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+              boxShadow: 'none',
               border: '1px solid var(--vien)',
               backgroundColor: 'var(--nen-the)',
-              borderRadius: 3,
+              borderRadius: 0,
             }}
           >
             <Box>
@@ -204,7 +204,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
               size="small"
               startIcon={<CheckCircle size={16} />}
               onClick={() => toggleLessonCompletion(lesson.id)}
-              sx={{ textTransform: 'none', borderRadius: 2, fontWeight: 'bold' }}
+              sx={{ textTransform: 'none', borderRadius: 0, fontWeight: 'bold' }}
             >
               {isLessonCompleted(lesson.id) ? 'Đã Xong!' : 'Đánh dấu Xong'}
             </Button>
@@ -235,9 +235,9 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
           display: 'flex',
           flexDirection: 'column',
           height: '100%',
-          borderRadius: 3,
+          borderRadius: 0,
           overflow: 'hidden',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+          boxShadow: 'none',
           border: '1px solid var(--vien)',
           backgroundColor: 'var(--nen-the)',
         }}
@@ -308,7 +308,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
                 variant="outlined"
                 color="primary"
                 onClick={() => setApiKeyDialogOpen(true)}
-                sx={{ minWidth: 0, p: 0.5, borderRadius: 2 }}
+                sx={{ minWidth: 0, p: 0.5, borderRadius: 0 }}
               >
                 <Settings size={18} />
               </Button>
@@ -370,7 +370,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
                 textAlign: 'center',
               }}
             >
-              <Avatar sx={{ width: 64, height: 64, bgcolor: 'rgba(15, 118, 110, 0.08)', color: 'var(--teal)' }}>
+              <Avatar sx={{ width: 64, height: 64, bgcolor: 'var(--nen-luc-nhat2)', color: 'var(--teal)' }}>
                 <Key size={32} />
               </Avatar>
               <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
@@ -384,7 +384,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
                 color="primary"
                 startIcon={<Settings size={18} />}
                 onClick={() => setApiKeyDialogOpen(true)}
-                sx={{ borderRadius: 2, textTransform: 'none', boxShadow: 'none' }}
+                sx={{ borderRadius: 0, textTransform: 'none', boxShadow: 'none' }}
               >
                 Cài đặt Key ngay
               </Button>
@@ -402,7 +402,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
                 textAlign: 'center',
               }}
             >
-              <Avatar sx={{ width: 64, height: 64, bgcolor: 'rgba(234, 88, 12, 0.08)', color: 'var(--cam)' }}>
+              <Avatar sx={{ width: 64, height: 64, bgcolor: 'var(--nen-cam-nhat2)', color: 'var(--cam)' }}>
                 <Sparkles size={32} />
               </Avatar>
               <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
@@ -413,9 +413,9 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
                 <strong>Câu hỏi tự luyện mẫu</strong> ở cột trái để bắt đầu buổi thảo luận nhé!
               </Typography>
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'center' }}>
-                <Chip icon={<Award size={14} color="var(--cam)" />} label="Hỗ trợ lý thuyết" variant="outlined" size="small" />
-                <Chip icon={<Lightbulb size={14} color="var(--cam)" />} label="Gợi mở phương pháp" variant="outlined" size="small" />
-                <Chip icon={<HelpCircle size={14} color="var(--cam)" />} label="Giải đáp thắc mắc 24/7" variant="outlined" size="small" />
+                <Chip icon={<Award size={14} color="var(--chu-dam)" />} label="Hỗ trợ lý thuyết" variant="outlined" size="small" />
+                <Chip icon={<Lightbulb size={14} color="var(--chu-dam)" />} label="Gợi mở phương pháp" variant="outlined" size="small" />
+                <Chip icon={<HelpCircle size={14} color="var(--chu-dam)" />} label="Giải đáp thắc mắc 24/7" variant="outlined" size="small" />
               </Box>
             </Box>
           ) : (
@@ -438,9 +438,9 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
                       sx={{
                         width: 32,
                         height: 32,
-                        bgcolor: 'rgba(234, 88, 12, 0.08)',
+                        bgcolor: 'var(--nen-cam-nhat2)',
                         color: 'var(--cam)',
-                        border: '1px solid rgba(234, 88, 12, 0.15)',
+                        border: '1px solid var(--nen-cam-nhat2)',
                       }}
                     >
                       <Sparkles size={16} />
@@ -451,8 +451,8 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
                     <Paper
                       sx={{
                         p: 2,
-                        borderRadius: isAi ? '0 16px 16px 16px' : '16px 0 16px 16px',
-                        backgroundColor: isAi ? 'var(--nen-nhat)' : 'var(--teal)',
+                        borderRadius: 0,
+                        backgroundColor: isAi ? 'var(--nen-nhat)' : 'var(--teal-nen)',
                         color: isAi ? 'text.primary' : 'var(--nen-the)',
                         border: isAi ? '1px solid var(--vien)' : 'none',
                         boxShadow: 'none',
@@ -482,9 +482,9 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
                 sx={{
                   width: 32,
                   height: 32,
-                  bgcolor: 'rgba(234, 88, 12, 0.08)',
+                  bgcolor: 'var(--nen-cam-nhat2)',
                   color: 'var(--cam)',
-                  border: '1px solid rgba(234, 88, 12, 0.15)',
+                  border: '1px solid var(--nen-cam-nhat2)',
                 }}
               >
                 <Sparkles size={16} />
@@ -492,7 +492,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
               <Paper
                 sx={{
                   p: 1.5,
-                  borderRadius: '0 16px 16px 16px',
+                  borderRadius: 0,
                   backgroundColor: 'var(--nen-nhat)',
                   border: '1px solid var(--vien)',
                   display: 'flex',
@@ -549,7 +549,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
             sx={{
               backgroundColor: 'var(--nen-the)',
               '& .MuiOutlinedInput-root': {
-                borderRadius: 2.5,
+                borderRadius: 0,
               },
             }}
           />
@@ -560,7 +560,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
             onClick={() => handleSend()}
             disabled={guestLimitReached || isSending || remainingCooldown > 0 || !inputMessage.trim()}
             sx={{
-              borderRadius: 2.5,
+              borderRadius: 0,
               minWidth: 48,
               height: 40,
               p: 0,

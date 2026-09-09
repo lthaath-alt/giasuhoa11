@@ -76,7 +76,7 @@ export const QuizPage: React.FC = () => {
   if (!quiz) {
     return (
       <Container maxWidth="sm" sx={{ py: 8, textAlign: 'center' }}>
-        <Paper variant="outlined" sx={{ p: 5, borderRadius: 4 }}>
+        <Paper variant="outlined" sx={{ p: 5, borderRadius: 0 }}>
           <AlertTriangle size={48} color="var(--do)" style={{ margin: '0 auto 16px' }} />
           <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 1 }}>
             Không tìm thấy bài kiểm tra
@@ -84,7 +84,7 @@ export const QuizPage: React.FC = () => {
           <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
             Đường dẫn bài kiểm tra không tồn tại hoặc đã bị xóa khỏi hệ thống.
           </Typography>
-          <Button variant="contained" onClick={() => navigate('/dashboard')} sx={{ textTransform: 'none', borderRadius: 2 }}>
+          <Button variant="contained" onClick={() => navigate('/dashboard')} sx={{ textTransform: 'none', borderRadius: 0 }}>
             Quay lại trang học tập
           </Button>
         </Paper>
@@ -108,7 +108,7 @@ export const QuizPage: React.FC = () => {
   if (isLocked) {
     return (
       <Container maxWidth="sm" sx={{ py: 8, textAlign: 'center' }}>
-        <Paper variant="outlined" sx={{ p: 5, borderRadius: 4 }}>
+        <Paper variant="outlined" sx={{ p: 5, borderRadius: 0 }}>
           <Lock size={48} color="var(--chu-mo)" style={{ margin: '0 auto 16px' }} />
           <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 1, color: 'var(--do)' }}>
             Bài học đang bị khóa
@@ -116,7 +116,7 @@ export const QuizPage: React.FC = () => {
           <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
             Hoàn thành bài {lessonIndex} (Bài học trước đó) để mở khóa bài kiểm tra này.
           </Typography>
-          <Button variant="contained" onClick={() => navigate('/dashboard')} sx={{ textTransform: 'none', borderRadius: 2 }}>
+          <Button variant="contained" onClick={() => navigate('/dashboard')} sx={{ textTransform: 'none', borderRadius: 0 }}>
             Quay lại trang học tập
           </Button>
         </Paper>
@@ -128,8 +128,8 @@ export const QuizPage: React.FC = () => {
   if (!currentUser) {
     return (
       <Container maxWidth="sm" sx={{ py: 8, textAlign: 'center' }}>
-        <Paper variant="outlined" sx={{ p: 5, borderRadius: 4 }}>
-          <GraduationCap size={48} color="var(--cam)" style={{ margin: '0 auto 16px' }} />
+        <Paper variant="outlined" sx={{ p: 5, borderRadius: 0 }}>
+          <GraduationCap size={48} color="var(--chu-dam)" style={{ margin: '0 auto 16px' }} />
           <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 1 }}>
             Yêu cầu Đăng nhập
           </Typography>
@@ -140,7 +140,7 @@ export const QuizPage: React.FC = () => {
             variant="contained"
             color="primary"
             onClick={() => navigate('/login', { state: { from: `/quiz/${quizId}` } })}
-            sx={{ textTransform: 'none', borderRadius: 2 }}
+            sx={{ textTransform: 'none', borderRadius: 0 }}
           >
             Đăng nhập ngay
           </Button>
@@ -153,7 +153,7 @@ export const QuizPage: React.FC = () => {
   if (currentUser.email.toLowerCase() !== quiz.userEmail.toLowerCase() && currentUser.role !== 'admin' && currentUser.role !== 'school_admin') {
     return (
       <Container maxWidth="sm" sx={{ py: 8, textAlign: 'center' }}>
-        <Paper variant="outlined" sx={{ p: 5, borderRadius: 4 }}>
+        <Paper variant="outlined" sx={{ p: 5, borderRadius: 0 }}>
           <XCircle size={48} color="var(--do)" style={{ margin: '0 auto 16px' }} />
           <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 1, color: 'var(--do)' }}>
             Quyền truy cập bị từ chối
@@ -161,7 +161,7 @@ export const QuizPage: React.FC = () => {
           <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
             Bài kiểm tra này được thiết lập riêng cho một học sinh khác. Bạn không thể làm đề thi của người khác!
           </Typography>
-          <Button variant="contained" onClick={() => navigate('/dashboard')} sx={{ textTransform: 'none', borderRadius: 2 }}>
+          <Button variant="contained" onClick={() => navigate('/dashboard')} sx={{ textTransform: 'none', borderRadius: 0 }}>
             Vào bài học của bạn
           </Button>
         </Paper>
@@ -174,7 +174,7 @@ export const QuizPage: React.FC = () => {
   if (isExpired) {
     return (
       <Container maxWidth="sm" sx={{ py: 8, textAlign: 'center' }}>
-        <Paper variant="outlined" sx={{ p: 5, borderRadius: 4 }}>
+        <Paper variant="outlined" sx={{ p: 5, borderRadius: 0 }}>
           <Clock size={48} color="var(--chu-mo)" style={{ margin: '0 auto 16px' }} />
           <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 1 }}>
             Bài kiểm tra đã hết hạn
@@ -182,7 +182,7 @@ export const QuizPage: React.FC = () => {
           <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
             Link bài kiểm tra này đã quá hạn 24 giờ. Vui lòng thảo luận lại với Gia sư AI để nhận bài kiểm tra mới.
           </Typography>
-          <Button variant="contained" onClick={() => navigate('/dashboard')} sx={{ textTransform: 'none', borderRadius: 2 }}>
+          <Button variant="contained" onClick={() => navigate('/dashboard')} sx={{ textTransform: 'none', borderRadius: 0 }}>
             Quay lại Dashboard
           </Button>
         </Paper>
@@ -287,15 +287,15 @@ export const QuizPage: React.FC = () => {
             sx={{
               p: 4,
               mb: 4,
-              borderRadius: 4,
+              borderRadius: 0,
               textAlign: 'center',
-              border: '1px solid rgba(15,118,110,0.2)',
-              background: 'linear-gradient(135deg, rgba(15,118,110,0.06) 0%, rgba(15,118,110,0.01) 100%)',
+              border: '1px solid var(--vien-2)',
+              backgroundColor: 'var(--nen-luc-nhat2)',
             }}
           >
             <Box sx={{
               width: 72, height: 72, borderRadius: '50%',
-              bgcolor: 'rgba(15,118,110,0.12)', display: 'flex',
+              bgcolor: 'var(--nen-luc-nhat2)', display: 'flex',
               alignItems: 'center', justifyContent: 'center', mx: 'auto', mb: 2,
             }}>
               <Award size={36} color="var(--teal)" />
@@ -309,15 +309,15 @@ export const QuizPage: React.FC = () => {
 
             <Grid container spacing={2} sx={{ mb: 2, justifyContent: 'center' }}>
               <Grid size={{ xs: 6, sm: 4 }}>
-                <Paper variant="outlined" sx={{ p: 2, borderRadius: 3 }}>
-                  <Typography variant="h4" sx={{ fontWeight: 800, color: 'var(--cam)' }}>
+                <Paper variant="outlined" sx={{ p: 2, borderRadius: 0 }}>
+                  <Typography variant="h4" sx={{ fontWeight: 800, color: 'var(--chu-dam)' }}>
                     {quiz.score}/{quiz.maxScore}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">Điểm số đạt được</Typography>
                 </Paper>
               </Grid>
               <Grid size={{ xs: 6, sm: 4 }}>
-                <Paper variant="outlined" sx={{ p: 2, borderRadius: 3 }}>
+                <Paper variant="outlined" sx={{ p: 2, borderRadius: 0 }}>
                   <Typography variant="h4" sx={{ fontWeight: 800, color: 'var(--teal)' }}>
                     {percent}%
                   </Typography>
@@ -325,7 +325,7 @@ export const QuizPage: React.FC = () => {
                 </Paper>
               </Grid>
               <Grid size={{ xs: 12, sm: 4 }}>
-                <Paper variant="outlined" sx={{ p: 2, borderRadius: 3 }}>
+                <Paper variant="outlined" sx={{ p: 2, borderRadius: 0 }}>
                   <Typography variant="h4" sx={{ fontWeight: 800, color: 'var(--chu)' }}>
                     {correctCount}/{quiz.questions.length}
                   </Typography>
@@ -335,12 +335,12 @@ export const QuizPage: React.FC = () => {
             </Grid>
 
             {percent >= 70 ? (
-              <Alert severity="success" sx={{ borderRadius: 3, textAlign: 'left', mt: 3 }}>
+              <Alert severity="success" sx={{ borderRadius: 0, textAlign: 'left', mt: 3 }}>
                 <AlertTitle sx={{ fontWeight: 'bold' }}>Chúc mừng! Bạn đã hoàn thành tốt bài học</AlertTitle>
                 Điểm số đạt trên 70% chứng tỏ bạn đã nắm vững kiến thức Socratic vừa trao đổi với Gia sư AI.
               </Alert>
             ) : (
-              <Alert severity="warning" sx={{ borderRadius: 3, textAlign: 'left', mt: 3 }}>
+              <Alert severity="warning" sx={{ borderRadius: 0, textAlign: 'left', mt: 3 }}>
                 <AlertTitle sx={{ fontWeight: 'bold' }}>Cần tiếp tục ôn luyện thêm</AlertTitle>
                 Điểm số của bạn dưới 70%. Bạn nên xem kỹ lại phần giải thích chi tiết từng câu sai bên dưới và trao đổi thêm với Gia sư AI.
               </Alert>
@@ -359,7 +359,7 @@ export const QuizPage: React.FC = () => {
               const weightColor = q.difficulty === 'Thấp' ? 'var(--luc)' : q.difficulty === 'Trung bình' ? 'var(--vang)' : 'var(--do)';
 
               return (
-                <Paper key={q.id} variant="outlined" sx={{ p: 3, borderRadius: 3.5, borderLeft: `5px solid ${isCorrect ? 'var(--luc)' : 'var(--do)'}` }}>
+                <Paper key={q.id} variant="outlined" sx={{ p: 3, borderRadius: 0, borderLeft: `5px solid ${isCorrect ? 'var(--luc)' : 'var(--do)'}` }}>
                   {/* Câu header */}
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5, flexWrap: 'wrap', gap: 1 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -378,7 +378,7 @@ export const QuizPage: React.FC = () => {
                   </Typography>
 
                   {/* Hiển thị câu trả lời */}
-                  <Box sx={{ p: 2, bgcolor: 'var(--nen-trang)', borderRadius: 2.5, mb: 2 }}>
+                  <Box sx={{ p: 2, bgcolor: 'var(--nen-trang)', borderRadius: 0, mb: 2 }}>
                     <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5, fontWeight: 'bold' }}>
                       CÂU TRẢ LỜI CỦA BẠN:
                     </Typography>
@@ -394,7 +394,7 @@ export const QuizPage: React.FC = () => {
 
                   {/* Nhận xét từ AI */}
                   {res?.feedback && (
-                    <Box sx={{ p: 2, bgcolor: 'rgba(15,118,110,0.04)', borderRadius: 2.5, mb: 2, borderLeft: '3px solid var(--teal)' }}>
+                    <Box sx={{ p: 2, bgcolor: 'var(--nen-luc-nhat2)', borderRadius: 0, mb: 2, border: '1px solid var(--teal-nen)' }}>
                       <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5, fontWeight: 'bold', color: 'var(--teal)' }}>
                         🤖 NHẬN XÉT CỦA GIA SƯ AI:
                       </Typography>
@@ -416,7 +416,7 @@ export const QuizPage: React.FC = () => {
 
                   {/* Đáp án đúng mẫu */}
                   {!isCorrect && (
-                    <Box sx={{ p: 2, bgcolor: 'var(--nen-nhat)', borderRadius: 2.5 }}>
+                    <Box sx={{ p: 2, bgcolor: 'var(--nen-nhat)', borderRadius: 0 }}>
                       <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5, fontWeight: 'bold' }}>
                         ĐÁP ÁN MẪU CHUẨN:
                       </Typography>
@@ -439,7 +439,7 @@ export const QuizPage: React.FC = () => {
               variant="contained"
               startIcon={<ArrowLeft size={16} />}
               onClick={() => navigate('/dashboard')}
-              sx={{ textTransform: 'none', px: 4, py: 1.2, borderRadius: 3 }}
+              sx={{ textTransform: 'none', px: 4, py: 1.2, borderRadius: 0 }}
             >
               Quay lại trang học tập
             </Button>
@@ -448,7 +448,7 @@ export const QuizPage: React.FC = () => {
 
         {/* Dialog báo chưa đạt (dưới 7 điểm) */}
         <Dialog open={showRetryDialog} onClose={() => {}} maxWidth="sm" fullWidth>
-          <DialogTitle sx={{ fontWeight: 'bold', color: 'var(--cam)' }}>
+          <DialogTitle sx={{ fontWeight: 'bold', color: 'var(--chu-dam)' }}>
             Chưa đạt yêu cầu phần Cơ bản
           </DialogTitle>
           <DialogContent>
@@ -458,10 +458,10 @@ export const QuizPage: React.FC = () => {
             </DialogContentText>
           </DialogContent>
           <DialogActions sx={{ px: 3, pb: 3, justifyContent: 'space-between' }}>
-            <Button onClick={handleSkip} color="inherit" sx={{ textTransform: 'none', borderRadius: 2 }}>
+            <Button onClick={handleSkip} color="inherit" sx={{ textTransform: 'none', borderRadius: 0 }}>
               Bỏ qua, học tiếp Bài sau
             </Button>
-            <Button onClick={handleRetry} color="primary" variant="contained" sx={{ textTransform: 'none', borderRadius: 2, boxShadow: 'none' }}>
+            <Button onClick={handleRetry} color="primary" variant="contained" sx={{ textTransform: 'none', borderRadius: 0, boxShadow: 'none' }}>
               Làm lại bài kiểm tra
             </Button>
           </DialogActions>
@@ -479,7 +479,7 @@ export const QuizPage: React.FC = () => {
             </DialogContentText>
           </DialogContent>
           <DialogActions sx={{ px: 3, pb: 3, justifyContent: 'center' }}>
-            <Button onClick={() => { setShowUnlockDialog(false); navigate('/dashboard'); }} color="primary" variant="contained" sx={{ textTransform: 'none', borderRadius: 2, boxShadow: 'none' }}>
+            <Button onClick={() => { setShowUnlockDialog(false); navigate('/dashboard'); }} color="primary" variant="contained" sx={{ textTransform: 'none', borderRadius: 0, boxShadow: 'none' }}>
               Vào phần Nâng cao ngay
             </Button>
           </DialogActions>
@@ -499,20 +499,20 @@ export const QuizPage: React.FC = () => {
           sx={{
             p: 2.5,
             mb: 4,
-            borderRadius: 3.5,
+            borderRadius: 0,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            border: '1px solid rgba(234,88,12,0.3)',
-            background: 'linear-gradient(135deg, rgba(234,88,12,0.04) 0%, rgba(234,88,12,0.01) 100%)',
+            border: '1px solid var(--vang-nen)',
+            backgroundColor: 'var(--nen-vang-nhat)',
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-            <Box sx={{ p: 1, bgcolor: 'rgba(234,88,12,0.1)', borderRadius: 2, display: 'flex' }}>
-              <Clock size={20} color="var(--cam)" />
+            <Box sx={{ p: 1, bgcolor: 'var(--vang-nen)', borderRadius: 0, display: 'flex' }}>
+              <Clock size={20} color="var(--chu-tren-vang)" />
             </Box>
             <Box>
-              <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--cam)' }}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--vang)' }}>
                 Thời gian nộp bài còn lại
               </Typography>
               <Typography variant="caption" color="text.secondary">
@@ -525,7 +525,8 @@ export const QuizPage: React.FC = () => {
             sx={{
               fontFamily: 'monospace',
               fontWeight: 'black',
-              color: 'var(--cam)',
+              fontVariantNumeric: 'tabular-nums',
+              color: 'var(--chu-dam)',
             }}
           >
             {timeLeftStr || '--:--:--'}
@@ -533,7 +534,7 @@ export const QuizPage: React.FC = () => {
         </Paper>
 
         {/* Tiêu đề đề bài */}
-        <Paper variant="outlined" sx={{ p: 4, mb: 4, borderRadius: 4 }}>
+        <Paper variant="outlined" sx={{ p: 4, mb: 4, borderRadius: 0 }}>
           <Typography variant="h5" sx={{ fontWeight: 900, color: 'var(--teal)', mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
             <GraduationCap size={24} />
             BÀI KIỂM TRA TỰ HỌC PHẢN XẠ HÓA 11
@@ -556,7 +557,7 @@ export const QuizPage: React.FC = () => {
             const value = answers[q.id] || '';
 
             return (
-              <Paper key={q.id} variant="outlined" sx={{ p: 3, borderRadius: 3.5, transition: 'box-shadow 0.2s', '&:hover': { boxShadow: '0 4px 12px rgba(0,0,0,0.03)' } }}>
+              <Paper key={q.id} variant="outlined" sx={{ p: 3, borderRadius: 0, transition: 'box-shadow 0.2s', '&:hover': { boxShadow: 'none' } }}>
                 {/* Câu header */}
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
                   <Chip label={`Câu ${idx + 1}`} color="primary" size="small" sx={{ fontWeight: 'bold' }} />
@@ -588,12 +589,12 @@ export const QuizPage: React.FC = () => {
                                 variant="outlined"
                                 onClick={() => handleAnswerChange(q.id, opt.key)}
                                 sx={{
-                                  borderRadius: 2.5,
+                                  borderRadius: 0,
                                   cursor: 'pointer',
                                   transition: 'all 0.15s',
                                   borderColor: isSelected ? 'var(--cam)' : 'var(--vien)',
-                                  bgcolor: isSelected ? 'rgba(234,88,12,0.04)' : 'var(--nen-the)',
-                                  '&:hover': { borderColor: 'var(--cam)', bgcolor: 'rgba(234,88,12,0.02)' }
+                                  bgcolor: isSelected ? 'var(--nen-cam-nhat2)' : 'var(--nen-the)',
+                                  '&:hover': { borderColor: 'var(--cam)', bgcolor: 'var(--nen-cam-nhat2)' }
                                 }}
                               >
                                 <CardContent sx={{ py: 1.5, px: 2, display: 'flex', alignItems: 'center', gap: 1, '&:last-child': { pb: 1.5 } }}>
@@ -633,7 +634,7 @@ export const QuizPage: React.FC = () => {
                             flex: 1,
                             minWidth: 120,
                             py: 1.5,
-                            borderRadius: 2.5,
+                            borderRadius: 0,
                             fontWeight: 'bold',
                             boxShadow: 'none',
                           }}
@@ -654,7 +655,7 @@ export const QuizPage: React.FC = () => {
                     value={value}
                     onChange={e => handleAnswerChange(q.id, e.target.value)}
                     sx={{
-                      '& .MuiOutlinedInput-root': { borderRadius: 3 }
+                      '& .MuiOutlinedInput-root': { borderRadius: 0 }
                     }}
                   />
                 )}
@@ -665,7 +666,7 @@ export const QuizPage: React.FC = () => {
 
         {/* Lỗi nộp bài */}
         {errorMsg && (
-          <Alert severity="error" sx={{ mb: 3, borderRadius: 3 }}>
+          <Alert severity="error" sx={{ mb: 3, borderRadius: 0 }}>
             {errorMsg}
           </Alert>
         )}
@@ -681,11 +682,11 @@ export const QuizPage: React.FC = () => {
             sx={{
               px: 6,
               py: 1.5,
-              borderRadius: 3,
+              borderRadius: 0,
               fontWeight: 'bold',
               textTransform: 'none',
-              boxShadow: '0 4px 12px rgba(234,88,12,0.2)',
-              '&:hover': { boxShadow: '0 6px 20px rgba(234,88,12,0.3)' }
+              boxShadow: 'none',
+              '&:hover': { boxShadow: 'none' }
             }}
           >
             Nộp bài kiểm tra
@@ -702,7 +703,7 @@ export const QuizPage: React.FC = () => {
           </Typography>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2.5, gap: 1 }}>
-          <Button onClick={() => setSubmitConfirmOpen(false)} sx={{ textTransform: 'none', borderRadius: 2 }}>
+          <Button onClick={() => setSubmitConfirmOpen(false)} sx={{ textTransform: 'none', borderRadius: 0 }}>
             Hủy
           </Button>
           <Button
@@ -710,7 +711,7 @@ export const QuizPage: React.FC = () => {
             color="primary"
             onClick={handleSubmit}
             disabled={submitting}
-            sx={{ textTransform: 'none', borderRadius: 2, fontWeight: 'bold' }}
+            sx={{ textTransform: 'none', borderRadius: 0, fontWeight: 'bold' }}
           >
             {submitting ? 'Đang chấm điểm...' : 'Xác nhận nộp'}
           </Button>

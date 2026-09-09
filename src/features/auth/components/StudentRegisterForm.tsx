@@ -94,7 +94,7 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
       <Box id="student-register-success" sx={{ textAlign: 'center', py: 3 }}>
         <Box sx={{
           width: 64, height: 64, borderRadius: '50%',
-          bgcolor: 'rgba(16,185,129,0.12)', display: 'flex',
+          bgcolor: 'var(--nen-luc-nhat2)', display: 'flex',
           alignItems: 'center', justifyContent: 'center', mx: 'auto', mb: 2,
         }}>
           <CheckCircle size={36} color="var(--luc)" />
@@ -114,7 +114,7 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
   return (
     <Box id="student-register-form-container">
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-        <UserPlus size={22} color="var(--cam)" />
+        <UserPlus size={22} color="var(--chu-dam)" />
         <Typography variant="h5" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)' }}>
           Đăng ký học sinh
         </Typography>
@@ -124,7 +124,7 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
       </Typography>
 
       {error && (
-        <Alert id="register-error-alert" severity="error" sx={{ mb: 2.5, borderRadius: 2 }}>
+        <Alert id="register-error-alert" severity="error" sx={{ mb: 2.5, borderRadius: 0 }}>
           {error}
         </Alert>
       )}
@@ -151,7 +151,7 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
                 ),
               },
             }}
-            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
+            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }}
           />
 
           {/* Email */}
@@ -175,7 +175,7 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
                 ),
               },
             }}
-            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
+            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }}
           />
 
           {/* Mật khẩu */}
@@ -206,7 +206,7 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
                 ),
               },
             }}
-            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
+            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }}
           />
 
           {/* Xác nhận mật khẩu */}
@@ -238,14 +238,14 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
                 ),
               },
             }}
-            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
+            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }}
           />
 
           {/* Mã lớp (tùy chọn) */}
           <Box sx={{
-            p: 2, borderRadius: 3,
+            p: 2, borderRadius: 0,
             border: '1px dashed var(--chu-mo)',
-            bgcolor: inviteCode ? 'rgba(15,118,110,0.04)' : 'var(--nen-trang)',
+            bgcolor: inviteCode ? 'var(--nen-luc-nhat2)' : 'var(--nen-trang)',
             transition: 'all 0.2s',
           }}>
             <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, display: 'block', mb: 1 }}>
@@ -272,7 +272,7 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
               }}
               sx={{
                 '& .MuiOutlinedInput-root': {
-                  borderRadius: 2.5,
+                  borderRadius: 0,
                   ...(inviteCode && { borderColor: 'var(--teal)' }),
                 },
                 '& .MuiInputBase-input': {
@@ -297,10 +297,10 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
             disabled={loading}
             startIcon={loading ? <CircularProgress size={18} color="inherit" /> : <UserPlus size={18} />}
             sx={{
-              py: 1.5, borderRadius: 3,
+              py: 1.5, borderRadius: 0,
               fontWeight: 'bold', textTransform: 'none',
               boxShadow: 'none',
-              '&:hover': { boxShadow: '0 4px 12px rgba(234, 88, 12, 0.2)' },
+              '&:hover': { boxShadow: 'none' },
             }}
           >
             {loading

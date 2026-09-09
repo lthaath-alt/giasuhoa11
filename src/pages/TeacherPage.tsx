@@ -50,12 +50,12 @@ const CredentialDialog: React.FC<CredentialDialogProps> = ({ open, onClose, cred
         ✅ Tài khoản đã được tạo thành công!
       </DialogTitle>
       <DialogContent sx={{ pt: 3 }}>
-        <Alert severity="warning" sx={{ mb: 2, borderRadius: 2 }}>
+        <Alert severity="warning" sx={{ mb: 2, borderRadius: 0 }}>
           Sao chép và cấp thông tin này cho học sinh ngay bây giờ. Mật khẩu sẽ không hiển thị lại!
         </Alert>
 
         {credentials && (
-          <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 3, bgcolor: 'var(--nen-trang)' }}>
+          <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 0, bgcolor: 'var(--nen-trang)' }}>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
               <Box>
                 <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'bold' }}>HỌ TÊN</Typography>
@@ -72,7 +72,7 @@ const CredentialDialog: React.FC<CredentialDialogProps> = ({ open, onClose, cred
               <Box>
                 <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'bold' }}>MẬT KHẨU</Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Typography variant="body1" sx={{ fontWeight: 'bold', fontFamily: 'monospace', color: 'var(--cam)', letterSpacing: showPassword ? 0 : 4 }}>
+                  <Typography variant="body1" sx={{ fontWeight: 'bold', fontFamily: 'monospace', color: 'var(--chu-dam)', letterSpacing: showPassword ? 0 : 4 }}>
                     {showPassword ? credentials.password : '••••••••••'}
                   </Typography>
                   <IconButton size="small" onClick={() => setShowPassword(v => !v)}>
@@ -89,11 +89,11 @@ const CredentialDialog: React.FC<CredentialDialogProps> = ({ open, onClose, cred
           variant="outlined"
           startIcon={<Copy size={16} />}
           onClick={copyAll}
-          sx={{ borderRadius: 2, textTransform: 'none' }}
+          sx={{ borderRadius: 0, textTransform: 'none' }}
         >
           {copied ? '✓ Đã sao chép!' : 'Sao chép tất cả'}
         </Button>
-        <Button variant="contained" color="primary" onClick={onClose} sx={{ borderRadius: 2, textTransform: 'none' }}>
+        <Button variant="contained" color="primary" onClick={onClose} sx={{ borderRadius: 0, textTransform: 'none' }}>
           Đóng
         </Button>
       </DialogActions>
@@ -173,7 +173,7 @@ const CreateStudentDialog: React.FC<CreateStudentDialogProps> = ({
         </Box>
       </DialogTitle>
       <DialogContent>
-        {error && <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>{error}</Alert>}
+        {error && <Alert severity="error" sx={{ mb: 2, borderRadius: 0 }}>{error}</Alert>}
 
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
           <TextField
@@ -182,7 +182,7 @@ const CreateStudentDialog: React.FC<CreateStudentDialogProps> = ({
             value={name}
             onChange={e => setName(e.target.value)}
             disabled={loading}
-            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
+            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }}
           />
 
           <Box>
@@ -209,7 +209,7 @@ const CreateStudentDialog: React.FC<CreateStudentDialogProps> = ({
               onChange={e => setIdentifier(e.target.value)}
               disabled={loading}
               type={useEmail ? 'email' : 'text'}
-              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
+              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }}
             />
           </Box>
 
@@ -223,19 +223,19 @@ const CreateStudentDialog: React.FC<CreateStudentDialogProps> = ({
             type="number"
             {...({ inputProps: { min: 1, max: 99 } } as any)}
             helperText="Mật khẩu sẽ được tạo tự động theo format: {TÊN_LỚP}_{SBD}_{4 ký tự ngẫu nhiên}"
-            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
+            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }}
           />
         </Box>
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2.5, gap: 1 }}>
-        <Button onClick={handleClose} disabled={loading} sx={{ textTransform: 'none', borderRadius: 2 }}>Hủy</Button>
+        <Button onClick={handleClose} disabled={loading} sx={{ textTransform: 'none', borderRadius: 0 }}>Hủy</Button>
         <Button
           variant="contained"
           color="secondary"
           onClick={handleCreate}
           disabled={loading}
           startIcon={<UserPlus size={16} />}
-          sx={{ textTransform: 'none', borderRadius: 2, boxShadow: 'none' }}
+          sx={{ textTransform: 'none', borderRadius: 0, boxShadow: 'none' }}
         >
           {loading ? 'Đang tạo...' : 'Tạo tài khoản'}
         </Button>
@@ -292,7 +292,7 @@ export const TeacherPage: React.FC = () => {
           <Toolbar sx={{ justifyContent: 'space-between', py: 1, px: { xs: 0 } }}>
 
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-              <Box sx={{ p: 1, backgroundColor: 'rgba(15, 118, 110, 0.1)', borderRadius: 2, display: 'flex' }}>
+              <Box sx={{ p: 1, backgroundColor: 'var(--nen-luc-nhat2)', borderRadius: 0, display: 'flex' }}>
                 <GraduationCap size={22} color="var(--teal)" />
               </Box>
               <Box>
@@ -307,7 +307,7 @@ export const TeacherPage: React.FC = () => {
 
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center', gap: 1.5 }}>
-                <Avatar sx={{ bgcolor: 'rgba(15, 118, 110, 0.1)', color: 'var(--teal)', width: 36, height: 36, fontWeight: 'bold' }}>
+                <Avatar sx={{ bgcolor: 'var(--nen-luc-nhat2)', color: 'var(--teal)', width: 36, height: 36, fontWeight: 'bold' }}>
                   {currentUser?.name.charAt(0).toUpperCase()}
                 </Avatar>
                 <Box>
@@ -324,7 +324,7 @@ export const TeacherPage: React.FC = () => {
                 size="small"
                 startIcon={<BookOpen size={14} />}
                 onClick={() => navigate('/dashboard')}
-                sx={{ textTransform: 'none', borderRadius: 2, fontWeight: 'bold', color: 'var(--teal)', borderColor: 'var(--teal)', '&:hover': { bgcolor: 'rgba(15,118,110,0.05)' } }}
+                sx={{ textTransform: 'none', borderRadius: 0, fontWeight: 'bold', color: 'var(--teal)', borderColor: 'var(--teal)', '&:hover': { bgcolor: 'var(--nen-luc-nhat2)' } }}
               >
                 Vào học tập
               </Button>
@@ -336,7 +336,7 @@ export const TeacherPage: React.FC = () => {
                 size="small"
                 startIcon={<LogOut size={14} />}
                 onClick={handleLogout}
-                sx={{ textTransform: 'none', borderRadius: 2, fontWeight: 'bold', boxShadow: 'none' }}
+                sx={{ textTransform: 'none', borderRadius: 0, fontWeight: 'bold', boxShadow: 'none' }}
               >
                 Đăng xuất
               </Button>

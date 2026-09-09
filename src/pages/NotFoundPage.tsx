@@ -18,7 +18,7 @@ export const NotFoundPage: React.FC = () => {
      đây là tự làm con số nợ tăng lên. Đã mắc đúng vậy: 66 hoá 67. */
   return (
     <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--nen-trang)', p: 3 }}>
-      <Paper sx={{ p: 5, textAlign: 'center', maxWidth: 450, borderRadius: 4, boxShadow: 'none', backgroundColor: 'var(--nen-the)', border: '1px solid var(--vien)' }}>
+      <Paper sx={{ p: 5, textAlign: 'center', maxWidth: 450, borderRadius: 0, boxShadow: 'none', backgroundColor: 'var(--nen-the)', border: '1px solid var(--vien)' }}>
         <Box sx={{ color: 'var(--luc)', mb: 2, display: 'flex', justifyContent: 'center' }}>
           <HelpCircle size={64} />
         </Box>
@@ -39,7 +39,7 @@ export const NotFoundPage: React.FC = () => {
           color="primary"
           startIcon={<ArrowLeft size={16} />}
           onClick={() => navigate('/')}
-          sx={{ borderRadius: 2, textTransform: 'none', boxShadow: 'none' }}
+          sx={{ borderRadius: 0, textTransform: 'none', boxShadow: 'none' }}
         >
           Quay lại Trang chủ
         </Button>

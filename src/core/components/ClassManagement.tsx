@@ -121,14 +121,14 @@ export const ClassManagement: React.FC<ClassManagementProps> = ({
             color="primary"
             startIcon={<Plus size={16} />}
             onClick={onCreateClick}
-            sx={{ textTransform: 'none', borderRadius: 2, fontWeight: 'bold', boxShadow: 'none' }}
+            sx={{ textTransform: 'none', borderRadius: 0, fontWeight: 'bold', boxShadow: 'none' }}
           >
             Tạo Lớp Học Mới
           </Button>
         )}
       </Box>
 
-      <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid var(--vien)', borderRadius: 3 }}>
+      <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid var(--vien)', borderRadius: 0 }}>
         <Table>
           <TableHead>
             <TableRow sx={{ bgcolor: 'var(--nen-trang)' }}>
@@ -154,7 +154,7 @@ export const ClassManagement: React.FC<ClassManagementProps> = ({
                     </Typography>
                     {cls.inviteCode && (
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
-                        <Typography variant="caption" sx={{ fontFamily: 'monospace', color: 'var(--teal)', fontWeight: 'bold', bgcolor: 'rgba(15,118,110,0.1)', px: 1, borderRadius: 1 }}>
+                        <Typography variant="caption" sx={{ fontFamily: 'monospace', color: 'var(--teal)', fontWeight: 'bold', bgcolor: 'var(--nen-luc-nhat2)', px: 1, borderRadius: 0 }}>
                           Mã: {cls.inviteCode}
                         </Typography>
                         <Tooltip title={codeCopied === cls.inviteCode ? 'Đã sao chép!' : 'Sao chép mã'}>
@@ -180,7 +180,7 @@ export const ClassManagement: React.FC<ClassManagementProps> = ({
                       label={`${cls.studentIdentifiers.length} học sinh`}
                       sx={{
                         fontWeight: 'bold',
-                        bgcolor: 'rgba(59, 130, 246, 0.1)',
+                        bgcolor: 'var(--nen-xanh-nhat2)',
                         color: 'var(--xanh-troi)'
                       }}
                     />
@@ -231,10 +231,10 @@ export const ClassManagement: React.FC<ClassManagementProps> = ({
           </DialogContentText>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={() => setDeleteId(null)} sx={{ textTransform: 'none', borderRadius: 2 }}>
+          <Button onClick={() => setDeleteId(null)} sx={{ textTransform: 'none', borderRadius: 0 }}>
             Hủy
           </Button>
-          <Button onClick={confirmDelete} color="error" variant="contained" sx={{ textTransform: 'none', borderRadius: 2, boxShadow: 'none' }}>
+          <Button onClick={confirmDelete} color="error" variant="contained" sx={{ textTransform: 'none', borderRadius: 0, boxShadow: 'none' }}>
             Xóa lớp
           </Button>
         </DialogActions>
@@ -277,7 +277,7 @@ export const ClassManagement: React.FC<ClassManagementProps> = ({
           </Box>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={() => setEditClass(null)} sx={{ textTransform: 'none', borderRadius: 2 }}>
+          <Button onClick={() => setEditClass(null)} sx={{ textTransform: 'none', borderRadius: 0 }}>
             Hủy
           </Button>
           <Button 
@@ -285,7 +285,7 @@ export const ClassManagement: React.FC<ClassManagementProps> = ({
             color="primary" 
             variant="contained" 
             disabled={!editName.trim() || !editTeacherEmail}
-            sx={{ textTransform: 'none', borderRadius: 2, boxShadow: 'none' }}
+            sx={{ textTransform: 'none', borderRadius: 0, boxShadow: 'none' }}
           >
             Lưu thay đổi
           </Button>
@@ -294,7 +294,7 @@ export const ClassManagement: React.FC<ClassManagementProps> = ({
 
       {/* Dialog xác nhận xuất danh sách (reset mật khẩu) */}
       <Dialog open={Boolean(exportClassId)} onClose={() => !exporting && setExportClassId(null)} maxWidth="sm" fullWidth>
-        <DialogTitle sx={{ fontWeight: 'bold', color: 'var(--cam)' }}>
+        <DialogTitle sx={{ fontWeight: 'bold', color: 'var(--chu-dam)' }}>
           ⚠️ Xác nhận xuất danh sách tài khoản lớp
         </DialogTitle>
         <DialogContent>
@@ -310,7 +310,7 @@ export const ClassManagement: React.FC<ClassManagementProps> = ({
                 <>
                   Thao tác này sẽ đặt lại mật khẩu của <strong>{count} học sinh</strong> trong lớp <strong>{cls.name}</strong>.<br /><br />
                   <span style={{ color: 'var(--do)', fontWeight: 'bold' }}>Mật khẩu cũ sẽ không dùng được nữa.</span> Hệ thống sẽ sinh mật khẩu mới theo format:<br />
-                  <code style={{ background: 'var(--nen-nhat)', padding: '2px 6px', borderRadius: 4 }}>{cls.name.replace(/\s/g, '')}_SBD_4ký_tự</code><br /><br />
+                  <code style={{ background: 'var(--nen-nhat)', padding: '2px 6px', borderRadius: 0 }}>{cls.name.replace(/\s/g, '')}_SBD_4ký_tự</code><br /><br />
                   Bạn sẽ tải xuống file CSV chứa thông tin đăng nhập mới để phát cho học sinh.
                   Hãy chắc rằng bạn đã in/gửi cho tất cả học sinh ngay sau khi xuất.
                 </>
@@ -322,7 +322,7 @@ export const ClassManagement: React.FC<ClassManagementProps> = ({
           <Button
             onClick={() => setExportClassId(null)}
             disabled={exporting}
-            sx={{ textTransform: 'none', borderRadius: 2 }}
+            sx={{ textTransform: 'none', borderRadius: 0 }}
           >
             Hủy
           </Button>
@@ -335,7 +335,7 @@ export const ClassManagement: React.FC<ClassManagementProps> = ({
             variant="contained"
             disabled={exporting}
             startIcon={<Download size={16} />}
-            sx={{ textTransform: 'none', borderRadius: 2, boxShadow: 'none' }}
+            sx={{ textTransform: 'none', borderRadius: 0, boxShadow: 'none' }}
           >
             {exporting ? 'Đang xuất...' : 'Đặt lại mật khẩu & Xuất CSV'}
           </Button>

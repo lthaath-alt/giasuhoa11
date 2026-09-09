@@ -42,14 +42,14 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleForm }) => {
         id="register-option-student-self"
         variant="outlined"
         sx={{
-          p: 2.5, borderRadius: 3, mb: 2,
-          borderColor: 'rgba(234, 88, 12, 0.3)',
-          backgroundColor: 'rgba(234, 88, 12, 0.02)',
+          p: 2.5, borderRadius: 0, mb: 2,
+          borderColor: 'var(--cam-vien)',
+          backgroundColor: 'var(--nen-cam-nhat2)',
           cursor: 'pointer',
           transition: 'all 0.2s',
           '&:hover': {
-            backgroundColor: 'rgba(234, 88, 12, 0.06)',
-            borderColor: 'rgba(234, 88, 12, 0.5)',
+            backgroundColor: 'var(--nen-cam-nhat2)',
+            borderColor: 'var(--cam-vien)',
             transform: 'translateY(-1px)',
           }
         }}
@@ -66,8 +66,8 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleForm }) => {
         }}
       >
         <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
-          <Box sx={{ p: 1, bgcolor: 'rgba(234, 88, 12, 0.1)', borderRadius: 2, display: 'flex' }}>
-            <UserPlus size={22} color="var(--cam)" />
+          <Box sx={{ p: 1, bgcolor: 'var(--nen-cam-nhat2)', borderRadius: 0, display: 'flex' }}>
+            <UserPlus size={22} color="var(--chu-dam)" />
           </Box>
           <Box>
             <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)', mb: 0.5 }}>
@@ -86,13 +86,13 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleForm }) => {
         id="register-option-school"
         variant="outlined"
         sx={{
-          p: 2.5, borderRadius: 3, mb: 3,
-          borderColor: 'rgba(15, 118, 110, 0.3)',
-          backgroundColor: 'rgba(15, 118, 110, 0.03)',
+          p: 2.5, borderRadius: 0, mb: 3,
+          borderColor: 'var(--vien-2)',
+          backgroundColor: 'var(--nen-luc-nhat2)',
         }}
       >
         <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
-          <Box sx={{ p: 1, bgcolor: 'rgba(15, 118, 110, 0.08)', borderRadius: 2, display: 'flex' }}>
+          <Box sx={{ p: 1, bgcolor: 'var(--nen-luc-nhat2)', borderRadius: 0, display: 'flex' }}>
             <GraduationCap size={22} color="var(--teal)" />
           </Box>
           <Box>
@@ -117,9 +117,9 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleForm }) => {
         startIcon={<ArrowLeft size={16} />}
         onClick={onToggleForm}
         sx={{
-          py: 1.3, borderRadius: 3, fontWeight: 'bold', textTransform: 'none',
+          py: 1.3, borderRadius: 0, fontWeight: 'bold', textTransform: 'none',
           borderColor: 'var(--cam)', color: 'var(--cam)',
-          '&:hover': { backgroundColor: 'rgba(234, 88, 12, 0.06)', borderColor: 'var(--cam)' }
+          '&:hover': { backgroundColor: 'var(--nen-cam-nhat2)', borderColor: 'var(--cam)' }
         }}
       >
         Quay lại Đăng nhập

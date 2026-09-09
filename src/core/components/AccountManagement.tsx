@@ -96,7 +96,7 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({
     switch (role) {
       case 'admin': return <Chip size="small" label="Quản trị Website" sx={{ bgcolor: 'var(--nen-vang-nhat)', color: 'var(--vang-dam)', fontWeight: 'bold' }} />;
       case 'school_admin': return <Chip size="small" label="Quản trị Trường học" sx={{ bgcolor: 'var(--nen-tim-nhat)', color: 'var(--tim)', fontWeight: 'bold' }} />;
-      case 'teacher': return <Chip size="small" label="Giáo viên" sx={{ bgcolor: '#ccfbf1', color: 'var(--teal)', fontWeight: 'bold' }} />;
+      case 'teacher': return <Chip size="small" label="Giáo viên" sx={{ bgcolor: 'var(--nen-luc-nhat)', color: 'var(--teal)', fontWeight: 'bold' }} />;
       case 'student': return <Chip size="small" label="Học sinh" sx={{ bgcolor: 'var(--nen-xanh-nhat)', color: 'var(--xanh-troi)', fontWeight: 'bold' }} />;
       default: return <Chip size="small" label={role} />;
     }
@@ -126,7 +126,7 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({
                 startIcon={<ShieldCheck size={16} />}
                 onClick={() => onCreateSchoolAdminClick?.(schools[0]?.id || '')}
                 sx={{
-                  textTransform: 'none', borderRadius: 2, fontWeight: 'bold', boxShadow: 'none',
+                  textTransform: 'none', borderRadius: 0, fontWeight: 'bold', boxShadow: 'none',
                   bgcolor: 'var(--tim-nen)', '&:hover': { bgcolor: '#4338ca' }
                 }}
               >
@@ -134,24 +134,24 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({
               </Button>
             )}
             {canCreateClass && (
-              <Button variant="outlined" color="primary" startIcon={<GraduationCap size={16} />} onClick={onCreateClassClick} sx={{ textTransform: 'none', borderRadius: 2, fontWeight: 'bold' }}>
+              <Button variant="outlined" color="primary" startIcon={<GraduationCap size={16} />} onClick={onCreateClassClick} sx={{ textTransform: 'none', borderRadius: 0, fontWeight: 'bold' }}>
                 Tạo Lớp Mới
               </Button>
             )}
             {canCreateTeacher && (
-              <Button variant="outlined" color="secondary" startIcon={<UserPlus size={16} />} onClick={onCreateTeacherClick} sx={{ textTransform: 'none', borderRadius: 2, fontWeight: 'bold' }}>
+              <Button variant="outlined" color="secondary" startIcon={<UserPlus size={16} />} onClick={onCreateTeacherClick} sx={{ textTransform: 'none', borderRadius: 0, fontWeight: 'bold' }}>
                 Thêm tài khoản Giáo viên
               </Button>
             )}
             {canCreateStudent && (
-              <Button variant="contained" color="primary" startIcon={<UserPlus size={16} />} onClick={onCreateStudentClick} sx={{ textTransform: 'none', borderRadius: 2, fontWeight: 'bold', boxShadow: 'none' }}>
+              <Button variant="contained" color="primary" startIcon={<UserPlus size={16} />} onClick={onCreateStudentClick} sx={{ textTransform: 'none', borderRadius: 0, fontWeight: 'bold', boxShadow: 'none' }}>
                 Thêm tài khoản Học sinh
               </Button>
             )}
           </Box>
         </Box>
 
-        <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid var(--vien)', borderRadius: 3 }}>
+        <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid var(--vien)', borderRadius: 0 }}>
           <Table>
             <TableHead>
               <TableRow sx={{ bgcolor: 'var(--nen-trang)' }}>
@@ -213,11 +213,11 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({
           {schools.map(school => {
             const admins = users.filter(u => u.role === 'school_admin' && u.schoolId === school.id);
             return (
-              <Paper key={school.id} elevation={0} sx={{ border: '1px solid var(--nen-tim-nhat)', borderRadius: 3, mb: 2, overflow: 'hidden' }}>
+              <Paper key={school.id} elevation={0} sx={{ border: '1px solid var(--nen-tim-nhat)', borderRadius: 0, mb: 2, overflow: 'hidden' }}>
                 {/* Header của từng trường */}
                 <Box sx={{ px: 3, py: 2, bgcolor: 'var(--nen-tim-nhat2)', borderBottom: '1px solid var(--nen-tim-nhat)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                    <Box sx={{ p: 0.8, bgcolor: 'var(--nen-tim-nhat)', borderRadius: 1.5, display: 'flex' }}>
+                    <Box sx={{ p: 0.8, bgcolor: 'var(--nen-tim-nhat)', borderRadius: 0, display: 'flex' }}>
                       <ShieldCheck size={16} color="var(--tim)" />
                     </Box>
                     <Box>
@@ -235,9 +235,9 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({
                     startIcon={<UserPlus size={14} />}
                     onClick={() => onCreateSchoolAdminClick?.(school.id)}
                     sx={{
-                      textTransform: 'none', borderRadius: 2, fontWeight: 'bold', fontSize: '0.78rem',
+                      textTransform: 'none', borderRadius: 0, fontWeight: 'bold', fontSize: '0.78rem',
                       borderColor: 'var(--tim-2)', color: 'var(--tim)',
-                      '&:hover': { bgcolor: 'rgba(99,102,241,0.08)' }
+                      '&:hover': { bgcolor: 'var(--nen-tim-nhat2)' }
                     }}
                   >
                     Thêm Admin
@@ -278,7 +278,7 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({
                               label={admin.status === 'active' ? 'Hoạt động' : 'Khóa'}
                               sx={{
                                 fontWeight: 'bold', fontSize: '0.7rem',
-                                bgcolor: admin.status === 'active' ? 'rgba(79,70,229,0.1)' : 'rgba(239,68,68,0.1)',
+                                bgcolor: admin.status === 'active' ? 'var(--nen-tim-nhat2)' : 'var(--nen-do-nhat)',
                                 color: admin.status === 'active' ? 'var(--tim)' : 'var(--do)',
                               }}
                             />
@@ -316,10 +316,10 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({
           </DialogContentText>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={() => setUserToDelete(null)} sx={{ textTransform: 'none', borderRadius: 2 }}>
+          <Button onClick={() => setUserToDelete(null)} sx={{ textTransform: 'none', borderRadius: 0 }}>
             Hủy
           </Button>
-          <Button onClick={confirmDeleteUser} color="error" variant="contained" sx={{ textTransform: 'none', borderRadius: 2, boxShadow: 'none' }}>
+          <Button onClick={confirmDeleteUser} color="error" variant="contained" sx={{ textTransform: 'none', borderRadius: 0, boxShadow: 'none' }}>
             Xóa tài khoản
           </Button>
         </DialogActions>
@@ -374,10 +374,10 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({
           </Box>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={() => setUserToEdit(null)} sx={{ textTransform: 'none', borderRadius: 2 }}>
+          <Button onClick={() => setUserToEdit(null)} sx={{ textTransform: 'none', borderRadius: 0 }}>
             Hủy
           </Button>
-          <Button onClick={handleEditSubmit} variant="contained" color="primary" sx={{ textTransform: 'none', borderRadius: 2, boxShadow: 'none' }}>
+          <Button onClick={handleEditSubmit} variant="contained" color="primary" sx={{ textTransform: 'none', borderRadius: 0, boxShadow: 'none' }}>
             Lưu thay đổi
           </Button>
         </DialogActions>

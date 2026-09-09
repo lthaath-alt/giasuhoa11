@@ -21,7 +21,7 @@ export const SuggestedQuestionsCard: React.FC<SuggestedQuestionsCardProps> = ({
       id="suggested-questions-card"
       sx={{
         borderLeft: '5px solid var(--teal)',
-        boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+        boxShadow: 'none',
         backgroundColor: 'var(--nen-the)',
         border: '1px solid var(--vien)',
         borderLeftWidth: '5px',
@@ -51,14 +51,14 @@ export const SuggestedQuestionsCard: React.FC<SuggestedQuestionsCardProps> = ({
                 textTransform: 'none',
                 p: 1.5,
                 borderStyle: 'dashed',
-                borderColor: 'rgba(15, 118, 110, 0.3)',
-                borderRadius: 2,
+                borderColor: 'var(--vien-2)',
+                borderRadius: 0,
                 fontSize: '0.8rem',
                 lineHeight: 1.4,
                 color: 'var(--teal)',
                 fontWeight: '600',
                 '&:hover': {
-                  backgroundColor: 'rgba(15, 118, 110, 0.04)',
+                  backgroundColor: 'var(--nen-luc-nhat2)',
                   borderColor: 'var(--teal)',
                 },
               }}

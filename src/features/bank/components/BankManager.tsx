@@ -598,7 +598,7 @@ export const BankManager: React.FC = () => {
                 {form.img && (
                   <>
                     <Box component="img" src={form.img}
-                      sx={{ height: 56, borderRadius: 1, border: '1px solid var(--vien)' }} />
+                      sx={{ height: 56, borderRadius: 0, border: '1px solid var(--vien)' }} />
                     <Button size="small" color="error" onClick={() => setForm(s => ({ ...s, img: undefined }))}>
                       Bỏ ảnh
                     </Button>

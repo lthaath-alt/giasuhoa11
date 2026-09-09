@@ -65,7 +65,7 @@ export const SlidesSection: React.FC = () => {
       sx={{
         width: '100%',
         bgcolor: 'var(--nen-xam)',
-        borderRadius: 3,
+        borderRadius: 0,
         p: 3,
       }}
     >
@@ -107,11 +107,11 @@ export const SlidesSection: React.FC = () => {
             flexShrink: 0,
             textTransform: 'none',
             fontWeight: 'bold',
-            borderRadius: 5,
+            borderRadius: 0,
             background: 'var(--nen-dam)',
             color: 'var(--chu-nguoc)',
             '&:hover': {
-              background: 'linear-gradient(90deg, #16407e 0%, #0056a3 100%)',
+              backgroundColor: 'var(--nen-dam)',
             },
           }}
         >
@@ -123,9 +123,9 @@ export const SlidesSection: React.FC = () => {
       <Paper
         sx={{
           overflow: 'hidden',
-          borderRadius: '16px',
+          borderRadius: 0,
           border: '2px solid var(--xanh-dam)',
-          boxShadow: '0 4px 16px rgba(30, 80, 162, 0.12)',
+          boxShadow: 'none',
           height: { xs: 'calc(100vh - 290px)', md: 'calc(100vh - 250px)' },
           minHeight: '400px',
         }}

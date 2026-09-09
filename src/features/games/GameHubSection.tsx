@@ -215,7 +215,7 @@ export const GameHubSection: React.FC = () => {
       sx={{
         width: '100%',
         bgcolor: 'var(--nen-xam)',
-        borderRadius: 3,
+        borderRadius: 0,
         p: 3,
       }}
     >
@@ -259,19 +259,19 @@ export const GameHubSection: React.FC = () => {
             key={game.id}
             sx={{
               position: 'relative',
-              borderRadius: '16px',
+              borderRadius: 0,
               display: 'flex',
               flexDirection: 'column',
               height: '100%',
               bgcolor: 'var(--nen-the)',
               border: '2px solid var(--xanh-dam)',
-              boxShadow: '0 4px 16px rgba(30, 80, 162, 0.12)',
+              boxShadow: 'none',
               transition: 'transform 0.2s, box-shadow 0.2s',
               overflow: 'hidden',
               cursor: 'pointer',
               '&:hover': {
                 transform: 'translateY(-4px)',
-                boxShadow: '0 12px 32px rgba(30, 80, 162, 0.2)',
+                boxShadow: 'none',
               },
             }}
           >
@@ -282,7 +282,7 @@ export const GameHubSection: React.FC = () => {
                 height: '150px',
                 flexShrink: 0,
                 overflow: 'hidden',
-                borderRadius: '16px 16px 0 0',
+                borderRadius: 0,
                 '& svg': {
                   width: '100%',
                   height: '100%',
@@ -357,11 +357,11 @@ export const GameHubSection: React.FC = () => {
                   mt: 2,
                   textTransform: 'none',
                   fontWeight: 'bold',
-                  borderRadius: 5,
+                  borderRadius: 0,
                   background: 'var(--nen-dam)',
                   color: 'var(--chu-nguoc)',
                   '&:hover': {
-                    background: 'linear-gradient(90deg, #16407e 0%, #0056a3 100%)',
+                    backgroundColor: 'var(--nen-dam)',
                   },
                 }}
               >
@@ -385,7 +385,7 @@ export const GameHubSection: React.FC = () => {
                 py: 1,
                 bgcolor: 'var(--xanh-dam-nen)',
                 color: 'var(--chu-nguoc)',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+                boxShadow: 'none',
               }}
             >
               <Typography variant="subtitle1" sx={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1 }}>

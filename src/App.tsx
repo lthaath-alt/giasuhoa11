@@ -30,7 +30,7 @@ const themeGoc = {
                        // CHỈ dùng cho hành động chính và lỗi thật, không trang trí.
       // MUI lay `light` lam GOC de tinh mau cho <Alert>: chu la darken(light,0.6),
       // nen la lighten(light,0.9). De `light` la mot mau co ALPHA thi ca hai deu
-      // ke thua do trong suot -- do duoc chu ra rgba(98,63,4,0.08), tuc mo 8%,
+      // ke thua do trong suot -- do duoc chu ra var(--nen-vang-nhat), tuc mo 8%,
       // gan nhu vo hinh. Bang mau TOI da sua tu truoc; bang SANG con sot.
       // Phai la mau DAC. Xem chu thich dau khoi palette.
       light: '#E85D5D',
@@ -61,8 +61,16 @@ const themeGoc = {
       primary: '#121210',  // Mực
       secondary: '#4D4D47',
     },
+    /* Lỗi thật dùng ĐÚNG màu đỏ tín hiệu của hành động chính. Trên nhãn hoá
+       chất chỉ có MỘT màu báo động; tách ra hai sắc đỏ khác nhau là làm loãng nó. */
+    error: { main: '#C4000E', light: '#E85D5D', dark: '#8C000C', contrastText: '#ffffff' },
+    info: { main: '#14508C', light: '#5B8FC9', dark: '#0E3A66', contrastText: '#ffffff' },
     divider: '#CBC9C0', // Đường kẻ — thế giới này dựng bằng nét kẻ, không bằng bóng đổ
   },
+  /* Bán kính duy nhất của hình dạng: 0. Mọi thành phần MUI không tự khai
+     borderRadius sẽ vuông góc — Menu, Popover, Snackbar, Accordion, Slider…
+     Sửa ở đây rẻ hơn nhiều so với đi đổi từng chỗ. */
+  shape: { borderRadius: 0 },
   typography: {
     // Inter cho chữ thân bài; Archivo cho GIỌNG HIỂN THỊ. Archivo là grotesque
     // công nghiệp gốc từ chữ biển báo — đúng thế giới nhãn cảnh báo, và Impeccable
@@ -110,61 +118,96 @@ const themeGoc = {
     },
   },
   components: {
+    /* Bóng đổ mềm là ngôn ngữ của thế giới cũ ("thẻ nổi trên nền"). Thế giới
+       nhãn dựng bằng NÉT KẺ: một mặt phẳng giấy, các ô chia bằng đường mực. Vì
+       vậy mọi mặc định boxShadow của MUI bị tắt, và độ sâu được diễn đạt bằng ĐỘ
+       ĐẬM của viền thay vì bằng độ nhòe của bóng. */
     MuiButton: {
+      defaultProps: { disableElevation: true },
       styleOverrides: {
         root: {
-          borderRadius: 12,
+          borderRadius: 0,
           boxShadow: 'none',
           padding: '8px 18px',
-          transition: 'all 0.2s ease-in-out',
-          '&:hover': {
-            boxShadow: '0 4px 12px rgba(234, 88, 12, 0.15)',
-            transform: 'translateY(-1px)',
-          },
-          '&:active': {
-            transform: 'translateY(0)',
-          },
+          transition: 'background-color 0.15s linear, color 0.15s linear',
+          '&:hover': { boxShadow: 'none' },
         },
+        outlined: { borderWidth: '1px' },
       },
     },
     MuiCard: {
+      defaultProps: { elevation: 0 },
       styleOverrides: {
         root: {
-          borderRadius: 16,
-          boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05)',
-          border: '1px solid var(--vien)', // Viền mỏng tinh tế
+          borderRadius: 0,
+          boxShadow: 'none',
+          border: '1px solid var(--vien)',
           backgroundColor: 'var(--nen-the)',
+          backgroundImage: 'none',
         },
       },
     },
     MuiPaper: {
+      defaultProps: { elevation: 0 },
       styleOverrides: {
         root: {
-          borderRadius: 16,
-          boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05)',
+          borderRadius: 0,
+          boxShadow: 'none',
           border: '1px solid var(--vien)',
           backgroundColor: 'var(--nen-the)',
+          backgroundImage: 'none',
         },
+      },
+    },
+    /* Mặt NỔI lên trên (hộp thoại, menu, gợi ý) không còn bóng đổ để tách khỏi
+       nền, nên phải tách bằng viền MỰC đậm — giống mép một tờ nhãn dán đè lên. */
+    MuiDialog: { styleOverrides: { paper: { border: '2px solid var(--chu-dam)' } } },
+    MuiMenu: { styleOverrides: { paper: { border: '2px solid var(--chu-dam)' } } },
+    MuiPopover: { styleOverrides: { paper: { border: '2px solid var(--chu-dam)' } } },
+    MuiAutocomplete: { styleOverrides: { paper: { border: '2px solid var(--chu-dam)' } } },
+    MuiTooltip: {
+      styleOverrides: {
+        tooltip: {
+          borderRadius: 0,
+          backgroundColor: 'var(--nen-dam)',
+          color: 'var(--chu-nguoc)',
+          fontSize: '0.75rem',
+          fontWeight: 600,
+          padding: '6px 10px',
+        },
+        arrow: { color: 'var(--nen-dam)' },
+      },
+    },
+    /* Chip là NHÃN NHỏ: chữ nhật, chữ đậm, không phải viên kẹo bo tròn. */
+    MuiChip: {
+      styleOverrides: {
+        root: { borderRadius: 0, fontWeight: 700, letterSpacing: '0.02em' },
       },
     },
     MuiTextField: {
       styleOverrides: {
         root: {
           '& .MuiOutlinedInput-root': {
-            borderRadius: 12,
-            '& fieldset': {
-              borderColor: 'var(--vien)',
-            },
-            '&:hover fieldset': {
-              borderColor: 'var(--cam)',
-            },
-            '&.Mui-focused fieldset': {
-              borderColor: 'var(--cam)',
-            },
+            borderRadius: 0,
+            '& fieldset': { borderColor: 'var(--vien)' },
+            '&:hover fieldset': { borderColor: 'var(--chu-dam)' },
+            '&.Mui-focused fieldset': { borderColor: 'var(--cam)', borderWidth: '2px' },
           },
         },
       },
     },
+    MuiOutlinedInput: { styleOverrides: { root: { borderRadius: 0 } } },
+    MuiToggleButton: { styleOverrides: { root: { borderRadius: 0 } } },
+    MuiLinearProgress: {
+      styleOverrides: {
+        root: { borderRadius: 0, height: 6, backgroundColor: 'var(--nen-nhat)' },
+        bar: { borderRadius: 0 },
+      },
+    },
+    /* Gạch chân tab là một nét mực dày, không phải vệt màu mờ. */
+    MuiTabs: { styleOverrides: { indicator: { height: 3, backgroundColor: 'var(--cam-nen)' } } },
+    MuiTab: { styleOverrides: { root: { textTransform: 'none', fontWeight: 700, minHeight: 44 } } },
+    MuiAlert: { styleOverrides: { root: { borderRadius: 0 } } },
   },
 };
 
@@ -183,27 +226,24 @@ export default function App() {
           palette: {
             ...(themeGoc as any).palette,
             mode: 'dark',
-            background: { default: '#0f151d', paper: '#18212c' },
-            text: { primary: '#e8eef5', secondary: '#a8b8c8' },
-            divider: '#2c3947',
+            /* Bản tối của thế giới nhãn: giấy đen, mực sáng. Các giá trị này trùng
+               khớp với :root[data-theme="dark"] trong index.css — hai hệ phải nói cùng
+               một thứ, không thì chữ MUI ngồi trên nền CSS khác hệ và tương phản tụt
+               mà build vẫn xanh. */
+            background: { default: '#0D0D0B', paper: '#161613' },
+            text: { primary: '#F3F2ED', secondary: '#AEADA5' },
+            divider: '#34342E',
             /* PHẢI đặt lại `light` cho từng màu, không được để nguyên bản sáng.
-               Ở bản sáng, `light` là rgba trong suốt 8% — dùng làm nền phớt cho
-               các vùng nhấn, đúng vai. Nhưng ở nền tối MUI lại lấy CHÍNH `light`
-               làm MÀU CHỮ cho <Alert>, <Chip>, nút outlined… Chữ màu rgba 8%
-               nghĩa là gần như trong suốt: băng "Em đang dùng bản dùng thử" mờ
-               tới mức không đọc nổi. Đây là lỗi ăn vào 66 chỗ dùng <Alert>, sửa
-               một chỗ này là hết. */
-            /* Cam ở nền tối đậm hơn một bậc (#ea580c → #c2410c, chính là
-               primary.dark của bản sáng). Chữ trắng trên #ea580c chỉ đạt
-               3,56 — dưới mức đọc được cho cỡ chữ 14px; đổi sang #c2410c
-               lên 5,18 mà vẫn đúng màu cam thương hiệu, lại đỡ chói trên
-               nền đậm. CỐ Ý chỉ đổi ở nền tối: nền sáng giữ nguyên. */
-            primary:   { ...(themeGoc as any).palette.primary,   main: '#c2410c', light: '#ff9a5c' },
-            secondary: { ...(themeGoc as any).palette.secondary, light: '#5fc8bd' },
-            warning:   { ...(themeGoc as any).palette.warning,   light: '#fbbf24' },
-            success:   { ...(themeGoc as any).palette.success,   light: '#5fc8bd' },
-            error:     { main: '#ef4444', light: '#ff9a9a', dark: '#b91c1c' },
-            info:      { main: '#4da3ec', light: '#8ec5f5', dark: '#1e6fb8' },
+               Ở nền tối MUI lấy CHÍNH `light` làm MÀU CHỮ cho <Alert>, <Chip>, nút
+               outlined… nên nó phải là sắc ĐÃ LÀM SÁNG cho nền đậm, không phải sắc
+               nhạt của bản sáng. Đây là lỗi từng ăn vào 66 chỗ dùng <Alert>. Còn
+               `main` thì ngược lại: nó là NỀN nút mang chữ trắng nên giữ độ đậm. */
+            primary:   { main: '#C4000E', light: '#FF5A50', dark: '#8C000C', contrastText: '#ffffff' },
+            secondary: { main: '#0F5A44', light: '#4FC9A5', dark: '#0A4231', contrastText: '#ffffff' },
+            warning:   { main: '#D9A600', light: '#F0BE2E', dark: '#8F6E00' },
+            success:   { main: '#17603A', light: '#4ADE80', dark: '#0F4527' },
+            error:     { main: '#C4000E', light: '#FF5A50', dark: '#8C000C', contrastText: '#ffffff' },
+            info:      { main: '#14508C', light: '#6BA9EE', dark: '#0E3A66', contrastText: '#ffffff' },
           },
         })
       : theme),

@@ -55,7 +55,7 @@ export const TeacherClassManager: React.FC<TeacherClassManagerProps> = ({ onClas
       <Paper
         id="teacher-class-created-panel"
         variant="outlined"
-        sx={{ p: 3, borderRadius: 3, borderColor: 'rgba(15,118,110,0.3)', bgcolor: 'rgba(15,118,110,0.02)' }}
+        sx={{ p: 3, borderRadius: 0, borderColor: 'var(--vien-2)', bgcolor: 'var(--nen-luc-nhat2)' }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
           <CheckCircle size={22} color="var(--teal)" />
@@ -73,12 +73,12 @@ export const TeacherClassManager: React.FC<TeacherClassManagerProps> = ({ onClas
         <Box
           sx={{
             display: 'inline-flex', alignItems: 'center', gap: 2,
-            p: 2, px: 3, borderRadius: 3,
+            p: 2, px: 3, borderRadius: 0,
             border: '2px dashed var(--teal)',
-            bgcolor: 'rgba(15,118,110,0.06)',
+            bgcolor: 'var(--nen-luc-nhat2)',
             cursor: 'pointer',
             transition: 'all 0.15s',
-            '&:hover': { bgcolor: 'rgba(15,118,110,0.10)', transform: 'scale(1.02)' },
+            '&:hover': { bgcolor: 'var(--nen-luc-nhat2)', transform: 'scale(1.02)' },
           }}
           onClick={copyCode}
           title="Nhấn để sao chép"
@@ -116,10 +116,10 @@ export const TeacherClassManager: React.FC<TeacherClassManagerProps> = ({ onClas
     <Paper
       id="teacher-create-class-panel"
       variant="outlined"
-      sx={{ p: 3, borderRadius: 3 }}
+      sx={{ p: 3, borderRadius: 0 }}
     >
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1 }}>
-        <Box sx={{ p: 1, bgcolor: 'rgba(15,118,110,0.08)', borderRadius: 2, display: 'flex' }}>
+        <Box sx={{ p: 1, bgcolor: 'var(--nen-luc-nhat2)', borderRadius: 0, display: 'flex' }}>
           <School size={20} color="var(--teal)" />
         </Box>
         <Box>
@@ -135,7 +135,7 @@ export const TeacherClassManager: React.FC<TeacherClassManagerProps> = ({ onClas
       <Divider sx={{ my: 2 }} />
 
       {error && (
-        <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>
+        <Alert severity="error" sx={{ mb: 2, borderRadius: 0 }}>
           {error}
         </Alert>
       )}
@@ -153,7 +153,7 @@ export const TeacherClassManager: React.FC<TeacherClassManagerProps> = ({ onClas
           sx={{
             flex: 1,
             minWidth: 200,
-            '& .MuiOutlinedInput-root': { borderRadius: 2.5 },
+            '& .MuiOutlinedInput-root': { borderRadius: 0 },
           }}
         />
         <Button
@@ -166,11 +166,11 @@ export const TeacherClassManager: React.FC<TeacherClassManagerProps> = ({ onClas
           sx={{
             textTransform: 'none',
             fontWeight: 'bold',
-            borderRadius: 2.5,
+            borderRadius: 0,
             bgcolor: 'var(--teal-nen)',
             boxShadow: 'none',
             whiteSpace: 'nowrap',
-            '&:hover': { bgcolor: '#0d9488', boxShadow: '0 2px 8px rgba(15,118,110,0.25)' },
+            '&:hover': { bgcolor: '#0d9488', boxShadow: 'none' },
             '&:disabled': { bgcolor: 'var(--nen-tat)' },
           }}
         >

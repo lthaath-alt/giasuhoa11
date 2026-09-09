@@ -19,7 +19,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
       sx={{
         p: 3,
         mb: 4,
-        borderRadius: 3,
+        borderRadius: 0,
         backgroundColor: 'var(--nen-the)',
         border: '1px solid var(--vien)',
         display: 'flex',
@@ -27,11 +27,11 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
         alignItems: { xs: 'flex-start', sm: 'center' },
         justifyContent: 'space-between',
         gap: 2,
-        boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+        boxShadow: 'none',
       }}
     >
       <Box>
-        <Typography variant="h5" color="var(--cam)" sx={{ display: 'flex', alignItems: 'center', gap: 1, fontWeight: 'bold' }}>
+        <Typography variant="h5" color="var(--chu-dam)" sx={{ display: 'flex', alignItems: 'center', gap: 1, fontWeight: 'bold' }}>
           <Users size={24} /> Bảng Điều Khiển Quản Trị Viên
         </Typography>
         <Typography variant="body2" color="text.secondary">
@@ -62,7 +62,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
             fontWeight: 'bold',
             '&:hover': {
               borderColor: 'var(--teal)',
-              backgroundColor: 'rgba(15, 118, 110, 0.05)',
+              backgroundColor: 'var(--nen-luc-nhat2)',
             },
           }}
         >

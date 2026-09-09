@@ -198,7 +198,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 display: 'flex',
                 alignItems: 'center',
                 gap: 1,
-                borderRadius: 20,
+                borderRadius: 0,
                 backgroundColor: 'var(--nen-nhat)',
                 px: 2,
                 py: 0.8,
@@ -241,8 +241,8 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                   mt: 1,
                   maxHeight: 280,
                   overflowY: 'auto',
-                  borderRadius: 3,
-                  boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+                  borderRadius: 0,
+                  boxShadow: 'none',
                   border: '1px solid var(--vien)',
                 }}
               >
@@ -377,10 +377,10 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                         height: 18,
                         fontSize: '0.6rem',
                         fontWeight: 'bold',
-                        bgcolor: 'linear-gradient(135deg, var(--vang) 0%, var(--cam) 100%)',
+                        bgcolor: 'var(--vang-nen)',
                         color: 'var(--chu-nguoc)',
                         ml: 0.5,
-                        boxShadow: '0 2px 4px rgba(234,88,12,0.3)',
+                        boxShadow: 'none',
                       }}
                     />
                   )}
@@ -393,7 +393,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                   onClick={handleLogout}
                   sx={{
                     textTransform: 'none',
-                    borderRadius: 20,
+                    borderRadius: 0,
                     fontSize: '0.72rem',
                     fontWeight: 'bold',
                     borderColor: 'var(--do)',
@@ -413,7 +413,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                   variant="outlined"
                   size="small"
                   onClick={() => navigate('/login')}
-                  sx={{ textTransform: 'none', borderRadius: 20, fontSize: '0.75rem', fontWeight: 'bold', borderColor: 'var(--xanh)', color: 'var(--xanh)' }}
+                  sx={{ textTransform: 'none', borderRadius: 0, fontSize: '0.75rem', fontWeight: 'bold', borderColor: 'var(--xanh)', color: 'var(--xanh)' }}
                 >
                   Đăng Nhập
                 </Button>
@@ -434,7 +434,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                     backgroundColor: 'var(--cam-nen)',
                     color: 'var(--chu-nguoc)',
                     boxShadow: 'none',
-                    '&:hover': { backgroundColor: 'var(--cam-dam)', boxShadow: 'none' },
+                    '&:hover': { backgroundColor: 'var(--nen-dam)', boxShadow: 'none' },
                   }}
                 >
                   Đăng Ký
@@ -658,9 +658,9 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                   fontWeight: 'bold',
                   px: 2,
                   py: 1,
-                  border: '1px solid rgba(255,153,0,0.4)',
-                  borderRadius: 2,
-                  '&:hover': { backgroundColor: 'rgba(255,153,0,0.15)' },
+                  border: '1px solid var(--nen-vang-nhat)',
+                  borderRadius: 0,
+                  '&:hover': { backgroundColor: 'var(--nen-vang-nhat)' },
                 }}
               >
                 Giáo viên
@@ -679,9 +679,9 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                   fontWeight: 'bold',
                   px: 2,
                   py: 1,
-                  border: '1px solid rgba(255,153,0,0.4)',
-                  borderRadius: 2,
-                  '&:hover': { backgroundColor: 'rgba(255,153,0,0.15)' },
+                  border: '1px solid var(--nen-vang-nhat)',
+                  borderRadius: 0,
+                  '&:hover': { backgroundColor: 'var(--nen-vang-nhat)' },
                 }}
               >
                 Quản trị Trường
@@ -700,9 +700,9 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                   fontWeight: 'bold',
                   px: 2,
                   py: 1,
-                  border: '1px solid rgba(255,153,0,0.4)',
-                  borderRadius: 2,
-                  '&:hover': { backgroundColor: 'rgba(255,153,0,0.15)' },
+                  border: '1px solid var(--nen-vang-nhat)',
+                  borderRadius: 0,
+                  '&:hover': { backgroundColor: 'var(--nen-vang-nhat)' },
                 }}
               >
                 Quản trị Website

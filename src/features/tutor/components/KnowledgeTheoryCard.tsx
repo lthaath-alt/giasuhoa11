@@ -12,16 +12,16 @@ export const KnowledgeTheoryCard: React.FC<KnowledgeTheoryCardProps> = ({ lesson
     <Card
       id="theory-card"
       sx={{
-        borderLeft: '5px solid var(--cam)',
-        boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+        boxShadow: 'none',
         backgroundColor: 'var(--nen-the)',
-        border: '1px solid var(--vien)',
-        borderLeftWidth: '5px',
+        /* Vien deu bon canh: o khai tren nhan. Soc mau day ben suon la ngon ngu
+           the gioi cu, hop dong huong cam no. */
+        border: '2px solid var(--chu-dam)',
       }}
     >
       <CardContent>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
-          <BookOpen size={20} color="var(--cam)" />
+          <BookOpen size={20} color="var(--chu-dam)" />
           <Typography variant="h6" color="text.primary" sx={{ fontWeight: 'bold' }}>
             Trọng tâm kiến thức
           </Typography>
@@ -37,11 +37,11 @@ export const KnowledgeTheoryCard: React.FC<KnowledgeTheoryCardProps> = ({ lesson
           color="text.primary"
           sx={{ mb: 1, display: 'flex', alignItems: 'center', gap: 0.5, fontWeight: 'bold' }}
         >
-          <Lightbulb size={16} color="var(--cam)" /> Công thức & Chìa khóa cần nhớ:
+          <Lightbulb size={16} color="var(--chu-dam)" /> Công thức & Chìa khóa cần nhớ:
         </Typography>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
           {lesson.formulae.map((f, i) => (
-            <Paper key={i} sx={{ p: 1.5, backgroundColor: 'var(--nen-trang)', border: '1px solid var(--vien)', borderRadius: 2 }}>
+            <Paper key={i} sx={{ p: 1.5, backgroundColor: 'var(--nen-trang)', border: '1px solid var(--vien)', borderRadius: 0 }}>
               <Typography
                 variant="caption"
                 sx={{ fontFamily: 'monospace', fontWeight: 600, color: 'var(--teal)', display: 'block', wordBreak: 'break-word' }}

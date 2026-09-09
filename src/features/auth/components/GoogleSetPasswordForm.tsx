@@ -81,8 +81,8 @@ export const GoogleSetPasswordForm: React.FC<GoogleSetPasswordFormProps> = ({
       {/* Thông tin Google đã xác thực */}
       <Box sx={{
         display: 'flex', alignItems: 'center', gap: 1.5, p: 2,
-        bgcolor: 'rgba(15, 118, 110, 0.06)', borderRadius: 2,
-        border: '1px solid rgba(15, 118, 110, 0.15)', mb: 3
+        bgcolor: 'var(--nen-luc-nhat2)', borderRadius: 0,
+        border: '1px solid var(--nen-luc-nhat2)', mb: 3
       }}>
         {googleInfo.picture ? (
           <img src={googleInfo.picture} alt="avatar" style={{ width: 40, height: 40, borderRadius: '50%' }} />
@@ -109,7 +109,7 @@ export const GoogleSetPasswordForm: React.FC<GoogleSetPasswordFormProps> = ({
       </Typography>
 
       {error && (
-        <Alert id="set-password-error-alert" severity="error" sx={{ mb: 2.5, borderRadius: 2 }}>
+        <Alert id="set-password-error-alert" severity="error" sx={{ mb: 2.5, borderRadius: 0 }}>
           {error}
         </Alert>
       )}
@@ -135,7 +135,7 @@ export const GoogleSetPasswordForm: React.FC<GoogleSetPasswordFormProps> = ({
                   </InputAdornment>
                 )
               } }}
-              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
+              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }}
             />
             {/* Thanh độ mạnh */}
             {password && (
@@ -144,9 +144,9 @@ export const GoogleSetPasswordForm: React.FC<GoogleSetPasswordFormProps> = ({
                   variant="determinate"
                   value={strength.score}
                   sx={{
-                    height: 6, borderRadius: 3,
+                    height: 6, borderRadius: 0,
                     bgcolor: 'var(--vien)',
-                    '& .MuiLinearProgress-bar': { bgcolor: strength.color, borderRadius: 3 }
+                    '& .MuiLinearProgress-bar': { bgcolor: strength.color, borderRadius: 0 }
                   }}
                 />
                 <Typography variant="caption" sx={{ color: strength.color, fontWeight: 'bold', mt: 0.5, display: 'block' }}>
@@ -175,7 +175,7 @@ export const GoogleSetPasswordForm: React.FC<GoogleSetPasswordFormProps> = ({
                 </InputAdornment>
               )
             } }}
-            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
+            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }}
           />
 
           <Button
@@ -186,7 +186,7 @@ export const GoogleSetPasswordForm: React.FC<GoogleSetPasswordFormProps> = ({
             size="large"
             disabled={loading || !passwordsMatch}
             startIcon={loading ? undefined : <CheckCircle2 size={18} />}
-            sx={{ py: 1.5, borderRadius: 3, fontWeight: 'bold', textTransform: 'none', boxShadow: 'none' }}
+            sx={{ py: 1.5, borderRadius: 0, fontWeight: 'bold', textTransform: 'none', boxShadow: 'none' }}
           >
             {loading ? 'Đang tạo tài khoản...' : 'Hoàn tất đăng ký'}
           </Button>

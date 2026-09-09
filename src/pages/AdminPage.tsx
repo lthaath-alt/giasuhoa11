@@ -56,8 +56,8 @@ export const AdminPage: React.FC = () => {
             
             {/* Logo */}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, cursor: 'pointer' }} onClick={handleBackToStudy}>
-              <Box sx={{ p: 1, backgroundColor: 'rgba(234, 88, 12, 0.15)', borderRadius: 2.5, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <GraduationCap size={24} color="var(--cam)" />
+              <Box sx={{ p: 1, backgroundColor: 'var(--nen-cam-nhat2)', borderRadius: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <GraduationCap size={24} color="var(--chu-dam)" />
               </Box>
               <Typography variant="h6" sx={{ letterSpacing: '-0.5px', fontWeight: 'bold', color: 'var(--chu-nguoc)' }}>
                 Hệ thống Quản lý Gia sư Hóa 11 AI
@@ -75,7 +75,7 @@ export const AdminPage: React.FC = () => {
                   <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--chu-nguoc)', lineHeight: 1.2 }}>
                     {currentUser?.name || 'Quản trị viên'}
                   </Typography>
-                  <Chip label="ADMINISTRATOR" size="small" sx={{ height: 18, fontSize: '0.6rem', fontWeight: 'bold', backgroundColor: 'rgba(234, 88, 12, 0.2)', color: 'var(--cam-nhat)', border: '1px solid rgba(234, 88, 12, 0.4)' }} />
+                  <Chip label="ADMINISTRATOR" size="small" sx={{ height: 18, fontSize: '0.6rem', fontWeight: 'bold', backgroundColor: 'var(--cam-vien)', color: 'var(--cam-nhat)', border: '1px solid var(--cam-vien)' }} />
                 </Box>
               </Box>
 
@@ -88,14 +88,14 @@ export const AdminPage: React.FC = () => {
                 onClick={handleBackToStudy}
                 sx={{
                   textTransform: 'none',
-                  borderRadius: 2.5,
+                  borderRadius: 0,
                   fontWeight: 'bold',
                   color: 'var(--luc)',
-                  borderColor: 'rgba(16, 185, 129, 0.4)',
-                  backgroundColor: 'rgba(16, 185, 129, 0.08)',
+                  borderColor: 'var(--vien-2)',
+                  backgroundColor: 'var(--nen-luc-nhat2)',
                   '&:hover': {
                     borderColor: 'var(--luc)',
-                    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                    backgroundColor: 'var(--nen-luc-nhat2)',
                   }
                 }}
               >
@@ -111,7 +111,7 @@ export const AdminPage: React.FC = () => {
                 onClick={handleLogout}
                 sx={{
                   textTransform: 'none',
-                  borderRadius: 2.5,
+                  borderRadius: 0,
                   fontWeight: 'bold',
                   boxShadow: 'none',
                   backgroundColor: 'var(--do-nen)',

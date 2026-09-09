@@ -64,7 +64,10 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   };
 
   const isStudent = selectedRole === 'student';
+  /* Hai bien, hai vai. `accentColor` chi duoc lam CHU/VIEN; muon to nen thi
+     phai dung `accentNen`. Giu chung canh nhau de lan sau khong lay nham. */
   const accentColor = isStudent ? 'var(--cam)' : 'var(--teal)';
+  const accentNen = isStudent ? 'var(--cam-nen)' : 'var(--teal-nen)';
 
   return (
     <Box id="login-form-container">
@@ -82,7 +85,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             display: 'flex',
             gap: 0.5,
             p: 0.5,
-            borderRadius: 999,
+            borderRadius: 0,
             backgroundColor: 'var(--nen-nhat)',
             border: '1px solid var(--vien)',
           }}
@@ -94,16 +97,16 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             onClick={() => { setSelectedRole('student'); setError(null); }}
             startIcon={<GraduationCap size={18} />}
             sx={{
-              borderRadius: 999,
+              borderRadius: 0,
               py: 1,
               textTransform: 'none',
               fontWeight: 'bold',
               transition: 'all 0.2s',
-              color: isStudent ? 'var(--nen-the)' : 'var(--chu-2)',
-              backgroundColor: isStudent ? 'var(--cam)' : 'transparent',
-              boxShadow: isStudent ? '0 2px 8px rgba(234, 88, 12, 0.25)' : 'none',
+              color: isStudent ? 'var(--chu-nguoc)' : 'var(--chu-2)',
+              backgroundColor: isStudent ? 'var(--cam-nen)' : 'transparent',
+              boxShadow: 'none',
               '&:hover': {
-                backgroundColor: isStudent ? 'var(--cam-dam)' : 'rgba(0,0,0,0.03)',
+                backgroundColor: isStudent ? 'var(--nen-dam)' : 'var(--nen-rat-nhat)',
               },
             }}
           >
@@ -117,16 +120,16 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             onClick={() => { setSelectedRole('teacher'); setError(null); }}
             startIcon={<School size={18} />}
             sx={{
-              borderRadius: 999,
+              borderRadius: 0,
               py: 1,
               textTransform: 'none',
               fontWeight: 'bold',
               transition: 'all 0.2s',
-              color: !isStudent ? 'var(--nen-the)' : 'var(--chu-2)',
-              backgroundColor: !isStudent ? 'var(--teal)' : 'transparent',
-              boxShadow: !isStudent ? '0 2px 8px rgba(15, 118, 110, 0.25)' : 'none',
+              color: !isStudent ? 'var(--chu-nguoc)' : 'var(--chu-2)',
+              backgroundColor: !isStudent ? 'var(--teal-nen)' : 'transparent',
+              boxShadow: 'none',
               '&:hover': {
-                backgroundColor: !isStudent ? '#0d5e56' : 'rgba(0,0,0,0.03)',
+                backgroundColor: !isStudent ? 'var(--nen-dam)' : 'var(--nen-rat-nhat)',
               },
             }}
           >
@@ -136,7 +139,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       </Box>
 
       {error && (
-        <Alert id="login-error-alert" severity="error" sx={{ mb: 2.5, borderRadius: 2 }}>
+        <Alert id="login-error-alert" severity="error" sx={{ mb: 2.5, borderRadius: 0 }}>
           {error}
         </Alert>
       )}
@@ -152,7 +155,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             onChange={e => setIdentifier(e.target.value)}
             disabled={loading}
             placeholder={isStudent ? "Ví dụ: student@gmail.com hoặc hs_nguyen" : "Ví dụ: teacher@school.edu.vn hoặc admin"}
-            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
+            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }}
           />
 
           <Box>
@@ -165,7 +168,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
               value={password}
               onChange={e => setPassword(e.target.value)}
               disabled={loading}
-              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
+              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }}
               slotProps={{
                 input: {
                   endAdornment: (
@@ -213,14 +216,14 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             startIcon={loading ? <CircularProgress size={18} color="inherit" /> : <LogIn size={18} />}
             sx={{
               py: 1.4,
-              borderRadius: 3,
+              borderRadius: 0,
               fontWeight: 'bold',
               textTransform: 'none',
-              backgroundColor: accentColor,
+              backgroundColor: accentNen,
               boxShadow: 'none',
               '&:hover': {
-                backgroundColor: isStudent ? 'var(--cam-dam)' : '#0d5e56',
-                boxShadow: isStudent ? '0 4px 12px rgba(234, 88, 12, 0.2)' : '0 4px 12px rgba(15, 118, 110, 0.2)'
+                backgroundColor: 'var(--nen-dam)',
+                boxShadow: 'none'
               }
             }}
           >

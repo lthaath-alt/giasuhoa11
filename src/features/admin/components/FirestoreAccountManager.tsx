@@ -220,7 +220,7 @@ export const FirestoreAccountManager: React.FC = () => {
   return (
     <Box id="firestore-account-manager-container" sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
       {/* Tiêu đề phần quản lý */}
-      <Paper elevation={0} sx={{ p: 2.5, borderRadius: 3, border: '1px solid var(--vien)', bgcolor: 'var(--nen-trang)' }}>
+      <Paper elevation={0} sx={{ p: 2.5, borderRadius: 0, border: '1px solid var(--vien)', bgcolor: 'var(--nen-trang)' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
           <ShieldCheck color="var(--teal)" size={24} />
           <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)' }}>
@@ -235,14 +235,14 @@ export const FirestoreAccountManager: React.FC = () => {
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1.4fr' }, gap: 3 }}>
         {/* CỘT TRÁI: FORM TẠO TÀI KHOẢN MỚI */}
         <Box>
-          <Card sx={{ borderRadius: 3, border: '1px solid var(--vien)', boxShadow: 'none' }}>
+          <Card sx={{ borderRadius: 0, border: '1px solid var(--vien)', boxShadow: 'none' }}>
             <CardContent sx={{ p: 3 }}>
               <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-                <UserPlus size={18} color="var(--cam)" /> Tạo Tài khoản mới (Firestore)
+                <UserPlus size={18} color="var(--chu-dam)" /> Tạo Tài khoản mới (Firestore)
               </Typography>
 
               {createMsg && (
-                <Alert severity={createMsg.type} sx={{ mb: 2, borderRadius: 2 }}>
+                <Alert severity={createMsg.type} sx={{ mb: 2, borderRadius: 0 }}>
                   {createMsg.text}
                 </Alert>
               )}
@@ -298,7 +298,7 @@ export const FirestoreAccountManager: React.FC = () => {
                     color="primary"
                     disabled={creating}
                     startIcon={creating ? <CircularProgress size={16} color="inherit" /> : <UserPlus size={16} />}
-                    sx={{ mt: 1, py: 1.2, borderRadius: 2, fontWeight: 'bold', textTransform: 'none' }}
+                    sx={{ mt: 1, py: 1.2, borderRadius: 0, fontWeight: 'bold', textTransform: 'none' }}
                   >
                     {creating ? 'Đang tạo...' : 'Tạo tài khoản ngay'}
                   </Button>
@@ -310,7 +310,7 @@ export const FirestoreAccountManager: React.FC = () => {
 
         {/* CỘT PHẢI: DANH SÁCH TÀI KHOẢN FIRESTORE */}
         <Box>
-          <Card sx={{ borderRadius: 3, border: '1px solid var(--vien)', boxShadow: 'none' }}>
+          <Card sx={{ borderRadius: 0, border: '1px solid var(--vien)', boxShadow: 'none' }}>
             <CardContent sx={{ p: 3 }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                 <Typography variant="subtitle1" sx={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -332,11 +332,11 @@ export const FirestoreAccountManager: React.FC = () => {
                   <CircularProgress size={24} />
                 </Box>
               ) : users.length === 0 ? (
-                <Alert severity="info" sx={{ borderRadius: 2 }}>
+                <Alert severity="info" sx={{ borderRadius: 0 }}>
                   Chưa có tài khoản nào trong collection "users" trên Firestore (hoặc chưa kết nối Config).
                 </Alert>
               ) : (
-                <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid var(--nen-nhat)', borderRadius: 2 }}>
+                <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid var(--nen-nhat)', borderRadius: 0 }}>
                   <Table size="small">
                     <TableHead sx={{ bgcolor: 'var(--nen-trang)' }}>
                       <TableRow>
@@ -365,7 +365,7 @@ export const FirestoreAccountManager: React.FC = () => {
                                   setResetPasswordVal('');
                                   setResetMsg(null);
                                 }}
-                                sx={{ textTransform: 'none', borderRadius: 1.5, fontSize: '0.72rem', px: 1 }}
+                                sx={{ textTransform: 'none', borderRadius: 0, fontSize: '0.72rem', px: 1 }}
                               >
                                 Reset MK
                               </Button>
@@ -377,7 +377,7 @@ export const FirestoreAccountManager: React.FC = () => {
                                 color="info"
                                 startIcon={<ShieldAlert size={13} />}
                                 onClick={() => handleOpenRoleDialog(u)}
-                                sx={{ textTransform: 'none', borderRadius: 1.5, fontSize: '0.72rem', px: 1 }}
+                                sx={{ textTransform: 'none', borderRadius: 0, fontSize: '0.72rem', px: 1 }}
                               >
                                 Đổi quyền
                               </Button>
@@ -407,7 +407,7 @@ export const FirestoreAccountManager: React.FC = () => {
               </Typography>
 
               {resetMsg && (
-                <Alert severity={resetMsg.type} sx={{ borderRadius: 2 }}>
+                <Alert severity={resetMsg.type} sx={{ borderRadius: 0 }}>
                   {resetMsg.text}
                 </Alert>
               )}
@@ -435,7 +435,7 @@ export const FirestoreAccountManager: React.FC = () => {
             color="warning"
             disabled={resetting}
             startIcon={resetting ? <CircularProgress size={16} color="inherit" /> : <Key size={16} />}
-            sx={{ textTransform: 'none', fontWeight: 'bold', borderRadius: 2 }}
+            sx={{ textTransform: 'none', fontWeight: 'bold', borderRadius: 0 }}
           >
             {resetting ? 'Đang lưu...' : 'Cập nhật Mật khẩu'}
           </Button>
@@ -459,7 +459,7 @@ export const FirestoreAccountManager: React.FC = () => {
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
 
               {/* Thông tin tài khoản đang được chọn */}
-              <Paper elevation={0} sx={{ p: 2, borderRadius: 2, bgcolor: '#f0f9ff', border: '1px solid #bae6fd' }}>
+              <Paper elevation={0} sx={{ p: 2, borderRadius: 0, bgcolor: '#f0f9ff', border: '1px solid #bae6fd' }}>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>Tài khoản được chọn</Typography>
                 <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)' }}>
                   {roleTargetUser.fullName}
@@ -502,14 +502,14 @@ export const FirestoreAccountManager: React.FC = () => {
 
               {/* Thông báo xác nhận / lỗi */}
               {roleMsg && (
-                <Alert severity={roleMsg.type} sx={{ borderRadius: 2, fontSize: '0.82rem' }}>
+                <Alert severity={roleMsg.type} sx={{ borderRadius: 0, fontSize: '0.82rem' }}>
                   {roleMsg.text}
                 </Alert>
               )}
 
               {/* Cảnh báo khi cấp quyền cao */}
               {(selectedNewRole === 'admin' || selectedNewRole === 'school_admin') && !roleMsg && (
-                <Alert severity="warning" sx={{ borderRadius: 2, fontSize: '0.82rem' }}>
+                <Alert severity="warning" sx={{ borderRadius: 0, fontSize: '0.82rem' }}>
                   ⚠️ Quyền <strong>{ROLE_CONFIG[selectedNewRole]?.label}</strong> có thể quản lý người dùng và dữ liệu hệ thống. Hãy chắc chắn trước khi cấp.
                 </Alert>
               )}
@@ -531,7 +531,7 @@ export const FirestoreAccountManager: React.FC = () => {
             color={confirmStep ? 'error' : 'info'}
             disabled={updatingRole || selectedNewRole === roleTargetUser?.role}
             startIcon={updatingRole ? <CircularProgress size={16} color="inherit" /> : <ShieldAlert size={16} />}
-            sx={{ textTransform: 'none', fontWeight: 'bold', borderRadius: 2 }}
+            sx={{ textTransform: 'none', fontWeight: 'bold', borderRadius: 0 }}
           >
             {updatingRole
               ? 'Đang cập nhật...'

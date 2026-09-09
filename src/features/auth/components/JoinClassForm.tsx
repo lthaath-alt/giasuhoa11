@@ -59,9 +59,9 @@ export const JoinClassForm: React.FC<JoinClassFormProps> = ({ onJoined, onDismis
       sx={{
         p: 2,
         mb: 3,
-        borderRadius: 3,
-        borderColor: 'rgba(15,118,110,0.3)',
-        background: 'linear-gradient(135deg, rgba(15,118,110,0.04) 0%, rgba(15,118,110,0.01) 100%)',
+        borderRadius: 0,
+        borderColor: 'var(--vien-2)',
+        backgroundColor: 'var(--nen-luc-nhat2)',
         position: 'relative',
       }}
     >
@@ -97,8 +97,8 @@ export const JoinClassForm: React.FC<JoinClassFormProps> = ({ onJoined, onDismis
       <Collapse in={!success}>
         <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start', pr: 3 }}>
           <Box sx={{
-            p: 1, bgcolor: 'rgba(15,118,110,0.1)',
-            borderRadius: 2, display: 'flex', flexShrink: 0, mt: 0.5,
+            p: 1, bgcolor: 'var(--nen-luc-nhat2)',
+            borderRadius: 0, display: 'flex', flexShrink: 0, mt: 0.5,
           }}>
             <School size={18} color="var(--teal)" />
           </Box>
@@ -112,7 +112,7 @@ export const JoinClassForm: React.FC<JoinClassFormProps> = ({ onJoined, onDismis
             </Typography>
 
             {error && (
-              <Alert severity="error" sx={{ mb: 1.5, borderRadius: 2, py: 0.5 }}>
+              <Alert severity="error" sx={{ mb: 1.5, borderRadius: 0, py: 0.5 }}>
                 <Typography variant="caption">{error}</Typography>
               </Alert>
             )}
@@ -137,7 +137,7 @@ export const JoinClassForm: React.FC<JoinClassFormProps> = ({ onJoined, onDismis
                 sx={{
                   width: 200,
                   '& .MuiOutlinedInput-root': {
-                    borderRadius: 2.5,
+                    borderRadius: 0,
                     '&.Mui-focused fieldset': { borderColor: 'var(--teal)' },
                   },
                   '& .MuiInputBase-input': {
@@ -159,10 +159,10 @@ export const JoinClassForm: React.FC<JoinClassFormProps> = ({ onJoined, onDismis
                 sx={{
                   textTransform: 'none',
                   fontWeight: 'bold',
-                  borderRadius: 2.5,
+                  borderRadius: 0,
                   bgcolor: 'var(--teal-nen)',
                   boxShadow: 'none',
-                  '&:hover': { bgcolor: '#0d9488', boxShadow: '0 2px 8px rgba(15,118,110,0.25)' },
+                  '&:hover': { bgcolor: '#0d9488', boxShadow: 'none' },
                   '&:disabled': { bgcolor: 'var(--nen-tat)' },
                 }}
               >

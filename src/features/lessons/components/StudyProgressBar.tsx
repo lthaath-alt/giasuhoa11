@@ -26,7 +26,7 @@ export const StudyProgressBar: React.FC<StudyProgressBarProps> = ({
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Award size={18} color="var(--cam)" />
+            <Award size={18} color="var(--chu-dam)" />
             <Typography variant="body2" sx={{ fontWeight: 'bold' }} color="text.primary">
               Tiến trình tự học SGK Hóa học 11:
             </Typography>
@@ -36,7 +36,7 @@ export const StudyProgressBar: React.FC<StudyProgressBarProps> = ({
               variant="determinate"
               value={progressPercent}
               color="primary"
-              sx={{ height: 6, borderRadius: 3, backgroundColor: 'var(--vien)' }}
+              sx={{ height: 6, borderRadius: 0, backgroundColor: 'var(--vien)' }}
             />
           </Box>
           <Typography variant="body2" sx={{ fontWeight: 'bold' }} color="primary.main">

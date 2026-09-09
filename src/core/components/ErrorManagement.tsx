@@ -93,28 +93,28 @@ export const ErrorManagement: React.FC = () => {
       {/* ─── 4 THẺ THỐNG KÊ ────────────────────────────────────────────── */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid var(--vien)' }}>
+          <Paper elevation={0} sx={{ p: 3, borderRadius: 0, border: '1px solid var(--vien)' }}>
             <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 'bold' }}>TỔNG SỐ LỖI THU THẬP</Typography>
             <Typography variant="h4" sx={{ fontWeight: 'bold', my: 1, color: 'var(--chu-dam)' }}>{totalLogs}</Typography>
             <Typography variant="caption" color="text.secondary">Ghi nhận trên toàn hệ thống</Typography>
           </Paper>
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid #fecaca', bgcolor: 'var(--nen-do-nhat2)' }}>
+          <Paper elevation={0} sx={{ p: 3, borderRadius: 0, border: '1px solid #fecaca', bgcolor: 'var(--nen-do-nhat2)' }}>
             <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'var(--do-dam)' }}>LỖI CHƯA XỬ LÝ (NEW)</Typography>
             <Typography variant="h4" sx={{ fontWeight: 'bold', my: 1, color: 'var(--do)' }}>{unhandledLogs}</Typography>
             <Typography variant="caption" sx={{ color: '#991b1b' }}>{criticalLogs} lỗi nghiêm trọng / API</Typography>
           </Paper>
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid #bbf7d0', bgcolor: 'var(--nen-luc-nhat2)' }}>
+          <Paper elevation={0} sx={{ p: 3, borderRadius: 0, border: '1px solid #bbf7d0', bgcolor: 'var(--nen-luc-nhat2)' }}>
             <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'var(--luc-dam)' }}>TỈ LỆ ỔN ĐỊNH NỀN TẢNG</Typography>
             <Typography variant="h4" sx={{ fontWeight: 'bold', my: 1, color: 'var(--luc)' }}>{stabilityRate}%</Typography>
             <Typography variant="caption" sx={{ color: 'var(--luc-dam2)' }}>Đã khắc phục: {resolvedLogs} sự cố</Typography>
           </Paper>
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid var(--nen-tim-nhat)', bgcolor: 'var(--nen-tim-nhat2)' }}>
+          <Paper elevation={0} sx={{ p: 3, borderRadius: 0, border: '1px solid var(--nen-tim-nhat)', bgcolor: 'var(--nen-tim-nhat2)' }}>
             <Typography variant="body2" sx={{ fontWeight: 'bold', color: '#4338ca' }}>NGUỒN DỮ LIỆU CẮT LỚP</Typography>
             <Typography variant="h4" sx={{ fontWeight: 'bold', my: 1, color: 'var(--tim)' }}>{componentsList.length}</Typography>
             <Typography variant="caption" sx={{ color: '#3730a3' }}>Module dịch vụ hoạt động</Typography>
@@ -125,7 +125,7 @@ export const ErrorManagement: React.FC = () => {
       <Grid container spacing={3} sx={{ mb: 4 }}>
         {/* ─── PHÂN PHỐI LỖI THEO MỨC ĐỘ ───────────────────────────────────── */}
         <Grid size={{ xs: 12, md: 7 }}>
-          <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid var(--vien)', height: '100%' }}>
+          <Paper elevation={0} sx={{ p: 3, borderRadius: 0, border: '1px solid var(--vien)', height: '100%' }}>
             <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 3 }}>Phân Phối Lỗi Theo Mức Độ</Typography>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               {levelDistribution.map((item, index) => {
@@ -133,7 +133,7 @@ export const ErrorManagement: React.FC = () => {
                 return (
                   <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: 220 }}>
-                      <Box sx={{ p: 0.5, borderRadius: 1, bgcolor: config.bg, color: config.color, display: 'flex' }}>
+                      <Box sx={{ p: 0.5, borderRadius: 0, bgcolor: config.bg, color: config.color, display: 'flex' }}>
                         {config.icon}
                       </Box>
                       <Typography variant="body2" sx={{ fontWeight: 500, color: 'var(--chu)' }}>
@@ -144,7 +144,7 @@ export const ErrorManagement: React.FC = () => {
                       <LinearProgress 
                         variant="determinate" 
                         value={item.percent} 
-                        sx={{ height: 8, borderRadius: 4, bgcolor: 'var(--nen-nhat)', '& .MuiLinearProgress-bar': { bgcolor: config.color } }} 
+                        sx={{ height: 8, borderRadius: 0, bgcolor: 'var(--nen-nhat)', '& .MuiLinearProgress-bar': { bgcolor: config.color } }} 
                       />
                     </Box>
                     <Box sx={{ minWidth: 80, textAlign: 'right' }}>
@@ -160,7 +160,7 @@ export const ErrorManagement: React.FC = () => {
 
         {/* ─── PHÂN PHỐI SỰ CỐ THEO THÀNH PHẦN ──────────────────────────────── */}
         <Grid size={{ xs: 12, md: 5 }}>
-          <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid var(--vien)', height: '100%' }}>
+          <Paper elevation={0} sx={{ p: 3, borderRadius: 0, border: '1px solid var(--vien)', height: '100%' }}>
             <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 3 }}>Phân Phối Sự Cố Theo Thành Phần</Typography>
             
             {componentsList.length === 0 ? (
@@ -170,7 +170,7 @@ export const ErrorManagement: React.FC = () => {
             ) : (
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 {componentsList.map(([comp, count], idx) => (
-                  <Box key={idx} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 1.5, bgcolor: 'var(--nen-trang)', borderRadius: 2 }}>
+                  <Box key={idx} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 1.5, bgcolor: 'var(--nen-trang)', borderRadius: 0 }}>
                     <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'var(--chu-dam-3)' }}>{comp}</Typography>
                     <Chip label={`${count} sự cố`} size="small" sx={{ bgcolor: 'var(--vien)', fontWeight: 'bold' }} />
                   </Box>
@@ -182,7 +182,7 @@ export const ErrorManagement: React.FC = () => {
       </Grid>
 
       {/* ─── DANH SÁCH LỖI CHI TIẾT ───────────────────────────────────────── */}
-      <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid var(--vien)' }}>
+      <Paper elevation={0} sx={{ p: 3, borderRadius: 0, border: '1px solid var(--vien)' }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
           <Typography variant="h6" sx={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1 }}>
             <ShieldAlert size={20} color="var(--do)" /> Danh sách sự cố chi tiết

@@ -182,7 +182,7 @@ export const DatabankManagement: React.FC = () => {
             else if (tabValue === 1) setIsEqDialogOpen(true);
             else setIsMatrixDialogOpen(true);
           }}
-          sx={{ textTransform: 'none', borderRadius: 2, fontWeight: 'bold', boxShadow: 'none' }}
+          sx={{ textTransform: 'none', borderRadius: 0, fontWeight: 'bold', boxShadow: 'none' }}
         >
           {tabValue === 0 ? 'Thêm Câu Hỏi' : tabValue === 1 ? 'Thêm Phương Trình' : 'Thêm Ma Trận'}
         </Button>
@@ -191,8 +191,8 @@ export const DatabankManagement: React.FC = () => {
       {/* 3 Stat Cards */}
       <Grid container spacing={2} sx={{ mb: 4 }}>
         <Grid size={{ xs: 12, md: 4 }}>
-          <Paper elevation={0} sx={{ p: 2, border: '1px solid var(--vien)', borderRadius: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Box sx={{ p: 1.5, bgcolor: 'var(--nen-tim-nhat)', borderRadius: 2 }}>
+          <Paper elevation={0} sx={{ p: 2, border: '1px solid var(--vien)', borderRadius: 0, display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Box sx={{ p: 1.5, bgcolor: 'var(--nen-tim-nhat)', borderRadius: 0 }}>
               <FileText size={24} color="var(--tim)" />
             </Box>
             <Box>
@@ -202,8 +202,8 @@ export const DatabankManagement: React.FC = () => {
           </Paper>
         </Grid>
         <Grid size={{ xs: 12, md: 4 }}>
-          <Paper elevation={0} sx={{ p: 2, border: '1px solid var(--vien)', borderRadius: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Box sx={{ p: 1.5, bgcolor: 'var(--nen-luc-nhat)', borderRadius: 2 }}>
+          <Paper elevation={0} sx={{ p: 2, border: '1px solid var(--vien)', borderRadius: 0, display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Box sx={{ p: 1.5, bgcolor: 'var(--nen-luc-nhat)', borderRadius: 0 }}>
               <FlaskConical size={24} color="var(--luc)" />
             </Box>
             <Box>
@@ -213,8 +213,8 @@ export const DatabankManagement: React.FC = () => {
           </Paper>
         </Grid>
         <Grid size={{ xs: 12, md: 4 }}>
-          <Paper elevation={0} sx={{ p: 2, border: '1px solid var(--vien)', borderRadius: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Box sx={{ p: 1.5, bgcolor: 'var(--nen-vang-nhat)', borderRadius: 2 }}>
+          <Paper elevation={0} sx={{ p: 2, border: '1px solid var(--vien)', borderRadius: 0, display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Box sx={{ p: 1.5, bgcolor: 'var(--nen-vang-nhat)', borderRadius: 0 }}>
               <Database size={24} color="var(--vang-dam)" />
             </Box>
             <Box>
@@ -242,12 +242,12 @@ export const DatabankManagement: React.FC = () => {
       {/* TAB 2 */}
       <CustomTabPanel value={tabValue} index={1}>
         {equations.length === 0 ? (
-          <Box sx={{ textAlign: 'center', p: 4, bgcolor: 'var(--nen-trang)', borderRadius: 3, border: '1px dashed var(--vien)' }}>
+          <Box sx={{ textAlign: 'center', p: 4, bgcolor: 'var(--nen-trang)', borderRadius: 0, border: '1px dashed var(--vien)' }}>
             <FlaskConical size={48} color="var(--chu-mo)" style={{ marginBottom: 16 }} />
             <Typography color="text.secondary">Chưa có phương trình nào trong kho. Nhấn 'Thêm Phương Trình' để tạo.</Typography>
           </Box>
         ) : (
-          <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid var(--vien)', borderRadius: 3 }}>
+          <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid var(--vien)', borderRadius: 0 }}>
             <Table>
               <TableHead>
                 <TableRow sx={{ bgcolor: 'var(--nen-trang)' }}>
@@ -281,7 +281,7 @@ export const DatabankManagement: React.FC = () => {
       {/* TAB 3 */}
       <CustomTabPanel value={tabValue} index={2}>
         {matrixResources.length === 0 ? (
-           <Box sx={{ textAlign: 'center', p: 4, bgcolor: 'var(--nen-trang)', borderRadius: 3, border: '1px dashed var(--vien)' }}>
+           <Box sx={{ textAlign: 'center', p: 4, bgcolor: 'var(--nen-trang)', borderRadius: 0, border: '1px dashed var(--vien)' }}>
              <FileText size={48} color="var(--chu-mo)" style={{ marginBottom: 16 }} />
              <Typography color="text.secondary">Chưa có tài nguyên ma trận mẫu nào. Nhấn 'Thêm Ma Trận' để tạo.</Typography>
            </Box>
@@ -289,7 +289,7 @@ export const DatabankManagement: React.FC = () => {
           <Grid container spacing={3}>
             {matrixResources.map(res => (
               <Grid size={{ xs: 12, md: 6 }} key={res.id}>
-                <Paper elevation={0} sx={{ p: 3, border: '1px solid var(--vien)', borderRadius: 3 }}>
+                <Paper elevation={0} sx={{ p: 3, border: '1px solid var(--vien)', borderRadius: 0 }}>
                   <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>{res.title}</Typography>
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>{res.description}</Typography>
                   <Typography variant="body2" sx={{ mb: 2 }}>Số câu: <strong>{res.questionCount}</strong> câu</Typography>

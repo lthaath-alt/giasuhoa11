@@ -42,7 +42,7 @@ export const AccountsTab: React.FC<AccountsTabProps> = ({
     <Box id="admin-tab-accounts" sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
       {/* Sub Tabs: Chuyển đổi giữa Firestore Manager và Local Accounts */}
       {!hideFirestoreTab && (
-      <Paper elevation={0} sx={{ p: 0.5, borderRadius: 3, border: '1px solid var(--vien)', backgroundColor: 'var(--nen-the)' }}>
+      <Paper elevation={0} sx={{ p: 0.5, borderRadius: 0, border: '1px solid var(--vien)', backgroundColor: 'var(--nen-the)' }}>
         <Tabs
           value={subTab}
           onChange={(_, val) => setSubTab(val)}
@@ -51,7 +51,7 @@ export const AccountsTab: React.FC<AccountsTabProps> = ({
             '& .MuiTab-root': {
               textTransform: 'none',
               fontWeight: 'bold',
-              borderRadius: 2,
+              borderRadius: 0,
               minHeight: 38,
               px: 2,
               mr: 0.5,
@@ -59,7 +59,7 @@ export const AccountsTab: React.FC<AccountsTabProps> = ({
               transition: 'all 0.2s',
               fontSize: '0.88rem',
               '&:hover': { backgroundColor: 'var(--nen-nhat)', color: 'var(--chu-dam)' },
-              '&.Mui-selected': { color: 'var(--cam)', backgroundColor: 'rgba(234, 88, 12, 0.08)' }
+              '&.Mui-selected': { color: 'var(--cam)', backgroundColor: 'var(--nen-cam-nhat2)' }
             },
             '& .MuiTabs-indicator': { backgroundColor: 'var(--cam-nen)' }
           }}
@@ -85,7 +85,7 @@ export const AccountsTab: React.FC<AccountsTabProps> = ({
 
       {/* Danh sách Local Accounts cũ */}
       {subTab === 'local' && (
-        <Card sx={{ borderRadius: 3, boxShadow: '0 1px 3px rgba(0,0,0,0.05)', border: '1px solid var(--vien)', backgroundColor: 'var(--nen-the)' }}>
+        <Card sx={{ borderRadius: 0, boxShadow: 'none', border: '1px solid var(--vien)', backgroundColor: 'var(--nen-the)' }}>
           <CardContent sx={{ p: 0 }}>
             <TableContainer>
               <Table>
@@ -127,8 +127,8 @@ export const AccountsTab: React.FC<AccountsTabProps> = ({
                                 sx={{
                                   bgcolor:
                                     student.status === 'active'
-                                      ? 'rgba(15, 118, 110, 0.08)'
-                                      : 'rgba(234, 88, 12, 0.08)',
+                                      ? 'var(--nen-luc-nhat2)'
+                                      : 'var(--nen-cam-nhat2)',
                                   color: student.status === 'active' ? 'var(--teal)' : 'var(--cam)',
                                   fontWeight: 'bold',
                                   fontSize: '0.9rem',
@@ -167,7 +167,7 @@ export const AccountsTab: React.FC<AccountsTabProps> = ({
                                     size="small"
                                     startIcon={<Check size={14} />}
                                     onClick={() => approveUser(student.email)}
-                                    sx={{ textTransform: 'none', borderRadius: 1.5, boxShadow: 'none' }}
+                                    sx={{ textTransform: 'none', borderRadius: 0, boxShadow: 'none' }}
                                   >
                                     Duyệt kích hoạt
                                   </Button>
@@ -178,7 +178,7 @@ export const AccountsTab: React.FC<AccountsTabProps> = ({
                                     size="small"
                                     startIcon={<X size={14} />}
                                     onClick={() => rejectUser(student.email)}
-                                    sx={{ textTransform: 'none', borderRadius: 1.5 }}
+                                    sx={{ textTransform: 'none', borderRadius: 0 }}
                                   >
                                     Từ chối
                                   </Button>

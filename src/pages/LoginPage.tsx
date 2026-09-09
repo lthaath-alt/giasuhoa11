@@ -31,7 +31,7 @@ const BrandPanel: React.FC = () => (
       px: { md: 5, lg: 7 },
       py: 6,
       backgroundColor: 'var(--teal-nen)', // Teal đậm — màu thương hiệu đã có sẵn trong theme
-      backgroundImage: 'radial-gradient(circle at 15% 20%, rgba(255,255,255,0.06), transparent 45%)',
+      backgroundImage: 'none',
       color: 'var(--chu-nguoc)',
     }}
   >
@@ -74,7 +74,7 @@ const BrandPanel: React.FC = () => (
           <Box
             key={title}
             sx={{
-              p: 2, borderRadius: 3,
+              p: 2, borderRadius: 0,
               border: '1px solid rgba(255,255,255,0.18)',
               backgroundColor: 'rgba(255,255,255,0.06)',
             }}
@@ -189,7 +189,7 @@ export const LoginPage: React.FC = () => {
             id="auth-form-paper"
             sx={{
               p: { xs: 3, sm: 5 },
-              borderRadius: 4,
+              borderRadius: 0,
               border: '1px solid var(--vien)',
               backgroundColor: 'var(--nen-the)',
             }}
@@ -236,13 +236,13 @@ export const LoginPage: React.FC = () => {
                   onClick={handleContinueAsGuest}
                   sx={{
                     py: 1.2,
-                    borderRadius: 3,
+                    borderRadius: 0,
                     textTransform: 'none',
                     fontWeight: 'bold',
                     borderColor: 'var(--cam)',
                     color: 'var(--cam)',
                     '&:hover': {
-                      backgroundColor: 'rgba(234, 88, 12, 0.08)',
+                      backgroundColor: 'var(--nen-cam-nhat2)',
                       borderColor: 'var(--cam)',
                     },
                   }}

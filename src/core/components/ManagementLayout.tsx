@@ -56,26 +56,19 @@ const StatCard: React.FC<StatCardProps> = ({ topLabel, mainContent, description,
     onClick={onClick}
     sx={{
       p: 2.5,
-      borderRadius: 3,
+      borderRadius: 0,
       cursor: 'pointer',
       border: '1px solid var(--vien)',
       position: 'relative',
       overflow: 'hidden',
       transition: 'all 0.2s ease-in-out',
+      /* Truoc day co mot soc mau day 4px chay doc suon trai. Hop dong huong
+         cam soc do; the so lieu duoc phan biet bang BIEU TUONG va chu, khong
+         bang mot vach mau. Cai soc con lam sai vai nua: accentColor la bien vai
+         CHU, to lam nen thi o che do toi no sang len. */
       '&:hover': {
-        transform: 'translateY(-2px)',
-        boxShadow: '0 8px 25px rgba(0,0,0,0.08)',
-        borderColor: accentColor,
-      },
-      '&::before': {
-        content: '""',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        width: '4px',
-        height: '100%',
-        backgroundColor: accentColor,
-        borderRadius: '4px 0 0 4px',
+        boxShadow: 'none',
+        borderColor: 'var(--chu-dam)',
       },
     }}
   >
@@ -83,8 +76,11 @@ const StatCard: React.FC<StatCardProps> = ({ topLabel, mainContent, description,
       <Box
         sx={{
           p: 1.2,
-          borderRadius: 2,
-          bgcolor: `${accentColor}14`,
+          borderRadius: 0,
+          /* Truoc la `${accentColor}14` — noi duoi hex vao mot chuoi bien CSS
+             ra mot chuoi khong phai mau hop le, nen o nay von khong co nen
+             nao ca. */
+          bgcolor: 'var(--nen-nhat)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -141,13 +137,13 @@ const PlaceholderContent: React.FC<{ title: string }> = ({ title }) => (
       justifyContent: 'center',
       minHeight: 350,
       gap: 2,
-      borderRadius: 3,
+      borderRadius: 0,
       border: '2px dashed var(--vien)',
       bgcolor: 'var(--nen-trang)',
     }}
   >
-    <Box sx={{ p: 2, bgcolor: 'rgba(234,88,12,0.06)', borderRadius: '50%' }}>
-      <Construction size={36} color="var(--cam)" />
+    <Box sx={{ p: 2, bgcolor: 'var(--nen-cam-nhat2)', borderRadius: '50%' }}>
+      <Construction size={36} color="var(--chu-dam)" />
     </Box>
     <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--chu)' }}>
       {title}
@@ -271,11 +267,11 @@ export const ManagementLayout: React.FC<ManagementLayoutProps> = ({
               cursor: 'pointer',
               position: 'relative',
               transition: 'all 0.15s ease',
-              bgcolor: isActive ? 'rgba(234, 88, 12, 0.06)' : 'transparent',
+              bgcolor: isActive ? 'var(--nen-cam-nhat2)' : 'transparent',
               color: isActive ? 'var(--cam)' : 'var(--chu)',
               fontWeight: isActive ? 700 : 500,
               '&:hover': {
-                bgcolor: isActive ? 'rgba(234, 88, 12, 0.08)' : 'var(--nen-nhat)',
+                bgcolor: isActive ? 'var(--nen-cam-nhat2)' : 'var(--nen-nhat)',
                 color: isActive ? 'var(--cam)' : 'var(--chu-dam)',
               },
               '&::before': isActive
@@ -286,7 +282,7 @@ export const ManagementLayout: React.FC<ManagementLayoutProps> = ({
                     top: '15%',
                     bottom: '15%',
                     width: '3.5px',
-                    borderRadius: '0 4px 4px 0',
+                    borderRadius: 0,
                     backgroundColor: 'var(--cam-nen)',
                   }
                 : {},
@@ -329,7 +325,7 @@ export const ManagementLayout: React.FC<ManagementLayoutProps> = ({
           mainContent={roleName}
           description="Nhấp để đổi mật khẩu bảo mật"
           accentColor="var(--cam)"
-          icon={<Shield size={20} color="var(--cam)" />}
+          icon={<Shield size={20} color="var(--chu-dam)" />}
           onClick={() => handleStatClick('password')}
         />
         <StatCard
@@ -366,7 +362,7 @@ export const ManagementLayout: React.FC<ManagementLayoutProps> = ({
               onClick={() => setMobileOpen(true)}
               sx={{
                 bgcolor: 'var(--nen-nhat)',
-                borderRadius: 2,
+                borderRadius: 0,
                 '&:hover': { bgcolor: 'var(--vien)' },
               }}
             >
@@ -381,7 +377,7 @@ export const ManagementLayout: React.FC<ManagementLayoutProps> = ({
             open={mobileOpen}
             onClose={() => setMobileOpen(false)}
             sx={{
-              '& .MuiDrawer-paper': { width: 260, borderRadius: '0 16px 16px 0' }
+              '& .MuiDrawer-paper': { width: 260, borderRadius: 0 }
             }}
           >
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', p: 1 }}>
@@ -409,7 +405,7 @@ export const ManagementLayout: React.FC<ManagementLayoutProps> = ({
             sx={{
               width: 240,
               flexShrink: 0,
-              borderRadius: 3,
+              borderRadius: 0,
               border: '1px solid var(--vien)',
               alignSelf: 'flex-start',
               position: 'sticky',

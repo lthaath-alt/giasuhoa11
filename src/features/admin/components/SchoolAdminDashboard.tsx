@@ -32,7 +32,7 @@ export const SchoolAdminDashboard: React.FC = () => {
       />
 
       {/* Tabs chuyển đổi */}
-      <Paper elevation={0} sx={{ borderRadius: 3, p: 0.8, mb: 3, border: '1px solid var(--vien)', backgroundColor: 'var(--nen-the)' }}>
+      <Paper elevation={0} sx={{ borderRadius: 0, p: 0.8, mb: 3, border: '1px solid var(--vien)', backgroundColor: 'var(--nen-the)' }}>
         <Tabs
           value={activeTab}
           onChange={(_, val) => setActiveTab(val)}
@@ -43,7 +43,7 @@ export const SchoolAdminDashboard: React.FC = () => {
             '& .MuiTab-root': {
               textTransform: 'none',
               fontWeight: 'bold',
-              borderRadius: 2.5,
+              borderRadius: 0,
               minHeight: 44,
               px: 2.5,
               mr: 0.5,
@@ -51,9 +51,9 @@ export const SchoolAdminDashboard: React.FC = () => {
               transition: 'all 0.2s',
               fontSize: '0.92rem',
               '&:hover': { backgroundColor: 'var(--nen-nhat)', color: 'var(--chu-dam)' },
-              '&.Mui-selected': { color: 'var(--cam)', backgroundColor: 'rgba(234, 88, 12, 0.08)' }
+              '&.Mui-selected': { color: 'var(--cam)', backgroundColor: 'var(--nen-cam-nhat2)' }
             },
-            '& .MuiTabs-indicator': { height: 3, borderRadius: '3px 3px 0 0', backgroundColor: 'var(--cam-nen)' }
+            '& .MuiTabs-indicator': { height: 3, borderRadius: 0, backgroundColor: 'var(--cam-nen)' }
           }}
         >
           <Tab
@@ -93,10 +93,10 @@ export const SchoolAdminDashboard: React.FC = () => {
           {!mySchool ? (
             <Alert severity="error">Chưa được gán trường học, vui lòng liên hệ Admin Website.</Alert>
           ) : (
-            <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid var(--vien)', boxShadow: 'none' }}>
+            <Paper sx={{ p: 3, borderRadius: 0, border: '1px solid var(--vien)', boxShadow: 'none' }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-                <Box sx={{ p: 1, bgcolor: 'rgba(234,88,12,0.08)', borderRadius: 2 }}>
-                  <Building2 size={24} color="var(--cam)" />
+                <Box sx={{ p: 1, bgcolor: 'var(--nen-cam-nhat2)', borderRadius: 0 }}>
+                  <Building2 size={24} color="var(--chu-dam)" />
                 </Box>
                 <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{mySchool.name}</Typography>
               </Box>
@@ -110,7 +110,7 @@ export const SchoolAdminDashboard: React.FC = () => {
                     <Users size={18} /> Giáo viên
                   </Typography>
                   <Button size="small" variant="outlined" color="primary" startIcon={<UserPlus size={14} />}
-                    onClick={() => setCreateTeacherSchool(mySchool.id)} sx={{ textTransform: 'none', borderRadius: 2, fontWeight: 'bold' }}>
+                    onClick={() => setCreateTeacherSchool(mySchool.id)} sx={{ textTransform: 'none', borderRadius: 0, fontWeight: 'bold' }}>
                     Thêm GV
                   </Button>
                 </Box>
@@ -120,7 +120,7 @@ export const SchoolAdminDashboard: React.FC = () => {
                   return (
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                       {schoolTeachers.map(t => (
-                        <Chip key={t.email} avatar={<Avatar sx={{ bgcolor: 'rgba(234,88,12,0.1)', color: 'var(--cam)' }}>{t.name.charAt(0)}</Avatar>}
+                        <Chip key={t.email} avatar={<Avatar sx={{ bgcolor: 'var(--nen-cam-nhat2)', color: 'var(--cam)' }}>{t.name.charAt(0)}</Avatar>}
                           label={`${t.name} – ${t.email}`} variant="outlined" sx={{ fontWeight: 600 }} />
                       ))}
                     </Box>
@@ -135,7 +135,7 @@ export const SchoolAdminDashboard: React.FC = () => {
                     <GraduationCap size={18} /> Lớp học
                   </Typography>
                   <Button size="small" variant="outlined" color="secondary" startIcon={<Plus size={14} />}
-                    onClick={() => setCreateClassSchool(mySchool.id)} sx={{ textTransform: 'none', borderRadius: 2, fontWeight: 'bold', color: 'var(--teal)', borderColor: 'var(--teal)' }}>
+                    onClick={() => setCreateClassSchool(mySchool.id)} sx={{ textTransform: 'none', borderRadius: 0, fontWeight: 'bold', color: 'var(--teal)', borderColor: 'var(--teal)' }}>
                     Tạo lớp
                   </Button>
                 </Box>
@@ -147,7 +147,7 @@ export const SchoolAdminDashboard: React.FC = () => {
                       {schoolClasses.map(cls => {
                         const teacher = users.find(u => u.email.toLowerCase() === cls.teacherEmail.toLowerCase());
                         return (
-                          <Paper key={cls.id} variant="outlined" sx={{ p: 1.5, borderRadius: 2, minWidth: 160 }}>
+                          <Paper key={cls.id} variant="outlined" sx={{ p: 1.5, borderRadius: 0, minWidth: 160 }}>
                             <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--teal)' }}>Lớp {cls.name}</Typography>
                             <Typography variant="caption" color="text.secondary">GVCN: {teacher?.name || cls.teacherEmail}</Typography><br />
                             <Typography variant="caption" color="text.secondary">{cls.studentIdentifiers.length} học sinh</Typography>

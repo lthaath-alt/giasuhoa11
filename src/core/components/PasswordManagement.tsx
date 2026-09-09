@@ -40,12 +40,12 @@ const CredentialDialog: React.FC<CredentialDialogProps> = ({ open, onClose, cred
         Mật khẩu đã được cấp lại!
       </DialogTitle>
       <DialogContent sx={{ pt: 3 }}>
-        <Alert severity="warning" sx={{ mb: 2, borderRadius: 2 }}>
+        <Alert severity="warning" sx={{ mb: 2, borderRadius: 0 }}>
           Sao chép và cấp thông tin này cho người dùng ngay bây giờ. Mật khẩu sẽ không hiển thị lại ở bất kỳ đâu trong hệ thống!
         </Alert>
 
         {credentials && (
-          <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 3, bgcolor: 'var(--nen-trang)' }}>
+          <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 0, bgcolor: 'var(--nen-trang)' }}>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
               <Box>
                 <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'bold' }}>HỌ TÊN</Typography>
@@ -62,7 +62,7 @@ const CredentialDialog: React.FC<CredentialDialogProps> = ({ open, onClose, cred
               <Box>
                 <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'bold' }}>MẬT KHẨU MỚI</Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Typography variant="body1" sx={{ fontWeight: 'bold', fontFamily: 'monospace', color: 'var(--cam)', letterSpacing: showPassword ? 0 : 4 }}>
+                  <Typography variant="body1" sx={{ fontWeight: 'bold', fontFamily: 'monospace', color: 'var(--chu-dam)', letterSpacing: showPassword ? 0 : 4 }}>
                     {showPassword ? credentials.password : '••••••••••'}
                   </Typography>
                   <IconButton size="small" onClick={() => setShowPassword(v => !v)}>
@@ -79,11 +79,11 @@ const CredentialDialog: React.FC<CredentialDialogProps> = ({ open, onClose, cred
           variant="outlined"
           startIcon={<Copy size={16} />}
           onClick={copyAll}
-          sx={{ borderRadius: 2, textTransform: 'none' }}
+          sx={{ borderRadius: 0, textTransform: 'none' }}
         >
           {copied ? '✓ Đã sao chép!' : 'Sao chép tất cả'}
         </Button>
-        <Button variant="contained" color="primary" onClick={onClose} sx={{ borderRadius: 2, textTransform: 'none' }}>
+        <Button variant="contained" color="primary" onClick={onClose} sx={{ borderRadius: 0, textTransform: 'none' }}>
           Đóng
         </Button>
       </DialogActions>
@@ -132,7 +132,7 @@ export const PasswordManagement: React.FC<Props> = ({ users }) => {
     switch (role) {
       case 'admin': return <Chip size="small" label="Quản trị Website" sx={{ bgcolor: 'var(--nen-vang-nhat)', color: 'var(--vang-dam)', fontWeight: 'bold' }} />;
       case 'school_admin': return <Chip size="small" label="Quản trị Trường học" sx={{ bgcolor: 'var(--nen-tim-nhat)', color: 'var(--tim)', fontWeight: 'bold' }} />;
-      case 'teacher': return <Chip size="small" label="Giáo viên" sx={{ bgcolor: '#ccfbf1', color: 'var(--teal)', fontWeight: 'bold' }} />;
+      case 'teacher': return <Chip size="small" label="Giáo viên" sx={{ bgcolor: 'var(--nen-luc-nhat)', color: 'var(--teal)', fontWeight: 'bold' }} />;
       case 'student': return <Chip size="small" label="Học sinh" sx={{ bgcolor: 'var(--nen-xanh-nhat)', color: 'var(--xanh-troi)', fontWeight: 'bold' }} />;
       default: return <Chip size="small" label={role} />;
     }
@@ -146,7 +146,7 @@ export const PasswordManagement: React.FC<Props> = ({ users }) => {
         <Grid container spacing={3}>
           {/* Hộp 1 */}
           <Grid size={{ xs: 12, md: 4 }}>
-            <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid var(--vien)', height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <Paper elevation={0} sx={{ p: 3, borderRadius: 0, border: '1px solid var(--vien)', height: '100%', display: 'flex', flexDirection: 'column' }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                 <Typography variant="h6" sx={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1 }}>
                   <Shield size={20} color="#3b82f6" /> Mật khẩu Cấp 1
@@ -156,7 +156,7 @@ export const PasswordManagement: React.FC<Props> = ({ users }) => {
               <Typography variant="body2" color="text.secondary" sx={{ mb: 3, flexGrow: 1 }}>
                 Dành cho học sinh thường. Quy tắc: tối thiểu 8 ký tự, gồm chữ, số và ký tự đặc biệt.
               </Typography>
-              <Alert severity="info" sx={{ borderRadius: 2 }}>
+              <Alert severity="info" sx={{ borderRadius: 0 }}>
                 Tính năng đang được hoàn thiện
               </Alert>
             </Paper>
@@ -164,7 +164,7 @@ export const PasswordManagement: React.FC<Props> = ({ users }) => {
           
           {/* Hộp 2 */}
           <Grid size={{ xs: 12, md: 4 }}>
-            <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid var(--vien)', height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <Paper elevation={0} sx={{ p: 3, borderRadius: 0, border: '1px solid var(--vien)', height: '100%', display: 'flex', flexDirection: 'column' }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                 <Typography variant="h6" sx={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1 }}>
                   <ShieldCheck size={20} color="#8b5cf6" /> Mật khẩu Cấp 2
@@ -174,7 +174,7 @@ export const PasswordManagement: React.FC<Props> = ({ users }) => {
               <Typography variant="body2" color="text.secondary" sx={{ mb: 3, flexGrow: 1 }}>
                 Dành cho học sinh đạt trên 8 điểm ở bài kiểm tra do AI chấm, được mở khoá nội dung nâng cao.
               </Typography>
-              <Alert severity="info" sx={{ borderRadius: 2 }}>
+              <Alert severity="info" sx={{ borderRadius: 0 }}>
                 Tính năng đang được hoàn thiện
               </Alert>
             </Paper>
@@ -182,10 +182,10 @@ export const PasswordManagement: React.FC<Props> = ({ users }) => {
           
           {/* Hộp 3 */}
           <Grid size={{ xs: 12, md: 4 }}>
-            <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid var(--cam-vien)', bgcolor: 'var(--nen-cam-nhat)', height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <Paper elevation={0} sx={{ p: 3, borderRadius: 0, border: '1px solid var(--cam-vien)', bgcolor: 'var(--nen-cam-nhat)', height: '100%', display: 'flex', flexDirection: 'column' }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                 <Typography variant="h6" sx={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1, color: '#9a3412' }}>
-                  <ShieldAlert size={20} color="var(--cam)" /> Khôi phục mật khẩu
+                  <ShieldAlert size={20} color="var(--chu-dam)" /> Khôi phục mật khẩu
                 </Typography>
                 <Chip label="Khẩn cấp" size="small" sx={{ bgcolor: 'var(--nen-cam-nhat2)', color: 'var(--cam-dam)', fontWeight: 'bold' }} />
               </Box>
@@ -193,7 +193,7 @@ export const PasswordManagement: React.FC<Props> = ({ users }) => {
                 Xử lý yêu cầu khôi phục mật khẩu từ học sinh.
               </Typography>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'var(--cam)' }}>
+                <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)' }}>
                   Đang có {resetRequests.length} yêu cầu
                 </Typography>
               </Box>
@@ -205,11 +205,11 @@ export const PasswordManagement: React.FC<Props> = ({ users }) => {
       {/* ─── DANH SÁCH YÊU CẦU KHÔI PHỤC (Box 3 Expand) ──────────────────── */}
       <Box sx={{ mt: 4 }}>
         <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)', mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-          <KeyRound size={20} color="var(--cam)" />
+          <KeyRound size={20} color="var(--chu-dam)" />
           Danh sách yêu cầu cấp lại mật khẩu
         </Typography>
 
-        <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid var(--vien)', borderRadius: 3 }}>
+        <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid var(--vien)', borderRadius: 0 }}>
           <Table>
             <TableHead>
               <TableRow sx={{ bgcolor: 'var(--nen-trang)' }}>
@@ -244,7 +244,7 @@ export const PasswordManagement: React.FC<Props> = ({ users }) => {
                         size="small"
                         startIcon={<KeyRound size={14} />}
                         onClick={() => handleResetPassword(req)}
-                        sx={{ textTransform: 'none', borderRadius: 2, borderColor: 'var(--cam)', color: 'var(--cam)', fontWeight: 'bold' }}
+                        sx={{ textTransform: 'none', borderRadius: 0, borderColor: 'var(--cam)', color: 'var(--chu-dam)', fontWeight: 'bold' }}
                       >
                         Cấp lại mật khẩu
                       </Button>

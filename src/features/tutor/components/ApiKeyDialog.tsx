@@ -108,7 +108,7 @@ export const ApiKeyDialog: React.FC<ApiKeyDialogProps> = ({ open, onClose }) => 
       <DialogContent>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, pt: 1 }}>
           
-          <Alert severity="info" sx={{ borderRadius: 2 }}>
+          <Alert severity="info" sx={{ borderRadius: 0 }}>
             <Typography variant="body2">
               Bằng cách cung cấp API Key của riêng bạn, bạn có thể vượt qua giới hạn sử dụng chung và tận hưởng trải nghiệm học tập không gián đoạn. 
               <strong> Key của bạn chỉ được lưu cục bộ trên trình duyệt này và không bao giờ được gửi đến máy chủ của chúng tôi.</strong>
@@ -136,7 +136,7 @@ export const ApiKeyDialog: React.FC<ApiKeyDialogProps> = ({ open, onClose }) => 
                       </IconButton>
                     </InputAdornment>
                   ),
-                  sx: { borderRadius: 2 },
+                  sx: { borderRadius: 0 },
                 },
               }}
             />
@@ -149,7 +149,7 @@ export const ApiKeyDialog: React.FC<ApiKeyDialogProps> = ({ open, onClose }) => 
                 startIcon={<Trash2 size={16} />}
                 onClick={handleDelete}
                 disabled={!apiKey}
-                sx={{ textTransform: 'none', borderRadius: 2 }}
+                sx={{ textTransform: 'none', borderRadius: 0 }}
               >
                 Xóa Key
               </Button>
@@ -160,7 +160,7 @@ export const ApiKeyDialog: React.FC<ApiKeyDialogProps> = ({ open, onClose }) => 
                 startIcon={testing ? <CircularProgress size={16} /> : <CheckCircle size={16} />}
                 onClick={handleTestKey}
                 disabled={testing || !apiKey}
-                sx={{ textTransform: 'none', borderRadius: 2 }}
+                sx={{ textTransform: 'none', borderRadius: 0 }}
               >
                 Kiểm tra Key
               </Button>
@@ -168,7 +168,7 @@ export const ApiKeyDialog: React.FC<ApiKeyDialogProps> = ({ open, onClose }) => 
           </Box>
 
           {testResult && (
-            <Alert severity={testResult.success ? 'success' : 'error'} sx={{ borderRadius: 2 }}>
+            <Alert severity={testResult.success ? 'success' : 'error'} sx={{ borderRadius: 0 }}>
               {testResult.message}
             </Alert>
           )}
@@ -195,7 +195,7 @@ export const ApiKeyDialog: React.FC<ApiKeyDialogProps> = ({ open, onClose }) => 
         </Box>
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2.5, gap: 1 }}>
-        <Button onClick={onClose} sx={{ textTransform: 'none', borderRadius: 2 }}>
+        <Button onClick={onClose} sx={{ textTransform: 'none', borderRadius: 0 }}>
           Hủy
         </Button>
         <Button
@@ -204,7 +204,7 @@ export const ApiKeyDialog: React.FC<ApiKeyDialogProps> = ({ open, onClose }) => 
           onClick={handleSave}
           startIcon={<Save size={16} />}
           disabled={testing}
-          sx={{ textTransform: 'none', borderRadius: 2, boxShadow: 'none' }}
+          sx={{ textTransform: 'none', borderRadius: 0, boxShadow: 'none' }}
         >
           Lưu Key
         </Button>

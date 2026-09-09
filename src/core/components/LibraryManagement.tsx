@@ -64,14 +64,14 @@ export const LibraryManagement: React.FC = () => {
           color="primary"
           startIcon={<Plus size={18} />}
           onClick={handleOpenDialog}
-          sx={{ textTransform: 'none', borderRadius: 2, fontWeight: 'bold', boxShadow: 'none' }}
+          sx={{ textTransform: 'none', borderRadius: 0, fontWeight: 'bold', boxShadow: 'none' }}
         >
           Tạo Đề Thi Chung (Kho Web)
         </Button>
       </Box>
 
       {exams.length === 0 ? (
-        <Paper elevation={0} sx={{ p: 6, textAlign: 'center', border: '2px dashed var(--vien)', borderRadius: 3, bgcolor: 'var(--nen-trang)' }}>
+        <Paper elevation={0} sx={{ p: 6, textAlign: 'center', border: '2px dashed var(--vien)', borderRadius: 0, bgcolor: 'var(--nen-trang)' }}>
           <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
             <FileText size={48} color="var(--chu-mo)" />
           </Box>
@@ -86,7 +86,7 @@ export const LibraryManagement: React.FC = () => {
         <Grid container spacing={3}>
           {exams.map(exam => (
             <Grid size={{ xs: 12, md: 6 }} key={exam.id}>
-              <Paper elevation={0} sx={{ p: 3, border: '1px solid var(--vien)', borderRadius: 3, height: '100%', position: 'relative' }}>
+              <Paper elevation={0} sx={{ p: 3, border: '1px solid var(--vien)', borderRadius: 0, height: '100%', position: 'relative' }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
                   <Chip size="small" label={exam.topic} sx={{ bgcolor: 'var(--nen-nhat)', color: 'var(--chu)', fontWeight: 'bold' }} />
                   <Chip
@@ -123,7 +123,7 @@ export const LibraryManagement: React.FC = () => {
                     href={exam.driveLink || '#'}
                     target="_blank"
                     disabled={!exam.driveLink}
-                    sx={{ textTransform: 'none', borderRadius: 2 }}
+                    sx={{ textTransform: 'none', borderRadius: 0 }}
                   >
                     Xem chi tiết
                   </Button>
@@ -180,10 +180,10 @@ export const LibraryManagement: React.FC = () => {
           </Box>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={() => setIsDialogOpen(false)} sx={{ textTransform: 'none', borderRadius: 2 }}>
+          <Button onClick={() => setIsDialogOpen(false)} sx={{ textTransform: 'none', borderRadius: 0 }}>
             Hủy
           </Button>
-          <Button onClick={handleSubmit} variant="contained" color="primary" sx={{ textTransform: 'none', borderRadius: 2, boxShadow: 'none' }}>
+          <Button onClick={handleSubmit} variant="contained" color="primary" sx={{ textTransform: 'none', borderRadius: 0, boxShadow: 'none' }}>
             Tạo đề thi
           </Button>
         </DialogActions>

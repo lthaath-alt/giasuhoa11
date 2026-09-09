@@ -68,11 +68,10 @@ const BongBong: React.FC<{ loi: string; huong: 'duoi' | 'trai'; xuongDong?: bool
     sx={{
       position: 'relative',
       bgcolor: 'var(--nen-the)',
-      border: '2px solid #0062b8',
-      borderRadius: 3,
+      border: '2px solid var(--chu-dam)',
+      borderRadius: 0,
       px: 2,
       py: 1.15,
-      boxShadow: '0 4px 14px rgba(0,98,184,0.13)',
       /* Chặn bề ngang để câu dài tự ngắt dòng thay vì kéo bong bóng ra khỏi
          màn hình. Câu ngắn vẫn nằm gọn một dòng vì hộp co theo nội dung.
          Kiểu đứng: gói trong bề ngang cột nhân vật.
@@ -85,8 +84,8 @@ const BongBong: React.FC<{ loi: string; huong: 'duoi' | 'trai'; xuongDong?: bool
         width: 12,
         height: 12,
         bgcolor: 'var(--nen-the)',
-        borderRight: '2px solid #0062b8',
-        borderBottom: '2px solid #0062b8',
+        borderRight: '2px solid var(--chu-dam)',
+        borderBottom: '2px solid var(--chu-dam)',
         ...(huong === 'duoi'
           ? { bottom: -8, left: '50%', ml: '-6px', transform: 'rotate(45deg)' }
           : { left: -8, top: '50%', mt: '-6px', transform: 'rotate(135deg)' }),

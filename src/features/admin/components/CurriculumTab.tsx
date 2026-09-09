@@ -189,14 +189,14 @@ export const CurriculumTab: React.FC = () => {
           color="primary"
           startIcon={<Plus size={16} />}
           onClick={handleOpenAddChapter}
-          sx={{ textTransform: 'none', fontWeight: 'bold', borderRadius: 2 }}
+          sx={{ textTransform: 'none', fontWeight: 'bold', borderRadius: 0 }}
         >
           Thêm Chương (Danh mục)
         </Button>
       </Box>
 
       {curriculum.length === 0 ? (
-        <Alert severity="info" sx={{ borderRadius: 3 }}>
+        <Alert severity="info" sx={{ borderRadius: 0 }}>
           Chưa có danh mục chương trình học nào được tạo. Vui lòng thêm Chương học mới để bắt đầu thiết kế bài giảng!
         </Alert>
       ) : (
@@ -206,7 +206,7 @@ export const CurriculumTab: React.FC = () => {
               key={chapter.id}
               id={`curriculum-accordion-${chapter.id}`}
               sx={{
-                borderRadius: '12px !important',
+                borderRadius: '0 !important',
                 border: '1px solid var(--vien)',
                 boxShadow: 'none',
                 overflow: 'hidden',
@@ -233,7 +233,7 @@ export const CurriculumTab: React.FC = () => {
                   <Typography sx={{ fontWeight: 'bold', color: 'var(--chu-dam-2)' }}>
                     {chapter.title}
                   </Typography>
-                  <Typography variant="caption" sx={{ color: 'text.secondary', ml: 1, bgcolor: 'var(--vien)', px: 1, py: 0.3, borderRadius: 1.5 }}>
+                  <Typography variant="caption" sx={{ color: 'text.secondary', ml: 1, bgcolor: 'var(--vien)', px: 1, py: 0.3, borderRadius: 0 }}>
                     {chapter.lessons.length} bài học
                   </Typography>
                 </Box>
@@ -273,7 +273,7 @@ export const CurriculumTab: React.FC = () => {
                     color="secondary"
                     startIcon={<Plus size={14} />}
                     onClick={() => handleOpenAddLesson(chapter.id)}
-                    sx={{ textTransform: 'none', fontWeight: 'bold', borderRadius: 1.5 }}
+                    sx={{ textTransform: 'none', fontWeight: 'bold', borderRadius: 0 }}
                   >
                     Thêm Bài Học Mới
                   </Button>
@@ -289,7 +289,7 @@ export const CurriculumTab: React.FC = () => {
                       <Paper
                         key={les.id}
                         variant="outlined"
-                        sx={{ p: 2, borderRadius: 2.5, borderColor: 'var(--vien)' }}
+                        sx={{ p: 2, borderRadius: 0, borderColor: 'var(--vien)' }}
                       >
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
                           <Box>
@@ -336,7 +336,7 @@ export const CurriculumTab: React.FC = () => {
                         {/* Công thức quan trọng */}
                         {les.formulae.length > 0 && (
                           <Box sx={{ mb: 1.5 }}>
-                            <Typography variant="caption" sx={{ fontWeight: 'bold', color: 'var(--cam)', display: 'block', mb: 0.5 }}>
+                            <Typography variant="caption" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)', display: 'block', mb: 0.5 }}>
                               Công thức cần nhớ:
                             </Typography>
                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, pl: 1 }}>
@@ -450,7 +450,7 @@ export const CurriculumTab: React.FC = () => {
               </Typography>
 
               {lessonQuestions.length === 0 ? (
-                <Box sx={{ p: 2, bgcolor: 'var(--nen-trang)', borderRadius: 2, border: '1px dashed var(--vien)', mb: 2 }}>
+                <Box sx={{ p: 2, bgcolor: 'var(--nen-trang)', borderRadius: 0, border: '1px dashed var(--vien)', mb: 2 }}>
                   <Typography variant="caption" color="text.secondary" sx={{ display: 'block', textAlign: 'center' }}>
                     Chưa có câu hỏi định hướng nào. Soạn thảo form phía dưới để thêm câu hỏi giúp Gia sư định hình phong cách phản hồi.
                   </Typography>
@@ -458,7 +458,7 @@ export const CurriculumTab: React.FC = () => {
               ) : (
                 <Box sx={{ maxHeight: 180, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 1, mb: 2 }}>
                   {lessonQuestions.map((q, qIdx) => (
-                    <Paper key={qIdx} variant="outlined" sx={{ p: 1.5, position: 'relative', borderRadius: 2 }}>
+                    <Paper key={qIdx} variant="outlined" sx={{ p: 1.5, position: 'relative', borderRadius: 0 }}>
                       <IconButton
                         size="small"
                         color="error"
@@ -479,7 +479,7 @@ export const CurriculumTab: React.FC = () => {
               )}
 
               {/* Form thêm câu hỏi nhanh */}
-              <Paper variant="outlined" sx={{ p: 2, bgcolor: 'var(--nen-trang)', borderRadius: 2.5 }}>
+              <Paper variant="outlined" sx={{ p: 2, bgcolor: 'var(--nen-trang)', borderRadius: 0 }}>
                 <Typography variant="caption" sx={{ fontWeight: 'bold', color: 'var(--chu)', display: 'block', mb: 1 }}>
                   Soạn câu hỏi dẫn dắt mẫu cho bài này:
                 </Typography>
@@ -517,7 +517,7 @@ export const CurriculumTab: React.FC = () => {
                     startIcon={<Plus size={12} />}
                     onClick={handleAddQuestionToForm}
                     disabled={!currentQuestion.trim() || !currentHint.trim() || !currentAnswer.trim()}
-                    sx={{ textTransform: 'none', mt: 0.5, borderRadius: 1.5 }}
+                    sx={{ textTransform: 'none', mt: 0.5, borderRadius: 0 }}
                   >
                     Thêm vào danh sách câu hỏi
                   </Button>
@@ -535,7 +535,7 @@ export const CurriculumTab: React.FC = () => {
             variant="contained"
             color="primary"
             disabled={!lessonTitle.trim() || !lessonSummary.trim()}
-            sx={{ textTransform: 'none', fontWeight: 'bold', borderRadius: 2 }}
+            sx={{ textTransform: 'none', fontWeight: 'bold', borderRadius: 0 }}
           >
             Lưu bài học
           </Button>

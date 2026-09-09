@@ -53,7 +53,7 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onBackTo
         <Box sx={{
           display: 'flex', justifyContent: 'center', alignItems: 'center',
           width: 64, height: 64, borderRadius: '50%',
-          bgcolor: 'rgba(15, 118, 110, 0.08)', border: '2px solid rgba(15, 118, 110, 0.2)',
+          bgcolor: 'var(--nen-luc-nhat2)', border: '2px solid var(--vien-2)',
           mx: 'auto', mb: 2
         }}>
           <KeyRound size={28} color="var(--teal)" />
@@ -66,15 +66,15 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onBackTo
           Sao chép mật khẩu dưới đây và dùng để đăng nhập ngay bây giờ.
         </Typography>
 
-        <Alert severity="warning" sx={{ mb: 2.5, borderRadius: 2, textAlign: 'left' }}>
+        <Alert severity="warning" sx={{ mb: 2.5, borderRadius: 0, textAlign: 'left' }}>
           Lưu lại mật khẩu này ngay! Nếu mất, bạn cần thực hiện lại bước "Quên mật khẩu".
         </Alert>
 
         {/* Hiển thị mật khẩu mới */}
         <Box sx={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          p: 2.5, bgcolor: 'var(--nen-trang)', borderRadius: 3,
-          border: '1.5px solid rgba(15, 118, 110, 0.25)', mb: 2
+          p: 2.5, bgcolor: 'var(--nen-trang)', borderRadius: 0,
+          border: '1.5px solid var(--vien-2)', mb: 2
         }}>
           <Box sx={{ textAlign: 'left' }}>
             <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'bold', display: 'block' }}>
@@ -95,7 +95,7 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onBackTo
             <Button
               size="small" variant="outlined"
               onClick={() => setShowPassword(v => !v)}
-              sx={{ minWidth: 'auto', p: 0.8, borderRadius: 2 }}
+              sx={{ minWidth: 'auto', p: 0.8, borderRadius: 0 }}
             >
               {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
             </Button>
@@ -104,7 +104,7 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onBackTo
               size="small" variant="contained" color="secondary"
               startIcon={<Copy size={14} />}
               onClick={handleCopy}
-              sx={{ textTransform: 'none', borderRadius: 2, fontWeight: 'bold', boxShadow: 'none', fontSize: '0.75rem' }}
+              sx={{ textTransform: 'none', borderRadius: 0, fontWeight: 'bold', boxShadow: 'none', fontSize: '0.75rem' }}
             >
               {copied ? '✓ Đã sao chép' : 'Sao chép'}
             </Button>
@@ -119,7 +119,7 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onBackTo
           id="back-to-login-after-reset-btn"
           variant="contained" color="primary" fullWidth size="large"
           onClick={onBackToLogin}
-          sx={{ py: 1.5, borderRadius: 3, fontWeight: 'bold', textTransform: 'none', boxShadow: 'none' }}
+          sx={{ py: 1.5, borderRadius: 0, fontWeight: 'bold', textTransform: 'none', boxShadow: 'none' }}
         >
           Đăng nhập với mật khẩu mới
         </Button>
@@ -132,8 +132,8 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onBackTo
   return (
     <Box id="forgot-password-form">
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
-        <Box sx={{ p: 1, bgcolor: 'rgba(234, 88, 12, 0.08)', borderRadius: 2 }}>
-          <RefreshCw size={20} color="var(--cam)" />
+        <Box sx={{ p: 1, bgcolor: 'var(--nen-cam-nhat2)', borderRadius: 0 }}>
+          <RefreshCw size={20} color="var(--chu-dam)" />
         </Box>
         <Box>
           <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)', lineHeight: 1.2 }}>
@@ -146,7 +146,7 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onBackTo
       </Box>
 
       {error && (
-        <Alert id="forgot-password-error-alert" severity="error" sx={{ mb: 2.5, borderRadius: 2 }}>
+        <Alert id="forgot-password-error-alert" severity="error" sx={{ mb: 2.5, borderRadius: 0 }}>
           {error}
         </Alert>
       )}
@@ -168,7 +168,7 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onBackTo
                 </Box>
               )
             } }}
-            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
+            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }}
           />
 
           <Button
@@ -179,7 +179,7 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onBackTo
             size="large"
             disabled={loading}
             startIcon={loading ? undefined : <KeyRound size={18} />}
-            sx={{ py: 1.5, borderRadius: 3, fontWeight: 'bold', textTransform: 'none', boxShadow: 'none' }}
+            sx={{ py: 1.5, borderRadius: 0, fontWeight: 'bold', textTransform: 'none', boxShadow: 'none' }}
           >
             {loading ? 'Đang tạo mật khẩu mới...' : 'Lấy mật khẩu mới'}
           </Button>

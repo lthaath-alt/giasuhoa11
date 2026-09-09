@@ -94,7 +94,7 @@ export const StudentArea: React.FC = () => {
 
   return (
     <Box>
-      <Paper sx={{ mb: 4, px: 3, py: 2, borderRadius: 3, display: 'flex', alignItems: 'center', gap: 2, backgroundColor: 'var(--nen-dam)', color: 'var(--chu-nguoc)' }}>
+      <Paper sx={{ mb: 4, px: 3, py: 2, borderRadius: 0, display: 'flex', alignItems: 'center', gap: 2, backgroundColor: 'var(--nen-dam)', color: 'var(--chu-nguoc)' }}>
         <Avatar sx={{ width: 56, height: 56, bgcolor: 'rgba(255,255,255,0.2)' }}>
           {currentUser.name.charAt(0).toUpperCase()}
         </Avatar>
@@ -106,7 +106,7 @@ export const StudentArea: React.FC = () => {
         </Box>
       </Paper>
 
-      <Paper sx={{ width: '100%', borderRadius: 3, overflow: 'hidden', border: '1px solid var(--vien)', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+      <Paper sx={{ width: '100%', borderRadius: 0, overflow: 'hidden', border: '1px solid var(--vien)', boxShadow: 'none' }}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider', bgcolor: 'var(--nen-trang)' }}>
           <Tabs
             value={tabValue}
@@ -134,8 +134,8 @@ export const StudentArea: React.FC = () => {
             </Typography>
 
             {!myClass ? (
-              <Paper sx={{ p: 4, textAlign: 'center', bgcolor: 'var(--nen-cam-nhat)', borderRadius: 3, border: '1px dashed var(--cam-nhat2)' }}>
-                <Typography variant="body1" sx={{ color: 'var(--cam)', fontWeight: 'bold', mb: 1 }}>
+              <Paper sx={{ p: 4, textAlign: 'center', bgcolor: 'var(--nen-cam-nhat)', borderRadius: 0, border: '1px dashed var(--cam-nhat2)' }}>
+                <Typography variant="body1" sx={{ color: 'var(--chu-dam)', fontWeight: 'bold', mb: 1 }}>
                   Chưa tham gia lớp học nào.
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
@@ -143,7 +143,7 @@ export const StudentArea: React.FC = () => {
                 </Typography>
               </Paper>
             ) : assignedExams.length === 0 ? (
-              <Paper sx={{ p: 4, textAlign: 'center', bgcolor: 'var(--nen-trang)', borderRadius: 3, border: '1px dashed var(--vien)' }}>
+              <Paper sx={{ p: 4, textAlign: 'center', bgcolor: 'var(--nen-trang)', borderRadius: 0, border: '1px dashed var(--vien)' }}>
                 <Typography variant="body1" color="text.secondary">
                   Hiện chưa có bài tập nào được giao.
                 </Typography>
@@ -159,7 +159,7 @@ export const StudentArea: React.FC = () => {
                   
                   return (
                     <Grid size={{ xs: 12, md: 6 }} key={exam.id}>
-                      <Card sx={{ borderRadius: 3, border: '1px solid var(--vien)', boxShadow: 'none', '&:hover': { boxShadow: '0 4px 12px rgba(0,0,0,0.05)', borderColor: 'var(--vien)' } }}>
+                      <Card sx={{ borderRadius: 0, border: '1px solid var(--vien)', boxShadow: 'none', '&:hover': { boxShadow: 'none', borderColor: 'var(--vien)' } }}>
                         <CardContent>
                           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
                             <Chip size="small" label={exam.topic || 'Hóa học 11'} sx={{ bgcolor: 'var(--nen-xanh-nhat2)', color: 'var(--xanh)', fontWeight: 'bold', fontSize: '0.7rem' }} />
@@ -211,7 +211,7 @@ export const StudentArea: React.FC = () => {
                               size="small"
                               disabled={isOverdue || submissions >= maxAttempts}
                               endIcon={isOverdue || submissions >= maxAttempts ? <Lock size={14} /> : <ArrowRight size={14} />}
-                              sx={{ textTransform: 'none', borderRadius: 2, fontWeight: 'bold' }}
+                              sx={{ textTransform: 'none', borderRadius: 0, fontWeight: 'bold' }}
                             >
                               {submitted ? 'Làm lại' : 'Vào làm bài'}
                             </Button>
@@ -240,7 +240,7 @@ export const StudentArea: React.FC = () => {
               <Grid container spacing={2}>
                 {topics.map((topic, idx) => (
                   <Grid size={{ xs: 12, sm: 6, md: 4 }} key={idx}>
-                    <Card sx={{ borderRadius: 3, border: '1px solid var(--vien)', cursor: 'pointer', '&:hover': { borderColor: 'var(--xanh)', bgcolor: '#f0f9ff' } }}>
+                    <Card sx={{ borderRadius: 0, border: '1px solid var(--vien)', cursor: 'pointer', '&:hover': { borderColor: 'var(--xanh)', bgcolor: '#f0f9ff' } }}>
                       <CardContent sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)' }}>{topic}</Typography>
                         <ArrowRight size={16} color="var(--chu-mo)" />
@@ -254,7 +254,7 @@ export const StudentArea: React.FC = () => {
 
           {/* TAB 3: Gia sư Hóa học AI */}
           <TabPanel value={tabValue} index={2}>
-            <Box sx={{ height: '70vh', borderRadius: 4, overflow: 'hidden', border: '1px solid var(--vien)' }}>
+            <Box sx={{ height: '70vh', borderRadius: 0, overflow: 'hidden', border: '1px solid var(--vien)' }}>
               <TutorChat 
                 lesson={{
                   id: 'student-free-chat',
@@ -275,7 +275,7 @@ export const StudentArea: React.FC = () => {
 
             <Grid container spacing={4}>
               <Grid size={{ xs: 12, md: 4 }}>
-                <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid var(--vien)', bgcolor: 'var(--nen-trang)', textAlign: 'center' }}>
+                <Paper sx={{ p: 3, borderRadius: 0, border: '1px solid var(--vien)', bgcolor: 'var(--nen-trang)', textAlign: 'center' }}>
                   <Avatar sx={{ width: 80, height: 80, bgcolor: 'var(--xanh-nen)', margin: '0 auto', mb: 2, fontSize: '2rem' }}>
                     <Award size={40} />
                   </Avatar>
@@ -284,7 +284,7 @@ export const StudentArea: React.FC = () => {
                   
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                     <Typography variant="caption" sx={{ fontWeight: 'bold', minWidth: 40 }}>{progressPercent}%</Typography>
-                    <LinearProgress variant="determinate" value={progressPercent} sx={{ flexGrow: 1, height: 8, borderRadius: 4, bgcolor: 'var(--vien)', '& .MuiLinearProgress-bar': { bgcolor: 'var(--xanh-nen)' } }} />
+                    <LinearProgress variant="determinate" value={progressPercent} sx={{ flexGrow: 1, height: 8, borderRadius: 0, bgcolor: 'var(--vien)', '& .MuiLinearProgress-bar': { bgcolor: 'var(--xanh-nen)' } }} />
                   </Box>
                   <Typography variant="caption" color="text.secondary">Tiến độ chương trình Hóa 11</Typography>
                 </Paper>
@@ -294,7 +294,7 @@ export const StudentArea: React.FC = () => {
                 <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
                   <CheckCircle size={18} color="var(--luc)" /> Lịch sử làm bài
                 </Typography>
-                <Paper sx={{ borderRadius: 3, border: '1px solid var(--vien)', overflow: 'hidden' }}>
+                <Paper sx={{ borderRadius: 0, border: '1px solid var(--vien)', overflow: 'hidden' }}>
                   <List disablePadding>
                     {/* Fake data for demo */}
                     <ListItem divider sx={{ py: 2 }}>

@@ -65,7 +65,7 @@ export const ProgressChatsTab: React.FC<ProgressChatsTabProps> = ({
     >
       {/* CỘT TRÁI: CHỌN HỌC SINH */}
       <Box>
-        <Card sx={{ borderRadius: 3, height: '100%', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', border: '1px solid var(--vien)', backgroundColor: 'var(--nen-the)' }}>
+        <Card sx={{ borderRadius: 0, height: '100%', boxShadow: 'none', border: '1px solid var(--vien)', backgroundColor: 'var(--nen-the)' }}>
           <CardContent>
             <Typography variant="h6" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1, fontWeight: 'bold' }}>
               <Users size={18} /> Danh sách học sinh
@@ -88,22 +88,22 @@ export const ProgressChatsTab: React.FC<ProgressChatsTabProps> = ({
                       key={stud.email}
                       onClick={() => handleSelectStudent(stud.email)}
                       sx={{
-                        borderRadius: 2,
+                        borderRadius: 0,
                         border: '1px solid',
                         borderColor: active ? 'var(--cam)' : 'var(--vien)',
-                        backgroundColor: active ? 'rgba(234, 88, 12, 0.08)' : 'var(--nen-the)',
+                        backgroundColor: active ? 'var(--nen-cam-nhat2)' : 'var(--nen-the)',
                         cursor: 'pointer',
                         transition: 'all 0.2s',
                         '&:hover': {
                           borderColor: 'var(--cam)',
-                          backgroundColor: 'rgba(234, 88, 12, 0.04)',
+                          backgroundColor: 'var(--nen-cam-nhat2)',
                         },
                       }}
                     >
                       <Avatar
                         sx={{
-                          bgcolor: active ? 'var(--cam)' : 'rgba(234, 88, 12, 0.08)',
-                          color: active ? 'var(--nen-the)' : 'var(--cam)',
+                          bgcolor: active ? 'var(--cam-nen)' : 'var(--nen-cam-nhat2)',
+                          color: active ? 'var(--chu-nguoc)' : 'var(--cam)',
                           mr: 2,
                           width: 32,
                           height: 32,
@@ -141,7 +141,7 @@ export const ProgressChatsTab: React.FC<ProgressChatsTabProps> = ({
             sx={{
               p: 5,
               textAlign: 'center',
-              borderRadius: 3,
+              borderRadius: 0,
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
@@ -150,7 +150,7 @@ export const ProgressChatsTab: React.FC<ProgressChatsTabProps> = ({
               gap: 1,
               border: '1px dashed var(--vien)',
               backgroundColor: 'var(--nen-the)',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+              boxShadow: 'none',
             }}
           >
             <MessageSquare size={48} color="var(--chu-2)" />
@@ -164,7 +164,7 @@ export const ProgressChatsTab: React.FC<ProgressChatsTabProps> = ({
         ) : (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
             {/* 1. Phần Trực quan hóa Tiến độ */}
-            <Card sx={{ borderRadius: 3, boxShadow: '0 1px 3px rgba(0,0,0,0.05)', border: '1px solid var(--vien)', backgroundColor: 'var(--nen-the)' }}>
+            <Card sx={{ borderRadius: 0, boxShadow: 'none', border: '1px solid var(--vien)', backgroundColor: 'var(--nen-the)' }}>
               <CardContent sx={{ p: 3 }}>
                 <Typography variant="h6" color="text.primary" sx={{ mb: 2, fontWeight: 'bold' }}>
                   Tiến độ tự học: {selectedStudent?.name}
@@ -183,7 +183,7 @@ export const ProgressChatsTab: React.FC<ProgressChatsTabProps> = ({
                     variant="determinate"
                     value={progressPercent}
                     color="primary"
-                    sx={{ height: 8, borderRadius: 4, backgroundColor: 'var(--vien)' }}
+                    sx={{ height: 8, borderRadius: 0, backgroundColor: 'var(--vien)' }}
                   />
                 </Box>
 
@@ -210,7 +210,7 @@ export const ProgressChatsTab: React.FC<ProgressChatsTabProps> = ({
             </Card>
 
             {/* 2. Phần Lịch sử cuộc trò chuyện */}
-            <Card sx={{ borderRadius: 3, boxShadow: '0 1px 3px rgba(0,0,0,0.05)', border: '1px solid var(--vien)', backgroundColor: 'var(--nen-the)' }}>
+            <Card sx={{ borderRadius: 0, boxShadow: 'none', border: '1px solid var(--vien)', backgroundColor: 'var(--nen-the)' }}>
               <CardContent sx={{ p: 3 }}>
                 <Box
                   sx={{
@@ -255,7 +255,7 @@ export const ProgressChatsTab: React.FC<ProgressChatsTabProps> = ({
                     overflowY: 'auto',
                     p: 1.5,
                     backgroundColor: 'var(--nen-trang)',
-                    borderRadius: 2,
+                    borderRadius: 0,
                   }}
                 >
                   {studentChatsOnLesson.length === 0 ? (
@@ -275,10 +275,10 @@ export const ProgressChatsTab: React.FC<ProgressChatsTabProps> = ({
                           <Paper
                             sx={{
                               p: 1.5,
-                              bgcolor: isAi ? 'var(--nen-the)' : 'rgba(15, 118, 110, 0.08)',
+                              bgcolor: isAi ? 'var(--nen-the)' : 'var(--nen-luc-nhat2)',
                               color: 'text.primary',
-                              borderRadius: 2,
-                              border: isAi ? '1px solid var(--vien)' : '1px solid rgba(15, 118, 110, 0.15)',
+                              borderRadius: 0,
+                              border: isAi ? '1px solid var(--vien)' : '1px solid var(--nen-luc-nhat2)',
                               boxShadow: 'none',
                             }}
                           >

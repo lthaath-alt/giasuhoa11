@@ -14,11 +14,11 @@ export const WelcomeWorkspace: React.FC<WelcomeWorkspaceProps> = ({ setSelectedL
       id="welcome-workspace"
       sx={{
         p: { xs: 4, sm: 8 },
-        borderRadius: 4,
+        borderRadius: 0,
         border: '1px solid var(--vien)',
-        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.03)',
+        boxShadow: 'none',
         textAlign: 'center',
-        background: 'linear-gradient(135deg, var(--nen-the) 0%, var(--nen-trang) 100%)',
+        backgroundColor: 'var(--nen-the)',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -26,7 +26,7 @@ export const WelcomeWorkspace: React.FC<WelcomeWorkspaceProps> = ({ setSelectedL
         minHeight: 480,
       }}
     >
-      <Avatar sx={{ width: 80, height: 80, bgcolor: 'rgba(234, 88, 12, 0.08)', color: 'var(--cam)', mb: 3 }}>
+      <Avatar sx={{ width: 80, height: 80, bgcolor: 'var(--nen-cam-nhat2)', color: 'var(--cam)', mb: 3 }}>
         <Sparkles size={40} />
       </Avatar>
 
@@ -63,14 +63,14 @@ export const WelcomeWorkspace: React.FC<WelcomeWorkspaceProps> = ({ setSelectedL
               p: 2,
               cursor: 'pointer',
               textAlign: 'left',
-              borderRadius: 3,
+              borderRadius: 0,
               border: '1px solid var(--vien)',
               transition: 'all 0.2s',
               backgroundColor: 'var(--nen-the)',
               '&:hover': {
                 transform: 'translateY(-3px)',
                 borderColor: 'var(--cam)',
-                boxShadow: '0 6px 16px rgba(234, 88, 12, 0.12)',
+                boxShadow: 'none',
               },
             }}
           >
@@ -82,8 +82,8 @@ export const WelcomeWorkspace: React.FC<WelcomeWorkspaceProps> = ({ setSelectedL
                   borderRadius: '50%',
                   backgroundColor:
                     idx % 2 === 0
-                      ? 'rgba(234, 88, 12, 0.08)'
-                      : 'rgba(15, 118, 110, 0.08)',
+                      ? 'var(--nen-cam-nhat2)'
+                      : 'var(--nen-luc-nhat2)',
                   color:
                     idx % 2 === 0
                       ? 'var(--cam)'

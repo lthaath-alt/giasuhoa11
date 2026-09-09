@@ -103,7 +103,7 @@ function QuestionImages({ images }: { images: Question['images'] }) {
             maxWidth: '100%',
             maxHeight: 200,
             objectFit: 'contain',
-            borderRadius: 1,
+            borderRadius: 0,
             border: '1px solid var(--vien)',
             p: 0.5,
             bgcolor: 'var(--nen-the)',
@@ -243,7 +243,7 @@ function UploadWordDialog({ open, chapterId, lessonId, lessonTitle, onClose, onS
         {/* Tải template */}
         <Alert
           severity="info"
-          sx={{ mb: 2, borderRadius: 2 }}
+          sx={{ mb: 2, borderRadius: 0 }}
           action={
             <Button
               size="small"
@@ -259,7 +259,7 @@ function UploadWordDialog({ open, chapterId, lessonId, lessonTitle, onClose, onS
         </Alert>
 
         {existingCount > 0 && (
-          <Alert severity="success" sx={{ mb: 2, borderRadius: 2 }}>
+          <Alert severity="success" sx={{ mb: 2, borderRadius: 0 }}>
             Bài học này đang có <strong>{existingCount} câu hỏi</strong>. File upload mới sẽ được <strong>nối thêm</strong>, không ghi đè.
           </Alert>
         )}
@@ -270,13 +270,13 @@ function UploadWordDialog({ open, chapterId, lessonId, lessonTitle, onClose, onS
           sx={{
             p: 3,
             textAlign: 'center',
-            borderRadius: 3,
+            borderRadius: 0,
             borderStyle: 'dashed',
             borderColor: 'var(--chu-mo)',
             bgcolor: 'var(--nen-trang)',
             cursor: 'pointer',
             transition: 'all 0.2s',
-            '&:hover': { borderColor: 'var(--xanh)', bgcolor: 'rgba(0,98,184,0.04)' },
+            '&:hover': { borderColor: 'var(--xanh)', bgcolor: 'var(--nen-xanh-nhat2)' },
           }}
           onClick={() => fileInputRef.current?.click()}
         >
@@ -306,7 +306,7 @@ function UploadWordDialog({ open, chapterId, lessonId, lessonTitle, onClose, onS
 
         {/* Lỗi parse */}
         {parseResult && parseResult.errors.length > 0 && (
-          <Alert severity="error" sx={{ mt: 2, borderRadius: 2 }}>
+          <Alert severity="error" sx={{ mt: 2, borderRadius: 0 }}>
             <AlertTitle>Phát hiện {parseResult.errors.length} lỗi định dạng</AlertTitle>
             <Box component="ul" sx={{ mt: 1, pl: 2, mb: 0 }}>
               {parseResult.errors.map((e, i) => (
@@ -318,7 +318,7 @@ function UploadWordDialog({ open, chapterId, lessonId, lessonTitle, onClose, onS
 
         {/* Cảnh báo */}
         {parseResult && parseResult.warnings.length > 0 && (
-          <Alert severity="warning" sx={{ mt: 2, borderRadius: 2 }}>
+          <Alert severity="warning" sx={{ mt: 2, borderRadius: 0 }}>
             <AlertTitle>Cảnh báo ({parseResult.warnings.length})</AlertTitle>
             <Box component="ul" sx={{ mt: 1, pl: 2, mb: 0 }}>
               {parseResult.warnings.map((w, i) => (
@@ -382,7 +382,7 @@ function PreviewQuestionCard({ question, index, onRemove }: { question: ParsedQu
   const [open, setOpen] = useState(index < 3); // Mở sẵn 3 câu đầu
 
   return (
-    <Paper variant="outlined" sx={{ borderRadius: 2, overflow: 'hidden' }}>
+    <Paper variant="outlined" sx={{ borderRadius: 0, overflow: 'hidden' }}>
       <Box
         sx={{
           display: 'flex',
@@ -448,7 +448,7 @@ function PreviewQuestionCard({ question, index, onRemove }: { question: ParsedQu
           )}
 
           {question.essayPoints && question.essayPoints.length > 0 && (
-            <Box sx={{ mt: 1, display: 'flex', flexDirection: 'column', gap: 0.5, bgcolor: 'var(--nen-trang)', p: 1, borderRadius: 1 }}>
+            <Box sx={{ mt: 1, display: 'flex', flexDirection: 'column', gap: 0.5, bgcolor: 'var(--nen-trang)', p: 1, borderRadius: 0 }}>
               <Typography variant="caption" sx={{ fontWeight: 'bold', color: 'var(--chu)' }}>Đáp án mẫu:</Typography>
               {question.essayPoints.map((p, i) => (
                 <Typography key={i} variant="caption" sx={{ color: 'var(--chu-dam-2)' }}>
@@ -633,7 +633,7 @@ function QuestionCard({ question, index, chapterId, lessonId, onDeleted, onEdite
 
   return (
     <>
-      <Paper variant="outlined" sx={{ borderRadius: 2.5, overflow: 'hidden', transition: 'box-shadow 0.2s', '&:hover': { boxShadow: '0 2px 8px rgba(0,0,0,0.08)' } }}>
+      <Paper variant="outlined" sx={{ borderRadius: 0, overflow: 'hidden', transition: 'box-shadow 0.2s', '&:hover': { boxShadow: 'none' } }}>
         {/* Header */}
         <Box
           sx={{ display: 'flex', alignItems: 'center', gap: 1.5, px: 2, py: 1.5, bgcolor: 'var(--nen-trang)', cursor: 'pointer' }}
@@ -690,8 +690,8 @@ function QuestionCard({ question, index, chapterId, lessonId, onDeleted, onEdite
                       alignItems: 'flex-start',
                       gap: 1,
                       p: 1,
-                      borderRadius: 1.5,
-                      bgcolor: opt.key === question.correctAnswer ? 'rgba(16,185,129,0.08)' : 'var(--nen-trang)',
+                      borderRadius: 0,
+                      bgcolor: opt.key === question.correctAnswer ? 'var(--nen-luc-nhat2)' : 'var(--nen-trang)',
                       border: opt.key === question.correctAnswer ? '1px solid var(--luc)' : '1px solid transparent',
                     }}
                   >
@@ -708,7 +708,7 @@ function QuestionCard({ question, index, chapterId, lessonId, onDeleted, onEdite
             )}
 
             {question.correctAnswer && question.type !== 'Trắc nghiệm' && (
-              <Box sx={{ mt: 1.5, p: 1, bgcolor: 'rgba(16,185,129,0.08)', borderRadius: 1.5, border: '1px solid var(--luc)', display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
+              <Box sx={{ mt: 1.5, p: 1, bgcolor: 'var(--nen-luc-nhat2)', borderRadius: 0, border: '1px solid var(--luc)', display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
                 <CheckCircle size={14} color="var(--luc)" />
                 <Typography variant="caption" sx={{ color: 'var(--luc)', fontWeight: 'bold' }}>
                   Đáp án đúng: {question.correctAnswer}
@@ -812,7 +812,7 @@ export const LibraryTab: React.FC = () => {
         </Box>
 
         {curriculum.length === 0 ? (
-          <Alert severity="info" sx={{ borderRadius: 3 }} icon={<Info size={20} />}>
+          <Alert severity="info" sx={{ borderRadius: 0 }} icon={<Info size={20} />}>
             <AlertTitle>Chưa có chương học nào</AlertTitle>
             Vui lòng tạo chương học trong tab <strong>"Bài học &amp; Chương trình"</strong> trước. Thư viện sẽ tự động phản ánh cấu trúc đó.
           </Alert>
@@ -828,13 +828,13 @@ export const LibraryTab: React.FC = () => {
                   <Card
                     id={`library-chapter-card-${chapter.id}`}
                     sx={{
-                      borderRadius: 3,
+                      borderRadius: 0,
                       border: '1px solid var(--vien)',
                       boxShadow: 'none',
                       transition: 'all 0.2s',
                       '&:hover': {
                         borderColor: 'var(--xanh)',
-                        boxShadow: '0 4px 16px rgba(0,98,184,0.12)',
+                        boxShadow: 'none',
                         transform: 'translateY(-2px)',
                       },
                     }}
@@ -844,7 +844,7 @@ export const LibraryTab: React.FC = () => {
                         <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5, mb: 2 }}>
                           <Box
                             sx={{
-                              width: 44, height: 44, borderRadius: 2,
+                              width: 44, height: 44, borderRadius: 0,
                               bgcolor: `hsl(${(idx * 43) % 360}, 70%, 92%)`,
                               display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
                             }}
@@ -913,7 +913,7 @@ export const LibraryTab: React.FC = () => {
         </Box>
 
         {selectedChapter.lessons.length === 0 ? (
-          <Alert severity="info" sx={{ borderRadius: 3 }} icon={<Info size={20} />}>
+          <Alert severity="info" sx={{ borderRadius: 0 }} icon={<Info size={20} />}>
             Chương này chưa có bài học. Thêm bài học trong tab <strong>"Bài học &amp; Chương trình"</strong>.
           </Alert>
         ) : (
@@ -928,10 +928,10 @@ export const LibraryTab: React.FC = () => {
                   id={`library-lesson-${lesson.id}`}
                   variant="outlined"
                   sx={{
-                    borderRadius: 2.5,
+                    borderRadius: 0,
                     transition: 'all 0.15s',
                     cursor: 'pointer',
-                    '&:hover': { borderColor: 'var(--xanh)', boxShadow: '0 2px 8px rgba(0,98,184,0.08)' },
+                    '&:hover': { borderColor: 'var(--xanh)', boxShadow: 'none' },
                   }}
                   onClick={() => goToQuestions(lesson.id)}
                 >
@@ -939,7 +939,7 @@ export const LibraryTab: React.FC = () => {
                     <Box
                       sx={{
                         width: 38, height: 38, borderRadius: '50%',
-                        bgcolor: 'rgba(0,98,184,0.08)',
+                        bgcolor: 'var(--nen-xanh-nhat2)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
                       }}
                     >
@@ -1020,7 +1020,7 @@ export const LibraryTab: React.FC = () => {
             color="primary"
             startIcon={<Upload size={16} />}
             onClick={() => setUploadOpen(true)}
-            sx={{ textTransform: 'none', fontWeight: 'bold', borderRadius: 2 }}
+            sx={{ textTransform: 'none', fontWeight: 'bold', borderRadius: 0 }}
           >
             Upload file Word
           </Button>
@@ -1028,7 +1028,7 @@ export const LibraryTab: React.FC = () => {
 
         {/* Cảnh báo ít câu */}
         {isLow && (
-          <Alert severity="warning" sx={{ mb: 2, borderRadius: 2 }} icon={<AlertTriangle size={18} />}>
+          <Alert severity="warning" sx={{ mb: 2, borderRadius: 0 }} icon={<AlertTriangle size={18} />}>
             Bài học này chỉ có <strong>{questions.length} câu hỏi</strong> (khuyến cáo ít nhất {LibraryStorage.MIN_QUESTIONS_WARNING} câu).
             Học sinh có thể gặp câu hỏi trùng lặp khi kiểm tra nhiều lần. Hãy upload thêm.
           </Alert>
@@ -1038,7 +1038,7 @@ export const LibraryTab: React.FC = () => {
         {questions.length === 0 ? (
           <Paper
             variant="outlined"
-            sx={{ p: 5, textAlign: 'center', borderRadius: 3, borderStyle: 'dashed', borderColor: 'var(--vien)' }}
+            sx={{ p: 5, textAlign: 'center', borderRadius: 0, borderStyle: 'dashed', borderColor: 'var(--vien)' }}
           >
             <Upload size={40} color="var(--chu-mo)" />
             <Typography variant="h6" sx={{ mt: 2, fontWeight: 'bold', color: 'var(--chu-2)' }}>

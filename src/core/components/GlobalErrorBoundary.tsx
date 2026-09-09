@@ -43,7 +43,7 @@ export class GlobalErrorBoundary extends Component<Props, State> {
           <Typography color="text.secondary" sx={{ mb: 4, maxWidth: 500 }}>
             Hệ thống vừa gặp một sự cố khi hiển thị giao diện. Lỗi này đã được tự động ghi nhận vào hệ thống để ban quản trị xử lý.
           </Typography>
-          <Button variant="contained" onClick={() => window.location.reload()} sx={{ textTransform: 'none', borderRadius: 2 }}>
+          <Button variant="contained" onClick={() => window.location.reload()} sx={{ textTransform: 'none', borderRadius: 0 }}>
             Tải lại trang
           </Button>
         </Box>
