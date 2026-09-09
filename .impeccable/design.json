@@ -1,0 +1,399 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-09T00:00:00Z",
+  "title": "Design System: Gia sư Hóa 11",
+  "extensions": {
+    "colorMeta": {
+      "tin-hieu-nen": {
+        "role": "primary",
+        "displayName": "Đỏ tín hiệu (vai NỀN)",
+        "canonical": "#C4000E",
+        "darkValue": "#C4000E",
+        "note": "Giữ nguyên ở cả hai chế độ vì luôn mang chữ trắng.",
+        "tonalRamp": ["#2A0003", "#4F0006", "#73000A", "#8C000C", "#C4000E", "#E85D5D", "#F49B9B", "#FAE8E8"]
+      },
+      "tin-hieu": {
+        "role": "primary",
+        "displayName": "Đỏ tín hiệu (vai CHỮ)",
+        "canonical": "#B3000F",
+        "darkValue": "#FF5A50",
+        "note": "Sáng lên ở chế độ tối để đọc được trên giấy đen. Không bao giờ dùng làm nền.",
+        "tonalRamp": ["#260003", "#4A0006", "#6E0009", "#8C000C", "#B3000F", "#D02A2A", "#DE5555", "#EFC7C7"]
+      },
+      "tin-hieu-dam": {
+        "role": "primary",
+        "displayName": "Đỏ tín hiệu đậm",
+        "canonical": "#8C000C",
+        "darkValue": "#FF7A6E",
+        "tonalRamp": ["#1F0003", "#3D0005", "#5C0008", "#8C000C", "#B3000F", "#D02A2A", "#E88585", "#F8DDDD"]
+      },
+      "vang-nen": {
+        "role": "secondary",
+        "displayName": "Vàng cảnh báo",
+        "canonical": "#F5C400",
+        "darkValue": "#D9A600",
+        "note": "Băng kẻ chéo phòng thí nghiệm. Cũng là nền của ::selection.",
+        "tonalRamp": ["#241D00", "#453800", "#665200", "#8F7300", "#B89400", "#F5C400", "#FFD640", "#FCF1D4"]
+      },
+      "chu-tren-vang": {
+        "role": "secondary",
+        "displayName": "Chữ trên nền vàng",
+        "canonical": "#1A1400",
+        "darkValue": "#1A1400",
+        "note": "Chữ trắng trên vàng chỉ đạt 2,8. Cặp này đạt hơn 8. Giữ nguyên ở cả hai chế độ.",
+        "tonalRamp": ["#0D0A00", "#1A1400", "#332800", "#4D3D00", "#665100", "#998000", "#CCB033", "#F0E4B8"]
+      },
+      "luc-tham-nen": {
+        "role": "tertiary",
+        "displayName": "Lục phòng thí nghiệm",
+        "canonical": "#0F5A44",
+        "darkValue": "#0F5A44",
+        "tonalRamp": ["#04170F", "#082D22", "#0F5A44", "#14755A", "#2E8B6D", "#5FB79B", "#9BD6C4", "#E1EFE6"]
+      },
+      "luc-nen": {
+        "role": "tertiary",
+        "displayName": "Lục an toàn (nền)",
+        "canonical": "#17603A",
+        "darkValue": "#17603A",
+        "tonalRamp": ["#061A0F", "#0B3020", "#17603A", "#1E7A4A", "#2E8B5A", "#63B98C", "#A2D9BC", "#EFF6F1"]
+      },
+      "xanh-nen": {
+        "role": "tertiary",
+        "displayName": "Xanh tài liệu",
+        "canonical": "#14508C",
+        "darkValue": "#14508C",
+        "tonalRamp": ["#061627", "#0A2A48", "#0E3A66", "#14508C", "#2E6DAD", "#5B8FC9", "#B4C8DE", "#E1EBF6"]
+      },
+      "nen-trang": {
+        "role": "neutral",
+        "displayName": "Giấy trang (ngà)",
+        "canonical": "#F2F1ED",
+        "darkValue": "#0D0D0B",
+        "tonalRamp": ["#0D0D0B", "#1F1F1B", "#34342E", "#63635B", "#A9A89F", "#CBC9C0", "#E7E6E0", "#F2F1ED"]
+      },
+      "nen-the": {
+        "role": "neutral",
+        "displayName": "Mặt nhãn",
+        "canonical": "#FFFFFF",
+        "darkValue": "#161613",
+        "note": "Nền thẻ, hộp thoại, và hàng menu dưới thanh nhận diện.",
+        "tonalRamp": ["#0D0D0B", "#161613", "#292926", "#4D4D47", "#8B8A82", "#CBC9C0", "#F2F1ED", "#FFFFFF"]
+      },
+      "nen-nhat": {
+        "role": "neutral",
+        "displayName": "Giấy nhấn nhẹ",
+        "canonical": "#E7E6E0",
+        "darkValue": "#1F1F1B",
+        "tonalRamp": ["#0D0D0B", "#1F1F1B", "#34342E", "#5A5A53", "#8B8A82", "#CBC9C0", "#E7E6E0", "#F8F7F4"]
+      },
+      "vien": {
+        "role": "neutral",
+        "displayName": "Nét kẻ",
+        "canonical": "#CBC9C0",
+        "darkValue": "#34342E",
+        "note": "Thiết bị dựng hình chính của cả hệ. Cũng là màu con trượt thanh cuộn.",
+        "tonalRamp": ["#121210", "#2A2A26", "#3B3B34", "#5A5A53", "#8B8A82", "#CBC9C0", "#DEDCD4", "#F2F1ED"]
+      },
+      "chu-dam": {
+        "role": "neutral",
+        "displayName": "Mực",
+        "canonical": "#121210",
+        "darkValue": "#F3F2ED",
+        "note": "Vai CHỮ. Không bao giờ dùng làm nền — dùng --nen-dam.",
+        "tonalRamp": ["#121210", "#292926", "#3C3C37", "#4D4D47", "#63635B", "#A9A89F", "#DFDED7", "#F3F2ED"]
+      },
+      "chu": {
+        "role": "neutral",
+        "displayName": "Mực nhạt",
+        "canonical": "#4D4D47",
+        "darkValue": "#AEADA5",
+        "tonalRamp": ["#121210", "#292926", "#3C3C37", "#4D4D47", "#63635B", "#98978F", "#CBC9C0", "#F2F1ED"]
+      },
+      "chu-mo": {
+        "role": "neutral",
+        "displayName": "Mực mờ",
+        "canonical": "#63635B",
+        "darkValue": "#8B8A82",
+        "tonalRamp": ["#121210", "#292926", "#3C3C37", "#4D4D47", "#63635B", "#8B8A82", "#CBC9C0", "#F2F1ED"]
+      },
+      "chu-nguoc": {
+        "role": "neutral",
+        "displayName": "Chữ nghịch",
+        "canonical": "#FFFFFF",
+        "darkValue": "#FFFFFF",
+        "note": "Chữ trên mọi nền MÀU. LUÔN trắng ở cả hai chế độ.",
+        "tonalRamp": ["#1F1F1B", "#3C3C37", "#5A5A53", "#8B8A82", "#A9A89F", "#CBC9C0", "#E7E6E0", "#FFFFFF"]
+      },
+      "nen-dam": {
+        "role": "neutral",
+        "displayName": "Mặt mực",
+        "canonical": "#121210",
+        "darkValue": "#121210",
+        "note": "Mặt CỐ Ý TỐI ở cả hai chế độ: thanh nhận diện, dải đầu trường, thanh phủ khung trò chơi, tooltip.",
+        "tonalRamp": ["#0A0A08", "#121210", "#1A1A16", "#2A2A26", "#3C3C37", "#63635B", "#A9A89F", "#E7E6E0"]
+      },
+      "vien-dam": {
+        "role": "neutral",
+        "displayName": "Nét kẻ trên mặt mực",
+        "canonical": "#2A2A26",
+        "darkValue": "#2A2A26",
+        "tonalRamp": ["#0A0A08", "#121210", "#1A1A16", "#2A2A26", "#3B3B34", "#5A5A53", "#8B8A82", "#CBC9C0"]
+      },
+      "chu-tren-nen-dam": {
+        "role": "neutral",
+        "displayName": "Chữ mờ trên mặt mực",
+        "canonical": "#A9A89F",
+        "darkValue": "#A9A89F",
+        "note": "Không dùng lại --chu-mo được: mặt đó cố ý tối ở cả hai chế độ, --chu-mo lật màu và tụt còn 4,22. Cặp này đạt 6,96.",
+        "tonalRamp": ["#121210", "#2A2A26", "#4D4D47", "#63635B", "#8B8A82", "#A9A89F", "#CBC9C0", "#F2F1ED"]
+      },
+      "nen-ma": {
+        "role": "neutral",
+        "displayName": "Nền khối mã / công thức",
+        "canonical": "#1A1A16",
+        "darkValue": "#101010",
+        "note": "Cố ý giữ nền tối ở cả hai chế độ, như mọi trình soạn mã.",
+        "tonalRamp": ["#0A0A08", "#101010", "#1A1A16", "#2A2A26", "#3C3C37", "#63635B", "#A9A89F", "#E8E7E1"]
+      },
+      "chu-ma": {
+        "role": "neutral",
+        "displayName": "Chữ khối mã",
+        "canonical": "#E8E7E1",
+        "darkValue": "#E8E7E1",
+        "tonalRamp": ["#1A1A16", "#2A2A26", "#4D4D47", "#63635B", "#8B8A82", "#A9A89F", "#CBC9C0", "#E8E7E1"]
+      },
+      "nen-tat": {
+        "role": "neutral",
+        "displayName": "Nền nút vô hiệu hoá",
+        "canonical": "#CBC9C0",
+        "darkValue": "#3A3A33",
+        "note": "Đi kèm chữ --chu (đạt 5,13). Mặc định rgba(0,0,0,0.26) của MUI chỉ đạt 1,83.",
+        "tonalRamp": ["#121210", "#2A2A26", "#3A3A33", "#5A5A53", "#8B8A82", "#CBC9C0", "#DEDCD4", "#F2F1ED"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display — Archivo 800", "purpose": "h1–h4. Câu tuyên ngôn ở panel đăng nhập, tên màn hình." },
+      "headline": { "displayName": "Headline — Archivo 700", "purpose": "h5–h6. Tên bài giảng, tiêu đề khối trong trình đọc." },
+      "title": { "displayName": "Title — IBM Plex Sans 600", "purpose": "subtitle1/subtitle2. Tên mục, tên tính năng." },
+      "body": { "displayName": "Body — IBM Plex Sans 400", "purpose": "body1/body2. Câu chữ dài để đọc, line-height 1.6." },
+      "label": { "displayName": "Label — Archivo 700 HOA", "purpose": "overline. Giọng NHÃN: đặt tên cho một trường, một khối. Một khối một nhãn." },
+      "button": { "displayName": "Button — Archivo 700", "purpose": "Chữ nút, text-transform: none. Chữ hoa dành cho NHÃN, không dành cho lệnh." },
+      "data": { "displayName": "Data — tabular-nums", "purpose": "Mọi con số đo được: điểm, số câu, mã bài, số lượt hỏi còn lại." }
+    },
+    "shadows": [],
+    "motion": [
+      {
+        "name": "mo-muc-bai",
+        "value": "animation: mo-muc-bai 170ms ease-out both; delays 0 / 50 / 100 / 150ms",
+        "purpose": "Nhịp DUY NHẤT của hệ. Mở một mục bài trong TextbookViewer thì các khối con trải ra so le; khối thứ tư kết thúc ở 320ms. Khối thứ năm trở đi dùng chung độ trễ 150ms. CSS thuần, không thư viện."
+      },
+      {
+        "name": "doi-mat-nut",
+        "value": "background-color 0.15s linear, color 0.15s linear",
+        "purpose": "Chuyển trạng thái nút. Chỉ đổi màu — không transform, không bóng."
+      },
+      {
+        "name": "doi-che-do-mau",
+        "value": "background-color .18s ease, color .18s ease",
+        "purpose": "Trên <body>, khi bật/tắt chế độ tối."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "@media (prefers-reduced-motion: reduce) { .mo-muc-bai > * { animation: none; } }",
+        "purpose": "Tắt hoàn toàn nhịp duy nhất. Chưa chạy thử trên máy có bật thật thiết lập này; mới xác minh sự tồn tại của luật."
+      }
+    ],
+    "breakpoints": [
+      { "name": "xs", "value": "0px" },
+      { "name": "sm", "value": "600px" },
+      { "name": "md", "value": "900px" },
+      { "name": "lg", "value": "1200px" },
+      { "name": "xl", "value": "1536px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Nút hành động chính",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Đỏ tín hiệu, vuông góc. Đúng MỘT nút loại này trên mỗi khung hình.",
+      "html": "<button class=\"ds-btn-primary\">Vào học</button>",
+      "css": ".ds-btn-primary { background: var(--tin-hieu-nen, #C4000E); color: var(--chu-nguoc, #fff); font-family: Archivo, system-ui, sans-serif; font-weight: 700; font-size: 0.78rem; letter-spacing: 0.01em; padding: 8px 16px; border: none; border-radius: 0; cursor: pointer; transition: background-color 0.15s linear, color 0.15s linear; } .ds-btn-primary:hover { background: var(--nen-dam, #121210); } .ds-btn-primary:focus-visible { outline: 2px solid var(--tin-hieu, #B3000F); outline-offset: 2px; } .ds-btn-primary:disabled { background: var(--nen-tat, #CBC9C0); color: var(--chu, #4D4D47); cursor: default; }"
+    },
+    {
+      "name": "Nút viền mực",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Hành động thứ hai. Hover đảo cực thành nền mực chữ trắng.",
+      "html": "<button class=\"ds-btn-outline\">Mở</button>",
+      "css": ".ds-btn-outline { background: transparent; color: var(--chu-dam, #121210); font-family: Archivo, system-ui, sans-serif; font-weight: 700; font-size: 0.78rem; letter-spacing: 0.01em; padding: 8px 16px; border: 1px solid var(--chu-dam, #121210); border-radius: 0; cursor: pointer; transition: background-color 0.15s linear, color 0.15s linear; } .ds-btn-outline:hover { background: var(--nen-dam, #121210); color: var(--chu-nguoc, #fff); } .ds-btn-outline:focus-visible { outline: 2px solid var(--tin-hieu, #B3000F); outline-offset: 2px; }"
+    },
+    {
+      "name": "Trường nhãn",
+      "kind": "custom",
+      "refersTo": "field-band",
+      "description": "Thành phần chữ ký của hệ: một ô khai trên nhãn hoá chất. Dải mực ở đầu mang ký hiệu thoi và tên viết hoa; thân là giấy, mang một dòng trạng thái THẬT và một hành động neo phải.",
+      "html": "<section class=\"ds-field\"><header class=\"ds-field-band\"><span class=\"ds-thoi\" aria-hidden=\"true\"><span>01</span></span><h2>Bài giảng</h2></header><div class=\"ds-field-body\"><p class=\"ds-field-status\">Đã học 7 / 25 bài</p><button class=\"ds-btn-primary\">Vào học</button></div></section>",
+      "css": ".ds-field { border: 2px solid var(--chu-dam, #121210); background: var(--nen-the, #fff); display: flex; flex-direction: column; } .ds-field-band { background: var(--nen-dam, #121210); color: var(--chu-nguoc, #fff); padding: 9px 16px; display: flex; align-items: center; gap: 12px; } .ds-field-band h2 { margin: 0; font-family: Archivo, system-ui, sans-serif; font-weight: 700; font-size: 0.82rem; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1.3; } .ds-thoi { width: 22px; height: 22px; flex-shrink: 0; border: 2px solid currentColor; transform: rotate(45deg); display: inline-flex; align-items: center; justify-content: center; font-size: 0.62rem; font-weight: 800; line-height: 1; } .ds-thoi > * { transform: rotate(-45deg); } .ds-field-body { padding: 16px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; flex-grow: 1; } .ds-field-status { margin: 0; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-weight: 600; font-size: 0.875rem; color: var(--chu-dam-3, #3C3C37); font-variant-numeric: tabular-nums; }"
+    },
+    {
+      "name": "Bảng khai kẻ ô",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Nhiều ô cùng nhóm thì liền cạnh, chia bằng MỘT nét dùng chung — không phải nhiều thẻ rời có khe. Mỗi ô chỉ vẽ cạnh phải và cạnh dưới; khung ngoài đóng lại hai cạnh còn lại.",
+      "html": "<div class=\"ds-table-grid\"><div class=\"ds-table-cell\"><h3>Bám sát SGK</h3><p>Tóm tắt lý thuyết &amp; công thức từng Chương/Bài.</p></div><div class=\"ds-table-cell\"><h3>Gia sư AI đồng hành</h3><p>Đàm thoại 1:1, gợi mở tư duy, sửa sai từng bước.</p></div><div class=\"ds-table-cell\"><h3>Giám sát tiến trình</h3><p>Lưu lịch sử, đánh dấu hoàn thành, theo dõi rõ ràng.</p></div><div class=\"ds-table-cell\"><h3>Dùng thử miễn phí</h3><p>Trải nghiệm ngay với vai trò khách vãng lai.</p></div></div>",
+      "css": ".ds-table-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border: 1px solid var(--vien, #CBC9C0); border-right: 0; border-bottom: 0; background: var(--nen-the, #fff); } .ds-table-cell { padding: 16px; border-right: 1px solid var(--vien, #CBC9C0); border-bottom: 1px solid var(--vien, #CBC9C0); } .ds-table-cell h3 { margin: 0 0 4px; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-weight: 700; font-size: 0.875rem; color: var(--chu-dam, #121210); } .ds-table-cell p { margin: 0; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 0.75rem; line-height: 1.5; color: var(--chu, #4D4D47); }"
+    },
+    {
+      "name": "Ô nhập",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Vuông góc, viền nét kẻ. Focus làm viền dày lên 2px và chuyển sang đỏ tín hiệu — độ dày mang trạng thái.",
+      "html": "<input class=\"ds-input\" type=\"text\" placeholder=\"Tìm bài học...\" />",
+      "css": ".ds-input { background: var(--nen-the, #fff); color: var(--chu-dam, #121210); font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 1rem; padding: 10px 12px; border: 1px solid var(--vien, #CBC9C0); border-radius: 0; caret-color: var(--tin-hieu, #B3000F); outline: none; } .ds-input::placeholder { color: var(--chu-mo, #63635B); } .ds-input:hover { border-color: var(--chu-dam, #121210); } .ds-input:focus { border: 2px solid var(--tin-hieu, #B3000F); padding: 9px 11px; }"
+    },
+    {
+      "name": "Thanh nhận diện và hàng menu",
+      "kind": "nav",
+      "refersTo": "field-band",
+      "description": "Dải nhận diện là MỰC; hàng menu ngay dưới là GIẤY. Không được dựng ngược. Mục đang chọn mang gạch chân mực dày 3px màu đỏ tín hiệu.",
+      "html": "<div class=\"ds-nav\"><div class=\"ds-nav-ident\"><span class=\"ds-nav-mark\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 7v14\"/><path d=\"M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z\"/></svg></span><strong>Gia sư Hóa 11</strong><span class=\"ds-nav-sub\">Hệ thống tự học AI</span></div><div class=\"ds-nav-row\"><button class=\"ds-nav-item ds-nav-item--active\">Bài giảng</button><button class=\"ds-nav-item\">Gia sư AI</button><button class=\"ds-nav-item\">Đề kiểm tra</button><button class=\"ds-nav-item\">Trò chơi</button></div></div>",
+      "css": ".ds-nav { border-bottom: 2px solid var(--chu-dam, #121210); } .ds-nav-ident { background: var(--nen-dam, #121210); color: var(--chu-nguoc, #fff); display: flex; align-items: center; gap: 12px; padding: 12px 16px; } .ds-nav-mark { background: var(--nen-the, #fff); color: var(--chu-dam, #121210); width: 44px; height: 44px; border-radius: 0; display: flex; align-items: center; justify-content: center; flex-shrink: 0; } .ds-nav-ident strong { font-family: Archivo, system-ui, sans-serif; font-weight: 800; letter-spacing: -0.02em; font-size: 1.1rem; } .ds-nav-sub { font-family: Archivo, system-ui, sans-serif; font-weight: 700; font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--chu-tren-nen-dam, #A9A89F); } .ds-nav-row { background: var(--nen-the, #fff); display: flex; align-items: center; gap: 8px; padding: 4px 12px; overflow-x: auto; } .ds-nav-row::-webkit-scrollbar { display: none; } .ds-nav-item { flex-shrink: 0; white-space: nowrap; background: transparent; color: var(--chu-2, #5A5A53); font-family: Archivo, system-ui, sans-serif; font-weight: 700; font-size: 0.82rem; padding: 8px 16px; border: none; border-bottom: 3px solid transparent; border-radius: 0; cursor: pointer; } .ds-nav-item:hover { background: var(--nen-nhat, #E7E6E0); } .ds-nav-item--active { color: var(--chu-dam, #121210); background: var(--nen-nhat, #E7E6E0); border-bottom-color: var(--tin-hieu, #B3000F); } .ds-nav-item:focus-visible { outline: 2px solid var(--tin-hieu, #B3000F); outline-offset: 2px; }"
+    },
+    {
+      "name": "Chip nhãn nhỏ",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Chữ nhật, chữ đậm. Một cái nhãn nhỏ, không phải viên kẹo bo tròn.",
+      "html": "<span class=\"ds-chip\">Chương 2</span>",
+      "css": ".ds-chip { display: inline-flex; align-items: center; height: 24px; padding: 0 12px; background: var(--nen-nhat, #E7E6E0); color: var(--chu-dam, #121210); font-family: 'IBM Plex Sans', system-ui, sans-serif; font-weight: 700; font-size: 0.75rem; letter-spacing: 0.02em; border-radius: 0; }"
+    },
+    {
+      "name": "Khối công thức",
+      "kind": "custom",
+      "refersTo": "code-block",
+      "description": "Đặt trên mặt mực, nền cố ý tối ở cả hai chế độ như mọi trình soạn mã. Nhãn khối viết hoa ở giọng Label.",
+      "html": "<div class=\"ds-formula\"><span class=\"ds-formula-label\">Công thức</span><code class=\"ds-formula-code\">n = V / 24,79</code></div>",
+      "css": ".ds-formula { background: var(--nen-dam, #121210); border: 1px solid var(--vien-dam, #2A2A26); border-radius: 0; padding: 16px; } .ds-formula-label { display: block; margin-bottom: 12px; font-family: Archivo, system-ui, sans-serif; font-weight: 700; font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--chu-tren-nen-dam, #A9A89F); } .ds-formula-code { display: block; background: var(--nen-ma, #1A1A16); color: var(--chu-ma, #E8E7E1); border: 1px solid var(--vien, #CBC9C0); border-radius: 0; padding: 8px; font-size: 0.9rem; line-height: 1.6; font-variant-numeric: tabular-nums; }"
+    },
+    {
+      "name": "Tooltip",
+      "kind": "custom",
+      "refersTo": "tooltip",
+      "description": "Mặt mực, vuông góc, không bóng.",
+      "html": "<span class=\"ds-tooltip\">Đổi chế độ màu</span>",
+      "css": ".ds-tooltip { display: inline-block; background: var(--nen-dam, #121210); color: var(--chu-nguoc, #fff); font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 0.75rem; font-weight: 600; padding: 6px 10px; border-radius: 0; box-shadow: none; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Nhãn cảnh báo hoá chất",
+    "overview": "Ngôn ngữ thị giác không mượn từ ngành phần mềm giáo dục mà mượn từ chính ngành hoá học: hệ nhãn GHS dán trên mọi lọ hoá chất trong phòng thí nghiệm. Nền nhãn trắng và giấy ngà, mực đen đặc, viền là đường kẻ thẳng, thứ bậc nghiêm ngặt, và đỏ tín hiệu chỉ xuất hiện ở chỗ thật sự có tín hiệu. Một cái nhãn hoá chất phải đọc được từ cuối phòng thí nghiệm; giao diện này phải đọc được từ cuối lớp học, vì máy chiếu trong lớp là một trong ba cảnh dùng thật.\n\nMật độ là mật độ của một tờ khai: các trường ngồi liền cạnh nhau, chia bằng một nét mực dùng chung, không phải bốn tấm thẻ rời trôi nổi có khe hở. Độ sâu diễn đạt bằng ĐỘ ĐẬM CỦA VIỀN, không bằng độ nhoè của bóng — toàn bộ mặc định boxShadow của MUI bị tắt trong src/App.tsx, và trong src/ không còn một giá trị boxShadow sống nào ngoài 'none'. Mặt nào nổi lên trên (hộp thoại, menu, popover) thì tách khỏi nền bằng viền mực 2px, đúng như mép một tờ nhãn dán đè lên.\n\nThế giới này từ chối kiểu app học tập bo tròn pastel với vòng tiến độ và linh vật cười — đó là thứ mọi nền tảng học online đều xuất ra. Chủ dự án đã hai lần xác nhận từ bỏ bảng màu cam–teal cũ; di sản teal cuối cùng (mảng nền panel đăng nhập) đã được thay bằng mực.",
+    "keyCharacteristics": [
+      "Giấy ngà (#F2F1ED) và mặt nhãn trắng (#FFFFFF); mực gần đen (#121210).",
+      "Bán kính góc bằng 0 ở mọi nơi; hình tròn 50% chỉ dành cho huy hiệu và chấm trạng thái.",
+      "Không có bóng đổ nào, kể cả bóng khối cứng. Nét kẻ làm hết việc đó.",
+      "Hai phông grotesque công nghiệp: Archivo cho giọng hiển thị, IBM Plex Sans cho thân bài.",
+      "Ký hiệu riêng của thế giới: hình thoi nét đều 2px, ô 22×22.",
+      "Số luôn dạng bảng (tabular-nums) — điểm, số câu, mã bài đều là dữ liệu đo được.",
+      "Hai chế độ màu là tính năng thật, có máy đo, không phải tuỳ chọn trang trí.",
+      "Đúng MỘT nhịp chuyển động trong toàn hệ thống."
+    ],
+    "rules": [
+      {
+        "name": "The One Variable, One Role Rule",
+        "body": "Hễ tồn tại --X-nen thì --X chỉ dành cho vai chữ. Ở chế độ tối, biến vai-chữ được làm sáng lên để đọc được trên giấy đen, còn biến vai-nền giữ nguyên độ đậm để chữ trắng trên nó vẫn đọc được. Một biến không gánh nổi hai vai trái ngược. Luật này đã bị vi phạm bốn lần trong lịch sử dự án — lần tệ nhất làm cả thanh quản trị thành chữ trắng trên nền trắng — và nay npm run kiem-tra:mau canh nó tự động cho cả 8 màu nhấn có bản nền riêng.",
+        "section": "colors"
+      },
+      {
+        "name": "The Rationed Red Rule",
+        "body": "--tin-hieu* chỉ dùng cho hành động chính, lỗi thật, và trạng thái đang chọn. Không bao giờ để trang trí, không bao giờ làm nền một mảng lớn, và không quá một lần trên mỗi khung hình. Biến này được đổi tên có chủ ý từ --cam sang --tin-hieu để chính cái tên mang theo luật. Lỗi thật dùng đúng một sắc đỏ ấy: trên nhãn hoá chất chỉ có MỘT màu báo động.",
+        "section": "colors"
+      },
+      {
+        "name": "The Measured, Not Asserted Rule",
+        "body": "Tương phản là số đo, không phải lời khẳng định. npm run kiem-tra chạy 9 bộ / 194 mục; riêng bộ màu đo 71 cặp chữ/nền đã khai mỗi chế độ đối chiếu ngưỡng 4,5; 27 cặp viết cùng một khối sx dò thẳng từ mã nguồn; và 3 chỉ báo phi-chữ đối chiếu 3,0. Cặp nào chấp nhận dưới ngưỡng thì phải nằm trong danh sách miễn kèm LÝ DO.",
+        "section": "colors"
+      },
+      {
+        "name": "The Label-Voice Rule",
+        "body": "Chữ HOA toàn phần + letter-spacing 0.12em là giọng NHÃN: nó đặt tên cho một trường, một khối, một nhóm. Nó không phải giọng câu văn và không phải giọng nút bấm. Một khối chỉ được có một nhãn, đặt ở dải đầu khối.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tabular Number Rule",
+        "body": "Mọi con số đo được — điểm, số câu, mã bài, số lượt hỏi còn lại — phải thẳng cột. src/index.css bật tabular-nums cho table, [data-so] và .so-lieu; chỗ nào hiện số ngoài ba vùng đó thì đặt fontVariantNumeric tại chỗ.",
+        "section": "typography"
+      },
+      {
+        "name": "The Three Real Screens Rule",
+        "body": "Điện thoại buổi tối, máy tính ở nhà, máy chiếu trong lớp — cả ba là cảnh dùng thật, không cảnh nào hạng hai. Máy chiếu là lý do ngôn ngữ nhãn thắng: chữ hoa nặng, tương phản cao và nét kẻ đậm đọc được từ cuối lớp, còn chữ mảnh trên thẻ pastel thì không.",
+        "section": "layout"
+      },
+      {
+        "name": "The Ink-Rule Depth Rule",
+        "body": "Muốn một khối nổi hơn? Làm đậm viền nó, đừng thêm bóng. Bóng đổ mềm là ngôn ngữ của thế giới cũ (thẻ nổi trên nền); thế giới này là một mặt phẳng giấy chia ô bằng đường mực.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Straight-Rule Rule",
+        "body": "Thế giới này dựng bằng đường kẻ thẳng. Không bo góc lớn, không viền trái màu dày kiểu callout, không dải gradient. Một đường 1px biết nói đủ mọi thứ mà một cái bóng nói được.",
+        "section": "shapes"
+      },
+      {
+        "name": "The Shared-Rule Table Rule",
+        "body": "Nhiều ô cùng nhóm thì liền cạnh, chia bằng MỘT nét dùng chung, không phải nhiều thẻ rời có khe. Mỗi ô chỉ vẽ cạnh phải và cạnh dưới, khung ngoài đóng lại hai cạnh còn lại. Đây là trường có kẻ ô như bảng khai nhãn — thiết bị dựng hình đặc trưng nhất của hệ.",
+        "section": "shapes"
+      },
+      {
+        "name": "The Real Number Rule",
+        "body": "Dòng trạng thái của trường phải đọc từ dữ liệu đang chạy. Không con số nào được bịa — một cái nhãn ghi sai số thì tệ hơn là không ghi.",
+        "section": "components"
+      },
+      {
+        "name": "The One Beat Rule",
+        "body": "MỘT nghĩa là một. Cả hệ thống không có chỗ thứ hai chuyển động. Thêm một chỗ nữa là mỗi chỗ mất đi phần ý nghĩa của nó. Sự khan hiếm CHÍNH LÀ hiệu ứng.",
+        "section": "components"
+      }
+    ],
+    "dos": [
+      "Do khai mọi màu mới thành biến trong src/index.css, ở CẢ HAI khối :root và :root[data-theme=\"dark\"], rồi dùng qua var(--ten-bien).",
+      "Do tách vai ngay từ lúc đặt tên: có --X-nen thì --X chỉ làm chữ.",
+      "Do chạy npm run kiem-tra:mau sau mỗi lần đụng vào màu, và ghi // mau-ok ở cuối dòng đã xem tay và xác nhận đúng.",
+      "Do giữ border-radius: 0 cho mọi hình chữ nhật; chỉ 50% cho hình tròn thật.",
+      "Do diễn đạt độ sâu bằng độ đậm viền: 1px var(--vien) → 2px var(--chu-dam).",
+      "Do cho mỗi khối đúng một dải nhãn viết hoa ở đầu, mang ký hiệu thoi nếu khối là một trường.",
+      "Do giữ mỗi khung hình đúng một nút đỏ tín hiệu.",
+      "Do đặt tabular-nums cho mọi con số hiện ra ngoài table.",
+      "Do dùng minmax(0, 1fr) trong gridTemplateColumns, không dùng 1fr trần.",
+      "Do đặt màu chữ tường minh bằng color: 'var(--...)' khi nền đến từ biến CSS còn chữ mặc định đến từ bảng màu MUI — hai hệ khác nhau, chỉ cần một bên đổi trước là chữ biến mất.",
+      "Do giữ mã màu THẬT trong khối palette của src/App.tsx: MUI cần số để tự tính sắc độ đậm/nhạt. Và phải đặt lại light cho từng màu ở bản tối — MUI lấy chính light làm màu CHỮ cho <Alert>, <Chip>, nút outlined."
+    ],
+    "donts": [
+      "Don't thêm box-shadow — không bóng mềm, không bóng khối cứng, không bóng màu. Hệ này không có ngôn ngữ bóng đổ; làm đậm viền thay vào đó.",
+      "Don't bo góc thẻ, nút, ô nhập, chip hay khối bất kỳ.",
+      "Don't dùng đỏ tín hiệu để trang trí, để làm nền một mảng lớn, hay quá một lần trên một khung hình; và don't thêm sắc đỏ thứ hai cho báo lỗi.",
+      "Don't lấy một biến vai-CHỮ (--chu-dam, --tin-hieu, --luc, --xanh…) làm màu NỀN. Ở chế độ tối chúng lật sáng lên và mặt nền biến thành trắng-trên-trắng.",
+      "Don't viết mã màu cứng trong .tsx, kể cả rgba() trắng/đen — phép đo chỉ soi biến CSS nên màu viết cứng lọt lưới (trang 404 từng có tương phản 1,03 vì thế).",
+      "Don't thêm nhịp chuyển động thứ hai vào bất cứ đâu.",
+      "Don't kéo thư viện chuyển động vào gói tải cho một hiệu ứng.",
+      "Don't dựng nhiều thẻ rời có khe khi nhóm ấy đáng là một bảng kẻ ô chia bằng nét dùng chung.",
+      "Don't viền trái màu dày kiểu callout, chữ gradient, hay lưới thẻ cùng cỡ.",
+      "Don't viết hoa chữ NÚT: chữ hoa là giọng của NHÃN."
+    ],
+    "outOfWorld": [
+      "Các trò chơi trong public/games/ giữ bảng màu pastel riêng — chế độ Chơi khác chế độ Operate, chủ dự án chốt 09/09/2026. \"Rắn và Thang\" làm theo áp phích chủ dự án gửi, có npm run kiem-tra:ran-thang canh. Chỗ tiếp giáp (thẻ chọn trò, thanh phủ khung) thì PHẢI thuộc thế giới nhãn.",
+      "Bốn tệp tranh vẽ GameArt.tsx, doodles.tsx, ChemDoodles.tsx, Mascot.tsx được miễn khỏi hệ biến màu và khỏi việc đảo màu theo chế độ."
+    ],
+    "notCanonized": [
+      "TextbookViewer.tsx dùng '\"Georgia\", serif' cho văn bản lý thuyết (3 chỗ) và '\"Courier New\", monospace' cho công thức — phông hệ điều hành nằm ngoài cặp Archivo + IBM Plex Sans. Nợ bản dựng, không phải bậc thứ ba của thang chữ.",
+      "Panel trái LoginPage.tsx còn rgba(255,255,255,0.85 / 0.78 / 0.75) viết thẳng; bộ đếm mã màu cứng chỉ bắt dạng #rrggbb nên các giá trị này không bị đo tương phản. Đúng cách là --chu-tren-nen-dam.",
+      "Bộ biểu tượng lucide-react là biểu tượng nét kế thừa từ bản dựng cũ, không phải bộ ký hiệu của thế giới này. Bộ ký hiệu của hệ là hình thoi."
+    ],
+    "caveats": [
+      "Bản dựng code-led: không có comp được duyệt, vòng gieo ý tưởng không sinh ra ảnh nào.",
+      "Vòng duyệt hoàn thiện chạy KHÔNG có ảnh chụp màn hình (môi trường không ghi được PNG ra đĩa); kết luận chỉ có hiệu lực trong phạm vi mã nguồn và số đo. Hai vòng đã chạy; vòng thứ hai trả về disposition: fix và các điểm nó nêu đã được sửa.",
+      "prefers-reduced-motion chưa được chạy thử trên máy có bật thật thiết lập đó; mới xác minh sự tồn tại của luật trong mã.",
+      "Hợp đồng hướng ghi bước so le 60ms; bản đã dựng là 50ms. DESIGN.md chép theo bản dựng."
+    ]
+  }
+}

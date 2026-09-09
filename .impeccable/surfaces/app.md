@@ -56,8 +56,8 @@ verdict, DESIGN.md, and every shipping raster carrying its provenance
 - **Giữ nguyên**: tên "Gia sư Hóa 11", dòng phụ "HỆ THỐNG TỰ HỌC AI", logo sách mở, số
   Zalo 0345203054, nhân vật Thầy Hùng. Chủ dự án xác nhận là ràng buộc.
 - **Được thay**: bảng màu cam–teal cũ. Chủ dự án xác nhận hai lần.
-- **Tương phản ≥ 4,5** ở cả hai chế độ màu, có `npm run kiem-tra:mau` đo 70 cặp mỗi
-  chế độ. Đây là sàn cứng, không thương lượng vì lý do thẩm mỹ.
+- **Tương phản ≥ 4,5** ở cả hai chế độ màu, có `npm run kiem-tra:mau` đo 71 cặp khai sẵn, 27 cặp
+  tự tìm trong mã, và 3 chỉ báo phi-chữ ở ngưỡng 3,0 — mỗi chế độ. Đây là sàn cứng, không thương lượng vì lý do thẩm mỹ.
 - **Ba cỡ màn hình đều là cảnh dùng thật**: điện thoại buổi tối, máy tính ở nhà, máy
   chiếu trong lớp. Máy chiếu là lý do ngôn ngữ nhãn thắng — nó đọc được từ xa.
 - **Chế độ tối là bắt buộc**, không phải tuỳ chọn: học sinh học buổi tối. Cảnh vật lý
@@ -72,7 +72,7 @@ verdict, DESIGN.md, and every shipping raster carrying its provenance
   Thứ PHẢI thuộc thế giới nhãn là **chỗ tiếp giáp**: thẻ chọn trò và thanh phủ khung
   trò chơi — như một cái nhãn dán trên hộp đựng trò chơi.
 - **Ngữ pháp chuyển động: đúng MỘT nhịp, và nó nằm ở chỗ mở một bài.** Trải so le các
-  khối bên trong mục vừa mở, tổng ~320ms, bước 60ms — đây là dòng nâng mượn từ *Miura
-  Orbit Sheet* được trả. Dựng bằng CSS thuần, cố ý KHÔNG kéo thư viện chuyển động vào
+  khối bên trong mục vừa mở: bước 50ms, mỗi khối 170ms, khối thứ tư kết
+  thúc ở 320ms — đây là dòng nâng mượn từ *Miura Orbit Sheet* được trả. Dựng bằng CSS thuần, cố ý KHÔNG kéo thư viện chuyển động vào
   gói tải: học sinh dùng mạng di động và nặng trang là rào cản thật. Luôn tắt dưới
   `prefers-reduced-motion`.
