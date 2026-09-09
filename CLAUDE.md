@@ -139,6 +139,36 @@ Mở Claude Code ở thư mục dự án thì các kỹ năng này tự nạp, g
   1.0.4: `/speckit-constitution`, `/speckit-specify`, `/speckit-plan`, `/speckit-tasks`,
   `/speckit-implement`, `/speckit-converge`, cùng bốn cái tuỳ chọn. Do `specify init`
   sinh ra, đừng sửa tay — chạy lại lệnh đó khi nâng cấp.
+- **`impeccable`** — quy trình thiết kế giao diện: chốt sự thật sản phẩm, bốc hướng,
+  viết hợp đồng hướng, dựng, rồi duyệt kết thúc. Thế giới thị giác hiện tại của dự án
+  ra đời từ đây; xem mục "Thế giới thị giác" bên dưới.
+- **14 kỹ năng `superpowers`** — cách LÀM VIỆC, không phải cách viết code:
+  `brainstorming`, `writing-plans`, `executing-plans`, `systematic-debugging`,
+  `verification-before-completion`, `requesting-code-review`, `receiving-code-review`,
+  `test-driven-development`, `using-git-worktrees`, `dispatching-parallel-agents`,
+  `subagent-driven-development`, `finishing-a-development-branch`, `writing-skills`,
+  `using-superpowers`. Chép nguyên văn từ `github.com/obra/superpowers` v6.3.0 (MIT).
+  Nguồn gốc, giấy phép và cách nâng cấp: `.claude/skills/SUPERPOWERS-LICENSE.md`.
+
+### Ba chỗ superpowers nói khác dự án này — theo dự án
+
+Nhóm kỹ năng trên viết cho một dự án phần mềm điển hình. Repo này khác ở ba điểm, và
+khi mâu thuẫn thì **`CLAUDE.md` thắng**:
+
+1. **`test-driven-development` bảo viết test trước khi viết code.** Dự án này KHÔNG có
+   bộ chạy test nào — không Vitest, không Jest. Hàng rào là `npm run lint` cộng chín bộ
+   kiểm tự viết trong `scripts/`. "Viết test trước" ở đây nghĩa là **viết phép kiểm
+   trước**, thêm vào đúng bộ kiểm liên quan. Đừng tự dựng khung test mới khi user không
+   yêu cầu.
+2. **`using-git-worktrees`, `finishing-a-development-branch`, `dispatching-parallel-agents`
+   giả định AI tự quản nhánh, tự trộn, tự đẩy.** Ở đây thì không: mục "Cách làm việc" đã
+   chốt là KHÔNG tự chạy `npm run build`, git nguy hiểm, push hay deploy — user tự làm.
+3. **`verification-before-completion` đòi chạy lệnh kiểm rồi mới được nói "xong".** Cái
+   này ăn khớp với dự án, và mạnh hơn: bài học số 1 trong mục "Rút kinh nghiệm" nói
+   đừng tin dòng chữ "xong" của chính script mình viết. Dùng nó.
+
+Một điểm nữa: bản chép này KHÔNG có hook lúc mở phiên như bản plugin, nên kỹ năng
+`using-superpowers` phải được gọi ra chứ không tự nhắc.
 
 `.gitignore` chặn `.claude/*` nhưng CỐ Ý mở ngoại lệ `!.claude/skills/`, để kỹ năng
 theo được `git pull` sang máy khác. Phần còn lại của `.claude/` (vd `settings.local.json`)
