@@ -415,7 +415,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'center' }}>
                 <Chip icon={<Award size={14} color="var(--chu-dam)" />} label="Hỗ trợ lý thuyết" variant="outlined" size="small" />
                 <Chip icon={<Lightbulb size={14} color="var(--chu-dam)" />} label="Gợi mở phương pháp" variant="outlined" size="small" />
-                <Chip icon={<HelpCircle size={14} color="var(--chu-dam)" />} label="Giải đáp thắc mắc 24/7" variant="outlined" size="small" />
+                <Chip icon={<HelpCircle size={14} color="var(--chu-dam)" />} label="Giải đáp thắc mắc" variant="outlined" size="small" />
               </Box>
             </Box>
           ) : (

@@ -290,7 +290,8 @@ console.log('\n== Tương phản chữ trên nền ==');
      và nó ghép nền của `'&:hover'` với màu chữ của trạng thái thường — ra 15 báo
      động, gần hết là giả, vì khi rê chuột thì cả hai đổi cùng lúc. Mỗi khối
      `{…}` con là một trạng thái riêng và được đo riêng. */
-  const capThat = new Map<string, string>();   // "chu|nen" -> nơi gặp đầu tiên
+  const capThat = new Map<string, string>();     // "chu|nen"  -> nơi gặp đầu tiên
+  const capChiBao = new Map<string, string>();   // "vien|nen" -> nơi gặp đầu tiên
 
   /** Tách một đoạn mã thành từng PHẠM VI: thuộc tính của chính nó, không kèm
       thuộc tính của các khối con. Mỗi khối con thành một phạm vi riêng. */
@@ -331,6 +332,41 @@ console.log('\n== Tương phản chữ trên nền ==');
           const khoa = `${c}|${b}`;
           if (!capThat.has(khoa)) capThat.set(khoa, basename(f));
         }
+        /* Viền MANG TRẠNG THÁI là chỉ báo, ngưỡng 3,0 chứ không phải 4,5.
+           Nhận ra bằng dấu `?`: một viền đổi theo trạng thái thì mới là thứ
+           nói cho người dùng biết họ đang ở đâu. Viền hằng số là đường kẻ
+           trang trí — bản đầu của phép đo này gộp cả hai và báo 21 lỗi, gần
+           hết là `--vien` trên nền thẻ ở 1,66, tức chính đường kẻ mảnh mà cả
+           thế giới thị giác này dựng bằng. Bắt nó đạt 3,0 là bắt mọi nét kẻ
+           phải đen kịt — WCAG 1.4.11 không đòi thế, nó đòi cho THÀNH PHẦN và
+           TRẠNG THÁI. */
+        /* Đo ĐÚNG MỘT hình dạng, và đo cho chắc:
+              borderX: <điều kiện> ? '…var(--A)…' : '…transparent…'
+           tức một viền CHỈ hiện ở một trạng thái. Lúc đó nó là dấu hiệu duy
+           nhất của trạng thái ấy và phải nổi trên chính nền của trạng thái ấy.
+           Gạch chân tab đang chọn là hình dạng này.
+
+           CỐ Ý bỏ hai hình dạng khác, vì tĩnh không phân biệt nổi:
+           - hai nhánh đều là biến (`active ? '--tin-hieu' : '--vien'`): nhánh
+             không-được-chọn chính là đường kẻ thường, đo nó là báo oan;
+           - nhánh kia là 'none' (`isAi ? … : 'none'`): đó là phân biệt hai LOẠI
+             nội dung, đã có nền và vị trí gánh, viền chỉ là trang trí.
+           Ba vòng chỉnh trước đều vấp đúng hai hình dạng này. Thà đo ít mà đúng
+           còn hơn đo rộng rồi phải tắt dần cho im. */
+        const vien = [...pv.matchAll(/(?:border[A-Za-z]*|outline):\s*([^,\n]*\?[^,\n]*transparent[^,\n]*)/g)]
+          .map(m => [...m[1].matchAll(/var\((--[a-z0-9-]+)\)/g)].map(x => x[1]))
+          .filter(bien => bien.length === 1)
+          .map(bien => bien[0]);
+        /* Nền của chính trạng thái đó cũng viết dạng ba ngôi, nên phải đọc hết
+           giá trị chứ không chỉ trường hợp `var(--x)` nằm sát dấu hai chấm —
+           nếu không thì `nen` rỗng và phép đo này bắt được 0 thứ, tức là vô
+           dụng. Nhánh còn lại của ba ngôi thường là 'transparent', không phải
+           biến, nên cặp lấy ra đúng là cặp của trạng thái ĐANG CHỌN. */
+        const nenTrangThai = [...pv.matchAll(/(?:bgcolor|backgroundColor):[^,\n]*?var\((--[a-z0-9-]+)\)/g)].map(m => m[1]);
+        for (const b of nenTrangThai) for (const v of vien) {
+          const khoa = `${v}|${b}`;
+          if (!capChiBao.has(khoa)) capChiBao.set(khoa, basename(f));
+        }
       }
       i = n.indexOf('sx={{', ket);
     }
@@ -349,6 +385,37 @@ console.log('\n== Tương phản chữ trên nền ==');
     if (rot.length) truot(`chế độ ${che}: cặp viết cùng chỗ đạt ${NGUONG}`,
       `${rot.length}/${so} cặp chưa đạt — ${rot.slice(0, 6).join('; ')}`);
     else dat(`chế độ ${che}: cả ${so} cặp viết cùng chỗ đều đạt ${NGUONG}`);
+  }
+
+  /* ── Chỉ báo phi-chữ: viền, gạch chân, vòng tiêu điểm ─────────────────────
+     Ngưỡng 3,0 (WCAG 1.4.11), không phải 4,5: đây không phải chữ.
+
+     Thêm mục này sau khi CHÍNH một bản sửa của đợt thiết kế lại gây ra lỗi mà
+     cả chín bộ kiểm đều không thấy. Hàng menu được đảo từ mực sang giấy, nên
+     gạch chân báo tab đang chọn đổi theo sang `--tin-hieu-nen`. Ở chế độ sáng
+     nó đạt 6,26. Ở chế độ TỐI, hàng menu là #161613 và `--tin-hieu-nen` chỉ còn
+     2,90 — nghĩa là gần như không còn dấu hiệu nào cho biết đang ở tab nào.
+     Mọi phép đo cũ chỉ soi cặp CHỮ/nền, nên không cái nào với tới.
+
+     GIỚI HẠN, nói thẳng ra để không ai tưởng chỗ này đã kín: phép đo chỉ ghép
+     được viền với nền khi CẢ HAI viết trong cùng một khối `sx`. Đúng cái gạch
+     chân vừa kể thì viền nằm trên nút còn nền nằm trên khối cha — khác khối,
+     nên vẫn ngoài tầm. Chỗ đó hiện được canh bằng cặp cố định, và một chỉ báo
+     mới đặt trên một mặt nền mới vẫn phải đo tay. */
+  const NGUONG_CHI_BAO = 3;
+  for (const [che, b] of Object.entries(BANG)) {
+    const rot: string[] = [];
+    let so = 0;
+    for (const [khoa, tep] of capChiBao) {
+      const [v, n] = khoa.split('|');
+      if (!b[v] || !b[n] || duocMien(v, n)) continue;
+      so++;
+      const t = tuongPhan(b[v], b[n]);
+      if (t < NGUONG_CHI_BAO) rot.push(`${v} trên ${n} = ${t.toFixed(2)} (${tep})`);
+    }
+    if (rot.length) truot(`chế độ ${che}: chỉ báo phi-chữ đạt ${NGUONG_CHI_BAO}`,
+      `${rot.length}/${so} chưa đạt — ${rot.slice(0, 6).join('; ')}`);
+    else dat(`chế độ ${che}: cả ${so} chỉ báo phi-chữ đều đạt ${NGUONG_CHI_BAO}`);
   }
 }
 

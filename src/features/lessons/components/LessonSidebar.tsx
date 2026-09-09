@@ -170,7 +170,10 @@ export const LessonSidebar: React.FC<LessonSidebarProps> = ({
                           opacity: isLocked ? 0.6 : 1,
                         transition: 'all 0.2s',
                         border: '1px solid',
-                        borderColor: isSelected ? 'var(--tin-hieu-vien)' : 'transparent',
+                        /* Vien hong nhat tren nen hong nhat chi duoc 1,14 — bai dang chon gan
+                           nhu khong khac bai thuong. Do tin hieu la mau dung cho trang thai
+                           DANG CHON, va len 5,32. */
+                        borderColor: isSelected ? 'var(--tin-hieu)' : 'transparent',
                         backgroundColor: isSelected ? 'var(--nen-tin-hieu-nhat2)' : 'transparent',
                         '&:hover': {
                           backgroundColor: isSelected

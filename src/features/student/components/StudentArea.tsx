@@ -259,7 +259,7 @@ export const StudentArea: React.FC = () => {
                 lesson={{
                   id: 'student-free-chat',
                   title: 'Gia sư Hóa học AI',
-                  summary: 'Trợ lý học tập 24/7',
+                  summary: 'Trợ lý học tập riêng cho từng em',
                   formulae: [],
                   commonQuestions: []
                 }} 

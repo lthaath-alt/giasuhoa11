@@ -509,7 +509,7 @@ export const DashboardPage: React.FC = () => {
                   Chào mừng các em học sinh đến với <strong>Gia sư Hóa 11</strong>! Đây là nền tảng tự học Hoá học lớp 11 bám sát đúng 25 bài của bộ Kết nối tri thức 2018 — chính bộ sách các em đang cầm trên tay.
                 </Typography>
                 <Typography variant="body1" sx={{ mb: 4, lineHeight: 1.8, color: 'var(--chu-dam-3)' }}>
-                  Với mong muốn giúp mọi học sinh đều có thể tự tin làm chủ môn Hóa mà không cần đi học thêm tốn kém, chúng tôi đã tích hợp công nghệ trí tuệ nhân tạo (AI) thông minh để tạo ra một <strong>Người Thầy Gia Sư Đồng Hành 24/7</strong>. Gia sư AI không làm thay bài tập cho học sinh, mà đóng vai trò người hướng dẫn tận tình, khơi gợi suy nghĩ và dìu dắt các em giải quyết bài tập qua từng bước tư duy.
+                  Với mong muốn giúp mọi học sinh đều có thể tự tin làm chủ môn Hóa mà không cần đi học thêm tốn kém, chúng tôi đã tích hợp công nghệ trí tuệ nhân tạo (AI) thông minh để tạo ra một <strong>Người Thầy Gia Sư riêng cho từng em</strong>. Gia sư AI không làm thay bài tập cho học sinh, mà đóng vai trò người hướng dẫn tận tình, khơi gợi suy nghĩ và dìu dắt các em giải quyết bài tập qua từng bước tư duy.
                 </Typography>
 
 
@@ -669,7 +669,7 @@ export const DashboardPage: React.FC = () => {
                     </Avatar>
                     <Box>
                       <Typography variant="subtitle1" sx={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1 }}>
-                        Thầy Hùng - Gia Sư Tư Vấn 24/7
+                        Thầy Hùng — Gia sư tư vấn
                         <Chip label="ONLINE" size="small" color="secondary" sx={{ height: 16, fontSize: '0.65rem', fontWeight: 'bold' }} />
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
@@ -682,7 +682,7 @@ export const DashboardPage: React.FC = () => {
                         color={hasApiKey ? 'inherit' : 'warning'}
                         onClick={() => setApiKeyDialogOpen(true)}
                         sx={{ minWidth: 0, whiteSpace: 'nowrap' }}>
-                        {hasApiKey ? '⚙️' : '⚙️ Nhập API key'}
+                        {hasApiKey ? 'API key' : 'Nhập API key'}
                       </Button>
                     </Tooltip>
                   </Box>
@@ -690,7 +690,7 @@ export const DashboardPage: React.FC = () => {
                   {/* Chưa có key thì nói thẳng, đừng để học sinh tưởng đang chat với AI */}
                   {!hasApiKey && (
                     <Alert severity="warning" sx={{ borderRadius: 0, py: 0.5, px: 2, '.MuiAlert-message': { fontSize: '0.8rem' } }}>
-                      Chưa có API key nên thầy chưa trả lời được. Bấm <strong>⚙️ Nhập API key</strong> ở
+                      Chưa có API key nên thầy chưa trả lời được. Bấm <strong>Nhập API key</strong> ở
                       trên, làm theo hướng dẫn lấy key miễn phí từ Google AI Studio.
                     </Alert>
                   )}
@@ -870,7 +870,7 @@ export const DashboardPage: React.FC = () => {
                     </AccordionSummary>
                     <AccordionDetails>
                       <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.7 }}>
-                        Gia sư AI đóng vai trò như một giáo viên thực thụ đồng hành cùng em 24/7.
+                        Gia sư AI đóng vai trò như một giáo viên thực thụ đồng hành cùng em qua từng bước.
                         <br />
                         - Khi em học lý thuyết, Gia sư tóm tắt các điểm then chốt nhất giúp em dễ nhớ dễ hiểu.
                         <br />

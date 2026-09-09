@@ -48,7 +48,8 @@ Ba điều cộng lại, và phải cộng lại mới thành khác biệt — c
   **chơi trò ôn tập**. Bốn việc này là một vòng học, không phải bốn sản phẩm rời.
 - Giáo viên soạn câu hỏi trên web; ngân hàng thật nằm ở Firestore và tự đồng bộ về kho
   mã mỗi đêm.
-- Hai trò chơi ôn tập: "Vòng Quanh Hoá 11" và "Rắn và Thang" (25 màn theo 25 bài, mở
+- Bốn trò chơi ôn tập: "Thám Tử Hoá Chất", "Giải Cứu Phòng Thí Nghiệm", "Vòng Quanh
+  Hoá 11" và "Rắn và Thang" (25 màn theo 25 bài, mở
   khoá lần lượt). Trò chơi chạy trong iframe cùng nguồn, nói chuyện với web bằng
   `postMessage`.
 - Lớp học dùng chung một máy chiếu là cảnh sử dụng thật, không phải giả định.
@@ -56,7 +57,7 @@ Ba điều cộng lại, và phải cộng lại mới thành khác biệt — c
 ## Capabilities and Constraints
 
 **Đang có:** 25 bài giảng + trình đọc SGK · gia sư AI Gemini · ngân hàng 252 câu ·
-sinh đề kiểm tra theo chương · hai trò chơi · khu quản trị trường và quản trị hệ thống ·
+sinh đề kiểm tra theo chương · bốn trò chơi · khu quản trị trường và quản trị hệ thống ·
 hai chế độ màu sáng/tối đồng bộ toàn hệ thống.
 
 **Ràng buộc bắt buộc giữ:**
@@ -91,7 +92,7 @@ giữ nó, nên nhận diện màu được phép thay khi dựng thế giới t
 
 - 25 bài giảng thật, sinh từ tệp `.docx` của chính giáo viên → `src/features/lessons/constants.ts`.
 - 252 câu hỏi thật, do giáo viên soạn và duyệt → `public/bank/ngan-hang.json`.
-- Hai trò chơi chạy được → `public/games/`.
+- Bốn trò chơi chạy được → `public/games/`.
 - Đề cương nghiên cứu khoa học → `docs/de-cuong-nghien-cuu.md`.
 
 **Chưa có, và không được bịa ra:** con số học sinh đang dùng, lời chứng thực của người

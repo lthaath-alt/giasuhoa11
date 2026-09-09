@@ -214,8 +214,8 @@ export const LoginPage: React.FC = () => {
           >
             {/* Logo mobile (chỉ hiện khi màn hình nhỏ, vì cột trái đã ẩn) */}
             <Box sx={{ display: { xs: 'flex', md: 'none' }, alignItems: 'center', gap: 1, mb: 3, justifyContent: 'center' }}>
-              <BookOpen size={24} color="var(--luc-tham)" />
-              <Typography variant="h5" color="var(--luc-tham)" sx={{ fontWeight: 'bold' }}>
+              <BookOpen size={24} color="var(--chu-dam)" />
+              <Typography variant="h5" color="var(--chu-dam)" sx={{ fontWeight: 'bold' }}>
                 Gia sư Hóa 11
               </Typography>
             </Box>

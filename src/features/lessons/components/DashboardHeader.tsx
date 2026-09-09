@@ -509,13 +509,13 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               }}
               startIcon={<Layers size={16} />}
               sx={{
-                color: 'var(--chu-dam)',
+                color: activeTab === 'hocmai' ? 'var(--chu-dam)' : 'var(--chu-2)',
                 textTransform: 'none',
                 fontWeight: 'bold',
                 px: 2,
                 py: 1,
                 borderRadius: 0,
-                borderBottom: activeTab === 'hocmai' ? '3px solid var(--tin-hieu-nen)' : '3px solid transparent',
+                borderBottom: activeTab === 'hocmai' ? '3px solid var(--tin-hieu)' : '3px solid transparent',
                 backgroundColor: activeTab === 'hocmai' ? 'var(--nen-nhat)' : 'transparent',
                 '&:hover': { backgroundColor: 'var(--nen-nhat)' },
               }}
@@ -532,13 +532,13 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               }}
               startIcon={<Info size={16} />}
               sx={{
-                color: 'var(--chu-dam)',
+                color: activeTab === 'gioithieu' ? 'var(--chu-dam)' : 'var(--chu-2)',
                 textTransform: 'none',
                 fontWeight: 'bold',
                 px: 2,
                 py: 1,
                 borderRadius: 0,
-                borderBottom: activeTab === 'gioithieu' ? '3px solid var(--tin-hieu-nen)' : '3px solid transparent',
+                borderBottom: activeTab === 'gioithieu' ? '3px solid var(--tin-hieu)' : '3px solid transparent',
                 backgroundColor: activeTab === 'gioithieu' ? 'var(--nen-nhat)' : 'transparent',
                 '&:hover': { backgroundColor: 'var(--nen-nhat)' },
               }}
@@ -554,14 +554,14 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               }}
               startIcon={<Presentation size={16} />}
               sx={{
-                color: 'var(--chu-dam)',
+                color: activeTab === 'baigiang' ? 'var(--chu-dam)' : 'var(--chu-2)',
                 textTransform: 'none',
                 fontWeight: 'bold',
                 px: 2,
                 py: 1,
                 borderRadius: 0,
                 whiteSpace: 'nowrap',
-                borderBottom: activeTab === 'baigiang' ? '3px solid var(--tin-hieu-nen)' : '3px solid transparent',
+                borderBottom: activeTab === 'baigiang' ? '3px solid var(--tin-hieu)' : '3px solid transparent',
                 backgroundColor: activeTab === 'baigiang' ? 'var(--nen-nhat)' : 'transparent',
                 '&:hover': { backgroundColor: 'var(--nen-nhat)' },
               }}
@@ -577,14 +577,14 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               }}
               startIcon={<Gamepad2 size={16} />}
               sx={{
-                color: 'var(--chu-dam)',
+                color: activeTab === 'trochoi' ? 'var(--chu-dam)' : 'var(--chu-2)',
                 textTransform: 'none',
                 fontWeight: 'bold',
                 px: 2,
                 py: 1,
                 borderRadius: 0,
                 whiteSpace: 'nowrap',
-                borderBottom: activeTab === 'trochoi' ? '3px solid var(--tin-hieu-nen)' : '3px solid transparent',
+                borderBottom: activeTab === 'trochoi' ? '3px solid var(--tin-hieu)' : '3px solid transparent',
                 backgroundColor: activeTab === 'trochoi' ? 'var(--nen-nhat)' : 'transparent',
                 '&:hover': { backgroundColor: 'var(--nen-nhat)' },
               }}
@@ -600,13 +600,13 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               }}
               startIcon={<MessageSquare size={16} />}
               sx={{
-                color: 'var(--chu-dam)',
+                color: activeTab === 'ichat' ? 'var(--chu-dam)' : 'var(--chu-2)',
                 textTransform: 'none',
                 fontWeight: 'bold',
                 px: 2,
                 py: 1,
                 borderRadius: 0,
-                borderBottom: activeTab === 'ichat' ? '3px solid var(--tin-hieu-nen)' : '3px solid transparent',
+                borderBottom: activeTab === 'ichat' ? '3px solid var(--tin-hieu)' : '3px solid transparent',
                 backgroundColor: activeTab === 'ichat' ? 'var(--nen-nhat)' : 'transparent',
                 '&:hover': { backgroundColor: 'var(--nen-nhat)' },
               }}
@@ -620,13 +620,13 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               onClick={() => setActiveTab('hotro')}
               startIcon={<HelpCircle size={16} />}
               sx={{
-                color: 'var(--chu-dam)',
+                color: activeTab === 'hotro' ? 'var(--chu-dam)' : 'var(--chu-2)',
                 textTransform: 'none',
                 fontWeight: 'bold',
                 px: 2,
                 py: 1,
                 borderRadius: 0,
-                borderBottom: activeTab === 'hotro' ? '3px solid var(--tin-hieu-nen)' : '3px solid transparent',
+                borderBottom: activeTab === 'hotro' ? '3px solid var(--tin-hieu)' : '3px solid transparent',
                 backgroundColor: activeTab === 'hotro' ? 'var(--nen-nhat)' : 'transparent',
                 '&:hover': { backgroundColor: 'var(--nen-nhat)' },
               }}
@@ -643,13 +643,13 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 onClick={() => setActiveTab('hocsinh')}
                 startIcon={<UserIcon size={16} />}
                 sx={{
-                  color: 'var(--chu-dam)',
+                  color: activeTab === 'hocsinh' ? 'var(--chu-dam)' : 'var(--chu-2)',
                   textTransform: 'none',
                   fontWeight: 'bold',
                   px: 2,
                   py: 1,
                   borderRadius: 0,
-                  borderBottom: activeTab === 'hocsinh' ? '3px solid var(--tin-hieu-nen)' : '3px solid transparent',
+                  borderBottom: activeTab === 'hocsinh' ? '3px solid var(--tin-hieu)' : '3px solid transparent',
                   backgroundColor: activeTab === 'hocsinh' ? 'var(--nen-nhat)' : 'transparent',
                   '&:hover': { backgroundColor: 'var(--nen-nhat)' },
                 }}
