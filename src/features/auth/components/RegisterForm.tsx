@@ -71,7 +71,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleForm }) => {
           </Box>
           <Box>
             <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)', mb: 0.5 }}>
-              Học sinh đăng ký bằng Email ✨
+              Học sinh đăng ký bằng Email
             </Typography>
             <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.6, display: 'block' }}>
               Điền email + mật khẩu để tạo tài khoản. Có <strong>mã lớp</strong> do giáo viên cấp?

@@ -52,8 +52,8 @@ import { GameHubSection, SO_TRO_CHOI } from '../features/games/GameHubSection';
 import { SlidesSection } from '../features/lessons/components/SlidesSection';
 import { ActivityFields, type Truong } from '../features/lessons/components/ActivityFields';
 import {
-  ChemDoodles, GameDoodles, GameDoodlesTren, GameDoodlesDuoi,
-  MascotToanThan, MascotDauVai,
+  GameDoodles, GameDoodlesTren, GameDoodlesDuoi,
+  MascotDauVai,
 } from '../features/mascot';
 import { RichText } from '../core/components/RichText';
 import { ApiKeyDialog } from '../features/tutor/components/ApiKeyDialog';
@@ -136,6 +136,10 @@ export const DashboardPage: React.FC = () => {
       trangThai: currentUser
         ? 'Thầy Hùng gợi mở từng bước, không đưa đáp số'
         : `còn ${Math.max(0, 25 - guestChatCount)}/25 câu hỏi thử`,
+      /* Thầy Hùng đứng ở mép phải ĐÚNG trường này, không phải giữa màn —
+         hợp đồng hướng chỉ định vậy, và ở đây nhân vật nói đúng việc mình làm
+         thay vì làm nền trang trí cho cả trang. */
+      nhanVat: <MascotDauVai tab="gioithieu" rong={64} anBongBong />,
       moKhi: () => setActiveTab('ichat'),
       nhanNut: 'Hỏi bài',
     },
@@ -265,7 +269,11 @@ export const DashboardPage: React.FC = () => {
             (không lồng vào trong) để trải hết bề ngang trang mà vẫn không đẩy
             ra thanh cuộn ngang. Chỉ dùng ở tab Giới thiệu — nơi khối chữ hẹp
             nên còn thừa lề hai bên. */}
-        {activeTab === 'gioithieu' && <ChemDoodles />}
+        {/* ChemDoodles TUNG rai o day — hinh hoa chat pastel ve tay, hai le
+            cua chinh man dau. THESIS cua huong tu choi thang idiom do, va no
+            khong nam trong danh sach rang buoc thuong hieu (ten, dong phu, logo
+            sach mo, so Zalo, Thay Hung), nen bo. Cac tab khac van giu hinh cua
+            rieng chung. */}
         <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
 
           {/* ================= TAB 1: CÁC KHÓA HỌC (HỌC MÃI LAYOUT CHÍNH) ================= */}
@@ -486,45 +494,19 @@ export const DashboardPage: React.FC = () => {
                   huong doi hoc sinh bam duoc viec can lam ngay trong man dau,
                   khong phai cuon tim. */}
               <ActivityFields truongs={truongViec} />
-              {/* Nhân vật đứng ngoài lề trái, sát mép khối chữ. Cần khoảng
-                  215px + 16px lề nên chỉ bật từ 1440px trở lên; hẹp hơn thì
-                  rơi xuống kiểu ló đầu nằm trong khối chữ bên dưới. */}
-              <Box
-                sx={{
-                  position: 'absolute',
-                  top: 0,
-                  right: '100%',
-                  mr: 2,
-                  display: 'none',
-                  '@media (min-width:1440px)': { display: 'block' },
-                }}
-              >
-                <MascotToanThan tab="gioithieu" />
-              </Box>
               <Paper sx={{ p: { xs: 4, md: 6 }, borderRadius: 0, border: '1px solid var(--vien)', boxShadow: 'none' }}>
-                {/* Màn hình hẹp không đủ lề cho nhân vật đứng — thay bằng kiểu
-                    ló đầu xếp ngay trên tiêu đề. */}
-                <Box
-                  sx={{
-                    display: 'flex',
-                    mb: 2,
-                    '@media (min-width:1440px)': { display: 'none' },
-                  }}
-                >
-                  <MascotDauVai tab="gioithieu" rong={84} />
-                </Box>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 4 }}>
                   <Avatar variant="square" sx={{ bgcolor: 'var(--nen-dam)', color: 'var(--chu-nguoc)', width: 56, height: 56 }}>
                     <Info size={32} />
                   </Avatar>
                   <Box>
-                    <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)' }}>Giới thiệu về Gia Sư Hóa Học 11 AI</Typography>
-                    <Typography variant="subtitle2" color="text.secondary">Nền tảng tự học đột phá kết hợp Trí tuệ nhân tạo thế hệ mới</Typography>
+                    <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)' }}>Giới thiệu về Gia sư Hóa 11</Typography>
+                    <Typography variant="subtitle2" color="text.secondary">Tự học Hoá học 11 bám sát sách, có gia sư AI dẫn đường</Typography>
                   </Box>
                 </Box>
 
                 <Typography variant="body1" sx={{ mb: 3, lineHeight: 1.8, color: 'var(--chu-dam-3)' }}>
-                  Chào mừng các em học sinh đến với <strong>Gia Sư Hóa Học 11 AI</strong>! Đây là dự án học tập thông minh tiên phong tại Việt Nam, mang đến giải pháp hỗ trợ tự học Hóa học lớp 11 vượt trội theo chương trình phổ thông mới.
+                  Chào mừng các em học sinh đến với <strong>Gia sư Hóa 11</strong>! Đây là nền tảng tự học Hoá học lớp 11 bám sát đúng 25 bài của bộ Kết nối tri thức 2018 — chính bộ sách các em đang cầm trên tay.
                 </Typography>
                 <Typography variant="body1" sx={{ mb: 4, lineHeight: 1.8, color: 'var(--chu-dam-3)' }}>
                   Với mong muốn giúp mọi học sinh đều có thể tự tin làm chủ môn Hóa mà không cần đi học thêm tốn kém, chúng tôi đã tích hợp công nghệ trí tuệ nhân tạo (AI) thông minh để tạo ra một <strong>Người Thầy Gia Sư Đồng Hành 24/7</strong>. Gia sư AI không làm thay bài tập cho học sinh, mà đóng vai trò người hướng dẫn tận tình, khơi gợi suy nghĩ và dìu dắt các em giải quyết bài tập qua từng bước tư duy.
@@ -624,7 +606,7 @@ export const DashboardPage: React.FC = () => {
                           Nguồn kiến thức: {allLessons.length} bài Hóa 11 (KNTT 2018)
                         </Typography>
                         <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.68rem', display: 'block' }}>
-                          <span style={{ color: 'var(--luc-tham)', fontWeight: 'bold' }}>Đã nạp sẵn trong web ⚡</span>
+                          <span style={{ color: 'var(--luc-tham)', fontWeight: 'bold' }}>Đã nạp sẵn trong web</span>
                           {' '}— Thầy luôn có danh mục cả 25 bài; mở một bài cụ thể thì có thêm toàn văn bài đó.
                         </Typography>
                       </Box>

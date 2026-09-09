@@ -396,7 +396,7 @@ export const QuizPage: React.FC = () => {
                   {res?.feedback && (
                     <Box sx={{ p: 2, bgcolor: 'var(--nen-luc-nhat2)', borderRadius: 0, mb: 2, border: '1px solid var(--luc-tham-nen)' }}>
                       <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5, fontWeight: 'bold', color: 'var(--luc-tham)' }}>
-                        🤖 NHẬN XÉT CỦA GIA SƯ AI:
+                        NHẬN XÉT CỦA GIA SƯ AI:
                       </Typography>
                       <Typography variant="body2" sx={{ whiteSpace: 'pre-line', color: 'var(--chu-dam-3)' }}>
                         {res.feedback}
@@ -470,7 +470,7 @@ export const QuizPage: React.FC = () => {
         {/* Dialog báo đạt (>= 7 điểm) */}
         <Dialog open={showUnlockDialog} onClose={() => setShowUnlockDialog(false)} maxWidth="sm" fullWidth>
           <DialogTitle sx={{ fontWeight: 'bold', color: 'var(--luc)' }}>
-            🎉 Chúc mừng! Mở khoá thành công
+            Chúc mừng! Mở khoá thành công
           </DialogTitle>
           <DialogContent>
             <DialogContentText>

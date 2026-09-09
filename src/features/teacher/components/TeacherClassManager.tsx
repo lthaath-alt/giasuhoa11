@@ -179,7 +179,7 @@ export const TeacherClassManager: React.FC<TeacherClassManagerProps> = ({ onClas
       </Box>
 
       <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1.5, lineHeight: 1.6 }}>
-        💡 Sau khi tạo, hệ thống sẽ sinh <strong>mã lớp 6 ký tự</strong> tự động.
+        Sau khi tạo, hệ thống sẽ sinh <strong>mã lớp 6 ký tự</strong> tự động.
         Chia sẻ mã này để học sinh tự tham gia.
       </Typography>
     </Paper>

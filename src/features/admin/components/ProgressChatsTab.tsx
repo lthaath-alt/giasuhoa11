@@ -286,7 +286,7 @@ export const ProgressChatsTab: React.FC<ProgressChatsTabProps> = ({
                               variant="caption"
                               sx={{ display: 'block', mb: 0.5, fontWeight: 'bold', color: isAi ? 'var(--luc-tham)' : 'var(--tin-hieu)' }}
                             >
-                              {isAi ? '🤖 Gia sư AI' : `👤 ${selectedStudent?.name}`}
+                              {isAi ? 'Gia sư AI' : selectedStudent?.name}
                             </Typography>
                             <Typography variant="body2" sx={{ whiteSpace: 'pre-line', fontSize: '0.85rem' }}>
                               <RichText text={msg.content} />

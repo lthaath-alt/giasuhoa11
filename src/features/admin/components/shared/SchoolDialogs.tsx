@@ -24,7 +24,7 @@ export const CredentialDialog: React.FC<{ open: boolean; onClose: () => void; cr
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle sx={{ bgcolor: 'var(--tin-hieu-nen)', color: 'var(--chu-nguoc)', fontWeight: 'bold' }}>
-        ✅ Tài khoản Giáo viên đã được tạo!
+        Tài khoản Giáo viên đã được tạo!
       </DialogTitle>
       <DialogContent sx={{ pt: 3 }}>
         <Alert severity="warning" sx={{ mb: 2, borderRadius: 0 }}>

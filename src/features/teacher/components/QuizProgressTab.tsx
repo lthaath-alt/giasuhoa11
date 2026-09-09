@@ -448,7 +448,7 @@ export const QuizProgressTab: React.FC<QuizProgressTabProps> = ({ students, isAd
                           {/* Nhận xét AI */}
                           <Box sx={{ p: 1.5, bgcolor: 'var(--nen-tin-hieu-nhat2)', borderRadius: 0, mb: 2 }}>
                             <Typography variant="caption" color="var(--chu-dam)" sx={{ fontWeight: 'bold', display: 'block', mb: 0.5 }}>
-                              🤖 AI NHẬN XÉT:
+                              AI NHẬN XÉT:
                             </Typography>
                             <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'pre-line' }}>
                               {result.feedback}

@@ -51,6 +51,8 @@ export interface Truong {
   chinh?: boolean;
   /** Lý do mục bị khoá, hiện thay cho nút. */
   khoa?: string;
+  /** Nhân vật đứng ở mép phải trường, nếu trường này có. */
+  nhanVat?: React.ReactNode;
 }
 
 export const ActivityFields: React.FC<{ truongs: Truong[] }> = ({ truongs }) => (
@@ -122,6 +124,11 @@ export const ActivityFields: React.FC<{ truongs: Truong[] }> = ({ truongs }) => 
           >
             {t.trangThai}
           </Typography>
+
+          {/* Nhân vật đứng ở MÉP PHẢI trường, không phải giữa màn — hợp đồng
+              hướng chỉ định đúng chỗ này. Đặt trước nút để nút vẫn là thứ neo
+              ở mép ngoài cùng, nơi tay người dùng tìm tới. */}
+          {t.nhanVat}
 
           {t.moKhi ? (
             <Button

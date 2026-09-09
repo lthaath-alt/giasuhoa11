@@ -30,22 +30,26 @@ const BrandPanel: React.FC = () => (
       minHeight: '100vh',
       px: { md: 5, lg: 7 },
       py: 6,
-      backgroundColor: 'var(--luc-tham-nen)', // Teal đậm — màu thương hiệu đã có sẵn trong theme
+      /* MỰC, không phải lục. Chỗ này từng là mảng teal đậm — di sản của bảng
+         màu cam–teal mà chủ dự án đã hai lần xác nhận từ bỏ, và OWN-WORLD không
+         cấp một mặt nền lục nào. Đây là màn đầu tiên người quay lại nhìn thấy;
+         để nó ngoài thế giới thì thế giới bắt đầu từ màn thứ hai. */
+      backgroundColor: 'var(--nen-dam)',
       backgroundImage: 'none',
       color: 'var(--chu-nguoc)',
     }}
   >
     {/* Logo trên cùng */}
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+      {/* Cùng con dấu với thanh nhận diện: ô giấy vuông mang biểu tượng mực. */}
       <Box sx={{
-        bgcolor: 'rgba(255,255,255,0.12)', width: 44, height: 44, borderRadius: '50%',
+        bgcolor: 'var(--nen-the)', width: 44, height: 44, borderRadius: 0,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        border: '1px solid rgba(255,255,255,0.25)'
       }}>
-        <BookOpen size={22} color="var(--chu-nguoc)" />
+        <BookOpen size={22} color="var(--chu-dam)" />
       </Box>
       <Typography variant="h6" sx={{ fontWeight: 'bold', letterSpacing: '-0.3px' }}>
-        Gia sư Hóa học 11 AI
+        Gia sư Hóa 11
       </Typography>
     </Box>
 
@@ -67,7 +71,18 @@ const BrandPanel: React.FC = () => (
       </Typography>
 
       {/* Lưới 4 tính năng, 2x2 */}
-      <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2.5 }}>
+      {/* Bảng khai: bốn ô LIỀN CẠNH chia bằng một nét dùng chung, không phải
+          bốn thẻ rời có khe. Đây là thiết bị mà OWN-WORLD gọi tên — "trường có
+          kẻ ô như bảng khai nhãn" — và là chỗ trước đây build mới chỉ làm cho
+          các hộp vuông góc chứ chưa thật sự kẻ ô. Lưới thu gọn viền: mỗi ô chỉ
+          vẽ cạnh phải và cạnh dưới, khung ngoài đóng lại hai cạnh còn lại. */}
+      <Box sx={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+        border: '1px solid var(--chu-tren-nen-dam)',
+        borderRight: 0,
+        borderBottom: 0,
+      }}>
         {[
           { icon: <BookOpen size={20} />, title: 'Bám sát SGK', desc: 'Tóm tắt lý thuyết & công thức từng Chương/Bài.' },
           { icon: <Sparkles size={20} />, title: 'Gia sư AI đồng hành', desc: 'Đàm thoại 1:1, gợi mở tư duy, sửa sai từng bước.' },
@@ -78,8 +93,8 @@ const BrandPanel: React.FC = () => (
             key={title}
             sx={{
               p: 2, borderRadius: 0,
-              border: '1px solid rgba(255,255,255,0.18)',
-              backgroundColor: 'rgba(255,255,255,0.06)',
+              borderRight: '1px solid var(--chu-tren-nen-dam)',
+              borderBottom: '1px solid var(--chu-tren-nen-dam)',
             }}
           >
             <Box sx={{ color: 'var(--vang-nen)', mb: 1 }}>{icon}</Box>
@@ -94,7 +109,7 @@ const BrandPanel: React.FC = () => (
 
     {/* Footer */}
     <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.78)' }}>
-      © 2026 Gia sư Hóa học 11 AI. All rights reserved.
+      © 2026 Gia sư Hóa 11. Bản quyền thuộc về nhóm tác giả.
     </Typography>
   </Box>
 );
@@ -201,7 +216,7 @@ export const LoginPage: React.FC = () => {
             <Box sx={{ display: { xs: 'flex', md: 'none' }, alignItems: 'center', gap: 1, mb: 3, justifyContent: 'center' }}>
               <BookOpen size={24} color="var(--luc-tham)" />
               <Typography variant="h5" color="var(--luc-tham)" sx={{ fontWeight: 'bold' }}>
-                Gia sư Hóa học 11 AI
+                Gia sư Hóa 11
               </Typography>
             </Box>
 
@@ -212,7 +227,7 @@ export const LoginPage: React.FC = () => {
                   Đăng nhập tài khoản
                 </Typography>
                 <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-                  Chào mừng bạn quay lại với Gia sư Hóa học 11 AI.
+                  Chào mừng bạn quay lại với Gia sư Hóa 11.
                 </Typography>
               </Box>
             )}

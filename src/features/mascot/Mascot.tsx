@@ -147,7 +147,10 @@ export const MascotToanThan: React.FC<{ tab?: TabMascot }> = ({ tab = 'gioithieu
 };
 
 /* ---------- Kiểu 2: ló đầu + vai, xếp trong dòng nội dung ---------- */
-export const MascotDauVai: React.FC<{ tab: TabMascot; rong?: number }> = ({ tab, rong = 96 }) => {
+/* `anBongBong`: chỉ lấy hình, bỏ lời thoại. Dùng cho ô hẹp — trong trường
+   "Gia sư AI" ở khung hình đầu thì một bong bóng nữa sẽ chọi nhau với dòng
+   trạng thái và nút bấm. */
+export const MascotDauVai: React.FC<{ tab: TabMascot; rong?: number; anBongBong?: boolean }> = ({ tab, rong = 96, anBongBong = false }) => {
   const loi = useMemo(() => dungLoiThoai(tab), [tab]);
   return (
     <Box
@@ -174,7 +177,7 @@ export const MascotDauVai: React.FC<{ tab: TabMascot; rong?: number }> = ({ tab,
           ...NHIP_THO,
         }}
       />
-      <BongBong loi={loi} huong="trai" />
+      {!anBongBong && <BongBong loi={loi} huong="trai" />}
     </Box>
   );
 };

@@ -115,10 +115,14 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
       color="inherit"
       elevation={0}
       sx={{
-        backgroundColor: 'var(--nen-the)',
-        /* Thế giới nhãn dựng bằng NÉT KẺ, không bằng bóng đổ mềm. Một đường mực
-           đậm dưới thanh thay cho vệt mờ toả — đó là cách một cái nhãn thật kết
-           thúc ở mép giấy. */
+        /* Dải NHẬN DIỆN là mực, đúng như FIRST VIEWPORT gọi tên. Trước đây
+           dựng ngược: dải này trắng còn mực thì bị giao cho hàng menu bên dưới,
+           nên thứ hợp đồng gọi là "thanh nhận diện mực đen" lại là giấy.
+
+           Thế giới nhãn dựng bằng NÉT KẺ, không bằng bóng đổ mềm: một đường mực
+           đậm dưới thanh thay cho vệt mờ toả. */
+        backgroundColor: 'var(--nen-dam)',
+        color: 'var(--chu-nguoc)',
         borderBottom: '2px solid var(--chu-dam)',
         boxShadow: 'none',
       }}
@@ -151,7 +155,9 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 /* Mực đen, không xanh dương: ô nhận diện là con dấu trên nhãn.
                    Góc vuông và không bóng đổ — hình thoi bo tròn nửa vời là di
                    sản của thế giới cũ. */
-                backgroundColor: 'var(--nen-dam)',
+                /* Trên dải mực thì con dấu phải lật: ô GIẤY mang biểu tượng
+                   MỰC, như một nhãn dán trắng đè lên nền đen. */
+                backgroundColor: 'var(--nen-the)',
                 borderRadius: 0,
                 display: 'flex',
                 alignItems: 'center',
@@ -159,7 +165,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 boxShadow: 'none',
               }}
             >
-              <BookOpen size={24} color="var(--chu-nguoc)" />
+              <BookOpen size={24} color="var(--chu-dam)" />
             </Box>
             <Box>
               <Typography
@@ -168,8 +174,8 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                   fontWeight: 900,
                   letterSpacing: '-0.5px',
                   /* Ten he thong la MUC. Cai duy nhat mang mau tin hieu tren
-                     thanh nay la dong phu va nut hanh dong chinh. */
-                  color: 'var(--chu-dam)',
+                     thanh nay la nut hanh dong chinh. */
+                  color: 'var(--chu-nguoc)',
                   lineHeight: 1.1,
                   display: 'flex',
                   alignItems: 'center',
@@ -182,8 +188,9 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 variant="caption"
                 sx={{
                   fontWeight: 'bold',
-                  /* Nhan thuong hieu, khong phai tin hieu. */
-                  color: 'var(--chu-2)',
+                  /* Nhãn thương hiệu, không phải tín hiệu. Trên mặt mực thì
+                     dùng biến sinh ra cho đúng mặt đó. */
+                  color: 'var(--chu-tren-nen-dam)',
                   letterSpacing: '0.5px',
                   textTransform: 'uppercase',
                   fontSize: '0.68rem',
@@ -207,7 +214,8 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 py: 0.8,
                 border: '1px solid transparent',
                 '&:focus-within': {
-                  borderColor: 'var(--chu-dam)',
+                  /* Trên dải mực, viền mực không thấy được — dùng vàng cảnh báo. */
+                  borderColor: 'var(--vang-nen)',
                   backgroundColor: 'var(--nen-the)',
                 },
               }}
@@ -308,8 +316,8 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                      giới nhãn chỉ có MỘT màu tín hiệu, và nó dành cho việc học —
                      nên nút này hạ xuống dạng khung kẻ. */
                   backgroundColor: 'transparent',
-                  color: 'var(--chu-dam)',
-                  border: '1px solid var(--chu-dam)',
+                  color: 'var(--chu-nguoc)',
+                  border: '1px solid var(--chu-nguoc)',
                   borderRadius: 0,
                   fontSize: '0.75rem',
                   fontWeight: 700,
@@ -317,8 +325,8 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                   px: 2,
                   py: 0.6,
                   '&:hover': {
-                    backgroundColor: 'var(--nen-dam)',
-                    color: 'var(--chu-nguoc)',
+                    backgroundColor: 'var(--nen-the)',
+                    color: 'var(--chu-dam)',
                   },
                 }}
               >
@@ -334,7 +342,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 onClick={doiCheDo}
                 size="small"
                 aria-label={laToi ? 'Chuyển sang nền sáng' : 'Chuyển sang nền tối'}
-                sx={{ color: 'var(--chu-2)', '&:hover': { color: 'var(--tin-hieu)' } }}
+                sx={{ color: 'var(--chu-tren-nen-dam)', '&:hover': { color: 'var(--chu-nguoc)' } }}
               >
                 {laToi ? <Sun size={18} /> : <Moon size={18} />}
               </IconButton>
@@ -344,7 +352,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             {currentUser ? (
               // ── Đã đăng nhập: Avatar + Tên + Chip vai trò + Đăng xuất
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                <Avatar sx={{ bgcolor: 'var(--xanh-nen)', color: 'var(--chu-nguoc)', width: 34, height: 34, fontWeight: 'bold', fontSize: '0.9rem' }}>
+                <Avatar variant="square" sx={{ bgcolor: 'var(--nen-the)', color: 'var(--chu-dam)', width: 34, height: 34, fontWeight: 'bold', fontSize: '0.9rem' }}>
                   {currentUser.name.charAt(0).toUpperCase()}
                 </Avatar>
                 <Box sx={{ display: { xs: 'none', sm: 'block' }, textAlign: 'left' }}>
@@ -375,7 +383,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                   {currentUser.role === 'student' && hasAdvancedStudentTitle(currentUser.email) && (
                     <Chip
                       size="small"
-                      label="HS Nâng cao 🎓"
+                      label="HS Nâng cao"
                       sx={{
                         height: 18,
                         fontSize: '0.6rem',
@@ -399,9 +407,9 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                     borderRadius: 0,
                     fontSize: '0.72rem',
                     fontWeight: 'bold',
-                    borderColor: 'var(--do)',
-                    color: 'var(--do)',
-                    '&:hover': { bgcolor: 'var(--nen-do-nhat2)' },
+                    borderColor: 'var(--chu-nguoc)',
+                    color: 'var(--chu-nguoc)',
+                    '&:hover': { bgcolor: 'var(--nen-the)', color: 'var(--chu-dam)' },
                   }}
                 >
                   Đăng xuất
@@ -416,7 +424,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                   variant="outlined"
                   size="small"
                   onClick={() => navigate('/login')}
-                  sx={{ textTransform: 'none', borderRadius: 0, fontSize: '0.75rem', fontWeight: 'bold', borderColor: 'var(--chu-dam)', color: 'var(--chu-dam)' }}
+                  sx={{ textTransform: 'none', borderRadius: 0, fontSize: '0.75rem', fontWeight: 'bold', borderColor: 'var(--chu-nguoc)', color: 'var(--chu-nguoc)' }}
                 >
                   Đăng Nhập
                 </Button>
@@ -437,7 +445,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                     backgroundColor: 'var(--tin-hieu-nen)',
                     color: 'var(--chu-nguoc)',
                     boxShadow: 'none',
-                    '&:hover': { backgroundColor: 'var(--nen-dam)', boxShadow: 'none' },
+                    '&:hover': { backgroundColor: 'var(--nen-the)', color: 'var(--chu-dam)', boxShadow: 'none' },
                   }}
                 >
                   Đăng Ký
@@ -454,12 +462,12 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                     fontSize: '0.75rem',
                     fontWeight: 700,
                     backgroundColor: 'transparent',
-                    color: 'var(--chu-dam)',
-                    border: '1px solid var(--chu-dam)',
+                    color: 'var(--chu-nguoc)',
+                    border: '1px solid var(--chu-nguoc)',
                     boxShadow: 'none',
                     '&:hover': {
-                      backgroundColor: 'var(--nen-dam)',
-                      color: 'var(--chu-nguoc)',
+                      backgroundColor: 'var(--nen-the)',
+                      color: 'var(--chu-dam)',
                       boxShadow: 'none',
                     },
                   }}
@@ -473,7 +481,8 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
       </Container>
 
       {/* 2. DÒNG DƯỚI: THANH NAVIGATE MENU CHÍNH (GIỐNG HOCMAI.VN TRONG HÌNH) */}
-      <Box sx={{ backgroundColor: 'var(--nen-dam)', color: 'var(--chu-nguoc)' }}>
+      {/* Hàng menu nay là GIẤY: dải mực đã về đúng chỗ của nó ở trên. */}
+      <Box sx={{ backgroundColor: 'var(--nen-the)', color: 'var(--chu-dam)' }}>
         <Container maxWidth="xl">
           <Box
             sx={{
@@ -500,15 +509,15 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               }}
               startIcon={<Layers size={16} />}
               sx={{
-                color: 'var(--chu-nguoc)',
+                color: 'var(--chu-dam)',
                 textTransform: 'none',
                 fontWeight: 'bold',
                 px: 2,
                 py: 1,
                 borderRadius: 0,
-                borderBottom: activeTab === 'hocmai' ? '3px solid var(--vang-nen)' : '3px solid transparent',
-                backgroundColor: activeTab === 'hocmai' ? 'rgba(255,255,255,0.1)' : 'transparent',
-                '&:hover': { backgroundColor: 'rgba(255,255,255,0.15)' },
+                borderBottom: activeTab === 'hocmai' ? '3px solid var(--tin-hieu-nen)' : '3px solid transparent',
+                backgroundColor: activeTab === 'hocmai' ? 'var(--nen-nhat)' : 'transparent',
+                '&:hover': { backgroundColor: 'var(--nen-nhat)' },
               }}
             >
               Các khóa học (Hóa 11)
@@ -523,15 +532,15 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               }}
               startIcon={<Info size={16} />}
               sx={{
-                color: 'var(--chu-nguoc)',
+                color: 'var(--chu-dam)',
                 textTransform: 'none',
                 fontWeight: 'bold',
                 px: 2,
                 py: 1,
                 borderRadius: 0,
-                borderBottom: activeTab === 'gioithieu' ? '3px solid var(--vang-nen)' : '3px solid transparent',
-                backgroundColor: activeTab === 'gioithieu' ? 'rgba(255,255,255,0.1)' : 'transparent',
-                '&:hover': { backgroundColor: 'rgba(255,255,255,0.15)' },
+                borderBottom: activeTab === 'gioithieu' ? '3px solid var(--tin-hieu-nen)' : '3px solid transparent',
+                backgroundColor: activeTab === 'gioithieu' ? 'var(--nen-nhat)' : 'transparent',
+                '&:hover': { backgroundColor: 'var(--nen-nhat)' },
               }}
             >
               Giới thiệu
@@ -545,16 +554,16 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               }}
               startIcon={<Presentation size={16} />}
               sx={{
-                color: 'var(--chu-nguoc)',
+                color: 'var(--chu-dam)',
                 textTransform: 'none',
                 fontWeight: 'bold',
                 px: 2,
                 py: 1,
                 borderRadius: 0,
                 whiteSpace: 'nowrap',
-                borderBottom: activeTab === 'baigiang' ? '3px solid var(--vang-nen)' : '3px solid transparent',
-                backgroundColor: activeTab === 'baigiang' ? 'rgba(255,255,255,0.1)' : 'transparent',
-                '&:hover': { backgroundColor: 'rgba(255,255,255,0.15)' },
+                borderBottom: activeTab === 'baigiang' ? '3px solid var(--tin-hieu-nen)' : '3px solid transparent',
+                backgroundColor: activeTab === 'baigiang' ? 'var(--nen-nhat)' : 'transparent',
+                '&:hover': { backgroundColor: 'var(--nen-nhat)' },
               }}
             >
               Bài giảng
@@ -568,16 +577,16 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               }}
               startIcon={<Gamepad2 size={16} />}
               sx={{
-                color: 'var(--chu-nguoc)',
+                color: 'var(--chu-dam)',
                 textTransform: 'none',
                 fontWeight: 'bold',
                 px: 2,
                 py: 1,
                 borderRadius: 0,
                 whiteSpace: 'nowrap',
-                borderBottom: activeTab === 'trochoi' ? '3px solid var(--vang-nen)' : '3px solid transparent',
-                backgroundColor: activeTab === 'trochoi' ? 'rgba(255,255,255,0.1)' : 'transparent',
-                '&:hover': { backgroundColor: 'rgba(255,255,255,0.15)' },
+                borderBottom: activeTab === 'trochoi' ? '3px solid var(--tin-hieu-nen)' : '3px solid transparent',
+                backgroundColor: activeTab === 'trochoi' ? 'var(--nen-nhat)' : 'transparent',
+                '&:hover': { backgroundColor: 'var(--nen-nhat)' },
               }}
             >
               Trò chơi
@@ -591,15 +600,15 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               }}
               startIcon={<MessageSquare size={16} />}
               sx={{
-                color: 'var(--chu-nguoc)',
+                color: 'var(--chu-dam)',
                 textTransform: 'none',
                 fontWeight: 'bold',
                 px: 2,
                 py: 1,
                 borderRadius: 0,
-                borderBottom: activeTab === 'ichat' ? '3px solid var(--vang-nen)' : '3px solid transparent',
-                backgroundColor: activeTab === 'ichat' ? 'rgba(255,255,255,0.1)' : 'transparent',
-                '&:hover': { backgroundColor: 'rgba(255,255,255,0.15)' },
+                borderBottom: activeTab === 'ichat' ? '3px solid var(--tin-hieu-nen)' : '3px solid transparent',
+                backgroundColor: activeTab === 'ichat' ? 'var(--nen-nhat)' : 'transparent',
+                '&:hover': { backgroundColor: 'var(--nen-nhat)' },
               }}
             >
               iChat - Hỏi đáp với AI
@@ -611,15 +620,15 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               onClick={() => setActiveTab('hotro')}
               startIcon={<HelpCircle size={16} />}
               sx={{
-                color: 'var(--chu-nguoc)',
+                color: 'var(--chu-dam)',
                 textTransform: 'none',
                 fontWeight: 'bold',
                 px: 2,
                 py: 1,
                 borderRadius: 0,
-                borderBottom: activeTab === 'hotro' ? '3px solid var(--vang-nen)' : '3px solid transparent',
-                backgroundColor: activeTab === 'hotro' ? 'rgba(255,255,255,0.1)' : 'transparent',
-                '&:hover': { backgroundColor: 'rgba(255,255,255,0.15)' },
+                borderBottom: activeTab === 'hotro' ? '3px solid var(--tin-hieu-nen)' : '3px solid transparent',
+                backgroundColor: activeTab === 'hotro' ? 'var(--nen-nhat)' : 'transparent',
+                '&:hover': { backgroundColor: 'var(--nen-nhat)' },
               }}
             >
               Hỗ trợ
@@ -634,15 +643,15 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 onClick={() => setActiveTab('hocsinh')}
                 startIcon={<UserIcon size={16} />}
                 sx={{
-                  color: 'var(--chu-nguoc)',
+                  color: 'var(--chu-dam)',
                   textTransform: 'none',
                   fontWeight: 'bold',
                   px: 2,
                   py: 1,
                   borderRadius: 0,
-                  borderBottom: activeTab === 'hocsinh' ? '3px solid var(--vang-nen)' : '3px solid transparent',
-                  backgroundColor: activeTab === 'hocsinh' ? 'rgba(255,255,255,0.1)' : 'transparent',
-                  '&:hover': { backgroundColor: 'rgba(255,255,255,0.15)' },
+                  borderBottom: activeTab === 'hocsinh' ? '3px solid var(--tin-hieu-nen)' : '3px solid transparent',
+                  backgroundColor: activeTab === 'hocsinh' ? 'var(--nen-nhat)' : 'transparent',
+                  '&:hover': { backgroundColor: 'var(--nen-nhat)' },
                 }}
               >
                 Học sinh
@@ -656,8 +665,9 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 onClick={() => navigate('/teacher')}
                 startIcon={<GraduationCap size={16} />}
                 sx={{
-                  /* Tren dai muc: phai la --vang-nen (11,4), khong phai --vang (2,94). */
-                  color: 'var(--vang-nen)',
+                  /* Hàng menu nay là giấy: --vang-nen trên giấy chỉ được 1,75.
+                     Mực là màu đúng, và vai trò đã có biểu tượng riêng phân biệt. */
+                  color: 'var(--chu-dam)',
                   textTransform: 'none',
                   fontWeight: 'bold',
                   px: 2,
@@ -678,8 +688,9 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 onClick={() => navigate('/school-admin')}
                 startIcon={<Building2 size={16} />}
                 sx={{
-                  /* Tren dai muc: phai la --vang-nen (11,4), khong phai --vang (2,94). */
-                  color: 'var(--vang-nen)',
+                  /* Hàng menu nay là giấy: --vang-nen trên giấy chỉ được 1,75.
+                     Mực là màu đúng, và vai trò đã có biểu tượng riêng phân biệt. */
+                  color: 'var(--chu-dam)',
                   textTransform: 'none',
                   fontWeight: 'bold',
                   px: 2,
@@ -700,8 +711,9 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 onClick={() => navigate('/admin')}
                 startIcon={<ShieldCheck size={16} />}
                 sx={{
-                  /* Tren dai muc: phai la --vang-nen (11,4), khong phai --vang (2,94). */
-                  color: 'var(--vang-nen)',
+                  /* Hàng menu nay là giấy: --vang-nen trên giấy chỉ được 1,75.
+                     Mực là màu đúng, và vai trò đã có biểu tượng riêng phân biệt. */
+                  color: 'var(--chu-dam)',
                   textTransform: 'none',
                   fontWeight: 'bold',
                   px: 2,

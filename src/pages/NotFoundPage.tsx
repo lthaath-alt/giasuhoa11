@@ -31,7 +31,7 @@ export const NotFoundPage: React.FC = () => {
           404 - Không tìm thấy trang
         </Typography>
         <Typography variant="body2" sx={{ mb: 4, color: 'var(--chu-2)' }}>
-          Đường dẫn bạn truy cập không tồn tại hoặc đã bị thay đổi trong hệ thống Gia sư Hóa học 11 AI.
+          Đường dẫn bạn truy cập không tồn tại hoặc đã bị thay đổi trong hệ thống Gia sư Hóa 11.
         </Typography>
         <Button
           id="back-home-404-btn"

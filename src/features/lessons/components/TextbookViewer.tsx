@@ -342,7 +342,7 @@ export const TextbookViewer: React.FC<TextbookViewerProps> = ({ lesson, onOpenCh
         }}
       >
         <Box>
-          <Typography variant="subtitle1" sx={{ fontWeight: 700, color: VAI.chu }}>🤖 Còn thắc mắc về bài học này?</Typography>
+          <Typography variant="subtitle1" sx={{ fontWeight: 700, color: VAI.chu }}>Còn thắc mắc về bài học này?</Typography>
           <Typography variant="body2" sx={{ color: 'var(--chu-2)', mt: 0.5 }}>Gia sư AI sẵn sàng giải đáp mọi câu hỏi của bạn ngay lập tức!</Typography>
         </Box>
         <Button

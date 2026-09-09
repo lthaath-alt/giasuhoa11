@@ -536,7 +536,7 @@ export const FirestoreAccountManager: React.FC = () => {
             {updatingRole
               ? 'Đang cập nhật...'
               : confirmStep
-              ? '✅ XÁC NHẬN CẤP QUYỀN'
+              ? 'XÁC NHẬN CẤP QUYỀN'
               : 'Cập nhật quyền'}
           </Button>
         </DialogActions>

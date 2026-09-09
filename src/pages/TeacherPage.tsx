@@ -47,7 +47,7 @@ const CredentialDialog: React.FC<CredentialDialogProps> = ({ open, onClose, cred
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle sx={{ bgcolor: 'var(--luc-tham-nen)', color: 'var(--chu-nguoc)', fontWeight: 'bold' }}>
-        ✅ Tài khoản đã được tạo thành công!
+        Tài khoản đã được tạo thành công!
       </DialogTitle>
       <DialogContent sx={{ pt: 3 }}>
         <Alert severity="warning" sx={{ mb: 2, borderRadius: 0 }}>
@@ -300,7 +300,7 @@ export const TeacherPage: React.FC = () => {
                   {myClass ? `Lớp ${myClass.name}` : 'Không gian Giáo viên'}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  Gia sư Hóa học 11 AI
+                  Gia sư Hóa 11
                 </Typography>
               </Box>
             </Box>
