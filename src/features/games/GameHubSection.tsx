@@ -229,7 +229,7 @@ export const GameHubSection: React.FC = () => {
           sx={{
             fontWeight: 800,
             fontSize: '28px',
-            color: 'var(--xanh-dam)',
+            color: 'var(--chu-dam)',
             display: 'flex',
             alignItems: 'center',
             gap: 1.5,
@@ -268,7 +268,7 @@ export const GameHubSection: React.FC = () => {
               flexDirection: 'column',
               height: '100%',
               bgcolor: 'var(--nen-the)',
-              border: '2px solid var(--xanh-dam)',
+              border: '2px solid var(--chu-dam)',
               boxShadow: 'none',
               transition: 'transform 0.2s, box-shadow 0.2s',
               overflow: 'hidden',

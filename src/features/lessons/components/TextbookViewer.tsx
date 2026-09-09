@@ -177,7 +177,9 @@ export const TextbookViewer: React.FC<TextbookViewerProps> = ({ lesson, onOpenCh
 
                 {/* Nội dung mục - ẩn/hiện */}
                 <Collapse in={isOpen} timeout={300}>
-                  <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+                  {/* .mo-muc-bai: cac khoi ben trong trai ra so le mot nhip.
+                      Nhip duy nhat cua ca he thong — xem chu thich o index.css. */}
+                  <Box className="mo-muc-bai" sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 2.5 }}>
 
                     {/* Lý thuyết chính */}
                     <Box sx={{ p: 2.5, bgcolor: 'var(--nen-rat-nhat)', borderRadius: 0, border: '1px solid var(--vien)' }}>

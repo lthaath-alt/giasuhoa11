@@ -234,3 +234,42 @@ table, [data-so], .so-lieu {
   font-variant-numeric: tabular-nums;
 }
 
+/* ── MỘT nhịp, và đây là nó ──────────────────────────────────────────────────
+   Mở một mục trong trình đọc SGK thì các khối bên trong trải ra so le: lý
+   thuyết, rồi ghi nhớ, rồi công thức. Cấu trúc của bài tự bày ra trong một
+   nhịp, thay vì đổ ụp xuống cùng lúc.
+
+   Đây là dòng nâng mượn từ hướng bị loại *Miura Orbit Sheet* trong hợp đồng
+   hướng — "mở một bài là bung trọn cấu trúc của nó trong một nhịp" — nên nó là
+   một lời hứa được trả, không phải một hiệu ứng thêm vào cho vui.
+
+   MỘT nhịp nghĩa là một: cả hệ thống không có chỗ thứ hai chuyển động. Thêm
+   chỗ nữa là mỗi chỗ mất đi phần ý nghĩa của nó.
+
+   Dựng bằng CSS thuần, CỐ Ý không dùng `motion` dù gói đó đã nằm trong
+   package.json: chưa tệp nào trong src/ import nó, nên nó chưa hề nằm trong gói
+   tải về. Kéo cả một thư viện vào cho đúng một hiệu ứng là đánh đổi sai —
+   PRODUCT.md ghi học sinh dùng mạng di động và nặng trang là rào cản thật.
+
+   Bước 50ms, mỗi khối chạy 170ms, khối thứ tư kết thúc ở 320ms. Đủ để mắt đọc
+   ra thứ tự, chưa đủ để phải chờ. Khối thứ năm trở đi dùng chung độ trễ cuối —
+   một mục dài không được biến thành hàng đợi. */
+@keyframes mo-muc-bai {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.mo-muc-bai > * {
+  animation: mo-muc-bai 170ms ease-out both;
+}
+.mo-muc-bai > *:nth-child(1) { animation-delay: 0ms; }
+.mo-muc-bai > *:nth-child(2) { animation-delay: 50ms; }
+.mo-muc-bai > *:nth-child(3) { animation-delay: 100ms; }
+.mo-muc-bai > *:nth-child(n + 4) { animation-delay: 150ms; }
+
+/* Ai đã bảo máy là đừng chuyển động thì không chuyển động. Lối này dự án đã
+   dùng sẵn ở Mascot, ChemDoodles và hai trò chơi. */
+@media (prefers-reduced-motion: reduce) {
+  .mo-muc-bai > * { animation: none; }
+}
+

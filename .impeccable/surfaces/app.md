@@ -62,3 +62,17 @@ verdict, DESIGN.md, and every shipping raster carrying its provenance
   chiếu trong lớp. Máy chiếu là lý do ngôn ngữ nhãn thắng — nó đọc được từ xa.
 - **Chế độ tối là bắt buộc**, không phải tuỳ chọn: học sinh học buổi tối. Cảnh vật lý
   quyết định điều này, không phải thói quen thể loại.
+- **Trò chơi trong `public/games/` CỐ Ý ở ngoài thế giới này.** Bề mặt trên là chế độ
+  **Operate** — nơi học sinh làm việc. Trò chơi là chế độ **Chơi**, và một trò chơi có
+  thế giới riêng là lựa chọn thiết kế, không phải lỗi đồng bộ. Chủ dự án chốt ngày
+  09/09/2026, sau khi một vòng duyệt kết thúc nêu chỗ này là "hai sản phẩm khác nhau".
+  Riêng "Rắn và Thang" còn là **thiết kế chủ dự án đặt riêng**: thầy gửi ảnh một tấm áp
+  phích trò chơi và yêu cầu làm theo, `npm run kiem-tra:ran-thang` đang canh đúng bảng
+  màu ấy. Đổi nó là xoá việc đã duyệt.
+  Thứ PHẢI thuộc thế giới nhãn là **chỗ tiếp giáp**: thẻ chọn trò và thanh phủ khung
+  trò chơi — như một cái nhãn dán trên hộp đựng trò chơi.
+- **Ngữ pháp chuyển động: đúng MỘT nhịp, và nó nằm ở chỗ mở một bài.** Trải so le các
+  khối bên trong mục vừa mở, tổng ~320ms, bước 60ms — đây là dòng nâng mượn từ *Miura
+  Orbit Sheet* được trả. Dựng bằng CSS thuần, cố ý KHÔNG kéo thư viện chuyển động vào
+  gói tải: học sinh dùng mạng di động và nặng trang là rào cản thật. Luôn tắt dưới
+  `prefers-reduced-motion`.
