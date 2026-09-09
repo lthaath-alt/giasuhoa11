@@ -133,6 +133,13 @@ const themeGoc = {
           '&:hover': { boxShadow: 'none' },
         },
         outlined: { borderWidth: '1px' },
+        /* Nut da vo hieu hoa: MUI mac dinh cho chu rgba(0,0,0,0.26) — tren nen
+           --nen-tat chi duoc 1,83, doc gan nhu khong ra. WCAG mien tru thanh
+           phan bi vo hieu hoa, nhung mot cai nhan thi doc duoc hoac khong; giu
+           no MO chu khong giu no MOT. Muc nhat --chu dat 5,13. */
+        contained: {
+          '&.Mui-disabled': { backgroundColor: 'var(--nen-tat)', color: 'var(--chu)' },
+        },
       },
     },
     MuiCard: {

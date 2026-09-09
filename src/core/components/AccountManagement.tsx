@@ -127,7 +127,7 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({
                 onClick={() => onCreateSchoolAdminClick?.(schools[0]?.id || '')}
                 sx={{
                   textTransform: 'none', borderRadius: 0, fontWeight: 'bold', boxShadow: 'none',
-                  bgcolor: 'var(--tim-nen)', '&:hover': { bgcolor: '#4338ca' }
+                  bgcolor: 'var(--tim-nen)', '&:hover': { bgcolor: 'var(--nen-dam)' }
                 }}
               >
                 Thêm Admin Trường
@@ -221,7 +221,7 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({
                       <ShieldCheck size={16} color="var(--tim)" />
                     </Box>
                     <Box>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: '#1e1b4b' }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--tim-2)' }}>
                         {school.name}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
@@ -254,7 +254,7 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({
                 ) : (
                   <Table size="small">
                     <TableHead>
-                      <TableRow sx={{ bgcolor: '#f8f7ff' }}>
+                      <TableRow sx={{ bgcolor: 'var(--nen-tim-nhat2)' }}>
                         <TableCell sx={{ fontWeight: 'bold', color: 'var(--tim)', fontSize: '0.78rem' }}>Họ Tên</TableCell>
                         <TableCell sx={{ fontWeight: 'bold', color: 'var(--tim)', fontSize: '0.78rem' }}>Email Đăng Nhập</TableCell>
                         <TableCell sx={{ fontWeight: 'bold', color: 'var(--tim)', fontSize: '0.78rem' }}>Trạng Thái</TableCell>

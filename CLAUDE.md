@@ -88,10 +88,19 @@ này từng được ghi ở đây nhưng chưa bao giờ tồn tại.
   không phải chỗ để "dọn code" — muốn siết thì phải thay hẳn sang Firebase Auth và
   bàn trước với user.
 - `Grid` MUI v9 dùng `size={{ xs, sm, md }}` (không phải `item`/`xs=` kiểu bản cũ).
-- Theme MUI khai ngay trong `src/App.tsx` (không có `core/theme/`): primary là **cam
-  `#ea580c`**, secondary teal `#0f766e`; phần nền tối được dựng lại bằng một theme thứ
-  hai ở cuối tệp. Khối `palette` phải giữ mã màu THẬT — đưa biến CSS vào là hỏng cả
-  bảng màu, vì MUI cần màu thật để tự tính sắc độ đậm/nhạt.
+- Theme MUI khai ngay trong `src/App.tsx` (không có `core/theme/`): primary là **đỏ tín
+  hiệu `#C4000E`**, secondary lục phòng thí nghiệm `#0F5A44`, warning vàng cảnh báo
+  `#F5C400`; nền `#F2F1ED` (giấy nhãn) trên `#FFFFFF` (mặt nhãn). Phần nền tối được
+  dựng lại bằng một theme thứ hai ở cuối tệp và **phải trùng khớp** với
+  `:root[data-theme="dark"]` trong `index.css` — hai hệ nói khác nhau thì chữ MUI ngồi
+  trên nền CSS khác hệ, tương phản tụt mà build vẫn xanh.
+  Khối `palette` phải giữ mã màu THẬT — đưa biến CSS vào là hỏng cả bảng màu, vì MUI
+  cần màu thật để tự tính sắc độ đậm/nhạt. Đây là **chỗ duy nhất** còn được viết cứng
+  mã màu; `kiem-tra:mau` bắt mọi chỗ khác.
+- Khối `components` của theme quy định hình dạng chung: `shape.borderRadius = 0`, mọi
+  `boxShadow` mặc định bị tắt, `Paper`/`Card` dùng nét kẻ thay bóng đổ, mặt nổi lên
+  (hộp thoại / menu / gợi ý) tách khỏi nền bằng viền mực 2px. Sửa ở đó rẻ hơn nhiều so
+  với đi đổi từng `sx`.
 - Đừng sửa `vite.config.ts` phần `hmr`/`watch` (do AI Studio điều khiển, sửa gây nhấp nháy khi edit).
 - Đừng commit `.env.local` / API key.
 
@@ -103,13 +112,14 @@ Hằng ngày:
 |---|---|
 | `npm run dev` | Máy chủ phát triển, cổng 3000 |
 | `npm run lint` | `tsc --noEmit` — hàng rào chính, chạy MỘT LẦN trước khi báo xong |
-| `npm run kiem-tra` | Chạy cả 8 bộ kiểm, 184 mục. Chạy trước khi commit |
+| `npm run kiem-tra` | Chạy cả 9 bộ kiểm, 190 mục. Chạy trước khi commit |
 | `npm run build` | **Chỉ khi user yêu cầu** |
 
 Bộ kiểm chạy riêng khi cần: `kiem-tra:chuong-trinh` (dữ liệu 25 bài),
 `kiem-tra:ngan-hang`, `kiem-tra:de-chuong`, `kiem-tra:het-luot`, `kiem-tra:mau`
 (biến màu + tương phản), `kiem-tra:thuc-nghiem`, `kiem-tra:ran-thang`,
-`kiem-tra:dong-bo` (cần mạng, mất mạng thì tự bỏ qua).
+`kiem-tra:dong-bo` (cần mạng, mất mạng thì tự bỏ qua), `kiem-tra:tai-lieu`
+(mọi đường dẫn và lệnh npm mà CLAUDE.md / hiến chương nhắc tới đều phải có thật).
 
 Sinh lại dữ liệu — đọc `scripts/README.md` trước khi dùng:
 `soan` (từ tệp .docx sang `constants.ts`), `xuat:ngan-hang` (Firestore sang repo),
@@ -173,6 +183,25 @@ web vẫn đúng vì nó đọc thẳng Firestore; `kiem-tra:dong-bo` sinh ra đ
 - Nếu user yêu cầu "làm web cài được như app / hoạt động offline / thêm PWA": giải thích ngắn gọn rủi ro cache gây rối cho người mới, hỏi lại có chắc không rồi mới làm — đừng tự động thêm.
 - (Firebase SDK có dùng service worker nội bộ cho auth — đó là chuyện khác, không phải PWA, không cần đụng tới.)
 
+## Thế giới thị giác — nhãn cảnh báo hoá chất
+
+Giao diện đi theo hệ **nhãn cảnh báo GHS** trên lọ hoá chất phòng thí nghiệm, chốt
+ngày 09/09/2026. Hợp đồng hướng đầy đủ nằm ở `.impeccable/surfaces/app.md`, sự thật
+sản phẩm ở `PRODUCT.md`. Bốn điều rút gọn, đủ để không đi lệch:
+
+1. **Ba mực in.** Mực đen là mặc định cho MỌI chữ và dấu đánh mục. **Đỏ tín hiệu chỉ
+   dành cho hành động chính, lỗi thật, và trạng thái đang chọn** — dùng thêm chỗ nữa
+   là màu mất nghĩa. Vàng cảnh báo cho trạng thái đang dở (đồng hồ đếm ngược, mẹo cần
+   nhớ). Lục phòng thí nghiệm là vai phụ cho trạng thái an toàn / đúng.
+2. **Dựng bằng nét kẻ, không bằng bóng đổ.** Góc vuông, viền mực. Không bo góc lớn,
+   không bóng đổ mềm, không chuyển sắc, không viền trái dày một màu.
+3. **Chữ hiển thị dùng Archivo** (grotesque công nghiệp, gốc từ chữ biển báo); Inter ở
+   lại làm chữ thân bài. Nhãn và mã viết hoa; số dùng dạng bảng (`tabular-nums`).
+4. **Máy chiếu là cảnh dùng thật.** Ngôn ngữ nhãn thắng vì nó đọc được từ cuối lớp —
+   đừng đánh đổi độ tương phản hay cỡ chữ để lấy vẻ thanh nhã.
+
+Muốn đổi hướng thì đổi hợp đồng trước, đừng sửa lẻ từng màn.
+
 ## Bảng màu & chế độ sáng / tối
 
 Toàn bộ màu của giao diện nằm trong `src/index.css` dưới dạng biến CSS, khai hai
@@ -189,9 +218,9 @@ Mặc định SÁNG, kể cả khi máy đang để nền tối.
 |---|---|---|
 | Nền trang, nền thẻ | `--nen-*` | Sáng → tối khi đổi chế độ |
 | Chữ trên nền trang | `--chu-*` | Tối → sáng khi đổi chế độ (ngược lại) |
-| Chữ trên nền MÀU (nút cam, thanh menu) | `--chu-nguoc` | Luôn trắng ở CẢ hai chế độ |
-| Màu thương hiệu làm CHỮ | `--cam`, `--teal`, `--xanh`, ... | Nền tối phải SÁNG lên mới đọc được |
-| Màu thương hiệu làm NỀN nút | `--cam-nen`, `--teal-nen`, `--xanh-nen`, ... | Nền tối phải ĐẬM lại để chữ trắng đọc được |
+| Chữ trên nền MÀU (nút đỏ tín hiệu, thanh menu mực) | `--chu-nguoc` | Luôn trắng ở CẢ hai chế độ |
+| Màu nhấn làm CHỮ | `--cam`, `--teal`, `--xanh`, ... | Nền tối phải SÁNG lên mới đọc được |
+| Màu nhấn làm NỀN nút | `--cam-nen`, `--teal-nen`, `--xanh-nen`, ... | Nền tối phải ĐẬM lại để chữ trắng đọc được |
 | Khối mã / công thức | `--nen-ma`, `--chu-ma` | Cố ý giữ nền tối ở cả hai chế độ |
 | Mặt nền cố ý TỐI (thanh quản trị, khung công thức) | `--nen-dam`, `--vien-dam`, `--chu-tren-nen-dam` | Giữ nguyên ở cả hai chế độ |
 | Nền nút đã bị vô hiệu hoá | `--nen-tat` | Không phải màu chữ |
@@ -200,7 +229,15 @@ Hai dòng cuối là bài học phải trả giá: ban đầu chỉ có một bi
 vai chữ lẫn vai nền. Làm sáng nó lên cho vai chữ thì thanh menu thành xanh nhạt
 mang chữ trắng, tương phản tụt còn 2,7 — nhìn là biết sai nhưng build vẫn xanh.
 
-**Luật quan trọng nhất, và đã bị vi phạm ba lần:** hễ có biến `--X-nen` thì `--X` CHỈ dành cho vai chữ. Ở chế độ tối `--X` được làm sáng lên cho dễ đọc trên nền đậm, nên đem nó làm nền nút mang chữ trắng là trắng-trên-sáng. `npm run kiem-tra:mau` nay có luật tự bảo trì canh đúng điều đó.
+**Luật quan trọng nhất, và đã bị vi phạm bốn lần:** hễ có biến `--X-nen` thì `--X` CHỈ dành cho vai chữ. Ở chế độ tối `--X` được làm sáng lên cho dễ đọc trên nền đậm, nên đem nó làm nền nút mang chữ trắng là trắng-trên-sáng. `npm run kiem-tra:mau` nay có luật tự bảo trì canh đúng điều đó.
+
+Lần lọt thứ tư (09/09/2026) đáng nhớ vì nó cho thấy một phép kiểm ĐÚNG vẫn có thể mù:
+regex cũ đòi `var(--x)` đứng NGAY sau `backgroundColor:`, nên mọi chỗ viết dạng ba ngôi
+(`active ? 'var(--teal)' : …`) đều lọt — mà đó lại đúng là lối viết cho trạng thái đang
+chọn, tức đúng chỗ nút mang chữ trắng. Sáu chỗ lọt: hai nút chọn vai và nút Đăng nhập ở
+màn đăng nhập, hai ảnh đại diện "đang chọn", cột biểu đồ điểm, bong bóng chat. Nay cả
+ba phép kiểm đọc hết GIÁ TRỊ của thuộc tính (tới dấu phẩy) và soi thêm `linkColor`,
+`accentColor`, `statusColor`.
 
 **Và một bài học về chính bộ kiểm tra:** phép kiểm "không lấy biến CHỮ làm màu nền" đã báo ĐẠT suốt nhiều tuần mà chưa hề soi dòng nào — regex dùng nhóm không-bắt `(?:...)` nên biến nằm ở `m[1]`, mà mã lại đọc `m[2]`, luôn `undefined`. Vì thế lỗi "nền thanh quản trị dùng `--chu-dam`" lọt tới tận tay người dùng. Một phép kiểm luôn xanh mà chưa bao giờ bắt được gì thì đáng ngờ hơn là đáng mừng: thỉnh thoảng phải cố tình làm hỏng một chỗ để xem nó có kêu không.
 
@@ -220,8 +257,15 @@ Hai điều về phép đo tương phản, thêm ngày 08/09/2026:
   cần một bên đổi trước là chữ biến mất. Gặp trường hợp đó thì đặt màu chữ tường minh
   bằng `color: 'var(--...)'`.
 
-Chú ý khi viết chú thích: bộ đếm "mã màu cứng" quét cả chú thích, nên đừng viết lại mã
-màu dạng `#rrggbb` trong đó — làm vậy là tự đẩy con số nợ lên.
+**Ngưỡng mã màu cứng nay là 0.** Từ 09/09/2026 trong `src/*.tsx` không còn mã màu
+viết cứng nào ngoài khối `palette` của MUI và bốn tệp tranh vẽ. Trước đó ngưỡng là 70
+và con số đứng ở 66 rất lâu — đủ chỗ cho chữ `#f5a623` ở khu trò chơi sống sót với
+tương phản 2,0 trên nền trắng, vì phép kiểm chỉ ĐẾM chứ không ĐO. Cần một mã màu thật
+thì ghi `// mau-ok` ở cuối dòng.
+
+Chú ý khi viết chú thích: cả bộ đếm "mã màu cứng" lẫn phép kiểm tên biến đều quét chú
+thích. Đừng viết lại mã màu dạng `#rrggbb` trong đó, và đừng viết `var(--x)` làm ví dụ
+— tên biến giả sẽ bị báo là gõ nhầm.
 
 Cố ý KHÔNG đụng tới `GameArt.tsx`, `doodles.tsx`, `ChemDoodles.tsx`,
 `Mascot.tsx` (tranh vẽ — đảo màu theo nền là hỏng hình) và khối `palette` trong

@@ -149,7 +149,7 @@ export const PasswordManagement: React.FC<Props> = ({ users }) => {
             <Paper elevation={0} sx={{ p: 3, borderRadius: 0, border: '1px solid var(--vien)', height: '100%', display: 'flex', flexDirection: 'column' }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                 <Typography variant="h6" sx={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Shield size={20} color="#3b82f6" /> Mật khẩu Cấp 1
+                  <Shield size={20} color="var(--xanh)" /> Mật khẩu Cấp 1
                 </Typography>
                 <Chip label="Bảo mật mặc định" size="small" sx={{ bgcolor: 'var(--nen-xanh-nhat)', color: 'var(--xanh)', fontWeight: 'bold' }} />
               </Box>
@@ -167,9 +167,9 @@ export const PasswordManagement: React.FC<Props> = ({ users }) => {
             <Paper elevation={0} sx={{ p: 3, borderRadius: 0, border: '1px solid var(--vien)', height: '100%', display: 'flex', flexDirection: 'column' }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                 <Typography variant="h6" sx={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <ShieldCheck size={20} color="#8b5cf6" /> Mật khẩu Cấp 2
+                  <ShieldCheck size={20} color="var(--tim)" /> Mật khẩu Cấp 2
                 </Typography>
-                <Chip label="Độ nâng cao" size="small" sx={{ bgcolor: '#ede9fe', color: '#6d28d9', fontWeight: 'bold' }} />
+                <Chip label="Độ nâng cao" size="small" sx={{ bgcolor: 'var(--nen-tim-nhat)', color: 'var(--tim)', fontWeight: 'bold' }} />
               </Box>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 3, flexGrow: 1 }}>
                 Dành cho học sinh đạt trên 8 điểm ở bài kiểm tra do AI chấm, được mở khoá nội dung nâng cao.
@@ -184,7 +184,7 @@ export const PasswordManagement: React.FC<Props> = ({ users }) => {
           <Grid size={{ xs: 12, md: 4 }}>
             <Paper elevation={0} sx={{ p: 3, borderRadius: 0, border: '1px solid var(--cam-vien)', bgcolor: 'var(--nen-cam-nhat)', height: '100%', display: 'flex', flexDirection: 'column' }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Typography variant="h6" sx={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1, color: '#9a3412' }}>
+                <Typography variant="h6" sx={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1, color: 'var(--cam-dam)' }}>
                   <ShieldAlert size={20} color="var(--chu-dam)" /> Khôi phục mật khẩu
                 </Typography>
                 <Chip label="Khẩn cấp" size="small" sx={{ bgcolor: 'var(--nen-cam-nhat2)', color: 'var(--cam-dam)', fontWeight: 'bold' }} />

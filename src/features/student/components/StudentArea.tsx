@@ -169,7 +169,7 @@ export const StudentArea: React.FC = () => {
                               sx={{ 
                                 fontWeight: 'bold', fontSize: '0.7rem',
                                 bgcolor: submitted ? 'var(--nen-luc-nhat)' : (isOverdue ? 'var(--nen-do-nhat)' : 'var(--nen-nhat)'),
-                                color: submitted ? 'var(--luc-dam2)' : (isOverdue ? '#991b1b' : 'var(--chu)')
+                                color: submitted ? 'var(--luc-dam2)' : (isOverdue ? 'var(--do-dam)' : 'var(--chu)')
                               }} 
                             />
                           </Box>
@@ -240,7 +240,7 @@ export const StudentArea: React.FC = () => {
               <Grid container spacing={2}>
                 {topics.map((topic, idx) => (
                   <Grid size={{ xs: 12, sm: 6, md: 4 }} key={idx}>
-                    <Card sx={{ borderRadius: 0, border: '1px solid var(--vien)', cursor: 'pointer', '&:hover': { borderColor: 'var(--xanh)', bgcolor: '#f0f9ff' } }}>
+                    <Card sx={{ borderRadius: 0, border: '1px solid var(--vien)', cursor: 'pointer', '&:hover': { borderColor: 'var(--xanh)', bgcolor: 'var(--nen-xanh-nhat2)' } }}>
                       <CardContent sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)' }}>{topic}</Typography>
                         <ArrowRight size={16} color="var(--chu-mo)" />
@@ -279,7 +279,7 @@ export const StudentArea: React.FC = () => {
                   <Avatar sx={{ width: 80, height: 80, bgcolor: 'var(--xanh-nen)', margin: '0 auto', mb: 2, fontSize: '2rem' }}>
                     <Award size={40} />
                   </Avatar>
-                  <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'var(--xanh)' }}>{completedCount}</Typography>
+                  <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)', fontVariantNumeric: 'tabular-nums' }}>{completedCount}</Typography>
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>Bài học đã hoàn thành</Typography>
                   
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
@@ -311,7 +311,7 @@ export const StudentArea: React.FC = () => {
                     </ListItem>
                     <ListItem sx={{ py: 2 }}>
                       <ListItemIcon>
-                        <Avatar sx={{ bgcolor: 'var(--nen-vang-nhat)', color: '#b45309', width: 40, height: 40 }}>
+                        <Avatar sx={{ bgcolor: 'var(--nen-vang-nhat)', color: 'var(--vang-dam)', width: 40, height: 40 }}>
                           <Typography variant="caption" sx={{ fontWeight: 'bold' }}>7.0</Typography>
                         </Avatar>
                       </ListItemIcon>

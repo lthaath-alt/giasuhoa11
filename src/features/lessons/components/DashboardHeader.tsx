@@ -167,7 +167,9 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 sx={{
                   fontWeight: 900,
                   letterSpacing: '-0.5px',
-                  color: 'var(--xanh)',
+                  /* Ten he thong la MUC. Cai duy nhat mang mau tin hieu tren
+                     thanh nay la dong phu va nut hanh dong chinh. */
+                  color: 'var(--chu-dam)',
                   lineHeight: 1.1,
                   display: 'flex',
                   alignItems: 'center',
@@ -204,12 +206,12 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 py: 0.8,
                 border: '1px solid transparent',
                 '&:focus-within': {
-                  borderColor: 'var(--xanh)',
+                  borderColor: 'var(--chu-dam)',
                   backgroundColor: 'var(--nen-the)',
                 },
               }}
             >
-              <Search size={16} color="var(--xanh)" style={{ marginLeft: 6 }} />
+              <Search size={16} color="var(--chu-mo)" style={{ marginLeft: 6 }} />
               <input
                 id="hocmai-search-bar"
                 placeholder="Tìm kiếm bài học hóa học 11..."
@@ -362,10 +364,10 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                       fontSize: '0.6rem',
                       fontWeight: 'bold',
                       bgcolor:
-                        currentUser.role === 'admin' ? '#7c3aed'
+                        currentUser.role === 'admin' ? 'var(--tim-nen)'
                         : currentUser.role === 'school_admin' ? 'var(--xanh-troi2)'
-                        : currentUser.role === 'teacher' ? '#059669'
-                        : 'var(--cam)',
+                        : currentUser.role === 'teacher' ? 'var(--luc-nen)'
+                        : 'var(--cam-nen)',
                       color: 'var(--chu-nguoc)',
                     }}
                   />

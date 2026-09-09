@@ -29,7 +29,7 @@ function checkPasswordStrength(pw: string): { score: number; label: string; colo
   if (score <= 2) return { score: 20, label: 'Yếu',     color: 'var(--do)' };
   if (score === 3) return { score: 55, label: 'Trung bình', color: 'var(--vang)' };
   if (score === 4) return { score: 80, label: 'Tốt',     color: 'var(--teal)' };
-  return               { score: 100, label: 'Rất mạnh', color: '#059669' };
+  return               { score: 100, label: 'Rất mạnh', color: 'var(--luc-dam)' };
 }
 
 export const GoogleSetPasswordForm: React.FC<GoogleSetPasswordFormProps> = ({

@@ -272,7 +272,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             {remainingCooldown > 0 ? (
               <Chip 
-                icon={<Clock size={14} color="#d32f2f" />} 
+                icon={<Clock size={14} color="var(--do)" />} 
                 label={`Tạm dừng: ${Math.ceil(remainingCooldown / 60000)} phút`} 
                 color="error" 
                 size="small" 
@@ -281,7 +281,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
               />
             ) : offTopicStrikes > 0 ? (
               <Chip 
-                icon={<ShieldAlert size={14} color="#ed6c02" />} 
+                icon={<ShieldAlert size={14} color="var(--vang)" />} 
                 label={`Cảnh báo lạc đề: ${offTopicStrikes}/5`} 
                 color="warning" 
                 size="small" 
@@ -453,13 +453,13 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
                         p: 2,
                         borderRadius: 0,
                         backgroundColor: isAi ? 'var(--nen-nhat)' : 'var(--teal-nen)',
-                        color: isAi ? 'text.primary' : 'var(--nen-the)',
+                        color: isAi ? 'text.primary' : 'var(--chu-nguoc)',
                         border: isAi ? '1px solid var(--vien)' : 'none',
                         boxShadow: 'none',
                       }}
                     >
                       <Typography variant="body2" sx={{ whiteSpace: 'pre-line', lineHeight: 1.6, fontSize: '0.9rem' }}>
-                        <RichText text={msg.content} linkColor={isAi ? 'var(--xanh)' : 'var(--nen-the)'} />
+                        <RichText text={msg.content} linkColor={isAi ? 'var(--xanh)' : 'var(--chu-nguoc)'} />
                       </Typography>
                     </Paper>
                     <Typography

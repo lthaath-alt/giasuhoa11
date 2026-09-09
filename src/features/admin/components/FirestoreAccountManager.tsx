@@ -450,7 +450,7 @@ export const FirestoreAccountManager: React.FC = () => {
         fullWidth
       >
         <DialogTitle sx={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1 }}>
-          <ShieldAlert size={20} color="#0284c7" />
+          <ShieldAlert size={20} color="var(--xanh)" />
           Cấp / Thay đổi Quyền Tài khoản
         </DialogTitle>
 
@@ -459,7 +459,7 @@ export const FirestoreAccountManager: React.FC = () => {
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
 
               {/* Thông tin tài khoản đang được chọn */}
-              <Paper elevation={0} sx={{ p: 2, borderRadius: 0, bgcolor: '#f0f9ff', border: '1px solid #bae6fd' }}>
+              <Paper elevation={0} sx={{ p: 2, borderRadius: 0, bgcolor: 'var(--nen-xanh-nhat2)', border: '1px solid var(--vien-xanh)' }}>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>Tài khoản được chọn</Typography>
                 <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)' }}>
                   {roleTargetUser.fullName}

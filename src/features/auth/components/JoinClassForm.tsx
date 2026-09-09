@@ -162,7 +162,7 @@ export const JoinClassForm: React.FC<JoinClassFormProps> = ({ onJoined, onDismis
                   borderRadius: 0,
                   bgcolor: 'var(--teal-nen)',
                   boxShadow: 'none',
-                  '&:hover': { bgcolor: '#0d9488', boxShadow: 'none' },
+                  '&:hover': { bgcolor: 'var(--nen-dam)', boxShadow: 'none' },
                   '&:disabled': { bgcolor: 'var(--nen-tat)' },
                 }}
               >

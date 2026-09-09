@@ -176,7 +176,7 @@ export const CurriculumTab: React.FC = () => {
       {/* Header khu vực */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Box>
-          <Typography variant="h5" sx={{ fontWeight: 'bold', color: 'var(--xanh)' }}>
+          <Typography variant="h5" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)' }}>
             Quản lý Bài học & Chương trình
           </Typography>
           <Typography variant="body2" color="text.secondary">
@@ -229,7 +229,7 @@ export const CurriculumTab: React.FC = () => {
                 }}
               >
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                  <BookOpen size={20} color="var(--xanh)" />
+                  <BookOpen size={20} color="var(--chu-dam)" />
                   <Typography sx={{ fontWeight: 'bold', color: 'var(--chu-dam-2)' }}>
                     {chapter.title}
                   </Typography>
@@ -351,7 +351,7 @@ export const CurriculumTab: React.FC = () => {
 
                         {/* Số lượng câu hỏi gợi ý */}
                         <Box>
-                          <Typography variant="caption" sx={{ fontWeight: 'bold', color: 'var(--xanh)', display: 'inline-block' }}>
+                          <Typography variant="caption" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)', display: 'inline-block' }}>
                             Câu hỏi gợi ý Gia sư AI hỗ trợ tư duy:{' '}
                           </Typography>
                           <Typography variant="caption" color="text.primary" sx={{ fontWeight: 'bold', ml: 0.5 }}>
@@ -467,7 +467,7 @@ export const CurriculumTab: React.FC = () => {
                       >
                         <Trash2 size={12} />
                       </IconButton>
-                      <Typography variant="caption" sx={{ fontWeight: 'bold', color: 'var(--xanh)', display: 'block', pr: 2 }}>
+                      <Typography variant="caption" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)', display: 'block', pr: 2 }}>
                         CH: {q.question}
                       </Typography>
                       <Typography variant="caption" sx={{ display: 'block', color: 'text.secondary', fontStyle: 'italic', mt: 0.5 }}>

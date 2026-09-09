@@ -270,7 +270,7 @@ export const DashboardPage: React.FC = () => {
                             fontSize: '0.82rem',
                             px: 1.5,
                             ...(studyMode === 'sgk'
-                              ? { bgcolor: 'var(--xanh-nen)', color: 'var(--chu-nguoc)', boxShadow: 'none', '&:hover': { bgcolor: '#0284c7' } }
+                              ? { bgcolor: 'var(--xanh-nen)', color: 'var(--chu-nguoc)', boxShadow: 'none', '&:hover': { bgcolor: 'var(--xanh)' } }
                               : { color: 'var(--chu-2)', '&:hover': { bgcolor: 'var(--vien)', color: 'var(--xanh-troi2)' } }
                             ),
                           }}
@@ -458,7 +458,7 @@ export const DashboardPage: React.FC = () => {
                   <MascotDauVai tab="gioithieu" rong={84} />
                 </Box>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 4 }}>
-                  <Avatar sx={{ bgcolor: 'var(--xanh-nen)', color: 'var(--chu-nguoc)', width: 56, height: 56 }}>
+                  <Avatar variant="square" sx={{ bgcolor: 'var(--nen-dam)', color: 'var(--chu-nguoc)', width: 56, height: 56 }}>
                     <Info size={32} />
                   </Avatar>
                   <Box>
@@ -476,11 +476,28 @@ export const DashboardPage: React.FC = () => {
 
 
                 {/* TRIẾT LÝ GIẢNG DẠY */}
-                <Box sx={{ p: 3.5, bgcolor: 'var(--nen-xanh-nhat2)', borderRadius: 0, border: '1px solid var(--vien-xanh)', mb: 4 }}>
-                  <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: 'var(--xanh-chu)', mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <ShieldCheck size={20} /> Triết lý giảng dạy của Gia sư AI
+                {/* Ô khai: viền mực đều bốn cạnh, nhãn hoa nhỏ nằm trên một dải
+                    giấy sẫm, chữ đen trên nền giấy. Đây là hình thức của một ô
+                    thông tin bắt buộc trên nhãn hoá chất — nó nói "đọc phần này"
+                    bằng cấu trúc chứ không bằng cách tô màu. */}
+                <Box sx={{ border: '2px solid var(--chu-dam)', mb: 4 }}>
+                  <Typography
+                    variant="overline"
+                    component="div"
+                    sx={{
+                      bgcolor: 'var(--nen-dam)',
+                      color: 'var(--chu-nguoc)',
+                      px: 2,
+                      py: 0.8,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1,
+                      lineHeight: 1.4,
+                    }}
+                  >
+                    <ShieldCheck size={16} /> Triết lý giảng dạy của Gia sư AI
                   </Typography>
-                  <Typography variant="body2" sx={{ lineHeight: 1.7, color: 'var(--xanh-chu2)' }}>
+                  <Typography variant="body2" sx={{ p: 3, lineHeight: 1.7, color: 'var(--chu-dam-3)' }}>
                     <strong>“Cho con cá không bằng cho cần câu”</strong> – Gia sư AI của chúng tôi được thiết kế theo chuẩn sư phạm nghiêm ngặt. Khi học sinh gõ một câu hỏi hoặc bài tập, thầy sẽ không bao giờ đưa thẳng đáp số cuối cùng để học sinh chép. Thay vào đó, thầy sẽ phân tích đề, gợi ý lý thuyết nền tảng và dẫn dắt học sinh đặt bút tính toán từng bước. Điều này giúp học sinh phát triển tư duy logic tự chủ, tự mình tìm ra đáp số để nhớ kiến thức bền vững nhất!
                   </Typography>
                 </Box>
@@ -688,7 +705,7 @@ export const DashboardPage: React.FC = () => {
                                   p: 2,
                                   borderRadius: 0,
                                   backgroundColor: isAi ? 'var(--nen-nhat)' : 'var(--xanh-nen)',
-                                  color: isAi ? 'text.primary' : 'var(--nen-the)',
+                                  color: isAi ? 'text.primary' : 'var(--chu-nguoc)',
                                   boxShadow: 'none',
                                   border: isAi ? '1px solid var(--vien)' : 'none',
                                 }}

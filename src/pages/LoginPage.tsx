@@ -54,7 +54,10 @@ const BrandPanel: React.FC = () => (
       <Typography variant="h3" sx={{ fontWeight: 800, lineHeight: 1.2, mb: 1 }}>
         Nâng tầm tư duy
       </Typography>
-      <Typography variant="h3" sx={{ fontWeight: 800, lineHeight: 1.2, mb: 3, color: 'var(--cam-nhat2)' }}>
+      {/* Do tin hieu tren nen luc dam chi con 2,16 — do la hai mau cung do sam,
+          dat canh nhau thi khong con thu bac nao. Vang canh bao tren luc la cap
+          doi cua chinh he nhan GHS, va do duoc 4,98. */}
+      <Typography variant="h3" sx={{ fontWeight: 800, lineHeight: 1.2, mb: 3, color: 'var(--vang-nen)' }}>
         tự học Hóa học lớp 11
       </Typography>
 
@@ -79,7 +82,7 @@ const BrandPanel: React.FC = () => (
               backgroundColor: 'rgba(255,255,255,0.06)',
             }}
           >
-            <Box sx={{ color: 'var(--cam-nhat2)', mb: 1 }}>{icon}</Box>
+            <Box sx={{ color: 'var(--vang-nen)', mb: 1 }}>{icon}</Box>
             <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 0.5 }}>{title}</Typography>
             <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.75)', lineHeight: 1.5, display: 'block' }}>
               {desc}
@@ -90,7 +93,7 @@ const BrandPanel: React.FC = () => (
     </Box>
 
     {/* Footer */}
-    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)' }}>
+    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.78)' }}>
       © 2026 Gia sư Hóa học 11 AI. All rights reserved.
     </Typography>
   </Box>

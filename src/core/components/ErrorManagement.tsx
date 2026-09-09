@@ -13,9 +13,9 @@ const ERROR_LEVEL_COLORS: Record<ErrorLevel, { bg: string; color: string; icon: 
   'Nghiêm Trọng (Critical)': { bg: 'var(--nen-do-nhat)', color: 'var(--do)', icon: <ServerCrash size={14} /> },
   'Lỗi API/AI Service': { bg: 'var(--nen-vang-nhat)', color: 'var(--vang-dam)', icon: <Globe size={14} /> },
   'Lỗi Cơ Sở Dữ Liệu': { bg: 'var(--nen-tim-nhat)', color: 'var(--tim)', icon: <Database size={14} /> },
-  'Lỗi Xác Thực/Phân Quyền': { bg: '#fce7f3', color: '#db2777', icon: <UserCog size={14} /> },
+  'Lỗi Xác Thực/Phân Quyền': { bg: 'var(--nen-tim-nhat)', color: 'var(--tim)', icon: <UserCog size={14} /> },
   'Lỗi Giao Diện Client': { bg: 'var(--nen-cam-nhat2)', color: 'var(--cam)', icon: <Bug size={14} /> },
-  'Cảnh Báo Hệ Thống': { bg: '#fef08a', color: '#a16207', icon: <AlertTriangle size={14} /> },
+  'Cảnh Báo Hệ Thống': { bg: 'var(--nen-vang-nhat)', color: 'var(--vang-dam)', icon: <AlertTriangle size={14} /> },
   'Thông Tin Hệ Thống': { bg: 'var(--nen-xanh-nhat)', color: 'var(--xanh-troi)', icon: <Info size={14} /> }
 };
 
@@ -100,14 +100,14 @@ export const ErrorManagement: React.FC = () => {
           </Paper>
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <Paper elevation={0} sx={{ p: 3, borderRadius: 0, border: '1px solid #fecaca', bgcolor: 'var(--nen-do-nhat2)' }}>
+          <Paper elevation={0} sx={{ p: 3, borderRadius: 0, border: '1px solid var(--cam-vien)', bgcolor: 'var(--nen-do-nhat2)' }}>
             <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'var(--do-dam)' }}>LỖI CHƯA XỬ LÝ (NEW)</Typography>
             <Typography variant="h4" sx={{ fontWeight: 'bold', my: 1, color: 'var(--do)' }}>{unhandledLogs}</Typography>
-            <Typography variant="caption" sx={{ color: '#991b1b' }}>{criticalLogs} lỗi nghiêm trọng / API</Typography>
+            <Typography variant="caption" sx={{ color: 'var(--do-dam)' }}>{criticalLogs} lỗi nghiêm trọng / API</Typography>
           </Paper>
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <Paper elevation={0} sx={{ p: 3, borderRadius: 0, border: '1px solid #bbf7d0', bgcolor: 'var(--nen-luc-nhat2)' }}>
+          <Paper elevation={0} sx={{ p: 3, borderRadius: 0, border: '1px solid var(--nen-luc-nhat)', bgcolor: 'var(--nen-luc-nhat2)' }}>
             <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'var(--luc-dam)' }}>TỈ LỆ ỔN ĐỊNH NỀN TẢNG</Typography>
             <Typography variant="h4" sx={{ fontWeight: 'bold', my: 1, color: 'var(--luc)' }}>{stabilityRate}%</Typography>
             <Typography variant="caption" sx={{ color: 'var(--luc-dam2)' }}>Đã khắc phục: {resolvedLogs} sự cố</Typography>
@@ -115,9 +115,9 @@ export const ErrorManagement: React.FC = () => {
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Paper elevation={0} sx={{ p: 3, borderRadius: 0, border: '1px solid var(--nen-tim-nhat)', bgcolor: 'var(--nen-tim-nhat2)' }}>
-            <Typography variant="body2" sx={{ fontWeight: 'bold', color: '#4338ca' }}>NGUỒN DỮ LIỆU CẮT LỚP</Typography>
+            <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'var(--tim)' }}>NGUỒN DỮ LIỆU CẮT LỚP</Typography>
             <Typography variant="h4" sx={{ fontWeight: 'bold', my: 1, color: 'var(--tim)' }}>{componentsList.length}</Typography>
-            <Typography variant="caption" sx={{ color: '#3730a3' }}>Module dịch vụ hoạt động</Typography>
+            <Typography variant="caption" sx={{ color: 'var(--tim-2)' }}>Module dịch vụ hoạt động</Typography>
           </Paper>
         </Grid>
       </Grid>

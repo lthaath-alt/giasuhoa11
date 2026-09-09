@@ -83,14 +83,26 @@ console.log('\n== Không dùng lẫn vai NỀN và vai CHỮ ==');
     // Dòng có chú thích `mau-ok` là chỗ đã xem tay và xác nhận đúng vai.
     const n = readFileSync(f, 'utf8')
       .split(/\r?\n/).filter(d => !d.includes('mau-ok')).join('\n');
-    for (const m of n.matchAll(/(^|[^a-zA-Z-])color(?:=|: ?)["']var\((--[a-z0-9-]+)\)["']/g))
-      if (/^--(nen|vien)/.test(m[2])) lanNen.push(`${basename(f)}: color → ${m[2]}`);
-    /* Nhóm bắt ở đây là m[1], KHÔNG phải m[2]: phần đầu là (?:...) không bắt.
-       Bản trước đọc nhầm m[2] nên luôn là undefined, và phép kiểm này chưa bao
-       giờ chạy — nó báo ĐẠT suốt mà không hề soi dòng nào. Đúng vì thế mà lỗi
-       "nền thanh quản trị dùng --chu-dam" lọt tới tận tay người dùng. */
-    for (const m of n.matchAll(/(?:bgcolor|backgroundColor|background)(?:=|: ?)["']var\((--[a-z0-9-]+)\)["']/g))
-      if (/^--chu/.test(m[1])) lanChu.push(`${basename(f)}: nền → ${m[1]}`);
+    /* Đọc hết GIÁ TRỊ của thuộc tính (tới dấu phẩy) chứ không chỉ trường hợp
+       `var(--x)` nằm ngay sau dấu hai chấm — nếu không thì mọi chỗ viết dạng
+       ba ngôi đều lọt, mà đó lại đúng là lối viết cho trạng thái đang chọn.
+       Cách này bắt được `linkColor={isAi ? 'var(--xanh)' : 'var(--nen-the)'}`,
+       chỗ lấy biến NỀN làm màu chữ trong bong bóng chat.
+
+       Tên thuộc tính mang vai CHỮ trong repo này: `color`, `linkColor`,
+       `accentColor`, `statusColor`. `borderColor` là vai viền, không tính. */
+    for (const d of n.split('\n')) {
+      const mChu = d.match(/(?:(?<![a-zA-Z-])color|linkColor|accentColor|statusColor)(?:=\{?|: ?)([^,]*)/);
+      if (mChu) for (const m of mChu[1].matchAll(/var\((--[a-z0-9-]+)\)/g))
+        if (/^--(nen|vien)/.test(m[1])) lanNen.push(`${basename(f)}: color → ${m[1]}`);
+      /* Bản đầu của phép kiểm dưới đây đọc nhầm nhóm bắt (m[2] trong khi biến
+         nằm ở m[1]) nên luôn là undefined — nó báo ĐẠT suốt nhiều tuần mà chưa
+         hề soi dòng nào, và vì thế lỗi "nền thanh quản trị dùng --chu-dam" lọt
+         tới tận tay người dùng. */
+      const mNen = d.match(/(?:bgcolor|backgroundColor|background)(?:=\{?|: ?)([^,]*)/);
+      if (mNen) for (const m of mNen[1].matchAll(/var\((--[a-z0-9-]+)\)/g))
+        if (/^--chu/.test(m[1])) lanChu.push(`${basename(f)}: nền → ${m[1]}`);
+    }
   }
   if (lanNen.length) truot('không lấy biến NỀN làm màu chữ', lanNen.slice(0, 6).join(' | ') + (lanNen.length > 6 ? ` … (${lanNen.length} chỗ)` : ''));
   else dat('không lấy biến NỀN làm màu chữ');
@@ -151,10 +163,20 @@ console.log('\n== Không còn mã màu viết cứng ==');
     if (so) con.push(`${basename(f)} (${so})`);
   }
   const TONG = con.reduce((s, x) => s + Number(x.match(/\((\d+)\)/)![1]), 0);
-  // Ngưỡng: chốt ở mức hiện tại để con số chỉ được GIẢM, không được tăng thêm.
-  const NGUONG = 70;
-  if (TONG > NGUONG) truot(`mã màu cứng không vượt ${NGUONG}`, `đang có ${TONG}: ${con.slice(0, 8).join(', ')}`);
-  else dat(`mã màu cứng còn ${TONG} (ngưỡng ${NGUONG}) — phần lớn là màu nhấn chỉ dùng một chỗ`);
+  /* Ngưỡng: chốt ở mức hiện tại để con số chỉ được GIẢM, không được tăng thêm.
+     Ngày 09/09/2026 xuống 0 — trước đó là 70 và đã đứng ở 66 rất lâu.
+
+     Vì sao đáng siết hẳn về 0: phép kiểm này chỉ ĐẾM chứ không ĐO. Một mã màu
+     viết cứng vừa không đổi theo chế độ tối, vừa không nằm trong 70 cặp được đo
+     tương phản — nên nó là chỗ duy nhất trong dự án mà cả hai hàng rào đều
+     không với tới. Chữ `#f5a623` trên nền trắng ở khu trò chơi sống sót đúng
+     kiểu đó: tương phản 2,0, cỡ chữ 12px, và mọi vòng kiểm đều báo ĐẠT.
+
+     Cần một mã màu thật (ví dụ khối `palette` của MUI, hoặc tranh vẽ) thì ghi
+     `// mau-ok` ở cuối dòng — dòng đó được bỏ qua. */
+  const NGUONG = 0;
+  if (TONG > NGUONG) truot(`không còn mã màu viết cứng`, `đang có ${TONG}: ${con.slice(0, 8).join(', ')}`);
+  else dat(`không còn mã màu viết cứng nào ngoài bảng màu MUI và tranh vẽ`);
 }
 
 console.log('\n== Tương phản chữ trên nền ==');

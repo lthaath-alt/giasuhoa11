@@ -154,7 +154,7 @@ function Breadcrumb({ view, chapterTitle, lessonTitle, onGoChapters, onGoLessons
       {view === 'questions' && (
         <>
           <ChevronRight size={14} color="var(--chu-mo)" />
-          <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'var(--xanh)' }}>{lessonTitle}</Typography>
+          <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)' }}>{lessonTitle}</Typography>
         </>
       )}
     </Box>
@@ -231,7 +231,7 @@ function UploadWordDialog({ open, chapterId, lessonId, lessonTitle, onClose, onS
     <Dialog open={open} onClose={handleClose} fullWidth maxWidth="md" scroll="paper">
       <DialogTitle sx={{ fontWeight: 'bold', borderBottom: '1px solid var(--vien)', pb: 2 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-          <Upload size={20} color="var(--xanh)" />
+          <Upload size={20} color="var(--chu-dam)" />
           <Box>
             <Typography variant="h6" sx={{ fontWeight: 'bold', lineHeight: 1.2 }}>Upload câu hỏi từ file Word</Typography>
             <Typography variant="caption" color="text.secondary">{lessonTitle}</Typography>
@@ -276,7 +276,7 @@ function UploadWordDialog({ open, chapterId, lessonId, lessonTitle, onClose, onS
             bgcolor: 'var(--nen-trang)',
             cursor: 'pointer',
             transition: 'all 0.2s',
-            '&:hover': { borderColor: 'var(--xanh)', bgcolor: 'var(--nen-xanh-nhat2)' },
+            '&:hover': { borderColor: 'var(--chu-dam)', bgcolor: 'var(--nen-nhat)' },
           }}
           onClick={() => fileInputRef.current?.click()}
         >
@@ -523,7 +523,7 @@ function EditQuestionDialog({ open, question, chapterId, lessonId, onClose, onSa
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
       <DialogTitle sx={{ fontWeight: 'bold' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Edit2 size={18} color="var(--xanh)" />
+          <Edit2 size={18} color="var(--chu-dam)" />
           Sửa câu hỏi
           <Chip label={question.type} size="small" color={TYPE_COLOR[question.type]} sx={{ ml: 1 }} />
         </Box>
@@ -724,7 +724,7 @@ function QuestionCard({ question, index, chapterId, lessonId, onDeleted, onEdite
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, pl: 1, borderLeft: '3px solid var(--vien)' }}>
                   {question.essayPoints.map((p, i) => (
                     <Typography key={i} variant="body2" sx={{ color: 'var(--chu-dam-2)' }}>
-                      <strong style={{ color: 'var(--xanh)' }}>{p.label}:</strong> {p.content}
+                      <strong style={{ color: 'var(--chu-dam)' }}>{p.label}:</strong> {p.content}
                     </Typography>
                   ))}
                 </Box>
@@ -801,7 +801,7 @@ export const LibraryTab: React.FC = () => {
       <Box id="library-tab-container">
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
           <Box>
-            <Typography variant="h5" sx={{ fontWeight: 'bold', color: 'var(--xanh)', display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant="h5" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)', display: 'flex', alignItems: 'center', gap: 1 }}>
               <Library size={24} />
               Thư viện câu hỏi
             </Typography>
@@ -931,7 +931,7 @@ export const LibraryTab: React.FC = () => {
                     borderRadius: 0,
                     transition: 'all 0.15s',
                     cursor: 'pointer',
-                    '&:hover': { borderColor: 'var(--xanh)', boxShadow: 'none' },
+                    '&:hover': { borderColor: 'var(--chu-dam)', boxShadow: 'none' },
                   }}
                   onClick={() => goToQuestions(lesson.id)}
                 >
@@ -943,7 +943,7 @@ export const LibraryTab: React.FC = () => {
                         display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
                       }}
                     >
-                      <FileText size={18} color="var(--xanh)" />
+                      <FileText size={18} color="var(--chu-dam)" />
                     </Box>
 
                     <Box sx={{ flex: 1 }}>

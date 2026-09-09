@@ -309,7 +309,8 @@ export const GameHubSection: React.FC = () => {
                   fontWeight: 600,
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px',
-                  color: '#f5a623',
+                  /* Ten chuong la NHAN PHU, khong phai tin hieu — muc nhat. */
+                  color: 'var(--chu-2)',
                   mb: '6px',
                   display: 'block',
                   whiteSpace: 'nowrap',
@@ -395,7 +396,7 @@ export const GameHubSection: React.FC = () => {
                 <X size={24} />
               </IconButton>
             </Box>
-            <Box sx={{ flexGrow: 1, bgcolor: '#000000' }}>
+            <Box sx={{ flexGrow: 1, bgcolor: 'var(--nen-dam)' }}>
               <iframe
                 ref={khungRef}
                 src={diaChiKhung}

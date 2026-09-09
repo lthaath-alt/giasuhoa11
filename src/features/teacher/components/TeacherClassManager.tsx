@@ -170,7 +170,7 @@ export const TeacherClassManager: React.FC<TeacherClassManagerProps> = ({ onClas
             bgcolor: 'var(--teal-nen)',
             boxShadow: 'none',
             whiteSpace: 'nowrap',
-            '&:hover': { bgcolor: '#0d9488', boxShadow: 'none' },
+            '&:hover': { bgcolor: 'var(--nen-dam)', boxShadow: 'none' },
             '&:disabled': { bgcolor: 'var(--nen-tat)' },
           }}
         >

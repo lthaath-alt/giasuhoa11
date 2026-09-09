@@ -363,7 +363,7 @@ export const DatabankManagement: React.FC = () => {
                         fontWeight: 'bold',
                         bgcolor: qForm.correctAnswer === opt ? 'var(--nen-luc-nhat)' : 'var(--nen-nhat)',
                         color: qForm.correctAnswer === opt ? 'var(--luc)' : 'var(--chu)',
-                        border: `1px solid ${qForm.correctAnswer === opt ? '#86efac' : 'var(--vien)'}`,
+                        border: `1px solid ${qForm.correctAnswer === opt ? 'var(--luc-nen)' : 'var(--vien)'}`,
                       }}
                     />
                     <TextField
