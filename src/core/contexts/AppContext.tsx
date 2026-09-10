@@ -14,7 +14,10 @@ import { QuizService } from '../../features/quiz/quizService';
 import { BankFirestore } from '../../features/bank/bankStore';
 import { toLegacy, toChapter } from '../../features/bank/convert';
 import { QuizStorage } from '../../features/quiz/quizStorage';
-import { loginWithFirestore, createAccountWithFirestore } from '../services/firestoreAuth';
+import { loginWithFirestore, createAccountWithFirestore, resetPasswordWithFirestore } from '../services/firestoreAuth';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
+import { auth, db } from '../services/firebase';
 import { FirestoreService } from '../services/firestoreService';
 import { runMigrationIfNeeded } from '../services/migrationService';
 import { ErrorLogService } from '../services/errorLog';
@@ -365,15 +368,69 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       // 6. Guest chat count (vẫn từ localStorage — thuộc thiết bị)
       setGuestChatCount(GuestChatStorage.getCount());
 
-      // 7. Không tự động khôi phục session — user phải đăng nhập lại
+      // 7. Phiên nay do Firebase Auth quản — xem useEffect riêng ngay bên dưới.
+      //    Hai khoá localStorage này là tàn dư của hệ đăng nhập cũ, dọn cho sạch.
       localStorage.removeItem('h11_current_user_data');
       localStorage.removeItem('h11_current_user_email');
-      setCurrentUser(null);
 
       setLoading(false);
     };
 
     init();
+  }, []);
+
+  /* ── Phiên đăng nhập: nghe Firebase Auth ───────────────────────────────────
+   *
+   * ĐỔI HÀNH VI (10/09/2026): trước đây `init()` CỐ Ý xoá session mỗi lần mở
+   * trang, nên bấm F5 là văng ra màn đăng nhập. Firebase Auth giữ phiên trong
+   * IndexedDB, nên nay F5 vẫn còn đăng nhập.
+   *
+   * Phải là useEffect RIÊNG, và hồ sơ phải đọc THẲNG từ Firestore — KHÔNG lấy
+   * từ mảng `users` trong state. Hai lý do:
+   *
+   *   1. Hàm gọi lại này sống lâu hơn lần chạy đăng ký nó. Đóng gói mảng
+   *      `users` vào trong là giữ mãi một ảnh chụp cũ, và người VỪA đăng ký
+   *      xong sẽ không có trong ảnh chụp đó — đăng ký thành công nhưng bị đá
+   *      ngược ra màn đăng nhập.
+   *   2. Đặt `users` vào mảng phụ thuộc thì mỗi lần danh sách đổi lại đăng ký
+   *      lại người nghe. Đọc thẳng thì mảng phụ thuộc rỗng mới là đúng.
+   */
+  useEffect(() => {
+    const thoi = onAuthStateChanged(auth, async (nguoiAuth) => {
+      if (!nguoiAuth) {
+        setCurrentUser(null);
+        localStorage.removeItem('h11_current_user_email');
+        localStorage.removeItem('h11_current_user_data');
+        return;
+      }
+
+      const anh = await getDoc(doc(db, 'users', nguoiAuth.uid));
+      if (!anh.exists()) {
+        /* Có phiên Auth mà không có hồ sơ — đừng đoán, đừng tự tạo. Đây là dấu
+           hiệu dữ liệu lệch, phải để người quản trị nhìn thấy. */
+        await signOut(auth);
+        setCurrentUser(null);
+        return;
+      }
+
+      const d = anh.data();
+      const hoSo: User = {
+        ...(d as any),
+        id: anh.id,
+        email: d.email || d.username || nguoiAuth.email || '',
+        name: d.fullName || d.name || '',
+        role: chuanHoaVaiTro(d.role as string),
+      };
+
+      await loadProgressForUser(hoSo.email);
+      persistSession(hoSo);
+      /* Đồng bộ vào mảng `users` để phần còn lại của app thấy bản mới nhất. */
+      setUsers(prev => prev.some(u => u.id === hoSo.id)
+        ? prev.map(u => u.id === hoSo.id ? hoSo : u)
+        : [...prev, hoSo]);
+    });
+
+    return () => thoi();   // huỷ đăng ký khi component rời đi
   }, []);
 
   // ── Helper: lưu session (localStorage — chỉ cho thiết bị hiện tại) ─────────
@@ -397,40 +454,19 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
   const login = async (identifier: string, password: string) => {
     const fsRes = await loginWithFirestore(identifier, password);
-
-    if (fsRes.success && fsRes.user) {
-      const resolvedRole: UserRole = chuanHoaVaiTro(fsRes.user.role as string);
-
-      // Tìm user đầy đủ từ state (đã load khi init)
-      const lower = identifier.toLowerCase();
-      const stateUser = users.find(
-        u => u.email.toLowerCase() === lower ||
-             u.username?.toLowerCase() === lower
-      );
-
-      const appUser: User = stateUser || {
-        id: fsRes.user.uid,
-        email: `${fsRes.user.username}@firestore.local`,
-        username: fsRes.user.username,
-        password: fsRes.user.password,
-        name: fsRes.user.fullName,
-        role: resolvedRole,
-        status: 'active',
-        authProvider: 'local',
-        canChangePassword: true,
-        createdAt: typeof fsRes.user.createdAt === 'string'
-          ? fsRes.user.createdAt
-          : new Date().toISOString(),
-      };
-
-      // Load progress cho user này
-      await loadProgressForUser(appUser.email);
-
-      persistSession(appUser);
-      return { success: true, message: 'Đăng nhập thành công!', user: appUser };
+    if (!fsRes.success || !fsRes.user) {
+      return { success: false, message: fsRes.message || 'Sai email hoặc mật khẩu' };
     }
 
-    return { success: false, message: fsRes.message || 'Sai tài khoản hoặc mật khẩu' };
+    /* KHÔNG tự dựng `appUser` ở đây nữa: `onAuthStateChanged` chạy ngay sau khi
+       đăng nhập thành công và tự đặt `currentUser` từ hồ sơ Firestore. Dựng hai
+       lần là hai nguồn sự thật.
+       Bản cũ còn nguy hơn thế: khi không tìm thấy user trong state nó bịa ra
+       email dạng `<username>@firestore.local`. Mà `progress` và `chats` trỏ tới
+       người dùng BẰNG EMAIL — nên tiến độ học sẽ ghi vào một địa chỉ không có
+       thật, và người dùng thấy mình mất sạch tiến độ. */
+    const stateUser = users.find(u => u.id === fsRes.user!.uid);
+    return { success: true, message: 'Đăng nhập thành công!', user: stateUser };
   };
 
   // ── Đăng nhập / Đăng ký bằng Google ──────────────────────────────────────
@@ -523,21 +559,25 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       role: 'student',
       email: identifier,
       status: 'pending',
+      dangTuDangKy: true,   // tạo trên app CHÍNH -> đăng nhập luôn sau khi tạo
     });
 
     if (!fsRes.success) {
       return { success: false, message: fsRes.message };
     }
 
-    const id = fsRes.user?.uid || `uid_${Date.now()}_${email.replace(/[^a-z0-9]/gi, '').slice(0, 8)}`;
+    /* Id nay LUÔN là uid của Firebase Auth. Bản cũ có nhánh dự phòng bịa ra
+       `uid_<thời điểm>_<email>` khi thiếu — nay không cần: tạo tài khoản thành
+       công thì chắc chắn có uid, còn thất bại thì đã trả về ở trên rồi. */
     const newUser: User = {
-      id,
+      id: fsRes.user!.uid,
       email,
       username: identifier,
-      password,
       name,
       role: 'student',
       status: 'pending',
+      /* Vẫn là 'local': trường này nói CÁCH đăng nhập (email+mật khẩu hay
+         Google), không nói chỗ lưu mật khẩu. Cách đăng nhập không đổi. */
       authProvider: 'local',
       canChangePassword: false,
       createdAt: new Date().toISOString(),
@@ -552,48 +592,26 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
   // ── Đăng xuất ────────────────────────────────────────────────────────────
 
-  const logout = () => {
+  const logout = async () => {
+    /* `signOut` làm `onAuthStateChanged` chạy, và chính chỗ đó dọn
+       `currentUser` + localStorage. Đặt `setCurrentUser(null)` ở đây nữa là
+       thừa, nhưng giữ lại thì giao diện đổi ngay không phải đợi vòng lặp sự
+       kiện — người dùng bấm Đăng xuất là thấy phản hồi tức thì. */
     setCurrentUser(null);
     setChats([]);
-    localStorage.removeItem('h11_current_user_email');
-    localStorage.removeItem('h11_current_user_data');
+    await signOut(auth);
   };
 
   // ── Quên mật khẩu ────────────────────────────────────────────────────────
 
   const forgotPassword = async (identifier: string) => {
-    const lower = identifier.toLowerCase();
-    const user = users.find(
-      u => u.email.toLowerCase() === lower || u.username?.toLowerCase() === lower
-    );
-    if (!user) {
-      return { success: false, message: 'Không tìm thấy tài khoản với email/username này.' };
-    }
-
-    if (user.role === 'student') {
-      return {
-        success: false,
-        message: 'Tài khoản học sinh do Giáo viên quản lý. Vui lòng liên hệ giáo viên để được cấp lại mật khẩu.',
-      };
-    }
-
-    const newPassword = generateRandomPassword();
-    // Cập nhật Firestore
-    await FirestoreService.updateUserById(user.id, { password: newPassword });
-
-    // Cập nhật state
-    setUsers(prev => prev.map(u => u.id === user.id ? { ...u, password: newPassword } : u));
-
-    if (currentUser?.id === user.id) {
-      setCurrentUser(prev => prev ? { ...prev, password: newPassword } : prev);
-    }
-
-    return {
-      success: true,
-      message: `Mật khẩu mới đã được tạo. Hãy sao chép và lưu lại ngay bây giờ!`,
-      newPassword,
-      email: user.email,
-    };
+    /* Bản cũ TỰ SINH mật khẩu mới, ghi thẳng vào Firestore rồi hiện lên màn
+       hình. Ai mở được màn đó là đổi được mật khẩu người khác — và mật khẩu
+       mới nằm luôn trong `users`, nơi ai cũng đọc được. Nay chỉ gửi thư; chỉ
+       chủ hộp thư mới đặt lại được.
+       Bỏ luôn quy tắc "học sinh phải nhờ giáo viên": nó ra đời vì admin phải
+       gõ mật khẩu hộ, mà nay không ai gõ hộ ai nữa. */
+    return await resetPasswordWithFirestore(identifier.trim().toLowerCase());
   };
 
   // ── Library & Databank Methods ──────────────────────────────────────────────

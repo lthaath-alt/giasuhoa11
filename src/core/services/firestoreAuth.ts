@@ -1,104 +1,135 @@
 import {
-  collection,
-  query,
-  where,
-  getDocs,
-  addDoc,
-  updateDoc,
-  doc,
-  serverTimestamp,
-  Timestamp
+  collection, getDocs, getDoc, setDoc, updateDoc,
+  doc, serverTimestamp, Timestamp,
 } from 'firebase/firestore';
-import { db } from './firebase';
+import {
+  signInWithEmailAndPassword, createUserWithEmailAndPassword,
+  sendPasswordResetEmail, signOut,
+} from 'firebase/auth';
+import { db, auth, taoAuthPhu } from './firebase';
 import { ErrorLogService } from './errorLog';
 
-// ─── Data Interface cho User trên Firestore ─────────────────────────────────
+/* ─── Đăng nhập qua Firebase Auth ─────────────────────────────────────────────
+ *
+ * Trước 10/09/2026 tệp này đọc thẳng collection `users` rồi SO CHUỖI mật khẩu
+ * ngay trên trình duyệt. Mà `users` phải cho đọc công khai để việc đó chạy
+ * được, nên bất kỳ ai cũng tải về được mật khẩu của mọi người. Đó là lỗ hổng
+ * nặng nhất của dự án.
+ *
+ * Nay mật khẩu chỉ tồn tại ở phía Firebase Auth, đã băm, không bao giờ về tới
+ * trình duyệt. Tài liệu `users/{uid}` chỉ còn giữ hồ sơ: tên, vai, lớp, trạng
+ * thái.
+ *
+ * Id tài liệu = `uid` của Auth (đánh lại khoá ngày 10/09/2026). Bắt buộc như
+ * vậy vì luật Firestore KHÔNG truy vấn được, chỉ `get()` theo đường dẫn — đợt
+ * siết phân quyền sẽ cần đọc `users/{request.auth.uid}` để biết vai.
+ *
+ * `npm run kiem-tra:an-ninh` canh cho tệp này không quay lại lối cũ.
+ */
+
+// ─── Hồ sơ người dùng trên Firestore (KHÔNG còn mật khẩu) ───────────────────
 export interface FirestoreUser {
-  /** Document ID trên Firestore (dùng làm UID) */
+  /** Id tài liệu = uid của Firebase Auth */
   uid: string;
-  /** Mã đăng nhập / Tên tài khoản */
+  /** Email đăng nhập */
   username: string;
-  /** Mật khẩu lưu dạng plain text */
-  password: string;
   /** Họ và tên hiển thị */
   fullName: string;
-  /** Vai trò: "teacher", "student", "admin", v.v. */
+  /** Vai trò: 'admin' | 'school_admin' | 'teacher' | 'student' */
   role: string;
-  /** Thời gian tạo tài khoản */
   createdAt?: string | Timestamp;
 }
 
-// ─── 1. CHỨC NĂNG ĐĂNG NHẬP (Firestore direct) ──────────────────────────────
-/**
- * Đăng nhập bằng cách truy vấn Firestore collection "users" theo username hoặc email
- * và so sánh trực tiếp chuỗi mật khẩu (plain text).
- */
+/** Đổi mã lỗi của Firebase Auth sang câu tiếng Việt học sinh đọc hiểu. */
+function loiTiengViet(ma: string): string {
+  switch (ma) {
+    case 'auth/invalid-credential':
+    case 'auth/wrong-password':
+    case 'auth/user-not-found':
+      return 'Sai email hoặc mật khẩu.';
+    case 'auth/invalid-email':
+      return 'Email không đúng định dạng.';
+    case 'auth/user-disabled':
+      return 'Tài khoản này đã bị khoá. Hãy liên hệ giáo viên.';
+    case 'auth/too-many-requests':
+      return 'Sai quá nhiều lần. Hãy đợi vài phút rồi thử lại.';
+    case 'auth/email-already-in-use':
+      return 'Email này đã có tài khoản rồi.';
+    case 'auth/weak-password':
+      return 'Mật khẩu phải từ 6 ký tự trở lên.';
+    case 'auth/network-request-failed':
+      return 'Không kết nối được. Hãy kiểm tra mạng.';
+    default:
+      return 'Không đăng nhập được. Hãy thử lại.';
+  }
+}
+
+/* Sai mật khẩu là chuyện thường ngày — KHÔNG ghi vào nhật ký lỗi. Ghi thì nhật
+   ký ngập bởi lỗi gõ nhầm và lỗi hệ thống thật bị chìm mất. */
+const LOI_THUONG = new Set([
+  'auth/invalid-credential', 'auth/wrong-password',
+  'auth/user-not-found', 'auth/invalid-email',
+]);
+
+// ─── 1. ĐĂNG NHẬP ───────────────────────────────────────────────────────────
 export const loginWithFirestore = async (
-  username: string,
+  email: string,
   password: string
 ): Promise<{ success: boolean; message: string; user?: FirestoreUser }> => {
+  const dinhDanh = email.trim().toLowerCase();
+  if (!dinhDanh || !password) {
+    return { success: false, message: 'Vui lòng nhập đầy đủ email và mật khẩu!' };
+  }
   try {
-    const trimmedUsername = username.trim().toLowerCase();
-    if (!trimmedUsername || !password) {
-      return { success: false, message: 'Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu!' };
+    const cred = await signInWithEmailAndPassword(auth, dinhDanh, password);
+    const uid = cred.user.uid;
+
+    /* Hồ sơ nằm ở `users/{uid}`. Thiếu hồ sơ thì KHÔNG tự tạo: có tài khoản
+       Auth mà không có hồ sơ là dấu hiệu dữ liệu lệch, phải để người quản trị
+       nhìn thấy chứ đừng lặng lẽ vá. Và phải đăng xuất ngay, nếu không người
+       dùng mắc kẹt ở trạng thái nửa vời — Auth thì đã vào, app thì chưa. */
+    const hoSo = await getDoc(doc(db, 'users', uid));
+    if (!hoSo.exists()) {
+      await signOut(auth);
+      return {
+        success: false,
+        message: 'Tài khoản đăng nhập được nhưng chưa có hồ sơ trong hệ thống. Hãy báo giáo viên.',
+      };
     }
 
-    // Bước 1: Tham chiếu tới collection "users" trên Firestore
-    const usersCollection = collection(db, 'users');
-
-    // Bước 2: Tạo query tìm document có field "username" hoặc "email" khớp
-    let querySnapshot = await getDocs(query(usersCollection, where('username', '==', trimmedUsername)));
-    if (querySnapshot.empty) {
-      querySnapshot = await getDocs(query(usersCollection, where('email', '==', trimmedUsername)));
-    }
-
-    // Bước 3: Nếu không tìm thấy document nào khớp username/email
-    if (querySnapshot.empty) {
-      return { success: false, message: 'Sai tài khoản hoặc mật khẩu' };
-    }
-
-    // Bước 4: Lấy document đầu tiên tìm được
-    const userDoc = querySnapshot.docs[0];
-    const userData = userDoc.data();
-
-    // Bước 5: So sánh chuỗi mật khẩu trực tiếp (Plain text comparison)
-    if (userData.password !== password) {
-      return { success: false, message: 'Sai tài khoản hoặc mật khẩu' };
-    }
-
-    // Bước 6: Đăng nhập thành công -> Trả về thông tin user cùng document ID (uid)
-    const user: FirestoreUser = {
-      uid: userDoc.id,
-      username: userData.username || userData.email || trimmedUsername,
-      password: userData.password,
-      fullName: userData.fullName || userData.name || '',
-      role: userData.role || 'student',
-      createdAt: userData.createdAt ? userData.createdAt.toString() : new Date().toISOString(),
-    };
-
+    const d = hoSo.data();
     return {
       success: true,
       message: 'Đăng nhập thành công!',
-      user,
+      user: {
+        uid,
+        username: d.email || d.username || dinhDanh,
+        fullName: d.fullName || d.name || '',
+        role: d.role || 'student',
+        createdAt: d.createdAt?.toDate ? d.createdAt.toDate().toISOString() : d.createdAt || '',
+      },
     };
   } catch (error: any) {
-    console.error('Lỗi khi đăng nhập Firestore:', error);
-    ErrorLogService.logError({
-      level: 'Lỗi Cơ Sở Dữ Liệu',
-      component: 'firestoreAuth.login',
-      message: error?.message || 'Lỗi khi đăng nhập Firestore'
-    });
-    return {
-      success: false,
-      message: error?.message || 'Có lỗi xảy ra khi kết nối tới Firestore. Vui lòng kiểm tra lại cấu hình Firebase!',
-    };
+    const ma = error?.code || '';
+    if (!LOI_THUONG.has(ma)) {
+      ErrorLogService.logError({
+        level: 'Lỗi Cơ Sở Dữ Liệu',
+        component: 'firestoreAuth.login',
+        message: `${ma} — ${error?.message || ''}`,
+      });
+    }
+    return { success: false, message: loiTiengViet(ma) };
   }
 };
 
-// ─── 2. CHỨC NĂNG TẠO TÀI KHOẢN (Firestore direct) ──────────────────────────
+// ─── 2. TẠO TÀI KHOẢN ───────────────────────────────────────────────────────
 /**
- * Tạo tài khoản mới bằng cách kiểm tra username/email chưa tồn tại,
- * sau đó ghi trực tiếp document mới vào collection "users" từ client.
+ * Tạo tài khoản Auth + hồ sơ Firestore.
+ *
+ * `dangTuDangKy = true`  → người dùng tự đăng ký: tạo trên app CHÍNH nên tạo
+ *                          xong là đăng nhập luôn (đúng ý muốn).
+ * `dangTuDangKy = false` → admin tạo hộ: dùng app PHỤ để phiên của admin không
+ *                          bị đụng. Xem `taoAuthPhu()` trong `firebase.ts`.
  */
 export const createAccountWithFirestore = async (data: {
   username: string;
@@ -109,188 +140,170 @@ export const createAccountWithFirestore = async (data: {
   classId?: string;
   schoolId?: string;
   status?: string;
+  dangTuDangKy?: boolean;
 }): Promise<{ success: boolean; message: string; user?: FirestoreUser }> => {
+  const email = (data.email || data.username).trim().toLowerCase();
+  const fullName = data.fullName.trim();
+  const role = data.role || 'student';
+  const status = data.status || 'active';
+
+  /* Chốt chặn GIỮ NGUYÊN từ bản cũ: không tạo được tài khoản quyền cao qua
+     đường này. Bản cũ viết `role === 'admin' || role === 'admin' ||
+     role === 'school_admin'` — lặp 'admin' hai lần, chắc định gõ một vai khác.
+     Nay viết bằng danh sách cho gọn và không lặp. */
+  const VAI_CAM = new Set(['admin', 'school_admin']);
+  if (VAI_CAM.has(role)) {
+    return {
+      success: false,
+      message: 'Chỉ được phép tạo tài khoản với vai trò học sinh hoặc giáo viên qua chức năng này.',
+    };
+  }
+
+  if (!email || !data.password || !fullName) {
+    return { success: false, message: 'Vui lòng nhập đầy đủ Email, Mật khẩu và Họ tên!' };
+  }
+  if (data.password.length < 6) {
+    return { success: false, message: 'Mật khẩu phải từ 6 ký tự trở lên.' };
+  }
+
+  const tuDangKy = data.dangTuDangKy === true;
+  const phu = tuDangKy ? null : taoAuthPhu();
+
   try {
-    const username = data.username.trim().toLowerCase();
-    const password = data.password;
-    const fullName = data.fullName.trim();
-    const role     = data.role || 'student';
-    const email    = (data.email || username).trim().toLowerCase();
-    const status   = data.status || 'active';
+    const authDung = phu ? phu.authPhu : auth;
+    const cred = await createUserWithEmailAndPassword(authDung, email, data.password);
+    const uid = cred.user.uid;
 
-    if (role === 'admin' || role === 'admin' || role === 'school_admin') {
-      return { success: false, message: 'Chỉ được phép tạo tài khoản với vai trò học sinh hoặc giáo viên qua chức năng này.' };
-    }
-
-    if (!username || !password || !fullName) {
-      return { success: false, message: 'Vui lòng nhập đầy đủ Username, Mật khẩu và Họ tên!' };
-    }
-
-    const usersCollection = collection(db, 'users');
-
-    // Bước 1: Kiểm tra username/email đã tồn tại chưa bằng query
-    let checkSnapshot = await getDocs(query(usersCollection, where('username', '==', username)));
-    if (checkSnapshot.empty && email) {
-      checkSnapshot = await getDocs(query(usersCollection, where('email', '==', email)));
-    }
-
-    if (!checkSnapshot.empty) {
-      return { success: false, message: `Tài khoản / Email "${username}" đã tồn tại trên Firestore!` };
-    }
-
-    // Bước 2: Chuẩn bị dữ liệu document mới (Plain text password, createdAt timestamp)
-    const newUserPayload: Record<string, any> = {
-      username,
-      password, // Lưu plain text theo yêu cầu
+    /* `setDoc` với id = uid, KHÔNG dùng `addDoc`: luật Firestore đợt sau cần
+       đọc `users/{request.auth.uid}` để biết vai. `addDoc` sinh id ngẫu nhiên
+       là hỏng đúng điều đó — và đó chính là lý do đã phải chạy một đợt đánh
+       lại khoá cho 15 tài khoản cũ. */
+    const hoSo: Record<string, any> = {
+      email,
+      username: email,
       fullName,
       name: fullName,
-      email,
       role,
       status,
+      authUid: uid,
+      /* 'local' = đăng nhập bằng email+mật khẩu, đối lại với 'google'. Trường
+         này nói CÁCH đăng nhập, không nói chỗ lưu mật khẩu — nên nó không đổi
+         sau đợt chuyển sang Firebase Auth. 15 hồ sơ cũ cũng đang ghi 'local'. */
+      authProvider: 'local',
       createdAt: serverTimestamp(),
     };
+    if (data.classId) hoSo.classId = data.classId;
+    if (data.schoolId) hoSo.schoolId = data.schoolId;
 
-    if (data.classId) newUserPayload.classId = data.classId;
-    if (data.schoolId) newUserPayload.schoolId = data.schoolId;
-
-    // Bước 3: Ghi trực tiếp document mới vào Firestore (bằng addDoc từ client)
-    const docRef = await addDoc(usersCollection, newUserPayload);
-
-    // Bước 4: Trả về đối tượng User vừa tạo thành công
-    const createdUser: FirestoreUser = {
-      uid: docRef.id,
-      username,
-      password,
-      fullName,
-      role,
-      createdAt: new Date().toISOString(),
-    };
+    await setDoc(doc(db, 'users', uid), hoSo);
 
     return {
       success: true,
-      message: `Đã tạo tài khoản "${username}" thành công trên Firestore!`,
-      user: createdUser,
+      message: `Đã tạo tài khoản "${email}" thành công!`,
+      user: { uid, username: email, fullName, role, createdAt: new Date().toISOString() },
     };
   } catch (error: any) {
-    console.error('Lỗi khi tạo tài khoản Firestore:', error);
-    ErrorLogService.logError({
-      level: 'Lỗi Cơ Sở Dữ Liệu',
-      component: 'firestoreAuth.createAccount',
-      message: error?.message || 'Lỗi khi tạo tài khoản trên Firestore'
-    });
-    return {
-      success: false,
-      message: error?.message || 'Không thể tạo tài khoản trên Firestore. Vui lòng kiểm tra lại kết nối/config!',
-    };
+    const ma = error?.code || '';
+    if (!LOI_THUONG.has(ma) && ma !== 'auth/email-already-in-use') {
+      ErrorLogService.logError({
+        level: 'Lỗi Cơ Sở Dữ Liệu',
+        component: 'firestoreAuth.createAccount',
+        message: `${ma} — ${error?.message || ''}`,
+      });
+    }
+    return { success: false, message: loiTiengViet(ma) };
+  } finally {
+    /* Huỷ app phụ kể cả khi tạo lỗi — bỏ sót thì nó nằm lại trong bộ nhớ và
+       giữ luôn một phiên đăng nhập không ai dùng. */
+    if (phu) await phu.huy();
   }
 };
 
-// ─── 3. CHỨC NĂNG RESET MẬT KHẨU (Firestore direct) ────────────────────────
+// ─── 3. ĐẶT LẠI MẬT KHẨU ────────────────────────────────────────────────────
 /**
- * Reset/Đổi mật khẩu bằng cách gọi updateDoc trực tiếp trên document ID của người dùng.
+ * Gửi thư đặt lại mật khẩu.
+ *
+ * ⚠ CHỮ KÝ ĐÃ ĐỔI: trước là `(docId, newPassword)` — admin tự gõ mật khẩu mới
+ * rồi ghi thẳng vào Firestore. Nay không ai đặt hộ mật khẩu ai được nữa; chỉ
+ * chủ hộp thư mới đặt được. Đó chính là điều đợt này muốn.
+ *
+ * Firebase gửi thư miễn phí trên gói Spark. Nội dung thư sửa ở
+ * Firebase Console → Authentication → Templates.
  */
 export const resetPasswordWithFirestore = async (
-  docId: string,
-  newPassword: string
+  email: string
 ): Promise<{ success: boolean; message: string }> => {
+  const dinhDanh = (email || '').trim().toLowerCase();
+  if (!dinhDanh) return { success: false, message: 'Không xác định được email tài khoản!' };
+
+  /* Câu trả lời CỐ Ý giống hệt nhau dù email có tồn tại hay không. Nói khác đi
+     là biến màn này thành công cụ dò xem ai có tài khoản trong hệ thống. */
+  const traLoiChung = {
+    success: true,
+    message: `Nếu ${dinhDanh} có tài khoản, thư đặt lại mật khẩu đã được gửi. Hãy kiểm tra cả hộp thư rác.`,
+  };
+
   try {
-    if (!docId) {
-      return { success: false, message: 'Không xác định được ID tài khoản!' };
-    }
-    if (!newPassword || newPassword.trim() === '') {
-      return { success: false, message: 'Mật khẩu mới không được để trống!' };
-    }
-
-    // Bước 1: Tạo tham chiếu tới document cụ thể trong collection "users"
-    const userDocRef = doc(db, 'users', docId);
-
-    // Bước 2: Gọi updateDoc ghi đè trực tiếp trường password (plain text)
-    await updateDoc(userDocRef, {
-      password: newPassword,
-    });
-
-    return {
-      success: true,
-      message: 'Cập nhật mật khẩu thành công!',
-    };
+    await sendPasswordResetEmail(auth, dinhDanh);
+    return traLoiChung;
   } catch (error: any) {
-    console.error('Lỗi khi reset mật khẩu Firestore:', error);
-    ErrorLogService.logError({
-      level: 'Lỗi Cơ Sở Dữ Liệu',
-      component: 'firestoreAuth.resetPassword',
-      message: error?.message || 'Lỗi khi cập nhật mật khẩu trên Firestore'
-    });
-    return {
-      success: false,
-      message: error?.message || 'Không thể cập nhật mật khẩu trên Firestore!',
-    };
+    const ma = error?.code || '';
+    if (ma === 'auth/user-not-found') return traLoiChung;
+    if (!LOI_THUONG.has(ma)) {
+      ErrorLogService.logError({
+        level: 'Lỗi Cơ Sở Dữ Liệu',
+        component: 'firestoreAuth.resetPassword',
+        message: `${ma} — ${error?.message || ''}`,
+      });
+    }
+    return { success: false, message: loiTiengViet(ma) };
   }
 };
 
-// ─── 4. CẬP NHẬT QUYỀN (ROLE) TÀI KHOẢN (Dành cho Super Admin) ─────────────
+// ─── 4. CẬP NHẬT VAI TRÒ ────────────────────────────────────────────────────
 /**
- * Cập nhật vai trò (role) của một tài khoản dựa trên document ID.
+ * Cập nhật vai trò dựa trên uid (= id tài liệu).
  * Chỉ nên được gọi từ giao diện Super Admin.
  */
 export const updateUserRole = async (
-  docId: string,
+  uid: string,
   newRole: string
 ): Promise<{ success: boolean; message: string }> => {
   try {
-    if (!docId) {
-      return { success: false, message: 'Không xác định được ID tài khoản!' };
-    }
-    if (!newRole || !newRole.trim()) {
-      return { success: false, message: 'Vui lòng chọn quyền hạn mới!' };
-    }
+    if (!uid) return { success: false, message: 'Không xác định được ID tài khoản!' };
+    if (!newRole || !newRole.trim()) return { success: false, message: 'Vui lòng chọn quyền hạn mới!' };
 
-    const userDocRef = doc(db, 'users', docId);
-    await updateDoc(userDocRef, { role: newRole.trim() });
-
-    return {
-      success: true,
-      message: `Đã cập nhật quyền thành "${newRole}" thành công!`,
-    };
+    await updateDoc(doc(db, 'users', uid), { role: newRole.trim() });
+    return { success: true, message: `Đã cập nhật quyền thành "${newRole}" thành công!` };
   } catch (error: any) {
-    console.error('Lỗi khi cập nhật role Firestore:', error);
     ErrorLogService.logError({
       level: 'Lỗi Cơ Sở Dữ Liệu',
       component: 'firestoreAuth.updateUserRole',
       message: error?.message || 'Lỗi khi cập nhật quyền người dùng',
     });
-    return {
-      success: false,
-      message: error?.message || 'Không thể cập nhật quyền trên Firestore!',
-    };
+    return { success: false, message: error?.message || 'Không thể cập nhật quyền trên Firestore!' };
   }
 };
 
-// ─── 5. TRUY VẤN DANH SÁCH TÀI KHOẢN (Hiển thị cho Admin/GV) ───────────────
-/**
- * Lấy tất cả tài khoản từ collection "users" để hiển thị trong giao diện quản lý.
- */
+// ─── 5. DANH SÁCH TÀI KHOẢN ─────────────────────────────────────────────────
 export const getFirestoreUsers = async (): Promise<FirestoreUser[]> => {
   try {
-    const usersCollection = collection(db, 'users');
-    const snapshot = await getDocs(usersCollection);
-
-    return snapshot.docs.map((docSnap) => {
-      const data = docSnap.data();
+    const snapshot = await getDocs(collection(db, 'users'));
+    return snapshot.docs.map((s) => {
+      const d = s.data();
       return {
-        uid: docSnap.id,
-        username: data.username || '',
-        password: data.password || '',
-        fullName: data.fullName || data.name || '',
-        role: data.role || 'student',
-        createdAt: data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : data.createdAt || '',
+        uid: s.id,
+        username: d.email || d.username || '',
+        fullName: d.fullName || d.name || '',
+        role: d.role || 'student',
+        createdAt: d.createdAt?.toDate ? d.createdAt.toDate().toISOString() : d.createdAt || '',
       };
     });
   } catch (error: any) {
-    console.error('Lỗi khi lấy danh sách user từ Firestore:', error);
     ErrorLogService.logError({
       level: 'Lỗi Cơ Sở Dữ Liệu',
       component: 'firestoreAuth.getUsers',
-      message: error?.message || 'Lỗi khi lấy danh sách người dùng'
+      message: error?.message || 'Lỗi khi lấy danh sách người dùng',
     });
     return [];
   }

@@ -77,7 +77,8 @@ export const FirestoreAccountManager: React.FC = () => {
 
   // State cho Dialog Reset Mật khẩu
   const [selectedUser, setSelectedUser] = useState<FirestoreUser | null>(null);
-  const [resetPasswordVal, setResetPasswordVal] = useState('');
+  /* Đã bỏ state `resetPasswordVal`: admin không gõ mật khẩu mới nữa, chỉ gửi
+     thư đặt lại. Xem `handleResetPassword`. */
   const [resetMsg, setResetMsg]         = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [resetting, setResetting]       = useState(false);
 
@@ -131,28 +132,25 @@ export const FirestoreAccountManager: React.FC = () => {
     }
   };
 
-  // ── Xử lý Yêu cầu 4: Reset Mật khẩu bằng updateDoc ───────────────────────
+  // ── Gửi thư đặt lại mật khẩu ─────────────────────────────────────────────
+  /* Trước 10/09/2026 hàm này nhận mật khẩu mới do admin tự gõ rồi ghi thẳng
+     vào Firestore. Nay Firebase Auth giữ mật khẩu (đã băm) và KHÔNG ai đặt hộ
+     mật khẩu ai được nữa — chỉ chủ hộp thư đặt lại được. Đó là điều khiến mật
+     khẩu thật sự an toàn, không phải bất tiện cần khắc phục. */
   const handleResetPassword = async () => {
     if (!selectedUser) return;
     setResetMsg(null);
 
-    if (!resetPasswordVal.trim()) {
-      setResetMsg({ type: 'error', text: 'Vui lòng nhập mật khẩu mới!' });
-      return;
-    }
-
     setResetting(true);
-    const result = await resetPasswordWithFirestore(selectedUser.uid, resetPasswordVal.trim());
+    const result = await resetPasswordWithFirestore(selectedUser.username);
     setResetting(false);
 
     if (result.success) {
-      setResetMsg({ type: 'success', text: `Đã đổi mật khẩu cho ${selectedUser.username} thành công!` });
+      setResetMsg({ type: 'success', text: result.message });
       setTimeout(() => {
         setSelectedUser(null);
-        setResetPasswordVal('');
         setResetMsg(null);
-        fetchUsers();
-      }, 1500);
+      }, 4000);   // thư gửi đi rồi, để người đọc kịp câu thông báo
     } else {
       setResetMsg({ type: 'error', text: result.message });
     }
@@ -362,12 +360,11 @@ export const FirestoreAccountManager: React.FC = () => {
                                 startIcon={<Key size={13} />}
                                 onClick={() => {
                                   setSelectedUser(u);
-                                  setResetPasswordVal('');
                                   setResetMsg(null);
                                 }}
                                 sx={{ textTransform: 'none', borderRadius: 0, fontSize: '0.72rem', px: 1 }}
                               >
-                                Reset MK
+                                Gửi thư đặt MK
                               </Button>
 
                               {/* [MỚI] Nút Đổi quyền */}
@@ -397,13 +394,24 @@ export const FirestoreAccountManager: React.FC = () => {
       {/* DIALOG RESET MẬT KHẨU */}
       <Dialog open={Boolean(selectedUser)} onClose={() => setSelectedUser(null)} maxWidth="xs" fullWidth>
         <DialogTitle sx={{ fontWeight: 'bold' }}>
-          Reset Mật khẩu Firestore
+          Gửi thư đặt lại mật khẩu
         </DialogTitle>
         <DialogContent dividers>
           {selectedUser && (
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              <Typography variant="body2" color="text.secondary">
-                Đang đổi mật khẩu cho username: <strong>{selectedUser.username}</strong> ({selectedUser.fullName})
+              <Typography variant="body2" sx={{ color: 'var(--chu-nhat)' }}>
+                Gửi tới: <strong>{selectedUser.username}</strong> ({selectedUser.fullName})
+              </Typography>
+
+              {/* Không còn ô nhập mật khẩu mới. Từ 10/09/2026 mật khẩu do
+                  Firebase Auth giữ ở dạng đã băm, nên KHÔNG ai đặt hộ mật khẩu
+                  ai được nữa — kể cả quản trị viên. */}
+              <Typography variant="body2" sx={{ color: 'var(--chu-nhat)', lineHeight: 1.7 }}>
+                Hệ thống gửi một lá thư tới địa chỉ trên. Người dùng bấm đường dẫn
+                trong thư rồi tự đặt mật khẩu mới.
+                <br />
+                Thầy cô <strong>không đặt hộ mật khẩu được nữa</strong> — đây chính
+                là điều khiến mật khẩu an toàn: không ai ngoài chủ tài khoản biết nó.
               </Typography>
 
               {resetMsg && (
@@ -411,17 +419,6 @@ export const FirestoreAccountManager: React.FC = () => {
                   {resetMsg.text}
                 </Alert>
               )}
-
-              <TextField
-                label="Mật khẩu mới"
-                type="password"
-                fullWidth
-                size="small"
-                value={resetPasswordVal}
-                onChange={(e) => setResetPasswordVal(e.target.value)}
-                placeholder="Nhập mật khẩu mới..."
-                autoFocus
-              />
             </Box>
           )}
         </DialogContent>
@@ -437,7 +434,7 @@ export const FirestoreAccountManager: React.FC = () => {
             startIcon={resetting ? <CircularProgress size={16} color="inherit" /> : <Key size={16} />}
             sx={{ textTransform: 'none', fontWeight: 'bold', borderRadius: 0 }}
           >
-            {resetting ? 'Đang lưu...' : 'Cập nhật Mật khẩu'}
+            {resetting ? 'Đang gửi...' : 'Gửi thư'}
           </Button>
         </DialogActions>
       </Dialog>
