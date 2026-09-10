@@ -51,7 +51,38 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // ── Trợ giúp ────────────────────────────────────────────────────────────
+    // ── Danh tính và vai trò (đợt 2, 10/09/2026) ────────────────────────────
+
+    function dangNhap() {
+      return request.auth != null;
+    }
+
+    /* Email nằm sẵn trong token, đọc nó KHÔNG tốn lượt đọc nào. Đây là lý do
+       mọi phép kiểm quyền sở hữu bên dưới đều dùng email chứ không dùng uid. */
+    function email() {
+      return request.auth.token.email;
+    }
+
+    /* NGƯỢC LẠI: mỗi lần gọi get() là MỘT LƯỢT ĐỌC CÓ TÍNH TIỀN. Gói Spark cho
+       50.000 lượt/ngày. Vì thế hàm này chỉ được dùng ở những đường ghi HIẾM
+       (giáo viên soạn câu hỏi, quản trị sửa cấu hình), và TUYỆT ĐỐI KHÔNG dùng
+       trong luật của `progress` và `chats` — hai chỗ học sinh ghi liên tục
+       trong lúc học.
+       Cách đúng đắn hơn là custom claims, nhưng thứ đó cần Admin SDK trong
+       Cloud Function, tức gói Blaze trả tiền. */
+    function vaiTro() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    function laGiaoVien() {
+      return dangNhap() && vaiTro() in ['teacher', 'school_admin', 'admin'];
+    }
+
+    function laQuanTri() {
+      return dangNhap() && vaiTro() in ['school_admin', 'admin'];
+    }
+
+    // ── Trợ giúp: kiểm nội dung câu hỏi ─────────────────────────────────────
 
     // Một chuỗi có an toàn để đổ vào `dangerouslySetInnerHTML` không?
     //
@@ -122,38 +153,86 @@ service cloud.firestore {
     }
 
     // ── Ngân hàng câu hỏi ───────────────────────────────────────────────────
-    // Đọc: công khai. Trò chơi và bộ kiểm đọc thẳng, không đăng nhập.
-    // Ghi:  vẫn mở (chưa có danh tính), NHƯNG nội dung phải sạch.
+    /* ĐỌC PHẢI GIỮ CÔNG KHAI. Workflow đồng bộ đêm
+       (.github/workflows/dong-bo-ngan-hang.yml → npm run xuat:ngan-hang) đọc
+       Firestore KHÔNG đăng nhập, chỉ bằng khoá web. Siết dòng này là đồng bộ
+       chết mà không ai biết — web vẫn đúng vì nó đọc thẳng Firestore, chỉ có
+       bản chụp trong git lệch dần. */
     match /bank_questions/{id} {
       allow read: if true;
-      allow create, update: if cauHoiSach();
-      allow delete: if true;
+      allow create, update: if laGiaoVien() && cauHoiSach();
+      allow delete: if laGiaoVien();
     }
 
     // Kho câu hỏi cũ. Đọc thật ngày 10/09/2026: RỖNG, không còn bản ghi nào.
     // Giữ luật giống hệt, để nếu có ai ghi lại vào đây thì cũng phải sạch.
     match /questions/{id} {
       allow read: if true;
-      allow create, update: if cauHoiSach();
-      allow delete: if true;
+      allow create, update: if laGiaoVien() && cauHoiSach();
+      allow delete: if laGiaoVien();
     }
 
-    // ── Các collection còn lại ──────────────────────────────────────────────
-    // Giữ nguyên quyền như luật cũ. Siết chúng lại đòi có danh tính, tức đòi
-    // Firebase Auth — việc riêng, phải bàn trước.
-    //
-    // CẢNH BÁO cho `users`: bản ghi ở đây chứa mật khẩu dạng chữ thường và ai
-    // cũng đọc được. Đây là lỗ hổng nặng nhất của dự án.
-    match /users/{id}          { allow read, write: if true; }
-    match /chats/{id}          { allow read, write: if true; }
-    match /classes/{id}        { allow read, write: if true; }
-    match /schools/{id}        { allow read, write: if true; }
-    match /exams/{id}          { allow read, write: if true; }
-    match /progress/{id}       { allow read, write: if true; }
-    match /equations/{id}      { allow read, write: if true; }
-    match /matrix_resources/{id}    { allow read, write: if true; }
-    match /curriculum_chapters/{id} { allow read, write: if true; }
-    match /system_settings/{id}     { allow read, write: if true; }
+    // ── Nội dung học: đọc công khai, ghi theo vai ───────────────────────────
+    // Trang chào và chế độ "Dùng Thử" đọc những thứ này khi chưa đăng nhập.
+    match /curriculum_chapters/{id} { allow read: if true; allow write: if laGiaoVien(); }
+    match /exams/{id}               { allow read: if true; allow write: if laGiaoVien(); }
+    match /equations/{id}           { allow read: if true; allow write: if laGiaoVien(); }
+    match /matrix_resources/{id}    { allow read: if true; allow write: if laGiaoVien(); }
+    match /system_settings/{id}     { allow read: if true; allow write: if laQuanTri(); }
+    match /schools/{id}             { allow read: if true; allow write: if laQuanTri(); }
+
+    // ── Dữ liệu người: phải đăng nhập ───────────────────────────────────────
+
+    /* Id tài liệu CHÍNH LÀ email — đã kiểm trên dữ liệu thật ngày 10/09/2026.
+       Nhờ vậy kiểm được quyền sở hữu mà KHÔNG tốn lượt đọc nào. Đây là chỗ học
+       sinh ghi nhiều nhất nên không được phép dùng get(). */
+    match /progress/{userId} {
+      allow read, write: if dangNhap() && (email() == userId || laGiaoVien());
+    }
+
+    /* App đọc chats bằng query(where('userEmail','==',…), where('lessonId','==',…)),
+       tức truy vấn CÓ RÀNG BUỘC trên đúng trường luật kiểm — điều kiện bắt buộc
+       để Firestore cho phép một truy vấn. Xem `getChatsByUserLesson` trong
+       firestoreService.ts. */
+    match /chats/{id} {
+      allow read:   if dangNhap() && (email() == resource.data.userEmail || laGiaoVien());
+      allow create: if dangNhap() && email() == request.resource.data.userEmail;
+      allow update, delete: if dangNhap() && (email() == resource.data.userEmail || laGiaoVien());
+    }
+
+    /* Đọc rộng cho người đã đăng nhập, CÓ CHỦ Ý. Học sinh tự đăng ký vào lớp
+       bằng mã mời (`joinClassByCode` tra `classes.find(c => c.inviteCode …)`),
+       mà lúc đó email các em CHƯA nằm trong studentIdentifiers. Siết chặt hơn
+       là chức năng "vào lớp bằng mã" chết.
+       Hệ quả đã biết và chấp nhận: học sinh đã đăng nhập thấy được email bạn
+       cùng trường. Muốn kín hơn thì tách mã mời ra một collection riêng. */
+    match /classes/{id} {
+      allow read:  if dangNhap();
+      allow write: if laGiaoVien();
+    }
+
+    /* CHÚ Ý hai điều, cả hai đều dễ viết sai:
+
+       1. `create` phải cho phép CẢ trường hợp giáo viên/quản trị tạo hộ. Khi
+          admin tạo tài khoản cho giáo viên, tài khoản Auth được tạo trên
+          Firebase App PHỤ (xem `taoAuthPhu()`) nhưng hồ sơ ghi bằng db của app
+          CHÍNH — lúc ghi, request.auth.uid là ADMIN chứ không phải người mới.
+          Thiếu vế laGiaoVien() là chặn đúng createTeacher / createSchoolAdmin /
+          createStudent.
+
+       2. `update` phải chặn tự đổi `role`. Không chặn thì một học sinh mở
+          console trình duyệt là tự phong mình làm admin, và cả đợt này vô
+          nghĩa. */
+    match /users/{userId} {
+      allow read:   if dangNhap() && (request.auth.uid == userId || laGiaoVien());
+      allow create: if dangNhap() && (request.auth.uid == userId || laGiaoVien());
+      allow update: if dangNhap() && (
+                      (request.auth.uid == userId
+                       && request.resource.data.role == resource.data.role)
+                      || laQuanTri()
+                    );
+      allow delete: if laQuanTri();
+    }
 
     // ── Mọi thứ khác: cấm ───────────────────────────────────────────────────
     // Mười hai collection trên là toàn bộ những gì mã nguồn dùng tới, liệt kê
