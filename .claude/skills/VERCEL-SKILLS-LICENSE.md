@@ -1,12 +1,26 @@
-# Nguồn gốc và giấy phép — hai kỹ năng `vercel-*`
+# Nguồn gốc và giấy phép — ba kỹ năng từ Vercel Labs
 
-Chép ngày 10/09/2026 từ **`github.com/vercel-labs/agent-skills`**, giấy phép
-**MIT**, © 2026 Vercel, Inc.
+Chép ngày 10/09/2026, giấy phép **MIT**, © 2026 Vercel, Inc. Từ **HAI** repo
+khác nhau — chỗ này rất dễ nhầm:
 
-| Thư mục | Nội dung |
-|---|---|
-| `vercel-composition-patterns/` | Lối viết component React ghép được: compound component, render prop, context. Có phần React 19. |
-| `vercel-react-best-practices/` | Hiệu năng React theo Vercel Engineering. |
+| Thư mục | Repo nguồn | Nội dung |
+|---|---|---|
+| `vercel-composition-patterns/` | `vercel-labs/agent-skills` | Lối viết component React ghép được: compound component, render prop, context. Có phần React 19. |
+| `vercel-react-best-practices/` | `vercel-labs/agent-skills` | Hiệu năng React theo Vercel Engineering. |
+| `find-skills/` | `vercel-labs/skills` | Đi TÌM kỹ năng chưa có trên Internet. |
+
+## `find-skills` làm gì, và KHÔNG làm gì
+
+**Làm:** khi user hỏi "có kỹ năng nào cho việc X không", nó bảo chạy
+`npx skills find X` và tra bảng xếp hạng ở skills.sh, rồi kiểm số lượt cài và
+uy tín nguồn trước khi đề xuất.
+
+**KHÔNG làm:** nó không nhắc dùng những kỹ năng ĐÃ CÓ trong repo này. Việc đó do
+mục "Cách làm việc" trong `CLAUDE.md` lo — đó mới là thứ tự nạp mỗi phiên.
+
+**Trước khi chạy `npx skills` phải hỏi user.** Lệnh đó tải và chạy mã từ npm, rồi
+kéo kỹ năng về từ repo GitHub bất kỳ. Mạng công ty (Zscaler) cũng hay chặn.
+Kỹ năng trong repo này đều chép tay và theo git, cố ý như vậy.
 
 ## Vì sao chỉ lấy hai trong chín
 

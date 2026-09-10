@@ -15,6 +15,26 @@ hướng dẫn vận hành hằng ngày và không được mâu thuẫn với t
 - Trả lời bằng tiếng Việt; giữ nguyên tiếng Anh cho tên biến/hàm/file/lệnh/code.
 - Trả lời gọn, đi thẳng việc. Yêu cầu chưa rõ hoặc thiếu thông tin → HỎI LẠI trước, đừng đoán rồi làm sai.
 - Việc lớn/mơ hồ: nói ngắn gọn định làm gì rồi mới code, để user kịp chỉnh hướng.
+- **XEM DANH SÁCH KỸ NĂNG TRƯỚC KHI ĐỌC MÃ.** Repo có gần 30 kỹ năng ở
+  `.claude/skills/`, nạp sẵn mỗi phiên, chọn một cái chỉ tốn một câu. Bốn mốc
+  BẮT BUỘC dừng lại tự hỏi "việc này có kỹ năng nào không":
+
+  | Khi | Gọi |
+  |---|---|
+  | User mô tả việc còn mơ hồ, hoặc có nhiều đường làm | `brainstorming` |
+  | Có gì đó hỏng / sai / chạy không như mong đợi | `systematic-debugging` |
+  | Sắp nói "xong" | `verification-before-completion` |
+  | Việc nhiều bước, nhiều tệp | `writing-plans` rồi `executing-plans` |
+
+  Vì sao phải viết ra đây: bản chép superpowers này KHÔNG có hook lúc mở phiên
+  như bản plugin, nên **không có gì tự nhắc** — chỉ dòng này nhắc. Đã lỡ hai lần
+  thấy rõ cái giá: một lần định đọc ~18.000 dòng mã trò chơi để "chuyển chúng
+  sang thế giới mới", trong khi `brainstorming` hỏi đúng một câu ("trò chơi có
+  cần thế giới của app không?") là việc co lại còn sửa một chỗ nối; một lần đoán
+  nguyên nhân lỗi CSP thay vì chạy `systematic-debugging` ngay từ đầu.
+
+  Kỹ năng `find-skills` là việc KHÁC: nó đi tìm kỹ năng **chưa có** trên
+  Internet (chạy `npx skills find`, cần mạng). Đừng lẫn hai việc.
 - Sửa xong một việc: chạy `npm run lint` MỘT LẦN trước khi báo xong. Bỏ qua nếu chỉ đổi chữ/màu/comment. Không chạy sau mỗi chỉnh nhỏ.
 - KHÔNG tự chạy `npm run build`, git nguy hiểm (reset/xoá/ghi đè), push/deploy — user tự làm.
 - Ưu tiên sửa đúng file/màn hình user chỉ ra; chỉ đọc rộng khi thật sự chưa biết lỗi ở đâu.
@@ -157,8 +177,12 @@ Mở Claude Code ở thư mục dự án thì các kỹ năng này tự nạp, g
   trong 9 kỹ năng của repo đó; bảy cái kia hoặc chỉ dùng cho Vercel (dự án này
   lên Netlify), hoặc mâu thuẫn với hợp đồng hướng, hoặc phải tải hướng dẫn từ URL
   lúc chạy. Lý do từng cái: `.claude/skills/VERCEL-SKILLS-LICENSE.md`.
-  Lưu ý `github.com/vercel-labs/skills` là **trình cài đặt CLI**, không phải bộ
-  kỹ năng — dự án này chép tay và theo git, không dùng nó.
+- **`find-skills`** — đi TÌM kỹ năng chưa có trên Internet (`npx skills find`,
+  bảng xếp hạng skills.sh). Chép từ `github.com/vercel-labs/skills` (MIT) — repo
+  này là **trình cài đặt CLI**, không phải bộ kỹ năng; chỉ lấy đúng tệp
+  `SKILL.md` của `find-skills`, không cài CLI. **Phải hỏi user trước khi chạy
+  `npx skills`**: lệnh đó tải và chạy mã từ npm. Đừng lẫn nó với việc dùng kỹ
+  năng đã có — việc đó nằm ở mục "Cách làm việc" bên trên.
 
 ### Ba chỗ superpowers nói khác dự án này — theo dự án
 
