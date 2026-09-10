@@ -310,6 +310,62 @@ console.log('\n== Luật phân quyền Firestore nằm trong git ==');
   }
 }
 
+console.log('\n== Luật Firestore phân quyền theo vai ==');
+{
+  /* Ba phép kiểm canh cho đợt 2 không bị lùi lại. Luật lỏng KHÔNG làm app vỡ —
+     nó chỉ lặng lẽ cho phép mọi thứ, nên phải có phép kiểm nhìn thay người. */
+  const R = join(GOC, 'firestore.rules');
+  const luat = existsSync(R)
+    ? doc(R).split(/\r?\n/).filter(d => !d.trimStart().startsWith('//')).join('\n')
+    : '';
+
+  /* 1. Không còn cửa mở toang.
+        `allow read: if true` là HỢP LỆ và cần thiết ở `bank_questions` — đồng
+        bộ đêm đọc Firestore không đăng nhập. Nên chỉ đếm những dòng cho GHI. */
+  const moToang = [...luat.matchAll(/allow[^:]*:\s*if\s+true\s*;/g)].length;
+  const chiDoc = [...luat.matchAll(/allow\s+read\s*:\s*if\s+true\s*;/g)].length;
+  const ghiToang = moToang - chiDoc;
+  if (!existsSync(R)) truot('có firestore.rules', 'thiếu tệp');
+  else if (ghiToang > 0) truot('không còn `allow write: if true`', `${ghiToang} chỗ vẫn cho ghi tự do`);
+  else dat('không còn `allow write: if true`');
+
+  /* 2. Mọi collection mã nguồn có GHI đều phải có mục `match` riêng.
+        Thêm collection mới mà quên viết luật thì nó rơi vào mục cấm tất ở cuối
+        tệp và hỏng IM LẶNG — phép kiểm này bắt trước khi chuyện đó xảy ra. */
+  const hang: Record<string, string> = {};
+  for (const f of tepNguon) {
+    for (const m of doc(f).matchAll(/\b(COL_[A-Z_]+)\s*=\s*['"]([^'"]+)['"]/g)) hang[m[1]] = m[2];
+  }
+  const dungToi = new Set<string>(Object.values(hang));
+  for (const f of tepNguon) {
+    for (const m of doc(f).matchAll(/collection\(\s*db\s*,\s*['"]([^'"]+)['"]/g)) dungToi.add(m[1]);
+  }
+  const thieuLuat = [...dungToi].filter(c => !new RegExp(`match\\s+/${c}/`).test(luat));
+  if (thieuLuat.length) truot('mọi collection đều có luật riêng', 'thiếu: ' + thieuLuat.join(', '));
+  else dat(`cả ${dungToi.size} collection đều có luật riêng`);
+
+  /* 3. MỌI tên trường luật nhắc tới phải THẬT SỰ tồn tại trong mã.
+        Đây đúng là cái bẫy đã sập ở đợt 1: luật nhắm `content`/`explanation`/
+        `options` trong khi Firestore lưu `q`/`e`/`o`, nên mệnh đề
+        `!('content' in d) || …` LUÔN đúng và luật cho qua mọi tải trọng —
+        vẫn "đạt" mọi phép thử kiểu "câu hỏi sạch vẫn ghi được".
+
+        Bản đầu của phép kiểm này chỉ dò một DANH SÁCH CỐ ĐỊNH ba tên trường,
+        nên thử bịa ra một tên khác thì nó không thấy — tức nó sẽ không bắt
+        được chính cái bẫy nó sinh ra để bắt. Nay rút tên trường ra từ chính
+        luật rồi mới đối chiếu. */
+  const truongTrongLuat = new Set<string>();
+  for (const m of luat.matchAll(/\b(?:request\.)?resource\.data\.([A-Za-z_]\w*)/g)) truongTrongLuat.add(m[1]);
+  for (const m of luat.matchAll(/['"]([A-Za-z_]\w*)['"]\s+in\s+(?:request\.)?resource\.data/g)) truongTrongLuat.add(m[1]);
+  /* `role` do luật đọc qua get(...).data.role, không khớp hai mẫu trên. */
+  if (/\.data\.role\b/.test(luat)) truongTrongLuat.add('role');
+
+  const khongCoThat = [...truongTrongLuat].filter(t => !tepNguon.some(f => doc(f).includes(t)));
+  if (!truongTrongLuat.size) truot('luật kiểm bằng tên trường có thật', 'luật không nhắc trường nào — chưa siết?');
+  else if (khongCoThat.length) truot('luật kiểm bằng tên trường có thật', 'không có trong mã: ' + khongCoThat.join(', '));
+  else dat(`cả ${truongTrongLuat.size} tên trường luật nhắc tới đều có thật trong mã`);
+}
+
 console.log('\n== Không lộ bí mật trong mã nguồn ==');
 {
   /* Khoá web của Firebase KHÔNG phải bí mật (nó vốn nằm trong gói JS ai cũng
