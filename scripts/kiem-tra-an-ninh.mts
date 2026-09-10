@@ -141,6 +141,78 @@ console.log('\n== Header bảo mật khi phát hành ==');
        thì header viết ra mà không phủ trang nào cả. */
     if (!/^\/\*\s*$/m.test(n)) truot('header bảo mật phủ mọi đường dẫn', 'thiếu mục `/*` — Netlify chỉ áp header cho đường dẫn được liệt kê');
     else dat('header bảo mật phủ mọi đường dẫn (/*)');
+
+    /* Chống nhúng phải là SAMEORIGIN, không phải DENY — nếu app tự nhúng chính
+       mình. `DENY` và `frame-ancestors 'none'` cấm MỌI trang nhúng, kể cả cùng
+       nguồn. Bản đầu để `DENY` đã lên production ngày 10/09/2026 và làm toàn bộ
+       bài giảng lẫn trò chơi hiện ra ô trống mang biểu tượng cấm.
+       `frame-src 'self'` không cứu được: nó nói trang CHA được nhúng ai, còn hai
+       thứ dưới đây nói trang CON cho ai nhúng mình. */
+    const soKhung = tepNguon.filter(f => doc(f).includes('<iframe')).length;
+    if (soKhung === 0) dat('app không tự nhúng khung — DENY là đúng');
+    else {
+      const xfo = n.match(/^\s*X-Frame-Options\s*:\s*(\S+)/m)?.[1];
+      const to = n.match(/frame-ancestors\s+'([a-z]+)'/)?.[1];
+      const hong: string[] = [];
+      if (xfo === 'DENY') hong.push(`X-Frame-Options: DENY (phải là SAMEORIGIN)`);
+      if (to === 'none') hong.push(`frame-ancestors 'none' (phải là 'self')`);
+      if (hong.length) truot(`app nhúng khung cùng nguồn ở ${soKhung} tệp — header phải cho phép`, hong.join(' | '));
+      else dat(`app nhúng khung ở ${soKhung} tệp, và header cho phép cùng nguồn`);
+    }
+  }
+}
+
+console.log('\n== Trang tĩnh sống được dưới CSP ==');
+{
+  /* Sáu trang tĩnh trong `public/` (trang bài giảng + năm trò chơi) dựng HOÀN
+     TOÀN bằng script nội tuyến. `script-src 'self'` chặn sạch chúng — ngày
+     10/09/2026 chuyện này đã lên tới production và giết cả sáu trang.
+     Cách chữa là băm sha256 từng đoạn lúc dựng (`scripts/bam-csp.mts`), KHÔNG
+     phải thêm 'unsafe-inline' — từ khoá đó bật lại cả `<img onerror=…>`. */
+  const tepHtml = existsSync(join(GOC, 'public'))
+    ? moiTep(join(GOC, 'public'), ['.html'])
+    : [];
+  const coNoiTuyen = tepHtml.filter(f =>
+    [...doc(f).matchAll(/<script\b([^>]*)>/gi)].some(m => !/\bsrc\s*=/i.test(m[1])));
+
+  if (coNoiTuyen.length === 0) dat('không trang tĩnh nào dùng script nội tuyến');
+  else {
+    /* 1. Bước băm phải còn trong lệnh build. Gỡ nó ra thì hash biến mất khỏi
+          CSP và các trang chết IM LẶNG — build vẫn xanh, chỉ production hỏng. */
+    const pkg = doc(join(GOC, 'package.json'));
+    const lenhBuild = JSON.parse(pkg).scripts?.build ?? '';
+    if (!lenhBuild.includes('bam-csp')) {
+      truot(`${coNoiTuyen.length} trang tĩnh dùng script nội tuyến — build phải chạy bam-csp`,
+        `lệnh build hiện là "${lenhBuild}" — thiếu bước băm, CSP sẽ chặn hết các trang này`);
+    } else dat(`build có chạy bam-csp cho ${coNoiTuyen.length} trang tĩnh`);
+
+    /* 2. Hash chỉ cứu được script nội tuyến. Bốn thứ dưới đây thì không, và
+          chúng sẽ chết dưới CSP dù có băm bao nhiêu lần. */
+    const cam: [RegExp, string][] = [
+      [/<[a-z][^>]*?\son[a-z]+\s*=/gi, 'thuộc tính on…= nội tuyến (cần unsafe-hashes)'],
+      [/(?<![.\w])eval\s*\(|new\s+Function\s*\(/g, 'eval / new Function (cần unsafe-eval)'],
+      [/set(?:Timeout|Interval)\s*\(\s*['"`]/g, 'setTimeout("chuỗi") (cần unsafe-eval)'],
+      [/(?:href|src)\s*=\s*['"]javascript:/gi, 'URL javascript:'],
+    ];
+    /* Bỏ chú thích trước khi soi. Bản đầu quét cả tệp, và mục này ĐỎ ngay lần
+       chạy đầu — vì chính chú thích giải thích lỗ hổng có viết ví dụ
+       `<img src=x onerror=…>`. Một phép kiểm đọc lời cảnh báo về mối nguy rồi
+       báo động vì chính lời cảnh báo đó. Cùng bài học với bộ đếm mã màu cứng. */
+    const boChuThich = (n: string) => n
+      .replace(/<!--[\s\S]*?-->/g, ' ')        // chú thích HTML
+      .replace(/\/\*[\s\S]*?\*\//g, ' ')       // chú thích khối JS
+      .replace(/(?<![:\w])\/\/[^\n]*/g, ' ');  // chú thích dòng JS, chừa https://
+
+    const pham: string[] = [];
+    for (const f of coNoiTuyen) {
+      const n = boChuThich(doc(f));
+      for (const [re, vi] of cam) {
+        const so = [...n.matchAll(re)].length;
+        if (so) pham.push(`${ten(f)}: ${so} × ${vi}`);
+      }
+    }
+    if (pham.length) truot('trang tĩnh không dùng thứ mà hash không cứu được', pham.join(' | '));
+    else dat('trang tĩnh không có on…= / eval / javascript: — hash là đủ');
   }
 }
 

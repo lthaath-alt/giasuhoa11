@@ -2,17 +2,13 @@ rules_version = '2';
 
 // ─── Luật phân quyền Firestore — Gia sư Hóa 11 ───────────────────────────────
 //
-// ĐỌC KỸ TRƯỚC KHI TRIỂN KHAI. Tệp này là BẢN ĐỀ XUẤT, viết ngày 10/09/2026 từ
-// việc đọc mã nguồn. Nó CHƯA từng được đối chiếu với luật đang chạy thật trong
-// bảng điều khiển Firebase, vì luật đó chưa bao giờ nằm trong git — và chính
-// đó là lý do có tệp này.
+// Luật ĐANG CHẠY trước bản này (đọc trong bảng điều khiển ngày 10/09/2026, bản
+// ghi ngày 22/07/2026) chỉ có đúng một dòng có tác dụng:
 //
-//   1. Mở  console.firebase.google.com → Firestore Database → Rules
-//   2. So bản đang chạy với bản này. Chỗ nào bản đang chạy CHO PHÉP mà bản này
-//      không, ứng dụng sẽ hỏng ở chỗ đó.
-//   3. Dán vào "Rules playground" thử vài thao tác thật: đăng nhập, mở đề kiểm
-//      tra, giáo viên soạn câu hỏi.
-//   4. Publish. Firebase giữ lịch sử — lùi lại được nếu hỏng.
+//     match /{document=**} { allow read, write: if true; }
+//
+// Tức toàn bộ cơ sở dữ liệu mở toang: ai trên Internet cũng đọc, sửa, xoá được
+// mọi thứ. Chính Firebase cũng dán cảnh báo đỏ lên đó.
 //
 // ─── VÌ SAO LUẬT NÀY KHÔNG KIỂM DANH TÍNH ──────────────────────────────────
 //
@@ -39,35 +35,90 @@ rules_version = '2';
 // câu hỏi chứa `<img src=x onerror=…>`, và nó chạy trong trình duyệt của mọi
 // học sinh mở đề. Phía trình duyệt đã vá bằng `src/core/services/locHtml.ts`;
 // luật dưới đây là hàng rào thứ hai, chặn ngay từ lúc GHI.
+//
+// ─── BẢN ĐẦU CỦA TỆP NÀY NHẮM SAI TÊN TRƯỜNG ───────────────────────────────
+//
+// Ghi lại vì đây đúng là kiểu lỗi làm một hàng rào trông như đang đứng mà thật
+// ra không chắn gì. Bản viết sáng 10/09/2026 kiểm `content` / `explanation` /
+// `options` — tên lấy từ trí nhớ, không ai đo. Firestore thật lưu `q` / `e` /
+// `o`. Mệnh đề `!('content' in d) || …` vì thế LUÔN đúng, và luật cho qua mọi
+// tải trọng miễn là đặt vào trường `q`. Nó sẽ ĐẠT mọi phép thử kiểu "câu hỏi
+// sạch vẫn ghi được" mà không chặn nổi một đòn tấn công nào.
+//
+// Tên trường dưới đây đọc thẳng từ 60 bản ghi thật trong Firestore ngày
+// 10/09/2026, đối chiếu với `src/features/bank/types.ts`.
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
     // ── Trợ giúp ────────────────────────────────────────────────────────────
 
-    // Chuỗi có mang mã hoặc thẻ nguy hiểm không?
-    // Danh sách CẤM ở đây là cố ý và có giới hạn: nó KHÔNG thay thế bộ lọc
-    // phía trình duyệt (bộ lọc đó dùng danh sách CHO PHÉP, chặt hơn hẳn). Luật
-    // Firestore không có bộ phân tích HTML, nên chỗ này chỉ chặn những dạng
-    // thô nhất — đủ để một kẻ tấn công tiện tay bị chặn từ cửa.
-    function coMaDoc(s) {
-      return s is string && (
-        s.matches('(?i).*<\\s*/?\\s*(script|iframe|object|embed|link|meta|base|svg|img|video|audio|form|input).*')
-        || s.matches('(?i).*\\son[a-z]+\\s*=.*')          // onerror=, onload=, onclick=…
-        || s.matches('(?i).*javascript\\s*:.*')
-        || s.matches('(?i).*data\\s*:\\s*text/html.*')
+    // Một chuỗi có an toàn để đổ vào `dangerouslySetInnerHTML` không?
+    //
+    // Danh sách CẤM ở đây là cố ý và có giới hạn: nó KHÔNG thay thế bộ lọc phía
+    // trình duyệt (bộ lọc đó dùng danh sách CHO PHÉP, chặt hơn hẳn). Luật
+    // Firestore không có bộ phân tích HTML, nên chỗ này chỉ chặn những dạng thô
+    // nhất — đủ để một kẻ tấn công tiện tay bị chặn ngay từ cửa.
+    //
+    // Cờ `(?is)` chứ không phải `(?i)`: trong RE2, dấu chấm KHÔNG khớp ký tự
+    // xuống dòng. Thiếu chữ `s` thì chỉ cần chèn một dấu xuống dòng trước tải
+    // trọng là lách được cả bốn mẫu dưới đây.
+    //
+    // KHÔNG cấm dấu `<` và `>` nói chung: nội dung hoá học dùng chúng làm dấu
+    // so sánh thật ("pH < 7 là môi trường acid"). Đã đếm trên 252 câu đang có.
+    function sach(s) {
+      return s is string
+        && s.size() < 4000
+        && !s.matches('(?is).*<\\s*/?\\s*(script|iframe|object|embed|link|meta|base|svg|img|video|audio|form|input|style|template|marquee)[\\s/>].*')
+        && !s.matches('(?is).*\\son[a-z]+\\s*=.*')
+        && !s.matches('(?is).*javascript\\s*:.*')
+        && !s.matches('(?is).*data\\s*:\\s*text/html.*');
+    }
+
+    // Bốn phương án trắc nghiệm. Luật Firestore không có vòng lặp, nên phải mở
+    // từng chỉ số. `types.ts` khai "Đúng 4 phương án", và 252 câu đang có đều là
+    // 0 hoặc đúng 4 — nên chặn ở 4. Ngày nào cần 5 phương án thì luật này từ
+    // chối và người sửa sẽ biết ngay tại sao; im lặng hỏng còn hơn im lặng mở.
+    function phuongAnSach(d) {
+      return !('o' in d) || (
+        d.o.size() <= 4
+        && (d.o.size() < 1 || sach(d.o[0]))
+        && (d.o.size() < 2 || sach(d.o[1]))
+        && (d.o.size() < 3 || sach(d.o[2]))
+        && (d.o.size() < 4 || sach(d.o[3]))
       );
     }
 
-    // Câu hỏi hợp lệ: không quá dài, và không trường chữ nào mang mã.
-    // Giới hạn độ dài vừa chặn được việc nhồi dữ liệu rác vào kho, vừa cắt
-    // ngắn mọi tải trọng tấn công.
+    // Bốn ý của câu đúng/sai. Mỗi ý là một map { s: nội dung, v: đúng hay sai }.
+    function ySach(d) {
+      return !('st' in d) || (
+        d.st.size() <= 4
+        && (d.st.size() < 1 || sach(d.st[0].s))
+        && (d.st.size() < 2 || sach(d.st[1].s))
+        && (d.st.size() < 3 || sach(d.st[2].s))
+        && (d.st.size() < 4 || sach(d.st[3].s))
+      );
+    }
+
+    // Một câu hỏi hợp lệ. Mọi trường CHỮ đi tới `ChemicalText` đều phải sạch:
+    // `q`, `e`, từng phương án `o[]`, từng ý `st[].s`, và `ansText`.
+    //
+    // `img` cố ý KHÔNG bị quét bằng `sach()`: nó là ảnh dạng data URI (đo được
+    // tới 66.000 ký tự) và đi vào thuộc tính src của thẻ <img>, không đi vào
+    // innerHTML. Ràng buộc của nó là phải bắt đầu bằng `data:image/`.
+    //
+    // Ngưỡng đều rộng gấp nhiều lần số đo thật ngày 10/09/2026: nhiều nhất 14
+    // trường một câu, `q` dài nhất 333 ký tự, `e` dài nhất 316, mỗi phương án
+    // dài nhất 80, mỗi ý dài nhất 113.
     function cauHoiSach() {
       let d = request.resource.data;
       return request.resource.size() < 40
-        && (!('content' in d) || (d.content is string && d.content.size() < 4000 && !coMaDoc(d.content)))
-        && (!('explanation' in d) || (d.explanation is string && d.explanation.size() < 4000 && !coMaDoc(d.explanation)))
-        && (!('options' in d) || d.options.size() <= 10);
+        && 'q' in d && sach(d.q)
+        && (!('e' in d) || sach(d.e))
+        && (!('ansText' in d) || sach(d.ansText))
+        && phuongAnSach(d)
+        && ySach(d)
+        && (!('img' in d) || (d.img is string && d.img.matches('(?s)data:image/.*')));
     }
 
     // ── Ngân hàng câu hỏi ───────────────────────────────────────────────────
@@ -79,7 +130,8 @@ service cloud.firestore {
       allow delete: if true;
     }
 
-    // Kho câu hỏi cũ, cùng hình dạng nên cùng luật.
+    // Kho câu hỏi cũ. Đọc thật ngày 10/09/2026: RỖNG, không còn bản ghi nào.
+    // Giữ luật giống hệt, để nếu có ai ghi lại vào đây thì cũng phải sạch.
     match /questions/{id} {
       allow read: if true;
       allow create, update: if cauHoiSach();
@@ -87,7 +139,7 @@ service cloud.firestore {
     }
 
     // ── Các collection còn lại ──────────────────────────────────────────────
-    // Giữ nguyên quyền như hiện tại. Siết chúng lại đòi có danh tính, tức đòi
+    // Giữ nguyên quyền như luật cũ. Siết chúng lại đòi có danh tính, tức đòi
     // Firebase Auth — việc riêng, phải bàn trước.
     //
     // CẢNH BÁO cho `users`: bản ghi ở đây chứa mật khẩu dạng chữ thường và ai
@@ -106,8 +158,8 @@ service cloud.firestore {
     // ── Mọi thứ khác: cấm ───────────────────────────────────────────────────
     // Mười hai collection trên là toàn bộ những gì mã nguồn dùng tới, liệt kê
     // bằng cách quét `collection(db, …)` và các hằng `COL_*` ngày 10/09/2026.
-    // Thêm collection mới thì phải thêm luật cho nó ở đây — im lặng hỏng còn
-    // hơn im lặng mở toang.
+    // Đã kiểm thêm: dự án KHÔNG dùng subcollection nào, nên các mục `match` một
+    // tầng ở trên phủ hết. Thêm collection mới thì phải thêm luật cho nó ở đây.
     match /{document=**} {
       allow read, write: if false;
     }

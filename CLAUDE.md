@@ -112,7 +112,7 @@ Hằng ngày:
 |---|---|
 | `npm run dev` | Máy chủ phát triển, cổng 3000 |
 | `npm run lint` | `tsc --noEmit` — hàng rào chính, chạy MỘT LẦN trước khi báo xong |
-| `npm run kiem-tra` | Chạy cả 10 bộ kiểm, 205 mục. Chạy trước khi commit |
+| `npm run kiem-tra` | Chạy cả 10 bộ kiểm, 208 mục. Chạy trước khi commit |
 | `npm run build` | **Chỉ khi user yêu cầu** |
 
 Bộ kiểm chạy riêng khi cần: `kiem-tra:chuong-trinh` (dữ liệu 25 bài),
@@ -235,12 +235,41 @@ có câu đó đều chạy mã của hắn. Mà `users` lưu mật khẩu dạn
    thật, không đòn nào lọt; và bốn công thức hoá học giữ nguyên từng ký tự.
    **Mọi `dangerouslySetInnerHTML` PHẢI gọi hàm này** — có phép kiểm canh.
 2. **`public/_headers`** — năm header bảo mật phủ `/*`, trong đó CSP là hàng rào
-   thứ hai nếu bộ lọc thủng. `script-src 'self'` chặt được vì gói đã dựng không
-   có script nội tuyến nào. Đã thử CSP trên ứng dụng đang chạy: Firestore, hai
-   phông, và khung trò chơi đều qua.
-3. **`firestore.rules`** — nay nằm trong git. Chặn nội dung có mã ngay từ lúc GHI.
+   thứ hai nếu bộ lọc thủng. `script-src 'self'` chặt được vì gói Vite dựng ra
+   chỉ có `<script src="/assets/…">`. Xem mục "Ba cái bẫy của `_headers`" bên dưới.
+3. **`firestore.rules`** — nay nằm trong git, và ĐÃ triển khai ngày 10/09/2026
+   (luật cũ là `match /{document=**} { allow read, write: if true; }`, mở toang).
+   Chặn nội dung có mã ngay từ lúc GHI. Luật nhắm các trường THẬT của Firestore:
+   `q`, `e`, `o[]`, `st[].s`, `ansText` — **không phải** `content`/`explanation`/
+   `options`; bản đầu nhắm sai tên nên cho qua mọi tải trọng.
 4. **Kiểm `e.origin`** ở mọi handler `postMessage` — trò chơi chạy trong iframe
    và nói chuyện với web qua đó.
+5. **Trò chơi cũng phải sạch.** `giai-cuu-phong-thi-nghiem.html` từng nối thẳng
+   `q.e` vào `innerHTML`. Nay dựng bằng nút DOM. Bốn game còn lại dùng
+   `textContent`. Đợt rà soát đầu chỉ quét `src/` nên bỏ sót cả `public/games/` —
+   lần sau quét cả hai.
+
+### Ba cái bẫy của `_headers`, đã trả giá bằng production
+
+Cả ba đều lên tới người dùng thật ngày 10/09/2026, và **không cái nào bị `npm run
+build` hay `npm run lint` bắt** — vì chúng không phải lỗi mã.
+
+1. **`X-Frame-Options: DENY` giết chính app.** `DENY` cấm MỌI trang nhúng, kể cả
+   trang này nhúng chính nó. Mà app có hai khung cùng nguồn: bài giảng
+   (`SlidesSection.tsx`) và trò chơi (`GameHubSection.tsx`). Phải là `SAMEORIGIN`
+   + `frame-ancestors 'self'`. `frame-src 'self'` KHÔNG cứu được — nó nói trang
+   CHA được nhúng ai, còn hai thứ kia nói trang CON cho ai nhúng mình.
+2. **`script-src 'self'` giết sáu trang tĩnh.** Trang bài giảng và năm trò chơi
+   trong `public/` dựng HOÀN TOÀN bằng script nội tuyến (11 đoạn, không tệp `.js`
+   ngoài nào). Cách chữa là băm sha256 lúc dựng — `scripts/bam-csp.mts`, chạy tự
+   động trong `npm run build`. **ĐỪNG thêm `'unsafe-inline'`**: nó bật lại cả
+   thuộc tính `on…=`, tức đúng `<img src=x onerror=…>` mà CSP sinh ra để chặn.
+   Hash phải băm bản đã chuẩn hoá CRLF→LF, vì bộ phân tích HTML làm vậy trước.
+3. **Vite KHÔNG đọc `_headers`** — đó là tính năng của Netlify. Nên mọi lượt
+   "đã thử CSP ở máy dev" đều không thật: `X-Frame-Options` chỉ tồn tại ở dạng
+   header, và `frame-ancestors` bị bỏ qua khi đặt trong thẻ `<meta>`. Muốn thử
+   thật thì phải phục vụ `dist/` bằng một máy chủ có áp `_headers`, hoặc deploy
+   bản nháp. Đây là lý do gốc khiến hai cái bẫy trên lọt.
 
 **Hai lỗ hổng CHƯA vá được, và vì sao:**
 

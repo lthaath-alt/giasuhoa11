@@ -16,9 +16,23 @@
   # tải lên bị đoán nhầm thành HTML là chạy được mã trong đó.
   X-Content-Type-Options: nosniff
 
-  # Không cho site khác nhúng trang này vào iframe rồi phủ lớp trong suốt lên
+  # Không cho site KHÁC nhúng trang này vào iframe rồi phủ lớp trong suốt lên
   # để lừa bấm — nguy nhất là ở màn đăng nhập.
-  X-Frame-Options: DENY
+  #
+  # SAMEORIGIN chứ KHÔNG phải DENY. `DENY` cấm mọi trang nhúng, kể cả chính
+  # trang này nhúng chính nó — và app có hai chỗ làm đúng như vậy: khung bài
+  # giảng (`SlidesSection.tsx`) và khung trò chơi (`GameHubSection.tsx`), cả hai
+  # đều trỏ tới đường dẫn cùng nguồn. Bản đầu để `DENY` và đã lên production
+  # ngày 10/09/2026: toàn bộ bài giảng lẫn trò chơi hiện ra ô trống có biểu
+  # tượng cấm. `frame-src 'self'` bên dưới KHÔNG cứu được — nó nói trang cha
+  # được nhúng ai, còn dòng này nói trang con cho ai nhúng mình.
+  #
+  # Vì sao thử ở máy dev không bắt được: Vite KHÔNG đọc tệp `_headers` (đây là
+  # tính năng của Netlify), nên lượt thử hôm đó phải giả CSP bằng thẻ <meta> —
+  # mà `X-Frame-Options` chỉ tồn tại ở dạng header, và `frame-ancestors` thì bị
+  # bỏ qua khi đặt trong <meta>. Phép thử ấy về mặt cấu tạo không thể thấy lỗi
+  # này. Muốn thử thật thì phải chạy `npx serve dist` hoặc deploy bản nháp.
+  X-Frame-Options: SAMEORIGIN
 
   # Sang site ngoài (Zalo, Google) thì chỉ gửi tên miền, không gửi đường dẫn.
   # Đường dẫn ở đây có thể chứa mã đề kiểm tra.
@@ -43,7 +57,9 @@
   #  base-uri 'self'     Chặn thẻ <base> bị chèn để đổi đích mọi đường dẫn.
   #  form-action 'self'  Biểu mẫu không được gửi đi đâu khác.
   #  frame-ancestors     Bản CSP của X-Frame-Options ở trên, cho trình duyệt mới.
-  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://*.google.com https://*.gstatic.com https://*.firebaseio.com wss://*.firebaseio.com; frame-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+  #                      Phải là 'self', không phải 'none' — xem lời giải thích
+  #                      dài ở X-Frame-Options bên trên.
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://*.google.com https://*.gstatic.com https://*.firebaseio.com wss://*.firebaseio.com; frame-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'
 
 # ─── Cache cho ảnh bài giảng tĩnh (public/hoa11) ────────────────────────────
 #

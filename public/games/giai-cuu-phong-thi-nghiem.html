@@ -2506,7 +2506,21 @@ function answer(i, q, cx, cy, isValve){
     else if(k === i) b.classList.add('wrong');
   });
   const ok = i === q.a;
-  $('q-explain').innerHTML = (ok ? '<b>Chính xác. </b>' : '<b>Chưa đúng. </b>') + q.e;
+  // Lời giải thích đến từ `bank_questions`, collection ai trên Internet cũng
+  // ghi được. Trước đây nối thẳng vào innerHTML: một câu hỏi chứa
+  // `<img src=x onerror=…>` là chạy mã ngay trong máy học sinh. Cùng chuỗi tấn
+  // công đã vá bên ứng dụng React ngày 10/09/2026, nhưng đợt đó chỉ quét `src/`
+  // nên chỗ này lọt.
+  // Dựng bằng nút DOM: `q.e` vào làm text node, không có đường chèn mã. Không
+  // mất gì — đã đếm cả 252 câu, KHÔNG câu nào dùng thẻ HTML; chỉ số hoá học
+  // viết bằng ký tự Unicode (H₂, Na⁺, 10⁻⁵), 190/252 câu. Cùng lối với đề bài
+  // ở trên: `$('q-stem').textContent = q.q`.
+  const oGiai = $('q-explain');
+  oGiai.textContent = '';
+  const dam = document.createElement('b');
+  dam.textContent = ok ? 'Chính xác. ' : 'Chưa đúng. ';
+  oGiai.appendChild(dam);
+  oGiai.appendChild(document.createTextNode(q.e || ''));
   $('q-explain').classList.remove('hide');
   $('q-next').classList.remove('hide');
   $('q-next').textContent = ok ? 'Nhận thưởng và chơi tiếp' : 'Chơi tiếp';
