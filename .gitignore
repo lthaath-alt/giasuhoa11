@@ -36,4 +36,12 @@ credentials/
 # lệnh /speckit-* nào. Phần còn lại của .claude/ vẫn bị chặn — chính Spec Kit cũng
 # cảnh báo thư mục này có thể chứa thông tin đăng nhập.
 !.claude/skills/
+#
+# ...và trừ settings.json, vì HOOK nằm trong đó. Hook là thứ duy nhất bắt buộc
+# được AI làm gì; CLAUDE.md chỉ là lời khuyên, đọc rồi vẫn quên. Hai hook hiện
+# có: nhắc gọi kỹ năng mỗi lượt, và bộ dò thiết kế của impeccable. Cả hai dùng
+# `${CLAUDE_PROJECT_DIR}` nên chạy được ở mọi máy.
+# ĐỪNG để thông tin đăng nhập vào tệp này — nó nay theo git. Cấu hình riêng từng
+# máy thì viết vào `.claude/settings.local.json`, tệp đó vẫn bị chặn.
+!.claude/settings.json
 __pycache__/
