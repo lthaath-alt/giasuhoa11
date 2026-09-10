@@ -1,6 +1,6 @@
-import { initializeApp, getApps, getApp } from 'firebase/app';
+import { initializeApp, getApps, getApp, deleteApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
+import { getAuth, signOut, type Auth } from 'firebase/auth';
 import { FIREBASE_CONG_KHAI } from './firebaseCongKhai';
 
 // 1. Cấu hình Firebase: ưu tiên biến môi trường, thiếu thì lấy bản công khai
@@ -36,6 +36,48 @@ export const db = getFirestore(app);
  * hiện tại của ứng dụng.
  */
 export const auth = getAuth(app);
+
+/* Đếm tăng dần để đặt tên app phụ. Chỉ dùng `Date.now()` là chưa đủ: hai lời
+   gọi trong cùng một mili-giây sẽ trùng tên, và `initializeApp` với tên đã tồn
+   tại thì ném lỗi. Hiếm, nhưng đây là đường tạo tài khoản hàng loạt. */
+let soAppPhu = 0;
+
+/**
+ * Tạo một Firebase App PHỤ chỉ để tạo tài khoản mới.
+ *
+ * Vì sao cần: `createUserWithEmailAndPassword` ĐĂNG NHẬP LUÔN bằng tài khoản
+ * vừa tạo. Gọi nó trên app chính thì admin đang thao tác bị đá ra khỏi phiên
+ * của chính mình và trở thành người dùng vừa tạo — mất phiên, mất luôn ngữ
+ * cảnh đang làm dở.
+ *
+ * Cách chính thống là dùng Admin SDK trong Cloud Function, nhưng thứ đó đòi
+ * gói Blaze trả tiền. Dự án đang ở gói Spark ($0), nên dùng app phụ: nó có kho
+ * phiên riêng, tạo xong thì huỷ, phiên của admin không hề bị đụng.
+ *
+ * LUÔN gọi `huy()` trong khối `finally`, kể cả khi tạo lỗi — bỏ sót thì app
+ * phụ nằm lại trong bộ nhớ và giữ luôn một phiên đăng nhập không ai dùng.
+ *
+ * Dùng thế nào:
+ *
+ *     const phu = taoAuthPhu();
+ *     try {
+ *       await createUserWithEmailAndPassword(phu.authPhu, email, matKhau);
+ *     } finally {
+ *       await phu.huy();
+ *     }
+ */
+export function taoAuthPhu(): { authPhu: Auth; huy: () => Promise<void> } {
+  const ten = `phu-${Date.now()}-${++soAppPhu}`;
+  const appPhu = initializeApp(firebaseConfig, ten);
+  const authPhu = getAuth(appPhu);
+  return {
+    authPhu,
+    huy: async () => {
+      try { await signOut(authPhu); } catch { /* chưa đăng nhập thì thôi */ }
+      await deleteApp(appPhu);
+    },
+  };
+}
 
 export default db;
 
