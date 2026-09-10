@@ -320,11 +320,14 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       // 1. Chạy migration localStorage → Firestore nếu chưa làm
       await runMigrationIfNeeded();
 
-      // 2. Load song song tất cả collections từ Firestore
+      /* 2. Tải NỘI DUNG HỌC — những collection đọc công khai.
+            `users` và `classes` KHÔNG tải ở đây: từ đợt 2 (10/09/2026), luật
+            Firestore đòi đăng nhập mới đọc được hai collection đó, vì chúng
+            mang họ tên và email học sinh. Chúng được tải trong useEffect nghe
+            `onAuthStateChanged` bên dưới.
+            Đã kiểm: trang công khai `DashboardPage` không dùng cả hai. */
       const [
-        allUsers,
         allSchools,
-        allClasses,
         allQuestions,
         allExams,
         allEqs,
@@ -332,9 +335,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         curriculumOverrides,
         settings,
       ] = await Promise.all([
-        FirestoreService.getUsers(),
         FirestoreService.getSchools(),
-        FirestoreService.getClasses(),
         FirestoreService.getQuestions(),
         FirestoreService.getExams(),
         FirestoreService.getEquations(),
@@ -343,26 +344,15 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         FirestoreService.getSystemSettings(),
       ]);
 
-      /* 3. Đưa mọi tên vai trò cũ về 4 bậc hiện hành.
-            Trước đây chỗ này ánh xạ 'admin' → 'super_admin', tức NGƯỢC chiều với
-            dữ liệu sau đợt gộp vai trò 01/09/2026. Nay dùng bảng chuẩn hoá dùng
-            chung, xử lý được cả super_admin / system_admin / free_user còn sót. */
-      const migratedUsers = allUsers.map(u => {
-        const chuan = chuanHoaVaiTro(u.role as string);
-        return chuan === u.role ? u : { ...u, role: chuan };
-      });
-
-      // 4. Cập nhật state
-      setUsers(migratedUsers);
+      // 3. Cập nhật state
       setSchools(allSchools);
-      setClasses(allClasses);
       setLibraryQuestions(allQuestions);
       setExams(allExams);
       setEquations(allEqs);
       setMatrixResources(allMatrix);
       setSystemSettings(settings);
 
-      // 5. Merge curriculum với constants
+      // 4. Merge curriculum với constants
       setCurriculum(mergeCurriculumWithConstants(curriculumOverrides));
 
       // 6. Guest chat count (vẫn từ localStorage — thuộc thiết bị)
@@ -399,10 +389,28 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     const thoi = onAuthStateChanged(auth, async (nguoiAuth) => {
       if (!nguoiAuth) {
         setCurrentUser(null);
+        /* Dọn luôn hai collection mang dữ liệu người. Không dọn thì sau khi
+           đăng xuất, danh sách học sinh vẫn nằm trong bộ nhớ trình duyệt của
+           máy đó — người kế tiếp mở máy vẫn đọc được qua công cụ nhà phát
+           triển. */
+        setUsers([]);
+        setClasses([]);
         localStorage.removeItem('h11_current_user_email');
         localStorage.removeItem('h11_current_user_data');
         return;
       }
+
+      /* Đã đăng nhập → nay mới đọc được hai collection mang dữ liệu người.
+         Tải trước khi dựng hồ sơ, để màn quản trị mở ra là có sẵn dữ liệu. */
+      const [dsNguoiDung, dsLop] = await Promise.all([
+        FirestoreService.getUsers(),
+        FirestoreService.getClasses(),
+      ]);
+      setUsers(dsNguoiDung.map(u => {
+        const chuan = chuanHoaVaiTro(u.role as string);
+        return chuan === u.role ? u : { ...u, role: chuan };
+      }));
+      setClasses(dsLop);
 
       const anh = await getDoc(doc(db, 'users', nguoiAuth.uid));
       if (!anh.exists()) {
