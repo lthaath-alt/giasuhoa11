@@ -1,3 +1,4 @@
+import { locHtml } from '../../../core/services/locHtml';
 import React, { useState, useCallback, useRef } from 'react';
 import {
   Box,
@@ -81,7 +82,8 @@ const DIFFICULTY_COLOR: Record<DifficultyLevel, string> = {
 function QuestionContent({ html }: { html: string }) {
   return (
     <span
-      dangerouslySetInnerHTML={{ __html: html }}
+      /* Lọc trước: nội dung tới từ collection ai cũng ghi được. */
+      dangerouslySetInnerHTML={{ __html: locHtml(html) }}
       style={{ lineHeight: 1.7 }}
     />
   );

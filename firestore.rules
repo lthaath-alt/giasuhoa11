@@ -1,0 +1,115 @@
+rules_version = '2';
+
+// ─── Luật phân quyền Firestore — Gia sư Hóa 11 ───────────────────────────────
+//
+// ĐỌC KỸ TRƯỚC KHI TRIỂN KHAI. Tệp này là BẢN ĐỀ XUẤT, viết ngày 10/09/2026 từ
+// việc đọc mã nguồn. Nó CHƯA từng được đối chiếu với luật đang chạy thật trong
+// bảng điều khiển Firebase, vì luật đó chưa bao giờ nằm trong git — và chính
+// đó là lý do có tệp này.
+//
+//   1. Mở  console.firebase.google.com → Firestore Database → Rules
+//   2. So bản đang chạy với bản này. Chỗ nào bản đang chạy CHO PHÉP mà bản này
+//      không, ứng dụng sẽ hỏng ở chỗ đó.
+//   3. Dán vào "Rules playground" thử vài thao tác thật: đăng nhập, mở đề kiểm
+//      tra, giáo viên soạn câu hỏi.
+//   4. Publish. Firebase giữ lịch sử — lùi lại được nếu hỏng.
+//
+// ─── VÌ SAO LUẬT NÀY KHÔNG KIỂM DANH TÍNH ──────────────────────────────────
+//
+// Dự án dùng hệ đăng nhập TỰ VIẾT (`src/core/services/firestoreAuth.ts`), KHÔNG
+// dùng Firebase Auth. Nghĩa là `request.auth` LUÔN LUÔN null ở mọi yêu cầu.
+// Không có cách nào để luật biết ai đang gọi.
+//
+// Hệ quả phải nói thẳng: luật ở đây KHÔNG thể phân quyền theo vai trò. Nó chỉ
+// làm được một việc — kiểm HÌNH DẠNG dữ liệu. Muốn phân quyền thật thì phải
+// chuyển sang Firebase Auth, và đó là một việc riêng cần bàn với chủ dự án.
+//
+// ─── HAI LỖ HỔNG ĐÃ BIẾT, CHƯA VÁ ĐƯỢC Ở ĐÂY ───────────────────────────────
+//
+// (a) `users` chứa mật khẩu dạng CHỮ THƯỜNG và phải cho đọc, vì việc đăng nhập
+//     chạy ngay trên trình duyệt: nó tải bản ghi người dùng về rồi so mật khẩu.
+//     Tức bất kỳ ai cũng đọc được toàn bộ mật khẩu. Không luật nào cứu được
+//     điều này — chỉ Firebase Auth mới cứu được.
+//
+// (b) Mọi collection đều phải cho ghi, vì không có danh tính để phân biệt giáo
+//     viên với người lạ.
+//
+// Thứ luật này LÀM ĐƯỢC, và làm ngay: chặn nội dung có mã ở `bank_questions`.
+// Đó là đường tấn công đã được xác minh ngày 10/09/2026 — kẻ tấn công ghi một
+// câu hỏi chứa `<img src=x onerror=…>`, và nó chạy trong trình duyệt của mọi
+// học sinh mở đề. Phía trình duyệt đã vá bằng `src/core/services/locHtml.ts`;
+// luật dưới đây là hàng rào thứ hai, chặn ngay từ lúc GHI.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Trợ giúp ────────────────────────────────────────────────────────────
+
+    // Chuỗi có mang mã hoặc thẻ nguy hiểm không?
+    // Danh sách CẤM ở đây là cố ý và có giới hạn: nó KHÔNG thay thế bộ lọc
+    // phía trình duyệt (bộ lọc đó dùng danh sách CHO PHÉP, chặt hơn hẳn). Luật
+    // Firestore không có bộ phân tích HTML, nên chỗ này chỉ chặn những dạng
+    // thô nhất — đủ để một kẻ tấn công tiện tay bị chặn từ cửa.
+    function coMaDoc(s) {
+      return s is string && (
+        s.matches('(?i).*<\\s*/?\\s*(script|iframe|object|embed|link|meta|base|svg|img|video|audio|form|input).*')
+        || s.matches('(?i).*\\son[a-z]+\\s*=.*')          // onerror=, onload=, onclick=…
+        || s.matches('(?i).*javascript\\s*:.*')
+        || s.matches('(?i).*data\\s*:\\s*text/html.*')
+      );
+    }
+
+    // Câu hỏi hợp lệ: không quá dài, và không trường chữ nào mang mã.
+    // Giới hạn độ dài vừa chặn được việc nhồi dữ liệu rác vào kho, vừa cắt
+    // ngắn mọi tải trọng tấn công.
+    function cauHoiSach() {
+      let d = request.resource.data;
+      return request.resource.size() < 40
+        && (!('content' in d) || (d.content is string && d.content.size() < 4000 && !coMaDoc(d.content)))
+        && (!('explanation' in d) || (d.explanation is string && d.explanation.size() < 4000 && !coMaDoc(d.explanation)))
+        && (!('options' in d) || d.options.size() <= 10);
+    }
+
+    // ── Ngân hàng câu hỏi ───────────────────────────────────────────────────
+    // Đọc: công khai. Trò chơi và bộ kiểm đọc thẳng, không đăng nhập.
+    // Ghi:  vẫn mở (chưa có danh tính), NHƯNG nội dung phải sạch.
+    match /bank_questions/{id} {
+      allow read: if true;
+      allow create, update: if cauHoiSach();
+      allow delete: if true;
+    }
+
+    // Kho câu hỏi cũ, cùng hình dạng nên cùng luật.
+    match /questions/{id} {
+      allow read: if true;
+      allow create, update: if cauHoiSach();
+      allow delete: if true;
+    }
+
+    // ── Các collection còn lại ──────────────────────────────────────────────
+    // Giữ nguyên quyền như hiện tại. Siết chúng lại đòi có danh tính, tức đòi
+    // Firebase Auth — việc riêng, phải bàn trước.
+    //
+    // CẢNH BÁO cho `users`: bản ghi ở đây chứa mật khẩu dạng chữ thường và ai
+    // cũng đọc được. Đây là lỗ hổng nặng nhất của dự án.
+    match /users/{id}          { allow read, write: if true; }
+    match /chats/{id}          { allow read, write: if true; }
+    match /classes/{id}        { allow read, write: if true; }
+    match /schools/{id}        { allow read, write: if true; }
+    match /exams/{id}          { allow read, write: if true; }
+    match /progress/{id}       { allow read, write: if true; }
+    match /equations/{id}      { allow read, write: if true; }
+    match /matrix_resources/{id}    { allow read, write: if true; }
+    match /curriculum_chapters/{id} { allow read, write: if true; }
+    match /system_settings/{id}     { allow read, write: if true; }
+
+    // ── Mọi thứ khác: cấm ───────────────────────────────────────────────────
+    // Mười hai collection trên là toàn bộ những gì mã nguồn dùng tới, liệt kê
+    // bằng cách quét `collection(db, …)` và các hằng `COL_*` ngày 10/09/2026.
+    // Thêm collection mới thì phải thêm luật cho nó ở đây — im lặng hỏng còn
+    // hơn im lặng mở toang.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

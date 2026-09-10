@@ -296,13 +296,36 @@ console.log('\n== Tương phản chữ trên nền ==');
   /** Tách một đoạn mã thành từng PHẠM VI: thuộc tính của chính nó, không kèm
       thuộc tính của các khối con. Mỗi khối con thành một phạm vi riêng. */
   function phamVi(ma: string, ra: string[] = []): string[] {
+    /* Đánh dấu những ký tự nằm TRONG chuỗi, để phép đếm ngoặc bỏ qua chúng.
+       Không đánh dấu thì một dấu `{` lẻ trong một chuỗi — ví dụ
+       `content: '"{"'`, lối viết hay gặp cho pseudo-element — làm phép đếm lệch
+       và nuốt trọn phần còn lại của khối `sx`. Khi đó cặp chữ/nền trong khối ấy
+       không bao giờ được đo, mà bảng kết quả vẫn báo ĐẠT. Đã chạy thử đúng cảnh
+       đó trước khi sửa.
+
+       CHỈ đánh dấu, KHÔNG xoá: bản sửa đầu tiên thay ruột chuỗi bằng khoảng
+       trắng, thế là `color: 'var(--chu-dam)'` cũng mất luôn tên biến và phép đo
+       bắt được 0 cặp. Một phép kiểm không đo gì thì tệ hơn một phép kiểm sai. */
+    const trongChuoi = new Array<boolean>(ma.length).fill(false);
+    for (let i = 0, dau: string | null = null; i < ma.length; i++) {
+      const c = ma[i];
+      if (dau) {
+        trongChuoi[i] = true;
+        if (c === dau && ma[i - 1] !== '\\') dau = null;
+      } else if (c === "'" || c === '"') {
+        dau = c;
+        trongChuoi[i] = true;
+      }
+    }
+    const laNgoac = (i: number, c: string) => ma[i] === c && !trongChuoi[i];
+
     let rieng = '', k = 0;
     while (k < ma.length) {
-      if (ma[k] === '{') {
+      if (laNgoac(k, '{')) {
         let sau = 1, j = k + 1;
         for (; j < ma.length && sau > 0; j++) {
-          if (ma[j] === '{') sau++;
-          else if (ma[j] === '}') sau--;
+          if (laNgoac(j, '{')) sau++;
+          else if (laNgoac(j, '}')) sau--;
         }
         phamVi(ma.slice(k + 1, j - 1), ra);   // khối con: phạm vi riêng
         k = j;

@@ -1,3 +1,4 @@
+import { locHtml } from '../../../core/services/locHtml';
 import React, { useState, useCallback } from 'react';
 import {
   Box, Card, CardContent, Typography, Divider, List, ListItem,
@@ -17,8 +18,10 @@ import type { User } from '../../auth/types';
 import type { Quiz, QuizQuestionResult } from '../../quiz/types';
 
 // Helper render Hóa học (giữ sub/sup)
+// Nội dung tới từ `bank_questions`, collection ai cũng ghi được — PHẢI lọc.
+// Xem src/core/services/locHtml.ts.
 function ChemicalText({ html }: { html: string }) {
-  return <span dangerouslySetInnerHTML={{ __html: html }} />;
+  return <span dangerouslySetInnerHTML={{ __html: locHtml(html) }} />;
 }
 
 interface QuizProgressTabProps {

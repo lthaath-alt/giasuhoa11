@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",
-    "kiem-tra": "npm run kiem-tra:chuong-trinh && npm run kiem-tra:ngan-hang && npm run kiem-tra:de-chuong && npm run kiem-tra:het-luot && npm run kiem-tra:mau && npm run kiem-tra:thuc-nghiem && npm run kiem-tra:ran-thang && npm run kiem-tra:tai-lieu && npm run kiem-tra:dong-bo",
+    "kiem-tra": "npm run kiem-tra:chuong-trinh && npm run kiem-tra:ngan-hang && npm run kiem-tra:de-chuong && npm run kiem-tra:het-luot && npm run kiem-tra:mau && npm run kiem-tra:thuc-nghiem && npm run kiem-tra:ran-thang && npm run kiem-tra:tai-lieu && npm run kiem-tra:dong-bo && npm run kiem-tra:an-ninh",
     "kiem-tra:chuong-trinh": "tsx scripts/kiem-tra-chuong-trinh.mts",
     "kiem-tra:het-luot": "tsx scripts/kiem-tra-het-luot.mts",
     "thu:ai": "tsx scripts/thu-gia-su-ai.mts",
@@ -29,7 +29,8 @@
     "gan:cau-hoi": "tsx scripts/gan-cau-hoi-theo-bai.mts && npm run nhung:ran-thang",
     "xuat:ngan-hang": "tsx scripts/xuat-ngan-hang.mts",
     "kiem-tra:dong-bo": "tsx scripts/kiem-tra-dong-bo-ngan-hang.mts",
-    "kiem-tra:tai-lieu": "tsx scripts/kiem-tra-tai-lieu.mts"
+    "kiem-tra:tai-lieu": "tsx scripts/kiem-tra-tai-lieu.mts",
+    "kiem-tra:an-ninh": "tsx scripts/kiem-tra-an-ninh.mts"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

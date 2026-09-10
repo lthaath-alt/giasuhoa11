@@ -1,4 +1,51 @@
-# Cache cho ảnh bài giảng tĩnh (public/hoa11).
+# ─── Header bảo mật, áp cho MỌI đường dẫn ───────────────────────────────────
+#
+# Netlify đọc tệp này khi phát hành. Mục `/*` phải đứng ĐẦU và phủ mọi đường
+# dẫn; các mục hẹp hơn bên dưới chỉ thêm header cache.
+#
+# Thêm ngày 10/09/2026, sau một lượt rà soát tìm ra lỗ hổng XSS lưu trữ:
+# collection `bank_questions` để `allow write: if true` (ai cũng ghi được), và
+# nội dung câu hỏi đọc từ đó đi thẳng vào `dangerouslySetInnerHTML`. Lỗ hổng đã
+# được vá bằng bộ lọc `src/core/services/locHtml.ts`; những header dưới đây là
+# HÀNG RÀO THỨ HAI, để lần sau ai đó quên gọi bộ lọc thì thiệt hại vẫn bị chặn.
+#
+# `npm run kiem-tra:an-ninh` canh cho những dòng này không biến mất.
+
+/*
+  # Trình duyệt đừng tự đoán kiểu tệp. Không có dòng này thì một tệp người dùng
+  # tải lên bị đoán nhầm thành HTML là chạy được mã trong đó.
+  X-Content-Type-Options: nosniff
+
+  # Không cho site khác nhúng trang này vào iframe rồi phủ lớp trong suốt lên
+  # để lừa bấm — nguy nhất là ở màn đăng nhập.
+  X-Frame-Options: DENY
+
+  # Sang site ngoài (Zalo, Google) thì chỉ gửi tên miền, không gửi đường dẫn.
+  # Đường dẫn ở đây có thể chứa mã đề kiểm tra.
+  Referrer-Policy: strict-origin-when-cross-origin
+
+  # App không dùng camera, micro, định vị hay cảm biến nào. Tắt sẵn thì mã lạ
+  # chèn được vào cũng không xin quyền được.
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+
+  # Chính sách nội dung — hàng rào thứ hai nếu bộ lọc HTML thủng.
+  #
+  #  script-src 'self'   Gói đã dựng KHÔNG có script nội tuyến nào (kiểm trong
+  #                      dist/index.html), nên chặt được tới mức này. Đây là
+  #                      dòng chặn `<img onerror=…>` và mọi mã chèn khác.
+  #  style-src           MUI/emotion chèn thẻ <style> lúc chạy nên buộc phải có
+  #                      'unsafe-inline'. Chấp nhận được: CSS nội tuyến không
+  #                      chạy được mã, và script-src vẫn chặt.
+  #  connect-src         Firestore, Gemini, và Google OAuth. Đây là dòng chặn
+  #                      việc gửi trộm dữ liệu ra tên miền lạ.
+  #  frame-src 'self'    Trò chơi chạy trong iframe CÙNG NGUỒN.
+  #  object-src 'none'   Không dùng Flash/applet — đóng hẳn.
+  #  base-uri 'self'     Chặn thẻ <base> bị chèn để đổi đích mọi đường dẫn.
+  #  form-action 'self'  Biểu mẫu không được gửi đi đâu khác.
+  #  frame-ancestors     Bản CSP của X-Frame-Options ở trên, cho trình duyệt mới.
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://*.google.com https://*.gstatic.com https://*.firebaseio.com wss://*.firebaseio.com; frame-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+
+# ─── Cache cho ảnh bài giảng tĩnh (public/hoa11) ────────────────────────────
 #
 # Mặc định Netlify đặt max-age=0, must-revalidate cho file tĩnh, nghĩa là mỗi
 # lần học sinh mở lại một bài, trình duyệt phải hỏi server lại từng ảnh

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Box, Button, Typography } from '@mui/material';
+import { Thoi } from '../../../core/components/Thoi';
 
 /**
  * Bốn trường nhãn ở khung hình đầu của trang chủ.
@@ -15,30 +16,6 @@ import { Box, Button, Typography } from '@mui/material';
  * Chỉ MỘT hành động chính, nền đỏ tín hiệu, nằm ở trường đầu tiên. Ba trường
  * còn lại là khung kẻ — đỏ mà xuất hiện bốn lần thì hết là tín hiệu.
  */
-
-/** Ký hiệu thoi, nét đều — bộ ký hiệu của thế giới nhãn. */
-const Thoi: React.FC<{ children?: React.ReactNode }> = ({ children }) => (
-  <Box
-    component="span"
-    aria-hidden
-    sx={{
-      width: 22,
-      height: 22,
-      flexShrink: 0,
-      border: '2px solid currentColor',
-      transform: 'rotate(45deg)',
-      display: 'inline-flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      fontSize: '0.62rem',
-      fontWeight: 800,
-      lineHeight: 1,
-      '& > *': { transform: 'rotate(-45deg)' },
-    }}
-  >
-    <span>{children}</span>
-  </Box>
-);
 
 export interface Truong {
   ma: string;
@@ -84,6 +61,9 @@ export const ActivityFields: React.FC<{ truongs: Truong[] }> = ({ truongs }) => 
           sx={{
             backgroundColor: 'var(--nen-dam)',
             color: 'var(--chu-nguoc)',
+            /* Xem chu thich cung viec o NotFoundPage: che do toi lam dai nhan
+               tan vao than the, nen ranh gioi phai la mot net ke. */
+            borderBottom: '2px solid var(--chu-dam)',
             px: 2,
             py: 1.1,
             display: 'flex',

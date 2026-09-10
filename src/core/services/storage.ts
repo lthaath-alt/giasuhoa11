@@ -93,8 +93,16 @@ export function generateClassPassword(className: string, studentNumber: number):
 
 export const GuestChatStorage = {
   getCount(): number {
-    const count = localStorage.getItem(GUEST_CHAT_COUNT_KEY);
-    return count ? parseInt(count, 10) : 0;
+    /* `parseInt` trả NaN khi giá trị trong localStorage không phải số (người
+       dùng tự sửa, hoặc một bản cũ ghi sai). Hậu quả đo được: `NaN >= 25` là
+       `false` nên giới hạn dùng thử NGỪNG ÁP DỤNG vĩnh viễn, và `25 - NaN`
+       cũng là NaN nên trường "Gia sư AI" ở trang chủ hiện đúng chữ
+       "còn NaN/25 câu hỏi thử".
+       Coi giá trị hỏng như chưa dùng lần nào: thà đếm lại từ đầu còn hơn mở
+       toang, và người dùng thấy một con số thật thay vì chữ NaN. */
+    const tho = localStorage.getItem(GUEST_CHAT_COUNT_KEY);
+    const so = tho ? parseInt(tho, 10) : 0;
+    return Number.isFinite(so) && so >= 0 ? so : 0;
   },
 
   increment(): number {

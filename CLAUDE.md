@@ -112,14 +112,16 @@ Hằng ngày:
 |---|---|
 | `npm run dev` | Máy chủ phát triển, cổng 3000 |
 | `npm run lint` | `tsc --noEmit` — hàng rào chính, chạy MỘT LẦN trước khi báo xong |
-| `npm run kiem-tra` | Chạy cả 9 bộ kiểm, 190 mục. Chạy trước khi commit |
+| `npm run kiem-tra` | Chạy cả 10 bộ kiểm, 205 mục. Chạy trước khi commit |
 | `npm run build` | **Chỉ khi user yêu cầu** |
 
 Bộ kiểm chạy riêng khi cần: `kiem-tra:chuong-trinh` (dữ liệu 25 bài),
 `kiem-tra:ngan-hang`, `kiem-tra:de-chuong`, `kiem-tra:het-luot`, `kiem-tra:mau`
 (biến màu + tương phản), `kiem-tra:thuc-nghiem`, `kiem-tra:ran-thang`,
 `kiem-tra:dong-bo` (cần mạng, mất mạng thì tự bỏ qua), `kiem-tra:tai-lieu`
-(mọi đường dẫn và lệnh npm mà CLAUDE.md / hiến chương nhắc tới đều phải có thật).
+(mọi đường dẫn và lệnh npm mà CLAUDE.md / hiến chương nhắc tới đều phải có thật),
+`kiem-tra:an-ninh` (những hàng rào an ninh không được phép biến mất — xem mục
+"An ninh" bên dưới).
 
 Sinh lại dữ liệu — đọc `scripts/README.md` trước khi dùng:
 `soan` (từ tệp .docx sang `constants.ts`), `xuat:ngan-hang` (Firestore sang repo),
@@ -206,6 +208,54 @@ web vẫn đúng vì nó đọc thẳng Firestore; `kiem-tra:dong-bo` sinh ra đ
 - **`.env.local` chỉ cần cho tính năng AI**: biến `GEMINI_API_KEY` (xem `.env.example`). Thiếu nó thì các phần KHÁC vẫn chạy, chỉ màn hình gọi Gemini mới lỗi.
 - Nếu user báo "màn hình AI trắng trang / báo lỗi API key": kiểm tra đã tạo file `.env.local` (copy từ `.env.example`) và điền `GEMINI_API_KEY` thật chưa, rồi chạy lại `npm run dev`. Đây là nguyên nhân số 1 khiến người mới tưởng "hỏng app".
 - ĐỪNG commit `.env.local` (đã nằm trong `.gitignore`).
+
+## An ninh
+
+Rà soát ngày 10/09/2026 tìm ra một lỗ hổng **XSS lưu trữ** đã sống trong dự án
+từ lâu. Chuỗi tấn công:
+
+```
+bank_questions để allow write: if true   →  ai trên Internet cũng ghi được
+        ↓
+nội dung câu hỏi đọc từ đó
+        ↓
+đi thẳng vào dangerouslySetInnerHTML    →  không có bộ lọc nào trong cả dự án
+```
+
+Kẻ tấn công ghi một câu hỏi chứa `<img src=x onerror=…>` là mọi học sinh mở đề
+có câu đó đều chạy mã của hắn. Mà `users` lưu mật khẩu dạng chữ thường và
+`firestoreAuth.ts` so sánh ngay trên trình duyệt, nên hắn lấy được cả tài khoản.
+
+**Bốn hàng rào hiện có. `npm run kiem-tra:an-ninh` canh cho chúng không biến mất.**
+
+1. **`src/core/services/locHtml.ts`** — lọc HTML bằng danh sách CHO PHÉP (sáu thẻ:
+   sub, sup, b, strong, i, em, br, u) và bỏ SẠCH mọi thuộc tính. Dùng
+   `<template>` của trình duyệt chứ không dùng regex: regex trên HTML luôn lách
+   được bằng `<img/src=x>`, `<IMG SRC=x>`, thẻ lồng nhau. Đã thử 10 đòn tấn công
+   thật, không đòn nào lọt; và bốn công thức hoá học giữ nguyên từng ký tự.
+   **Mọi `dangerouslySetInnerHTML` PHẢI gọi hàm này** — có phép kiểm canh.
+2. **`public/_headers`** — năm header bảo mật phủ `/*`, trong đó CSP là hàng rào
+   thứ hai nếu bộ lọc thủng. `script-src 'self'` chặt được vì gói đã dựng không
+   có script nội tuyến nào. Đã thử CSP trên ứng dụng đang chạy: Firestore, hai
+   phông, và khung trò chơi đều qua.
+3. **`firestore.rules`** — nay nằm trong git. Chặn nội dung có mã ngay từ lúc GHI.
+4. **Kiểm `e.origin`** ở mọi handler `postMessage` — trò chơi chạy trong iframe
+   và nói chuyện với web qua đó.
+
+**Hai lỗ hổng CHƯA vá được, và vì sao:**
+
+- `users` chứa mật khẩu **dạng chữ thường** và phải cho đọc công khai, vì đăng
+  nhập chạy ngay trên trình duyệt. Không luật Firestore nào cứu được.
+- Mọi collection đều phải cho ghi, vì **không có danh tính**: dự án dùng hệ đăng
+  nhập tự viết nên `request.auth` luôn null.
+
+Cả hai chỉ chữa được bằng cách **chuyển sang Firebase Auth** — việc lớn, phải bàn
+với chủ dự án trước, đừng tự làm.
+
+Khoá web của Firebase trong `firebaseCongKhai.ts` **không phải bí mật** (nó vốn
+nằm trong gói JS ai bấm F12 cũng đọc được); an toàn dựa vào Firestore Rules. Khoá
+Gemini thì CÓ là bí mật vì nó tính tiền — `kiem-tra:an-ninh` canh không cho khoá
+nào lọt vào `src/`.
 
 ## KHÔNG biến app thành PWA / service worker
 - Dự án này KHÔNG phải PWA và phải giữ nguyên như vậy. ĐỪNG thêm `vite-plugin-pwa`, `workbox`, `manifest.webmanifest`, hay bất kỳ đoạn `navigator.serviceWorker.register(...)` nào.
