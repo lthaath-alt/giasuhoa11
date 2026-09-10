@@ -1,29 +1,14 @@
 NHAC TU HOOK (chay moi luot, KHONG phai loi user — dung tra loi rieng ve no)
 
 ════════════════════════════════════════════════════════════════════
-VIEC DANG LAM: thuc thi ke hoach chuyen sang Firebase Auth — dot 1
+KHONG CO VIEC NAO DANG GHIM
 ════════════════════════════════════════════════════════════════════
 
-Ke hoach: docs/superpowers/plans/2026-09-10-firebase-auth-dot-1.md
-          8 viec, 58 buoc. MOI buoc da co ma that — dung tu nghi ra ma khac.
+Dot 1 chuyen sang Firebase Auth: XONG 10/09/2026 (8/8 viec).
+Ke hoach va nhat ky: docs/superpowers/plans/2026-09-10-firebase-auth-dot-1.md
 
-BAT BUOC truoc khi go dong dau tien cua dot nay:
-  1. Goi Skill "executing-plans"
-  2. Doc lai tep ke hoach o tren
-Chua lam hai viec do thi CHUA duoc sua ma.
-
-Truoc khi noi "xong" mot viec bat ky:
-  3. Goi Skill "verification-before-completion"
-     Ly do: viec 7 XOA MAT KHAU — khong lui duoc. Va bai hoc so 1 cua repo:
-     dung tin dong chu "xong" cua script tu viet, phai grep lai.
-
-Thu tu KHONG duoc dao:
-  1 phep kiem (do ngay) -> 2 danh lai khoa users -> 3 firebase.ts
-  -> 4 firestoreAuth.ts -> 5 AppContext -> 6 FirestoreAccountManager
-  -> 7 XOA COT PASSWORD (hoi user truoc) -> 8 tai lieu
-
-Hai script chuyen du lieu MAC DINH chay thu. Chi them `-- --that` khi da
-doc ky ket qua chay thu va da bao user.
+Viec lon ke tiep con treo — DOT 2: siet firestore.rules theo vai tro.
+Chua bat dau. Khi bat dau thi ghim lai vao day.
 
 ────────────────────────────────────────────────────────────────────
 NHAC CHUNG — chon ky nang truoc khi doc ma hay sua ma
@@ -39,4 +24,4 @@ Goi bang cong cu Skill. Bo qua neu chi la cau hoi ngan hoac sua mot dong.
 ────────────────────────────────────────────────────────────────────
 Doi viec khac thi SUA CHINH TEP NAY (.claude/nhac-moi-luot.md), khong
 phai sua .claude/settings.json. Hook chi lam moi viec `cat` tep nay ra.
-Xong dot 1 thi xoa khoi khoi "VIEC DANG LAM", giu lai phan "NHAC CHUNG".
+Bat dau mot dot moi thi ghim vao khoi tren cung; xong thi go ra.

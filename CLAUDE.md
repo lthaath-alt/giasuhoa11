@@ -51,7 +51,7 @@ hướng dẫn vận hành hằng ngày và không được mâu thuẫn với t
 | UI | MUI v9 (`@mui/material`) + Tailwind v4 (nạp bằng `@import "tailwindcss"` trong `index.css`, KHÔNG có tệp cấu hình) + emotion |
 | Icons / Animation | `lucide-react`, `@mui/icons-material` / `motion` |
 | Backend | Firebase Firestore |
-| Auth | **Hệ TỰ VIẾT**, không dùng Firebase Auth — xem mục "Vài điểm dễ vấp" |
+| Auth | **Firebase Auth** (email + mật khẩu). Hồ sơ ở `users/{uid}` — xem "Vài điểm dễ vấp" |
 | AI | `@google/genai` (Gemini), key qua `GEMINI_API_KEY` ở `.env.local` |
 | Routing | `react-router-dom` v7 |
 | Form | Không có thư viện form — viết tay bằng state |
@@ -97,16 +97,40 @@ này từng được ghi ở đây nhưng chưa bao giờ tồn tại.
 5. Chạy `npm run lint` kiểm tra sạch trước khi báo xong.
 
 ## Vài điểm dễ vấp (đọc trước khi sửa vùng liên quan)
-- **Auth là hệ tự viết, KHÔNG phải Firebase Auth.** Trạng thái nằm ở
+- **Auth là Firebase Auth** (chuyển ngày 10/09/2026). Trạng thái vẫn nằm ở
   `core/contexts/AppContext.tsx`, lấy ra bằng `useApp()` (khai ở `core/hooks/useApp.ts`,
   không phải `useAuth`) → `{ currentUser, users, loading, login, register, logout,
-  loginWithGoogle, forgotPassword, … }`.
+  loginWithGoogle, forgotPassword, … }`. **Hình dạng `currentUser` KHÔNG đổi**, nên
+  32 tệp dùng nó không phải sửa gì.
   Vai trò: `UserRole = 'admin' | 'school_admin' | 'teacher' | 'student'` (bốn vai, chữ
   thường, gạch dưới — không phải `'Teacher' | 'Student'`).
-  Đăng nhập chạy qua `core/services/firestoreAuth.ts`: nó đọc thẳng collection `users`
-  rồi **so mật khẩu dạng chữ thường ngay trên trình duyệt**. Đây là lỗ hổng đã biết,
-  không phải chỗ để "dọn code" — muốn siết thì phải thay hẳn sang Firebase Auth và
-  bàn trước với user.
+
+  Bốn điều phải nhớ trước khi đụng vào vùng này:
+
+  1. **Id tài liệu `users` = `uid` của Auth.** `AppContext` nghe `onAuthStateChanged`
+     rồi đọc thẳng `users/{uid}`. Bắt buộc như vậy vì luật Firestore KHÔNG truy vấn
+     được, chỉ `get()` theo đường dẫn — đợt siết phân quyền sẽ cần
+     `users/{request.auth.uid}` để biết vai. Dùng `addDoc` (id ngẫu nhiên) là hỏng
+     đúng điều đó.
+  2. **Tạo tài khoản hộ người khác phải đi qua `taoAuthPhu()`** trong `firebase.ts`.
+     `createUserWithEmailAndPassword` ĐĂNG NHẬP LUÔN bằng tài khoản vừa tạo, nên gọi
+     trên app chính là admin bị đá khỏi phiên của chính mình. Mọi đường tạo tài khoản
+     (`register`, `createTeacher`, `createSchoolAdmin`, `createStudent`) đều gọi
+     `createAccountWithFirestore` — **đừng bao giờ ghi thẳng `users` để tạo tài khoản**,
+     sẽ ra hồ sơ mồ côi không có bản ghi Auth và không ai đăng nhập được.
+  3. **Mật khẩu KHÔNG còn trong Firestore**, và kiểu `User` không có trường
+     `password` — đó là hàng rào do trình biên dịch giữ. Không ai đặt hộ mật khẩu ai
+     được nữa, chỉ gửi thư đặt lại.
+  4. **Phiên sống qua F5.** Trước đây `AppContext` cố ý xoá session mỗi lần mở trang;
+     Firebase Auth giữ phiên trong IndexedDB.
+
+  Hai điều đợt chuyển KHÔNG làm được, ghi để khỏi tìm lại:
+  - **"Đặt lại mật khẩu cả lớp"** trong `ClassManagement` đã bỏ. Trình duyệt không đặt
+    được mật khẩu cho người khác; muốn có lại thì cần Cloud Function + Admin SDK, tức
+    gói Blaze trả tiền. Nút đó nay chỉ xuất CSV danh sách lớp kèm tên đăng nhập.
+  - **Học sinh không có email thật** dùng địa chỉ `<username>@internal.local`. Đăng
+    nhập bình thường, nhưng không nhận được thư đặt lại — quên mật khẩu thì giáo viên
+    phải tạo lại tài khoản.
 - `Grid` MUI v9 dùng `size={{ xs, sm, md }}` (không phải `item`/`xs=` kiểu bản cũ).
 - Theme MUI khai ngay trong `src/App.tsx` (không có `core/theme/`): primary là **đỏ tín
   hiệu `#C4000E`**, secondary lục phòng thí nghiệm `#0F5A44`, warning vàng cảnh báo
@@ -132,7 +156,7 @@ Hằng ngày:
 |---|---|
 | `npm run dev` | Máy chủ phát triển, cổng 3000 |
 | `npm run lint` | `tsc --noEmit` — hàng rào chính, chạy MỘT LẦN trước khi báo xong |
-| `npm run kiem-tra` | Chạy cả 10 bộ kiểm, 208 mục. Chạy trước khi commit |
+| `npm run kiem-tra` | Chạy cả 10 bộ kiểm, 211 mục. Chạy trước khi commit |
 | `npm run build` | **Chỉ khi user yêu cầu** |
 
 Bộ kiểm chạy riêng khi cần: `kiem-tra:chuong-trinh` (dữ liệu 25 bài),
@@ -255,8 +279,9 @@ nội dung câu hỏi đọc từ đó
 ```
 
 Kẻ tấn công ghi một câu hỏi chứa `<img src=x onerror=…>` là mọi học sinh mở đề
-có câu đó đều chạy mã của hắn. Mà `users` lưu mật khẩu dạng chữ thường và
-`firestoreAuth.ts` so sánh ngay trên trình duyệt, nên hắn lấy được cả tài khoản.
+có câu đó đều chạy mã của hắn. Lúc đó `users` còn lưu mật khẩu dạng chữ thường và
+`firestoreAuth.ts` so sánh ngay trên trình duyệt, nên hắn lấy được cả tài khoản —
+**vế sau này đã hết** từ đợt chuyển sang Firebase Auth cùng ngày, xem mục dưới.
 
 **Bốn hàng rào hiện có. `npm run kiem-tra:an-ninh` canh cho chúng không biến mất.**
 
@@ -303,15 +328,20 @@ build` hay `npm run lint` bắt** — vì chúng không phải lỗi mã.
    thật thì phải phục vụ `dist/` bằng một máy chủ có áp `_headers`, hoặc deploy
    bản nháp. Đây là lý do gốc khiến hai cái bẫy trên lọt.
 
-**Hai lỗ hổng CHƯA vá được, và vì sao:**
+**Lỗ hổng mật khẩu chữ thường: ĐÃ VÁ ngày 10/09/2026.** Chuyển sang Firebase
+Auth, và xoá cột `password` khỏi cả 17 tài liệu `users` còn mang nó. Mật khẩu
+nay đã băm và không bao giờ về tới trình duyệt. Bốn phép kiểm trong
+`kiem-tra:an-ninh` canh cho nó không quay lại, mạnh nhất là phép kiểm "kiểu
+`User` không có trường `password`" — hàng rào đó do trình biên dịch giữ.
 
-- `users` chứa mật khẩu **dạng chữ thường** và phải cho đọc công khai, vì đăng
-  nhập chạy ngay trên trình duyệt. Không luật Firestore nào cứu được.
-- Mọi collection đều phải cho ghi, vì **không có danh tính**: dự án dùng hệ đăng
-  nhập tự viết nên `request.auth` luôn null.
+**Lỗ hổng CÒN LẠI, và vì sao:** mọi collection vẫn phải cho ghi. Có `request.auth`
+rồi nhưng `firestore.rules` **chưa siết theo vai** — đó là **đợt 2**, cố ý tách ra
+để đợt 1 hỏng thì chỉ hỏng đường đăng nhập, thấy ngay.
 
-Cả hai chỉ chữa được bằng cách **chuyển sang Firebase Auth** — việc lớn, phải bàn
-với chủ dự án trước, đừng tự làm.
+Đợt 2 làm được rồi nhờ hai thứ đã dựng sẵn: id tài liệu `users` **bằng** `uid` nên
+luật đọc được `get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role`;
+và `progress`/`chats` trỏ tới người dùng bằng `userEmail` nên luật dùng thẳng
+`request.auth.token.email` được.
 
 Khoá web của Firebase trong `firebaseCongKhai.ts` **không phải bí mật** (nó vốn
 nằm trong gói JS ai bấm F12 cũng đọc được); an toàn dựa vào Firestore Rules. Khoá

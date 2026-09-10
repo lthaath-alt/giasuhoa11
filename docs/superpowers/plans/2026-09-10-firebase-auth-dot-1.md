@@ -1182,3 +1182,66 @@ git commit -m "CLAUDE.md: Auth nay la Firebase Auth, khong con mat khau chu thuo
   không có `authUid`. Hỏi user rồi mới xoá.
 - **Bảy tài khoản trông như tài khoản thử** (`hocsinh1/2/3@`, `conva@`, `convb@`,
   `schooladmin@demo.com`, `admin@gmail.com`) — hỏi user xem cái nào bỏ được.
+
+---
+
+# ĐÃ LÀM XONG — 10/09/2026
+
+Cả 8 việc. Commit `535e01f` → `e316655`. Nghiệm thu: đăng nhập chạy sau khi xoá
+cột `password`, chủ dự án xác nhận.
+
+## Bốn chỗ kế hoạch SAI hoặc THIẾU
+
+Ghi lại vì đây mới là phần đáng đọc — kế hoạch đúng thì không cần nhớ.
+
+**1. Đếm thiếu quá nửa phạm vi.** Kế hoạch ghi 4 tệp mang mật khẩu; thật ra 7 tệp,
+17 chỗ. Phép kiểm ở Việc 1 lộ ra điều đó ngay — đó chính là lý do viết phép kiểm
+trước khi sửa mã.
+
+**2. Bỏ sót một lỗ hổng CHỨC NĂNG lớn hơn cả lỗ hổng an ninh.**
+`createTeacher` / `createSchoolAdmin` / `createStudent` không tạo tài khoản
+Firebase Auth — chúng bịa id rồi ghi thẳng Firestore. Nghĩa là sau Việc 4–6, mọi
+tài khoản giáo viên và học sinh tạo ra đều **không đăng nhập được**. Kế hoạch
+không nhắc một chữ. Phải thêm hẳn Việc 6b.
+
+**3. Chốt chặn vai trò đặt sai chỗ.** Việc 4 giữ nó trong `firestoreAuth.ts`,
+nhưng hàm đó là chỗ DUY NHẤT tạo được cặp "tài khoản Auth + hồ sơ", nên nó chặn
+nhầm cả `createSchoolAdmin` hợp lệ. Chuyển ra `FirestoreAccountManager` — hạn chế
+thuộc về NGƯỜI GỌI, không thuộc về công cụ.
+
+**4. Regex là hàng rào yếu.** Hàng rào mạnh nhất hoá ra là **bỏ trường `password`
+khỏi kiểu `User`**: trình biên dịch chỉ ra đúng 6 chỗ, trong khi regex vừa báo
+thừa (6 chỗ truyền vào Firebase Auth là chính đáng) vừa bỏ sót (lối viết tắt
+`{ password, }`). Lần sau gặp việc kiểu này: đổi KIỂU trước, đừng viết regex.
+
+## Chức năng mất đi, đã báo chủ dự án
+
+- **"Đặt lại mật khẩu cả lớp"** — trình duyệt không đặt được mật khẩu cho người
+  khác. Cần Cloud Function + Admin SDK, tức gói Blaze trả tiền. Nút đó nay chỉ
+  xuất CSV danh sách lớp kèm tên đăng nhập.
+- **Học sinh dùng `<username>@internal.local`** đăng nhập được nhưng không nhận
+  được thư đặt lại mật khẩu.
+
+## Ba lỗi trong chính bộ kiểm tra, tự bắt được
+
+- Hàm bỏ chú thích thay cả khối `/* */` bằng MỘT dấu cách → mọi số dòng phía sau
+  lệch, phép kiểm chỉ sai chỗ.
+- Luật "cấm `password` làm khoá object ở mọi nơi" báo đỏ cả 6 chỗ hợp lệ. Một
+  phép kiểm đỏ vĩnh viễn thì người ta học cách phớt lờ nó.
+- Phép kiểm "firestoreAuth có gọi Firebase Auth" dùng `includes()` trên cả tệp,
+  nên ba cái tên hàm nằm trong CHÚ THÍCH cũng làm nó xanh.
+
+## Một báo động giả đã không sửa nhầm
+
+App báo `useApp must be used within an AppProvider`. Mở tab mới với bộ đệm console
+sạch thì app tải đúng, 0 lỗi — đó là dấu vết Vite HMR hoán mô-đun nóng giữa lúc
+sửa nhiều bước. Không có lỗi nào trong mã.
+
+## Dọn dẹp còn treo
+
+- Bản chụp dự phòng chứa mật khẩu chữ thường ở thư mục tạm
+  (`giasuhoa11-duphong-*`) — xoá khi chắc chắn không cần lùi nữa.
+- Hai hồ sơ mồ côi `admin@system.local` và `superadmin@giasuhoa11.com`: không có
+  `authUid`, không đăng nhập được. Chờ chủ dự án quyết.
+- **ĐỢT 2**: siết `firestore.rules` theo vai. Làm được rồi nhờ id tài liệu `users`
+  đã bằng `uid`.
