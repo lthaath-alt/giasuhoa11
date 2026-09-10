@@ -151,6 +151,14 @@ Mở Claude Code ở thư mục dự án thì các kỹ năng này tự nạp, g
   `subagent-driven-development`, `finishing-a-development-branch`, `writing-skills`,
   `using-superpowers`. Chép nguyên văn từ `github.com/obra/superpowers` v6.3.0 (MIT).
   Nguồn gốc, giấy phép và cách nâng cấp: `.claude/skills/SUPERPOWERS-LICENSE.md`.
+- **`vercel-composition-patterns`, `vercel-react-best-practices`** — lối viết
+  component React ghép được, và hiệu năng React. Chép từ
+  `github.com/vercel-labs/agent-skills` (MIT), bản ngày 10/09/2026. Chỉ lấy 2
+  trong 9 kỹ năng của repo đó; bảy cái kia hoặc chỉ dùng cho Vercel (dự án này
+  lên Netlify), hoặc mâu thuẫn với hợp đồng hướng, hoặc phải tải hướng dẫn từ URL
+  lúc chạy. Lý do từng cái: `.claude/skills/VERCEL-SKILLS-LICENSE.md`.
+  Lưu ý `github.com/vercel-labs/skills` là **trình cài đặt CLI**, không phải bộ
+  kỹ năng — dự án này chép tay và theo git, không dùng nó.
 
 ### Ba chỗ superpowers nói khác dự án này — theo dự án
 
