@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import {
   Box, TextField, Button, Typography, Alert, Divider
 } from '@mui/material';
-import { Mail, KeyRound, Copy, RefreshCw, Eye, EyeOff } from 'lucide-react';
+import { Mail, KeyRound, RefreshCw } from 'lucide-react';
 import { useApp } from '../../../core/hooks/useApp';
 
 interface ForgotPasswordFormProps {
@@ -14,14 +14,19 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onBackTo
   const [identifier, setIdentifier] = useState('');
   const [loading, setLoading]       = useState(false);
   const [error, setError]           = useState<string | null>(null);
-  const [result, setResult]         = useState<{ newPassword: string; email: string } | null>(null);
-  const [showPassword, setShowPassword] = useState(false);
-  const [copied, setCopied]         = useState(false);
+  /* Từ 10/09/2026 màn này KHÔNG còn hiện mật khẩu mới.
+     Trước đó `forgotPassword` tự sinh mật khẩu, ghi thẳng vào Firestore rồi
+     khoe lên đây kèm nút sao chép. Nay Firebase Auth giữ mật khẩu ở dạng đã
+     băm và chỉ gửi thư đặt lại — không ai đọc hay đặt hộ được nữa.
+     Nếu không sửa màn này thì nó vẫn chạy nhưng SAI HOÀN TOÀN: điều kiện
+     `res.newPassword` không bao giờ đúng, nên câu báo THÀNH CÔNG của hệ thống
+     lại hiện ra ở ô màu đỏ dành cho lỗi. */
+  const [daGui, setDaGui]           = useState<{ email: string; loiNhan: string } | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!identifier.trim()) {
-      setError('Vui lòng nhập email hoặc username tài khoản của bạn.');
+      setError('Vui lòng nhập email tài khoản của bạn.');
       return;
     }
     setError(null);
@@ -30,24 +35,13 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onBackTo
     const res = await forgotPassword(identifier.trim());
     setLoading(false);
 
-    if (res.success && res.newPassword) {
-      setResult({ newPassword: res.newPassword, email: res.email || identifier });
-    } else {
-      setError(res.message);
-    }
-  };
-
-  const handleCopy = () => {
-    if (result) {
-      navigator.clipboard.writeText(result.newPassword);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
+    if (res.success) setDaGui({ email: identifier.trim(), loiNhan: res.message });
+    else setError(res.message);
   };
 
   // ── Màn hình kết quả ───────────────────────────────────────────────────────
 
-  if (result) {
+  if (daGui) {
     return (
       <Box id="forgot-password-result" sx={{ textAlign: 'center' }}>
         <Box sx={{
@@ -56,63 +50,27 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onBackTo
           bgcolor: 'var(--nen-luc-nhat2)', border: '2px solid var(--vien-2)',
           mx: 'auto', mb: 2
         }}>
-          <KeyRound size={28} color="var(--luc-tham)" />
+          <Mail size={28} color="var(--luc-tham)" />
         </Box>
 
         <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)', mb: 0.5 }}>
-          Mật khẩu mới đã được tạo
-        </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-          Sao chép mật khẩu dưới đây và dùng để đăng nhập ngay bây giờ.
+          Đã gửi thư đặt lại mật khẩu
         </Typography>
 
-        <Alert severity="warning" sx={{ mb: 2.5, borderRadius: 0, textAlign: 'left' }}>
-          Lưu lại mật khẩu này ngay! Nếu mất, bạn cần thực hiện lại bước "Quên mật khẩu".
+        {/* Câu này do `resetPasswordWithFirestore` trả về, và nó CỐ Ý giống hệt
+            nhau dù email có tài khoản hay không — nói khác đi là biến màn này
+            thành công cụ dò xem ai có tài khoản trong hệ thống. */}
+        <Typography variant="body2" sx={{ color: 'var(--chu-2)', mb: 3, lineHeight: 1.7 }}>
+          {daGui.loiNhan}
+        </Typography>
+
+        <Alert severity="info" sx={{ mb: 2.5, borderRadius: 0, textAlign: 'left' }}>
+          Mở thư rồi bấm đường dẫn trong đó để tự đặt mật khẩu mới. Đường dẫn chỉ
+          dùng được một lần và sẽ hết hạn — không nhận được thì hãy xem hộp thư rác.
         </Alert>
 
-        {/* Hiển thị mật khẩu mới */}
-        <Box sx={{
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          p: 2.5, bgcolor: 'var(--nen-trang)', borderRadius: 0,
-          border: '1.5px solid var(--vien-2)', mb: 2
-        }}>
-          <Box sx={{ textAlign: 'left' }}>
-            <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'bold', display: 'block' }}>
-              MẬT KHẨU MỚI
-            </Typography>
-            <Typography
-              variant="h6"
-              sx={{
-                fontFamily: 'monospace', fontWeight: 'bold', color: 'var(--luc-tham)',
-                letterSpacing: showPassword ? 2 : 6,
-                mt: 0.5
-              }}
-            >
-              {showPassword ? result.newPassword : '••••••••••'}
-            </Typography>
-          </Box>
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            <Button
-              size="small" variant="outlined"
-              onClick={() => setShowPassword(v => !v)}
-              sx={{ minWidth: 'auto', p: 0.8, borderRadius: 0 }}
-            >
-              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-            </Button>
-            <Button
-              id="copy-new-password-btn"
-              size="small" variant="contained" color="secondary"
-              startIcon={<Copy size={14} />}
-              onClick={handleCopy}
-              sx={{ textTransform: 'none', borderRadius: 0, fontWeight: 'bold', boxShadow: 'none', fontSize: '0.75rem' }}
-            >
-              {copied ? '✓ Đã sao chép' : 'Sao chép'}
-            </Button>
-          </Box>
-        </Box>
-
-        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 3 }}>
-          Tài khoản: <strong>{result.email}</strong>
+        <Typography variant="caption" sx={{ color: 'var(--chu-2)', display: 'block', mb: 3 }}>
+          Gửi tới: <strong>{daGui.email}</strong>
         </Typography>
 
         <Button
@@ -121,7 +79,7 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onBackTo
           onClick={onBackToLogin}
           sx={{ py: 1.5, borderRadius: 0, fontWeight: 'bold', textTransform: 'none', boxShadow: 'none' }}
         >
-          Đăng nhập với mật khẩu mới
+          Quay lại đăng nhập
         </Button>
       </Box>
     );
@@ -140,7 +98,7 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onBackTo
             Quên mật khẩu?
           </Typography>
           <Typography variant="caption" color="text.secondary">
-            Nhập email hoặc username, hệ thống sẽ tạo mật khẩu mới.
+            Nhập email tài khoản, hệ thống gửi thư để bạn tự đặt lại.
           </Typography>
         </Box>
       </Box>
@@ -155,12 +113,12 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onBackTo
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
           <TextField
             id="forgot-password-identifier-field"
-            label="Email hoặc Username"
+            label="Email tài khoản"
             fullWidth
             value={identifier}
             onChange={e => setIdentifier(e.target.value)}
             disabled={loading}
-            placeholder="Nhập email đăng ký hoặc username"
+            placeholder="Nhập email đăng ký"
             slotProps={{ input: {
               startAdornment: (
                 <Box sx={{ mr: 1, display: 'flex', alignItems: 'center', color: 'text.secondary' }}>
@@ -181,7 +139,7 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onBackTo
             startIcon={loading ? undefined : <KeyRound size={18} />}
             sx={{ py: 1.5, borderRadius: 0, fontWeight: 'bold', textTransform: 'none', boxShadow: 'none' }}
           >
-            {loading ? 'Đang tạo mật khẩu mới...' : 'Lấy mật khẩu mới'}
+            {loading ? 'Đang gửi thư...' : 'Gửi thư đặt lại mật khẩu'}
           </Button>
 
           <Divider />
