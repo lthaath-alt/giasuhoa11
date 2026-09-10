@@ -53,8 +53,16 @@ export interface User {
    */
   username?: string;
 
-  /** Mật khẩu (plain-text trong mock; có thể hash sau này) */
-  password?: string;
+  /* KHÔNG có trường `password`, và cố ý như vậy từ 10/09/2026.
+     Mật khẩu nay do Firebase Auth giữ ở dạng đã băm, không bao giờ về tới
+     trình duyệt. Trước đó nó nằm ngay đây và trong collection `users` — mà
+     `users` phải cho đọc công khai để hệ đăng nhập cũ chạy được, nên bất kỳ ai
+     cũng tải về được mật khẩu của mọi người.
+     Bỏ trường này khỏi kiểu là hàng rào MẠNH NHẤT trong cả đợt: mọi chỗ còn
+     mang mật khẩu đi đều thành lỗi biên dịch, không cần regex nào đi tìm.
+     Muốn truyền mật khẩu để TẠO tài khoản thì truyền thẳng vào
+     `createAccountWithFirestore(...)` — nó chuyển tiếp cho Firebase Auth chứ
+     không ghi xuống Firestore. */
 
   /** Họ và tên hiển thị */
   name: string;

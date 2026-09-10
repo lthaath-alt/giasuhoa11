@@ -222,9 +222,14 @@ console.log('\n== Đăng nhập phải qua Firebase Auth ==');
      Lỗ hổng cũ: `users` lưu mật khẩu dạng chữ thường và `firestoreAuth.ts` so
      sánh ngay trên trình duyệt. Mà `users` PHẢI cho đọc công khai để việc đó
      chạy được, nên bất kỳ ai cũng tải về được mật khẩu của mọi người. */
+  /* Xoá chú thích nhưng GIỮ NGUYÊN số dòng: thay từng ký tự bằng dấu cách chứ
+     không thay cả khối bằng một dấu cách. Bản đầu làm cách sau, nên một khối
+     `/* … *​/` mười dòng co lại còn một dòng và mọi số dòng phía sau lệch đi —
+     phép kiểm chỉ đúng chỗ nào SAI, còn chỉ sai chỗ nào ĐANG sai. Đã đâm vào
+     đúng bẫy đó khi đi sửa 10 chỗ còn lại. */
   const boChuThich = (n: string) => n
-    .replace(/\/\*[\s\S]*?\*\//g, ' ')
-    .replace(/(?<![:\w])\/\/[^\n]*/g, ' ');
+    .replace(/\/\*[\s\S]*?\*\//g, m => m.replace(/[^\n]/g, ' '))
+    .replace(/(?<![:\w])\/\/[^\n]*/g, m => ' '.repeat(m.length));
 
   /* 1. Không còn chỗ nào so sánh mật khẩu bằng chuỗi. */
   const pham: string[] = [];
@@ -235,27 +240,42 @@ console.log('\n== Đăng nhập phải qua Firebase Auth ==');
   if (pham.length) truot('không so sánh mật khẩu trên trình duyệt', pham.join(', '));
   else dat('không so sánh mật khẩu trên trình duyệt');
 
-  /* 2. Không mang mật khẩu đi trong dữ liệu nữa.
-        Bản đầu của phép kiểm này (viết trong kế hoạch) chỉ soi ba lệnh
-        `setDoc|addDoc|updateDoc` gọi TRỰC TIẾP. Chạy thử mới thấy nó mù: dự án
-        ghi mật khẩu qua hàm bọc `FirestoreService.updateUserById(...)`, và còn
-        dựng `password` vào object User ở hàng chục chỗ trong AppContext. Sau
-        khi viết lại `firestoreAuth.ts`, phép kiểm hẹp đó sẽ XANH trong khi
-        mật khẩu vẫn chạy khắp nơi — đúng loại "xanh nhầm" mà mục Rút kinh
-        nghiệm của CLAUDE.md cảnh báo.
-        Nay dùng bất biến rộng và dễ kiểm: `password` KHÔNG được làm khoá của
-        object ở bất kỳ đâu trong `src/`. Khai kiểu (`password?: string`) thì
-        không tính — đó là mô tả, không phải dữ liệu chạy. */
-  const mang: string[] = [];
-  for (const f of tepNguon) {
-    boChuThich(doc(f)).split(/\r?\n/).forEach((d, i) => {
-      if (!/(^|[{,(\s])password\s*:/.test(d)) return;
-      if (/password\s*\??\s*:\s*(string|boolean|number)\b/.test(d)) return;  // khai kiểu
-      mang.push(`${ten(f)}:${i + 1}`);
-    });
+  /* 2. Kiểu `User` KHÔNG được có trường `password`.
+        Đây là hàng rào MẠNH NHẤT của cả đợt, và nó do trình biên dịch giữ chứ
+        không do regex: bỏ trường khỏi kiểu thì mọi chỗ còn mang mật khẩu đi
+        đều thành lỗi biên dịch. Ngày 10/09/2026 nó chỉ ra đúng 6 chỗ mà regex
+        vừa báo thừa vừa bỏ sót. Phép kiểm này chỉ canh cho không ai lặng lẽ
+        thêm trường đó trở lại. */
+  {
+    const P = join(GOC, 'src/features/auth/types.ts');
+    const n = boChuThich(doc(P));
+    const co = /^\s*password\s*\??\s*:/m.test(n);
+    if (co) truot('kiểu User không có trường password', 'trường đó vừa quay lại — trình biên dịch hết canh được mật khẩu');
+    else dat('kiểu User không có trường password');
   }
-  if (mang.length) truot(`không mang mật khẩu trong dữ liệu (${mang.length} chỗ)`, mang.slice(0, 8).join(', ') + (mang.length > 8 ? ` …và ${mang.length - 8} chỗ nữa` : ''));
-  else dat('không mang mật khẩu trong dữ liệu');
+
+  /* 3. Không ghi mật khẩu xuống Firestore, và `firestoreService` không đụng tới.
+        CHÚ Ý phân biệt hai việc dễ lẫn:
+          - TRUYỀN mật khẩu vào `createAccountWithFirestore(...)` là ĐÚNG — nó
+            chuyển tiếp cho `createUserWithEmailAndPassword` của Firebase Auth.
+          - GHI mật khẩu xuống Firestore là SAI, vì `users` phải cho đọc công
+            khai nên ghi xuống đó là ai cũng đọc được.
+        Bản trước của phép kiểm này cấm `password` làm khoá object ở MỌI nơi,
+        nên nó báo đỏ cả 6 chỗ truyền vào Auth — một phép kiểm đỏ vĩnh viễn thì
+        người ta sẽ học cách phớt lờ nó. */
+  const GHI = /(setDoc|addDoc|updateDoc|updateUserById|addUser|updateUser)\s*\([\s\S]{0,300}?\)/g;
+  const ghiPham: string[] = [];
+  for (const f of tepNguon) {
+    const n = boChuThich(doc(f));
+    for (const m of n.matchAll(GHI)) {
+      if (!/(^|[{,\s])password\s*[,:]/.test(m[0])) continue;
+      ghiPham.push(`${ten(f)}: ${m[1]}(…)`);
+    }
+  }
+  const dinhTrongService = /password/.test(boChuThich(doc(join(GOC, 'src/core/services/firestoreService.ts'))));
+  if (dinhTrongService) ghiPham.push('firestoreService.ts còn nhắc tới password — tệp này không được đụng tới mật khẩu');
+  if (ghiPham.length) truot('không ghi mật khẩu xuống Firestore', [...new Set(ghiPham)].join(' | '));
+  else dat('không ghi mật khẩu xuống Firestore');
 
   /* 3. `firestoreAuth.ts` phải thật sự GỌI Firebase Auth.
         Bỏ chú thích trước khi soi, và đòi thấy dấu `(` ngay sau tên hàm. Bản

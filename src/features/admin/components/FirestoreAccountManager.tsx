@@ -111,6 +111,19 @@ export const FirestoreAccountManager: React.FC = () => {
       return;
     }
 
+    /* Chốt chặn vai trò nằm ở ĐÂY chứ không ở `createAccountWithFirestore`.
+       Hàm đó là chỗ duy nhất tạo được cặp "tài khoản Auth + hồ sơ", nên
+       `createSchoolAdmin()` của hệ thống cũng phải đi qua nó — chặn ở trong đó
+       là chặn nhầm cả chức năng hợp lệ. Màn hình này thì đúng là không nên tạo
+       tài khoản quyền cao: nâng quyền có màn riêng, có bước xác nhận. */
+    if (newRole === 'admin' || newRole === 'school_admin') {
+      setCreateMsg({
+        type: 'error',
+        text: 'Màn này chỉ tạo được tài khoản học sinh hoặc giáo viên. Muốn cấp quyền cao hơn thì tạo trước rồi dùng chức năng "Đổi quyền".',
+      });
+      return;
+    }
+
     setCreating(true);
     const result = await createAccountWithFirestore({
       username: newUsername.trim(),
@@ -399,14 +412,14 @@ export const FirestoreAccountManager: React.FC = () => {
         <DialogContent dividers>
           {selectedUser && (
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              <Typography variant="body2" sx={{ color: 'var(--chu-nhat)' }}>
+              <Typography variant="body2" sx={{ color: 'var(--chu-2)' }}>
                 Gửi tới: <strong>{selectedUser.username}</strong> ({selectedUser.fullName})
               </Typography>
 
               {/* Không còn ô nhập mật khẩu mới. Từ 10/09/2026 mật khẩu do
                   Firebase Auth giữ ở dạng đã băm, nên KHÔNG ai đặt hộ mật khẩu
                   ai được nữa — kể cả quản trị viên. */}
-              <Typography variant="body2" sx={{ color: 'var(--chu-nhat)', lineHeight: 1.7 }}>
+              <Typography variant="body2" sx={{ color: 'var(--chu-2)', lineHeight: 1.7 }}>
                 Hệ thống gửi một lá thư tới địa chỉ trên. Người dùng bấm đường dẫn
                 trong thư rồi tự đặt mật khẩu mới.
                 <br />

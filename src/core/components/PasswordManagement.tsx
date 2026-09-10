@@ -109,18 +109,20 @@ export const PasswordManagement: React.FC<Props> = ({ users }) => {
     }
   }, [users]);
 
+  /* Từ 10/09/2026 `forgotPassword` GỬI THƯ đặt lại chứ không sinh mật khẩu mới
+     nữa, nên nó không còn trả về `newPassword`. Bản cũ ở đây đọc
+     `res.newPassword` rồi mở hộp thoại khoe mật khẩu — nay điều kiện đó không
+     bao giờ đúng, hộp thoại không bao giờ hiện, và người dùng chỉ thấy một
+     `alert` báo lỗi dù thư đã gửi đi rồi.
+     Nay hiện thẳng câu trả lời của hệ thống. Hộp thoại `credentialDialog` vẫn
+     còn để phục vụ luồng TẠO tài khoản mới — chỗ đó admin tự đặt mật khẩu ban
+     đầu nên vẫn có gì để hiện. */
   const handleResetPassword = async (user: UserType) => {
     const identifier = user.email || user.username!;
     const res = await forgotPassword(identifier);
-    if (res.success && res.newPassword) {
-      setCredentialDialog({
-        identifier: identifier,
-        password: res.newPassword,
-        name: user.name,
-      });
+    alert(res.message);
+    if (res.success) {
       setResetRequests(prev => prev.filter(req => req.id !== user.id));
-    } else {
-      alert("Lỗi khi cấp lại mật khẩu: " + res.message);
     }
   };
 

@@ -147,17 +147,13 @@ export const createAccountWithFirestore = async (data: {
   const role = data.role || 'student';
   const status = data.status || 'active';
 
-  /* Chốt chặn GIỮ NGUYÊN từ bản cũ: không tạo được tài khoản quyền cao qua
-     đường này. Bản cũ viết `role === 'admin' || role === 'admin' ||
-     role === 'school_admin'` — lặp 'admin' hai lần, chắc định gõ một vai khác.
-     Nay viết bằng danh sách cho gọn và không lặp. */
-  const VAI_CAM = new Set(['admin', 'school_admin']);
-  if (VAI_CAM.has(role)) {
-    return {
-      success: false,
-      message: 'Chỉ được phép tạo tài khoản với vai trò học sinh hoặc giáo viên qua chức năng này.',
-    };
-  }
+  /* Chốt chặn vai trò KHÔNG nằm ở đây nữa — nó đã chuyển ra
+     `FirestoreAccountManager`, tức đúng cái màn hình cần bị hạn chế.
+     Lý do: hàm này là chỗ DUY NHẤT tạo được cặp "tài khoản Auth + hồ sơ", nên
+     `createSchoolAdmin()` trong AppContext cũng buộc phải đi qua đây. Để chốt
+     chặn ở đây thì hàm tạo admin trường của chính hệ thống bị chặn, và người
+     ta sẽ lách bằng cách ghi thẳng Firestore — ra đúng loại hồ sơ mồ côi không
+     đăng nhập được. Hạn chế thuộc về NGƯỜI GỌI, không thuộc về công cụ. */
 
   if (!email || !data.password || !fullName) {
     return { success: false, message: 'Vui lòng nhập đầy đủ Email, Mật khẩu và Họ tên!' };

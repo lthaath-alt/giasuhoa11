@@ -79,16 +79,25 @@ export const ClassManagement: React.FC<ClassManagementProps> = ({
       ))
       .sort((a, b) => (a.studentNumber ?? 999) - (b.studentNumber ?? 999));
 
-    // Sinh mật khẩu mới cho từng học sinh và cập nhật Firestore
-    const rows: string[] = ['Số báo danh,Họ tên,Tên đăng nhập,Mật khẩu mới'];
+    /* KHÔNG còn cột mật khẩu, và không còn đặt lại mật khẩu.
+     *
+     * Bản cũ sinh mật khẩu mới cho từng em rồi ghi thẳng vào Firestore. Từ
+     * 10/09/2026 mật khẩu do Firebase Auth giữ ở dạng đã băm, và trình duyệt
+     * KHÔNG đặt được mật khẩu cho người khác — chỉ chủ tài khoản tự đổi được.
+     * Ghi vào Firestore lúc này chỉ tạo lại đúng cột `password` mà cả đợt
+     * chuyển vừa xoá đi, mà vẫn không đổi được mật khẩu thật.
+     *
+     * Làm lại được chức năng "đặt lại mật khẩu cả lớp" thì cần một Cloud
+     * Function dùng Admin SDK, tức gói Blaze trả tiền. Chưa làm.
+     *
+     * Phần còn giữ: danh sách lớp kèm TÊN ĐĂNG NHẬP, vẫn in ra phát cho học
+     * sinh được. */
+    const rows: string[] = ['Số báo danh,Họ tên,Tên đăng nhập'];
 
     for (const student of classStudents) {
       const sbd = student.studentNumber ?? 0;
-      const newPassword = generateClassPassword(cls.name, sbd);
-      // Cập nhập mật khẩu lên Firestore
-      await FirestoreService.updateUserById(student.id, { password: newPassword });
       const loginId = student.username || student.email;
-      rows.push(`${sbd},"${student.name}","${loginId}","${newPassword}"`);
+      rows.push(`${sbd},"${student.name}","${loginId}"`);
     }
 
     const csvContent = '\uFEFF' + rows.join('\n'); // BOM cho Excel
@@ -191,7 +200,7 @@ export const ClassManagement: React.FC<ClassManagementProps> = ({
                         <Edit size={16} />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="Xuất danh sách tài khoản lớp (reset mật khẩu)">
+                    <Tooltip title="Xuất danh sách tài khoản lớp (CSV)">
                       <IconButton size="small" onClick={() => setExportClassId(cls.id)} sx={{ color: 'var(--luc-tham)' }}>
                         <Download size={16} />
                       </IconButton>
@@ -292,10 +301,10 @@ export const ClassManagement: React.FC<ClassManagementProps> = ({
         </DialogActions>
       </Dialog>
 
-      {/* Dialog xác nhận xuất danh sách (reset mật khẩu) */}
+      {/* Dialog xác nhận xuất danh sách lớp */}
       <Dialog open={Boolean(exportClassId)} onClose={() => !exporting && setExportClassId(null)} maxWidth="sm" fullWidth>
         <DialogTitle sx={{ fontWeight: 'bold', color: 'var(--chu-dam)' }}>
-          ⚠️ Xác nhận xuất danh sách tài khoản lớp
+          Xuất danh sách tài khoản lớp
         </DialogTitle>
         <DialogContent>
           <DialogContentText>
@@ -308,11 +317,14 @@ export const ClassManagement: React.FC<ClassManagementProps> = ({
               )).length;
               return (
                 <>
-                  Thao tác này sẽ đặt lại mật khẩu của <strong>{count} học sinh</strong> trong lớp <strong>{cls.name}</strong>.<br /><br />
-                  <span style={{ color: 'var(--do)', fontWeight: 'bold' }}>Mật khẩu cũ sẽ không dùng được nữa.</span> Hệ thống sẽ sinh mật khẩu mới theo format:<br />
-                  <code style={{ background: 'var(--nen-nhat)', padding: '2px 6px', borderRadius: 0 }}>{cls.name.replace(/\s/g, '')}_SBD_4ký_tự</code><br /><br />
-                  Bạn sẽ tải xuống file CSV chứa thông tin đăng nhập mới để phát cho học sinh.
-                  Hãy chắc rằng bạn đã in/gửi cho tất cả học sinh ngay sau khi xuất.
+                  Tải về tệp CSV gồm số báo danh, họ tên và <strong>tên đăng nhập</strong> của{' '}
+                  <strong>{count} học sinh</strong> lớp <strong>{cls.name}</strong>.
+                  <br /><br />
+                  <strong>Tệp KHÔNG chứa mật khẩu, và thao tác này không đặt lại mật khẩu của ai.</strong>
+                  <br /><br />
+                  Từ 10/09/2026 mật khẩu do Firebase giữ ở dạng đã mã hoá — không ai
+                  đọc hay đặt hộ được nữa, kể cả thầy cô. Em nào quên mật khẩu thì
+                  thầy cô tạo lại tài khoản cho em đó.
                 </>
               );
             })()}
@@ -331,13 +343,13 @@ export const ClassManagement: React.FC<ClassManagementProps> = ({
               const cls = classes.find(c => c.id === exportClassId);
               if (cls) handleExportCSV(cls);
             }}
-            color="warning"
+            color="primary"
             variant="contained"
             disabled={exporting}
             startIcon={<Download size={16} />}
             sx={{ textTransform: 'none', borderRadius: 0, boxShadow: 'none' }}
           >
-            {exporting ? 'Đang xuất...' : 'Đặt lại mật khẩu & Xuất CSV'}
+            {exporting ? 'Đang xuất...' : 'Xuất CSV'}
           </Button>
         </DialogActions>
       </Dialog>

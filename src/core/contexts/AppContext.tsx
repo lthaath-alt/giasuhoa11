@@ -525,12 +525,10 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       return { success: false, message: fsRes.message };
     }
 
-    const id = fsRes.user?.uid || `uid_google_${googleInfo.sub.slice(0, 12)}`;
     const newUser: User = {
-      id,
+      id: fsRes.user!.uid,
       email: googleInfo.email,
       username: identifier,
-      password,
       name: googleInfo.name,
       role: 'student',
       status: 'active',
@@ -541,7 +539,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     };
 
     // Cập nhật Firestore với googleId (nếu chưa có)
-    await FirestoreService.updateUserById(id, { googleId: googleInfo.sub });
+    await FirestoreService.updateUserById(newUser.id, { googleId: googleInfo.sub });
 
     setUsers(prev => [...prev, newUser]);
     persistSession(newUser);
@@ -753,12 +751,31 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     }
 
     const password = data.password || generateRandomPassword();
-    const id = `uid_teacher_${Date.now()}`;
 
-    const teacher: User = {
-      id,
+    /* Tạo qua Firebase Auth thay vì bịa id rồi ghi thẳng Firestore.
+       Bản cũ đặt `id = uid_teacher_<thời điểm>` và KHÔNG tạo tài khoản Auth
+       nào. Từ 10/09/2026 app hỏi Firebase Auth khi đăng nhập, nên mọi tài
+       khoản tạo theo lối cũ đều là hồ sơ mồ côi: có trong danh sách, nhìn thì
+       bình thường, nhưng không ai đăng nhập được. Đây là chức năng chính của
+       nhà trường nên lỗi này sẽ lộ ra rất nhanh và rất khó chịu.
+       `createAccountWithFirestore` dùng Firebase App PHỤ, nên phiên của người
+       đang tạo (hiệu trưởng / quản trị) không bị đụng. */
+    const fsRes = await createAccountWithFirestore({
+      username: lower,
       email: lower,
       password,
+      fullName: data.name.trim(),
+      role: 'teacher',
+      schoolId: data.schoolId,
+      status: 'active',
+    });
+    if (!fsRes.success || !fsRes.user) {
+      return { success: false, message: fsRes.message || 'Không thể tạo tài khoản giáo viên. Vui lòng thử lại.' };
+    }
+
+    const teacher: User = {
+      id: fsRes.user.uid,
+      email: lower,
       name: data.name.trim(),
       role: 'teacher',
       status: 'active',
@@ -767,9 +784,6 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       canChangePassword: true,
       createdAt: new Date().toISOString(),
     };
-
-    const ok = await FirestoreService.addUser(teacher);
-    if (!ok) return { success: false, message: 'Không thể tạo tài khoản giáo viên. Vui lòng thử lại.' };
 
     setUsers(prev => [...prev, teacher]);
 
@@ -806,11 +820,26 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     }
 
     const password = data.password || generateRandomPassword();
-    const id = `uid_school_admin_${Date.now()}`;
-    const schoolAdmin: User = {
-      id,
+
+    /* Cũng đi qua Firebase Auth — xem lời giải thích ở `createTeacher`.
+       Đây chính là chức năng mà chốt chặn vai trò trong `firestoreAuth.ts`
+       từng chặn nhầm, nên chốt đó đã chuyển ra `FirestoreAccountManager`. */
+    const fsRes = await createAccountWithFirestore({
+      username: lower,
       email: lower,
       password,
+      fullName: data.name.trim(),
+      role: 'school_admin',
+      schoolId: data.schoolId,
+      status: 'active',
+    });
+    if (!fsRes.success || !fsRes.user) {
+      return { success: false, message: fsRes.message || 'Không thể tạo tài khoản admin trường. Vui lòng thử lại.' };
+    }
+
+    const schoolAdmin: User = {
+      id: fsRes.user.uid,
+      email: lower,
       name: data.name.trim(),
       role: 'school_admin',
       status: 'active',
@@ -819,9 +848,6 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       canChangePassword: true,
       createdAt: new Date().toISOString(),
     };
-
-    const ok = await FirestoreService.addUser(schoolAdmin);
-    if (!ok) return { success: false, message: 'Không thể tạo tài khoản admin trường. Vui lòng thử lại.' };
 
     // Thêm email vào School.adminEmails trên Firestore
     const school = schools.find(s => s.id === data.schoolId);
@@ -979,13 +1005,33 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         : generateRandomPassword()
     );
     const identifier = data.email || data.username!;
-    const id = `uid_student_${Date.now()}`;
+    const emailDangNhap = data.email?.toLowerCase().trim() || `${data.username}@internal.local`;
+
+    /* Đi qua Firebase Auth — xem lời giải thích ở `createTeacher`.
+       Lưu ý về học sinh KHÔNG có email thật: địa chỉ `<username>@internal.local`
+       đúng cú pháp nên Firebase Auth nhận, và các em đăng nhập bình thường bằng
+       địa chỉ đó. Nhưng nó không phải hộp thư thật, nên các em KHÔNG dùng được
+       chức năng "quên mật khẩu" — mất mật khẩu thì giáo viên phải tạo lại tài
+       khoản. Đây là hệ quả của thiết kế cũ (học sinh không cần email), không
+       phải điều đợt chuyển này gây ra. */
+    const fsRes = await createAccountWithFirestore({
+      username: emailDangNhap,
+      email: emailDangNhap,
+      password,
+      fullName: data.name.trim(),
+      role: 'student',
+      schoolId: data.schoolId,
+      classId: data.classId,
+      status: 'active',
+    });
+    if (!fsRes.success || !fsRes.user) {
+      return { success: false, message: fsRes.message || 'Không thể tạo tài khoản học sinh. Vui lòng thử lại.' };
+    }
 
     const student: User = {
-      id,
-      email: data.email?.toLowerCase().trim() || `${data.username}@internal.local`,
+      id: fsRes.user.uid,
+      email: emailDangNhap,
       username: data.username?.trim(),
-      password,
       name: data.name.trim(),
       role: 'student',
       status: 'active',
@@ -996,9 +1042,6 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       canChangePassword: false,
       createdAt: new Date().toISOString(),
     };
-
-    const ok = await FirestoreService.addUser(student);
-    if (!ok) return { success: false, message: 'Không thể tạo tài khoản học sinh. Vui lòng thử lại.' };
 
     // Thêm vào danh sách lớp trên Firestore
     await FirestoreService.addStudentToClass(data.classId, identifier);
@@ -1528,12 +1571,10 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       return { success: false, message: fsRes.message };
     }
 
-    const id = fsRes.user?.uid || `uid_student_self_${Date.now()}`;
     const newUser: User = {
-      id,
+      id: fsRes.user!.uid,
       email: identifier,
       username: identifier,
-      password,
       name: name.trim(),
       role: targetRole as UserRole,
       status: 'active',
