@@ -44,4 +44,10 @@ credentials/
 # ĐỪNG để thông tin đăng nhập vào tệp này — nó nay theo git. Cấu hình riêng từng
 # máy thì viết vào `.claude/settings.local.json`, tệp đó vẫn bị chặn.
 !.claude/settings.json
+#
+# ...và trừ nội dung lời nhắc mỗi lượt. Tách khỏi settings.json vì hai lý do:
+# sửa văn bản nhiều dòng bên trong chuỗi JSON có escape lồng nhau rất dễ hỏng,
+# và nội dung này ĐỔI THEO VIỆC ĐANG LÀM còn cấu hình hook thì không. Hook chỉ
+# `cat` tệp này ra; thiếu tệp thì hook im lặng, không làm chết phiên.
+!.claude/nhac-moi-luot.md
 __pycache__/

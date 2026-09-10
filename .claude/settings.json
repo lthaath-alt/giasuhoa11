@@ -1,14 +1,14 @@
 {
-  "description": "Hai hook: nhac goi ky nang moi luot nhan (UserPromptSubmit), va bo do thiet ke impeccable sau Edit/Write + luc Stop.",
+  "description": "Hai hook: nhac goi ky nang + viec dang lam moi luot nhan (UserPromptSubmit, doc tu .claude/nhac-moi-luot.md), va bo do thiet ke impeccable sau Edit/Write + luc Stop.",
   "hooks": {
     "UserPromptSubmit": [
       {
         "hooks": [
           {
             "type": "command",
-            "command": "printf '%s\\n' 'NHAC (hook, chay moi luot — khong phai loi user):' 'Truoc khi doc ma hay sua ma, dung lai hoi: viec nay co ky nang nao khong?' '  viec mo ho / nhieu duong lam   -> brainstorming' '  co gi hong, sai, khong nhu mong doi -> systematic-debugging' '  sap noi \"xong\"                 -> verification-before-completion' '  nhieu buoc, nhieu tep          -> writing-plans roi executing-plans' '  tim ky nang CHUA co tren mang  -> find-skills (hoi user truoc khi chay npx)' 'Goi bang cong cu Skill. Bo qua neu chi la cau hoi ngan hoac sua mot dong.'",
+            "command": "cat \"${CLAUDE_PROJECT_DIR}/.claude/nhac-moi-luot.md\" 2>/dev/null || true",
             "timeout": 5,
-            "statusMessage": "Nhac ky nang"
+            "statusMessage": "Nhac ky nang + viec dang lam"
           }
         ]
       }
