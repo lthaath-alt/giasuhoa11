@@ -216,6 +216,64 @@ console.log('\n== Trang tĩnh sống được dưới CSP ==');
   }
 }
 
+console.log('\n== Đăng nhập phải qua Firebase Auth ==');
+{
+  /* Ba phép kiểm này canh cho đợt chuyển 10/09/2026 không bị lùi lại.
+     Lỗ hổng cũ: `users` lưu mật khẩu dạng chữ thường và `firestoreAuth.ts` so
+     sánh ngay trên trình duyệt. Mà `users` PHẢI cho đọc công khai để việc đó
+     chạy được, nên bất kỳ ai cũng tải về được mật khẩu của mọi người. */
+  const boChuThich = (n: string) => n
+    .replace(/\/\*[\s\S]*?\*\//g, ' ')
+    .replace(/(?<![:\w])\/\/[^\n]*/g, ' ');
+
+  /* 1. Không còn chỗ nào so sánh mật khẩu bằng chuỗi. */
+  const pham: string[] = [];
+  for (const f of tepNguon) {
+    const n = boChuThich(doc(f));
+    if (/\.password\s*!==\s*password|password\s*!==\s*\w+\.password/.test(n)) pham.push(ten(f));
+  }
+  if (pham.length) truot('không so sánh mật khẩu trên trình duyệt', pham.join(', '));
+  else dat('không so sánh mật khẩu trên trình duyệt');
+
+  /* 2. Không mang mật khẩu đi trong dữ liệu nữa.
+        Bản đầu của phép kiểm này (viết trong kế hoạch) chỉ soi ba lệnh
+        `setDoc|addDoc|updateDoc` gọi TRỰC TIẾP. Chạy thử mới thấy nó mù: dự án
+        ghi mật khẩu qua hàm bọc `FirestoreService.updateUserById(...)`, và còn
+        dựng `password` vào object User ở hàng chục chỗ trong AppContext. Sau
+        khi viết lại `firestoreAuth.ts`, phép kiểm hẹp đó sẽ XANH trong khi
+        mật khẩu vẫn chạy khắp nơi — đúng loại "xanh nhầm" mà mục Rút kinh
+        nghiệm của CLAUDE.md cảnh báo.
+        Nay dùng bất biến rộng và dễ kiểm: `password` KHÔNG được làm khoá của
+        object ở bất kỳ đâu trong `src/`. Khai kiểu (`password?: string`) thì
+        không tính — đó là mô tả, không phải dữ liệu chạy. */
+  const mang: string[] = [];
+  for (const f of tepNguon) {
+    boChuThich(doc(f)).split(/\r?\n/).forEach((d, i) => {
+      if (!/(^|[{,(\s])password\s*:/.test(d)) return;
+      if (/password\s*\??\s*:\s*(string|boolean|number)\b/.test(d)) return;  // khai kiểu
+      mang.push(`${ten(f)}:${i + 1}`);
+    });
+  }
+  if (mang.length) truot(`không mang mật khẩu trong dữ liệu (${mang.length} chỗ)`, mang.slice(0, 8).join(', ') + (mang.length > 8 ? ` …và ${mang.length - 8} chỗ nữa` : ''));
+  else dat('không mang mật khẩu trong dữ liệu');
+
+  /* 3. `firestoreAuth.ts` phải thật sự GỌI Firebase Auth.
+        Bỏ chú thích trước khi soi, và đòi thấy dấu `(` ngay sau tên hàm. Bản
+        đầu viết `n.includes(ten)` trên cả tệp, nên chỉ cần ba cái tên đó nằm
+        trong một dòng chú thích là ĐẠT — mà chính tệp này có chú thích dài kể
+        về đợt chuyển. Lại đúng cái bẫy "đọc lời giải thích về hàng rào thay vì
+        đọc hàng rào" đã vấp hai lần ngày 10/09/2026. */
+  const P = join(GOC, 'src/core/services/firestoreAuth.ts');
+  if (!existsSync(P)) truot('có firestoreAuth.ts', 'thiếu tệp');
+  else {
+    const n = boChuThich(doc(P));
+    const can = ['signInWithEmailAndPassword', 'createUserWithEmailAndPassword', 'sendPasswordResetEmail'];
+    const thieu = can.filter(h => !new RegExp(`\\b${h}\\s*\\(`).test(n));
+    if (thieu.length) truot('firestoreAuth.ts dùng Firebase Auth', 'thiếu: ' + thieu.join(', '));
+    else dat('firestoreAuth.ts dùng Firebase Auth');
+  }
+}
+
 console.log('\n== Luật phân quyền Firestore nằm trong git ==');
 {
   /* Luật Firestore là thứ DUY NHẤT đứng giữa Internet và dữ liệu. Để nó chỉ
