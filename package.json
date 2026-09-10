@@ -28,6 +28,7 @@
     "nhung:ran-thang": "tsx scripts/nhung-du-lieu-ran-thang.mts",
     "gan:cau-hoi": "tsx scripts/gan-cau-hoi-theo-bai.mts && npm run nhung:ran-thang",
     "xuat:ngan-hang": "tsx scripts/xuat-ngan-hang.mts",
+    "chuyen:users": "tsx scripts/chuyen-users-sang-uid.mts",
     "kiem-tra:dong-bo": "tsx scripts/kiem-tra-dong-bo-ngan-hang.mts",
     "kiem-tra:tai-lieu": "tsx scripts/kiem-tra-tai-lieu.mts",
     "kiem-tra:an-ninh": "tsx scripts/kiem-tra-an-ninh.mts"
