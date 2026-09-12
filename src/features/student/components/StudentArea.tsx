@@ -31,6 +31,10 @@ import {
 } from 'lucide-react';
 import { useApp } from '../../../core/hooks/useApp';
 import { TutorChat } from '../../tutor/components/TutorChat';
+/* Khung nhập mã mời. Import chéo sang feature `auth` — cùng lối với dòng
+   `TutorChat` ngay trên. Xem chú thích ở khối "chưa tham gia lớp" bên dưới để
+   biết vì sao lối vào phải nằm ở đây chứ không ở `DashboardPage`. */
+import { JoinClassForm } from '../../auth/components/JoinClassForm';
 import { QuizStorage } from '../../quiz/quizStorage';
 
 interface TabPanelProps {
@@ -134,14 +138,33 @@ export const StudentArea: React.FC = () => {
             </Typography>
 
             {!myClass ? (
-              <Paper sx={{ p: 4, textAlign: 'center', bgcolor: 'var(--nen-tin-hieu-nhat)', borderRadius: 0, border: '1px dashed var(--tin-hieu-nhat2)' }}>
-                <Typography variant="body1" sx={{ color: 'var(--chu-dam)', fontWeight: 'bold', mb: 1 }}>
-                  Chưa tham gia lớp học nào.
+              /* Chưa vào lớp: đặt THẲNG khung nhập mã mời vào đây.
+               *
+               * Trước 12/09/2026 chỗ này chỉ có một dòng chữ bảo học sinh "hãy
+               * vào mục Các khóa học và nhập Mã mời". Hai điều làm dòng đó vô
+               * nghĩa, và cả hai đều đo được:
+               *
+               *   1. Mục "Các khóa học" ĐÃ BỊ ẨN khỏi thanh menu từ commit
+               *      9fe13b7, bằng cờ `HIEN_MUC_KHOA_HOC = false` ở đầu
+               *      `DashboardHeader.tsx`. Dòng chữ chỉ tới một nơi không còn
+               *      tồn tại.
+               *   2. `JoinClassForm` trong `DashboardPage` chỉ dựng khi
+               *      `activeTab === 'hocmai'`, mà nút duy nhất đặt tab đó nằm
+               *      TRONG khối bị cờ ẩn. Đường còn lại duy nhất là gõ tìm một
+               *      bài giảng rồi chọn từ gợi ý — lúc đó bài giảng mở ra luôn,
+               *      không ai tìm khung nhập mã theo cách đó.
+               *
+               * Nên cả tính năng "xin vào lớp" không có lối vào nào. Đây là chỗ
+               * học sinh THẬT SỰ đi tìm lớp, nên lối vào thuộc về đây.
+               *
+               * Dòng chữ giữ lại ở trên khung, để nếu học sinh bấm X đóng khung
+               * thì vẫn còn lời giải thích vì sao chưa có bài tập nào. */
+              <Box>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  Bạn chưa tham gia lớp học nào, nên chưa có bài tập nào được giao.
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Hãy vào mục "Các khóa học" và nhập Mã mời để vào lớp nhé.
-                </Typography>
-              </Paper>
+                <JoinClassForm />
+              </Box>
             ) : assignedExams.length === 0 ? (
               <Paper sx={{ p: 4, textAlign: 'center', bgcolor: 'var(--nen-trang)', borderRadius: 0, border: '1px dashed var(--vien)' }}>
                 <Typography variant="body1" color="text.secondary">
