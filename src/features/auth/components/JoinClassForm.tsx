@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-  Box, TextField, Button, Typography, Alert, Paper, InputAdornment,
+  Box, TextField, Button, Typography, Alert, Paper, MenuItem,
   CircularProgress, Collapse, IconButton,
 } from '@mui/material';
 import { School, CheckCircle, Clock, X, ArrowRight } from 'lucide-react';
@@ -16,7 +16,11 @@ interface JoinClassFormProps {
 /**
  * JoinClassForm — Banner nhỏ hiển thị trong DashboardPage.
  * Chỉ xuất hiện khi currentUser là học sinh chưa có classId.
- * Cho phép nhập mã lớp để gửi đơn xin vào lớp (chờ giáo viên duyệt).
+ * Cho phép CHỌN lớp từ danh sách rồi gửi đơn xin vào lớp (chờ giáo viên duyệt).
+ * Đổi từ "gõ mã 6 ký tự" sang "chọn lớp" ngày 12/09/2026: mã sinh tự động
+ * (X22P43, SDSAPT…) không ai đoán được, nên học sinh phải được đọc cho mới vào
+ * được lớp. Bên dưới KHÔNG đổi — vẫn gửi `inviteCode` của lớp đã chọn, vì luật
+ * Firestore chỉ cho học sinh ghi `pendingClassCode`, không cho ghi `classId`.
  * Nếu `currentUser.pendingClassCode` đã có sẵn (kể cả sau khi tải lại
  * trang), hiện banner "đang chờ duyệt" thay vì ô nhập — tránh học sinh
  * tưởng nhầm là chưa gửi gì.
@@ -25,7 +29,7 @@ interface JoinClassFormProps {
 export const JoinClassForm: React.FC<JoinClassFormProps> = ({ onJoined, onDismiss }) => {
   const { currentUser, joinClassByCode, classes } = useApp();
 
-  const [code, setCode]         = useState('');
+  const [lopId, setLopId]       = useState('');
   const [loading, setLoading]   = useState(false);
   const [error, setError]       = useState<string | null>(null);
   const [success, setSuccess]   = useState<string | null>(null);
@@ -44,11 +48,23 @@ export const JoinClassForm: React.FC<JoinClassFormProps> = ({ onJoined, onDismis
     c => c.inviteCode?.toUpperCase() === maDaGui.toUpperCase()
   ) ? maDaGui : undefined;
 
+  /* Sắp theo tên để danh sách đọc được: 11A1, 11A2… rồi 11B1, 11H.
+     `localeCompare` với 'vi' để tên có dấu không nhảy lung tung. */
+  const dsLop = [...classes].sort((a, b) => a.name.localeCompare(b.name, 'vi'));
+
   const handleJoin = async () => {
-    if (!code.trim()) { setError('Vui lòng nhập mã lớp.'); return; }
+    const lop = classes.find(c => c.id === lopId);
+    if (!lop) { setError('Vui lòng chọn lớp của bạn.'); return; }
+    /* Mã mời vẫn là cơ chế gửi đơn — luật Firestore chỉ cho học sinh ghi
+       `pendingClassCode`, không cho ghi `classId`. Lớp thiếu mã là dữ liệu
+       lệch, phải nói rõ chứ đừng gửi đơn rỗng. */
+    if (!lop.inviteCode) {
+      setError(`Lớp "${lop.name}" chưa có mã mời. Nhờ giáo viên tạo lại lớp.`);
+      return;
+    }
     setError(null);
     setLoading(true);
-    const res = await joinClassByCode(code.trim());
+    const res = await joinClassByCode(lop.inviteCode);
     setLoading(false);
 
     if (res.success && res.className) {
@@ -145,11 +161,11 @@ export const JoinClassForm: React.FC<JoinClassFormProps> = ({ onJoined, onDismis
 
           <Box sx={{ flex: 1 }}>
             <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)', mb: 0.5 }}>
-              Bạn có mã lớp do giáo viên cấp?
+              Bạn học lớp nào?
             </Typography>
             <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1.5, lineHeight: 1.5 }}>
-              Nhập mã lớp để xin vào lớp. Giáo viên duyệt xong thì thầy cô mới theo
-              dõi được tiến độ học. Lịch sử học hiện tại sẽ được giữ nguyên.
+              Chọn lớp của bạn rồi gửi đơn. Giáo viên duyệt xong thì thầy cô mới
+              theo dõi được tiến độ học. Lịch sử học hiện tại sẽ được giữ nguyên.
             </Typography>
 
             {error && (
@@ -160,42 +176,32 @@ export const JoinClassForm: React.FC<JoinClassFormProps> = ({ onJoined, onDismis
 
             <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'flex-start', flexWrap: 'wrap' }}>
               <TextField
-                id="join-class-code-input"
+                id="join-class-select"
+                select
                 size="small"
-                placeholder="Mã lớp (VD: ABC123)"
-                value={code}
-                onChange={e => setCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6))}
-                disabled={loading}
-                slotProps={{
-                  input: {
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <School size={14} color="var(--luc-tham)" />
-                      </InputAdornment>
-                    ),
-                  },
-                }}
+                label="Chọn lớp"
+                value={lopId}
+                onChange={e => setLopId(e.target.value)}
+                disabled={loading || dsLop.length === 0}
+                helperText={dsLop.length === 0 ? 'Đang tải danh sách lớp…' : ' '}
                 sx={{
-                  width: 200,
+                  minWidth: 240,
                   '& .MuiOutlinedInput-root': {
                     borderRadius: 0,
                     '&.Mui-focused fieldset': { borderColor: 'var(--luc-tham)' },
                   },
-                  '& .MuiInputBase-input': {
-                    fontFamily: 'monospace',
-                    fontSize: '0.95rem',
-                    letterSpacing: '0.15em',
-                    fontWeight: 700,
-                    color: 'var(--luc-tham)',
-                  },
                 }}
-              />
+              >
+                {dsLop.map(c => (
+                  <MenuItem key={c.id} value={c.id}>{c.name}</MenuItem>
+                ))}
+              </TextField>
               <Button
                 id="join-class-submit-btn"
                 variant="contained"
                 size="small"
                 onClick={handleJoin}
-                disabled={loading || code.length < 4}
+                disabled={loading || !lopId}
                 startIcon={loading ? <CircularProgress size={14} color="inherit" /> : <ArrowRight size={14} />}
                 sx={{
                   textTransform: 'none',
