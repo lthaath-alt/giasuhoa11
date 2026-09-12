@@ -803,9 +803,28 @@ npm run build
 
 - [ ] **Bước 3: Kéo thả `dist/` lên Netlify, rồi XÁC NHẬN bản mới thật sự đang chạy**
 
-Mở web bằng cửa sổ ẩn danh, đăng nhập bằng một tài khoản học sinh, mở khung
-"mã lớp" và xác nhận nút đã đổi thành **Gửi đơn**. Còn thấy chữ "Tham gia lớp"
-tức là trình duyệt đang giữ bản cũ — bấm Ctrl+F5, đừng đi tiếp.
+**Cách xác nhận này đã viết lại ngày 12/09/2026.** Bản đầu bảo "đăng nhập học
+sinh rồi mở khung mã lớp" — nhưng khung đó lúc ấy **không ai tới được** (xem
+commit `f57265a`), nên phép xác nhận đó vô dụng. Nay dùng một chỗ **công khai**,
+không cần đăng nhập.
+
+Mở web bằng **cửa sổ ẩn danh** rồi kiểm ba thứ:
+
+**a) Màn đăng ký học sinh** (Đăng ký ngay → Học sinh đăng ký bằng Email). Dòng
+trên ô "Mã lớp" phải là *"Có mã lớp do giáo viên cấp? Điền vào bên dưới để **gửi
+đơn xin vào lớp**."* Còn thấy *"được gắn vào lớp học ngay"* là trình duyệt giữ
+bản cũ — Ctrl+F5, đừng đi tiếp. (Dòng mới này đã đo trên máy chủ dev ngày
+12/09/2026, nên nó là dấu hiệu chắc chắn.)
+
+**b) Đăng nhập một tài khoản học sinh chưa có lớp** → tab **Học sinh** → khối
+"Bài tập GV giao" phải hiện thẳng khung nhập mã lớp. Đây là lối vào mới; trước
+đó chỗ này chỉ có một dòng chữ chỉ tới mục "Các khóa học" đã bị ẩn khỏi menu.
+
+**c) Trang phòng thí nghiệm 3D** (tính năng trộn về từ `origin/main`) phải hiện
+đúng, không trắng trang. Trang đó dựng bằng 2 đoạn script nội tuyến, mà CSP chặn
+script nội tuyến trừ khi có hash. `bam-csp.mts` quét đệ quy mọi `.html` trong
+`dist/` nên sẽ tự băm — nhưng đây là loại lỗi **chỉ hiện trên production**, và
+dự án đã trả giá vì nó đúng hai lần.
 
 **Chưa xác nhận xong thì TUYỆT ĐỐI chưa sang Task 7.**
 
