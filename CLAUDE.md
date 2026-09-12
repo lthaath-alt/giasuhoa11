@@ -124,6 +124,29 @@ này từng được ghi ở đây nhưng chưa bao giờ tồn tại.
   4. **Phiên sống qua F5.** Trước đây `AppContext` cố ý xoá session mỗi lần mở trang;
      Firebase Auth giữ phiên trong IndexedDB.
 
+  **"Vào lớp bằng mã mời" nay là ĐƠN CHỜ DUYỆT** (12/09/2026). Học sinh nhập mã
+  → mã cất vào `users.pendingClassCode` của chính em, **em chưa vào lớp**. Giáo
+  viên mở màn quản lý lớp, thấy cột "Đơn chờ", bấm Duyệt → **chính giáo viên**
+  ghi `classId` và `classes.studentIdentifiers`. Lý do: chủ dự án chốt học sinh
+  không sửa gì về lớp, kể cả thêm email của chính mình. Ba điều dễ vấp ở vùng này:
+
+  - **Lối vào nằm ở `StudentArea`**, trong khối "Chưa tham gia lớp học nào" của
+    tab Học sinh — KHÔNG phải ở `DashboardPage`. `JoinClassForm` trong
+    `DashboardPage` chỉ dựng khi `activeTab === 'hocmai'`, mà nút duy nhất đặt
+    tab đó là mục "Các khóa học" đã bị ẩn khỏi menu (`HIEN_MUC_KHOA_HOC = false`).
+    Tức lối vào cũ **không ai tới được** — cả tính năng nằm chết sau một tab ẩn.
+  - **Màn đăng ký cố ý KHÔNG tra mã.** Nó chạy khi chưa đăng nhập, mà `classes`
+    chỉ đọc được sau khi đăng nhập — tra là luôn ra "mã không tồn tại". Mã cất
+    nguyên văn; mã sai không trùng lớp nào.
+  - **Mã sai phải coi như chưa gửi.** `JoinClassForm` chỉ coi là "đang chờ duyệt"
+    khi `pendingClassCode` **trùng một lớp thật**. Bỏ phép đối chiếu đó thì em gõ
+    sai 6 ký tự sẽ bị khoá khỏi mọi lớp: không giáo viên nào thấy đơn để từ chối,
+    ô nhập thì bị ẩn, và chỉ Firebase Console cứu được.
+
+  Mã mời phải **4-6 ký tự, chỉ A-Z0-9** (hai ô nhập đều
+  `.replace(/[^A-Z0-9]/g,'').slice(0,6)`, nút gửi `disabled` khi `< 4`). Vì thế
+  lớp tên "11H" không dùng "11H" làm mã được — đang dùng `11H01`.
+
   Hai điều đợt chuyển KHÔNG làm được, ghi để khỏi tìm lại:
   - **"Đặt lại mật khẩu cả lớp"** trong `ClassManagement` đã bỏ. Trình duyệt không đặt
     được mật khẩu cho người khác; muốn có lại thì cần Cloud Function + Admin SDK, tức
@@ -156,13 +179,14 @@ Hằng ngày:
 |---|---|
 | `npm run dev` | Máy chủ phát triển, cổng 3000 |
 | `npm run lint` | `tsc --noEmit` — hàng rào chính, chạy MỘT LẦN trước khi báo xong |
-| `npm run kiem-tra` | Chạy cả 10 bộ kiểm, 211 mục. Chạy trước khi commit |
+| `npm run kiem-tra` | Chạy cả 11 bộ kiểm, 282 mục. Chạy trước khi commit |
 | `npm run build` | **Chỉ khi user yêu cầu** |
 
 Bộ kiểm chạy riêng khi cần: `kiem-tra:chuong-trinh` (dữ liệu 25 bài),
 `kiem-tra:ngan-hang`, `kiem-tra:de-chuong`, `kiem-tra:het-luot`, `kiem-tra:mau`
 (biến màu + tương phản), `kiem-tra:thuc-nghiem`, `kiem-tra:ran-thang`,
-`kiem-tra:dong-bo` (cần mạng, mất mạng thì tự bỏ qua), `kiem-tra:tai-lieu`
+`kiem-tra:dong-bo` (cần mạng, mất mạng thì tự bỏ qua), `kiem-tra:luyen-tap`,
+`kiem-tra:tai-lieu`
 (mọi đường dẫn và lệnh npm mà CLAUDE.md / hiến chương nhắc tới đều phải có thật),
 `kiem-tra:an-ninh` (những hàng rào an ninh không được phép biến mất — xem mục
 "An ninh" bên dưới).
@@ -214,7 +238,7 @@ Nhóm kỹ năng trên viết cho một dự án phần mềm điển hình. Rep
 khi mâu thuẫn thì **`CLAUDE.md` thắng**:
 
 1. **`test-driven-development` bảo viết test trước khi viết code.** Dự án này KHÔNG có
-   bộ chạy test nào — không Vitest, không Jest. Hàng rào là `npm run lint` cộng chín bộ
+   bộ chạy test nào — không Vitest, không Jest. Hàng rào là `npm run lint` cộng mười một bộ
    kiểm tự viết trong `scripts/`. "Viết test trước" ở đây nghĩa là **viết phép kiểm
    trước**, thêm vào đúng bộ kiểm liên quan. Đừng tự dựng khung test mới khi user không
    yêu cầu.
@@ -258,9 +282,9 @@ web vẫn đúng vì nó đọc thẳng Firestore; `kiem-tra:dong-bo` sinh ra đ
   trang, ĐỪNG đi sửa Firebase config trước; xem lỗi thật trong Console trình duyệt
   (F12) rồi mới chẩn đoán.
   - (Khoá web của Firebase không phải bí mật — nó vốn nằm trong mã JavaScript đã dựng
-    trên Netlify, ai bấm F12 cũng đọc được. An toàn dựa vào Firestore Rules. Hiện
-    `bank_questions` để `allow write: if true`, tức ai cũng ghi được — đây là lỗ hổng
-    đã biết, siết lại cần Firebase Auth.)
+    trên Netlify, ai bấm F12 cũng đọc được. An toàn dựa vào Firestore Rules, và
+    từ 12/09/2026 luật đã siết theo vai — xem mục "An ninh". `bank_questions` nay
+    chỉ giáo viên ghi được, nhưng vẫn **đọc công khai** vì đồng bộ đêm cần.)
 - **`.env.local` chỉ cần cho tính năng AI**: biến `GEMINI_API_KEY` (xem `.env.example`). Thiếu nó thì các phần KHÁC vẫn chạy, chỉ màn hình gọi Gemini mới lỗi.
 - Nếu user báo "màn hình AI trắng trang / báo lỗi API key": kiểm tra đã tạo file `.env.local` (copy từ `.env.example`) và điền `GEMINI_API_KEY` thật chưa, rồi chạy lại `npm run dev`. Đây là nguyên nhân số 1 khiến người mới tưởng "hỏng app".
 - ĐỪNG commit `.env.local` (đã nằm trong `.gitignore`).
@@ -334,14 +358,53 @@ nay đã băm và không bao giờ về tới trình duyệt. Bốn phép kiểm
 `kiem-tra:an-ninh` canh cho nó không quay lại, mạnh nhất là phép kiểm "kiểu
 `User` không có trường `password`" — hàng rào đó do trình biên dịch giữ.
 
-**Lỗ hổng CÒN LẠI, và vì sao:** mọi collection vẫn phải cho ghi. Có `request.auth`
-rồi nhưng `firestore.rules` **chưa siết theo vai** — đó là **đợt 2**, cố ý tách ra
-để đợt 1 hỏng thì chỉ hỏng đường đăng nhập, thấy ngay.
+**Phân quyền theo vai: ĐÃ PUBLISH ngày 12/09/2026** (đợt 2 + 2b). Đo ngay sau khi
+publish, bằng REST không đăng nhập — đúng tư cách mà workflow đồng bộ đêm dùng:
 
-Đợt 2 làm được rồi nhờ hai thứ đã dựng sẵn: id tài liệu `users` **bằng** `uid` nên
-luật đọc được `get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role`;
+| Collection | Khách chưa đăng nhập |
+|---|---|
+| `bank_questions` + 6 collection nội dung | ĐỌC ĐƯỢC (252 câu) — **phải giữ như vậy** |
+| `users`, `classes`, `progress`, `chats` | BỊ CHẶN (trước đó đọc được hết) |
+
+Luật làm được điều đó nhờ hai thứ dựng sẵn ở đợt 1: id tài liệu `users` **bằng**
+`uid` nên luật đọc được
+`get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role`;
 và `progress`/`chats` trỏ tới người dùng bằng `userEmail` nên luật dùng thẳng
-`request.auth.token.email` được.
+`request.auth.token.email`, **không tốn lượt đọc nào**.
+
+**Năm điều về luật hiện hành, đọc trước khi sửa `firestore.rules`:**
+
+1. **`bank_questions` PHẢI giữ `allow read: if true`.** Workflow đồng bộ đêm
+   (`.github/workflows/dong-bo-ngan-hang.yml`) đọc Firestore **không đăng nhập**.
+   Siết dòng đó là đồng bộ chết mà **không ai biết** — web vẫn đúng vì nó đọc
+   thẳng Firestore, chỉ bản chụp trong git lệch dần.
+2. **KHÔNG dùng `get()` trong luật của `progress` và `chats`.** Mỗi `get()` là một
+   lượt đọc **có tính tiền**, mà đó là hai chỗ học sinh ghi nhiều nhất. Hai khối
+   đó chỉ so `request.auth.token.email`, thứ có sẵn trong token.
+3. **`users` tách `read` thành `get` và `list`, cố ý.** `get` là đường ĐĂNG NHẬP
+   (`getDoc` ở `firestoreAuth.ts`); `list` là `getUsers()` (`getDocs`), chỉ màn
+   giáo viên/quản trị. Gộp lại một dòng `read` thì `list` phải dựa vào cách
+   Firestore đánh giá `request.auth.uid == userId` trên **từng** tài liệu trả về
+   — mà Rules Playground **không mô phỏng được `list`**, nên không đo được trước
+   khi publish. Tách ra thì `list` chỉ còn `laGiaoVien()`, không phụ thuộc tài
+   liệu. Sai `get` là **không ai đăng nhập được**; sai `list` là **mọi màn giáo
+   viên/quản trị trắng**.
+4. **Học sinh không sửa được SÁU trường trên hồ sơ của chính mình:** `role`,
+   `classId`, `schoolId`, `joinedClassId`, `username`, `email`. Ba cái sau là các
+   cửa sau tìm ra trong lúc soát: dự án có **hai** dấu hiệu thuộc lớp
+   (`classId` *và* `joinedClassId`), và sổ lớp khớp học sinh bằng **chuỗi định
+   danh** (`studentIdentifiers` so với `username`/`email`) chứ không bằng
+   `classId`. Khoá một cửa mà quên cửa kia thì vẫn lọt.
+5. **Giáo viên thuần chỉ tạo được tài khoản `role: 'student'`.** Tạo giáo viên
+   hay admin trường là việc của `laQuanTri()`. Để `|| laGiaoVien()` trần ở
+   `create` là một giáo viên lấy uid mới qua API đăng ký công khai của Google rồi
+   tự ghi hồ sơ `role: admin` — leo quyền teacher → admin.
+
+**Còn lại, đã biết và cố ý hoãn:** `laQuanTri()` ở cả `create` lẫn `update` không
+ràng buộc `role`, nên `school_admin` tự nâng mình lên `admin` được; và học sinh
+sửa được `status` (hôm nay vô hại — đã quét, không đường nào dùng `status` làm
+cổng). Hoãn được vì sửa chúng là sửa **luật**, mà publish lại luật **không cần
+build/deploy app** — nên để lại không làm tăng giá phải trả.
 
 Khoá web của Firebase trong `firebaseCongKhai.ts` **không phải bí mật** (nó vốn
 nằm trong gói JS ai bấm F12 cũng đọc được); an toàn dựa vào Firestore Rules. Khoá

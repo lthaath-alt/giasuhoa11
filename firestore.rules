@@ -249,7 +249,29 @@ service cloud.firestore {
           KHÔNG cấm hai trường này: giáo viên vẫn phải sửa được `username`/
           `email` hộ học sinh qua màn quản lý tài khoản. */
     match /users/{userId} {
-      allow read:   if dangNhap() && (request.auth.uid == userId || laGiaoVien());
+      /* TÁCH `read` thành `get` và `list` — cố ý, 12/09/2026.
+       *
+       * Hai cách đọc `users` trong mã là HAI thao tác khác nhau:
+       *   - `get`  : `getDoc(doc(db,'users',uid))` ở `firestoreAuth.ts:91` và
+       *              trong hiệu ứng `onAuthStateChanged`. Đây là đường ĐĂNG
+       *              NHẬP — học sinh phải đọc được hồ sơ của CHÍNH MÌNH.
+       *   - `list` : `getDocs(collection(db,'users'))` ở
+       *              `firestoreService.ts:83` (`getUsers()`), truy vấn KHÔNG
+       *              ràng buộc, chỉ màn giáo viên/quản trị dùng. Đã đo: sáu tệp
+       *              đọc mảng `users` đều là màn giáo viên/quản trị.
+       *
+       * Vì sao phải tách chứ không để một dòng `read`: với `list`, Firestore
+       * đánh giá luật theo TỪNG tài liệu trả về, nên mệnh đề
+       * `request.auth.uid == userId` phụ thuộc tài liệu và hành vi của cả truy
+       * vấn thành khó đoán. Mà Rules Playground KHÔNG mô phỏng được `list`
+       * (đã thử ngày 12/09/2026), nên không có cách nào đo trước khi publish.
+       * Tách ra thì `list` chỉ còn MỘT mệnh đề không phụ thuộc tài liệu —
+       * `laGiaoVien()` — và mệnh đề đó đã được đo bằng các phép thử ghi.
+       *
+       * Sai ở đây thì hỏng to theo hai hướng ngược nhau: `get` hỏng là KHÔNG
+       * AI đăng nhập được; `list` hỏng là mọi màn giáo viên/quản trị trắng. */
+      allow get:    if dangNhap() && (request.auth.uid == userId || laGiaoVien());
+      allow list:   if laGiaoVien();
 
       allow create: if dangNhap() && (
                       (request.auth.uid == userId
