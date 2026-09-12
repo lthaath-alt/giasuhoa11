@@ -16,8 +16,13 @@
  */
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, basename } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const GOC = new URL('..', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1');
+/* fileURLToPath chứ KHÔNG phải `.pathname`: pathname giữ nguyên mã hoá phần
+   trăm, nên thư mục có dấu cách hay chữ tiếng Việt ("NCKH 2026",
+   "gia-sư-hóa-học-11-ai") ra đường dẫn "NCKH%202026\gia-s%C6%B0..." và
+   readFileSync ném ENOENT. */
+const GOC = fileURLToPath(new URL('..', import.meta.url));
 const CSS = join(GOC, 'src/index.css');
 
 /* Tệp TRANH VẼ: màu trong đó là nét vẽ của hình minh hoạ, đảo theo nền chỉ làm

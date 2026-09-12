@@ -42,8 +42,12 @@
 import { readFileSync, writeFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { join, relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const GOC = new URL('..', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1');
+/* fileURLToPath, không phải .pathname: .pathname còn nguyên mã hoá URL, nên
+ * đường dẫn có dấu cách hoặc chữ tiếng Việt (NCKH%202026, gia-s%C6%B0…) thành
+ * thư mục không tồn tại và script tưởng nhầm là chưa có dist/. */
+const GOC = fileURLToPath(new URL('..', import.meta.url));
 const DIST = join(GOC, 'dist');
 
 function moiTep(thuMuc: string, duoi: string, ra: string[] = []): string[] {

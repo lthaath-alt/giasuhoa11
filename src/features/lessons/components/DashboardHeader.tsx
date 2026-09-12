@@ -34,6 +34,7 @@ import {
   Building2,
   Presentation,
   Gamepad2,
+  Target,
   Moon,
   Sun,
 } from 'lucide-react';
@@ -567,6 +568,29 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               }}
             >
               Bài giảng
+            </Button>
+
+            {/* Mục Luyện tập — 25 bài, mỗi bài 3 phần theo cấu trúc đề thi */}
+            <Button
+              id="nav-practice-btn"
+              onClick={() => {
+                setActiveTab('luyentap');
+              }}
+              startIcon={<Target size={16} />}
+              sx={{
+                color: 'var(--chu-nguoc)',
+                textTransform: 'none',
+                fontWeight: 'bold',
+                px: 2,
+                py: 1,
+                borderRadius: 0,
+                whiteSpace: 'nowrap',
+                borderBottom: activeTab === 'luyentap' ? '3px solid var(--vang)' : '3px solid transparent',
+                backgroundColor: activeTab === 'luyentap' ? 'rgba(255,255,255,0.1)' : 'transparent',
+                '&:hover': { backgroundColor: 'rgba(255,255,255,0.15)' },
+              }}
+            >
+              Luyện tập
             </Button>
 
             {/* Mục Trò Chơi — khu game truoc day nam trong tab "Các khóa học" */}

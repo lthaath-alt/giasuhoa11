@@ -217,4 +217,10 @@ export interface LearningProgress {
      Để dạng chuỗi tự do chứ không dựng kiểu chung, vì trò chơi là tệp HTML tĩnh
      nằm ngoài phần biên dịch của web — hai bên không dùng chung được kiểu nào. */
   troChoi?: Record<string, Record<string, { xong: boolean; cauDung: number; hang?: string }>>;
+  /* Tiến độ mục Luyện tập: { 'bai-2': { mc: {...}, tf: {...}, tn: {...} } }.
+     Kiểu đầy đủ là `TienDoLuyenTap` trong `features/practice/types.ts`. Để
+     `unknown` ở đây vì `features/auth` nằm dưới cùng chuỗi import — khai kiểu
+     thật sẽ tạo vòng phụ thuộc auth → practice → bank → auth. Chỗ dùng tự ép
+     kiểu về TienDoLuyenTap. */
+  luyenTap?: Record<string, unknown>;
 }
