@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import {
   Box, TextField, Button, Typography, Alert, CircularProgress,
-  InputAdornment, IconButton, Collapse,
+  InputAdornment, IconButton,
 } from '@mui/material';
 import {
-  UserPlus, Eye, EyeOff, Key, Mail, User, School, ArrowLeft, CheckCircle,
+  UserPlus, Eye, EyeOff, Key, Mail, User, ArrowLeft, CheckCircle,
 } from 'lucide-react';
 import { useApp } from '../../../core/hooks/useApp';
 import { useNavigate } from 'react-router-dom';
@@ -15,10 +15,13 @@ interface StudentRegisterFormProps {
 
 /**
  * StudentRegisterForm
- * Học sinh tự đăng ký tài khoản với mã lớp tuỳ chọn.
- * - Có mã lớp → role=student, gửi đơn xin vào lớp (pendingClassCode), chờ
- *   giáo viên duyệt — CHƯA gán classId.
- * - Không có mã lớp → role=student, chưa có classId.
+ * Học sinh tự đăng ký tài khoản. Luôn ra `role: 'student'`, chưa có lớp.
+ *
+ * KHÔNG còn ô "Mã lớp" (bỏ ngày 12/09/2026). Màn này chạy khi CHƯA đăng nhập,
+ * mà luật Firestore đòi đã đăng nhập mới đọc được `classes` — nên ở đây không
+ * có cách nào cho chọn lớp, và ô gõ mã thì không tra được để báo mã sai.
+ * Học sinh vào rồi chọn lớp ở tab Học sinh (`JoinClassForm`), chỗ đó đọc được
+ * danh sách lớp thật.
  */
 export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBackToLogin }) => {
   const { registerStudent } = useApp();
