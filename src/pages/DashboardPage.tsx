@@ -51,6 +51,7 @@ import { StudentArea } from '../features/student/components/StudentArea';
 import { GameHubSection, SO_TRO_CHOI } from '../features/games/GameHubSection';
 import { PracticeSection } from '../features/practice';
 import { SlidesSection } from '../features/lessons/components/SlidesSection';
+import { PhongThiNghiem } from '../features/lessons/components/PhongThiNghiem';
 import { ActivityFields, type Truong } from '../features/lessons/components/ActivityFields';
 import {
   GameDoodles, GameDoodlesTren, GameDoodlesDuoi,
@@ -465,6 +466,13 @@ export const DashboardPage: React.FC = () => {
                 <MascotDauVai tab="baigiang" />
               </Box>
               <SlidesSection />
+            </Box>
+          )}
+
+          {/* ================= TAB: THÍ NGHIỆM ================= */}
+          {activeTab === 'thinghiem' && (
+            <Box id="tab-content-lab">
+              <PhongThiNghiem />
             </Box>
           )}
 

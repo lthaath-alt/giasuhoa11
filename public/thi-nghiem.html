@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phòng trưng bày vi mô — Hóa 11</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>
+/* Chạy TRƯỚC khi vẽ để không nháy trắng một nhịp khi web chính đang ở nền tối. */
+if(new URLSearchParams(location.search).get('nen')==='toi')
+  document.documentElement.dataset.nen='toi';
+</script>
+<style>
+:root{
+  --ink:#121210; --ink-2:#4D4D47; --line:#CBC9C0;
+  --paper:#F2F1ED; --card:#FFFFFF;
+  --accent:#4FB6E8;
+  --f-hien-thi:'Archivo',system-ui,sans-serif;
+  --f-than-bai:'Inter',system-ui,sans-serif;
+}
+/* Bản nền tối. Trang này nằm trong iframe nên KHÔNG nhận được
+   data-theme="dark" mà web chính gắn lên <html> của nó — phải tự bật
+   qua tham số ?nen=toi trên đường dẫn. Các giá trị dưới đây lấy đúng
+   từ :root[data-theme="dark"] trong index.css để hai bên không lệch tông. */
+:root[data-nen="toi"]{
+  --ink:#F3F2ED; --ink-2:#AEADA5; --line:#34342E;
+  --paper:#0D0D0B; --card:#161613;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--f-than-bai);
+  background:var(--paper);color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased}
+h1,h2,.bigName b,.molTag b,.scaleTag b,.pick .txt b{font-family:var(--f-hien-thi)}
+.wrap{max-width:1100px;margin:0 auto;padding:30px 22px 60px}
+header h1{font-size:1.5rem;font-weight:600;letter-spacing:-.02em}
+header p{color:var(--ink-2);font-size:.94rem;max-width:58ch;margin:4px 0 22px}
+.layout{display:grid;grid-template-columns:1fr 272px;gap:18px;align-items:start}
+
+/* ---------- sân khấu ---------- */
+.stage{position:relative;border-radius:0;overflow:hidden;aspect-ratio:4/3;
+  min-height:340px;touch-action:none;background:#0F1726}
+.stage canvas{display:block;width:100%;height:100%;cursor:grab}
+.stage canvas:active{cursor:grabbing}
+
+/* tên hiện vật hiện to */
+.bigName{position:absolute;left:0;right:0;top:26px;text-align:center;pointer-events:none}
+.bigName b{display:block;font-size:1.9rem;font-weight:600;letter-spacing:-.025em;
+  color:#fff;text-shadow:0 2px 24px rgba(0,0,0,.55)}
+.bigName span{font-size:.88rem;color:#DCE6F5;opacity:.82;text-shadow:0 1px 10px rgba(0,0,0,.6)}
+
+/* nhãn phân tử khi đã tới nơi */
+.molTag{position:absolute;left:0;right:0;top:24px;text-align:center;pointer-events:none}
+.molTag b{display:block;font-size:2.1rem;font-weight:600;letter-spacing:.01em;
+  color:#fff;text-shadow:0 2px 26px rgba(0,0,0,.6)}
+.molTag span{font-size:.86rem;color:#E4EDF9;opacity:.8}
+
+/* thước đo */
+.scaleTag{position:absolute;left:18px;top:16px;pointer-events:none}
+.scaleTag b{display:block;font-size:1.2rem;font-weight:500;color:#fff;letter-spacing:.01em;
+  text-shadow:0 1px 12px rgba(0,0,0,.5)}
+.scaleTag span{font-size:.75rem;color:#fff;opacity:.66}
+
+.zoomBar{position:absolute;left:18px;right:18px;bottom:15px;display:flex;align-items:center;gap:11px}
+.zoomBar em{font-style:normal;font-size:.72rem;color:#fff;opacity:.6;white-space:nowrap}
+.zoomBar input{flex:1;height:3px;cursor:pointer}
+
+.toggles{position:absolute;right:18px;top:16px;display:flex;flex-direction:column;gap:6px;
+  align-items:flex-end;transition:opacity .3s}
+.toggles[data-hidden="1"]{opacity:0;pointer-events:none}
+.chk{display:flex;align-items:center;gap:7px;cursor:pointer;user-select:none;color:#fff;
+  font-size:.76rem;background:rgba(8,14,24,.55);backdrop-filter:blur(8px);
+  padding:6px 10px;border-radius:0;opacity:.8}
+.chk:hover{opacity:1}
+.chk input{width:13px;height:13px;cursor:pointer}
+
+/* ---------- cột hiện vật ---------- */
+.rail{display:flex;flex-direction:column;gap:7px}
+.rail > span{font-size:.79rem;color:var(--ink-2);margin-bottom:2px}
+.pick{position:relative;display:flex;align-items:center;gap:11px;text-align:left;width:100%;
+  font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);
+  padding:10px 13px;border-radius:0;cursor:pointer;overflow:hidden;transition:border-color .18s}
+.pick:hover{border-color:#A6B4C8}
+.pick .dot{width:11px;height:11px;border-radius:50%;flex:none}
+.pick .txt b{display:block;font-weight:500;font-size:.95rem}
+.pick .txt span{color:var(--ink-2);font-size:.8rem}
+.pick[aria-pressed="true"]{border-color:transparent;color:#fff}
+.pick[aria-pressed="true"] .txt span{color:rgba(255,255,255,.78)}
+.pick[aria-pressed="true"] .dot{background:rgba(255,255,255,.9)!important}
+
+/* ---------- biến đổi ---------- */
+.actions{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:2px}
+.actions button{font:inherit;font-size:.87rem;font-weight:500;padding:9px 17px;border-radius:0;
+  cursor:pointer;background:var(--card);border:1px solid var(--line);color:var(--ink);transition:.15s}
+.actions button:hover:not(:disabled){color:#fff;border-color:transparent;background:var(--accent)}
+.actions button:disabled{opacity:.4;cursor:not-allowed}
+.actions .why{font-size:.82rem;color:var(--ink-2);max-width:44ch}
+
+/* ---------- chú thích ---------- */
+.note{grid-column:1/-1;background:var(--card);border:1px solid var(--line);
+  border-left:4px solid var(--accent);border-radius:0;padding:17px 20px;min-height:134px;transition:border-color .3s}
+.note .eyebrow{font-size:.76rem;font-weight:500;color:var(--accent)}
+.note h2{font-size:1.06rem;font-weight:600;margin:2px 0 10px;display:flex;align-items:center;gap:9px}
+.note h2 em{font-style:normal;font-weight:400;font-size:.88rem;color:var(--ink-2)}
+.note h2 .chip{width:15px;height:15px;border-radius:50%;flex:none;box-shadow:0 0 0 2px rgba(0,0,0,.06)}
+.facts{display:flex;flex-wrap:wrap;gap:0 30px;margin-bottom:11px}
+.facts div{padding:3px 0}
+.facts dt{font-size:.74rem;color:var(--ink-2)}
+.facts dd{font-size:.92rem;font-weight:500}
+.note p{font-size:.92rem;color:#2C3746;max-width:74ch}
+.tapHint{color:var(--ink-2);font-style:italic}
+footer{margin-top:30px;font-size:.81rem;color:var(--ink-2);max-width:68ch}
+
+@media (max-width:760px){
+  .wrap{padding:20px 14px 44px}
+  .layout{grid-template-columns:1fr}
+  .stage{aspect-ratio:1/1}
+  .bigName b{font-size:1.5rem} .molTag b{font-size:1.7rem}
+  .toggles{top:auto;bottom:52px;right:14px;flex-direction:row}
+  .rail{flex-direction:row;flex-wrap:wrap}
+  .rail > span{width:100%}
+  .pick{flex:1 1 44%}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Phòng trưng bày vi mô</h1>
+  <p>Chọn một thứ quen thuộc rồi đi xuyên vào bên trong nó. Tới nơi thì xoay, chạm vào từng nguyên tử, và nghịch thử.</p>
+</header>
+
+<div class="layout">
+  <div class="stage" id="stage">
+    <canvas id="cv"></canvas>
+    <div class="bigName" id="bigName"><b></b><span></span></div>
+    <div class="molTag" id="molTag"><b></b><span></span></div>
+    <div class="scaleTag"><b id="scaleVal">12 cm</b><span id="scaleCap"></span></div>
+    <div class="toggles" id="toggles" data-hidden="1">
+      <label class="chk"><input type="checkbox" id="cbAngle" checked> Góc liên kết</label>
+      <label class="chk"><input type="checkbox" id="cbLone" checked> Cặp electron riêng</label>
+    </div>
+    <div class="zoomBar">
+      <em>Vật thật</em>
+      <input type="range" id="zoom" min="0" max="1000" value="0">
+      <em>Một phân tử</em>
+    </div>
+  </div>
+
+  <div class="rail" id="rail"><span>Chọn hiện vật</span></div>
+  <div class="actions" id="actions"></div>
+
+  <div class="note" id="note">
+    <div class="eyebrow" id="nEye"></div>
+    <h2 id="nTitle"></h2>
+    <dl class="facts" id="nFacts"></dl>
+    <p id="nBody"></p>
+  </div>
+</div>
+
+<footer>Bản demo gồm 4 hiện vật. Trên web thật sẽ nối thêm benzen, ethanol và bộ chất chương nitrogen&nbsp;–&nbsp;sulfur, dùng chung khung này.</footer>
+</div>
+
+<script>
+/* ================= nguyên tố ================= */
+const EL={
+ H:{c:'#F0F5FB',hi:'#FFFFFF',r:.34,ten:'Hydrogen',am:'2,20',bk:'37 pm'},
+ C:{c:'#6B7482',hi:'#A3ADBC',r:.62,ten:'Carbon',am:'2,55',bk:'77 pm'},
+ N:{c:'#4A78FF',hi:'#9DB6FF',r:.60,ten:'Nitrogen',am:'3,04',bk:'75 pm'},
+ O:{c:'#F04A3C',hi:'#FF9A8C',r:.57,ten:'Oxygen',am:'3,44',bk:'73 pm'}
+};
+
+/* ================= dạng phân tử ================= */
+const SP={
+h2o:{ft:'H₂O',ten:'Nước',host:'o',shape:'Gấp khúc',angle:'104,5°',pol:'Phân cực',
+ about:'Oxygen giữ hai cặp electron không tham gia liên kết. Chúng chiếm chỗ rộng hơn cặp liên kết nên ép hai liên kết O–H lại gần nhau, kéo góc xuống dưới 109,5°.',
+ atoms:{o:{e:'O',p:[0,0,0]},h1:{e:'H',p:[.759,.588,0]},h2:{e:'H',p:[-.759,.588,0]}},
+ bonds:[['o','h1',1,'96 pm'],['o','h2',1,'96 pm']],
+ lones:{l1:[0,-.537,.843],l2:[0,-.537,-.843]},arc:['h1','o','h2','104,5°'],
+ loneNote:'Hai cặp electron này là chỗ nước nhận proton. Chính chúng làm nước vừa cho được H⁺ vừa nhận được H⁺.'},
+
+h3o:{ft:'H₃O⁺',ten:'Ion hydronium',host:'o',shape:'Chóp tam giác',angle:'113°',pol:'Mang điện dương',
+ about:'Một cặp electron của oxygen vừa bắt lấy proton. Ba liên kết O–H đẩy nhau xuống thành hình chóp. Đây mới là dạng thật của "H⁺ trong dung dịch" mà đề bài hay viết tắt.',
+ atoms:{o:{e:'O',p:[0,0,0]},h1:{e:'H',p:[.817,.540,-.030]},h2:{e:'H',p:[-.817,.540,-.030]},h3:{e:'H',p:[0,-.654,.730]}},
+ bonds:[['o','h1',1,'98 pm'],['o','h2',1,'98 pm'],['o','h3',1,'98 pm']],
+ lones:{l2:[0,-.537,-.843]},arc:['h1','o','h2','113°'],
+ loneNote:'Chỉ còn một cặp electron riêng. Cặp kia đã dùng để giữ proton vừa nhận.'},
+
+oh:{ft:'OH⁻',ten:'Ion hydroxide',host:'o',shape:'Hai nguyên tử',angle:'—',pol:'Mang điện âm',
+ about:'Nước vừa nhường đi một proton. Chỗ liên kết O–H cũ giờ thành một cặp electron riêng — nó hiện ra đúng vị trí nguyên tử hydrogen vừa rời đi.',
+ atoms:{o:{e:'O',p:[0,0,0]},h1:{e:'H',p:[.759,.588,0]}},
+ bonds:[['o','h1',1,'96 pm']],
+ lones:{l1:[.024,-.576,.817],l2:[.024,-.576,-.817],l3:[-.839,.541,0]},arc:null,
+ loneNote:'Ba cặp electron riêng, nhiều hơn nước một cặp. Đó là lý do OH⁻ nhận proton rất mạnh.'},
+
+nh3:{ft:'NH₃',ten:'Ammonia',host:'n',shape:'Chóp tam giác',angle:'107°',pol:'Phân cực',
+ about:'Nhìn thẳng từ trên xuống rất dễ tưởng NH₃ phẳng. Xoay ngang một chút sẽ thấy ba nguyên tử hydrogen nằm thấp hơn nitrogen — phân tử có dạng chóp.',
+ atoms:{n:{e:'N',p:[0,0,0]},h1:{e:'H',p:[.938,-.376,0]},h2:{e:'H',p:[-.469,-.376,.812]},h3:{e:'H',p:[-.469,-.376,-.812]}},
+ bonds:[['n','h1',1,'101 pm'],['n','h2',1,'101 pm'],['n','h3',1,'101 pm']],
+ lones:{l1:[0,1,0]},arc:['h1','n','h2','107°'],
+ loneNote:'Cặp electron nhô lên phía trên chính là chỗ NH₃ bắt lấy H⁺. Bấm "Thêm H⁺" để xem nó làm việc đó.'},
+
+nh4:{ft:'NH₄⁺',ten:'Ion ammonium',host:'n',shape:'Tứ diện',angle:'109,5°',pol:'Mang điện dương',
+ about:'Cặp electron riêng đã biến thành liên kết thứ tư. Không còn cặp nào chiếm chỗ rộng nữa nên bốn liên kết N–H giãn đều ra, góc mở lên đúng 109,5°.',
+ atoms:{n:{e:'N',p:[0,0,0]},h1:{e:'H',p:[.971,-.343,0]},h2:{e:'H',p:[-.486,-.343,.841]},h3:{e:'H',p:[-.486,-.343,-.841]},h4:{e:'H',p:[0,1.03,0]}},
+ bonds:[['n','h1',1,'103 pm'],['n','h2',1,'103 pm'],['n','h3',1,'103 pm'],['n','h4',1,'103 pm']],
+ lones:{},arc:['h1','n','h2','109,5°'],loneNote:''},
+
+ch4:{ft:'CH₄',ten:'Methane',host:'c',shape:'Tứ diện',angle:'109,5°',pol:'Không phân cực',
+ about:'Bốn liên kết C–H giống hệt nhau và carbon không giữ cặp electron riêng nào, nên chúng đẩy nhau đều về bốn hướng. Vì thế methane không phân cực, dù từng liên kết vẫn có chênh lệch độ âm điện.',
+ atoms:{c:{e:'C',p:[0,0,0]},h1:{e:'H',p:[.629,.629,.629]},h2:{e:'H',p:[.629,-.629,-.629]},h3:{e:'H',p:[-.629,.629,-.629]},h4:{e:'H',p:[-.629,-.629,.629]}},
+ bonds:[['c','h1',1,'109 pm'],['c','h2',1,'109 pm'],['c','h3',1,'109 pm'],['c','h4',1,'109 pm']],
+ lones:{},arc:['h1','c','h2','109,5°'],loneNote:''},
+
+co2:{ft:'CO₂',ten:'Carbon dioxide',host:'c',shape:'Thẳng',angle:'180°',pol:'Không phân cực',
+ about:'So CO₂ với nước thì thấy rõ một điều: cả hai đều có liên kết phân cực, nhưng chỉ nước là phân tử phân cực. Carbon ở đây không giữ cặp electron riêng nào, nên hai liên kết đôi nằm thẳng hàng, ngược chiều và triệt tiêu nhau.',
+ atoms:{c:{e:'C',p:[0,0,0]},o1:{e:'O',p:[1.16,0,0]},o2:{e:'O',p:[-1.16,0,0]}},
+ bonds:[['c','o1',2,'116 pm'],['c','o2',2,'116 pm']],
+ lones:{},arc:['o1','c','o2','180°'],loneNote:''}
+};
+
+/* ================= hiện vật + tông màu ================= */
+const ITEMS=[
+ {id:'water',ten:'Cốc nước',sub:'nước — H₂O',sp:'h2o',art:'glass',
+  bg:[[12,32,58],[8,18,34]],acc:'#4FB6E8'},
+ {id:'gas',ten:'Bếp gas đang cháy',sub:'khí thiên nhiên — CH₄',sp:'ch4',art:'flame',
+  bg:[[62,34,16],[18,12,20]],acc:'#FF9B4A'},
+ {id:'soda',ten:'Lon nước ngọt',sub:'khí trong bọt — CO₂',sp:'co2',art:'can',
+  bg:[[70,22,36],[22,10,20]],acc:'#F2607A'},
+ {id:'clean',ten:'Chai lau kính',sub:'ammonia — NH₃',sp:'nh3',art:'bottle',
+  bg:[[14,62,58],[8,22,26]],acc:'#3FD0B4'}
+];
+
+const MORPH={
+ h2o:{add:'h3o',rem:'oh'}, h3o:{rem:'h2o'}, oh:{add:'h2o'},
+ nh3:{add:'nh4'}, nh4:{rem:'nh3'},
+ ch4:{why:'Carbon trong CH₄ đã dùng hết bốn electron hóa trị để tạo liên kết, không còn cặp nào để giữ proton. Đó là lý do methane trơ với acid.'},
+ co2:{why:'Carbon trong CO₂ cũng không còn cặp electron riêng. CO₂ chỉ thể hiện tính acid khi tan vào nước để tạo H₂CO₃.'}
+};
+
+/* ================= trạng thái ================= */
+let item=ITEMS[0], spKey='h2o';
+let zoom=0, rx=-.20, ry=.55;
+let showAngle=true, showLone=true;
+let sel=null, morph=null, flash=0;
+let drag=false,lx=0,ly=0,moved=false;
+let bgA=[...ITEMS[0].bg[0]], bgB=[...ITEMS[0].bg[1]];
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const cv=document.getElementById('cv'), ctx=cv.getContext('2d');
+let W=0,H=0;
+function resize(){
+  const r=cv.getBoundingClientRect(), d=Math.min(devicePixelRatio||1,2);
+  W=r.width;H=r.height;cv.width=Math.round(W*d);cv.height=Math.round(H*d);
+  ctx.setTransform(d,0,0,d,0,0);
+}
+new ResizeObserver(resize).observe(cv);
+
+const lerp=(a,b,t)=>a+(b-a)*t;
+const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+const rgb=a=>`rgb(${a[0]|0},${a[1]|0},${a[2]|0})`;
+function shade(hex,k){
+  const n=parseInt(hex.slice(1),16), c=v=>Math.max(0,Math.min(255,Math.round(v*(1+k))));
+  return `rgb(${c((n>>16)&255)},${c((n>>8)&255)},${c(n&255)})`;
+}
+function rgba(hex,a){
+  const n=parseInt(hex.slice(1),16);
+  return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`;
+}
+
+/* ================= cấu trúc (nội suy khi biến hình) ================= */
+function structure(){
+  const A=SP[spKey];
+  if(!morph) return {
+    atoms:Object.entries(A.atoms).map(([k,v])=>({k,e:v.e,p:v.p,a:1})),
+    bonds:A.bonds.map(b=>({i:b[0],j:b[1],o:b[2],len:b[3],a:1})),
+    lones:Object.entries(A.lones).map(([k,v])=>({k,d:v,a:1})),
+    host:A.host,arc:A.arc,sp:A};
+  const F=SP[morph.from],T=SP[morph.to],t=ease(morph.t);
+  const keys=new Set([...Object.keys(F.atoms),...Object.keys(T.atoms)]);
+  const atoms=[...keys].map(k=>{
+    const f=F.atoms[k],g=T.atoms[k];
+    if(f&&g) return {k,e:g.e,p:[lerp(f.p[0],g.p[0],t),lerp(f.p[1],g.p[1],t),lerp(f.p[2],g.p[2],t)],a:1};
+    return f?{k,e:f.e,p:f.p,a:1-t}:{k,e:g.e,p:g.p,a:t};
+  });
+  const bm=new Map();
+  [...F.bonds.map(b=>[b,'f']),...T.bonds.map(b=>[b,'t'])].forEach(([b,s])=>{
+    const id=b[0]+'-'+b[1];
+    if(!bm.has(id)) bm.set(id,{i:b[0],j:b[1],o:b[2],len:b[3],f:false,t:false});
+    bm.get(id)[s]=true;
+  });
+  const bonds=[...bm.values()].map(b=>({...b,a:b.f&&b.t?1:(b.f?1-t:t)}));
+  const lk=new Set([...Object.keys(F.lones),...Object.keys(T.lones)]);
+  const lones=[...lk].map(k=>{
+    const f=F.lones[k],g=T.lones[k];
+    if(f&&g) return {k,d:[lerp(f[0],g[0],t),lerp(f[1],g[1],t),lerp(f[2],g[2],t)],a:1};
+    return f?{k,d:f,a:1-t}:{k,d:g,a:t};
+  });
+  return {atoms,bonds,lones,host:T.host,arc:t>.5?T.arc:F.arc,sp:t>.5?T:F};
+}
+
+/* ================= chiếu ================= */
+const CAM=7.2,FOC=6.4;
+function rot(p){
+  const cy=Math.cos(ry),sy=Math.sin(ry),cx=Math.cos(rx),sx=Math.sin(rx);
+  const x1=p[0]*cy+p[2]*sy, z1=-p[0]*sy+p[2]*cy;
+  return [x1,p[1]*cx-z1*sx,p[1]*sx+z1*cx];
+}
+function proj(p,S){
+  const q=rot(p),f=FOC/(CAM-q[2]);
+  return {x:W/2+q[0]*f*S,y:H/2-q[1]*f*S,s:f*S,z:q[2]};
+}
+
+/* ================= nền ================= */
+function drawBG(){
+  bgA=bgA.map((v,i)=>lerp(v,item.bg[0][i],.09));
+  bgB=bgB.map((v,i)=>lerp(v,item.bg[1][i],.09));
+  const g=ctx.createRadialGradient(W/2,H*-.05,0,W/2,H*.5,Math.max(W,H)*.9);
+  g.addColorStop(0,rgb(bgA)); g.addColorStop(1,rgb(bgB));
+  ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+  // bụi lơ lửng
+  const t=performance.now()/1000;
+  ctx.save();
+  for(let i=0;i<26;i++){
+    const x=((i*127.3+t*(6+i%5)*2)%(W+60))-30;
+    const y=(Math.sin(i*2.1+t*.25)*.5+.5)*H;
+    ctx.globalAlpha=.05+(i%4)*.02;
+    ctx.beginPath(); ctx.arc(x,y,1+(i%3),0,7);
+    ctx.fillStyle=item.acc; ctx.fill();
+  }
+  ctx.restore();
+}
+
+/* ================= hiện vật ================= */
+function drawArt(kind,k,alpha){
+  if(alpha<=.01) return;
+  const S=Math.min(W,H)*.34*k, cx=W/2, cy=H/2, t=performance.now()/1000;
+  ctx.save(); ctx.globalAlpha=alpha; ctx.lineJoin='round'; ctx.lineCap='round';
+  if(kind==='glass'){
+    ctx.beginPath();
+    ctx.moveTo(cx-S*.60,cy-S*.72); ctx.lineTo(cx-S*.44,cy+S*.74);
+    ctx.lineTo(cx+S*.44,cy+S*.74); ctx.lineTo(cx+S*.60,cy-S*.72);
+    ctx.save(); ctx.clip();
+    const g=ctx.createLinearGradient(cx-S,cy-S*.3,cx+S,cy+S*.8);
+    g.addColorStop(0,'#5AC8F5'); g.addColorStop(.5,'#2E86D6'); g.addColorStop(1,'#1B5CA8');
+    ctx.fillStyle=g; ctx.fillRect(cx-S,cy-S*.24,S*2,S*1.1);
+    ctx.globalAlpha=alpha*.35;
+    for(let i=0;i<5;i++){
+      ctx.beginPath();
+      ctx.ellipse(cx-S*.3+i*S*.16, cy+S*.1+Math.sin(t*.8+i)*S*.06, S*.19,S*.03,0,0,7);
+      ctx.fillStyle='#BDEBFF'; ctx.fill();
+    }
+    ctx.restore();
+    ctx.strokeStyle='rgba(190,230,255,.85)'; ctx.lineWidth=Math.max(1.6,S*.032); ctx.stroke();
+    ctx.beginPath(); ctx.ellipse(cx,cy-S*.24,S*.535,S*.115,0,0,7);
+    ctx.fillStyle='#7FD8FA'; ctx.fill();
+  }
+  if(kind==='flame'){
+    ctx.beginPath(); ctx.ellipse(cx,cy+S*.64,S*.64,S*.14,0,0,7);
+    ctx.fillStyle='#2E3742'; ctx.fill();
+    for(let i=-1;i<=1;i++){
+      const ox=cx+i*S*.35, wob=Math.sin(t*3.2+i*2)*S*.035;
+      const h=S*(i===0?1.18:.88)*(1+Math.sin(t*4+i)*.04);
+      ctx.beginPath(); ctx.moveTo(ox,cy+S*.6);
+      ctx.bezierCurveTo(ox-S*.27,cy+S*.1, ox-S*.10+wob,cy+S*.6-h*.72, ox+wob,cy+S*.6-h);
+      ctx.bezierCurveTo(ox+S*.10+wob,cy+S*.6-h*.72, ox+S*.27,cy+S*.1, ox,cy+S*.6);
+      const g=ctx.createLinearGradient(0,cy+S*.6-h,0,cy+S*.6);
+      g.addColorStop(0,'#FFE9A8'); g.addColorStop(.35,'#FFA33C');
+      g.addColorStop(.75,'#4E8FE8'); g.addColorStop(1,'#1F4FB0');
+      ctx.fillStyle=g; ctx.fill();
+    }
+    ctx.globalAlpha=alpha*.55;
+    for(let i=0;i<8;i++){
+      const y=cy+S*.3-((i*.13+t*.28)%1)*S*1.5;
+      ctx.beginPath(); ctx.arc(cx+Math.sin(i*3+t)*S*.4,y,S*.018,0,7);
+      ctx.fillStyle='#FFC978'; ctx.fill();
+    }
+  }
+  if(kind==='can'){
+    const w=S*.54,h=S*1.34;
+    ctx.beginPath();
+    ctx.moveTo(cx-w/2,cy-h/2+S*.08); ctx.lineTo(cx-w/2,cy+h/2-S*.09);
+    ctx.quadraticCurveTo(cx-w/2,cy+h/2,cx-w/2+S*.1,cy+h/2);
+    ctx.lineTo(cx+w/2-S*.1,cy+h/2);
+    ctx.quadraticCurveTo(cx+w/2,cy+h/2,cx+w/2,cy+h/2-S*.09);
+    ctx.lineTo(cx+w/2,cy-h/2+S*.08); ctx.closePath();
+    const g=ctx.createLinearGradient(cx-w/2,0,cx+w/2,0);
+    g.addColorStop(0,'#8E1F31'); g.addColorStop(.4,'#F0455E'); g.addColorStop(.62,'#FF7188'); g.addColorStop(1,'#7C1A2A');
+    ctx.fillStyle=g; ctx.fill();
+    ctx.beginPath(); ctx.ellipse(cx,cy-h/2+S*.08,w/2,S*.095,0,0,7);
+    ctx.fillStyle='#D5DDE6'; ctx.fill();
+    ctx.beginPath(); ctx.ellipse(cx,cy-h/2+S*.08,w*.19,S*.035,0,0,7);
+    ctx.fillStyle='#9AA6B3'; ctx.fill();
+    for(let i=0;i<12;i++){
+      const bx=cx+Math.sin(i*2.3+t*.6)*w*.3;
+      const by=cy+h*.36-((i*.085+t*.22)%1)*h*.76;
+      ctx.globalAlpha=alpha*.8;
+      ctx.beginPath(); ctx.arc(bx,by,S*(.02+(i%3)*.013),0,7);
+      ctx.fillStyle='#FFE3E8'; ctx.fill();
+    }
+  }
+  if(kind==='bottle'){
+    const w=S*.58,h=S*1.0;
+    ctx.beginPath(); ctx.roundRect(cx-w/2,cy-h/2+S*.28,w,h,S*.1);
+    const g=ctx.createLinearGradient(cx-w/2,0,cx+w/2,0);
+    g.addColorStop(0,'#12695C'); g.addColorStop(.42,'#2FD4B4'); g.addColorStop(.62,'#78F0D8'); g.addColorStop(1,'#12695C');
+    ctx.fillStyle=g; ctx.fill();
+    ctx.fillStyle='#39465A';
+    ctx.fillRect(cx-S*.095,cy-h/2+S*.02,S*.19,S*.28);
+    ctx.beginPath(); ctx.roundRect(cx-S*.31,cy-h/2-S*.17,S*.62,S*.23,S*.055); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(cx-S*.31,cy-h/2-S*.11); ctx.lineTo(cx-S*.53,cy-h/2-S*.04);
+    ctx.strokeStyle='#39465A'; ctx.lineWidth=S*.06; ctx.stroke();
+    for(let i=0;i<10;i++){
+      const k2=(i*.1+t*.35)%1;
+      ctx.globalAlpha=alpha*(1-k2)*.85;
+      ctx.beginPath();
+      ctx.arc(cx-S*.55-k2*S*.75, cy-h/2-S*.09+Math.sin(i*1.7)*S*.13*k2*3, S*.026,0,7);
+      ctx.fillStyle='#B8FFEF'; ctx.fill();
+    }
+  }
+  ctx.restore();
+}
+
+/* ================= đám đông phân tử ================= */
+const swarm=Array.from({length:58},()=>({
+  a:Math.random()*6.28, r:.12+Math.random()*1, ph:Math.random()*6.28,
+  sp:.5+Math.random(), d:.45+Math.random()*.75
+}));
+function drawSwarm(alpha,spread){
+  if(alpha<=.01) return;
+  const A=SP[spKey], ks=Object.keys(A.atoms), t=performance.now()/1000;
+  ctx.save();
+  for(const s of swarm){
+    const jx=Math.sin(t*s.sp+s.ph)*7, jy=Math.cos(t*s.sp*1.3+s.ph)*7;
+    const cx=W/2+Math.cos(s.a)*s.r*spread+jx, cy=H/2+Math.sin(s.a)*s.r*spread*.78+jy;
+    const u=spread*.019*s.d, ang=t*.5*s.sp+s.ph;
+    ctx.globalAlpha=alpha*(.35+s.d*.55);
+    ks.forEach(k=>{
+      const p=A.atoms[k].p, e=A.atoms[k].e;
+      const x=cx+(p[0]*Math.cos(ang)-p[2]*Math.sin(ang))*u, y=cy-p[1]*u;
+      const rr=Math.max(1,u*EL[e].r);
+      const g=ctx.createRadialGradient(x-rr*.3,y-rr*.3,rr*.1,x,y,rr);
+      g.addColorStop(0,EL[e].hi); g.addColorStop(1,EL[e].c);
+      ctx.beginPath(); ctx.arc(x,y,rr,0,7); ctx.fillStyle=g; ctx.fill();
+    });
+  }
+  ctx.restore();
+}
+
+/* ================= phân tử ================= */
+let hit=[];
+function drawMolecule(alpha,S){
+  hit=[];
+  if(alpha<=.01) return;
+  const st=structure(), P={};
+  st.atoms.forEach(a=>P[a.k]=proj(a.p,S));
+  const items=[];
+
+  if(showLone){
+    const hb=st.atoms.find(a=>a.k===st.host);
+    if(hb) st.lones.forEach(L=>{
+      const q=proj([hb.p[0]+L.d[0]*.95,hb.p[1]+L.d[1]*.95,hb.p[2]+L.d[2]*.95],S);
+      const rad=q.s*.44;
+      if(L.a>.35) hit.push({kind:'lone',key:L.k,x:q.x,y:q.y,r:rad});
+      items.push({z:q.z-.02,f:()=>{
+        ctx.globalAlpha=alpha*L.a;
+        const g=ctx.createRadialGradient(q.x,q.y,0,q.x,q.y,rad);
+        g.addColorStop(0,'rgba(255,214,120,.78)');
+        g.addColorStop(.5,'rgba(240,180,70,.28)');
+        g.addColorStop(1,'rgba(240,180,70,0)');
+        ctx.beginPath(); ctx.arc(q.x,q.y,rad,0,7); ctx.fillStyle=g; ctx.fill();
+        if(sel&&sel.kind==='lone'&&sel.key===L.k){
+          ctx.beginPath(); ctx.arc(q.x,q.y,rad*1.08,0,7);
+          ctx.strokeStyle='rgba(255,232,170,.9)'; ctx.lineWidth=1.8; ctx.stroke();
+        }
+      }});
+    });
+  }
+
+  st.bonds.forEach(b=>{
+    const A=P[b.i],B=P[b.j]; if(!A||!B) return;
+    const mx=(A.x+B.x)/2,my=(A.y+B.y)/2,ms=(A.s+B.s)/2;
+    const dx=B.x-A.x,dy=B.y-A.y,L=Math.hypot(dx,dy)||1,nx=-dy/L,ny=dx/L;
+    const off=b.o===2?ms*.12:0;
+    if(b.a>.5) hit.push({kind:'bond',key:b.i+'-'+b.j,x:mx,y:my,r:Math.max(10,ms*.16),data:b});
+    items.push({z:(A.z+B.z)/2,f:()=>{
+      ctx.globalAlpha=alpha*b.a; ctx.lineCap='round';
+      const on=sel&&sel.kind==='bond'&&sel.key===b.i+'-'+b.j;
+      const ea=st.atoms.find(a=>a.k===b.i).e, eb=st.atoms.find(a=>a.k===b.j).e;
+      for(const k of (b.o===2?[-1,1]:[0])){
+        ctx.lineWidth=ms*(b.o===2?.095:.135)*(on?1.35:1);
+        ctx.beginPath(); ctx.moveTo(A.x+nx*off*k,A.y+ny*off*k); ctx.lineTo(mx+nx*off*k,my+ny*off*k);
+        ctx.strokeStyle=on?'#FFF3B0':shade(EL[ea].c,-.15); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(mx+nx*off*k,my+ny*off*k); ctx.lineTo(B.x+nx*off*k,B.y+ny*off*k);
+        ctx.strokeStyle=on?'#FFF3B0':shade(EL[eb].c,-.15); ctx.stroke();
+      }
+    }});
+  });
+
+  st.atoms.forEach(a=>{
+    const q=P[a.k], rad=q.s*EL[a.e].r*a.a;
+    if(a.a>.5) hit.push({kind:'atom',key:a.k,x:q.x,y:q.y,r:rad,data:a});
+    items.push({z:q.z,f:()=>{
+      ctx.globalAlpha=alpha*a.a*.5;
+      const hg=ctx.createRadialGradient(q.x,q.y,rad*.7,q.x,q.y,rad*2);
+      hg.addColorStop(0,rgba(EL[a.e].c,.5)); hg.addColorStop(1,rgba(EL[a.e].c,0));
+      ctx.beginPath(); ctx.arc(q.x,q.y,rad*2,0,7); ctx.fillStyle=hg; ctx.fill();
+
+      ctx.globalAlpha=alpha*a.a;
+      const g=ctx.createRadialGradient(q.x-rad*.36,q.y-rad*.4,rad*.05,q.x,q.y,rad*1.05);
+      g.addColorStop(0,EL[a.e].hi); g.addColorStop(.42,EL[a.e].c); g.addColorStop(1,shade(EL[a.e].c,-.5));
+      ctx.beginPath(); ctx.arc(q.x,q.y,rad,0,7); ctx.fillStyle=g; ctx.fill();
+      ctx.beginPath(); ctx.ellipse(q.x-rad*.33,q.y-rad*.38,rad*.24,rad*.16,-.7,0,7);
+      ctx.fillStyle='rgba(255,255,255,.55)'; ctx.fill();
+      if(sel&&sel.kind==='atom'&&sel.key===a.k){
+        ctx.beginPath(); ctx.arc(q.x,q.y,rad+4,0,7);
+        ctx.strokeStyle='#FFF3B0'; ctx.lineWidth=2; ctx.stroke();
+      }
+    }});
+  });
+
+  items.sort((p,q)=>p.z-q.z).forEach(o=>o.f());
+  ctx.globalAlpha=alpha;
+
+  if(flash>0){
+    const c=P[st.host];
+    if(c){
+      const R=Math.min(W,H)*.06+(1-flash)*Math.min(W,H)*.3;
+      ctx.beginPath(); ctx.arc(c.x,c.y,R,0,7);
+      ctx.strokeStyle=`rgba(255,238,170,${flash*.7})`; ctx.lineWidth=2+flash*4; ctx.stroke();
+    }
+  }
+
+  if(showAngle&&st.arc){
+    const [a,c,b,txt]=st.arc;
+    if(P[a]&&P[b]&&P[c]){
+      const C=P[c],A2=P[a],B2=P[b],R=Math.min(W,H)*.10;
+      const a1=Math.atan2(A2.y-C.y,A2.x-C.x), a2=Math.atan2(B2.y-C.y,B2.x-C.x);
+      let d=a2-a1; while(d>Math.PI)d-=6.283; while(d<-Math.PI)d+=6.283;
+      ctx.beginPath(); ctx.arc(C.x,C.y,R,a1,a1+d);
+      ctx.strokeStyle='rgba(255,255,255,.45)'; ctx.lineWidth=1.3; ctx.setLineDash([4,4]);
+      ctx.stroke(); ctx.setLineDash([]);
+      const m=a1+d/2;
+      ctx.fillStyle='rgba(255,255,255,.95)';
+      ctx.font='600 13px Inter,system-ui,sans-serif';
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText(txt,C.x+Math.cos(m)*(R+18),C.y+Math.sin(m)*(R+18));
+    }
+  }
+  ctx.globalAlpha=1;
+}
+
+/* ================= vòng lặp ================= */
+const bigName=document.getElementById('bigName'), molTag=document.getElementById('molTag');
+function frame(){
+  if(morph){
+    morph.t+=reduce?1:.022;
+    if(morph.t>=1){spKey=morph.to;morph=null;sel=null;renderPanels();}
+  }
+  if(flash>0) flash=Math.max(0,flash-.028);
+
+  drawBG();
+  const t=zoom;
+  drawArt(item.art,1+t*3.4,Math.max(0,1-t/.30));
+  drawSwarm(Math.max(0,Math.sin(Math.min(1,Math.max(0,(t-.22)/.52))*Math.PI))*.95,
+            Math.min(W,H)*(.18+t*.62));
+  const ma=Math.max(0,Math.min(1,(t-.66)/.24));
+  drawMolecule(ma,Math.min(W,H)*.30*(.55+ma*.45));
+
+  bigName.style.opacity=Math.max(0,1-t/.34);
+  molTag.style.opacity=ma;
+  updateScale(t);
+  document.getElementById('toggles').dataset.hidden=ma>.6?'0':'1';
+  requestAnimationFrame(frame);
+}
+
+function milestone(m){
+  if(m>=.02) return 'to cỡ bàn tay';
+  if(m>=.002) return 'to cỡ hạt gạo';
+  if(m>=2e-4) return 'cỡ đầu mũi kim';
+  if(m>=2e-5) return 'bề dày một sợi tóc';
+  if(m>=5e-7) return 'cỡ một con vi khuẩn';
+  if(m>=3e-8) return 'cỡ một con virus';
+  return 'cỡ một phân tử';
+}
+function updateScale(t){
+  const m=.12*Math.pow(10,-9.1*t);
+  let v,u;
+  if(m>=.01){v=m*100;u='cm'} else if(m>=1e-3){v=m*1000;u='mm'}
+  else if(m>=1e-6){v=m*1e6;u='µm'} else if(m>=1e-9){v=m*1e9;u='nm'}
+  else {v=m*1e12;u='pm'}
+  const txt=v>=100?String(Math.round(v)):v>=10?v.toFixed(0):v.toFixed(1);
+  document.getElementById('scaleVal').textContent=txt.replace('.',',')+' '+u;
+  document.getElementById('scaleCap').textContent=milestone(m);
+}
+
+/* ================= tương tác ================= */
+cv.addEventListener('pointerdown',e=>{
+  if(zoom<.7) return;
+  drag=true;moved=false;lx=e.clientX;ly=e.clientY;cv.setPointerCapture(e.pointerId);
+});
+cv.addEventListener('pointermove',e=>{
+  if(!drag) return;
+  if(Math.abs(e.clientX-lx)+Math.abs(e.clientY-ly)>3) moved=true;
+  ry+=(e.clientX-lx)*.0095; rx+=(e.clientY-ly)*.0095;
+  rx=Math.max(-1.45,Math.min(1.45,rx)); lx=e.clientX; ly=e.clientY;
+});
+addEventListener('pointerup',()=>drag=false);
+cv.addEventListener('click',e=>{
+  if(moved||zoom<.7) return;
+  const r=cv.getBoundingClientRect(), x=e.clientX-r.left, y=e.clientY-r.top;
+  let best=null,bd=1e9;
+  for(const h of hit){const d=Math.hypot(x-h.x,y-h.y); if(d<h.r+6&&d<bd){bd=d;best=h}}
+  sel=best?{kind:best.kind,key:best.key,data:best.data}:null;
+  renderNote();
+});
+const zs=document.getElementById('zoom');
+zs.addEventListener('input',e=>{
+  cancelAnimationFrame(travelId);
+  zoom=+e.target.value/1000;
+  if(zoom<.7){sel=null;renderNote()}
+});
+document.getElementById('cbAngle').addEventListener('change',e=>showAngle=e.target.checked);
+document.getElementById('cbLone').addEventListener('change',e=>showLone=e.target.checked);
+
+/* ================= cột hiện vật ================= */
+const rail=document.getElementById('rail');
+ITEMS.forEach(it=>{
+  const b=document.createElement('button');
+  b.className='pick'; b.dataset.id=it.id;
+  b.innerHTML=`<span class="dot" style="background:${it.acc}"></span>
+    <span class="txt"><b>${it.ten}</b><span>${it.sub}</span></span>`;
+  b.addEventListener('click',()=>choose(it));
+  rail.appendChild(b);
+});
+function choose(it){
+  item=it; spKey=it.sp; sel=null; morph=null; flash=0; rx=-.20; ry=.55;
+  document.documentElement.style.setProperty('--accent',it.acc);
+  document.querySelectorAll('.pick').forEach(p=>{
+    const on=p.dataset.id===it.id;
+    p.setAttribute('aria-pressed',on?'true':'false');
+    p.style.background=on?it.acc:'';
+  });
+  bigName.querySelector('b').textContent=it.ten;
+  bigName.querySelector('span').textContent=it.sub;
+  renderPanels();
+  travel();
+}
+let travelId=null;
+function travel(){
+  cancelAnimationFrame(travelId);
+  if(reduce){zoom=1;zs.value=1000;return}
+  const t0=performance.now(), dur=2400;
+  zoom=0; zs.value=0;
+  (function step(now){
+    const k=Math.min(1,(now-t0)/dur);
+    zoom=ease(k); zs.value=Math.round(zoom*1000);
+    if(k<1) travelId=requestAnimationFrame(step);
+  })(performance.now());
+}
+
+/* ================= nút biến đổi ================= */
+const actions=document.getElementById('actions');
+function renderActions(){
+  const m=MORPH[spKey]||{};
+  actions.innerHTML='';
+  const mk=(txt,to)=>{
+    const b=document.createElement('button');
+    b.textContent=txt; b.disabled=!to;
+    if(to) b.addEventListener('click',()=>{morph={from:spKey,to,t:0};flash=1;sel=null});
+    return b;
+  };
+  actions.append(mk('Thêm H⁺',m.add),mk('Bớt H⁺',m.rem));
+  if(m.why){const s=document.createElement('span');s.className='why';s.textContent=m.why;actions.append(s)}
+}
+
+/* ================= chú thích ================= */
+function renderNote(){
+  const st=structure(), A=st.sp;
+  const eye=document.getElementById('nEye'), ti=document.getElementById('nTitle'),
+        fa=document.getElementById('nFacts'), bo=document.getElementById('nBody');
+  molTag.querySelector('b').textContent=A.ft;
+  molTag.querySelector('span').textContent=A.ten;
+
+  if(!sel){
+    eye.textContent=zoom>.7?'Đang xem':'Hiện vật';
+    ti.innerHTML=`${A.ft} <em>${A.ten}</em>`;
+    fa.innerHTML=`<div><dt>Dạng hình học</dt><dd>${A.shape}</dd></div>
+      <div><dt>Góc liên kết</dt><dd>${A.angle}</dd></div>
+      <div><dt>Phân tử</dt><dd>${A.pol}</dd></div>`;
+    bo.innerHTML=A.about+(zoom>.7?` <span class="tapHint">Chạm vào một nguyên tử, một liên kết hay một cặp electron để xem nó là gì.</span>`:'');
+    return;
+  }
+  if(sel.kind==='atom'){
+    const e=sel.data.e, d=EL[e];
+    eye.textContent='Nguyên tử';
+    ti.innerHTML=`<span class="chip" style="background:${d.c}"></span>${d.ten} <em>${e}</em>`;
+    fa.innerHTML=`<div><dt>Bán kính</dt><dd>${d.bk}</dd></div>
+      <div><dt>Độ âm điện</dt><dd>${d.am}</dd></div>`;
+    bo.textContent=e==='H'
+      ?'Nguyên tử nhỏ nhất, chỉ có một electron. Trong mọi phân tử ở đây nó luôn nằm ở rìa và tạo đúng một liên kết.'
+      :`Nguyên tử trung tâm của phân tử này. Độ âm điện ${d.am} — càng lớn thì nó càng kéo electron của liên kết về phía mình.`;
+    return;
+  }
+  if(sel.kind==='bond'){
+    const b=sel.data;
+    const ea=st.atoms.find(a=>a.k===b.i).e, eb=st.atoms.find(a=>a.k===b.j).e;
+    const na=parseFloat(EL[ea].am.replace(',','.')), nb=parseFloat(EL[eb].am.replace(',','.'));
+    const dif=Math.abs(na-nb), keo=na>nb?ea:eb;
+    eye.textContent='Liên kết';
+    ti.innerHTML=`${ea}${b.o===2?'=':'–'}${eb} <em>${b.o===2?'liên kết đôi':'liên kết đơn'}</em>`;
+    fa.innerHTML=`<div><dt>Độ dài</dt><dd>${b.len}</dd></div>
+      <div><dt>Hiệu độ âm điện</dt><dd>${dif.toFixed(2).replace('.',',')}</dd></div>`;
+    bo.textContent=dif<.4
+      ?'Hiệu độ âm điện nhỏ nên cặp electron dùng chung nằm gần như ở giữa — liên kết gần như không phân cực.'
+      :`Electron bị kéo lệch về phía ${keo}. Từng liên kết phân cực, nhưng phân tử có phân cực hay không còn tùy vào hình dạng.`;
+    return;
+  }
+  eye.textContent='Cặp electron riêng';
+  ti.innerHTML=`<span class="chip" style="background:#F0B446"></span>Không tham gia liên kết`;
+  fa.innerHTML='';
+  bo.textContent=A.loneNote||'Cặp electron ở lớp ngoài cùng nhưng không dùng để tạo liên kết.';
+}
+function renderPanels(){renderActions();renderNote()}
+
+/* ================= khởi động ================= */
+resize();
+choose(ITEMS[0]);
+frame();
+</script>
+</body>
+</html>
