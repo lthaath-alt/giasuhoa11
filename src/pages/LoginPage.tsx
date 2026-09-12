@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box, Paper, Typography, Button, Divider } from '@mui/material';
+import { Box, Paper, Typography, Button, Divider, CircularProgress, Alert } from '@mui/material';
 import { BookOpen, Sparkles, UserCheck, Play } from 'lucide-react';
 import { useApp } from '../core/hooks/useApp';
 import LoginForm from '../features/auth/components/LoginForm';
@@ -143,7 +143,22 @@ export const LoginPage: React.FC = () => {
     }
   }, [dangVao, currentUser, navigate]);
 
-  const handleSuccess = () => setDangVao(true);
+  /* Chờ hồ sơ có giới hạn. Nếu `currentUser` không về trong 6 giây thì gần như
+     chắc là dữ liệu lệch — có phiên Auth mà không có tài liệu `users/{uid}`, và
+     `AppContext` đã gọi signOut. Đứng im vô tận là tệ, mà lặng lẽ quay về form
+     trống không một dòng giải thích cũng tệ. Nói thẳng ra. */
+  const [loiVao, setLoiVao] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!dangVao || currentUser) return;
+    const hen = setTimeout(() => {
+      setLoiVao('Không tải được hồ sơ của bạn. Vui lòng đăng nhập lại.');
+      setDangVao(false);
+    }, 6000);
+    return () => clearTimeout(hen);
+  }, [dangVao, currentUser]);
+
+  const handleSuccess = () => { setLoiVao(null); setDangVao(true); };
 
   const handleContinueAsGuest = () => navigate('/dashboard');
 
@@ -162,6 +177,22 @@ export const LoginPage: React.FC = () => {
   // ── Render form nội dung theo view ────────────────────────────────────────
 
   const renderFormContent = () => {
+    /* Đã bấm vào nhưng chưa điều hướng xong: PHẢI có nhánh riêng, đừng rơi
+       xuống switch(view). `setDangVao(true)` làm React vẽ xong khung hình mới
+       RỒI MỚI chạy useEffect, nên ở khung đó điều kiện panel bên dưới thành sai
+       và màn hình lật về form đăng nhập trống một nhịp. Đó là cơ chế của React,
+       không phải chuyện mạng nhanh chậm. */
+    if (dangVao) {
+      return (
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, py: 4 }}>
+          <CircularProgress size={28} sx={{ color: 'var(--chu-dam)' }} />
+          <Typography variant="body2" color="text.secondary">
+            Đang vào…
+          </Typography>
+        </Box>
+      );
+    }
+
     /* Phiên còn sống: KHÔNG tự nhảy vào trong, hiện nút để người dùng tự bấm.
        Đây là nửa "luôn lưu phiên" của yêu cầu — không phải nhập lại mật khẩu. */
     if (currentUser && !dangVao) {
@@ -238,8 +269,10 @@ export const LoginPage: React.FC = () => {
     }
   };
 
-  // Chỉ hiện nút "Dùng thử Khách" ở màn hình đăng nhập chính
-  const showGuestButton = view === 'login';
+  // Chỉ hiện nút "Dùng thử Khách" ở màn hình đăng nhập chính — không phải khi
+  // đang bày panel "Chào mừng trở lại" (currentUser) và không phải khi đang
+  // trong lúc chờ điều hướng (dangVao), kẻo bấm "Dùng thử" khi đã đăng nhập rồi.
+  const showGuestButton = view === 'login' && !dangVao && !currentUser;
 
   return (
     <Box
@@ -282,8 +315,10 @@ export const LoginPage: React.FC = () => {
               </Typography>
             </Box>
 
-            {/* Tiêu đề form */}
-            {view === 'login' && !(currentUser && !dangVao) && (
+            {/* Tiêu đề form — cũng phải ẩn khi dangVao (đang vào), cùng loại lỗi
+                với panel "Chào mừng trở lại": rơi xuống switch(view) không có
+                nghĩa là đang thật sự ở form đăng nhập trống. */}
+            {view === 'login' && !dangVao && !currentUser && (
               <Box sx={{ mb: 3 }}>
                 <Typography variant="h5" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)' }}>
                   Đăng nhập tài khoản
@@ -292,6 +327,13 @@ export const LoginPage: React.FC = () => {
                   Chào mừng bạn quay lại với Gia sư Hóa 11.
                 </Typography>
               </Box>
+            )}
+
+            {/* Chờ hồ sơ quá hạn (Sửa 2): báo lỗi thay vì im lặng quay về form trống. */}
+            {loiVao && (
+              <Alert severity="error" sx={{ mb: 2, borderRadius: 0 }}>
+                {loiVao}
+              </Alert>
             )}
 
             {/* Form content — giữ nguyên logic cũ, không đổi */}
