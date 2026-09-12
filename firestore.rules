@@ -211,26 +211,48 @@ service cloud.firestore {
       allow write: if laGiaoVien();
     }
 
-    /* CHÚ Ý hai điều, cả hai đều dễ viết sai:
+    /* BỐN điều phải nhớ, cả bốn đều đã viết sai một lần:
 
-       1. `create` phải cho phép CẢ trường hợp giáo viên/quản trị tạo hộ. Khi
-          admin tạo tài khoản cho giáo viên, tài khoản Auth được tạo trên
-          Firebase App PHỤ (xem `taoAuthPhu()`) nhưng hồ sơ ghi bằng db của app
-          CHÍNH — lúc ghi, request.auth.uid là ADMIN chứ không phải người mới.
-          Thiếu vế laGiaoVien() là chặn đúng createTeacher / createSchoolAdmin /
-          createStudent.
+       1. `create` phải cho phép giáo viên/quản trị tạo hộ. Khi admin tạo tài
+          khoản cho giáo viên, bản ghi Auth tạo trên app PHỤ (xem `taoAuthPhu()`)
+          nhưng hồ sơ ghi bằng db của app CHÍNH — lúc ghi, request.auth.uid là
+          ADMIN chứ không phải người mới.
 
-       2. `update` phải chặn tự đổi `role`. Không chặn thì một học sinh mở
-          console trình duyệt là tự phong mình làm admin, và cả đợt này vô
-          nghĩa. */
+       2. `create` cũng phải chặn TỰ PHONG VAI. Đăng ký Firebase Auth bằng email
+          + mật khẩu là công khai: ai cũng gọi thẳng API của Google để lấy một
+          uid hợp lệ mà không cần đụng vào web, rồi ghi users/{uid} với
+          role: "admin". Chặn `update` mà bỏ ngỏ `create` thì cửa vẫn mở, chỉ là
+          cửa bên cạnh.
+
+       3. Học sinh KHÔNG tự đặt được `classId`/`schoolId`. Nếu cho, thì dù
+          `classes` đã khoá, em vẫn tự xếp mình vào lớp bất kỳ qua cửa sau.
+          Vào lớp đi bằng `pendingClassCode` rồi chờ giáo viên duyệt.
+
+       4. So bằng `affectedKeys()` chứ KHÔNG so
+          `request.resource.data.classId == resource.data.classId`: phần lớn hồ
+          sơ không có hai trường đó, mà đọc một trường vắng mặt trong luật là
+          lỗi, và lỗi thì từ chối — tức chặn nhầm mọi người. */
     match /users/{userId} {
       allow read:   if dangNhap() && (request.auth.uid == userId || laGiaoVien());
-      allow create: if dangNhap() && (request.auth.uid == userId || laGiaoVien());
+
+      allow create: if dangNhap() && (
+                      (request.auth.uid == userId
+                       && request.resource.data.role == 'student'
+                       && !('classId' in request.resource.data)
+                       && !('schoolId' in request.resource.data))
+                      || laGiaoVien()
+                    );
+
       allow update: if dangNhap() && (
                       (request.auth.uid == userId
-                       && request.resource.data.role == resource.data.role)
+                       && !request.resource.data.diff(resource.data)
+                            .affectedKeys().hasAny(['role', 'classId', 'schoolId']))
+                      || (laGiaoVien()
+                          && !request.resource.data.diff(resource.data)
+                               .affectedKeys().hasAny(['role']))
                       || laQuanTri()
                     );
+
       allow delete: if laQuanTri();
     }
 

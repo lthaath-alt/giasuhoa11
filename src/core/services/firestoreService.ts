@@ -24,6 +24,7 @@ import {
   orderBy,
   writeBatch,
   serverTimestamp,
+  deleteField,
 } from 'firebase/firestore';
 import { db } from './firebase';
 import { ErrorLogService } from './errorLog';
@@ -169,6 +170,23 @@ export const FirestoreService = {
       return true;
     } catch (err) {
       handleError('updateUserById', err);
+      return false;
+    }
+  },
+
+  /**
+   * Xoá nguyện vọng vào lớp, sau khi giáo viên duyệt hoặc từ chối.
+   *
+   * Phải dùng `deleteField()` chứ không gán `undefined`: `cleanForFirestore`
+   * lọc bỏ `undefined` trước khi gửi, nên gán như vậy là KHÔNG ghi gì cả và
+   * đơn cũ nằm lại mãi trong danh sách chờ.
+   */
+  async clearPendingClassCode(userId: string): Promise<boolean> {
+    try {
+      await updateDoc(doc(db, COL_USERS, userId), { pendingClassCode: deleteField() });
+      return true;
+    } catch (err) {
+      handleError('clearPendingClassCode', err);
       return false;
     }
   },

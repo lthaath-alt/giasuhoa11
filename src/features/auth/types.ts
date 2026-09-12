@@ -118,6 +118,22 @@ export interface User {
   joinedClassId?: string;
 
   /**
+   * Mã lớp học sinh đã nhập để XIN vào lớp — chưa được duyệt.
+   *
+   * Khác `classId`: đây mới là nguyện vọng. Học sinh KHÔNG tự đặt được
+   * `classId` cho mình (luật Firestore chặn `affectedKeys()` chạm vào
+   * `classId`/`schoolId`), nên đường duy nhất vào lớp là giáo viên bấm Duyệt
+   * trong `ClassManagement` — và chính giáo viên ghi `classId` cùng
+   * `classes.studentIdentifiers`.
+   *
+   * Cố ý KHÔNG kiểm mã có thật hay không lúc nhập: màn đăng ký chạy khi chưa
+   * đăng nhập, mà từ đợt 2 `classes` chỉ nạp sau khi đăng nhập — mảng lúc đó
+   * rỗng nên mọi lần tra đều trả "mã không tồn tại", kể cả mã đúng. Mã sai
+   * đơn giản là không trùng lớp nào và không hiện ra ở đâu.
+   */
+  pendingClassCode?: string;
+
+  /**
    * Số báo danh trong lớp (chỉ áp dụng cho học sinh được GV tạo tài khoản).
    * Dùng để sinh mật khẩu có cấu trúc: {TÊN_LỚP}_{SBD:02d}_{4random}.
    */
