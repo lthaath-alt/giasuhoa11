@@ -33,7 +33,7 @@ Giáo viên duyệt thì chính giáo viên ghi `classId` và `classes.studentId
     1 phép kiểm  ->  2 luật + kiểu  ->  3 AppContext (đăng ký & xin vào lớp)
     ->  4 màn duyệt cho giáo viên  ->  5 chữ nghĩa giao diện
     ->  6 BUILD + DEPLOY + XÁC NHẬN            <- CỔNG, chủ dự án làm
-    ->  7 Playground 14 phép rồi Publish       <- CỔNG, khó lùi
+    ->  7 Playground 17 phép rồi Publish       <- CỔNG, khó lùi
     ->  8 thử tay ba vai + tài liệu
 
 Publish trước khi bản mới chạy trên Netlify thì bản đang chạy vẫn ghi vào
@@ -811,7 +811,7 @@ tức là trình duyệt đang giữ bản cũ — bấm Ctrl+F5, đừng đi ti
 
 ---
 
-### Task 7: CỔNG — 14 phép ở Rules Playground, rồi Publish
+### Task 7: CỔNG — 17 phép ở Rules Playground, rồi Publish
 
 **Chủ dự án làm.** Chép luật ĐANG chạy ra Notepad trước — đó là bản lùi.
 
@@ -830,25 +830,43 @@ tắt khi đổi Simulation type**, phải kiểm lại trước mỗi lần Run
 | 8 | học sinh | update | `/users/<uid HS>` | `name: Tên mới` | ✅ |
 | 9 | giáo viên | create | `/bank_questions/t3` | `q: 2+2=?` | ✅ |
 | 10 | giáo viên | create | `/bank_questions/t4` | `q: <img src=x onerror=alert(1)>` | ❌ |
-| 11 | giáo viên | create | `/users/<uid mới bịa>` | `role: teacher` | ✅ |
-| 12 | học sinh | **create** | `/users/<uid HS>` | `role: admin` | ❌ |
-| 13 | học sinh | update | `/users/<uid HS>` | `classId: class_abc` | ❌ |
-| 14 | học sinh | update | `/users/<uid HS>` | `pendingClassCode: ABC123` | ✅ |
+| 11 | **quản trị** | create | `/users/<uid mới bịa>` | `role: teacher` | ✅ |
+| 12 | **giáo viên thuần** | create | `/users/<uid mới bịa>` | `role: teacher` | ❌ |
+| 13 | **giáo viên thuần** | create | `/users/<uid mới bịa>` | `role: student` + `classId: <id lớp>` | ✅ |
+| 14 | học sinh | **create** | `/users/<uid HS>` | `role: admin` | ❌ |
+| 15 | học sinh | update | `/users/<uid HS>` | `classId: class_abc` | ❌ |
+| 16 | học sinh | update | `/users/<uid HS>` | `joinedClassId: class_abc` | ❌ |
+| 17 | học sinh | update | `/users/<uid HS>` | `pendingClassCode: ABC123` | ✅ |
 
-Ba phép mới (12, 13, 14) là lý do tồn tại của cả đợt 2b:
+**Bảng này đã được viết lại ngày 12/09/2026** sau khi lần soát Việc 2 tìm ra hai
+lỗ hổng trong bản luật đầu. Ba dòng 11-13 thay cho một dòng "giáo viên tạo
+`/users`" cũ, vì luật nay **phân biệt giáo viên thuần với quản trị**: giáo viên
+chỉ tạo được tài khoản học sinh, còn tạo tài khoản giáo viên là việc của quản
+trị. Dòng 16 là dòng mới hoàn toàn.
 
-- **Phép 12** — cửa bên cạnh. Sai là ai cũng tự phong mình làm admin.
-- **Phép 13** — cửa sau. Sai là học sinh tự xếp mình vào lớp bất kỳ dù `classes`
-  đã khoá.
-- **Phép 14** — sai là không ai gửi được đơn, tức tính năng vừa làm chết ngay.
+**Ba vai cần chuẩn bị sẵn uid + email THẬT** (Authentication → Users → cột User
+UID). "Giáo viên thuần" phải là hồ sơ có đúng `role: "teacher"` — lấy một
+`school_admin` hay `admin` là phép 12 ra ✅ và bảng vô nghĩa.
 
-Và ba phép cũ vẫn quan trọng nhất: **1** (sai là đồng bộ đêm chết âm thầm),
-**7** (sai là cả đợt vô nghĩa), **11** (sai là admin không tạo được tài khoản hộ).
+Sáu phép quan trọng nhất, và sai mỗi phép thì hỏng chuyện gì:
+
+- **Phép 1** — sai là đồng bộ đêm chết âm thầm. Web vẫn đúng vì nó đọc thẳng
+  Firestore; chỉ bản chụp trong git lệch dần, không ai biết.
+- **Phép 11** — sai là quản trị không tạo được tài khoản cho giáo viên, tức nhà
+  trường mất chức năng chính.
+- **Phép 12** — sai là một giáo viên tự nâng mình thành admin. Đây là lỗ hổng
+  lần soát vừa tìm ra; phép này là bằng chứng nó đã bị bịt.
+- **Phép 13** — sai là giáo viên không tạo được tài khoản cho học sinh lớp mình.
+  Cặp 12-13 phải ra NGƯỢC nhau; cùng ✅ hay cùng ❌ đều là luật sai.
+- **Phép 14** — cửa bên cạnh. Sai là ai cũng tự phong mình làm admin.
+- **Phép 16** — cửa sau thứ hai. Dự án có HAI dấu hiệu thuộc lớp (`classId` và
+  `joinedClassId`); khoá một cái mà quên cái kia thì học sinh vẫn tự chui vào
+  bảng tiến độ lớp của giáo viên.
 
 - [ ] **Bước 1: Dán luật mới vào ô soạn thảo, CHƯA Publish**
-- [ ] **Bước 2: Chạy đủ 14 phép, ghi lại phép nào lệch**
+- [ ] **Bước 2: Chạy đủ 17 phép, ghi lại phép nào lệch**
 - [ ] **Bước 3: Lệch một phép thôi cũng DỪNG — báo số phép và kết quả thật**
-- [ ] **Bước 4: Đúng cả 14 thì Publish**
+- [ ] **Bước 4: Đúng cả 17 thì Publish**
 
 ---
 
