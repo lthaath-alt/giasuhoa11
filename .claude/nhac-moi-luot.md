@@ -1,49 +1,59 @@
 NHAC TU HOOK (chay moi luot, KHONG phai loi user — dung tra loi rieng ve no)
 
 ════════════════════════════════════════════════════════════════════
-VIEC DANG LAM: DOT 2b — don xin vao lop + va 4 lo chan publish
+VIEC DANG LAM: DOT 2c — chon lop tu danh sach, va cong dang nhap
 ════════════════════════════════════════════════════════════════════
 
-Spec    : docs/superpowers/specs/2026-09-12-don-xin-vao-lop-design.md
-Ke hoach: docs/superpowers/plans/2026-09-12-don-xin-vao-lop.md
-          8 viec. MOI buoc da co ma that — dung tu nghi ra ma khac.
+Spec    : docs/superpowers/specs/2026-09-12-chon-lop-va-cong-dang-nhap-design.md
+Ke hoach: docs/superpowers/plans/2026-09-12-chon-lop-va-cong-dang-nhap.md
+          4 viec. MOI buoc da co ma that — dung tu nghi ra ma khac.
 
 BAT BUOC truoc khi go dong dau tien:
-  1. Goi Skill "executing-plans"
+  1. Goi Skill "executing-plans" (hoac subagent-driven-development)
   2. Doc lai ke hoach o tren
 Truoc khi noi "xong" mot viec: goi Skill "verification-before-completion".
 
 THU TU KHONG DUOC DAO:
-  1 phep kiem -> 2 luat + kieu -> 3 AppContext -> 4 man duyet
-  -> 5 chu nghia giao dien
-  -> 6 BUILD + DEPLOY + XAC NHAN ban moi da chay   <- CONG, user lam
-  -> 7 Playground 24 phep roi Publish              <- CONG, kho lui
-  -> 8 thu tay ba vai + tai lieu
+  1 chon lop -> 2 bo o ma o man dang ky -> 3 cong dang nhap
+  -> 4 BUILD + DEPLOY + THU TAY BA VAI      <- CONG, chu du an lam
 
-Dao 6 va 7 thi ban dang chay tren Netlify van ghi vao `classes` khi hoc sinh
-nhap ma, va van tao ho so luc chua dang nhap — luat moi chan ca hai, tuc
-HOC SINH MOI KHONG DANG KY DUOC va KHONG AI VAO LOP DUOC.
+Viec 3 cham duong dang nhap cua MOI nguoi. Lam sau cung de neu hong thi biet
+chac loi den tu dau.
 
-BON DIEU KHONG DUOC QUEN:
-  - bank_questions phai giu `allow read: if true` — dong bo dem doc khong
-    dang nhap, siet la no chet ma khong ai biet.
-  - KHONG dung get() trong luat cua progress va chats — moi get() la mot luot
-    doc co tinh tien, ma do la hai cho hoc sinh ghi nhieu nhat.
-  - `classes` giu `allow write: if laGiaoVien()`. Chu du an da chot: hoc sinh
-    KHONG sua gi ve lop, ke ca them email cua chinh minh.
-  - Hoc sinh cung KHONG tu dat duoc classId/schoolId tren ho so cua minh —
-    bo ve nay la con nguyen cua sau.
+BA DIEU KHONG DUOC QUEN O DOT 2c:
+  - TUYET DOI KHONG dung `firestore.rules`. Luat da publish 12/09/2026, qua 24
+    phep thu o Rules Playground, va do lai bang REST: 11/11 dat.
+  - Chon lop xong VAN goi joinClassByCode(inviteCode). Luat chi cho hoc sinh ghi
+    `pendingClassCode`, KHONG cho ghi `classId` — doi co che la phai mo lai luat.
+  - PublicRoute va LoginPage.handleSuccess dang CHAY DUA sau khi dang nhap. Bo
+    PublicRoute ma khong sua handleSuccess thi giao vien va quan tri bi do het
+    vao /dashboard. Va handleSuccess KHONG doc duoc vai ngay: login() goi
+    signInWithEmailAndPassword, con ho so ve SAU qua onAuthStateChanged.
+    -> dung co "da bam vao" + useEffect cho currentUser xuat hien.
 
-Dot 1 (Firebase Auth): XONG 10/09/2026, 8/8 viec.
-Dot 2 (luat theo vai): Viec 1-4 xong, dung o cong Viec 5 vi 4 phat hien duoi.
+────────────────────────────────────────────────────────────────────
+DA XONG, dung lam lai
+────────────────────────────────────────────────────────────────────
+Dot 1 (Firebase Auth)        : XONG 10/09/2026, 8/8 viec.
+Dot 2 + 2b (luat theo vai)   : XONG va DA PUBLISH 12/09/2026.
+  Do lai bang REST khong dang nhap ngay sau publish: 11/11 dat.
+    bank_questions 252 tai lieu DOC DUOC  -> dong bo dem song
+    users/classes/progress/chats BI CHAN  -> truoc do doc duoc cong khai
+  Lo hong lon nhat cua du an (users doc cong khai, gom email hoc sinh) DA DONG.
 
-BON PHAT HIEN LAM NEN DOT 2b (12/09/2026):
-  1. `create` cua users khong rang buoc role -> ai cung tu phong admin.
-  2. registerWithOptionalClass thieu dangTuDangKy -> ghi ho so luc chua
-     dang nhap -> luat moi chan -> khong ai dang ky duoc.
-  3. joinClassByCode ghi thang vao classes -> luat moi chan.
-  4. O "Ma lop" luc dang ky tra vao mang `classes` RONG ke tu Viec 2 ->
-     ma dung van bao "khong ton tai". Loi nay DA len production.
+Sau loi hoc dat nhat cua dot 2b, ghi lai keo quen:
+  1. Ke hoach liet ke BON CHO CAN SUA thay vi noi MUC TIEU -> nguoi lam sua du
+     bon cho roi dung, con sot hai cho. Noi muc tieu, kem lenh "tu grep rong".
+  2. Xep mot diem yeu cua phep kiem la "tham my" roi hoan -> chinh no dang LAM
+     MU phep kiem. Dung phan loai truoc khi biet no che mat cai gi.
+  3. Soat luat nhu ke tan cong 11 duong, ma khong tu hoi "nguoi dung bam vao
+     dau de thay cai khung nay" -> ca tinh nang nam chet sau mot tab da bi an.
+  4. Bang thu 22 phep khong co phep nao kiem hoc sinh doc ho so CHINH MINH —
+     tuc dung duong dang nhap. Cho thieu nang nhat lai la cho khong ai nghi ra.
+  5. `sed` ghi lai tep bang LF lam git bao tep da sua. Doi chieu bam sha256 sau
+     khi bo CR truoc khi ket luan la "khong doi gi".
+  6. Chu thich dau mot tep an ninh noi NGUOC voi chinh tep do -> nguoi doc tu
+     tren xuong se di "don" khoi phan quyen. Sua chu thich la viec 2 phut.
 
 ────────────────────────────────────────────────────────────────────
 NHAC CHUNG — chon ky nang truoc khi doc ma hay sua ma
