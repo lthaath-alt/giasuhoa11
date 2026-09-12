@@ -274,6 +274,11 @@ export interface AppContextType {
     className?: string;
   }>;
 
+  /** Giáo viên duyệt đơn xin vào lớp (thêm học sinh vào lớp) */
+  approveJoinRequest: (studentId: string, classId: string) => Promise<{ success: boolean; message: string }>;
+  /** Giáo viên từ chối đơn xin vào lớp (chỉ xoá nguyện vọng) */
+  rejectJoinRequest: (studentId: string) => Promise<{ success: boolean; message: string }>;
+
   /** Giáo viên/Admin chấm lại điểm câu tự luận của học sinh */
   updateQuizEssayScore: (
     quizId: string,
@@ -1686,6 +1691,46 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     };
   };
 
+  // ── Giáo viên duyệt đơn xin vào lớp ──────────────────────────────────
+
+  /* Hai lượt ghi dưới đây đều do GIÁO VIÊN thực hiện, và đó là cả điểm mấu
+     chốt của đợt 2b: học sinh không ghi được vào `classes`, cũng không tự đặt
+     được `classId` cho mình. Luật Firestore chặn cả hai đường. */
+  const approveJoinRequest = async (studentId: string, classId: string) => {
+    const cls = classes.find(c => c.id === classId);
+    if (!cls) return { success: false, message: 'Không tìm thấy lớp.' };
+    const student = users.find(u => u.id === studentId);
+    if (!student) return { success: false, message: 'Không tìm thấy học sinh.' };
+
+    const identifier = student.username || student.email;
+
+    const okHoSo = await FirestoreService.updateUserById(studentId, {
+      classId: cls.id,
+      joinedClassId: cls.id,
+      schoolId: cls.schoolId,
+    });
+    if (!okHoSo) return { success: false, message: 'Không cập nhật được hồ sơ học sinh.' };
+
+    await FirestoreService.addStudentToClass(cls.id, identifier);
+    await FirestoreService.clearPendingClassCode(studentId);
+
+    setUsers(prev => prev.map(u => u.id === studentId
+      ? { ...u, classId: cls.id, joinedClassId: cls.id, schoolId: cls.schoolId, pendingClassCode: undefined }
+      : u));
+    setClasses(prev => prev.map(c => c.id === cls.id
+      ? { ...c, studentIdentifiers: [...c.studentIdentifiers, identifier] }
+      : c));
+
+    return { success: true, message: `Đã thêm ${student.name} vào lớp "${cls.name}".` };
+  };
+
+  const rejectJoinRequest = async (studentId: string) => {
+    const ok = await FirestoreService.clearPendingClassCode(studentId);
+    if (!ok) return { success: false, message: 'Không xoá được đơn. Vui lòng thử lại.' };
+    setUsers(prev => prev.map(u => u.id === studentId ? { ...u, pendingClassCode: undefined } : u));
+    return { success: true, message: 'Đã từ chối đơn.' };
+  };
+
   // ── Giáo viên/Admin chấm lại điểm câu tự luận của học sinh ────────────
 
   const updateQuizEssayScore = async (quizId: string, questionId: string, newScore: number) => {
@@ -1789,6 +1834,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         registerWithOptionalClass,
         createClassSelf,
         joinClassByCode,
+        approveJoinRequest,
+        rejectJoinRequest,
         updateQuizEssayScore,
         systemSettings,
         updateSystemSettings,

@@ -26,7 +26,7 @@ export const ClassManagement: React.FC<ClassManagementProps> = ({
   onCreateClick,
   currentUserRole = 'admin',
 }) => {
-  const { updateClass, deleteClass } = useApp();
+  const { updateClass, deleteClass, approveJoinRequest, rejectJoinRequest } = useApp();
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [editClass, setEditClass] = useState<SchoolClass | null>(null);
   const [editName, setEditName] = useState('');
@@ -34,6 +34,8 @@ export const ClassManagement: React.FC<ClassManagementProps> = ({
   const [codeCopied, setCodeCopied] = useState<string | null>(null);
   const [exportClassId, setExportClassId] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
+  const [donClassId, setDonClassId] = useState<string | null>(null);
+  const [dangDuyet, setDangDuyet] = useState<string | null>(null);
 
   const getTeacherName = (email: string) => {
     const teacher = users.find(u => u.email.toLowerCase() === email.toLowerCase());
@@ -69,6 +71,15 @@ export const ClassManagement: React.FC<ClassManagementProps> = ({
   const getTeachers = () => {
     return users.filter(u => u.role === 'teacher');
   };
+
+  /* Đơn xin vào lớp = học sinh có `pendingClassCode` trùng mã mời của lớp.
+     Không có collection riêng, nên cũng không có gì phải đồng bộ. */
+  const getDonChoDuyet = (cls: SchoolClass) =>
+    users.filter(u =>
+      u.pendingClassCode &&
+      cls.inviteCode &&
+      u.pendingClassCode.toUpperCase() === cls.inviteCode.toUpperCase()
+    );
 
   const handleExportCSV = async (cls: SchoolClass) => {
     setExporting(true);
@@ -144,13 +155,14 @@ export const ClassManagement: React.FC<ClassManagementProps> = ({
               <TableCell sx={{ fontWeight: 'bold', color: 'var(--chu)' }}>Tên Lớp Học</TableCell>
               <TableCell sx={{ fontWeight: 'bold', color: 'var(--chu)' }}>Giáo Viên Phụ Trách</TableCell>
               <TableCell sx={{ fontWeight: 'bold', color: 'var(--chu)' }}>Sĩ Số Học Sinh</TableCell>
+              <TableCell sx={{ fontWeight: 'bold', color: 'var(--chu)' }}>Đơn chờ</TableCell>
               <TableCell sx={{ fontWeight: 'bold', color: 'var(--chu)', align: 'right' }}>Hành Động</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {classes.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={4} align="center" sx={{ py: 6, color: 'text.secondary' }}>
+                <TableCell colSpan={5} align="center" sx={{ py: 6, color: 'text.secondary' }}>
                   Chưa có lớp học nào được tạo.
                 </TableCell>
               </TableRow>
@@ -193,6 +205,23 @@ export const ClassManagement: React.FC<ClassManagementProps> = ({
                         color: 'var(--xanh-troi)'
                       }}
                     />
+                  </TableCell>
+                  <TableCell>
+                    {getDonChoDuyet(cls).length > 0 ? (
+                      <Chip
+                        size="small"
+                        clickable
+                        onClick={() => setDonClassId(cls.id)}
+                        label={`${getDonChoDuyet(cls).length} đơn chờ`}
+                        sx={{
+                          fontWeight: 'bold',
+                          bgcolor: 'var(--vang-nen)',
+                          color: 'var(--chu-tren-vang)',
+                        }}
+                      />
+                    ) : (
+                      <Typography variant="caption" color="text.secondary">—</Typography>
+                    )}
                   </TableCell>
                   <TableCell align="right">
                     <Tooltip title="Sửa thông tin">
@@ -351,6 +380,61 @@ export const ClassManagement: React.FC<ClassManagementProps> = ({
           >
             {exporting ? 'Đang xuất...' : 'Xuất CSV'}
           </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Dialog duyệt đơn xin vào lớp */}
+      <Dialog open={Boolean(donClassId)} onClose={() => setDonClassId(null)} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ fontWeight: 'bold' }}>Đơn xin vào lớp</DialogTitle>
+        <DialogContent>
+          <DialogContentText sx={{ mb: 2 }}>
+            Học sinh đã nhập mã lớp này. Duyệt thì em được thêm vào lớp và bắt đầu
+            được theo dõi tiến độ.
+          </DialogContentText>
+          {donClassId && getDonChoDuyet(classes.find(c => c.id === donClassId)!).map(hs => (
+            <Box
+              key={hs.id}
+              sx={{
+                display: 'flex', alignItems: 'center', gap: 2, py: 1.5,
+                borderBottom: '1px solid var(--vien-2)',
+              }}
+            >
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="body2" sx={{ fontWeight: 600 }}>{hs.name}</Typography>
+                <Typography variant="caption" color="text.secondary">{hs.email}</Typography>
+              </Box>
+              <Button
+                size="small"
+                disabled={dangDuyet === hs.id}
+                onClick={async () => {
+                  setDangDuyet(hs.id);
+                  await approveJoinRequest(hs.id, donClassId!);
+                  setDangDuyet(null);
+                }}
+                sx={{
+                  textTransform: 'none', fontWeight: 'bold', borderRadius: 0,
+                  bgcolor: 'var(--luc-tham-nen)', color: 'var(--chu-nguoc)',
+                }}
+              >
+                Duyệt
+              </Button>
+              <Button
+                size="small"
+                disabled={dangDuyet === hs.id}
+                onClick={async () => {
+                  setDangDuyet(hs.id);
+                  await rejectJoinRequest(hs.id);
+                  setDangDuyet(null);
+                }}
+                sx={{ textTransform: 'none', borderRadius: 0, color: 'var(--chu-2)' }}
+              >
+                Từ chối
+              </Button>
+            </Box>
+          ))}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDonClassId(null)} sx={{ textTransform: 'none' }}>Đóng</Button>
         </DialogActions>
       </Dialog>
     </Box>
