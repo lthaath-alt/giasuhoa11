@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, Paper, Typography, Button, Divider } from '@mui/material';
 import { BookOpen, Sparkles, UserCheck, Play } from 'lucide-react';
@@ -116,12 +116,34 @@ const BrandPanel: React.FC = () => (
 
 // ─── LoginPage ────────────────────────────────────────────────────────────────
 
+/** Trang chủ theo vai. Phải khớp với các thẻ canh trong `RouteGuards.tsx`. */
+const duongTheoVai = (role?: string) => {
+  if (role === 'admin') return '/admin';
+  if (role === 'school_admin') return '/school-admin';
+  if (role === 'teacher') return '/teacher';
+  return '/dashboard';
+};
+
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
+  const { currentUser, logout } = useApp();
   const [view, setView] = useState<LoginView>('login');
   const [pendingGoogleInfo, setPendingGoogleInfo] = useState<GoogleUserInfo | null>(null);
 
-  const handleSuccess = () => navigate('/dashboard');
+  /* Cờ "người dùng đã bấm vào". Vì sao phải chờ bằng useEffect chứ không điều
+     hướng ngay trong handleSuccess: `login()` gọi
+     signInWithEmailAndPassword, còn hồ sơ (có `role`) về SAU qua
+     onAuthStateChanged. Lúc handleSuccess chạy, `currentUser` vẫn còn null —
+     điều hướng ngay là đổ MỌI vai vào /dashboard, đúng lỗi bản cũ mắc phải. */
+  const [dangVao, setDangVao] = useState(false);
+
+  useEffect(() => {
+    if (dangVao && currentUser) {
+      navigate(duongTheoVai(currentUser.role), { replace: true });
+    }
+  }, [dangVao, currentUser, navigate]);
+
+  const handleSuccess = () => setDangVao(true);
 
   const handleContinueAsGuest = () => navigate('/dashboard');
 
@@ -134,12 +156,52 @@ export const LoginPage: React.FC = () => {
   // Sau khi hoàn tất đặt mật khẩu Google
   const handleGoogleRegisterSuccess = () => {
     setPendingGoogleInfo(null);
-    navigate('/dashboard');
+    setDangVao(true);
   };
 
   // ── Render form nội dung theo view ────────────────────────────────────────
 
   const renderFormContent = () => {
+    /* Phiên còn sống: KHÔNG tự nhảy vào trong, hiện nút để người dùng tự bấm.
+       Đây là nửa "luôn lưu phiên" của yêu cầu — không phải nhập lại mật khẩu. */
+    if (currentUser && !dangVao) {
+      return (
+        <Box>
+          <Typography variant="h5" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)', mb: 0.5 }}>
+            Chào mừng trở lại
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+            Bạn đang đăng nhập bằng <strong>{currentUser.email}</strong>.
+          </Typography>
+          <Button
+            id="continue-session-btn"
+            variant="contained"
+            size="large"
+            fullWidth
+            onClick={() => setDangVao(true)}
+            startIcon={<UserCheck size={18} />}
+            sx={{
+              py: 1.5, borderRadius: 0, fontWeight: 'bold',
+              textTransform: 'none', boxShadow: 'none',
+              '&:hover': { boxShadow: 'none' },
+            }}
+          >
+            Tiếp tục với {currentUser.name || currentUser.email}
+          </Button>
+          <Button
+            id="switch-account-btn"
+            variant="text"
+            size="small"
+            fullWidth
+            onClick={() => { void logout(); }}
+            sx={{ mt: 1.5, borderRadius: 0, textTransform: 'none', color: 'var(--chu-2)' }}
+          >
+            Đăng nhập bằng tài khoản khác
+          </Button>
+        </Box>
+      );
+    }
+
     switch (view) {
       case 'forgot-password':
         return (
@@ -221,7 +283,7 @@ export const LoginPage: React.FC = () => {
             </Box>
 
             {/* Tiêu đề form */}
-            {view === 'login' && (
+            {view === 'login' && !(currentUser && !dangVao) && (
               <Box sx={{ mb: 3 }}>
                 <Typography variant="h5" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)' }}>
                   Đăng nhập tài khoản

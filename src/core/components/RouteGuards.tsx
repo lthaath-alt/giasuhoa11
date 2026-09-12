@@ -57,18 +57,19 @@ export const TeacherRoute: React.FC = () => {
 
 // ─── PublicRoute – trang công khai (Login) ────────────────────────────────────
 
-/** Nếu đã đăng nhập → redirect đến đúng trang theo role. */
+/**
+ * PublicRoute – trang công khai (Login).
+ *
+ * KHÔNG còn đá người đã đăng nhập sang trang theo vai. Chủ dự án chốt
+ * 12/09/2026: vào web là luôn dừng ở màn đăng nhập.
+ *
+ * Việc điều hướng sau khi đăng nhập nay nằm HẲN ở `LoginPage` — trước đây
+ * `PublicRoute` và `LoginPage.handleSuccess` cùng điều hướng và chạy đua nhau,
+ * nên `handleSuccess` đổ mọi vai vào `/dashboard` mà không ai thấy, vì
+ * `PublicRoute` thường thắng. Một chỗ thì không đua với ai.
+ */
 export const PublicRoute: React.FC = () => {
-  const { currentUser, loading } = useApp();
+  const { loading } = useApp();
   if (loading) return <LoadingScreen />;
-
-  if (currentUser) {
-    if (currentUser.role === 'admin')  return <Navigate to="/admin" replace />;
-    if (currentUser.role === 'school_admin') return <Navigate to="/school-admin" replace />;
-    if (currentUser.role === 'teacher')      return <Navigate to="/teacher" replace />;
-    // student → dashboard học tập
-    return <Navigate to="/dashboard" replace />;
-  }
-
   return <Outlet />;
 };

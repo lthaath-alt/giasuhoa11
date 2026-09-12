@@ -263,6 +263,12 @@ export default function App() {
       <AppProvider>
         <HashRouter>
           <Routes>
+            {/* Vào web là LUÔN dừng ở màn đăng nhập — chủ dự án chốt 12/09/2026.
+                Còn phiên thì `LoginPage` hiện nút "Tiếp tục với <email>", chứ
+                KHÔNG tự nhảy vào trong. Để route này ngoài mọi thẻ canh để nó
+                không phải chờ màn "đang tải" của `ProtectedRoute`. */}
+            <Route path="/" element={<Navigate to="/login" replace />} />
+
             {/* PUBLIC ROUTES (Chỉ khi chưa đăng nhập) */}
             <Route element={<PublicRoute />}>
               <Route path="/login" element={<LoginPage />} />
@@ -272,7 +278,6 @@ export default function App() {
             <Route element={<ProtectedRoute />}>
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/quiz/:quizId" element={<QuizPage />} />
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
             </Route>
 
             {/* SUPER ADMIN ONLY ROUTES */}
