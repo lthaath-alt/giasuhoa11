@@ -7,20 +7,37 @@ import { buildLessonContext, buildLessonCatalog, buildProgramContext } from './l
 import { dungPrompt } from './promptSuPham';
 import { nhanhCuaHocSinh } from '../../research/thucNghiem';
 
+/* Chuỗi này có THỂ là một API key không?
+
+   Cố ý kiểm rất lỏng, và KHÔNG kiểm theo tiền tố. Google AI Studio đã đổi hình
+   dạng key: key cũ bắt đầu bằng "AIza", key cấp gần đây bắt đầu bằng "AQ.".
+   Bản trước chỉ nhận "AIza" nên người dùng dán một key MỚI hoàn toàn hợp lệ vào
+   vẫn bị bỏ qua lặng lẽ — hộp thoại đóng như đã lưu xong mà gia sư thì vẫn chạy
+   bằng key của web. Google còn có thể đổi hình dạng nữa, nên ở đây chỉ loại
+   những thứ chắc chắn không phải key: chuỗi rỗng, chuỗi toàn dấu cách, chuỗi
+   quá ngắn, hay cả một câu người dùng gõ nhầm vào ô.
+
+   Đây là kiểm cho đỡ hỏng, KHÔNG phải kiểm bảo mật hay kiểm tính hợp lệ: key
+   sai thì Google tự từ chối, và nút "Kiểm tra Key" mới là chỗ biết chắc.
+
+   Tách riêng để hộp thoại cài đặt dùng CHUNG một luật với chỗ đọc key ở dưới. */
+export const coDangKeyGoogle = (key: string): boolean => {
+  const k = (key ?? '').trim();
+  return k.length >= 20 && !/\s/.test(k);
+};
+
 // Get effective API key from localStorage or env
 export const getEffectiveApiKey = (): string => {
   /* Key của người dùng được ưu tiên, nhưng chỉ khi nó TRÔNG như một key thật.
 
      Bản trước nhận bất cứ chuỗi nào khác rỗng. Một chuỗi rác — hay một chuỗi
      toàn dấu cách còn sót trong localStorage — vẫn đè lên key của web và làm
-     gia sư câm hẳn, trong khi web thừa sức tự gọi được. Key của Google AI
-     Studio luôn bắt đầu bằng "AIza" và dài khoảng 39 ký tự; kiểm thô như dưới
-     đây đủ để loại chuỗi rác mà không loại nhầm key thật.
+     gia sư câm hẳn, trong khi web thừa sức tự gọi được.
 
-     Đây là kiểm ở phía người dùng cho đỡ hỏng, KHÔNG phải kiểm bảo mật: key
-     sai hình dạng thì Google tự từ chối. */
+     Xem coDangKeyGoogle ở trên để biết "trông như key thật" nghĩa là gì và vì
+     sao chỗ đó cố tình kiểm lỏng. */
   const userKey = (localStorage.getItem('gemini_api_key_user') ?? '').trim();
-  if (userKey.startsWith('AIza') && userKey.length >= 30) return userKey;
+  if (coDangKeyGoogle(userKey)) return userKey;
   return import.meta.env.VITE_GEMINI_API_KEY || import.meta.env.GEMINI_API_KEY || 'MISSING_API_KEY';
 };
 

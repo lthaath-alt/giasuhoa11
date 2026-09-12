@@ -7,7 +7,7 @@ import {
 import { Eye, EyeOff, Key, CheckCircle, ExternalLink, Save, Trash2 } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
 import { GEMINI_MODEL_NAME } from '../../../core/constants';
-import { thongBaoHetLuot } from '../services/geminiTutorService';
+import { thongBaoHetLuot, coDangKeyGoogle } from '../services/geminiTutorService';
 
 interface ApiKeyDialogProps {
   open: boolean;
@@ -36,15 +36,34 @@ export const ApiKeyDialog: React.FC<ApiKeyDialogProps> = ({ open, onClose }) => 
       return;
     }
 
+    /* Chỉ chặn những thứ chắc chắn không phải key (một câu gõ nhầm, vài dấu
+       cách), đừng đoán hình dạng key — Google có nhiều dạng key khác nhau và
+       còn đổi nữa. Key có đúng hay không thì vòng gọi thử ngay dưới trả lời. */
+    if (!coDangKeyGoogle(apiKey)) {
+      setTestResult({
+        success: false,
+        message: 'Chuỗi này trông không giống một API Key (quá ngắn hoặc có dấu cách '
+          + 'ở giữa). Em vào Google AI Studio, bấm "Create API Key" rồi bấm nút sao '
+          + 'chép ngay cạnh dòng key để lấy đúng và đủ nhé.',
+      });
+      return;
+    }
+
     setTesting(true);
     setTestResult(null);
 
     try {
       const ai = new GoogleGenAI({ apiKey: apiKey.trim() });
+      /* KHÔNG đặt maxOutputTokens ở đây.
+
+         Model đang dùng là model có suy nghĩ trước khi trả lời, và phần suy nghĩ
+         cũng tính vào maxOutputTokens. Đặt 10 thì hạn mức hết sạch ngay trong
+         lúc nghĩ, model dừng với response.text rỗng — nên MỘT KEY TỐT vẫn bị báo
+         "Không nhận được phản hồi hợp lệ từ Gemini." Câu hỏi thử chỉ xin một từ
+         nên bỏ hạn mức đi cũng không tốn gì đáng kể. */
       const response = await ai.models.generateContent({
         model: GEMINI_MODEL_NAME,
         contents: 'Say "hello" in Vietnamese, just that word.',
-        config: { maxOutputTokens: 10 }
       });
       
       if (response.text) {
@@ -86,6 +105,17 @@ export const ApiKeyDialog: React.FC<ApiKeyDialogProps> = ({ open, onClose }) => 
       });
       return;
     }
+    /* getEffectiveApiKey bỏ qua chuỗi không trông như key, nên lưu vào chỉ làm
+       người dùng tưởng đã xong. Báo thẳng ở đây thay vì đóng hộp thoại. */
+    if (apiKey.trim() && !coDangKeyGoogle(apiKey)) {
+      setTestResult({
+        success: false,
+        message: 'Chuỗi này trông không giống một API Key (quá ngắn hoặc có dấu cách '
+          + 'ở giữa) nên thầy chưa lưu. Em sao chép lại key ở Google AI Studio theo '
+          + 'hướng dẫn bên dưới nhé.',
+      });
+      return;
+    }
     if (apiKey.trim()) {
       localStorage.setItem('gemini_api_key_user', apiKey.trim());
     }
@@ -120,11 +150,12 @@ export const ApiKeyDialog: React.FC<ApiKeyDialogProps> = ({ open, onClose }) => 
             <TextField
               variant="outlined"
               fullWidth
-              placeholder="AIzaSyB..."
+              placeholder="Dán key lấy từ Google AI Studio"
               type={showKey ? 'text' : 'password'}
               value={apiKey}
               onChange={(e) => {
-                setApiKey(e.target.value);
+                // Dán từ trang web hay dính dấu cách hoặc dấu nháy ở hai đầu
+                setApiKey(e.target.value.trim().replace(/^["']|["']$/g, ''));
                 setTestResult(null);
               }}
               slotProps={{
