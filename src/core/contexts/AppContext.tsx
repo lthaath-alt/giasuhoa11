@@ -225,6 +225,8 @@ export interface AppContextType {
   getUserProgress: (email: string) => LearningProgress | null;
   luuTienDoTroChoi: (email: string, tro: string, bai: string,
                      ketQua: { xong: boolean; cauDung: number; hang?: string }) => Promise<void>;
+  luuTienDoLuyenTap: (email: string, bai: string, phan: string,
+                      tienDoPhan: unknown) => Promise<void>;
   getLessonProgress: (lessonId: string) => import('../../features/auth/types').LessonProgress | null;
   isLessonCompleted: (lessonId: string) => boolean;
   hasAdvancedStudentTitle: (email: string) => boolean;
@@ -1432,6 +1434,40 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     }
   };
 
+  /**
+   * Ghi tiến độ MỘT phần luyện tập của MỘT bài.
+   *
+   * Khác `luuTienDoTroChoi` ở chỗ KHÔNG so "tốt hơn thì mới ghi": tiến độ
+   * luyện tập còn mang cả số lượt đã dùng, mốc hết khóa và cờ cần ôn lại —
+   * những thứ phải ghi kể cả khi điểm lượt này thấp hơn lượt trước. Việc giữ
+   * lại thành tích cũ (`dat`, `tiLeCaoNhat`) đã do `capNhatSauLuot` lo.
+   */
+  const luuTienDoLuyenTap = async (
+    email: string, bai: string, phan: string, tienDoPhan: unknown,
+  ): Promise<void> => {
+    if (!email || email === 'guest') return;
+    const hienCo = progressCache[email]
+      || await FirestoreService.getUserProgress(email)
+      || { userEmail: email, completedLessons: [], details: {} };
+
+    const luyenTap = { ...(hienCo.luyenTap || {}) };
+    const cuaBai = { ...(luyenTap[bai] as Record<string, unknown> || {}) };
+    cuaBai[phan] = tienDoPhan;
+    luyenTap[bai] = cuaBai;
+
+    const moi: LearningProgress = { ...hienCo, luyenTap };
+    setProgressCache(p => ({ ...p, [email]: moi }));
+    try {
+      await FirestoreService.saveUserProgress(moi);
+    } catch (err) {
+      /* Không nuốt im: tiến độ luyện tập CHỈ nằm trên Firestore (khác trò chơi
+         có bản lưu trong máy). Ghi hỏng mà im lặng thì học sinh làm xong một
+         phần, tải lại trang là mất sạch mà không hiểu vì sao. */
+      console.error('Chưa lưu được tiến độ luyện tập:', err);
+      throw err;
+    }
+  };
+
   const getUserProgress = (email: string): LearningProgress | null => {
     return progressCache[email] || null;
   };
@@ -1824,6 +1860,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         updateLessonProgress,
         clearLessonHistory,
         luuTienDoTroChoi,
+        luuTienDoLuyenTap,
     getUserProgress,
         getLessonProgress,
         isLessonCompleted,

@@ -33,7 +33,9 @@ import {
   GraduationCap,
   Building2,
   Presentation,
+  Atom,
   Gamepad2,
+  Target,
   Moon,
   Sun,
 } from 'lucide-react';
@@ -567,6 +569,52 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               }}
             >
               Bài giảng
+            </Button>
+
+            {/* Mục Thí nghiệm — phòng trưng bày mô hình phân tử 3D */}
+            <Button
+              id="nav-lab-btn"
+              onClick={() => {
+                setActiveTab('thinghiem');
+              }}
+              startIcon={<Atom size={16} />}
+              sx={{
+                color: activeTab === 'thinghiem' ? 'var(--chu-dam)' : 'var(--chu-2)',
+                textTransform: 'none',
+                fontWeight: 'bold',
+                px: 2,
+                py: 1,
+                borderRadius: 0,
+                whiteSpace: 'nowrap',
+                borderBottom: activeTab === 'thinghiem' ? '3px solid var(--tin-hieu)' : '3px solid transparent',
+                backgroundColor: activeTab === 'thinghiem' ? 'var(--nen-nhat)' : 'transparent',
+                '&:hover': { backgroundColor: 'var(--nen-nhat)' },
+              }}
+            >
+              Thí nghiệm
+            </Button>
+
+            {/* Mục Luyện tập — 25 bài, mỗi bài 3 phần theo cấu trúc đề thi */}
+            <Button
+              id="nav-practice-btn"
+              onClick={() => {
+                setActiveTab('luyentap');
+              }}
+              startIcon={<Target size={16} />}
+              sx={{
+                color: activeTab === 'luyentap' ? 'var(--chu-dam)' : 'var(--chu-2)',
+                textTransform: 'none',
+                fontWeight: 'bold',
+                px: 2,
+                py: 1,
+                borderRadius: 0,
+                whiteSpace: 'nowrap',
+                borderBottom: activeTab === 'luyentap' ? '3px solid var(--tin-hieu)' : '3px solid transparent',
+                backgroundColor: activeTab === 'luyentap' ? 'var(--nen-nhat)' : 'transparent',
+                '&:hover': { backgroundColor: 'var(--nen-nhat)' },
+              }}
+            >
+              Luyện tập
             </Button>
 
             {/* Mục Trò Chơi — khu game truoc day nam trong tab "Các khóa học" */}

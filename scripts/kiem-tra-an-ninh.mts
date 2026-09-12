@@ -21,8 +21,12 @@
  */
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { join, basename, relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const GOC = new URL('..', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1');
+/* fileURLToPath, không phải .pathname: .pathname còn nguyên mã hoá URL, nên
+ * đường dẫn có dấu cách hoặc chữ tiếng Việt (NCKH%202026, gia-s%C6%B0…) thành
+ * thư mục không tồn tại và cả bộ kiểm không đọc được tệp nguồn nào. */
+const GOC = fileURLToPath(new URL('..', import.meta.url));
 
 let soLoi = 0;
 const dat = (ten: string) => console.log(`  OK   ${ten}`);

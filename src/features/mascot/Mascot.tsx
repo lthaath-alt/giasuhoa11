@@ -11,7 +11,7 @@ import { Box, Typography } from '@mui/material';
 const ANH_TOAN_THAN = '/mascot/mascot-toanthan.png';
 const ANH_DAU_VAI = '/mascot/mascot-dauvai.png';
 
-export type TabMascot = 'gioithieu' | 'baigiang' | 'trochoi';
+export type TabMascot = 'gioithieu' | 'baigiang' | 'trochoi' | 'luyentap';
 
 /* Mỗi lần vào trang bốc ngẫu nhiên một câu cho đỡ nhàm. */
 const LOI_THOAI: Record<TabMascot, string[]> = {
@@ -35,6 +35,11 @@ const LOI_THOAI: Record<TabMascot, string[]> = {
     'Chơi tí cho đỡ nản.',
     'Ván này dễ mà.',
     'Chơi trước học sau cũng được.',
+  ],
+  luyentap: [
+    'Sai cũng không sao, còn lượt mà.',
+    'Làm chậm thôi, đọc kỹ đề đã.',
+    'Qua được phần này là ngon rồi.',
   ],
 };
 
