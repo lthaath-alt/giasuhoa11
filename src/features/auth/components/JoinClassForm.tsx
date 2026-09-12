@@ -83,10 +83,11 @@ export const JoinClassForm: React.FC<JoinClassFormProps> = ({ onJoined, onDismis
             <CheckCircle size={20} color="var(--luc)" />
             <Box>
               <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--luc)' }}>
-                Tham gia lớp thành công!
+                Đã gửi đơn xin vào lớp!
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                Bạn đã được thêm vào lớp <strong>{success}</strong>. Giáo viên của bạn sẽ thấy tiến độ học tập.
+                Đơn vào lớp <strong>{success}</strong> đã gửi tới giáo viên. Khi được
+                duyệt, giáo viên sẽ thấy tiến độ học tập của bạn.
               </Typography>
             </Box>
           </Box>
@@ -108,7 +109,8 @@ export const JoinClassForm: React.FC<JoinClassFormProps> = ({ onJoined, onDismis
               Bạn có mã lớp do giáo viên cấp?
             </Typography>
             <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1.5, lineHeight: 1.5 }}>
-              Nhập mã lớp để được giáo viên theo dõi tiến độ học. Lịch sử học hiện tại sẽ được giữ nguyên.
+              Nhập mã lớp để xin vào lớp. Giáo viên duyệt xong thì thầy cô mới theo
+              dõi được tiến độ học. Lịch sử học hiện tại sẽ được giữ nguyên.
             </Typography>
 
             {error && (
@@ -166,7 +168,7 @@ export const JoinClassForm: React.FC<JoinClassFormProps> = ({ onJoined, onDismis
                   '&:disabled': { bgcolor: 'var(--nen-tat)' },
                 }}
               >
-                {loading ? 'Đang xử lý...' : 'Tham gia lớp'}
+                {loading ? 'Đang xử lý...' : 'Gửi đơn'}
               </Button>
             </Box>
           </Box>

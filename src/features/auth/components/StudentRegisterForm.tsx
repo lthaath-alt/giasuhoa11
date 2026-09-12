@@ -284,6 +284,10 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
                 },
               }}
             />
+            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
+              Nhập mã thì đơn vào lớp sẽ được gửi tới giáo viên. Bạn vẫn dùng được
+              ngay, không cần chờ duyệt.
+            </Typography>
           </Box>
 
           {/* Submit */}
