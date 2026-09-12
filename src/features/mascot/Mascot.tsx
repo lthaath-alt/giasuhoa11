@@ -3,11 +3,10 @@ import { Box, Typography } from '@mui/material';
 
 /* Nhân vật dẫn đường của trang: ngôi sao vàng, kèm một ngôi sao nhỏ bên phải.
 
-   - MascotDauVai:   xếp trong dòng nội dung ở các tab, bong bóng thoại bên phải.
-                     Tên hàm còn giữ từ thời nhân vật là người (cắt đầu + vai);
-                     nay là ngôi sao nên dùng NGUYÊN CON, không cắt — cắt nửa
-                     trên ngôi sao thì nhìn như ảnh bị lỗi.
-   - MascotToanThan: kiểu đứng toàn thân, hiện KHÔNG còn chỗ nào gọi tới.
+   MascotDauVai xếp trong dòng nội dung ở các tab, bong bóng thoại nằm bên
+   phải. Tên hàm còn giữ từ thời nhân vật là người (khi đó ảnh cắt đầu + vai);
+   nay là ngôi sao nên dùng NGUYÊN CON, không cắt — cắt nửa trên ngôi sao thì
+   nhìn như ảnh bị lỗi.
 
    Con sao nhỏ để nguyên chứ không bỏ: đo ra thì nó chồng ngang với cánh phải
    của con sao chính (chỗ hẹp nhất vẫn còn 68px đặc, không có cột trống nào),
@@ -15,7 +14,6 @@ import { Box, Typography } from '@mui/material';
 
    Ảnh đặt trong public/mascot nên đường dẫn tuyệt đối từ gốc site. */
 
-const ANH_TOAN_THAN = '/mascot/mascot-toanthan.png';
 const ANH_NHAN_VAT = '/mascot/mascot-sao.png';
 
 export type TabMascot = 'gioithieu' | 'baigiang' | 'trochoi' | 'luyentap';
@@ -118,47 +116,7 @@ const BongBong: React.FC<{ loi: string; huong: 'duoi' | 'trai'; xuongDong?: bool
   </Box>
 );
 
-/* Bề ngang ảnh toàn thân, ăn theo chỗ trống thực tế của lề trái.
-   Lề trái rộng = (bề ngang màn hình − 900px khối chữ) / 2 − 16px khe hở:
-     1440px -> 254px chỗ trống, dùng 245
-     1536px -> 302px            dùng 300
-     1800px -> 434px            dùng 375
-   Ảnh có kèm hoạ tiết vẽ tay nên nhân vật chỉ chiếm 70,8% bề ngang ảnh —
-   phải để ảnh to hơn hẳn thì nhân vật mới bằng cỡ cũ. */
-const KHUNG_TOAN_THAN = {
-  width: { xs: 245, xl: 300 },
-  '@media (min-width:1800px)': { width: 375 },
-};
-
-/* ---------- Kiểu 1: đứng toàn thân ở lề trái ---------- */
-export const MascotToanThan: React.FC<{ tab?: TabMascot }> = ({ tab = 'gioithieu' }) => {
-  const loi = useMemo(() => dungLoiThoai(tab), [tab]);
-  return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', ...KHUNG_TOAN_THAN }}>
-      <Box sx={{ mb: 1.5 }}>
-        <BongBong loi={loi} huong="duoi" xuongDong />
-      </Box>
-      <Box
-        component="img"
-        src={ANH_TOAN_THAN}
-        alt="Bạn học đồng hành của Gia Sư Hoá Học 11"
-        draggable={false}
-        /* Không dùng loading="lazy": nhân vật nằm ngay đầu trang, để lazy thì
-           chỗ đứng bị trống một nhịp rồi ảnh mới nhảy vào. aspectRatio giữ sẵn
-           đúng khoảng cho ảnh nên trang không bị xô lệch lúc tải. */
-        sx={{
-          ...KHUNG_TOAN_THAN,
-          aspectRatio: '620 / 924',
-          height: 'auto',
-          display: 'block',
-          ...NHIP_THO,
-        }}
-      />
-    </Box>
-  );
-};
-
-/* ---------- Kiểu 2: nhân vật xếp trong dòng nội dung ---------- */
+/* ---------- Nhân vật xếp trong dòng nội dung ---------- */
 /* `anBongBong`: chỉ lấy hình, bỏ lời thoại. Dùng cho ô hẹp — trong trường
    "Gia sư AI" ở khung hình đầu thì một bong bóng nữa sẽ chọi nhau với dòng
    trạng thái và nút bấm. */
