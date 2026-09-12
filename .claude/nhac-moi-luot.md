@@ -17,7 +17,7 @@ THU TU KHONG DUOC DAO:
   1 phep kiem -> 2 luat + kieu -> 3 AppContext -> 4 man duyet
   -> 5 chu nghia giao dien
   -> 6 BUILD + DEPLOY + XAC NHAN ban moi da chay   <- CONG, user lam
-  -> 7 Playground 22 phep roi Publish              <- CONG, kho lui
+  -> 7 Playground 24 phep roi Publish              <- CONG, kho lui
   -> 8 thu tay ba vai + tai lieu
 
 Dao 6 va 7 thi ban dang chay tren Netlify van ghi vao `classes` khi hoc sinh
