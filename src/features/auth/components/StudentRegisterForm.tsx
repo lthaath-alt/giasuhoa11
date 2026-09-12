@@ -21,14 +21,13 @@ interface StudentRegisterFormProps {
  * - Không có mã lớp → role=student, chưa có classId.
  */
 export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBackToLogin }) => {
-  const { registerWithOptionalClass } = useApp();
+  const { registerStudent } = useApp();
   const navigate = useNavigate();
 
   const [name, setName]         = useState('');
   const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
   const [confirmPw, setConfirmPw] = useState('');
-  const [inviteCode, setInviteCode] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPw, setShowConfirmPw] = useState(false);
   const [loading, setLoading]   = useState(false);
@@ -38,7 +37,7 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
   /* Kiểm ngay tại chỗ trước khi gọi Firebase.
 
      Bản trước CHỈ so hai ô mật khẩu. Để trống hết rồi bấm Đăng ký thì form gọi
-     thẳng registerWithOptionalClass('', '', '') — đo được: màn hình không hiện
+     thẳng registerStudent('', '', '') — đo được: màn hình không hiện
      báo lỗi nào, em ngồi bấm mãi mà không hiểu vì sao. Email sai định dạng cũng
      lọt xuống tận Firebase rồi trả về thông báo tiếng Anh.
 
@@ -71,11 +70,10 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
     if (sai) { setError(sai); return; }
 
     setLoading(true);
-    const res = await registerWithOptionalClass(
+    const res = await registerStudent(
       name.trim(),
       email.trim(),
-      password,
-      inviteCode.trim() || undefined
+      password
     );
     setLoading(false);
 
@@ -121,7 +119,7 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
         </Typography>
       </Box>
       <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-        Có mã lớp do giáo viên cấp? Điền vào bên dưới để gửi đơn xin vào lớp.
+        Đăng ký xong, vào mục Học sinh để chọn lớp của bạn.
       </Typography>
 
       {error && (
@@ -242,55 +240,6 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
             sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }}
           />
 
-          {/* Mã lớp (tùy chọn) */}
-          <Box sx={{
-            p: 2, borderRadius: 0,
-            border: '1px dashed var(--chu-mo)',
-            bgcolor: inviteCode ? 'var(--nen-luc-nhat2)' : 'var(--nen-trang)',
-            transition: 'all 0.2s',
-          }}>
-            <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, display: 'block', mb: 1 }}>
-              MÃ LỚP (TUỲ CHỌN)
-            </Typography>
-            <TextField
-              id="student-register-invite-code"
-              label="Mã lớp (6 ký tự)"
-              variant="outlined"
-              fullWidth
-              value={inviteCode}
-              onChange={e => setInviteCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6))}
-              disabled={loading}
-              placeholder="VD: ABC123"
-              helperText="Nhận từ giáo viên. Để trống nếu học tự do."
-              slotProps={{
-                input: {
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <School size={16} color={inviteCode ? 'var(--luc-tham)' : 'var(--chu-mo)'} />
-                    </InputAdornment>
-                  ),
-                },
-              }}
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: 0,
-                  ...(inviteCode && { borderColor: 'var(--luc-tham)' }),
-                },
-                '& .MuiInputBase-input': {
-                  fontFamily: 'monospace',
-                  fontSize: '1.1rem',
-                  letterSpacing: '0.2em',
-                  fontWeight: 'bold',
-                  color: inviteCode ? 'var(--luc-tham)' : 'inherit',
-                },
-              }}
-            />
-            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
-              Nhập mã thì đơn vào lớp sẽ được gửi tới giáo viên. Bạn vẫn dùng được
-              ngay, không cần chờ duyệt.
-            </Typography>
-          </Box>
-
           {/* Submit */}
           <Button
             id="student-register-submit-btn"
@@ -308,12 +257,7 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
               '&:hover': { boxShadow: 'none' },
             }}
           >
-            {loading
-              ? 'Đang tạo tài khoản...'
-              : inviteCode
-                ? 'Đăng ký & gửi đơn vào lớp'
-                : 'Đăng ký học tự do'
-            }
+            {loading ? 'Đang tạo tài khoản...' : 'Đăng ký'}
           </Button>
         </Box>
       </form>

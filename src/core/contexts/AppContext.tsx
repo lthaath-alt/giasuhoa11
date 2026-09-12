@@ -244,15 +244,13 @@ export interface AppContextType {
   // ── Quản lý lớp và tham gia lớp ─────────────────────────────────────────────
 
   /**
-   * Học sinh tự đăng ký tài khoản (có hoặc không có mã lớp).
-   * - Có mã lớp hợp lệ: tạo role='student', gán vào lớp.
-   * - Không có mã lớp: tạo role='student', học sinh tự do.
+   * Học sinh tự đăng ký tài khoản (role='student', chưa có lớp).
+   * Chọn lớp làm ở tab Học sinh sau khi đăng nhập.
    */
-  registerWithOptionalClass: (
+  registerStudent: (
     name: string,
     email: string,
-    password: string,
-    inviteCode?: string
+    password: string
   ) => Promise<{ success: boolean; message: string; user?: User }>;
 
   /**
@@ -1580,13 +1578,17 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     if (updatedChapter) FirestoreService.saveCurriculumChapter(updatedChapter);
   };
 
-  // ── Học sinh tự đăng ký (có hoặc không có mã lớp) ────────────────────────
+  // ── Học sinh tự đăng ký ───────────────────────────────────────────────────
 
-  const registerWithOptionalClass = async (
+  /* Đăng ký học sinh tự do. KHÔNG nhận mã lớp nữa (12/09/2026): màn đăng ký
+     chạy khi chưa đăng nhập nên không đọc được `classes`, không có cách nào cho
+     chọn lớp ở đó. Học sinh vào rồi chọn lớp ở tab Học sinh.
+     GHI CHÚ MÃ CHẾT: hàm `register` phía trên nay gần trùng hàm này và không có
+     ai gọi. Để lại theo quy ước "thấy mã chết thì nhắc chứ đừng xoá". */
+  const registerStudent = async (
     name: string,
     email: string,
-    password: string,
-    inviteCode?: string
+    password: string
   ) => {
     if (!name.trim()) return { success: false, message: 'Vui lòng nhập họ tên.' };
     if (!email.trim()) return { success: false, message: 'Vui lòng nhập email.' };
@@ -1604,20 +1606,12 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     const existing = users.find(u => u.email.toLowerCase() === lower);
     if (existing) return { success: false, message: `Email ${email} đã được đăng ký trong hệ thống!` };
 
-    /* KHÔNG tra mã lớp ở đây, và đó là CỐ Ý. Màn đăng ký chạy khi chưa đăng
-       nhập, mà từ đợt 2 `classes` chỉ nạp sau khi đăng nhập — mảng đang rỗng
-       nên mọi lần tra đều trả "mã không tồn tại", kể cả mã đúng. (Lỗi này đã
-       lên production từ lần deploy của Việc 3.) Mã cất nguyên văn vào
-       `pendingClassCode`; giáo viên nào có lớp mang mã đó sẽ thấy đơn. */
-    const maXinVaoLop = inviteCode?.trim().toUpperCase() || undefined;
-
     const fsRes = await createAccountWithFirestore({
       username: lower,
       password: password,
       fullName: name.trim(),
       role: 'student',
       email: lower,
-      pendingClassCode: maXinVaoLop,
       status: 'active',
       dangTuDangKy: true,   // tạo trên app CHÍNH -> đăng nhập luôn sau khi tạo
     });
@@ -1634,7 +1628,6 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       role: 'student',
       status: 'active',
       authProvider: 'local',
-      pendingClassCode: maXinVaoLop,
       canChangePassword: true,
       createdAt: new Date().toISOString(),
     };
@@ -1642,13 +1635,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     setUsers(prev => [...prev, newUser]);
     persistSession(newUser);
 
-    return {
-      success: true,
-      message: maXinVaoLop
-        ? `Tạo tài khoản thành công! Đã gửi đơn xin vào lớp mã "${maXinVaoLop}", chờ giáo viên duyệt.`
-        : 'Tạo tài khoản thành công!',
-      user: newUser,
-    };
+    return { success: true, message: 'Tạo tài khoản thành công!', user: newUser };
   };
 
   // ── Giáo viên tự tạo lớp ───────────────────────────────────────────
@@ -1872,7 +1859,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         addLesson,
         updateChapter,
         updateLesson,
-        registerWithOptionalClass,
+        registerStudent,
         createClassSelf,
         joinClassByCode,
         approveJoinRequest,
