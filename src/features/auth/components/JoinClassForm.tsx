@@ -3,11 +3,11 @@ import {
   Box, TextField, Button, Typography, Alert, Paper, InputAdornment,
   CircularProgress, Collapse, IconButton,
 } from '@mui/material';
-import { School, CheckCircle, X, ArrowRight } from 'lucide-react';
+import { School, CheckCircle, Clock, X, ArrowRight } from 'lucide-react';
 import { useApp } from '../../../core/hooks/useApp';
 
 interface JoinClassFormProps {
-  /** Gọi khi đã join thành công (cha cần refresh hoặc dismiss banner) */
+  /** Gọi khi đã gửi đơn xong (cha cần refresh hoặc dismiss banner) */
   onJoined?: (className: string) => void;
   /** Gọi khi người dùng bấm đóng banner */
   onDismiss?: () => void;
@@ -16,11 +16,14 @@ interface JoinClassFormProps {
 /**
  * JoinClassForm — Banner nhỏ hiển thị trong DashboardPage.
  * Chỉ xuất hiện khi currentUser là học sinh chưa có classId.
- * Cho phép nhập mã lớp để chuyển sang học sinh được quản lý.
+ * Cho phép nhập mã lớp để gửi đơn xin vào lớp (chờ giáo viên duyệt).
+ * Nếu `currentUser.pendingClassCode` đã có sẵn (kể cả sau khi tải lại
+ * trang), hiện banner "đang chờ duyệt" thay vì ô nhập — tránh học sinh
+ * tưởng nhầm là chưa gửi gì.
  * Lịch sử học tập được GIỮ NGUYÊN.
  */
 export const JoinClassForm: React.FC<JoinClassFormProps> = ({ onJoined, onDismiss }) => {
-  const { joinClassByCode } = useApp();
+  const { currentUser, joinClassByCode } = useApp();
 
   const [code, setCode]         = useState('');
   const [loading, setLoading]   = useState(false);
@@ -29,6 +32,10 @@ export const JoinClassForm: React.FC<JoinClassFormProps> = ({ onJoined, onDismis
   const [dismissed, setDismissed] = useState(false);
 
   if (dismissed) return null;
+
+  // Đơn đã có sẵn trên hồ sơ (kể cả sau F5) — suy ra từ currentUser, không
+  // cần thêm state hay localStorage.
+  const pendingCode = currentUser?.pendingClassCode;
 
   const handleJoin = async () => {
     if (!code.trim()) { setError('Vui lòng nhập mã lớp.'); return; }
@@ -94,8 +101,33 @@ export const JoinClassForm: React.FC<JoinClassFormProps> = ({ onJoined, onDismis
         )}
       </Collapse>
 
-      {/* Form nhập mã */}
-      <Collapse in={!success}>
+      {/* Đơn đang chờ giáo viên duyệt — kể cả sau khi tải lại trang, suy ra
+          thẳng từ currentUser.pendingClassCode, không phải state phiên này. */}
+      <Collapse in={!success && Boolean(pendingCode)}>
+        {pendingCode && (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <Box sx={{
+              p: 1, bgcolor: 'var(--vang-nen)',
+              borderRadius: 0, display: 'flex', flexShrink: 0,
+            }}>
+              <Clock size={18} color="var(--chu-tren-vang)" />
+            </Box>
+            <Box>
+              <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)' }}>
+                Đơn xin vào lớp đang chờ duyệt
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                Bạn đã gửi mã <strong>{pendingCode}</strong> tới giáo viên. Khi được
+                duyệt, bạn sẽ chính thức vào lớp và giáo viên sẽ thấy tiến độ học tập
+                của bạn.
+              </Typography>
+            </Box>
+          </Box>
+        )}
+      </Collapse>
+
+      {/* Form nhập mã — chỉ hiện khi chưa gửi đơn nào (kể cả đơn cũ từ trước F5) */}
+      <Collapse in={!success && !pendingCode}>
         <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start', pr: 3 }}>
           <Box sx={{
             p: 1, bgcolor: 'var(--nen-luc-nhat2)',

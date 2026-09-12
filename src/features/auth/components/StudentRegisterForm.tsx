@@ -16,7 +16,8 @@ interface StudentRegisterFormProps {
 /**
  * StudentRegisterForm
  * Học sinh tự đăng ký tài khoản với mã lớp tuỳ chọn.
- * - Có mã lớp → role=student, gán vào lớp.
+ * - Có mã lớp → role=student, gửi đơn xin vào lớp (pendingClassCode), chờ
+ *   giáo viên duyệt — CHƯA gán classId.
  * - Không có mã lớp → role=student, chưa có classId.
  */
 export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBackToLogin }) => {
@@ -120,7 +121,7 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
         </Typography>
       </Box>
       <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-        Có mã lớp do giáo viên cấp? Điền vào bên dưới để được gắn vào lớp học ngay.
+        Có mã lớp do giáo viên cấp? Điền vào bên dưới để gửi đơn xin vào lớp.
       </Typography>
 
       {error && (
@@ -310,7 +311,7 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
             {loading
               ? 'Đang tạo tài khoản...'
               : inviteCode
-                ? 'Đăng ký & tham gia lớp học'
+                ? 'Đăng ký & gửi đơn vào lớp'
                 : 'Đăng ký học tự do'
             }
           </Button>
