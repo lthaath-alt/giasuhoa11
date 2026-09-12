@@ -33,7 +33,7 @@ Giáo viên duyệt thì chính giáo viên ghi `classId` và `classes.studentId
     1 phép kiểm  ->  2 luật + kiểu  ->  3 AppContext (đăng ký & xin vào lớp)
     ->  4 màn duyệt cho giáo viên  ->  5 chữ nghĩa giao diện
     ->  6 BUILD + DEPLOY + XÁC NHẬN            <- CỔNG, chủ dự án làm
-    ->  7 Playground 17 phép rồi Publish       <- CỔNG, khó lùi
+    ->  7 Playground 21 phép rồi Publish       <- CỔNG, khó lùi
     ->  8 thử tay ba vai + tài liệu
 
 Publish trước khi bản mới chạy trên Netlify thì bản đang chạy vẫn ghi vào
@@ -811,7 +811,7 @@ tức là trình duyệt đang giữ bản cũ — bấm Ctrl+F5, đừng đi ti
 
 ---
 
-### Task 7: CỔNG — 17 phép ở Rules Playground, rồi Publish
+### Task 7: CỔNG — 21 phép ở Rules Playground, rồi Publish
 
 **Chủ dự án làm.** Chép luật ĐANG chạy ra Notepad trước — đó là bản lùi.
 
@@ -837,6 +837,35 @@ tắt khi đổi Simulation type**, phải kiểm lại trước mỗi lần Run
 | 15 | học sinh | update | `/users/<uid HS>` | `classId: class_abc` | ❌ |
 | 16 | học sinh | update | `/users/<uid HS>` | `joinedClassId: class_abc` | ❌ |
 | 17 | học sinh | update | `/users/<uid HS>` | `pendingClassCode: ABC123` | ✅ |
+| 18 | **giáo viên thuần** | **list** | `/users` | — | ✅ |
+| 19 | học sinh | **list** | `/users` | — | ❌ |
+| 20 | **giáo viên thuần** | update | `/users/<uid HS>` | `classId: <id lớp>` | ✅ |
+| 21 | **giáo viên thuần** | update | `/users/<uid HS>` | `role: admin` | ❌ |
+
+**Bốn dòng 18-21 thêm ngày 12/09/2026** sau lần soát toàn nhánh. Bảng 17 phép
+trước đó để trống đúng bốn đường mà sai một cái là phải lùi luật:
+
+- **Phép 18 là phép rủi ro nhất của cả đợt.** `getUsers()` là một truy vấn
+  **không ràng buộc** trên `users`. Firestore đánh giá luật `list` theo từng tài
+  liệu trả về, nên nếu `laGiaoVien()` không thoả được cho cả collection thì
+  **toàn bộ màn giáo viên và quản trị trắng**: danh sách tài khoản, sổ lớp, xuất
+  CSV, và chính cột "Đơn chờ" vừa làm. Kế hoạch này suy luận là nó đạt, nhưng
+  **chưa ai đo** — và `laGiaoVien()` gọi `get()` bên trong một phép `list`, đúng
+  chỗ tôi không dám chắc. Đây là phép duy nhất đo được nó trước khi Publish.
+- **Phép 19** là mặt sau của 18. Ra ✅ thì học sinh đọc được hồ sơ toàn hệ thống,
+  và cả quyết định "bỏ `getUsers()` cho học sinh" ở Việc 3 thành vô nghĩa.
+- **Phép 20 là đường Duyệt.** Sai là `approveJoinRequest` chết và cả đợt 2b vô
+  nghĩa. Bảng cũ chỉ thử `create` của giáo viên (phép 13), chưa thử `update` lần
+  nào.
+- **Phép 21** đo vế `laGiaoVien() && !hasAny(['role'])` ở nhánh `update` — chưa
+  phép nào chạm tới. Sai là giáo viên phong admin cho một tài khoản mình tạo rồi
+  đăng nhập bằng nó.
+
+**Phép 4 phải chạy trên một tài khoản học sinh CŨ**, không phải tài khoản vừa
+tạo. Luật `progress` so `request.auth.token.email` với id tài liệu, mà id đó lấy
+từ **trường `email` của hồ sơ** đã `toLowerCase`. Tài khoản mới thì hai thứ chắc
+chắn khớp vì cùng do `createAccountWithFirestore` sinh ra; 15 hồ sơ đánh lại khoá
+ở đợt 1 mới là chỗ có thể lệch — và lệch thì em đó **mất sạch tiến độ học**.
 
 **Bảng này đã được viết lại ngày 12/09/2026** sau khi lần soát Việc 2 tìm ra hai
 lỗ hổng trong bản luật đầu. Ba dòng 11-13 thay cho một dòng "giáo viên tạo
@@ -864,9 +893,9 @@ Sáu phép quan trọng nhất, và sai mỗi phép thì hỏng chuyện gì:
   bảng tiến độ lớp của giáo viên.
 
 - [ ] **Bước 1: Dán luật mới vào ô soạn thảo, CHƯA Publish**
-- [ ] **Bước 2: Chạy đủ 17 phép, ghi lại phép nào lệch**
+- [ ] **Bước 2: Chạy đủ 21 phép, ghi lại phép nào lệch**
 - [ ] **Bước 3: Lệch một phép thôi cũng DỪNG — báo số phép và kết quả thật**
-- [ ] **Bước 4: Đúng cả 17 thì Publish**
+- [ ] **Bước 4: Đúng cả 21 thì Publish**
 
 ---
 
