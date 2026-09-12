@@ -400,19 +400,21 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         return;
       }
 
-      /* Đã đăng nhập → nay mới đọc được hai collection mang dữ liệu người.
-         Tải trước khi dựng hồ sơ, để màn quản trị mở ra là có sẵn dữ liệu. */
-      const [dsNguoiDung, dsLop] = await Promise.all([
-        FirestoreService.getUsers(),
-        FirestoreService.getClasses(),
-      ]);
-      setUsers(dsNguoiDung.map(u => {
-        const chuan = chuanHoaVaiTro(u.role as string);
-        return chuan === u.role ? u : { ...u, role: chuan };
-      }));
-      setClasses(dsLop);
+      /* Hồ sơ đọc TRƯỚC, hai collection người đọc sau — ngược với bản cũ.
+         Lý do: `getUsers()` là truy vấn không ràng buộc, mà luật mới đòi
+         `request.auth.uid == userId` từng tài liệu, nên HỌC SINH gọi là chắc
+         chắn bị từ chối. Biết vai rồi mới gọi thì đỡ một vòng mạng và một
+         dòng lỗi vô ích mỗi lần học sinh đăng nhập. */
 
-      const anh = await getDoc(doc(db, 'users', nguoiAuth.uid));
+      /* Thử LẠI một lần trước khi kết luận là không có hồ sơ. Người vừa đăng
+         ký xong: `createUserWithEmailAndPassword` bắn sự kiện này NGAY, chạy
+         đua với `setDoc` ghi hồ sơ. Thua cuộc đua mà đá luôn ra thì người mới
+         đăng ký xong bị văng về màn đăng nhập dù tài khoản hoàn toàn hợp lệ. */
+      let anh = await getDoc(doc(db, 'users', nguoiAuth.uid));
+      if (!anh.exists()) {
+        await new Promise(r => setTimeout(r, 600));
+        anh = await getDoc(doc(db, 'users', nguoiAuth.uid));
+      }
       if (!anh.exists()) {
         /* Có phiên Auth mà không có hồ sơ — đừng đoán, đừng tự tạo. Đây là dấu
            hiệu dữ liệu lệch, phải để người quản trị nhìn thấy. */
@@ -432,6 +434,17 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
       await loadProgressForUser(hoSo.email);
       persistSession(hoSo);
+
+      /* `classes` thì học sinh đọc được (luật chỉ đòi đã đăng nhập) và màn
+         "xin vào lớp" cần nó. `users` thì chỉ giáo viên/quản trị đọc được. */
+      setClasses(await FirestoreService.getClasses());
+      if (hoSo.role !== 'student') {
+        const dsNguoiDung = await FirestoreService.getUsers();
+        setUsers(dsNguoiDung.map(u => {
+          const chuan = chuanHoaVaiTro(u.role as string);
+          return chuan === u.role ? u : { ...u, role: chuan };
+        }));
+      }
       /* Đồng bộ vào mảng `users` để phần còn lại của app thấy bản mới nhất. */
       setUsers(prev => prev.some(u => u.id === hoSo.id)
         ? prev.map(u => u.id === hoSo.id ? hoSo : u)
@@ -1540,39 +1553,31 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       return { success: false, message: 'Mật khẩu phải chứa cả chữ cái và chữ số.' };
     }
 
-    // Kiểm tra email đã tồn tại trong state
     const lower = email.toLowerCase().trim();
+
+    /* Phép kiểm này chỉ chạy được khi người gọi ĐÃ đăng nhập; với khách thì
+       mảng `users` rỗng nên nó không bao giờ bắt được gì. Hàng rào thật là
+       Firebase Auth: nó trả `auth/email-already-in-use`. Giữ lại vì vô hại và
+       cho thông báo đẹp hơn ở những đường có sẵn danh sách. */
     const existing = users.find(u => u.email.toLowerCase() === lower);
     if (existing) return { success: false, message: `Email ${email} đã được đăng ký trong hệ thống!` };
 
-    let assignedClassId: string | undefined;
-    let assignedSchoolId: string | undefined;
+    /* KHÔNG tra mã lớp ở đây, và đó là CỐ Ý. Màn đăng ký chạy khi chưa đăng
+       nhập, mà từ đợt 2 `classes` chỉ nạp sau khi đăng nhập — mảng đang rỗng
+       nên mọi lần tra đều trả "mã không tồn tại", kể cả mã đúng. (Lỗi này đã
+       lên production từ lần deploy của Việc 3.) Mã cất nguyên văn vào
+       `pendingClassCode`; giáo viên nào có lớp mang mã đó sẽ thấy đơn. */
+    const maXinVaoLop = inviteCode?.trim().toUpperCase() || undefined;
 
-    if (inviteCode && inviteCode.trim()) {
-      const code = inviteCode.trim().toUpperCase();
-      const schoolClass = classes.find(c => c.inviteCode?.toUpperCase() === code);
-      if (!schoolClass) {
-        return { success: false, message: `Mã lớp "${inviteCode.toUpperCase()}" không tồn tại. Vui lòng kiểm tra lại.` };
-      }
-      assignedClassId = schoolClass.id;
-      assignedSchoolId = schoolClass.schoolId;
-    }
-
-    const isManaged = Boolean(assignedClassId);
-    const identifier = lower;
-    // 'free_user' da gop vao 'student'; phan biet co lop hay khong bang classId
-    const targetRole: UserRole = 'student';
-
-    // Đẩy lên Firestore collection "users"
     const fsRes = await createAccountWithFirestore({
-      username: identifier,
+      username: lower,
       password: password,
       fullName: name.trim(),
-      role: targetRole,
-      email: identifier,
-      classId: assignedClassId,
-      schoolId: assignedSchoolId,
+      role: 'student',
+      email: lower,
+      pendingClassCode: maXinVaoLop,
       status: 'active',
+      dangTuDangKy: true,   // tạo trên app CHÍNH -> đăng nhập luôn sau khi tạo
     });
 
     if (!fsRes.success) {
@@ -1581,33 +1586,27 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
     const newUser: User = {
       id: fsRes.user!.uid,
-      email: identifier,
-      username: identifier,
+      email: lower,
+      username: lower,
       name: name.trim(),
-      role: targetRole as UserRole,
+      role: 'student',
       status: 'active',
       authProvider: 'local',
-      classId: assignedClassId,
-      joinedClassId: assignedClassId,
-      schoolId: assignedSchoolId,
+      pendingClassCode: maXinVaoLop,
       canChangePassword: true,
       createdAt: new Date().toISOString(),
     };
 
     setUsers(prev => [...prev, newUser]);
-
-    if (assignedClassId) {
-      // Cập nhật class trên Firestore
-      await FirestoreService.addStudentToClass(assignedClassId, identifier);
-      setClasses(prev => prev.map(c =>
-        c.id === assignedClassId
-          ? { ...c, studentIdentifiers: [...c.studentIdentifiers, identifier] }
-          : c
-      ));
-    }
-
     persistSession(newUser);
-    return { success: true, message: 'Tạo tài khoản thành công!', user: newUser };
+
+    return {
+      success: true,
+      message: maXinVaoLop
+        ? `Tạo tài khoản thành công! Đã gửi đơn xin vào lớp mã "${maXinVaoLop}", chờ giáo viên duyệt.`
+        : 'Tạo tài khoản thành công!',
+      user: newUser,
+    };
   };
 
   // ── Giáo viên tự tạo lớp ───────────────────────────────────────────
@@ -1652,38 +1651,39 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     if (currentUser.classId || currentUser.joinedClassId) {
       return { success: false, message: 'Bạn đã thuộc một lớp học. Liên hệ giáo viên nếu cần thay đổi.' };
     }
+    if (currentUser.pendingClassCode) {
+      return { success: false, message: 'Bạn đã gửi một đơn xin vào lớp và đang chờ giáo viên duyệt.' };
+    }
 
     const upper = code.trim().toUpperCase();
+
+    /* Học sinh ĐÃ đăng nhập thì đọc được `classes` (luật chỉ đòi đã đăng
+       nhập), nên ở đây tra mã được — khác màn đăng ký. Tra để báo sai ngay,
+       đỡ để em chờ một đơn không bao giờ tới tay ai. */
     const schoolClass = classes.find(c => c.inviteCode?.toUpperCase() === upper);
     if (!schoolClass) {
       return { success: false, message: `Mã lớp "${code.toUpperCase()}" không tồn tại. Vui lòng kiểm tra lại.` };
     }
 
-    const identifier = currentUser.username || currentUser.email;
-    const updates = {
-      role: 'student' as UserRole,
-      classId: schoolClass.id,
-      joinedClassId: schoolClass.id,
-      schoolId: schoolClass.schoolId,
-    };
+    /* CHỈ ghi vào hồ sơ của CHÍNH MÌNH, và chỉ đúng một trường nguyện vọng.
+       Không đặt `classId`, không đụng `classes` — luật Firestore chặn cả hai,
+       và đó là chủ ý: giáo viên là người duy nhất xếp lớp. */
+    const ok = await FirestoreService.updateUserById(currentUser.id, {
+      pendingClassCode: upper,
+    });
+    if (!ok) {
+      return { success: false, message: 'Không gửi được đơn. Vui lòng thử lại.' };
+    }
 
-    // Cập nhật Firestore
-    await FirestoreService.updateUserById(currentUser.id, updates);
-    await FirestoreService.addStudentToClass(schoolClass.id, identifier);
-
-    // Cập nhật state
-    const updatedUser = { ...currentUser, ...updates };
+    const updatedUser = { ...currentUser, pendingClassCode: upper };
     setCurrentUser(updatedUser);
     setUsers(prev => prev.map(u => u.id === currentUser.id ? updatedUser : u));
-    setClasses(prev => prev.map(c =>
-      c.id === schoolClass.id
-        ? { ...c, studentIdentifiers: [...c.studentIdentifiers, identifier] }
-        : c
-    ));
 
-    localStorage.setItem('h11_current_user_email', updatedUser.email);
-
-    return { success: true, message: `Đã tham gia lớp "${schoolClass.name}" thành công!`, className: schoolClass.name };
+    return {
+      success: true,
+      message: `Đã gửi đơn xin vào lớp "${schoolClass.name}". Chờ giáo viên duyệt.`,
+      className: schoolClass.name,
+    };
   };
 
   // ── Giáo viên/Admin chấm lại điểm câu tự luận của học sinh ────────────
