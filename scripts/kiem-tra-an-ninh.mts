@@ -357,6 +357,13 @@ console.log('\n== Luật Firestore phân quyền theo vai ==');
   const truongTrongLuat = new Set<string>();
   for (const m of luat.matchAll(/\b(?:request\.)?resource\.data\.([A-Za-z_]\w*)/g)) truongTrongLuat.add(m[1]);
   for (const m of luat.matchAll(/['"]([A-Za-z_]\w*)['"]\s+in\s+(?:request\.)?resource\.data/g)) truongTrongLuat.add(m[1]);
+  /* Tên trường còn nấp trong affectedKeys().hasAny([...]) / .hasOnly([...]) /
+     .hasAll([...]) — hai mẫu trên không thấy chúng. Cửa này mở ngày 12/09/2026
+     cùng luật `users` mới; không mở mẫu theo thì gõ sai tên trường ở đó là
+     luật im lặng cho qua, đúng cái bẫy đã sập ở đợt 1. */
+  for (const m of luat.matchAll(/\.has(?:Any|Only|All)\(\s*\[([^\]]*)\]/g)) {
+    for (const t of m[1].matchAll(/['"]([A-Za-z_]\w*)['"]/g)) truongTrongLuat.add(t[1]);
+  }
   /* `role` do luật đọc qua get(...).data.role, không khớp hai mẫu trên. */
   if (/\.data\.role\b/.test(luat)) truongTrongLuat.add('role');
 
