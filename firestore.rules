@@ -10,25 +10,18 @@ rules_version = '2';
 // Tức toàn bộ cơ sở dữ liệu mở toang: ai trên Internet cũng đọc, sửa, xoá được
 // mọi thứ. Chính Firebase cũng dán cảnh báo đỏ lên đó.
 //
-// ─── VÌ SAO LUẬT NÀY KHÔNG KIỂM DANH TÍNH ──────────────────────────────────
+// ─── HIỆN TRẠNG DANH TÍNH (từ đợt chuyển 10/09/2026) ───────────────────────
 //
-// Dự án dùng hệ đăng nhập TỰ VIẾT (`src/core/services/firestoreAuth.ts`), KHÔNG
-// dùng Firebase Auth. Nghĩa là `request.auth` LUÔN LUÔN null ở mọi yêu cầu.
-// Không có cách nào để luật biết ai đang gọi.
+// Dự án dùng Firebase Auth (email + mật khẩu) — KHÔNG còn là hệ tự viết so
+// mật khẩu trên trình duyệt. `request.auth` mang uid và email thật của người
+// gọi đã đăng nhập; id tài liệu `users` BẰNG uid đó, nên luật đọc được vai
+// bằng `get(/databases/$(database)/documents/users/$(request.auth.uid))`.
+// Mật khẩu không còn nằm trong Firestore — Firebase Auth giữ nó ở dạng đã băm
+// và không bao giờ trả về trình duyệt.
 //
-// Hệ quả phải nói thẳng: luật ở đây KHÔNG thể phân quyền theo vai trò. Nó chỉ
-// làm được một việc — kiểm HÌNH DẠNG dữ liệu. Muốn phân quyền thật thì phải
-// chuyển sang Firebase Auth, và đó là một việc riêng cần bàn với chủ dự án.
-//
-// ─── HAI LỖ HỔNG ĐÃ BIẾT, CHƯA VÁ ĐƯỢC Ở ĐÂY ───────────────────────────────
-//
-// (a) `users` chứa mật khẩu dạng CHỮ THƯỜNG và phải cho đọc, vì việc đăng nhập
-//     chạy ngay trên trình duyệt: nó tải bản ghi người dùng về rồi so mật khẩu.
-//     Tức bất kỳ ai cũng đọc được toàn bộ mật khẩu. Không luật nào cứu được
-//     điều này — chỉ Firebase Auth mới cứu được.
-//
-// (b) Mọi collection đều phải cho ghi, vì không có danh tính để phân biệt giáo
-//     viên với người lạ.
+// Phân quyền theo vai (`laGiaoVien()`, `laQuanTri()` bên dưới, và luật riêng
+// từng trường ở `match /users/{userId}`) ĐÃ CÓ từ đợt 2 — không còn là việc
+// "cần bàn riêng".
 //
 // Thứ luật này LÀM ĐƯỢC, và làm ngay: chặn nội dung có mã ở `bank_questions`.
 // Đó là đường tấn công đã được xác minh ngày 10/09/2026 — kẻ tấn công ghi một
@@ -211,7 +204,7 @@ service cloud.firestore {
       allow write: if laGiaoVien();
     }
 
-    /* NĂM điều phải nhớ, cả năm đều đã viết sai một lần:
+    /* SÁU điều phải nhớ, cả sáu đều đã viết sai một lần:
 
        1. `create` phải cho phép giáo viên tạo hộ — nhưng chỉ tạo hộ HỌC SINH.
           Tạo tài khoản giáo viên khác hay admin trường là việc của quản trị,
@@ -243,7 +236,18 @@ service cloud.firestore {
        5. So bằng `affectedKeys()` chứ KHÔNG so
           `request.resource.data.classId == resource.data.classId`: phần lớn hồ
           sơ không có hai trường đó, mà đọc một trường vắng mặt trong luật là
-          lỗi, và lỗi thì từ chối — tức chặn nhầm mọi người. */
+          lỗi, và lỗi thì từ chối — tức chặn nhầm mọi người.
+
+       6. Vế chủ tài khoản của `update` cũng phải cấm tự sửa `username`/`email`.
+          Sổ lớp (`classes.studentIdentifiers`) không khớp học sinh bằng
+          `classId` mà bằng CHUỖI ĐỊNH DANH — so với `u.email` hoặc
+          `u.username` (xem `ClassManagement.tsx`, `getTeacherName`/
+          `handleExportCSV`). Mà `classes` cho MỌI người đã đăng nhập đọc, nên
+          một em đọc được định danh trong sổ lớp đích rồi tự đặt `username`
+          của mình thành đúng chuỗi ấy là hiện ra trong bảng tiến độ của giáo
+          viên lớp đó — một cửa sau vào lớp không qua duyệt. Vế `laGiaoVien()`
+          KHÔNG cấm hai trường này: giáo viên vẫn phải sửa được `username`/
+          `email` hộ học sinh qua màn quản lý tài khoản. */
     match /users/{userId} {
       allow read:   if dangNhap() && (request.auth.uid == userId || laGiaoVien());
 
@@ -260,7 +264,7 @@ service cloud.firestore {
       allow update: if dangNhap() && (
                       (request.auth.uid == userId
                        && !request.resource.data.diff(resource.data)
-                            .affectedKeys().hasAny(['role', 'classId', 'schoolId', 'joinedClassId']))
+                            .affectedKeys().hasAny(['role', 'classId', 'schoolId', 'joinedClassId', 'username', 'email']))
                       || (laGiaoVien()
                           && !request.resource.data.diff(resource.data)
                                .affectedKeys().hasAny(['role']))

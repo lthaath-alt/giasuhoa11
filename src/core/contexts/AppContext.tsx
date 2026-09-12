@@ -545,6 +545,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       role: 'student',
       email: identifier,
       status: 'active',
+      dangTuDangKy: true,   // tạo trên app CHÍNH -> đăng nhập luôn sau khi tạo
     });
 
     if (!fsRes.success) {
@@ -1656,10 +1657,13 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     if (currentUser.classId || currentUser.joinedClassId) {
       return { success: false, message: 'Bạn đã thuộc một lớp học. Liên hệ giáo viên nếu cần thay đổi.' };
     }
-    if (currentUser.pendingClassCode) {
-      return { success: false, message: 'Bạn đã gửi một đơn xin vào lớp và đang chờ giáo viên duyệt.' };
-    }
-
+    /* KHÔNG chặn sớm chỉ vì đã có `pendingClassCode` cũ. Mã sai (gõ nhầm ở màn
+       đăng ký, lúc đó không tra được vì `classes` rỗng) không trùng lớp nào,
+       không giáo viên nào thấy để từ chối — chặn ở đây là khoá học sinh khỏi
+       mọi lớp vĩnh viễn, chỉ Firebase Console mới cứu được. Mệnh đề tra mã
+       ngay dưới đã báo lỗi cho mã sai; mã đúng thì cho ghi đè nguyện vọng cũ
+       (luật Firestore cho phép — `pendingClassCode` không nằm trong danh sách
+       trường bị cấm tự sửa). */
     const upper = code.trim().toUpperCase();
 
     /* Học sinh ĐÃ đăng nhập thì đọc được `classes` (luật chỉ đòi đã đăng

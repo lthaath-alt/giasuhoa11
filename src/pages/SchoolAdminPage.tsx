@@ -42,6 +42,25 @@ export const SchoolAdminPage: React.FC = () => {
   const schoolClasses = classes.filter(c => c.schoolId === currentUser?.schoolId);
   const schoolUsers = users.filter(u => u.schoolId === currentUser?.schoolId);
 
+  /* Học sinh tự đăng ký gửi đơn xin vào lớp CHƯA có `schoolId` (luật cấm đặt ở
+     create, và đường đăng ký cũng không đặt) — lọc `schoolUsers` một mình thì
+     cột "Đơn chờ" của ClassManagement luôn hiện "—" cho vai school_admin, vì
+     `getDonChoDuyet()` tìm đơn trong đúng mảng `users` được truyền vào. Bổ
+     sung thêm những hồ sơ có `pendingClassCode` trùng `inviteCode` của một lớp
+     thuộc trường này. KHÔNG truyền cả mảng `users` chưa lọc — ClassManagement
+     còn dùng nó cho ô chọn giáo viên (`getTeachers`) và sổ lớp
+     (`handleExportCSV`), làm vậy là admin trường thấy người của trường khác. */
+  const maMoiTrongTruong = new Set(
+    schoolClasses.map(c => c.inviteCode?.toUpperCase()).filter((m): m is string => Boolean(m))
+  );
+  const idSchoolUsers = new Set(schoolUsers.map(u => u.id));
+  const donChoDuyetNgoaiTruong = users.filter(u =>
+    !idSchoolUsers.has(u.id) &&
+    u.pendingClassCode &&
+    maMoiTrongTruong.has(u.pendingClassCode.toUpperCase())
+  );
+  const usersChoClassManagement = [...schoolUsers, ...donChoDuyetNgoaiTruong];
+
   return (
     <Box id="school-admin-page-layout" sx={{ minHeight: '100vh', backgroundColor: 'var(--nen-trang)', display: 'flex', flexDirection: 'column' }}>
       
@@ -144,7 +163,7 @@ export const SchoolAdminPage: React.FC = () => {
           classContent={
             <ClassManagement
               classes={schoolClasses}
-              users={schoolUsers}
+              users={usersChoClassManagement}
               canCreate={true}
               onCreateClick={() => setCreateClassOpen(true)}
               currentUserRole="school_admin"

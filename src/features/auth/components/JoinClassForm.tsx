@@ -23,7 +23,7 @@ interface JoinClassFormProps {
  * Lịch sử học tập được GIỮ NGUYÊN.
  */
 export const JoinClassForm: React.FC<JoinClassFormProps> = ({ onJoined, onDismiss }) => {
-  const { currentUser, joinClassByCode } = useApp();
+  const { currentUser, joinClassByCode, classes } = useApp();
 
   const [code, setCode]         = useState('');
   const [loading, setLoading]   = useState(false);
@@ -33,9 +33,16 @@ export const JoinClassForm: React.FC<JoinClassFormProps> = ({ onJoined, onDismis
 
   if (dismissed) return null;
 
-  // Đơn đã có sẵn trên hồ sơ (kể cả sau F5) — suy ra từ currentUser, không
-  // cần thêm state hay localStorage.
-  const pendingCode = currentUser?.pendingClassCode;
+  const maDaGui = currentUser?.pendingClassCode;
+  /* CHỈ coi là "đang chờ duyệt" khi mã trùng một lớp THẬT. Màn đăng ký cố ý
+     không tra mã (lúc đó chưa đăng nhập nên `classes` rỗng), nên một em gõ sai
+     6 ký tự sẽ mang mã không trùng lớp nào. Mã đó không hiện ra ở màn nào của
+     giáo viên, tức KHÔNG AI từ chối được để xoá nó. Nếu ta vẫn ẩn ô nhập theo
+     nó thì em bị khoá khỏi mọi lớp và chỉ Firebase Console cứu được. Mã sai
+     thì coi như chưa gửi gì — ô nhập vẫn hiện, em tự nhập lại. */
+  const pendingCode = maDaGui && classes.some(
+    c => c.inviteCode?.toUpperCase() === maDaGui.toUpperCase()
+  ) ? maDaGui : undefined;
 
   const handleJoin = async () => {
     if (!code.trim()) { setError('Vui lòng nhập mã lớp.'); return; }

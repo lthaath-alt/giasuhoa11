@@ -357,6 +357,16 @@ console.log('\n== Luật Firestore phân quyền theo vai ==');
   const truongTrongLuat = new Set<string>();
   for (const m of luat.matchAll(/\b(?:request\.)?resource\.data\.([A-Za-z_]\w*)/g)) truongTrongLuat.add(m[1]);
   for (const m of luat.matchAll(/['"]([A-Za-z_]\w*)['"]\s+in\s+(?:request\.)?resource\.data/g)) truongTrongLuat.add(m[1]);
+  /* `cauHoiSach()` gán `let d = request.resource.data;` rồi dùng `d.q`,
+     `'o' in d`… Hai mẫu trên đòi chữ `resource.data` đứng ngay trước nên
+     KHÔNG thấy nhóm trường của bank_questions — tức phép kiểm sinh ra từ bài
+     học đợt 1 lại mù với đúng nhóm trường đó. Đo ngày 12/09/2026: nó đếm 6 tên
+     và không tên nào là q/e/o/st/ansText/img. */
+  for (const m of luat.matchAll(/\blet\s+(\w+)\s*=\s*(?:request\.)?resource\.data\s*;/g)) {
+    const biDanh = m[1];
+    for (const t of luat.matchAll(new RegExp(`\\b${biDanh}\\.([A-Za-z_]\\w*)`, 'g'))) truongTrongLuat.add(t[1]);
+    for (const t of luat.matchAll(new RegExp(`['"]([A-Za-z_]\\w*)['"]\\s+in\\s+${biDanh}\\b`, 'g'))) truongTrongLuat.add(t[1]);
+  }
   /* Tên trường còn nấp trong affectedKeys().hasAny([...]) / .hasOnly([...]) /
      .hasAll([...]) — hai mẫu trên không thấy chúng. Cửa này mở ngày 12/09/2026
      cùng luật `users` mới; không mở mẫu theo thì gõ sai tên trường ở đó là
@@ -367,7 +377,16 @@ console.log('\n== Luật Firestore phân quyền theo vai ==');
   /* `role` do luật đọc qua get(...).data.role, không khớp hai mẫu trên. */
   if (/\.data\.role\b/.test(luat)) truongTrongLuat.add('role');
 
-  const khongCoThat = [...truongTrongLuat].filter(t => !tepNguon.some(f => doc(f).includes(t)));
+  /* So bằng RANH GIỚI TỪ (`\b…\b`), không phải `.includes()` thô. Tên trường
+     ngắn (1-2 ký tự như `o`, `st`) là substring của vô số danh tính khác
+     trong mã (`root`, `Tooltip`, `SchoolAdminRoute`…), nên `.includes()` luôn
+     "tìm thấy" chúng dù trường đó không có thật — đúng cái bẫy phép kiểm này
+     sinh ra để bắt. Phát hiện ngày 12/09/2026: cố tình đổi `'o' in d` thành
+     `'oo' in d` để phá hoại — bản `.includes()` cũ vẫn báo ĐẠT vì "oo" là
+     substring tình cờ của `root`/`Tooltip`/`SchoolAdminRoute`. */
+  const khongCoThat = [...truongTrongLuat].filter(t =>
+    !tepNguon.some(f => new RegExp(`\\b${t}\\b`).test(doc(f)))
+  );
   if (!truongTrongLuat.size) truot('luật kiểm bằng tên trường có thật', 'luật không nhắc trường nào — chưa siết?');
   else if (khongCoThat.length) truot('luật kiểm bằng tên trường có thật', 'không có trong mã: ' + khongCoThat.join(', '));
   else dat(`cả ${truongTrongLuat.size} tên trường luật nhắc tới đều có thật trong mã`);
