@@ -211,24 +211,36 @@ service cloud.firestore {
       allow write: if laGiaoVien();
     }
 
-    /* BỐN điều phải nhớ, cả bốn đều đã viết sai một lần:
+    /* NĂM điều phải nhớ, cả năm đều đã viết sai một lần:
 
-       1. `create` phải cho phép giáo viên/quản trị tạo hộ. Khi admin tạo tài
-          khoản cho giáo viên, bản ghi Auth tạo trên app PHỤ (xem `taoAuthPhu()`)
-          nhưng hồ sơ ghi bằng db của app CHÍNH — lúc ghi, request.auth.uid là
-          ADMIN chứ không phải người mới.
+       1. `create` phải cho phép giáo viên tạo hộ — nhưng chỉ tạo hộ HỌC SINH.
+          Tạo tài khoản giáo viên khác hay admin trường là việc của quản trị,
+          đi qua `laQuanTri()`; nhánh giáo viên ở đây chỉ mở khi
+          `role == 'student'`. Khi admin tạo tài khoản cho giáo viên, bản ghi
+          Auth tạo trên app PHỤ (xem `taoAuthPhu()`) nhưng hồ sơ ghi bằng db
+          của app CHÍNH — lúc ghi, request.auth.uid là ADMIN chứ không phải
+          người mới.
 
-       2. `create` cũng phải chặn TỰ PHONG VAI. Đăng ký Firebase Auth bằng email
-          + mật khẩu là công khai: ai cũng gọi thẳng API của Google để lấy một
-          uid hợp lệ mà không cần đụng vào web, rồi ghi users/{uid} với
-          role: "admin". Chặn `update` mà bỏ ngỏ `create` thì cửa vẫn mở, chỉ là
-          cửa bên cạnh.
+       2. `create` cũng phải chặn TỰ PHONG VAI, và ràng buộc `role` phải áp
+          dụng cho CẢ hai vế — học sinh tự đăng ký lẫn giáo viên tạo hộ — chứ
+          không chỉ vế học sinh. Đăng ký Firebase Auth bằng email + mật khẩu
+          là công khai: ai cũng gọi thẳng API của Google để lấy một uid hợp lệ
+          mà không cần đụng vào web, rồi ghi users/{uid} với role: "admin".
+          Một giáo viên đang đăng nhập cũng lấy được uid mới kiểu đó rồi tự
+          ghi role: "admin" nếu vế giáo viên không ép role — bỏ ngỏ vế nào thì
+          cửa vẫn mở, chỉ là cửa khác.
 
        3. Học sinh KHÔNG tự đặt được `classId`/`schoolId`. Nếu cho, thì dù
           `classes` đã khoá, em vẫn tự xếp mình vào lớp bất kỳ qua cửa sau.
           Vào lớp đi bằng `pendingClassCode` rồi chờ giáo viên duyệt.
 
-       4. So bằng `affectedKeys()` chứ KHÔNG so
+       4. `joinedClassId` là dấu hiệu thuộc lớp THỨ HAI — đọc như vậy ở
+          `QuizProgressTab.tsx` và `DashboardPage.tsx`. Chặn `classId`/
+          `schoolId` mà quên trường này thì cửa vẫn mở: học sinh tự đặt
+          `joinedClassId` cho mình là chui được vào bảng tiến độ lớp của giáo
+          viên, dù không hề có `classId` thật.
+
+       5. So bằng `affectedKeys()` chứ KHÔNG so
           `request.resource.data.classId == resource.data.classId`: phần lớn hồ
           sơ không có hai trường đó, mà đọc một trường vắng mặt trong luật là
           lỗi, và lỗi thì từ chối — tức chặn nhầm mọi người. */
@@ -239,14 +251,16 @@ service cloud.firestore {
                       (request.auth.uid == userId
                        && request.resource.data.role == 'student'
                        && !('classId' in request.resource.data)
-                       && !('schoolId' in request.resource.data))
-                      || laGiaoVien()
+                       && !('schoolId' in request.resource.data)
+                       && !('joinedClassId' in request.resource.data))
+                      || (laGiaoVien() && request.resource.data.role == 'student')
+                      || laQuanTri()
                     );
 
       allow update: if dangNhap() && (
                       (request.auth.uid == userId
                        && !request.resource.data.diff(resource.data)
-                            .affectedKeys().hasAny(['role', 'classId', 'schoolId']))
+                            .affectedKeys().hasAny(['role', 'classId', 'schoolId', 'joinedClassId']))
                       || (laGiaoVien()
                           && !request.resource.data.diff(resource.data)
                                .affectedKeys().hasAny(['role']))
