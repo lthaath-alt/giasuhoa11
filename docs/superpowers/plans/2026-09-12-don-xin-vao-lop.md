@@ -33,7 +33,7 @@ Giáo viên duyệt thì chính giáo viên ghi `classId` và `classes.studentId
     1 phép kiểm  ->  2 luật + kiểu  ->  3 AppContext (đăng ký & xin vào lớp)
     ->  4 màn duyệt cho giáo viên  ->  5 chữ nghĩa giao diện
     ->  6 BUILD + DEPLOY + XÁC NHẬN            <- CỔNG, chủ dự án làm
-    ->  7 Playground 21 phép rồi Publish       <- CỔNG, khó lùi
+    ->  7 Playground 22 phép rồi Publish       <- CỔNG, khó lùi
     ->  8 thử tay ba vai + tài liệu
 
 Publish trước khi bản mới chạy trên Netlify thì bản đang chạy vẫn ghi vào
@@ -830,7 +830,7 @@ dự án đã trả giá vì nó đúng hai lần.
 
 ---
 
-### Task 7: CỔNG — 21 phép ở Rules Playground, rồi Publish
+### Task 7: CỔNG — 22 phép ở Rules Playground, rồi Publish
 
 **Chủ dự án làm.** Chép luật ĐANG chạy ra Notepad trước — đó là bản lùi.
 
@@ -860,6 +860,18 @@ tắt khi đổi Simulation type**, phải kiểm lại trước mỗi lần Run
 | 19 | học sinh | **list** | `/users` | — | ❌ |
 | 20 | **giáo viên thuần** | update | `/users/<uid HS>` | `classId: <id lớp>` | ✅ |
 | 21 | **giáo viên thuần** | update | `/users/<uid HS>` | `role: admin` | ❌ |
+| 22 | học sinh | update | `/users/<uid HS>` | `username: <email HS khác>` | ❌ |
+
+**Phép 22 thêm ngày 12/09/2026.** Nó đo bản vá cửa sau thứ ba: sổ lớp khớp học
+sinh bằng **chuỗi định danh** (`studentIdentifiers` so với `username` hoặc
+`email`), không bằng `classId`. Học sinh đọc được `classes`, nên nếu luật không
+chặn thì em chép một định danh trong sổ lớp đích rồi đặt `username` của mình
+thành chuỗi đó là hiện ra trong bảng tiến độ của giáo viên lớp ấy. Không có phép
+này thì bản vá đó **không được đo lần nào**.
+
+**Giá trị thật để điền** (uid, email, `classId`, `inviteCode`) cố ý KHÔNG ghi
+vào tệp này: tệp nằm trong git và đẩy lên GitHub. Tra lại bằng Firebase Console,
+hoặc hỏi lại trợ lý — nó tra được từ Firestore mà không cần đăng nhập.
 
 **Bốn dòng 18-21 thêm ngày 12/09/2026** sau lần soát toàn nhánh. Bảng 17 phép
 trước đó để trống đúng bốn đường mà sai một cái là phải lùi luật:
@@ -912,9 +924,9 @@ Sáu phép quan trọng nhất, và sai mỗi phép thì hỏng chuyện gì:
   bảng tiến độ lớp của giáo viên.
 
 - [ ] **Bước 1: Dán luật mới vào ô soạn thảo, CHƯA Publish**
-- [ ] **Bước 2: Chạy đủ 21 phép, ghi lại phép nào lệch**
+- [ ] **Bước 2: Chạy đủ 22 phép, ghi lại phép nào lệch**
 - [ ] **Bước 3: Lệch một phép thôi cũng DỪNG — báo số phép và kết quả thật**
-- [ ] **Bước 4: Đúng cả 21 thì Publish**
+- [ ] **Bước 4: Đúng cả 22 thì Publish**
 
 ---
 
