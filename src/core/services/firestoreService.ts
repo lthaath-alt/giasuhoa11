@@ -95,6 +95,11 @@ export const FirestoreService = {
           schoolId: data.schoolId,
           classId: data.classId,
           joinedClassId: data.joinedClassId,
+          /* Hai dấu ĐƠN CHỜ DUYỆT. Thiếu chúng ở đây thì màn giáo viên /
+             quản trị đọc danh sách về là mất dấu đơn, và khung duyệt đơn
+             nằm im dù Firestore có đơn thật — lỗi tìm ra 13/09/2026. */
+          pendingClassCode: data.pendingClassCode,
+          pendingRole: data.pendingRole,
           googleId: data.googleId,
           canChangePassword: data.canChangePassword ?? true,
           createdAt: data.createdAt?.toDate
@@ -131,6 +136,8 @@ export const FirestoreService = {
         schoolId: data.schoolId,
         classId: data.classId,
         joinedClassId: data.joinedClassId,
+        pendingClassCode: data.pendingClassCode,
+        pendingRole: data.pendingRole,
         canChangePassword: data.canChangePassword ?? true,
         createdAt: data.createdAt?.toDate
           ? data.createdAt.toDate().toISOString()
