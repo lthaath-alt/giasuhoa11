@@ -13,7 +13,8 @@
    "luôn tỏa nhiệt"
   ],
   "q": "Phản ứng thuận nghịch là phản ứng",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -29,7 +30,8 @@
    "hiệu suất phản ứng đạt 100%"
   ],
   "q": "Khi một phản ứng thuận nghịch đạt trạng thái cân bằng thì",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 0,
@@ -45,7 +47,8 @@
    "[NH₃] / ([N₂]·[H₂])"
   ],
   "q": "Biểu thức hằng số cân bằng K_C của phản ứng N₂(g) + 3H₂(g) ⇌ 2NH₃(g) là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 0,
@@ -61,7 +64,8 @@
    "tan trong nước tạo ion OH⁻"
   ],
   "q": "Theo thuyết Brønsted – Lowry, acid là chất",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 0,
@@ -77,7 +81,8 @@
    "lưỡng tính"
   ],
   "q": "Dung dịch có pH = 3 thuộc môi trường",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 2,
@@ -93,7 +98,8 @@
    "mọi môi trường"
   ],
   "q": "Phenolphthalein chuyển sang màu hồng trong môi trường",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -109,7 +115,8 @@
    "C₂H₅OH"
   ],
   "q": "Chất nào sau đây là chất điện li mạnh?",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -125,7 +132,8 @@
    "pH = −log[OH⁻]"
   ],
   "q": "Công thức tính pH của dung dịch là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -141,7 +149,8 @@
    "chiều thuận rồi chiều nghịch"
   ],
   "q": "Cho cân bằng N₂(g) + 3H₂(g) ⇌ 2NH₃(g), Δ_rH < 0. Khi tăng nhiệt độ, cân bằng chuyển dịch theo chiều",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 0,
@@ -157,7 +166,8 @@
    "phụ thuộc chất xúc tác"
   ],
   "q": "Với cân bằng N₂(g) + 3H₂(g) ⇌ 2NH₃(g), khi tăng áp suất chung của hệ thì cân bằng chuyển dịch theo chiều",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 2,
@@ -173,7 +183,8 @@
    "làm tăng hằng số cân bằng K_C"
   ],
   "q": "Vai trò của chất xúc tác đối với một cân bằng hóa học là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -189,7 +200,8 @@
    "0,01"
   ],
   "q": "pH của dung dịch HCl 0,01 M là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 2,
@@ -205,7 +217,8 @@
    "13"
   ],
   "q": "pH của dung dịch NaOH 0,001 M là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -221,7 +234,8 @@
    "NH₃ và OH⁻"
   ],
   "q": "Cặp chất nào sau đây là một cặp acid – base liên hợp?",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 2,
@@ -237,7 +251,8 @@
    "luôn bằng 14"
   ],
   "q": "Dung dịch Na₂CO₃ có pH",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 2,
@@ -253,7 +268,8 @@
    "chuyển thành phản ứng một chiều"
   ],
   "q": "Cho cân bằng H₂(g) + I₂(g) ⇌ 2HI(g). Khi tăng áp suất chung của hệ, cân bằng sẽ",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 0,
@@ -269,7 +285,8 @@
    "100,6"
   ],
   "q": "Cho cân bằng H₂(g) + I₂(g) ⇌ 2HI(g). Ban đầu cho 1 mol H₂ và 1 mol I₂ vào bình 1 lít. Khi cân bằng có 1,56 mol HI. Giá trị K_C xấp xỉ",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 2,
@@ -285,7 +302,8 @@
    "0,240 M"
   ],
   "q": "Chuẩn độ 10,00 mL dung dịch NaOH bằng dung dịch HCl 0,100 M, hết 12,00 mL HCl. Nồng độ NaOH là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 3,
@@ -301,7 +319,8 @@
    "13"
   ],
   "q": "Trộn 100 mL dung dịch HCl 0,2 M với 100 mL dung dịch NaOH 0,4 M. pH của dung dịch sau phản ứng là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 2,
@@ -317,7 +336,8 @@
    "100 lần"
   ],
   "q": "Nồng độ ion H⁺ trong dung dịch có pH = 5 lớn gấp bao nhiêu lần dung dịch có pH = 8?",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 2,
@@ -333,7 +353,8 @@
    "4"
   ],
   "q": "Dung dịch CH₃COOH 0,1 M có độ điện li α = 1%. pH của dung dịch là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -349,7 +370,8 @@
    "chỉ cần thêm chất xúc tác"
   ],
   "q": "Cho cân bằng 2SO₂(g) + O₂(g) ⇌ 2SO₃(g), Δ_rH < 0. Để tăng hiệu suất tạo SO₃ cần",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 2,
@@ -365,7 +387,8 @@
    "160"
   ],
   "q": "Cho cân bằng 2SO₂(g) + O₂(g) ⇌ 2SO₃(g). Trong bình 1 lít ban đầu có 2 mol SO₂ và 1 mol O₂. Khi hệ đạt cân bằng thu được 1,6 mol SO₃. Giá trị K_C là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 2,
@@ -381,7 +404,8 @@
    "13,00"
   ],
   "q": "Trộn 200 mL dung dịch HCl 0,1 M với 300 mL dung dịch NaOH 0,1 M. pH của dung dịch thu được là (biết lg2 ≈ 0,30)",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "ch": 1,
@@ -438,7 +462,8 @@
    "liên kết ion"
   ],
   "q": "Liên kết trong phân tử N₂ là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 2,
@@ -454,7 +479,8 @@
    "0,03%"
   ],
   "q": "Nitrogen chiếm khoảng bao nhiêu phần trăm thể tích không khí?",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -470,7 +496,8 @@
    "có khí không màu hóa nâu trong không khí"
   ],
   "q": "Để nhận biết muối ammonium, người ta cho muối tác dụng với dung dịch kiềm rồi đun nóng, hiện tượng là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 2,
@@ -486,7 +513,8 @@
    "chất rắn màu đen"
   ],
   "q": "Ở điều kiện thường, sulfur là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 0,
@@ -502,7 +530,8 @@
    "dung dịch AgNO₃"
   ],
   "q": "Thuốc thử dùng nhận biết ion sulfate SO₄²⁻ trong dung dịch là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -518,7 +547,8 @@
    "dễ bay hơi"
   ],
   "q": "Sulfuric acid đặc có tính chất đặc trưng nào?",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -534,7 +564,8 @@
    "He và Ar"
   ],
   "q": "Khí nào sau đây là nguyên nhân chính gây mưa acid?",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -550,7 +581,8 @@
    "chất rắn thăng hoa"
   ],
   "q": "Ammonia NH₃ có tính chất vật lí nào sau đây?",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 0,
@@ -566,7 +598,8 @@
    "không hiện tượng"
   ],
   "q": "Đưa hai đũa thủy tinh, một tẩm dung dịch NH₃ đặc, một tẩm dung dịch HCl đặc, lại gần nhau. Hiện tượng quan sát được là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -582,7 +615,8 @@
    "NO tác dụng với N₂"
   ],
   "q": "Khí NO không màu nhưng hóa nâu ngay trong không khí vì",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -598,7 +632,8 @@
    "môi trường"
   ],
   "q": "Trong phản ứng SO₂ + Br₂ + 2H₂O → 2HBr + H₂SO₄, SO₂ đóng vai trò",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 0,
@@ -613,7 +648,8 @@
    "chất môi trường"
   ],
   "q": "Trong phản ứng SO₂ + 2H₂S → 3S + 2H₂O, SO₂ đóng vai trò",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -629,7 +665,8 @@
    "đun nóng acid rồi thêm nước"
   ],
   "q": "Cách pha loãng dung dịch H₂SO₄ đặc đúng kỹ thuật là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 2,
@@ -645,7 +682,8 @@
    "Mg"
   ],
   "q": "Kim loại nào sau đây bị thụ động hóa trong H₂SO₄ đặc, nguội?",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -661,7 +699,8 @@
    "có khí màu vàng lục"
   ],
   "q": "Cho lá đồng vào H₂SO₄ đặc, đun nóng. Hiện tượng là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -677,7 +716,8 @@
    "luôn là chất môi trường"
   ],
   "q": "Trong NH₃, nitrogen có số oxi hóa −3 là mức thấp nhất, do đó khi tham gia phản ứng oxi hóa – khử, NH₃",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -693,7 +733,8 @@
    "3,7185 L"
   ],
   "q": "Hòa tan hết 6,4 gam Cu bằng dung dịch H₂SO₄ đặc, nóng, dư. Thể tích khí SO₂ (đkc, 24,79 L/mol) thu được là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -709,7 +750,8 @@
    "12,8 gam"
   ],
   "q": "Đốt cháy hoàn toàn 3,2 gam sulfur trong khí oxygen dư. Khối lượng SO₂ thu được là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -725,7 +767,8 @@
    "5,83 gam"
   ],
   "q": "Cho 100 mL dung dịch H₂SO₄ 0,5 M tác dụng với dung dịch BaCl₂ dư. Khối lượng kết tủa thu được là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 2,
@@ -740,7 +783,8 @@
    "Na₂SO₄"
   ],
   "q": "Dẫn 0,1 mol SO₂ vào 100 mL dung dịch NaOH 1,5 M. Sản phẩm muối thu được là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -756,7 +800,8 @@
    "2,00 mol"
   ],
   "q": "Tổng hợp ammonia từ 1 mol N₂ và 3 mol H₂ với hiệu suất 25%. Số mol NH₃ thu được là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -772,7 +817,8 @@
    "4"
   ],
   "q": "Hệ số của H₂SO₄ trong phương trình Cu + H₂SO₄(đặc, nóng) → CuSO₄ + SO₂ + H₂O là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -788,7 +834,8 @@
    "0,40 M"
   ],
   "q": "Cho 200 mL dung dịch NH₃ tác dụng vừa đủ với 100 mL dung dịch HCl 0,2 M. Nồng độ mol của dung dịch NH₃ là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 2,
@@ -804,7 +851,8 @@
    "9,916 L"
   ],
   "q": "Hòa tan hoàn toàn 11,2 gam Fe bằng dung dịch H₂SO₄ đặc, nóng, dư. Thể tích khí SO₂ (đkc, 24,79 L/mol) thu được là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -819,7 +867,8 @@
    "20,8 gam"
   ],
   "q": "Dẫn 3,7185 lít SO₂ (đkc) vào 200 mL dung dịch NaOH 1 M. Khối lượng muối thu được là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "ch": 2,
@@ -877,7 +926,8 @@
    "hợp chất tách được từ cơ thể sống"
   ],
   "q": "Hợp chất hữu cơ là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -892,7 +942,8 @@
    "số liên kết π trong phân tử"
   ],
   "q": "Nhóm chức là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -908,7 +959,8 @@
    "có màu sắc khác nhau"
   ],
   "q": "Phương pháp chưng cất dùng để tách các chất",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -924,7 +976,8 @@
    "màu sắc khác nhau"
   ],
   "q": "Phương pháp chiết dựa trên",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -940,7 +993,8 @@
    "đo độ tan trong nước"
   ],
   "q": "Phổ hồng ngoại (IR) của một hợp chất hữu cơ được dùng để",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 0,
@@ -956,7 +1010,8 @@
    "độ tan"
   ],
   "q": "Phổ khối lượng (MS) cho biết thông tin nào?",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -972,7 +1027,8 @@
    "có cùng số nguyên tử carbon"
   ],
   "q": "Các chất đồng đẳng là những chất",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 0,
@@ -988,7 +1044,8 @@
    "có cùng tính chất hóa học"
   ],
   "q": "Các chất đồng phân là những chất",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 2,
@@ -1004,7 +1061,8 @@
    "KCN"
   ],
   "q": "Chất nào sau đây là hợp chất hữu cơ?",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -1020,7 +1078,8 @@
    "4"
   ],
   "q": "Số đồng phân cấu tạo của C₄H₁₀ là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -1036,7 +1095,8 @@
    "5"
   ],
   "q": "Số đồng phân cấu tạo alkane ứng với công thức C₅H₁₂ là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -1052,7 +1112,8 @@
    "sắc ký"
   ],
   "q": "Để tách dầu ăn ra khỏi hỗn hợp dầu ăn và nước, nên dùng phương pháp",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -1068,7 +1129,8 @@
    "lọc"
   ],
   "q": "Để thu ethanol từ dung dịch sau khi lên men, người ta dùng phương pháp",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 0,
@@ -1084,7 +1146,8 @@
    "C₃H₆O₃"
   ],
   "q": "Công thức đơn giản nhất của glucose C₆H₁₂O₆ là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -1100,7 +1163,8 @@
    "5"
   ],
   "q": "Số đồng phân cấu tạo mạch hở ứng với công thức C₃H₈O là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -1116,7 +1180,8 @@
    "cô cạn nhanh"
   ],
   "q": "Để tinh chế một chất rắn có lẫn tạp chất, người ta thường dùng phương pháp",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -1132,7 +1197,8 @@
    "C₃H₈O"
   ],
   "q": "Hợp chất X chứa 52,17% C; 13,04% H; 34,79% O về khối lượng và có phân tử khối 46. Công thức phân tử của X là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 0,
@@ -1148,7 +1214,8 @@
    "C₂H₆O₂"
   ],
   "q": "Đốt cháy hoàn toàn 0,1 mol chất hữu cơ X thu được 0,2 mol CO₂ và 0,3 mol H₂O. Biết X chứa oxygen và có M = 46. Công thức phân tử của X là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -1164,7 +1231,8 @@
    "C₆H₁₂O₆"
   ],
   "q": "Hợp chất Y có công thức đơn giản nhất là CH₂O và phân tử khối bằng 60. Công thức phân tử của Y là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 0,
@@ -1180,7 +1248,8 @@
    "C₆H₁₀O₅"
   ],
   "q": "Hợp chất Z chứa 40% C; 6,67% H; còn lại là oxygen, phân tử khối 180. Công thức phân tử của Z là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -1196,7 +1265,8 @@
    "arene"
   ],
   "q": "Đốt cháy hoàn toàn một hydrocarbon X thu được số mol CO₂ bằng số mol H₂O. X thuộc dãy đồng đẳng nào?",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -1212,7 +1282,8 @@
    "C₄H₁₀"
   ],
   "q": "Đốt cháy hoàn toàn 0,05 mol hydrocarbon X thu được 0,15 mol CO₂ và 0,20 mol H₂O. Công thức phân tử của X là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 2,
@@ -1227,7 +1298,8 @@
    "C₂H₆O₂"
   ],
   "q": "Đốt cháy hoàn toàn 0,1 mol hợp chất hữu cơ X chứa C, H, O thu được 0,3 mol CO₂ và 0,4 mol H₂O. Biết X tác dụng với Na giải phóng H₂ và tỉ khối của X so với H₂ bằng 38. Công thức phân tử của X là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 2,
@@ -1243,7 +1315,8 @@
    "8"
   ],
   "q": "Số đồng phân cấu tạo mạch hở ứng với công thức phân tử C₄H₁₀O là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "ch": 3,
@@ -1299,7 +1372,8 @@
    "CₙH₂ₙ₋₆"
   ],
   "q": "Công thức chung của dãy đồng đẳng alkane là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -1315,7 +1389,8 @@
    "phản ứng tráng bạc"
   ],
   "q": "Phản ứng đặc trưng của alkane là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 0,
@@ -1330,7 +1405,8 @@
    "vòng benzene"
   ],
   "q": "Phân tử alkene chứa",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 0,
@@ -1346,7 +1422,8 @@
    "nước vôi trong"
   ],
   "q": "Thuốc thử dùng để phân biệt ethylene với ethane là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -1362,7 +1439,8 @@
    "C₆H₁₄"
   ],
   "q": "Công thức phân tử của benzene là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 2,
@@ -1378,7 +1456,8 @@
    "CₙH₂ₙ₋₆"
   ],
   "q": "Công thức chung của dãy đồng đẳng alkyne là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -1393,7 +1472,8 @@
    "benzene"
   ],
   "q": "Khí nào sau đây được dùng để kích thích quả mau chín?",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 0,
@@ -1409,7 +1489,8 @@
    "phản ứng thủy phân"
   ],
   "q": "Arene (hydrocarbon thơm) đặc trưng bởi loại phản ứng nào?",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 2,
@@ -1425,7 +1506,8 @@
    "benzene"
   ],
   "q": "Chất nào sau đây làm mất màu nước bromine ở điều kiện thường?",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -1441,7 +1523,8 @@
    "propane"
   ],
   "q": "Cho propene tác dụng với HBr. Sản phẩm chính là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -1457,7 +1540,8 @@
    "dung dịch NaOH"
   ],
   "q": "Thuốc thử dùng nhận biết but-1-yne (alkyne có liên kết ba đầu mạch) là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 2,
@@ -1473,7 +1557,8 @@
    "5"
   ],
   "q": "Số đồng phân alkene mạch hở của C₄H₈ (kể cả đồng phân hình học) là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 0,
@@ -1489,7 +1574,8 @@
    "muối và nước"
   ],
   "q": "Phản ứng cracking alkane tạo ra",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 0,
@@ -1505,7 +1591,8 @@
    "chỉ CO₂"
   ],
   "q": "Đốt cháy hoàn toàn một alkane luôn thu được",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 2,
@@ -1521,7 +1608,8 @@
    "dung dịch hóa xanh"
   ],
   "q": "Cho benzene vào nước bromine rồi lắc đều. Hiện tượng là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 0,
@@ -1537,7 +1625,8 @@
    "ngẫu nhiên"
   ],
   "q": "Toluene tham gia phản ứng thế ở vòng benzene ưu tiên tại vị trí",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -1553,7 +1642,8 @@
    "CH₄"
   ],
   "q": "Đốt cháy hoàn toàn 0,1 mol một alkane thu được 0,3 mol CO₂. Công thức phân tử của alkane đó là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -1569,7 +1659,8 @@
    "24 gam"
   ],
   "q": "Dẫn 2,479 lít ethylene (đkc, 24,79 L/mol) vào dung dịch bromine dư. Khối lượng Br₂ đã phản ứng là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -1585,7 +1676,8 @@
    "66,67%"
   ],
   "q": "Dẫn 3,7185 lít (đkc) hỗn hợp CH₄ và C₂H₄ qua dung dịch bromine dư, thấy có 8 gam Br₂ phản ứng. Phần trăm thể tích C₂H₄ trong hỗn hợp là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -1601,7 +1693,8 @@
    "C₂H₆"
   ],
   "q": "Một alkane X có tỉ khối so với H₂ bằng 29. Công thức phân tử của X là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -1617,7 +1710,8 @@
    "14,7 gam"
   ],
   "q": "Cho 0,1 mol acetylene tác dụng hoàn toàn với dung dịch AgNO₃ trong NH₃ dư. Khối lượng kết tủa thu được là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -1633,7 +1727,8 @@
    "poly(vinyl chloride) (PVC)"
   ],
   "q": "Trùng hợp ethylene thu được polymer nào?",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -1649,7 +1744,8 @@
    "C₃H₆"
   ],
   "q": "Đốt cháy hoàn toàn 0,1 mol một alkyne thu được 0,3 mol CO₂ và 0,2 mol H₂O. Công thức phân tử của alkyne là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 3,
@@ -1665,7 +1761,8 @@
    "66,67%"
   ],
   "q": "Hỗn hợp X gồm ethylene và acetylene. Dẫn 0,3 mol X qua dung dịch bromine dư thấy có 0,5 mol Br₂ phản ứng. Phần trăm thể tích acetylene trong X là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -1681,7 +1778,8 @@
    "C₄H₁₀ và C₅H₁₂"
   ],
   "q": "Đốt cháy hoàn toàn hỗn hợp hai alkane kế tiếp nhau trong dãy đồng đẳng thu được 0,5 mol CO₂ và 0,7 mol H₂O. Hai alkane đó là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "ch": 4,
@@ -1738,7 +1836,8 @@
    "−O−"
   ],
   "q": "Nhóm chức của alcohol là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 0,
@@ -1754,7 +1853,8 @@
    "C₆H₆"
   ],
   "q": "Công thức phân tử của phenol là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -1770,7 +1870,8 @@
    "CₙH₂ₙO₂"
   ],
   "q": "Công thức chung của alcohol no, đơn chức, mạch hở là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 2,
@@ -1786,7 +1887,8 @@
    "phenol"
   ],
   "q": "Glycerol thuộc loại",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -1802,7 +1904,8 @@
    "alcohol là chất điện li"
   ],
   "q": "Alcohol có nhiệt độ sôi cao hơn hydrocarbon có phân tử khối tương đương là do",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -1817,7 +1920,8 @@
    "ô nhiễm kim loại nặng"
   ],
   "q": "Các hợp chất CFC (chlorofluorocarbon) gây tác hại môi trường nào?",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 0,
@@ -1833,7 +1937,8 @@
    "dung dịch NaHCO₃"
   ],
   "q": "Phenol thể hiện tính acid yếu nên tác dụng được với",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 2,
@@ -1849,7 +1954,8 @@
    "chỉ tan khi đun nóng"
   ],
   "q": "Ethanol tan trong nước như thế nào?",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -1865,7 +1971,8 @@
    "nước bromine"
   ],
   "q": "Thuốc thử để phân biệt ethanol và glycerol là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -1881,7 +1988,8 @@
    "không hiện tượng"
   ],
   "q": "Nhỏ nước bromine vào dung dịch phenol, hiện tượng là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -1897,7 +2005,8 @@
    "acetic acid"
   ],
   "q": "Đun ethanol với H₂SO₄ đặc ở 170 °C thu được sản phẩm chính là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 0,
@@ -1913,7 +2022,8 @@
    "alkene"
   ],
   "q": "Oxi hóa alcohol bậc I bằng CuO đun nóng thu được",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -1929,7 +2039,8 @@
    "ether"
   ],
   "q": "Oxi hóa alcohol bậc II bằng CuO đun nóng thu được",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 0,
@@ -1944,7 +2055,8 @@
    "nước cất"
   ],
   "q": "Có thể phân biệt phenol và ethanol bằng thuốc thử nào?",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -1959,7 +2071,8 @@
    "muối"
   ],
   "q": "Đun dẫn xuất halogen với dung dịch KOH trong ethanol, sản phẩm hữu cơ chính là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 2,
@@ -1975,7 +2088,8 @@
    "hóa vàng"
   ],
   "q": "Phenol có làm đổi màu quỳ tím không?",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 0,
@@ -1991,7 +2105,8 @@
    "4,958 L"
   ],
   "q": "Cho Na dư vào 4,6 gam ethanol. Thể tích khí H₂ thu được (đkc, 24,79 L/mol) là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 2,
@@ -2007,7 +2122,8 @@
    "5"
   ],
   "q": "Số đồng phân alcohol ứng với công thức C₄H₁₀O là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -2023,7 +2139,8 @@
    "3,36 gam"
   ],
   "q": "Đun 9,2 gam ethanol với H₂SO₄ đặc ở 170 °C, hiệu suất 80%. Khối lượng ethylene thu được là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -2039,7 +2156,8 @@
    "19,80 gam"
   ],
   "q": "Cho 9,4 gam phenol tác dụng hoàn toàn với nước bromine dư. Khối lượng kết tủa thu được là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -2055,7 +2173,8 @@
    "C₄H₉OH"
   ],
   "q": "Đốt cháy hoàn toàn 0,1 mol alcohol no, đơn chức, mạch hở X thu được 0,2 mol CO₂. X là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -2071,7 +2190,8 @@
    "có 40 mL nước trong 100 mL dung dịch"
   ],
   "q": "Cồn 40° nghĩa là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 2,
@@ -2087,7 +2207,8 @@
    "4,958 L"
   ],
   "q": "Cho 0,1 mol glycerol tác dụng hoàn toàn với Na dư. Thể tích H₂ thu được (đkc) là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 3,
@@ -2103,7 +2224,8 @@
    "66,67%"
   ],
   "q": "Cho 13,8 gam hỗn hợp ethanol và glycerol tác dụng hết với Na dư, thu được 4,958 lít H₂ (đkc). Phần trăm khối lượng glycerol trong hỗn hợp là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -2119,7 +2241,8 @@
    "34,56 gam"
   ],
   "q": "Oxi hóa 4,6 gam ethanol bằng CuO nung nóng với hiệu suất 80%, thu được aldehyde X. Cho toàn bộ X phản ứng tráng bạc hoàn toàn. Khối lượng Ag thu được là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "ch": 5,
@@ -2176,7 +2299,8 @@
    "−COOH"
   ],
   "q": "Nhóm carbonyl có công thức là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -2192,7 +2316,8 @@
    "−CO−"
   ],
   "q": "Aldehyde chứa nhóm chức nào?",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -2208,7 +2333,8 @@
    "CH₃CHO"
   ],
   "q": "Công thức của acetic acid là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -2224,7 +2350,8 @@
    "dung dịch KMnO₄"
   ],
   "q": "Thuốc thử Tollens dùng cho phản ứng tráng bạc là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -2240,7 +2367,8 @@
    "acetic acid"
   ],
   "q": "Ketone đơn giản nhất là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 0,
@@ -2256,7 +2384,8 @@
    "98%"
   ],
   "q": "Giấm ăn thường chứa acetic acid với nồng độ khoảng",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -2272,7 +2401,8 @@
    "không tan trong nước"
   ],
   "q": "Carboxylic acid có nhiệt độ sôi cao hơn alcohol có phân tử khối tương đương là do",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -2287,7 +2417,8 @@
    "−CO−"
   ],
   "q": "Nhóm chức của carboxylic acid là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -2303,7 +2434,8 @@
    "nước cất"
   ],
   "q": "Để phân biệt acetaldehyde và acetone, dùng",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -2319,7 +2451,8 @@
    "không hiện tượng"
   ],
   "q": "Nhỏ dung dịch NaHCO₃ vào ống nghiệm chứa acetic acid, hiện tượng là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 0,
@@ -2335,7 +2468,8 @@
    "sodium acetate"
   ],
   "q": "Đun CH₃COOH với C₂H₅OH có H₂SO₄ đặc làm xúc tác, sản phẩm hữu cơ chính là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 0,
@@ -2351,7 +2485,8 @@
    "kết tủa trắng"
   ],
   "q": "Đun nóng aldehyde với Cu(OH)₂ trong môi trường kiềm, hiện tượng là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -2367,7 +2502,8 @@
    "C₂H₅OH < CH₃COOH < C₆H₅OH"
   ],
   "q": "Thứ tự tăng dần tính acid của các chất C₂H₅OH, C₆H₅OH, CH₃COOH là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 0,
@@ -2383,7 +2519,8 @@
    "acetone"
   ],
   "q": "Khử acetaldehyde bằng NaBH₄ thu được",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 3,
@@ -2399,7 +2536,8 @@
    "Cu"
   ],
   "q": "Acetic acid không tác dụng với chất nào sau đây?",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -2415,7 +2553,8 @@
    "carboxylic acid"
   ],
   "q": "Phản ứng với I₂ trong môi trường NaOH tạo kết tủa vàng CHI₃ dùng để nhận biết",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -2431,7 +2570,8 @@
    "16,2 gam"
   ],
   "q": "Cho 4,4 gam acetaldehyde tác dụng hoàn toàn với AgNO₃/NH₃ dư. Khối lượng Ag thu được là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 0,
@@ -2447,7 +2587,8 @@
    "3,7185 L"
   ],
   "q": "Cho 6 gam acetic acid tác dụng với Na dư. Thể tích H₂ thu được (đkc, 24,79 L/mol) là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -2463,7 +2604,8 @@
    "3,52 gam"
   ],
   "q": "Đun 6 gam acetic acid với 4,6 gam ethanol có xúc tác H₂SO₄ đặc, hiệu suất 60%. Khối lượng ester thu được là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -2479,7 +2621,8 @@
    "0,40 M"
   ],
   "q": "Trung hòa 100 mL dung dịch CH₃COOH cần vừa đủ 50 mL dung dịch NaOH 0,2 M. Nồng độ mol của acid là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -2495,7 +2638,8 @@
    "CH₂=CH−CHO"
   ],
   "q": "Aldehyde đơn chức X tác dụng với AgNO₃/NH₃ dư theo tỉ lệ mol n(X) : n(Ag) = 1 : 4. X là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -2511,7 +2655,8 @@
    "0,6198 L"
   ],
   "q": "Cho 0,1 mol một carboxylic acid đơn chức tác dụng hết với NaHCO₃ dư. Thể tích CO₂ thu được (đkc) là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -2527,7 +2672,8 @@
    "C₃H₇COOH"
   ],
   "q": "Đốt cháy hoàn toàn 0,1 mol một carboxylic acid no, đơn chức, mạch hở thu được 0,2 mol CO₂. Acid đó là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -2543,7 +2689,8 @@
    "59,46%"
   ],
   "q": "Cho 7,4 gam hỗn hợp HCHO và CH₃CHO tác dụng với dung dịch AgNO₃/NH₃ dư, thu được 64,8 gam Ag. Phần trăm khối lượng HCHO trong hỗn hợp là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "a": 1,
@@ -2559,7 +2706,8 @@
    "C₃H₇COOH"
   ],
   "q": "Trung hòa hoàn toàn 12 gam một carboxylic acid X no, đơn chức, mạch hở cần vừa đủ 200 mL dung dịch NaOH 1 M. Công thức của X là",
-  "src": "builtin"
+  "src": "builtin",
+  "t": "mc"
  },
  {
   "ch": 6,
