@@ -19,11 +19,11 @@ CON DUNG MOT viec chu du an neu ma CHUA chot:
   khau giua gio" hay chi la "bi voi dong tai khoan thu"? Hoi lai truoc
   khi thiet ke bat cu thu gi.
 
-MOT CHO MA CHET tim ra 13/09/2026, moi BAO chu chua xoa:
-  src/features/admin/components/SchoolTab.tsx — 207 dong, co du nut "Them
-  giao vien" / "Them Admin Truong" / "Them lop", nhung KHONG TEP NAO dung
-  no. Duong that nam o AdminPage -> ManagementLayout -> "Quan ly Tai khoan"
-  -> nut "Them tai khoan Giao vien".
+MA CHET con lai, DA BAO chua xoa:
+  `CreateSchoolDialog` trong src/features/admin/components/shared/
+  SchoolDialogs.tsx — tro thanh mo coi sau khi xoa SchoolTab.tsx
+  (13/09/2026), khong tep nao dung nua. Giu lai vi "tao truong" la viec
+  co that co the can lai. Hoi chu du an truoc khi xoa.
 
 ────────────────────────────────────────────────────────────────────
 DA XONG, dung lam lai
