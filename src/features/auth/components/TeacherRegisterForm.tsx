@@ -41,13 +41,13 @@ export const TeacherRegisterForm: React.FC<TeacherRegisterFormProps> = ({ onBack
 
   /* Kiểm ngay tại chỗ trước khi gọi Firebase.
 
-     Bản trước CHỈ so hai ô mật khẩu. Để trống hết rồi bấm Đăng ký thì form gọi
-     thẳng registerStudent('', '', '') — đo được: màn hình không hiện
-     báo lỗi nào, em ngồi bấm mãi mà không hiểu vì sao. Email sai định dạng cũng
-     lọt xuống tận Firebase rồi trả về thông báo tiếng Anh.
+     Để trống hết rồi bấm Đăng ký mà không kiểm trước thì form sẽ gọi thẳng
+     registerTeacherApplicant('', '', '') — màn hình không hiện báo lỗi nào,
+     em ngồi bấm mãi mà không hiểu vì sao. Email sai định dạng cũng sẽ lọt
+     xuống tận Firebase rồi trả về thông báo tiếng Anh.
 
-     Yêu cầu "ít nhất 8 ký tự, gồm cả chữ và số" vốn chỉ được ghi làm chú thích
-     dưới ô mật khẩu, chưa bao giờ được kiểm — dán vào đây cho khớp lời hứa. */
+     Yêu cầu "ít nhất 8 ký tự, gồm cả chữ và số" đã ghi làm chú thích dưới ô
+     mật khẩu (`helperText`) nên phải kiểm đúng ở đây cho khớp lời hứa đó. */
   const kiemDuLieu = (): string | null => {
     if (!name.trim()) return 'Em chưa nhập họ và tên.';
     if (!email.trim()) return 'Em chưa nhập email.';
@@ -61,10 +61,9 @@ export const TeacherRegisterForm: React.FC<TeacherRegisterFormProps> = ({ onBack
     return null;
   };
 
-  /* Xoá báo lỗi ngay khi em sửa lại ô nhập.
-
-     Bản trước chỉ xoá lúc bấm Đăng ký, nên câu "Mật khẩu xác nhận không khớp"
-     vẫn nằm đó cả sau khi em đã gõ lại cho khớp — em tưởng mình vẫn sai. */
+  /* Xoá báo lỗi ngay khi em sửa lại ô nhập, để câu "Mật khẩu xác nhận không
+     khớp" không nằm lỳ trên màn hình sau khi em đã gõ lại cho khớp — không
+     thì em tưởng mình vẫn sai dù đã sửa đúng. */
   const goLai = <T,>(dat: (v: T) => void) => (v: T) => { setError(null); dat(v); };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -128,7 +127,7 @@ export const TeacherRegisterForm: React.FC<TeacherRegisterFormProps> = ({ onBack
       </Typography>
 
       {error && (
-        <Alert id="register-error-alert" severity="error" sx={{ mb: 2.5, borderRadius: 0 }}>
+        <Alert id="teacher-register-error-alert" severity="error" sx={{ mb: 2.5, borderRadius: 0 }}>
           {error}
         </Alert>
       )}

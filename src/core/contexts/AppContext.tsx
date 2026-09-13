@@ -247,17 +247,24 @@ export interface AppContextType {
   /**
    * Học sinh tự đăng ký tài khoản (role='student', chưa có lớp).
    * Chọn lớp làm ở tab Học sinh sau khi đăng nhập.
+   *
+   * `pendingRole` tuỳ chọn — dùng khi người gọi (vd `registerTeacherApplicant`)
+   * cần ghi thêm nguyện vọng lên hồ sơ NGAY TRONG CÙNG một lượt tạo tài khoản,
+   * để tránh việc ghi thêm lượt hai bị `onAuthStateChanged` chạy song song ghi
+   * đè mất.
    */
   registerStudent: (
     name: string,
     email: string,
-    password: string
+    password: string,
+    pendingRole?: 'teacher'
   ) => Promise<{ success: boolean; message: string; user?: User }>;
 
   /**
    * Người ngoài tự đăng ký, xin làm giáo viên (role vẫn là 'student' cho tới
-   * khi chủ dự án/đồng quản trị duyệt). Gọi lại `registerStudent` rồi ghi
-   * thêm `pendingRole: 'teacher'`.
+   * khi chủ dự án/đồng quản trị duyệt). Gọi lại `registerStudent` với
+   * `pendingRole: 'teacher'` — MỘT lượt ghi Firestore duy nhất, không có lượt
+   * ghi thứ hai để chạy đua với `onAuthStateChanged`.
    */
   registerTeacherApplicant: (
     name: string,
@@ -1612,7 +1619,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const registerStudent = async (
     name: string,
     email: string,
-    password: string
+    password: string,
+    pendingRole?: 'teacher'
   ) => {
     if (!name.trim()) return { success: false, message: 'Vui lòng nhập họ tên.' };
     if (!email.trim()) return { success: false, message: 'Vui lòng nhập email.' };
@@ -1638,6 +1646,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       email: lower,
       status: 'active',
       dangTuDangKy: true,   // tạo trên app CHÍNH -> đăng nhập luôn sau khi tạo
+      pendingRole,          // ghi cùng lượt setDoc — không có lượt ghi thứ hai
+                            // để chạy đua với onAuthStateChanged
     });
 
     if (!fsRes.success) {
@@ -1654,6 +1664,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       authProvider: 'local',
       canChangePassword: true,
       createdAt: new Date().toISOString(),
+      ...(pendingRole ? { pendingRole } : {}),
     };
 
     setUsers(prev => [...prev, newUser]);
@@ -1662,31 +1673,27 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     return { success: true, message: 'Tạo tài khoản thành công!', user: newUser };
   };
 
-  /* Đăng ký làm giáo viên = đăng ký học sinh + một nguyện vọng.
+  /* Đăng ký làm giáo viên = đăng ký học sinh + một nguyện vọng, ghi trong CÙNG
+     một lượt setDoc (qua tham số `pendingRole` của `registerStudent`).
      Tài khoản sinh ra với `role: 'student'` — đó là điều luật bắt buộc với mọi
      người tự đăng ký. Chỉ sau khi chủ dự án hoặc đồng quản trị bấm Duyệt thì
-     `role` mới thành 'teacher'. */
+     `role` mới thành 'teacher'.
+
+     Cố ý KHÔNG có lượt `updateUserById` thứ hai sau khi tạo tài khoản:
+     `createUserWithEmailAndPassword` kích hoạt `onAuthStateChanged` chạy song
+     song, và listener đó tự đọc `users/{uid}` rồi gọi `persistSession` ghi đè
+     `currentUser`. Một lượt ghi thứ hai chạy SAU sẽ có lúc thua cuộc đua đó,
+     làm `currentUser` mất `pendingRole` cho tới khi tải lại trang. Gộp thành
+     một lượt ghi duy nhất thì hết đua. */
   const registerTeacherApplicant = async (
     name: string,
     email: string,
     password: string
   ) => {
-    const res = await registerStudent(name, email, password);
-    if (!res.success || !res.user) return res;
+    const res = await registerStudent(name, email, password, 'teacher');
+    if (!res.success) return res;
 
-    const ok = await FirestoreService.updateUserById(res.user.id, { pendingRole: 'teacher' });
-    if (!ok) {
-      return {
-        success: true,
-        message: 'Đã tạo tài khoản, nhưng chưa gửi được đơn xin làm giáo viên. Vào mục Học sinh để thử lại.',
-        user: res.user,
-      };
-    }
-
-    const capNhat: User = { ...res.user, pendingRole: 'teacher' };
-    setUsers(prev => prev.map(u => (u.id === capNhat.id ? capNhat : u)));
-    setCurrentUser(capNhat);
-    return { success: true, message: 'Đã gửi đơn xin làm giáo viên. Chờ quản trị duyệt.', user: capNhat };
+    return { ...res, message: 'Đã gửi đơn xin làm giáo viên. Chờ quản trị duyệt.' };
   };
 
   // ── Giáo viên tự tạo lớp ───────────────────────────────────────────

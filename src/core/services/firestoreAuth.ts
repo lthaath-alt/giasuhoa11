@@ -140,6 +140,7 @@ export const createAccountWithFirestore = async (data: {
   classId?: string;
   schoolId?: string;
   pendingClassCode?: string;
+  pendingRole?: string;
   status?: string;
   dangTuDangKy?: boolean;
 }): Promise<{ success: boolean; message: string; user?: FirestoreUser }> => {
@@ -192,6 +193,7 @@ export const createAccountWithFirestore = async (data: {
     if (data.classId) hoSo.classId = data.classId;
     if (data.schoolId) hoSo.schoolId = data.schoolId;
     if (data.pendingClassCode) hoSo.pendingClassCode = data.pendingClassCode;
+    if (data.pendingRole) hoSo.pendingRole = data.pendingRole;
 
     await setDoc(doc(db, 'users', uid), hoSo);
 
