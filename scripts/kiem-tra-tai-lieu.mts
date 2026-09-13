@@ -40,8 +40,13 @@ const CO_Y_VANG = new Set([
   // nên trên máy chưa sinh ra nó thì đường dẫn này không tồn tại là đúng.
   'settings.local.json',
 ]);
-/* Không phải đường dẫn: mẫu đặt tên, đường dẫn URL, đuôi tệp đứng một mình. */
-const KHONG_PHAI_DUONG_DAN = new Set(['PascalCase.tsx', '.tsx', '.json', 'pages/', '/login', '/*']);
+/* Không phải đường dẫn: mẫu đặt tên, đường dẫn URL, đuôi tệp đứng một mình,
+   và đường dẫn TÀI LIỆU FIRESTORE (`quan_tri/dong_quan_tri` là một document
+   trên Firestore, không phải tệp trên đĩa — 13/09/2026). Liệt kê từng chuỗi
+   một chứ đừng bỏ qua theo mẫu: bỏ theo mẫu là mở cửa cho đường dẫn tệp thật
+   viết sai lọt qua. */
+const KHONG_PHAI_DUONG_DAN = new Set(['PascalCase.tsx', '.tsx', '.json', 'pages/', '/login', '/*',
+  'quan_tri/dong_quan_tri']);
 
 function moiTep(thuMuc: string, ra: string[] = []): string[] {
   for (const t of readdirSync(thuMuc, { withFileTypes: true })) {

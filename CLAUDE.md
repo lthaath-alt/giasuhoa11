@@ -154,6 +154,21 @@ này từng được ghi ở đây nhưng chưa bao giờ tồn tại.
   - **Học sinh không có email thật** dùng địa chỉ `<username>@internal.local`. Đăng
     nhập bình thường, nhưng không nhận được thư đặt lại — quên mật khẩu thì giáo viên
     phải tạo lại tài khoản.
+
+  **Giáo viên TỰ ĐĂNG KÝ, chờ duyệt** (13/09/2026). Màn đăng ký có thẻ thứ ba
+  "Giáo viên đăng ký". Người nộp được tạo với `role: student` + `pendingRole:
+  'teacher'` trong MỘT lượt ghi — tách làm hai lượt thì lượt sau chạy đua với
+  `onAuthStateChanged` và thua, mất dấu đơn. Trong lúc chờ họ dùng web như học
+  sinh. Khung duyệt ở "Quản lý Tài khoản" CHỈ hiện khi có đơn, và chỉ chủ dự án
+  với đồng quản trị thấy.
+
+  **Đồng quản trị** = danh sách email ở `quan_tri/dong_quan_tri`, chỉ chủ dự án
+  sửa được. Họ duyệt đơn và đặt được vai `teacher`/`school_admin`, nhưng KHÔNG
+  phong được `admin`, KHÔNG xoá hồ sơ, KHÔNG thêm đồng quản trị khác. Bản sao
+  để VẼ giao diện nằm ở `src/core/services/quanTri.ts`; hàng rào thật là luật.
+
+  Hai dấu đơn (`pendingClassCode`, `pendingRole`) phải có mặt ở MỌI chỗ đọc hồ
+  sơ từ Firestore — xem bài học số 7 ở mục "Rút kinh nghiệm".
 - `Grid` MUI v9 dùng `size={{ xs, sm, md }}` (không phải `item`/`xs=` kiểu bản cũ).
 - Theme MUI khai ngay trong `src/App.tsx` (không có `core/theme/`): primary là **đỏ tín
   hiệu `#C4000E`**, secondary lục phòng thí nghiệm `#0F5A44`, warning vàng cảnh báo
@@ -372,7 +387,18 @@ Luật làm được điều đó nhờ hai thứ dựng sẵn ở đợt 1: id 
 và `progress`/`chats` trỏ tới người dùng bằng `userEmail` nên luật dùng thẳng
 `request.auth.token.email`, **không tốn lượt đọc nào**.
 
-**Sáu điều về luật hiện hành, đọc trước khi sửa `firestore.rules`:**
+**Sửa luật xong là CHƯA có tác dụng gì.** Tệp `firestore.rules` trong git chỉ là
+bản thảo; luật đang chạy nằm trên Firebase Console. Chủ dự án dán tệp vào ô soạn,
+chạy Rules Playground cho đủ phép rồi mới bấm **Publish** — AI không publish được
+và không được tự deploy. Nên khi sửa luật: đưa NGUYÊN TỆP cho chủ dự án (đừng chỉ
+trích đoạn trong chat), kèm bảng phép thử Playground. Sau khi chủ dự án báo đã
+publish, đo lại bằng REST không đăng nhập — đó là tư cách mà đồng bộ đêm dùng.
+
+Một cái bẫy của Playground, đã mất nửa buổi vì nó: ô "Build document" ghi thừa
+một dấu cách vào tên trường (`role␣`) là tạo ra một trường KHÁC, và luật đọc
+`role` vẫn thấy giá trị cũ — phép thử ra ALLOWED trong khi luật hoàn toàn đúng.
+Ra kết quả lạ thì đòi xem `request.resource.data` trước khi đoán bất cứ điều gì.
+**Bảy điều về luật hiện hành, đọc trước khi sửa `firestore.rules`:**
 
 1. **`bank_questions` PHẢI giữ `allow read: if true`.** Workflow đồng bộ đêm
    (`.github/workflows/dong-bo-ngan-hang.yml`) đọc Firestore **không đăng nhập**.
@@ -406,6 +432,12 @@ và `progress`/`chats` trỏ tới người dùng bằng `userEmail` nên luật
    mở. `allow delete` trên `users` cũng chỉ còn chủ dự án.
    Đổi email chủ dự án thì PHẢI publish lại luật, không thì không ai đặt
    được vai nữa.
+7. **Đồng quản trị đọc bằng `get()`, nên tốn một lượt đọc mỗi lần gọi.**
+   `laDongQuanTri()` đọc `quan_tri/dong_quan_tri`, vì thế nó phải đứng SAU
+   `laChuDuAn()` trong mọi phép `||` — chủ dự án không tốn lượt đọc nào.
+   Collection `quan_tri` chỉ chủ dự án ghi được; đồng quản trị chỉ đọc.
+   Nhánh `update` của đồng quản trị chặn thêm `resource.data.role != 'admin'`
+   để họ không hạ vai một quản trị hệ thống.
 
 **Lỗ hổng tự nâng vai: ĐÃ VÁ 13/09/2026.** Trước đó `laQuanTri()` ở cả
 `create` lẫn `update` không ràng buộc `role`, nên một `school_admin` tự nâng
@@ -591,3 +623,11 @@ Ghi lại để lần sau không vấp nữa. Tất cả đều là lỗi KHÔNG
 
 6. **Đo trước khi sửa.** Chiều cao nhảy, chiều rộng khe, thời điểm boss đổi
    pha — số đo cụ thể ghi thẳng vào chú thích trong mã, đừng ước lượng.
+
+7. **Ép kiểu `as User` làm trình biên dịch mù khi thiếu trường.** `getUsers()` và
+   `getUserByIdentifier()` dựng hồ sơ bằng danh sách trường viết tay rồi đóng lại
+   bằng `as User`. Thêm `pendingRole` vào kiểu `User` mà quên thêm vào hai chỗ đó
+   thì `tsc` vẫn xanh, cả 12 bộ kiểm vẫn đạt, dữ liệu trong Firestore vẫn đúng —
+   mà khung duyệt đơn nằm im, và cột "Đơn chờ" của giáo viên mù theo. Hai tính
+   năng chết vì một dòng thiếu. Thêm trường vào kiểu `User` thì PHẢI
+   `grep "as User"` rồi thêm vào từng chỗ.
