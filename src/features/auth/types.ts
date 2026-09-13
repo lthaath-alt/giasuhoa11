@@ -112,13 +112,13 @@ export interface User {
 
   /**
    * ID lớp học mà học sinh đã tham gia qua mã mời (join class by code).
-   * Khác với classId (do Admin/GV gán), joinedClassId là do học sinh tự nhập mã.
+   * Khác với classId (do Admin/GV gán), joinedClassId là do học sinh tự xin vào.
    * Học sinh có thể chuyển thành học sinh có lớp khi join (classId được đặt).
    */
   joinedClassId?: string;
 
   /**
-   * Mã lớp học sinh đã nhập để XIN vào lớp — chưa được duyệt.
+   * Mã lớp học sinh đã chọn để XIN vào lớp — chưa được duyệt.
    *
    * Khác `classId`: đây mới là nguyện vọng. Học sinh KHÔNG tự đặt được
    * `classId` cho mình (luật Firestore chặn `affectedKeys()` chạm vào

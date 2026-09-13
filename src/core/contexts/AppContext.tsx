@@ -264,7 +264,7 @@ export interface AppContextType {
   }>;
 
   /**
-   * Học sinh đã đăng nhập nhập mã lớp để tham gia.
+   * Học sinh đã đăng nhập chọn lớp để gửi đơn xin vào.
    * Gán học sinh chưa có lớp vào một lớp (đặt classId).
    * Lịch sử học tập được GIỮ NGUYÊN.
    */
@@ -1675,7 +1675,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
   const joinClassByCode = async (code: string) => {
     if (!currentUser) return { success: false, message: 'Bạn cần đăng nhập trước khi tham gia lớp.' };
-    if (!code.trim()) return { success: false, message: 'Vui lòng nhập mã lớp.' };
+    if (!code.trim()) return { success: false, message: 'Vui lòng chọn lớp.' };
 
     if (currentUser.classId || currentUser.joinedClassId) {
       return { success: false, message: 'Bạn đã thuộc một lớp học. Liên hệ giáo viên nếu cần thay đổi.' };
@@ -1694,7 +1694,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
        đỡ để em chờ một đơn không bao giờ tới tay ai. */
     const schoolClass = classes.find(c => c.inviteCode?.toUpperCase() === upper);
     if (!schoolClass) {
-      return { success: false, message: `Mã lớp "${code.toUpperCase()}" không tồn tại. Vui lòng kiểm tra lại.` };
+      return { success: false, message: 'Lớp bạn chọn không còn tồn tại. Vui lòng tải lại trang rồi chọn lại.' };
     }
 
     /* CHỈ ghi vào hồ sơ của CHÍNH MÌNH, và chỉ đúng một trường nguyện vọng.

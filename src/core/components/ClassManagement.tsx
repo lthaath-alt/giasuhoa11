@@ -388,7 +388,7 @@ export const ClassManagement: React.FC<ClassManagementProps> = ({
         <DialogTitle sx={{ fontWeight: 'bold' }}>Đơn xin vào lớp</DialogTitle>
         <DialogContent>
           <DialogContentText sx={{ mb: 2 }}>
-            Học sinh đã nhập mã lớp này. Duyệt thì em được thêm vào lớp và bắt đầu
+            Học sinh đã chọn lớp này. Duyệt thì em được thêm vào lớp và bắt đầu
             được theo dõi tiến độ.
           </DialogContentText>
           {donClassId && getDonChoDuyet(classes.find(c => c.id === donClassId)!).map(hs => (

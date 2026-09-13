@@ -149,7 +149,7 @@ export const JoinClassForm: React.FC<JoinClassFormProps> = ({ onJoined, onDismis
         )}
       </Collapse>
 
-      {/* Form nhập mã — chỉ hiện khi chưa gửi đơn nào (kể cả đơn cũ từ trước F5) */}
+      {/* Ô chọn lớp — chỉ hiện khi chưa gửi đơn nào (kể cả đơn cũ từ trước F5) */}
       <Collapse in={!success && !pendingCode}>
         <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start', pr: 3 }}>
           <Box sx={{

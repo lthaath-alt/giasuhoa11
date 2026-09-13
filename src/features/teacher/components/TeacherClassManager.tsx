@@ -65,8 +65,9 @@ export const TeacherClassManager: React.FC<TeacherClassManagerProps> = ({ onClas
         </Box>
 
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2.5, lineHeight: 1.6 }}>
-          Chia sẻ <strong>mã lớp</strong> dưới đây cho học sinh. Học sinh nhập mã khi đăng ký hoặc
-          trong trang học tập để được thêm vào lớp.
+          Lớp đã hiện trong danh sách chọn lớp của học sinh. Các em vào mục{' '}
+          <strong>Học sinh</strong>, chọn lớp này rồi gửi đơn — thầy/cô duyệt là em vào
+          lớp. Mã dưới đây là mã nội bộ, học sinh không cần dùng tới.
         </Typography>
 
         {/* Mã mời nổi bật */}
@@ -127,7 +128,7 @@ export const TeacherClassManager: React.FC<TeacherClassManagerProps> = ({ onClas
             Tạo lớp của riêng bạn
           </Typography>
           <Typography variant="caption" color="text.secondary">
-            Không cần chờ Admin — tạo ngay và nhận mã mời cho học sinh
+            Không cần chờ Admin — tạo xong lớp hiện luôn trong danh sách cho học sinh chọn
           </Typography>
         </Box>
       </Box>
@@ -179,8 +180,8 @@ export const TeacherClassManager: React.FC<TeacherClassManagerProps> = ({ onClas
       </Box>
 
       <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1.5, lineHeight: 1.6 }}>
-        Sau khi tạo, hệ thống sẽ sinh <strong>mã lớp 6 ký tự</strong> tự động.
-        Chia sẻ mã này để học sinh tự tham gia.
+        Sau khi tạo, lớp hiện ngay trong danh sách để học sinh chọn.
+        Thầy/cô duyệt đơn là em vào lớp.
       </Typography>
     </Paper>
   );

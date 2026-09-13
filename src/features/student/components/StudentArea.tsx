@@ -31,7 +31,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../../../core/hooks/useApp';
 import { TutorChat } from '../../tutor/components/TutorChat';
-/* Khung nhập mã mời. Import chéo sang feature `auth` — cùng lối với dòng
+/* Ô chọn lớp. Import chéo sang feature `auth` — cùng lối với dòng
    `TutorChat` ngay trên. Xem chú thích ở khối "chưa tham gia lớp" bên dưới để
    biết vì sao lối vào phải nằm ở đây chứ không ở `DashboardPage`. */
 import { JoinClassForm } from '../../auth/components/JoinClassForm';
@@ -138,7 +138,7 @@ export const StudentArea: React.FC = () => {
             </Typography>
 
             {!myClass ? (
-              /* Chưa vào lớp: đặt THẲNG khung nhập mã mời vào đây.
+              /* Chưa vào lớp: đặt THẲNG ô chọn lớp vào đây.
                *
                * Trước 12/09/2026 chỗ này chỉ có một dòng chữ bảo học sinh "hãy
                * vào mục Các khóa học và nhập Mã mời". Hai điều làm dòng đó vô
