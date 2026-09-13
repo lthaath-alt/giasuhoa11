@@ -52,7 +52,7 @@ hướng dẫn vận hành hằng ngày và không được mâu thuẫn với t
 | Icons / Animation | `lucide-react`, `@mui/icons-material` / `motion` |
 | Backend | Firebase Firestore |
 | Auth | **Firebase Auth** (email + mật khẩu). Hồ sơ ở `users/{uid}` — xem "Vài điểm dễ vấp" |
-| AI | `@google/genai` (Gemini), key qua `GEMINI_API_KEY` ở `.env.local` |
+| AI | Gemini qua **Firebase AI Logic** (gói firebase/ai + App Check reCAPTCHA Enterprise) ở bản build — xem `src/features/tutor/services/giaSuFirebaseAI.ts`. `@google/genai` còn dùng cho key riêng người dùng tự nhập và script trong `scripts/` |
 | Routing | `react-router-dom` v7 |
 | Form | Không có thư viện form — viết tay bằng state |
 
@@ -285,8 +285,8 @@ web vẫn đúng vì nó đọc thẳng Firestore; `kiem-tra:dong-bo` sinh ra đ
     trên Netlify, ai bấm F12 cũng đọc được. An toàn dựa vào Firestore Rules, và
     từ 12/09/2026 luật đã siết theo vai — xem mục "An ninh". `bank_questions` nay
     chỉ giáo viên ghi được, nhưng vẫn **đọc công khai** vì đồng bộ đêm cần.)
-- **`.env.local` chỉ cần cho tính năng AI**: biến `GEMINI_API_KEY` (xem `.env.example`). Thiếu nó thì các phần KHÁC vẫn chạy, chỉ màn hình gọi Gemini mới lỗi.
-- Nếu user báo "màn hình AI trắng trang / báo lỗi API key": kiểm tra đã tạo file `.env.local` (copy từ `.env.example`) và điền `GEMINI_API_KEY` thật chưa, rồi chạy lại `npm run dev`. Đây là nguyên nhân số 1 khiến người mới tưởng "hỏng app".
+- **Web KHÔNG cần key Gemini** (từ 13/09/2026): gia sư gọi qua Firebase AI Logic, xem `src/features/tutor/services/giaSuFirebaseAI.ts`. `.env.local` chỉ cần `GEMINI_API_KEY` cho script trong `scripts/` (xem `.env.example`). **Đừng bao giờ** đặt key Gemini vào biến `VITE_*` — Vite chép nguyên văn vào gói JS; `kiem-tra:an-ninh` bắt điều đó.
+- Máy dev gọi Firebase AI Logic cần `VITE_APPCHECK_DEBUG_TOKEN` trong `.env.development.local` (token đăng ký ở Firebase Console → App Check → Manage debug tokens). Nếu gia sư báo "tạm mất kết nối với máy chủ": trên máy dev thường là thiếu hoặc sai token đó; trên Netlify thường là CSP trong `public/_headers` hoặc tên miền chưa có trong key reCAPTCHA. Mở F12 xem lỗi thật trước khi sửa.
 - ĐỪNG commit `.env.local` (đã nằm trong `.gitignore`).
 
 ## An ninh
@@ -435,6 +435,21 @@ Khoá web của Firebase trong `firebaseCongKhai.ts` **không phải bí mật**
 nằm trong gói JS ai bấm F12 cũng đọc được); an toàn dựa vào Firestore Rules. Khoá
 Gemini thì CÓ là bí mật vì nó tính tiền — `kiem-tra:an-ninh` canh không cho khoá
 nào lọt vào `src/`.
+
+**Key Gemini lộ trên Netlify: ĐÃ VÁ trong mã ngày 13/09/2026.** `VITE_GEMINI_API_KEY`
+bị Vite chép nguyên văn vào `dist/`, ai bấm F12 cũng lấy được — mà phép kiểm cũ
+báo ĐẠT vì chỉ soi `src/` và chỉ biết mẫu `AIza` (key cấp từ 2026 bắt đầu bằng
+`AQ.`). Key `AQ.` gắn tài khoản dịch vụ lại KHÔNG giới hạn được theo website. Nay
+bản build gọi qua Firebase AI Logic, không mang key nào; `kiem-tra:an-ninh` bắt
+cả mẫu `AQ.`, cấm mã đọc `VITE_GEMINI_API_KEY`, và quét `dist/` nếu có.
+Hai điều phải giữ:
+
+- **Chỉ AI Logic bật App Check.** Đừng bấm Enforce cho Firestore/Auth/Storage
+  trong Firebase Console khi app chưa khởi tạo App Check ở mọi màn — học sinh sẽ
+  không đăng nhập được. (Từ 02/11/2026 Firebase bắt buộc App Check cho AI Logic.)
+- **CSP phải cho phép reCAPTCHA** (`https://www.google.com/recaptcha/`,
+  `https://www.gstatic.com/recaptcha/`, `https://recaptcha.google.com/recaptcha/`) — thiếu thì
+  gia sư chết trên Netlify mà máy dev vẫn chạy.
 
 ## KHÔNG biến app thành PWA / service worker
 - Dự án này KHÔNG phải PWA và phải giữ nguyên như vậy. ĐỪNG thêm `vite-plugin-pwa`, `workbox`, `manifest.webmanifest`, hay bất kỳ đoạn `navigator.serviceWorker.register(...)` nào.
