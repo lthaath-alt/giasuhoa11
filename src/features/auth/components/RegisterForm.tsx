@@ -14,7 +14,7 @@ interface RegisterFormProps {
   * RegisterForm – Phiên bản mở rộng (Bước 2)
   *
   * Hệ thống hỗ trợ 2 luồng đăng ký:
-  * 1. Học sinh tự đăng ký email – có thể kèm mã lớp.
+  * 1. Học sinh tự đăng ký email – chọn lớp SAU khi vào, ở mục Học sinh.
   * 2. Tài khoản trường học – do Admin/GV cấp.
   */
 export const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleForm }) => {
@@ -74,8 +74,8 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleForm }) => {
               Học sinh đăng ký bằng Email
             </Typography>
             <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.6, display: 'block' }}>
-              Điền email + mật khẩu để tạo tài khoản. Có <strong>mã lớp</strong> do giáo viên cấp?
-              Nhập vào để được giáo viên theo dõi tiến độ học.
+              Điền email + mật khẩu để tạo tài khoản. Đăng ký xong, vào mục{' '}
+              <strong>Học sinh</strong> để chọn lớp của mình.
             </Typography>
           </Box>
         </Box>
