@@ -348,7 +348,23 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({
                       {user.username || user.email}
                     </Typography>
                   </TableCell>
-                  <TableCell>{getRoleChip(user.role)}</TableCell>
+                  {/* Đồng quản trị KHÔNG phải một vai — nó là quyền cộng thêm,
+                      cất ở `quan_tri/dong_quan_tri`. Nên nó đứng CẠNH nhãn vai
+                      chứ không thay thế nhãn vai: một người vừa là giáo viên
+                      vừa là đồng quản trị. Không đánh dấu ở đây thì nhìn bảng
+                      không tài nào biết ai đã được chỉ định. */}
+                  <TableCell>
+                    <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', alignItems: 'center' }}>
+                      {getRoleChip(user.role)}
+                      {user.email && dongQuanTri.includes(user.email.toLowerCase()) && (
+                        <Chip
+                          size="small"
+                          label="Đồng quản trị"
+                          sx={{ bgcolor: 'var(--nen-tim-nhat)', color: 'var(--tim)', fontWeight: 'bold' }}
+                        />
+                      )}
+                    </Box>
+                  </TableCell>
                   <TableCell>
                     <Typography variant="body2" color="text.secondary">
                       {getClassName(user.classId)}

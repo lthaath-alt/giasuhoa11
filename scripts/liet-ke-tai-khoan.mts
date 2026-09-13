@@ -20,7 +20,7 @@
 import readline from 'node:readline';
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth, signInWithEmailAndPassword, signOut } from 'firebase/auth';
-import { getFirestore, collection, getDocs } from 'firebase/firestore';
+import { getFirestore, collection, getDocs, doc, getDoc } from 'firebase/firestore';
 import { docEnv, cauHinh, thieuCauHinh } from './ngan-hang-chung.mts';
 
 /** Hỏi một dòng bình thường, có hiện chữ. */
@@ -168,13 +168,32 @@ async function chinh() {
     process.exit(1);
   }
 
+  /* Đồng quản trị KHÔNG phải một vai — nó là quyền cộng thêm, cất ở một tài
+     liệu riêng. Vì thế nó không bao giờ hiện ra như một nhóm trong bảng dưới,
+     và người đọc dễ tưởng việc chỉ định đã không ăn. Đánh dấu cạnh tên cho rõ.
+
+     Đọc lỗi là đường chạy BÌNH THƯỜNG: luật chỉ cho chủ dự án và chính đồng
+     quản trị đọc tài liệu này. Một giáo viên thường chạy script vẫn xem được
+     danh sách tài khoản, chỉ là không thấy dấu sao — im lặng, đừng báo lỗi. */
+  let dongQuanTri = new Set<string>();
+  try {
+    const d = await getDoc(doc(getFirestore(app), 'quan_tri', 'dong_quan_tri'));
+    const ds = d.exists() ? (d.data() as { emails?: unknown }).emails : undefined;
+    if (Array.isArray(ds)) {
+      dongQuanTri = new Set(ds.filter((x): x is string => typeof x === 'string').map(x => x.toLowerCase()));
+    }
+  } catch {
+    dongQuanTri = new Set();
+  }
+  const laDongQuanTri = (u: HoSo) => Boolean(u.email && dongQuanTri.has(u.email.toLowerCase()));
+
   for (const vai of ['admin', 'school_admin', 'teacher', 'student']) {
     const nhom = hoSo.filter(u => u.role === vai);
     if (!nhom.length) continue;
     console.log(`\n═══ ${TEN_VAI[vai]} — ${nhom.length} tài khoản ═══`);
     for (const u of nhom) {
       const dangNhapBang = u.email || u.username || '(KHÔNG CÓ — không đăng nhập được)';
-      console.log(`  ${dangNhapBang}`);
+      console.log(`  ${dangNhapBang}${laDongQuanTri(u) ? '   ★ ĐỒNG QUẢN TRỊ' : ''}`);
       console.log(`      uid : ${u.id}${uidThat(u.id) ? '' : '   ⚠ KHÔNG phải uid Auth — hồ sơ mồ côi'}`);
       if (u.name) console.log(`      tên : ${u.name}`);
       if (u.classId) console.log(`      lớp : ${u.classId}`);
@@ -192,6 +211,26 @@ async function chinh() {
   const moCoi = hoSo.filter(u => !uidThat(u.id));
   console.log(`\n───────────────────────────────────────────────`);
   console.log(`Tổng ${hoSo.length} hồ sơ.`);
+
+  /* Nói rõ đồng quản trị là quyền CỘNG THÊM, không phải một vai — nếu không,
+     người đọc thấy tên họ nằm trong nhóm HỌC SINH và tưởng chỉ định đã hỏng. */
+  if (dongQuanTri.size) {
+    console.log(`★ ${dongQuanTri.size} đồng quản trị: ${[...dongQuanTri].join(', ')}`);
+    console.log('  Đây là quyền cộng thêm, KHÔNG phải một vai — họ vẫn nằm trong nhóm vai của mình.');
+    const ngoaiDs = [...dongQuanTri].filter(e => !hoSo.some(u => u.email?.toLowerCase() === e));
+    if (ngoaiDs.length) {
+      console.log(`  ⚠ ${ngoaiDs.length} email không có hồ sơ nào: ${ngoaiDs.join(', ')}`);
+    }
+    const laHocSinh = hoSo.filter(u => laDongQuanTri(u) && u.role === 'student');
+    if (laHocSinh.length) {
+      console.log(`  ⚠ ${laHocSinh.length} người còn vai 'student' nên KHÔNG vào được màn duyệt đơn:`);
+      console.log(`     ${laHocSinh.map(u => u.email).join(', ')}`);
+      console.log("     Đổi vai thành 'teacher' thì mới dùng được quyền này.");
+    }
+  } else {
+    console.log('★ Chưa chỉ định đồng quản trị nào (hoặc tài khoản này không được đọc danh sách đó).');
+  }
+
   if (moCoi.length) {
     console.log(`⚠ ${moCoi.length} hồ sơ có id KHÔNG phải uid Auth: ${moCoi.map(u => u.id).join(', ')}`);
     console.log('  Không ai đăng nhập được vào chúng. Kiểm tab Authentication rồi xoá.');
