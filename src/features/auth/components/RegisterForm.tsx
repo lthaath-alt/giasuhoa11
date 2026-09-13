@@ -4,6 +4,7 @@ import {
 } from '@mui/material';
 import { ArrowLeft, GraduationCap, UserPlus } from 'lucide-react';
 import { StudentRegisterForm } from './StudentRegisterForm';
+import { TeacherRegisterForm } from './TeacherRegisterForm';
 
 interface RegisterFormProps {
   onToggleForm: () => void;
@@ -19,6 +20,7 @@ interface RegisterFormProps {
   */
 export const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleForm }) => {
   const [showStudentForm, setShowStudentForm] = useState(false);
+  const [showTeacherForm, setShowTeacherForm] = useState(false);
 
   if (showStudentForm) {
     return (
@@ -26,6 +28,10 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleForm }) => {
         onBackToLogin={() => setShowStudentForm(false)}
       />
     );
+  }
+
+  if (showTeacherForm) {
+    return <TeacherRegisterForm onBackToLogin={() => setShowTeacherForm(false)} />;
   }
 
   return (
@@ -102,6 +108,41 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleForm }) => {
             <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.6, display: 'block' }}>
               Tài khoản do <strong>Giáo viên chủ nhiệm</strong> hoặc <strong>Admin nhà trường</strong> tạo và cấp cho bạn.
               Liên hệ giáo viên của mình để nhận thông tin đăng nhập.
+            </Typography>
+          </Box>
+        </Box>
+      </Paper>
+
+      {/* Luồng 4: Giáo viên tự đăng ký, chờ duyệt */}
+      <Paper
+        id="register-option-teacher"
+        variant="outlined"
+        sx={{
+          p: 2.5, borderRadius: 0, mb: 3,
+          borderColor: 'var(--vien-2)',
+          backgroundColor: 'var(--nen-tim-nhat)',
+          cursor: 'pointer',
+          transition: 'all 0.2s',
+          '&:hover': { transform: 'translateY(-1px)' },
+        }}
+        role="button"
+        tabIndex={0}
+        onClick={() => setShowTeacherForm(true)}
+        onKeyDown={e => {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setShowTeacherForm(true); }
+        }}
+      >
+        <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
+          <Box sx={{ p: 1, bgcolor: 'var(--nen-tim-nhat)', borderRadius: 0, display: 'flex' }}>
+            <UserPlus size={22} color="var(--tim)" />
+          </Box>
+          <Box>
+            <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)', mb: 0.5 }}>
+              Giáo viên đăng ký
+            </Typography>
+            <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.6, display: 'block' }}>
+              Tự tạo tài khoản rồi chờ quản trị duyệt. Trong lúc chờ, bạn dùng web
+              như học sinh.
             </Typography>
           </Box>
         </Box>

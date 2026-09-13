@@ -134,6 +134,20 @@ export interface User {
   pendingClassCode?: string;
 
   /**
+   * Nguyện vọng làm giáo viên — chưa được duyệt.
+   *
+   * Cùng khuôn với `pendingClassCode`: người xin ghi được trường này lên hồ sơ
+   * của CHÍNH MÌNH (luật chỉ đòi `role == 'student'` lúc tự đăng ký và không
+   * cấm trường phụ), nhưng KHÔNG tự đặt được `role` — đổi `role` là việc của
+   * `laChuDuAn()` hoặc `laDongQuanTri()`.
+   *
+   * Chỉ coi là đơn khi giá trị ĐÚNG là 'teacher' VÀ `role === 'student'`. Giá
+   * trị lạ thì lờ đi: đợt 2b đã trả giá vì một mã lớp gõ sai khoá học sinh khỏi
+   * mọi lớp, do không ai thấy đơn để từ chối.
+   */
+  pendingRole?: 'teacher';
+
+  /**
    * Số báo danh trong lớp (chỉ áp dụng cho học sinh được GV tạo tài khoản).
    * Dùng để sinh mật khẩu có cấu trúc: {TÊN_LỚP}_{SBD:02d}_{4random}.
    */

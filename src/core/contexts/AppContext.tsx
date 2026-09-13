@@ -255,6 +255,17 @@ export interface AppContextType {
   ) => Promise<{ success: boolean; message: string; user?: User }>;
 
   /**
+   * Người ngoài tự đăng ký, xin làm giáo viên (role vẫn là 'student' cho tới
+   * khi chủ dự án/đồng quản trị duyệt). Gọi lại `registerStudent` rồi ghi
+   * thêm `pendingRole: 'teacher'`.
+   */
+  registerTeacherApplicant: (
+    name: string,
+    email: string,
+    password: string
+  ) => Promise<{ success: boolean; message: string; user?: User }>;
+
+  /**
    * Giáo viên tự tạo lớp (không qua Admin).
    * Sinh inviteCode tự động.
    */
@@ -1651,6 +1662,33 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     return { success: true, message: 'Tạo tài khoản thành công!', user: newUser };
   };
 
+  /* Đăng ký làm giáo viên = đăng ký học sinh + một nguyện vọng.
+     Tài khoản sinh ra với `role: 'student'` — đó là điều luật bắt buộc với mọi
+     người tự đăng ký. Chỉ sau khi chủ dự án hoặc đồng quản trị bấm Duyệt thì
+     `role` mới thành 'teacher'. */
+  const registerTeacherApplicant = async (
+    name: string,
+    email: string,
+    password: string
+  ) => {
+    const res = await registerStudent(name, email, password);
+    if (!res.success || !res.user) return res;
+
+    const ok = await FirestoreService.updateUserById(res.user.id, { pendingRole: 'teacher' });
+    if (!ok) {
+      return {
+        success: true,
+        message: 'Đã tạo tài khoản, nhưng chưa gửi được đơn xin làm giáo viên. Vào mục Học sinh để thử lại.',
+        user: res.user,
+      };
+    }
+
+    const capNhat: User = { ...res.user, pendingRole: 'teacher' };
+    setUsers(prev => prev.map(u => (u.id === capNhat.id ? capNhat : u)));
+    setCurrentUser(capNhat);
+    return { success: true, message: 'Đã gửi đơn xin làm giáo viên. Chờ quản trị duyệt.', user: capNhat };
+  };
+
   // ── Giáo viên tự tạo lớp ───────────────────────────────────────────
 
   const createClassSelf = async (className: string) => {
@@ -1907,6 +1945,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         updateChapter,
         updateLesson,
         registerStudent,
+        registerTeacherApplicant,
         createClassSelf,
         joinClassByCode,
         approveJoinRequest,
