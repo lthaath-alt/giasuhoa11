@@ -13,6 +13,7 @@
  * ngồi bấm lại cả buổi mà không bao giờ được trả lời.
  */
 import { thongBaoHetLuot } from '../src/features/tutor/services/geminiTutorService';
+import { loiThanhChuoi } from '../src/features/tutor/services/loiGemini';
 
 const LOI_PHUT = '{"error":{"code":429,"message":"You exceeded your current quota. \\n* Quota'
   + ' exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests,'
@@ -55,6 +56,36 @@ ok(!/\d+ giây/.test(tNgay), 'KHÔNG báo nhầm là chỉ chờ vài giây');
 
 console.log('\n== Lỗi khác thì không nhận nhầm ==');
 ok(tKey === '', 'lỗi sai API key không bị coi là hết lượt');
+
+/* Lỗi 429 như `firebase/ai` ném ra — dựng theo mã nguồn @firebase/ai 12.16.0
+   (AIError: message có "[429 Too Many Requests]", quotaId và retryDelay nằm
+   trong customErrorData.errorDetails, KHÔNG nằm trong message). */
+const loiFirebase = (quotaId: string, giay: string) => Object.assign(
+  new Error('AI: Error fetching from https://firebasevertexai.googleapis.com/v1beta/projects/'
+    + 'giasuhoa11/models/gemini-3.6-flash:generateContent: [429 Too Many Requests] '
+    + 'You exceeded your current quota. (AI/fetch-error)'),
+  {
+    code: 'fetch-error',
+    customErrorData: {
+      status: 429,
+      statusText: 'Too Many Requests',
+      errorDetails: [
+        { '@type': 'type.googleapis.com/google.rpc.QuotaFailure', violations: [{ quotaId }] },
+        { '@type': 'type.googleapis.com/google.rpc.RetryInfo', retryDelay: `${giay}s` },
+      ],
+    },
+  },
+);
+
+const fPhut = thongBaoHetLuot(loiThanhChuoi(loiFirebase('GenerateRequestsPerMinutePerProjectPerModel-FreeTier', '41')));
+const fNgay = thongBaoHetLuot(loiThanhChuoi(loiFirebase('GenerateRequestsPerDayPerProjectPerModel-FreeTier', '57')));
+
+console.log('\n== Lỗi dạng Firebase AI Logic ==');
+console.log('   ' + fPhut);
+console.log('   ' + fNgay);
+ok(fPhut.includes('mỗi phút') && fPhut.includes('41 giây'), 'Firebase: hết lượt PHÚT, đúng số giây');
+ok(fNgay.includes('trong ngày') && !/\d+ giây/.test(fNgay), 'Firebase: hết lượt NGÀY, không báo nhầm thành chờ giây');
+ok(thongBaoHetLuot(loiThanhChuoi(new Error(LOI_NGAY))) === tNgay, 'lỗi @google/genai đi qua loiThanhChuoi vẫn ra y như cũ');
 
 console.log('\n' + (hong === 0 ? '>>> TẤT CẢ ĐẠT' : `>>> CÓ ${hong} MỤC HỎNG`) + '\n');
 process.exit(hong === 0 ? 0 : 1);

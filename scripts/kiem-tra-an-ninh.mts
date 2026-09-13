@@ -396,11 +396,18 @@ console.log('\n== Luật Firestore phân quyền theo vai ==');
   else dat(`cả ${truongTrongLuat.size} tên trường luật nhắc tới đều có thật trong mã`);
 }
 
-console.log('\n== Không lộ bí mật trong mã nguồn ==');
+console.log('\n== Không lộ bí mật trong mã nguồn và bản dựng ==');
 {
   /* Khoá web của Firebase KHÔNG phải bí mật (nó vốn nằm trong gói JS ai cũng
-     đọc được — an toàn dựa vào Firestore Rules). Nhưng khoá Gemini thì có: nó
-     tính tiền theo lượt gọi. */
+     đọc được — an toàn dựa vào Firestore Rules). Nhưng khoá Gemini thì có.
+
+     Ngày 13/09/2026 phép kiểm cũ báo ĐẠT trong khi key Gemini nằm nguyên văn
+     trên Netlify, vì nó mù ba chỗ: chỉ biết mẫu `AIza` (key cấp từ 2026 bắt
+     đầu bằng `AQ.`), chỉ soi `src/` (key đi vào gói JS qua biến môi trường
+     VITE_, không hề nằm trong mã), và không cấm đọc biến đó. */
+  const MAU_KEY = /AIza[0-9A-Za-z_-]{30,}|AQ\.[0-9A-Za-z_-]{20,}/g;
+  const khoaFirebase = doc(join(GOC, 'src/core/services/firebaseCongKhai.ts'));
+
   const pham: string[] = [];
   for (const f of tepNguon) {
     /* Khoá web của Firebase CỐ Ý nằm trong git — nó vốn nằm trong gói JS ai cũng
@@ -410,13 +417,31 @@ console.log('\n== Không lộ bí mật trong mã nguồn ==');
        chính DÒNG chứa khoá — mà dòng đó chỉ có khoá, không có tên tệp. */
     if (basename(f) === 'firebaseCongKhai.ts') continue;
     doc(f).split(/\r?\n/).forEach((d, i) => {
-      if (/AIza[0-9A-Za-z_-]{30,}/.test(d)) {
+      if (new RegExp(MAU_KEY.source).test(d)) {
         pham.push(`${ten(f)}:${i + 1}`);
       }
     });
   }
   if (pham.length) truot('không có khoá API viết cứng trong src/', pham.join(', '));
   else dat('không có khoá API viết cứng trong src/');
+
+  /* Mọi biến `VITE_*` đều bị Vite chép nguyên văn vào gói JS. Key Gemini mà
+     đi qua đó là lộ, bất kể `.env.local` có nằm trong .gitignore hay không. */
+  const docBien = tepNguon.filter(f => /VITE_GEMINI_API_KEY|import\.meta\.env\.GEMINI_API_KEY/.test(doc(f)));
+  if (docBien.length) truot('mã trình duyệt không đọc key Gemini từ biến môi trường', docBien.map(ten).join(', '));
+  else dat('mã trình duyệt không đọc key Gemini từ biến môi trường');
+
+  const DIST = join(GOC, 'dist');
+  if (!existsSync(DIST)) {
+    dat('chưa có dist/ — bỏ qua phép quét bản dựng');
+  } else {
+    const lo = new Set<string>();
+    for (const f of moiTep(DIST, ['.js', '.html'])) {
+      for (const m of doc(f).matchAll(MAU_KEY)) if (!khoaFirebase.includes(m[0])) lo.add(ten(f));
+    }
+    if (lo.size) truot('dist/ không chứa key Google nào ngoài khoá Firebase công khai', [...lo].join(', ') + ' — build lại rồi chạy lại');
+    else dat('dist/ không chứa key Google nào ngoài khoá Firebase công khai');
+  }
 }
 
 console.log('\n== Email chủ dự án khớp giữa luật và mã ==');
