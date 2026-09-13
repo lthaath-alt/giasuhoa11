@@ -21,6 +21,13 @@ import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+  initializeTestEnvironment, assertSucceeds, assertFails,
+  type RulesTestEnvironment,
+} from '@firebase/rules-unit-testing';
+import {
+  doc, getDoc, setDoc, updateDoc, deleteDoc, collection, getDocs,
+} from 'firebase/firestore';
 
 const GOC = join(dirname(fileURLToPath(import.meta.url)), '..');
 const DU_AN = 'demo-giasuhoa11';   // tiền tố `demo-` = không bao giờ chạm hạ tầng thật
@@ -79,10 +86,137 @@ async function main() {
   process.exit(1);
 }
 
+/* Bảy nhân vật. Mỗi người phải có hồ sơ THẬT trong `users`, vì luật đọc vai
+   bằng get(users/{uid}) — không có hồ sơ thì laGiaoVien() luôn sai và phép
+   thử đạt vì lý do sai. */
+const NGUOI = {
+  chu:   { uid: 'uid_chu',    email: 'ktranquang713@gmail.com', role: 'admin'   },
+  dong:  { uid: 'uid_dong',   email: 'lthaa.th@gmail.com',      role: 'teacher' },
+  gv:    { uid: 'uid_gv',     email: 'gv@truong.local',         role: 'teacher' },
+  hs:    { uid: 'uid_hs',     email: 'hs@truong.local',         role: 'student' },
+  hs2:   { uid: 'uid_hs2',    email: 'hs2@truong.local',        role: 'student' },
+  hs3:   { uid: 'uid_hs3',    email: 'hs3@truong.local',        role: 'student' },
+  admin2:{ uid: 'uid_admin2', email: 'admin2@truong.local',     role: 'admin'   },
+};
+
+async function gieo(moi: RulesTestEnvironment) {
+  await moi.withSecurityRulesDisabled(async ctx => {
+    const db = ctx.firestore();
+    for (const n of Object.values(NGUOI)) {
+      await setDoc(doc(db, 'users', n.uid), {
+        email: n.email, username: n.email, name: n.uid,
+        role: n.role, status: 'active',
+      });
+    }
+    await setDoc(doc(db, 'quan_tri', 'dong_quan_tri'), {
+      emails: [NGUOI.dong.email],
+    });
+    await setDoc(doc(db, 'bank_questions', 'cau_1'), { q: 'Fe + HCl ?' });
+    await setDoc(doc(db, 'classes', 'lop_1'), { name: '11H', inviteCode: '11H01' });
+    await setDoc(doc(db, 'progress', NGUOI.hs.email), { diem: 8 });
+    await setDoc(doc(db, 'chats', 'chat_1'), { userEmail: NGUOI.hs.email, noiDung: 'chao' });
+  });
+}
+
+/** Tư cách đã đăng nhập, có email trong token — luật dùng
+ *  `request.auth.token.email` nên KHÔNG được quên tham số thứ hai. */
+const nhu = (moi: RulesTestEnvironment, n: { uid: string; email: string }) =>
+  moi.authenticatedContext(n.uid, { email: n.email }).firestore();
+
 /** Việc 2 viết thân hàm này. Trả về số phép hỏng. */
 async function chayCacPhep(): Promise<number> {
-  console.log('  (chưa có phép nào — xem Việc 2 của kế hoạch)');
-  return 0;
+  let sai = 0;
+  const dem = (dieu: boolean, ten: string, chiTiet = '') => {
+    if (!dieu) sai++;
+    console.log(`  ${dieu ? 'OK  ' : 'SAI '} ${ten}${chiTiet ? '\n       ' + chiTiet : ''}`);
+  };
+  const duoc = async (p: Promise<unknown>, ten: string) => {
+    try { await assertSucceeds(p); dem(true, ten); }
+    catch (e) { dem(false, ten, 'lẽ ra ĐƯỢC nhưng bị chặn: ' + (e as Error).message); }
+  };
+  const chan = async (p: Promise<unknown>, ten: string) => {
+    try { await assertFails(p); dem(true, ten); }
+    catch { dem(false, ten, 'lẽ ra BỊ CHẶN nhưng lại cho qua'); }
+  };
+
+  const moi = await initializeTestEnvironment({
+    projectId: CAU_HINH.DU_AN,
+    firestore: { rules: docLuat(), host: '127.0.0.1', port: CAU_HINH.CONG },
+  });
+  await moi.clearFirestore();
+  await gieo(moi);
+
+  const chu = nhu(moi, NGUOI.chu);
+  const dong = nhu(moi, NGUOI.dong);
+  const gv = nhu(moi, NGUOI.gv);
+  const hs = nhu(moi, NGUOI.hs);
+  const khach = moi.unauthenticatedContext().firestore();
+
+  // 1-2: đường đăng nhập
+  await duoc(getDoc(doc(hs, 'users', NGUOI.hs.uid)), '1. học sinh đọc hồ sơ CỦA CHÍNH MÌNH');
+  await chan(getDoc(doc(hs, 'users', NGUOI.hs2.uid)), '2. học sinh đọc hồ sơ người khác');
+
+  // 3-4: `list` — hai đường Playground không mô phỏng được
+  await chan(getDocs(collection(hs, 'users')), '3. học sinh liệt kê toàn bộ users');
+  await duoc(getDocs(collection(gv, 'users')), '4. giáo viên liệt kê toàn bộ users');
+
+  // 5-8: sáu cửa hậu trên hồ sơ của chính mình
+  await duoc(updateDoc(doc(hs, 'users', NGUOI.hs.uid), { name: 'Tên mới' }),
+    '5. học sinh sửa `name` của mình');
+  await chan(updateDoc(doc(hs, 'users', NGUOI.hs.uid), { role: 'teacher' }),
+    '6. học sinh tự nâng vai');
+  await chan(updateDoc(doc(hs, 'users', NGUOI.hs.uid), { classId: 'lop_1' }),
+    '7a. học sinh tự đặt `classId`');
+  await chan(updateDoc(doc(hs, 'users', NGUOI.hs.uid), { schoolId: 'truong_1' }),
+    '7b. học sinh tự đặt `schoolId`');
+  await chan(updateDoc(doc(hs, 'users', NGUOI.hs.uid), { joinedClassId: 'lop_1' }),
+    '7c. học sinh tự đặt `joinedClassId`');
+  await chan(updateDoc(doc(hs, 'users', NGUOI.hs.uid), { username: 'khac' }),
+    '8a. học sinh tự đổi `username`');
+  await chan(updateDoc(doc(hs, 'users', NGUOI.hs.uid), { email: 'khac@x.local' }),
+    '8b. học sinh tự đổi `email`');
+
+  // 9-13: ai được đặt vai
+  await duoc(updateDoc(doc(chu, 'users', NGUOI.hs2.uid), { role: 'teacher' }),
+    '9. chủ dự án đặt vai giáo viên');
+  await chan(updateDoc(doc(gv, 'users', NGUOI.hs.uid), { role: 'teacher' }),
+    '10. giáo viên thường đặt vai');
+  await duoc(updateDoc(doc(dong, 'users', NGUOI.hs.uid), { role: 'teacher' }),
+    '11. đồng quản trị đặt vai giáo viên');
+  await chan(updateDoc(doc(dong, 'users', NGUOI.hs.uid), { role: 'admin' }),
+    '12. đồng quản trị phong quản trị hệ thống');
+  await chan(updateDoc(doc(dong, 'users', NGUOI.admin2.uid), { role: 'teacher' }),
+    '13. đồng quản trị hạ vai một quản trị');
+
+  // 14: xoá hồ sơ
+  await chan(deleteDoc(doc(gv, 'users', NGUOI.hs.uid)), '14. giáo viên xoá hồ sơ');
+
+  // 15-16: khách chưa đăng nhập
+  await duoc(getDoc(doc(khach, 'bank_questions', 'cau_1')),
+    '15. khách đọc `bank_questions` (đồng bộ đêm sống nhờ điều này)');
+  await chan(getDocs(collection(khach, 'users')), '16a. khách liệt kê `users`');
+  await chan(getDocs(collection(khach, 'classes')), '16b. khách liệt kê `classes`');
+  await chan(getDoc(doc(khach, 'progress', NGUOI.hs.email)), '16c. khách đọc `progress`');
+  await chan(getDoc(doc(khach, 'chats', 'chat_1')), '16d. khách đọc `chats`');
+
+  // 17: bộ lọc XSS ngay lúc GHI. Có phép đối chứng câu sạch, để phép bẩn
+  //     không đạt vì một lý do khác.
+  await duoc(setDoc(doc(gv, 'bank_questions', 'cau_sach'), { q: 'H2SO4 đặc nóng?' }),
+    '17a. giáo viên ghi câu hỏi sạch');
+  await chan(setDoc(doc(gv, 'bank_questions', 'cau_ban'),
+    { q: 'xin chào <script>alert(1)</script>' }),
+    '17b. giáo viên ghi câu hỏi chứa thẻ script');
+
+  // 18: cái bẫy affectedKeys — `deleteClass` ghi role: 'student' đè lên hồ sơ
+  //     vốn đã là student. Giá trị không đổi nên `role` KHÔNG nằm trong
+  //     affectedKeys(), và giáo viên vẫn phải xoá được lớp.
+  //     Nhắm vào `hs3` chứ KHÔNG phải `hs`: phép 11 đã đổi `hs` thành teacher,
+  //     nên với `hs` thì role đổi giá trị thật và phép này sẽ đo ngược chiều.
+  await duoc(updateDoc(doc(gv, 'users', NGUOI.hs3.uid), { role: 'student', classId: null }),
+    '18. giáo viên ghi `role: student` đè lên hồ sơ vốn đã student');
+
+  await moi.cleanup();
+  return sai;
 }
 
 export const docLuat = () => readFileSync(join(GOC, 'firestore.rules'), 'utf8');
