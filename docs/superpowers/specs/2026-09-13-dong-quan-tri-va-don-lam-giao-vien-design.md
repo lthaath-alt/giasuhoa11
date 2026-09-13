@@ -145,8 +145,10 @@ Chủ dự án chạy trước khi Publish. Phép 10 là **phép hồi quy**.
 đó thì tài liệu không tồn tại và Playground báo "Null value error" chứ không báo
 DENIED.
 
-Publish xong thì đo lại bằng REST không đăng nhập (`do-sau-publish`): phải vẫn
-11/11, `bank_questions` vẫn 252 tài liệu.
+Publish xong thì đo lại bằng cách đọc Firestore qua REST **không đăng nhập**,
+xác nhận `bank_questions` (và sáu collection nội dung) vẫn đọc được, còn
+`users`/`classes`/`progress`/`chats` vẫn bị chặn: phải vẫn 11/11,
+`bank_questions` vẫn 252 tài liệu.
 
 ---
 

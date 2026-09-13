@@ -426,12 +426,14 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     const thoi = onAuthStateChanged(auth, async (nguoiAuth) => {
       if (!nguoiAuth) {
         setCurrentUser(null);
-        /* Dọn luôn hai collection mang dữ liệu người. Không dọn thì sau khi
-           đăng xuất, danh sách học sinh vẫn nằm trong bộ nhớ trình duyệt của
-           máy đó — người kế tiếp mở máy vẫn đọc được qua công cụ nhà phát
-           triển. */
+        /* Dọn luôn hai collection mang dữ liệu người, và danh sách đồng quản
+           trị (cùng loại dữ liệu người). Không dọn thì sau khi đăng xuất,
+           danh sách học sinh (hay email đồng quản trị) vẫn nằm trong bộ nhớ
+           trình duyệt của máy đó — người kế tiếp mở máy vẫn đọc được qua công
+           cụ nhà phát triển. */
         setUsers([]);
         setClasses([]);
+        setDongQuanTri([]);
         localStorage.removeItem('h11_current_user_email');
         localStorage.removeItem('h11_current_user_data');
         return;

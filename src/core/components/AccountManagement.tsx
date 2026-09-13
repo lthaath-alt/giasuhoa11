@@ -175,6 +175,19 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({
           </Box>
         </Box>
 
+        {/* Báo dùng CHUNG cho cả khung "Đồng quản trị" lẫn khung "Đơn xin làm
+            giáo viên": hai nút Duyệt/Từ chối ở khung dưới nằm trong điều kiện
+            hiển thị KHÁC (laChuDuAnHienTai || laDongQuanTriHienTai) với khung
+            "Đồng quản trị" (chỉ laChuDuAnHienTai) — đặt Alert ở TRONG một
+            trong hai khung thì một đồng quản trị không phải chủ dự án bấm
+            Duyệt/Từ chối sẽ không thấy phản hồi nào, kể cả khi thất bại. Đặt
+            ở đây, ngoài cả hai, để ai thấy khung nào cũng nhận được báo. */}
+        {baoDongQuanTri && (
+          <Alert severity={baoDongQuanTri.loi ? 'error' : 'success'} sx={{ mb: 2, borderRadius: 0, py: 0.5 }}>
+            <Typography variant="caption">{baoDongQuanTri.chu}</Typography>
+          </Alert>
+        )}
+
         {/* Đồng quản trị — CHỈ chủ dự án thấy. Đây chỉ là lớp vẽ: hàng rào thật
             là `allow write: if laChuDuAn()` trong firestore.rules. */}
         {laChuDuAnHienTai && (
@@ -188,12 +201,6 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({
               thống, <strong>không</strong> xoá được tài khoản, và <strong>không</strong> thêm
               được đồng quản trị khác. Chỉ mình bạn sửa được danh sách này.
             </Typography>
-
-            {baoDongQuanTri && (
-              <Alert severity={baoDongQuanTri.loi ? 'error' : 'success'} sx={{ mb: 2, borderRadius: 0, py: 0.5 }}>
-                <Typography variant="caption">{baoDongQuanTri.chu}</Typography>
-              </Alert>
-            )}
 
             {dongQuanTri.length === 0 ? (
               <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic', mb: 2 }}>
@@ -226,6 +233,14 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({
                 {users
                   .filter(u => u.email && u.email.toLowerCase() !== currentUser?.email?.toLowerCase())
                   .filter(u => !dongQuanTri.includes(u.email.toLowerCase()))
+                  /* Bỏ học sinh khỏi ô chọn: AccountManagement chỉ được dựng ở
+                     /admin, /school-admin, /teacher — cả ba trang đều bị
+                     RouteGuards chặn theo `role`, nên một tài khoản mang vai
+                     `student` không vào được trang nào trong ba trang đó.
+                     Chỉ định một học sinh làm đồng quản trị là ngõ cụt câm:
+                     giao diện báo "Đã thêm … làm đồng quản trị" nhưng người
+                     đó đăng nhập vào chẳng thấy khung duyệt nào cả. */
+                  .filter(u => u.role !== 'student')
                   .map(u => (
                     <MenuItem key={u.id} value={u.email}>
                       {u.name} — {u.email}

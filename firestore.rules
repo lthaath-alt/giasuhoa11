@@ -351,7 +351,7 @@ service cloud.firestore {
     }
 
     // ── Mọi thứ khác: cấm ───────────────────────────────────────────────────
-    // Mười hai collection trên là toàn bộ những gì mã nguồn dùng tới, liệt kê
+    // Mười ba collection trên là toàn bộ những gì mã nguồn dùng tới, liệt kê
     // bằng cách quét `collection(db, …)` và các hằng `COL_*` ngày 10/09/2026.
     // Đã kiểm thêm: dự án KHÔNG dùng subcollection nào, nên các mục `match` một
     // tầng ở trên phủ hết. Thêm collection mới thì phải thêm luật cho nó ở đây.

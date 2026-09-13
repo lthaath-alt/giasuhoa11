@@ -17,13 +17,9 @@ interface TeacherRegisterFormProps {
  * TeacherRegisterForm
  * Người ngoài tự đăng ký, xin làm giáo viên. Luôn ra `role: 'student'` trước —
  * luật Firestore bắt buộc vậy với mọi người tự đăng ký; đơn nằm ở
- * `pendingRole: 'teacher'` chờ chủ dự án/đồng quản trị duyệt.
- *
- * KHÔNG còn ô "Mã lớp" (bỏ ngày 12/09/2026). Màn này chạy khi CHƯA đăng nhập,
- * mà luật Firestore đòi đã đăng nhập mới đọc được `classes` — nên ở đây không
- * có cách nào cho chọn lớp, và ô gõ mã thì không tra được để báo mã sai.
- * Học sinh vào rồi chọn lớp ở tab Học sinh (`JoinClassForm`), chỗ đó đọc được
- * danh sách lớp thật.
+ * `pendingRole: 'teacher'` chờ chủ dự án/đồng quản trị duyệt (khung "Đơn xin
+ * làm giáo viên" trong `AccountManagement.tsx`). Trong lúc chờ, tài khoản
+ * dùng web như học sinh bình thường.
  */
 export const TeacherRegisterForm: React.FC<TeacherRegisterFormProps> = ({ onBackToLogin }) => {
   const { registerTeacherApplicant } = useApp();
@@ -37,7 +33,7 @@ export const TeacherRegisterForm: React.FC<TeacherRegisterFormProps> = ({ onBack
   const [showConfirmPw, setShowConfirmPw] = useState(false);
   const [loading, setLoading]   = useState(false);
   const [error, setError]       = useState<string | null>(null);
-  const [successInfo, setSuccessInfo] = useState<{ className?: string } | null>(null);
+  const [successInfo, setSuccessInfo] = useState(false);
 
   /* Kiểm ngay tại chỗ trước khi gọi Firebase.
 
@@ -82,7 +78,7 @@ export const TeacherRegisterForm: React.FC<TeacherRegisterFormProps> = ({ onBack
     setLoading(false);
 
     if (res.success) {
-      setSuccessInfo({});
+      setSuccessInfo(true);
       // Điều hướng sang dashboard sau 1.5 giây
       setTimeout(() => navigate('/dashboard'), 1500);
     } else {
@@ -92,7 +88,7 @@ export const TeacherRegisterForm: React.FC<TeacherRegisterFormProps> = ({ onBack
 
   // ── Màn hình thành công ────────────────────────────────────────────────────
 
-  if (successInfo !== null) {
+  if (successInfo) {
     return (
       <Box id="teacher-register-success" sx={{ textAlign: 'center', py: 3 }}>
         <Box sx={{
