@@ -20,7 +20,7 @@ export const firebaseConfig = {
 };
 
 // 2. Khởi tạo Firebase App (Tránh khởi tạo lại nếu ứng dụng đã khởi tạo)
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+export const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
 // 3. Khởi tạo và export instance Firestore `db` để dùng trực tiếp trong toàn bộ app
 export const db = getFirestore(app);

@@ -12,9 +12,12 @@
  * nghĩa là ai cũng ghi được — đó là chỗ cần siết (bằng Firebase Auth), không
  * phải chỗ này.
  *
- * KHÔNG bao giờ thêm `GEMINI_API_KEY` hay khoá tài khoản dịch vụ vào tệp này.
- * Những thứ đó là bí mật thật, phải ở `.env.local` và `.env.local` nằm trong
- * `.gitignore`. Đã kiểm: GEMINI_API_KEY không bị đóng vào bản dựng.
+ * KHÔNG bao giờ thêm key Gemini hay khoá tài khoản dịch vụ vào tệp này.
+ * Bản build KHÔNG còn chứa key Gemini: gia sư gọi qua Firebase AI Logic
+ * (xem giaSuFirebaseAI.ts). `GEMINI_API_KEY` trong `.env.local` chỉ dành cho
+ * script Node trong `scripts/`. `npm run kiem-tra:an-ninh` quét `dist/` để
+ * canh điều này — ngày 13/09/2026 dòng chú thích cũ ở đây nói "đã kiểm" trong
+ * khi key đang nằm nguyên văn trên Netlify.
  *
  * Biến môi trường VITE_FIREBASE_* vẫn được ưu tiên nếu có, để còn trỏ sang dự
  * án Firebase khác lúc thử nghiệm mà không phải sửa tệp này.
@@ -29,3 +32,12 @@ export const FIREBASE_CONG_KHAI = {
   messagingSenderId: '334980936585',
   appId: '1:334980936585:web:2590cc0f7551a0b492e758',
 } as const;
+
+/**
+ * Site key reCAPTCHA Enterprise cho App Check — CÔNG KHAI, cùng lý do với
+ * sáu giá trị trên: reCAPTCHA thiết kế nó để nằm trên trang. Nó chỉ dùng
+ * được trên các tên miền khai trong Google Cloud Console → reCAPTCHA
+ * (13/09/2026: `giasuhoa11.netlify.app`). Chuỗi rỗng = chưa cấu hình → bản
+ * build không gọi Firebase AI Logic.
+ */
+export const RECAPTCHA_ENTERPRISE_SITE_KEY = '6LeGYbktAAAAAAk5zOJ1Ad_PB3AqYojgUIaCvknD';
