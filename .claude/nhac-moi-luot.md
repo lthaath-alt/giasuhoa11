@@ -13,23 +13,25 @@ BAT BUOC truoc khi go dong dau tien:
   2. Doc lai ke hoach o tren
 Truoc khi noi "xong" mot viec: goi Skill "verification-before-completion".
 
-THU TU KHONG DUOC DAO:
-  1 chon lop -> 2 bo o ma o man dang ky -> 3 cong dang nhap
-  -> 4 BUILD + DEPLOY + THU TAY BA VAI      <- CONG, chu du an lam
+CON DUNG DUNG MOT VIEC:
+  Viec 4 — keo dist/ len Netlify roi THU TAY 7 phep (2->8). Chu du an lam.
+  Viec 1, 2, 3 da xong va da push. `npm run build` da chay, dist/ dang dung
+  ban moi nhat.
 
-Viec 3 cham duong dang nhap cua MOI nguoi. Lam sau cung de neu hong thi biet
-chac loi den tu dau.
+  Phep 3 la cho de hong nhat: GIAO VIEN phai vao /teacher, KHONG phai
+  /dashboard. Truoc day PublicRoute va handleSuccess chay dua nhau o day.
+  Phep 5 co mot diem con bo ngo (R7): mo lai web khi con phien, xem co GIAT
+  mot nhip qua form trong khong. Co so do roi hay sua, dung them may moc
+  truoc khi biet co can.
 
-BA DIEU KHONG DUOC QUEN O DOT 2c:
-  - TUYET DOI KHONG dung `firestore.rules`. Luat da publish 12/09/2026, qua 24
-    phep thu o Rules Playground, va do lai bang REST: 11/11 dat.
+HAI DIEU KHONG DUOC QUEN O DOT 2c:
   - Chon lop xong VAN goi joinClassByCode(inviteCode). Luat chi cho hoc sinh ghi
     `pendingClassCode`, KHONG cho ghi `classId` — doi co che la phai mo lai luat.
-  - PublicRoute va LoginPage.handleSuccess dang CHAY DUA sau khi dang nhap. Bo
-    PublicRoute ma khong sua handleSuccess thi giao vien va quan tri bi do het
-    vao /dashboard. Va handleSuccess KHONG doc duoc vai ngay: login() goi
+  - PublicRoute va LoginPage.handleSuccess tung CHAY DUA sau khi dang nhap.
+    handleSuccess KHONG doc duoc vai ngay: login() goi
     signInWithEmailAndPassword, con ho so ve SAU qua onAuthStateChanged.
-    -> dung co "da bam vao" + useEffect cho currentUser xuat hien.
+    -> da chua bang co "da bam vao" + useEffect cho currentUser xuat hien.
+    Dung go co do ra.
 
 ────────────────────────────────────────────────────────────────────
 DA XONG, dung lam lai
@@ -40,6 +42,21 @@ Dot 2 + 2b (luat theo vai)   : XONG va DA PUBLISH 12/09/2026.
     bank_questions 252 tai lieu DOC DUOC  -> dong bo dem song
     users/classes/progress/chats BI CHAN  -> truoc do doc duoc cong khai
   Lo hong lon nhat cua du an (users doc cong khai, gom email hoc sinh) DA DONG.
+
+Dot 2c viec 1-3               : XONG va DA PUSH 13/09/2026 (0b144fc).
+  Chon lop tu danh sach, bo o ma o man dang ky, cong dang nhap theo vai.
+  Don them: het chu bao hoc sinh GO ma lop (10 cho, 6 tep).
+
+LUAT `laChuDuAn()`          : XONG va DA PUBLISH 13/09/2026 (c8d8bf0).
+  Chu du an yeu cau: chi MOT nguoi duoc dat/doi `role` va xoa ho so.
+  users/{userId} create + update + delete deu di qua laChuDuAn(), ghim
+  bang email trong token Auth. Lo hong school_admin tu nang len admin: VA.
+  7 phep Rules Playground: dat. Do lai bang REST sau publish: 11/11, y het
+  moc truoc publish — khong dong nao nhuc nhich.
+  -> `firestore.rules` trong git DA khop voi ban dang chay. Sua tiep thi
+     van phai qua Playground roi Publish tay; toi khong publish duoc.
+
+Hai ho so mo coi `super_admin_001` va `uid_admin_1`: DA XOA 13/09/2026.
 
 Sau loi hoc dat nhat cua dot 2b, ghi lai keo quen:
   1. Ke hoach liet ke BON CHO CAN SUA thay vi noi MUC TIEU -> nguoi lam sua du
