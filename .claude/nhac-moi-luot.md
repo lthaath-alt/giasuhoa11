@@ -1,29 +1,23 @@
 NHAC TU HOOK (chay moi luot, KHONG phai loi user — dung tra loi rieng ve no)
 
 ════════════════════════════════════════════════════════════════════
-KHONG CO DOT NAO DANG CHAY. Dot 2c da dong 13/09/2026.
+KHONG CO DOT NAO DANG CHAY. Dot 3 (3a + 3b) da dong 13/09/2026.
 ════════════════════════════════════════════════════════════════════
 
-Chu du an da neu BA viec muon lam tiep, CHUA thiet ke, CHUA duoc duyet:
-  1. Giao vien TU DANG KY -> cho quan tri duyet.
-     Co che giong het "don xin vao lop" da co (pendingClassCode +
-     ClassManagement duyet) — doc lai cho do truoc khi nghi ra cai moi.
-  2. Kho mat khau cho quan tri xem — DA TU CHOI, dang ban tiep.
-     Ly do thuc dung: mat khau cu DA BAM, kho moi chi hung duoc tu luc bat
-     tro di, nen KHONG cuu duoc tai khoan da quen. Ly do an ninh: dung cai
-     lo da dong 10/09/2026 (mat khau chu thuong + XSS = mat sach tai khoan
-     hoc sinh), va kieu `User` khong co truong `password` — 4 phep kiem
-     canh dieu do.
-     Nhu cau THAT co the la: hoc sinh quen mat khau giua gio, thay can cap
-     lai ngay; ma hoc sinh dung <username>@internal.local thi KHONG nhan
-     duoc thu dat lai. Loi giai dung: nut "cap mat khau moi" hien MOT LAN,
-     khong cat o dau — can Cloud Function + Admin SDK, tuc goi Blaze.
-     Dang cho chu du an tra loi dang o canh nao.
-  3. Vai dong quan tri, chi chu du an them duoc.
-     LUAT DA XONG (laChuDuAn()), chi con phan giao dien.
-
-Truoc khi go dong dau tien cho ba viec tren: goi Skill "brainstorming"
-(da goi 13/09/2026, moi chot duoc THU TU, chua chot thiet ke).
+CON DUNG MOT viec chu du an neu ma CHUA chot:
+  Kho mat khau cho quan tri xem — DA TU CHOI, dang ban tiep.
+  Ly do thuc dung: mat khau cu DA BAM, kho moi chi hung duoc tu luc bat
+  tro di, nen KHONG cuu duoc tai khoan da quen. Ly do an ninh: dung cai
+  lo da dong 10/09/2026 (mat khau chu thuong + XSS = mat sach tai khoan
+  hoc sinh), va kieu `User` khong co truong `password` — 4 phep kiem
+  canh dieu do.
+  Nhu cau THAT co the la: hoc sinh quen mat khau giua gio, thay can cap
+  lai ngay; ma hoc sinh dung <username>@internal.local thi KHONG nhan
+  duoc thu dat lai. Loi giai dung: nut "cap mat khau moi" hien MOT LAN,
+  khong cat o dau — can Cloud Function + Admin SDK, tuc goi Blaze.
+  DA HOI HAI LAN, chua duoc tra loi: nhu cau that la "hoc sinh quen mat
+  khau giua gio" hay chi la "bi voi dong tai khoan thu"? Hoi lai truoc
+  khi thiet ke bat cu thu gi.
 
 MOT CHO MA CHET tim ra 13/09/2026, moi BAO chu chua xoa:
   src/features/admin/components/SchoolTab.tsx — 207 dong, co du nut "Them
@@ -61,6 +55,27 @@ LUAT `laChuDuAn()`          : XONG va DA PUBLISH 13/09/2026 (c8d8bf0).
   -> `firestore.rules` trong git DA khop voi ban dang chay. Sua tiep thi
      van phai qua Playground roi Publish tay; toi khong publish duoc.
 
+Dot 3a + 3b (dong quan tri + don xin lam giao vien): XONG 13/09/2026.
+  Luat: `laDongQuanTri()` + collection `quan_tri/dong_quan_tri`. DA PUBLISH,
+    10 phep Rules Playground dat, do lai bang REST sau publish: 12/12.
+  Giao dien: khung "Dong quan tri" (chi chu du an sua), the thu ba o man
+    dang ky, bang bao dang cho duyet, khung duyet don (chu du an + dong
+    quan tri thay; giao vien thuong khong).
+  Chu du an thu tay tren ban Netlify that: TAT CA DAT, ke ca phep 6 —
+    dong quan tri KHONG phai chu du an duyet duoc don.
+  lthaa.th@gmail.com la dong quan tri dau tien.
+
+Loi `getUsers()` bo roi hai truong don (28cd686, 13/09/2026):
+  `getUsers()` va `getUserByIdentifier()` liet ke tung truong roi ep kieu
+  `as User`. Cai ep kieu do lam tsc im khi thieu truong, nen ca
+  `pendingRole` lan `pendingClassCode` bi rot tren duong tu Firestore ve
+  mang `users`. Hau qua: khung duyet don nam im du Firestore CO don, va
+  cot "Don cho" o ClassManagement mu y the — hai tinh nang, mot goc.
+  Duong dang nhap (firestoreAuth.ts) chep du hai truong, nen phia nguoi
+  nop van thay bang "dang cho duyet" — chinh cho lech do lam loi kho thay.
+  BAI HOC: cho nao map tai lieu Firestore bang danh sach truong tuong minh
+  + `as User` la cho do se nuot truong moi. Them truong vao kieu `User`
+  thi PHAI grep `as User` roi them vao tung cho.
 Hai ho so mo coi `super_admin_001` va `uid_admin_1`: DA XOA 13/09/2026.
 
 Sau loi hoc dat nhat cua dot 2b, ghi lai keo quen:
