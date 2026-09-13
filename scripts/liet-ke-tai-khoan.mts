@@ -7,7 +7,7 @@
  * dự án chính là `users` từng đọc được công khai, gồm cả email học sinh.
  *
  * MẬT KHẨU:
- *   - hỏi ngay trên máy người chạy, KHÔNG hiện lên màn hình,
+ *   - hỏi ngay trên máy người chạy, hiện ra dấu sao chứ không hiện chữ,
  *   - KHÔNG nhận qua tham số dòng lệnh (tham số nằm lại trong lịch sử shell),
  *   - KHÔNG ghi ra tệp, KHÔNG in ra, KHÔNG gửi đi đâu ngoài Firebase Auth.
  *
@@ -15,6 +15,7 @@
  *
  *   npm run liet-ke:tai-khoan
  *   npm run liet-ke:tai-khoan -- ten@email.com     (điền sẵn email cho nhanh)
+ *   npm run liet-ke:tai-khoan -- --hien            (hiện mật khẩu dạng chữ)
  */
 import readline from 'node:readline';
 import { initializeApp, getApps, getApp } from 'firebase/app';
@@ -35,24 +36,64 @@ function hoi(cauHoi: string): Promise<string> {
 }
 
 /**
- * Hỏi mật khẩu, KHÔNG hiện ký tự nào.
+ * Hỏi mật khẩu.
  *
- * `_writeToOutput` là chỗ readline vẽ lại dòng đang gõ. Ghi đè nó để chỉ vẽ
- * đúng câu hỏi, còn mọi phím người dùng bấm thì không vẽ gì — không dấu sao,
- * vì số dấu sao cũng đã là một tin (độ dài mật khẩu).
+ * Bản đầu (13/09/2026) không vẽ gì cả khi người dùng gõ. Chủ dự án thử trên
+ * Windows PowerShell và báo "không nhập được ô mật khẩu" — phím CÓ vào, chỉ là
+ * màn hình đứng im nên không ai biết. Một ô nhập không phản hồi thì người dùng
+ * kết luận là hỏng, và kết luận đó hợp lý.
+ *
+ * Nay mỗi phím vẽ một dấu sao. Mặc định KHÔNG hiện chữ thật: terminal giữ lại
+ * khung cuộn, mà khung cuộn hay bị chụp màn hình gửi đi. Muốn chữ thật thì
+ * thêm cờ `--hien`.
+ *
+ * Đọc phím ở chế độ thô chứ không ghi đè `_writeToOutput` của readline: hàm đó
+ * còn được gọi cho cả chuỗi điều khiển vẽ lại dòng, nên đếm dấu sao sai.
  */
-function hoiKin(cauHoi: string): Promise<string> {
+function hoiKin(cauHoi: string, hien: boolean): Promise<string> {
   const ra = process.stdout;
-  const rl = readline.createInterface({ input: process.stdin, output: ra, terminal: true });
-  (rl as unknown as { _writeToOutput: (s: string) => void })._writeToOutput =
-    (s: string) => { if (s.includes(cauHoi)) ra.write(cauHoi); };
+  const vao = process.stdin;
+
+  /* Không có bàn phím thật (đầu vào bị chuyển hướng) thì chế độ thô không bật
+     được — lùi về đọc cả dòng như bình thường. */
+  if (!vao.isTTY) return hoi(cauHoi);
+
   return new Promise(xong => {
-    rl.on('close', () => xong(''));
-    rl.question(cauHoi, v => {
-      rl.close();
-      ra.write('\n');
-      xong(v);
-    });
+    ra.write(cauHoi);
+    vao.setRawMode(true);
+    vao.resume();
+    vao.setEncoding('utf8');
+
+    let daGo = '';
+    const nghe = (khoi: string) => {
+      /* Phím mũi tên / Home / End gửi cả chuỗi thoát `[A`. Bỏ ký tự ESC
+         rồi duyệt tiếp thì `[` và `A` lọt vào mật khẩu thành rác — phải bỏ cả
+         khối. */
+      if (khoi.charCodeAt(0) === 0x1b) return;
+      for (const c of khoi) {
+        if (c === '\r' || c === '\n') {
+          vao.off('data', nghe);
+          vao.setRawMode(false);
+          vao.pause();
+          ra.write('\n');
+          xong(daGo);
+          return;
+        }
+        if (c === '\u0003') {           // Ctrl+C
+          vao.setRawMode(false);
+          ra.write('\n');
+          process.exit(130);
+        }
+        if (c === '\u007f' || c === '\b') {   // Backspace
+          if (daGo.length) { daGo = daGo.slice(0, -1); ra.write('\b \b'); }
+          continue;
+        }
+        if (c < ' ') continue;         // bỏ mọi phím điều khiển khác
+        daGo += c;
+        ra.write(hien ? c : '*');
+      }
+    };
+    vao.on('data', nghe);
   });
 }
 
@@ -86,12 +127,19 @@ async function chinh() {
     process.exit(1);
   }
 
+  /* Cờ tách khỏi email, để `-- --hien` và `-- mail@x --hien` đều chạy. */
+  const thamSo = process.argv.slice(2);
+  const hienMatKhau = thamSo.includes('--hien');
+  const emailSan = thamSo.find(t => !t.startsWith('--'));
+
   console.log('Đăng nhập để đọc danh sách tài khoản.');
   console.log('Phải là tài khoản GIÁO VIÊN trở lên — luật chỉ cho vai đó đọc `users`.\n');
 
-  const email = process.argv[2] || await hoi('Email : ');
+  const email = emailSan || await hoi('Email : ');
   if (!email) { console.error('Chưa nhập email.'); process.exit(1); }
-  const matKhau = await hoiKin('Mật khẩu (không hiện): ');
+
+  const nhan = hienMatKhau ? 'Mật khẩu (HIỆN CHỮ): ' : 'Mật khẩu (hiện dấu sao): ';
+  const matKhau = await hoiKin(nhan, hienMatKhau);
   if (!matKhau) { console.error('Chưa nhập mật khẩu.'); process.exit(1); }
 
   const app = getApps().length ? getApp() : initializeApp(cauHinh(env));
