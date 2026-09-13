@@ -93,6 +93,24 @@ service cloud.firestore {
       return dangNhap() && email() == 'ktranquang713@gmail.com';
     }
 
+    /* ĐỒNG QUẢN TRỊ — chủ dự án chỉ định, danh sách nằm ở một tài liệu duy
+       nhất mà chỉ chủ dự án ghi được.
+
+       Vì sao KHÔNG cắm cờ `coAdmin: true` lên hồ sơ từng người: rẻ hơn thật
+       (luật vốn đã đọc hồ sơ người gọi để lấy `role`), nhưng nó mở HAI cửa
+       phải canh — học sinh tự sửa hồ sơ mình, và người mới tự đăng ký. Quên
+       một cửa là ai cũng tự phong. Dự án này đã vấp đúng kiểu lỗi đó hai lần.
+
+       Vì sao KHÔNG để trong `system_settings`: chỗ đó đang `allow write: if
+       laQuanTri()`, tức một `school_admin` ghi được và sẽ tự thêm mình.
+
+       Hàm này TỐN MỘT LƯỢT ĐỌC. Vì thế mọi phép `||` bên dưới đặt nó ở CUỐI,
+       sau các nhánh không tốn gì. */
+    function laDongQuanTri() {
+      return dangNhap() && get(/databases/$(database)/documents/quan_tri/dong_quan_tri)
+               .data.emails.hasAny([email()]);
+    }
+
     // ── Trợ giúp: kiểm nội dung câu hỏi ─────────────────────────────────────
 
     // Một chuỗi có an toàn để đổ vào `dangerouslySetInnerHTML` không?
@@ -266,6 +284,19 @@ service cloud.firestore {
           viên lớp đó — một cửa sau vào lớp không qua duyệt. Vế `laGiaoVien()`
           KHÔNG cấm hai trường này: giáo viên vẫn phải sửa được `username`/
           `email` hộ học sinh qua màn quản lý tài khoản. */
+    /* Danh sách đồng quản trị. Một tài liệu: `dong_quan_tri`.
+
+       PHẢI cho đồng quản trị ĐỌC. Bản thiết kế đầu để mỗi `laChuDuAn()` cho
+       kín, nhưng thế thì chính người đồng quản trị không đọc được danh sách để
+       biết mình có quyền — giao diện sẽ không vẽ nút Duyệt cho họ, và lỗi chỉ
+       lộ ra lúc thử tay.
+
+       Không có vòng lặp: `get()` trong luật KHÔNG bị luật đọc chặn. */
+    match /quan_tri/{id} {
+      allow read:  if laChuDuAn() || laDongQuanTri();
+      allow write: if laChuDuAn();
+    }
+
     match /users/{userId} {
       /* TÁCH `read` thành `get` và `list` — cố ý, 12/09/2026.
        *
@@ -299,6 +330,8 @@ service cloud.firestore {
                           && !('schoolId' in request.resource.data)
                           && !('joinedClassId' in request.resource.data))
                       || (laGiaoVien() && request.resource.data.role == 'student')
+                      || (laDongQuanTri()
+                          && request.resource.data.role in ['student', 'teacher', 'school_admin'])
                     );
 
       allow update: if dangNhap() && (
@@ -309,6 +342,9 @@ service cloud.firestore {
                       || (laGiaoVien()
                           && !request.resource.data.diff(resource.data)
                                .affectedKeys().hasAny(['role']))
+                      || (laDongQuanTri()
+                          && request.resource.data.role in ['student', 'teacher', 'school_admin']
+                          && resource.data.role != 'admin')
                     );
 
       allow delete: if laChuDuAn();
