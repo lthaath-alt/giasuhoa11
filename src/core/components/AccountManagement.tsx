@@ -40,7 +40,10 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({
   onCreateClassClick,
   onCreateSchoolAdminClick,
 }) => {
-  const { deleteUser, updateUserInfo, currentUser } = useApp();
+  const { deleteUser, updateUserInfo, currentUser,
+          dongQuanTri, laChuDuAnHienTai, themDongQuanTri, boDongQuanTri } = useApp();
+  const [emailMoi, setEmailMoi] = useState('');
+  const [baoDongQuanTri, setBaoDongQuanTri] = useState<{ loi: boolean; chu: string } | null>(null);
 
   // Khối 2: Trạng thái xóa và sửa người dùng
   const [userToDelete, setUserToDelete] = useState<UserType | null>(null);
@@ -150,6 +153,79 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({
             )}
           </Box>
         </Box>
+
+        {/* Đồng quản trị — CHỈ chủ dự án thấy. Đây chỉ là lớp vẽ: hàng rào thật
+            là `allow write: if laChuDuAn()` trong firestore.rules. */}
+        {laChuDuAnHienTai && (
+          <Paper variant="outlined" sx={{ p: 2.5, mb: 3, borderRadius: 0, borderColor: 'var(--vien)' }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)', mb: 0.5 }}>
+              Đồng quản trị
+            </Typography>
+            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2, lineHeight: 1.6 }}>
+              Những người này duyệt được đơn xin làm giáo viên và đặt được vai giáo viên
+              hoặc quản trị trường. Họ <strong>không</strong> phong được vai quản trị hệ
+              thống, <strong>không</strong> xoá được tài khoản, và <strong>không</strong> thêm
+              được đồng quản trị khác. Chỉ mình bạn sửa được danh sách này.
+            </Typography>
+
+            {baoDongQuanTri && (
+              <Alert severity={baoDongQuanTri.loi ? 'error' : 'success'} sx={{ mb: 2, borderRadius: 0, py: 0.5 }}>
+                <Typography variant="caption">{baoDongQuanTri.chu}</Typography>
+              </Alert>
+            )}
+
+            {dongQuanTri.length === 0 ? (
+              <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic', mb: 2 }}>
+                Chưa chỉ định ai.
+              </Typography>
+            ) : (
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
+                {dongQuanTri.map(e => (
+                  <Chip
+                    key={e}
+                    label={e}
+                    onDelete={async () => setBaoDongQuanTri(
+                      await boDongQuanTri(e).then(r => ({ loi: !r.success, chu: r.message }))
+                    )}
+                    sx={{ borderRadius: 0, bgcolor: 'var(--nen-tim-nhat)', color: 'var(--tim)', fontWeight: 'bold' }}
+                  />
+                ))}
+              </Box>
+            )}
+
+            <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
+              <TextField
+                select
+                size="small"
+                label="Chọn tài khoản để thêm"
+                value={emailMoi}
+                onChange={e => setEmailMoi(e.target.value)}
+                sx={{ minWidth: 280, '& .MuiOutlinedInput-root': { borderRadius: 0 } }}
+              >
+                {users
+                  .filter(u => u.email && u.email.toLowerCase() !== currentUser?.email?.toLowerCase())
+                  .filter(u => !dongQuanTri.includes(u.email.toLowerCase()))
+                  .map(u => (
+                    <MenuItem key={u.id} value={u.email}>
+                      {u.name} — {u.email}
+                    </MenuItem>
+                  ))}
+              </TextField>
+              <Button
+                variant="outlined"
+                disabled={!emailMoi}
+                onClick={async () => {
+                  const r = await themDongQuanTri(emailMoi);
+                  setBaoDongQuanTri({ loi: !r.success, chu: r.message });
+                  if (r.success) setEmailMoi('');
+                }}
+                sx={{ textTransform: 'none', borderRadius: 0, fontWeight: 'bold', mt: 0.2 }}
+              >
+                Thêm
+              </Button>
+            </Box>
+          </Paper>
+        )}
 
         <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid var(--vien)', borderRadius: 0 }}>
           <Table>
