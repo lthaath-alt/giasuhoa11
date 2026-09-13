@@ -45,6 +45,7 @@ const COL_PROGRESS     = 'progress';
 const COL_CHATS        = 'chats';
 const COL_CURRICULUM   = 'curriculum_chapters';
 const COL_SETTINGS     = 'system_settings';
+const COL_QUAN_TRI     = 'quan_tri';
 
 // ─── Helper ───────────────────────────────────────────────────────────────────
 
@@ -187,6 +188,32 @@ export const FirestoreService = {
       return true;
     } catch (err) {
       handleError('clearPendingClassCode', err);
+      return false;
+    }
+  },
+
+  /* Danh sách đồng quản trị. Một tài liệu duy nhất `quan_tri/dong_quan_tri`.
+     Luật chỉ cho chủ dự án và chính đồng quản trị ĐỌC, nên người thường gọi
+     hàm này sẽ nhận `permission-denied` — đó là đường chạy BÌNH THƯỜNG, trả
+     mảng rỗng chứ đừng báo lỗi ra màn hình. */
+  async docDongQuanTri(): Promise<string[]> {
+    try {
+      const s = await getDoc(doc(db, COL_QUAN_TRI, 'dong_quan_tri'));
+      if (!s.exists()) return [];
+      const ds = (s.data() as { emails?: unknown }).emails;
+      return Array.isArray(ds) ? ds.filter((x): x is string => typeof x === 'string') : [];
+    } catch {
+      return [];
+    }
+  },
+
+  /** Ghi đè cả danh sách. Luật chỉ cho chủ dự án ghi. */
+  async ghiDongQuanTri(emails: string[]): Promise<boolean> {
+    try {
+      await setDoc(doc(db, COL_QUAN_TRI, 'dong_quan_tri'), { emails });
+      return true;
+    } catch (err) {
+      handleError('ghiDongQuanTri', err);
       return false;
     }
   },

@@ -23,6 +23,7 @@ import { runMigrationIfNeeded } from '../services/migrationService';
 import { ErrorLogService } from '../services/errorLog';
 import { UserRole, chuanHoaVaiTro } from '../../features/auth/types';
 import { LibraryExam, Equation, MatrixResource, Question } from '../../features/library/types';
+import { EMAIL_CHU_DU_AN, laChuDuAn } from '../services/quanTri';
 
 // ─── Shared Data Types ────────────────────────────────────────────────────────
 
@@ -289,6 +290,13 @@ export interface AppContextType {
   // ── Cài đặt hệ thống ─────────────────────────────────────────────────────────
   systemSettings: { allowUserApiKey?: boolean };
   updateSystemSettings: (settings: { allowUserApiKey?: boolean }) => Promise<boolean>;
+
+  // ── Đồng quản trị ────────────────────────────────────────────────────────────
+  dongQuanTri: string[];
+  laChuDuAnHienTai: boolean;
+  laDongQuanTriHienTai: boolean;
+  themDongQuanTri: (email: string) => Promise<{ success: boolean; message: string }>;
+  boDongQuanTri: (email: string) => Promise<{ success: boolean; message: string }>;
 }
 
 // ─── Context & Provider ───────────────────────────────────────────────────────
@@ -313,6 +321,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [matrixResources, setMatrixResources] = useState<MatrixResource[]>([]);
   const [libraryQuestions, setLibraryQuestions] = useState<Question[]>([]);
   const [systemSettings, setSystemSettings] = useState<{ allowUserApiKey?: boolean }>({ allowUserApiKey: true });
+  const [dongQuanTri, setDongQuanTri] = useState<string[]>([]);
 
   // ── Progress cache (load theo user khi đăng nhập) ─────────────────────────
   const [progressCache, setProgressCache] = useState<Record<string, LearningProgress>>({});
@@ -454,6 +463,10 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       setUsers(prev => prev.some(u => u.id === hoSo.id)
         ? prev.map(u => u.id === hoSo.id ? hoSo : u)
         : [...prev, hoSo]);
+
+      /* Đọc lỗi (người thường không có quyền) thì `docDongQuanTri` đã trả mảng
+         rỗng — coi như không phải đồng quản trị, KHÔNG báo lỗi cho người dùng. */
+      setDongQuanTri(await FirestoreService.docDongQuanTri());
     });
 
     return () => thoi();   // huỷ đăng ký khi component rời đi
@@ -1800,6 +1813,40 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     return success;
   };
 
+  // ── Đồng quản trị ─────────────────────────────────────────────────────────
+
+  const laChuDuAnHienTai = laChuDuAn(currentUser?.email);
+  const laDongQuanTriHienTai = Boolean(
+    currentUser?.email && dongQuanTri.includes(currentUser.email.toLowerCase())
+  );
+
+  /* Thêm/bớt đồng quản trị. Hàng rào thật là luật (`allow write: if
+     laChuDuAn()`); kiểm ở đây chỉ để báo lỗi sớm và tử tế. */
+  const themDongQuanTri = async (email: string) => {
+    const lower = email.trim().toLowerCase();
+    if (!lower) return { success: false, message: 'Chưa nhập email.' };
+    if (lower === EMAIL_CHU_DU_AN) {
+      return { success: false, message: 'Chủ dự án vốn đã có toàn quyền, không cần thêm.' };
+    }
+    if (dongQuanTri.includes(lower)) {
+      return { success: false, message: 'Người này đã là đồng quản trị.' };
+    }
+    const moi = [...dongQuanTri, lower];
+    const ok = await FirestoreService.ghiDongQuanTri(moi);
+    if (!ok) return { success: false, message: 'Không ghi được. Chỉ chủ dự án mới thêm được đồng quản trị.' };
+    setDongQuanTri(moi);
+    return { success: true, message: `Đã thêm ${lower} làm đồng quản trị.` };
+  };
+
+  const boDongQuanTri = async (email: string) => {
+    const lower = email.trim().toLowerCase();
+    const moi = dongQuanTri.filter(e => e !== lower);
+    const ok = await FirestoreService.ghiDongQuanTri(moi);
+    if (!ok) return { success: false, message: 'Không ghi được. Chỉ chủ dự án mới bớt được đồng quản trị.' };
+    setDongQuanTri(moi);
+    return { success: true, message: `Đã bỏ ${lower} khỏi danh sách đồng quản trị.` };
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -1867,6 +1914,11 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         updateQuizEssayScore,
         systemSettings,
         updateSystemSettings,
+        dongQuanTri,
+        laChuDuAnHienTai,
+        laDongQuanTriHienTai,
+        themDongQuanTri,
+        boDongQuanTri,
       }}
     >
       {children}
