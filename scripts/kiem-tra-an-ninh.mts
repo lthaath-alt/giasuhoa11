@@ -419,5 +419,28 @@ console.log('\n== Không lộ bí mật trong mã nguồn ==');
   else dat('không có khoá API viết cứng trong src/');
 }
 
+console.log('\n== Email chủ dự án khớp giữa luật và mã ==');
+{
+  /* Vì sao cần phép kiểm này: `laChuDuAn()` trong luật là hàng rào THẬT, còn
+     hằng trong `src/` chỉ để quyết định vẽ hay không vẽ nút. Lệch nhau thì
+     người dùng thấy nút mà bấm vào bị từ chối, hoặc tệ hơn là không thấy nút
+     dù có quyền — và build vẫn xanh. */
+  const R = join(GOC, 'firestore.rules');
+  const S = join(GOC, 'src/core/services/quanTri.ts');
+
+  if (!existsSync(R)) {
+    truot('email chủ dự án khớp giữa luật và mã', 'thiếu firestore.rules');
+  } else if (!existsSync(S)) {
+    truot('email chủ dự án khớp giữa luật và mã', 'thiếu src/core/services/quanTri.ts');
+  } else {
+    const mLuat = /function\s+laChuDuAn\s*\(\s*\)[\s\S]{0,200}?email\(\)\s*==\s*'([^']+)'/.exec(readFileSync(R, 'utf8'));
+    const mNguon = /EMAIL_CHU_DU_AN\s*=\s*'([^']+)'/.exec(readFileSync(S, 'utf8'));
+    if (!mLuat) truot('email chủ dự án khớp giữa luật và mã', 'không đọc được email trong laChuDuAn() của firestore.rules');
+    else if (!mNguon) truot('email chủ dự án khớp giữa luật và mã', 'không đọc được EMAIL_CHU_DU_AN trong quanTri.ts');
+    else if (mLuat[1] !== mNguon[1]) truot('email chủ dự án khớp giữa luật và mã', `luật nói "${mLuat[1]}", mã nói "${mNguon[1]}"`);
+    else dat('email chủ dự án khớp giữa luật và mã');
+  }
+}
+
 console.log(soLoi === 0 ? '\n>>> TẤT CẢ ĐẠT\n' : `\n>>> CÓ ${soLoi} MỤC KHÔNG ĐẠT\n`);
 process.exit(soLoi === 0 ? 0 : 1);
