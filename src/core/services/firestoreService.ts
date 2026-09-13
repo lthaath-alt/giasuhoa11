@@ -192,6 +192,24 @@ export const FirestoreService = {
     }
   },
 
+  /**
+   * Xoá đơn xin làm giáo viên, sau khi được duyệt hoặc từ chối.
+   *
+   * Cùng lý do với `clearPendingClassCode`: `updateUserById` nhận
+   * `Partial<User>` nên không nhận được `deleteField()` (không ép kiểu nói
+   * dối), và `cleanForFirestore` chỉ lọc `undefined` chứ không xoá trường
+   * trên Firestore — gán `undefined` là KHÔNG ghi gì cả, đơn cũ nằm lại mãi.
+   */
+  async clearPendingRole(userId: string): Promise<boolean> {
+    try {
+      await updateDoc(doc(db, COL_USERS, userId), { pendingRole: deleteField() });
+      return true;
+    } catch (err) {
+      handleError('clearPendingRole', err);
+      return false;
+    }
+  },
+
   /* Danh sách đồng quản trị. Một tài liệu duy nhất `quan_tri/dong_quan_tri`.
      Luật chỉ cho chủ dự án và chính đồng quản trị ĐỌC, nên người thường gọi
      hàm này sẽ nhận `permission-denied` — đó là đường chạy BÌNH THƯỜNG, trả

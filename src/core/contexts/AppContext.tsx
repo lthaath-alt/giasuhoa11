@@ -298,6 +298,11 @@ export interface AppContextType {
   /** Giáo viên từ chối đơn xin vào lớp (chỉ xoá nguyện vọng) */
   rejectJoinRequest: (studentId: string) => Promise<{ success: boolean; message: string }>;
 
+  /** Chủ dự án/đồng quản trị duyệt đơn xin làm giáo viên (đặt role + schoolId) */
+  duyetDonGiaoVien: (userId: string, schoolId: string) => Promise<{ success: boolean; message: string }>;
+  /** Chủ dự án/đồng quản trị từ chối đơn xin làm giáo viên (chỉ xoá nguyện vọng) */
+  tuChoiDonGiaoVien: (userId: string) => Promise<{ success: boolean; message: string }>;
+
   /** Giáo viên/Admin chấm lại điểm câu tự luận của học sinh */
   updateQuizEssayScore: (
     quizId: string,
@@ -1816,6 +1821,35 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     return { success: true, message: 'Đã từ chối đơn.' };
   };
 
+  // ── Chủ dự án/đồng quản trị duyệt đơn xin làm giáo viên ───────────────
+
+  /* Đổi `role` là việc luật chỉ cho `laChuDuAn()` hoặc `laDongQuanTri()` —
+     người khác gọi sẽ bị Firestore từ chối, và đó đúng là hàng rào thật.
+     Kiểm ở đây (tìm user, thiếu schoolId) chỉ để báo sớm trên giao diện. */
+  const duyetDonGiaoVien = async (userId: string, schoolId: string) => {
+    const nguoi = users.find(u => u.id === userId);
+    if (!nguoi) return { success: false, message: 'Không tìm thấy tài khoản.' };
+    if (!schoolId) return { success: false, message: 'Vui lòng chọn trường cho giáo viên này.' };
+
+    const okHoSo = await FirestoreService.updateUserById(userId, { role: 'teacher', schoolId });
+    if (!okHoSo) {
+      return { success: false, message: 'Không duyệt được. Chỉ chủ dự án và đồng quản trị mới duyệt được đơn.' };
+    }
+    await FirestoreService.clearPendingRole(userId);
+
+    setUsers(prev => prev.map(u => u.id === userId
+      ? { ...u, role: 'teacher', schoolId, pendingRole: undefined }
+      : u));
+    return { success: true, message: `Đã duyệt ${nguoi.name} làm giáo viên.` };
+  };
+
+  const tuChoiDonGiaoVien = async (userId: string) => {
+    const ok = await FirestoreService.clearPendingRole(userId);
+    if (!ok) return { success: false, message: 'Không xoá được đơn. Vui lòng thử lại.' };
+    setUsers(prev => prev.map(u => u.id === userId ? { ...u, pendingRole: undefined } : u));
+    return { success: true, message: 'Đã từ chối đơn. Tài khoản vẫn dùng được như học sinh.' };
+  };
+
   // ── Giáo viên/Admin chấm lại điểm câu tự luận của học sinh ────────────
 
   const updateQuizEssayScore = async (quizId: string, questionId: string, newScore: number) => {
@@ -1957,6 +1991,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         joinClassByCode,
         approveJoinRequest,
         rejectJoinRequest,
+        duyetDonGiaoVien,
+        tuChoiDonGiaoVien,
         updateQuizEssayScore,
         systemSettings,
         updateSystemSettings,

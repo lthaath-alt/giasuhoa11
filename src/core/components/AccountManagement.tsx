@@ -41,9 +41,17 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({
   onCreateSchoolAdminClick,
 }) => {
   const { deleteUser, updateUserInfo, currentUser,
-          dongQuanTri, laChuDuAnHienTai, themDongQuanTri, boDongQuanTri } = useApp();
+          dongQuanTri, laChuDuAnHienTai, laDongQuanTriHienTai, themDongQuanTri, boDongQuanTri,
+          duyetDonGiaoVien, tuChoiDonGiaoVien } = useApp();
   const [emailMoi, setEmailMoi] = useState('');
   const [baoDongQuanTri, setBaoDongQuanTri] = useState<{ loi: boolean; chu: string } | null>(null);
+  const [truongChon, setTruongChon] = useState<Record<string, string>>({});
+
+  /* ĐỦ HAI điều mới là đơn. Giá trị `pendingRole` lạ, hoặc người đã là giáo
+     viên rồi (đã được duyệt nhưng `pendingRole` chưa kịp xoá xong), đều
+     không được lọt vào danh sách này — bài học từ mã lớp gõ sai: thiếu vế
+     hai thì người đã duyệt vẫn còn hiện trong danh sách chờ. */
+  const donGiaoVien = users.filter(u => u.pendingRole === 'teacher' && u.role === 'student');
 
   // Khối 2: Trạng thái xóa và sửa người dùng
   const [userToDelete, setUserToDelete] = useState<UserType | null>(null);
@@ -224,6 +232,69 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({
                 Thêm
               </Button>
             </Box>
+          </Paper>
+        )}
+
+        {/* Đơn xin làm giáo viên. CHỈ hiện khi có đơn — không để một khung rỗng
+            chiếm chỗ mỗi ngày. Chủ dự án và đồng quản trị thấy; giáo viên thường
+            không. Hàng rào thật là luật Firestore (`laChuDuAn()`/`laDongQuanTri()`
+            trên `update` đổi role) — khung này chỉ là lớp vẽ và báo sớm. */}
+        {(laChuDuAnHienTai || laDongQuanTriHienTai) && donGiaoVien.length > 0 && (
+          <Paper variant="outlined" sx={{ p: 2.5, mb: 3, borderRadius: 0, borderColor: 'var(--tin-hieu-vien)' }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--tin-hieu)', mb: 0.5 }}>
+              Đơn xin làm giáo viên ({donGiaoVien.length})
+            </Typography>
+            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2, lineHeight: 1.6 }}>
+              Những người này tự đăng ký và xin làm giáo viên. Duyệt thì họ thành giáo
+              viên của trường bạn chọn; từ chối thì họ vẫn dùng web như học sinh.
+            </Typography>
+
+            {schools.length === 0 ? (
+              <Typography variant="body2" sx={{ fontStyle: 'italic', color: 'var(--chu-mo)' }}>
+                Chưa có trường học nào. Tạo trường trước khi duyệt đơn.
+              </Typography>
+            ) : (
+              donGiaoVien.map(hs => (
+                <Box key={hs.id} sx={{
+                  display: 'flex', alignItems: 'center', gap: 2, py: 1.5, flexWrap: 'wrap',
+                  borderBottom: '1px solid var(--vien-2)',
+                }}>
+                  <Box sx={{ flex: 1, minWidth: 200 }}>
+                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>{hs.name}</Typography>
+                    <Typography variant="caption" color="text.secondary">{hs.email}</Typography>
+                  </Box>
+                  <TextField
+                    select size="small" label="Trường"
+                    value={truongChon[hs.id] || ''}
+                    onChange={e => setTruongChon(p => ({ ...p, [hs.id]: e.target.value }))}
+                    sx={{ minWidth: 180, '& .MuiOutlinedInput-root': { borderRadius: 0 } }}
+                  >
+                    {schools.map(t => <MenuItem key={t.id} value={t.id}>{t.name}</MenuItem>)}
+                  </TextField>
+                  <Button
+                    variant="contained" size="small"
+                    disabled={!truongChon[hs.id]}
+                    onClick={async () => {
+                      const r = await duyetDonGiaoVien(hs.id, truongChon[hs.id]);
+                      setBaoDongQuanTri({ loi: !r.success, chu: r.message });
+                    }}
+                    sx={{ textTransform: 'none', borderRadius: 0, fontWeight: 'bold', boxShadow: 'none' }}
+                  >
+                    Duyệt
+                  </Button>
+                  <Button
+                    variant="outlined" size="small"
+                    onClick={async () => {
+                      const r = await tuChoiDonGiaoVien(hs.id);
+                      setBaoDongQuanTri({ loi: !r.success, chu: r.message });
+                    }}
+                    sx={{ textTransform: 'none', borderRadius: 0 }}
+                  >
+                    Từ chối
+                  </Button>
+                </Box>
+              ))
+            )}
           </Paper>
         )}
 
