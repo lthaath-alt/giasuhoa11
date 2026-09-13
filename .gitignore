@@ -51,3 +51,6 @@ credentials/
 # `cat` tệp này ra; thiếu tệp thì hook im lặng, không làm chết phiên.
 !.claude/nhac-moi-luot.md
 __pycache__/
+
+# So ghi tien do cua subagent-driven-development (nhap, khong len git)
+.superpowers/
