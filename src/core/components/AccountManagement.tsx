@@ -42,16 +42,29 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({
 }) => {
   const { deleteUser, updateUserInfo, currentUser,
           dongQuanTri, laChuDuAnHienTai, laDongQuanTriHienTai, themDongQuanTri, boDongQuanTri,
-          duyetDonGiaoVien, tuChoiDonGiaoVien } = useApp();
+          duyetDonGiaoVien, tuChoiDonGiaoVien,
+          /* CHỈ khung "Đơn xin làm giáo viên" dùng hai biến này — xem chú
+             thích ngay tại khung đó vì sao. Bảng tài khoản và khung "Đồng
+             quản trị" giữ nguyên `users`/`schools` lấy từ props (props ở đó
+             cố ý là tập đã lọc theo trang: `myStudents`, `schoolUsers`...). */
+          users: tatCaNguoiDung, schools: tatCaTruong } = useApp();
   const [emailMoi, setEmailMoi] = useState('');
   const [baoDongQuanTri, setBaoDongQuanTri] = useState<{ loi: boolean; chu: string } | null>(null);
   const [truongChon, setTruongChon] = useState<Record<string, string>>({});
 
-  /* ĐỦ HAI điều mới là đơn. Giá trị `pendingRole` lạ, hoặc người đã là giáo
+  /* Dùng `tatCaNguoiDung` (từ context), KHÔNG dùng `users` (prop): props ở
+     TeacherPage/SchoolAdminPage là tập đã lọc theo lớp/trường của người xem
+     (`myStudents`, `schoolUsers`), mà người vừa đăng ký xin làm giáo viên thì
+     CHƯA có lớp, chưa có trường — không lọt vào tập đã lọc đó, nên đồng quản
+     trị đứng ở /teacher hay /school-admin sẽ không thấy đơn nào cả. Context
+     nạp `users` cho MỌI vai khác 'student' (AppContext.tsx, useEffect nghe
+     onAuthStateChanged) nên luôn có đủ dữ liệu ở đây.
+
+     ĐỦ HAI điều mới là đơn. Giá trị `pendingRole` lạ, hoặc người đã là giáo
      viên rồi (đã được duyệt nhưng `pendingRole` chưa kịp xoá xong), đều
      không được lọt vào danh sách này — bài học từ mã lớp gõ sai: thiếu vế
      hai thì người đã duyệt vẫn còn hiện trong danh sách chờ. */
-  const donGiaoVien = users.filter(u => u.pendingRole === 'teacher' && u.role === 'student');
+  const donGiaoVien = tatCaNguoiDung.filter(u => u.pendingRole === 'teacher' && u.role === 'student');
 
   // Khối 2: Trạng thái xóa và sửa người dùng
   const [userToDelete, setUserToDelete] = useState<UserType | null>(null);
@@ -249,7 +262,7 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({
               viên của trường bạn chọn; từ chối thì họ vẫn dùng web như học sinh.
             </Typography>
 
-            {schools.length === 0 ? (
+            {tatCaTruong.length === 0 ? (
               <Typography variant="body2" sx={{ fontStyle: 'italic', color: 'var(--chu-mo)' }}>
                 Chưa có trường học nào. Tạo trường trước khi duyệt đơn.
               </Typography>
@@ -269,7 +282,7 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({
                     onChange={e => setTruongChon(p => ({ ...p, [hs.id]: e.target.value }))}
                     sx={{ minWidth: 180, '& .MuiOutlinedInput-root': { borderRadius: 0 } }}
                   >
-                    {schools.map(t => <MenuItem key={t.id} value={t.id}>{t.name}</MenuItem>)}
+                    {tatCaTruong.map(t => <MenuItem key={t.id} value={t.id}>{t.name}</MenuItem>)}
                   </TextField>
                   <Button
                     variant="contained" size="small"

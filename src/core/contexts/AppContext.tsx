@@ -1835,11 +1835,30 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     if (!okHoSo) {
       return { success: false, message: 'Không duyệt được. Chỉ chủ dự án và đồng quản trị mới duyệt được đơn.' };
     }
-    await FirestoreService.clearPendingRole(userId);
+
+    /* Hai lượt ghi này KHÔNG gộp thành một: lượt trên đổi `role`/`schoolId` —
+       cổng phân quyền thật, luật chỉ cho `laChuDuAn()`/`laDongQuanTri()` ghi —
+       còn lượt dưới chỉ dọn cờ `pendingRole`, một trường phụ không ai canh
+       theo vai. Tách riêng để lượt nào hỏng cũng biết đúng lượt đó, không
+       phải đoán.
+       Lượt dọn cờ thất bại KHÔNG phải "hỏng hoàn toàn": lượt trên đã ghi
+       xong trên Firestore, người này BÂY GIỜ THẬT SỰ là giáo viên. Cái sai
+       chỉ là cờ `pendingRole` cũ còn sót lại — vô hại về phân quyền, chỉ
+       khiến việc dọn dẹp chưa xong. Vì vậy tuyệt đối không trả `success:
+       false` ở đây: người bấm sẽ tưởng chưa duyệt và bấm lại, trong khi vai
+       đã đổi rồi. Cập nhật state cục bộ theo ĐÚNG thực tế rồi báo thật. */
+    const okXoaCo = await FirestoreService.clearPendingRole(userId);
 
     setUsers(prev => prev.map(u => u.id === userId
-      ? { ...u, role: 'teacher', schoolId, pendingRole: undefined }
+      ? { ...u, role: 'teacher', schoolId, pendingRole: okXoaCo ? undefined : u.pendingRole }
       : u));
+
+    if (!okXoaCo) {
+      return {
+        success: true,
+        message: `Đã duyệt ${nguoi.name} làm giáo viên, nhưng chưa xoá được dấu đơn cũ. Vui lòng thử lại sau.`,
+      };
+    }
     return { success: true, message: `Đã duyệt ${nguoi.name} làm giáo viên.` };
   };
 
