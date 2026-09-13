@@ -278,6 +278,31 @@ export const DashboardPage: React.FC = () => {
             rieng chung. */}
         <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
 
+          {/* Băng "đơn xin làm giáo viên đang chờ duyệt" — ĐO trước khi đặt (Đợt 3b/6):
+              đây là chỗ DUY NHẤT trong /dashboard luôn dựng bất kể activeTab. Mọi khối
+              phía dưới đều gác bằng {activeTab === '...'} (hocmai, baigiang, thinghiem,
+              luyentap, trochoi, gioithieu, ichat, hotro, hocsinh), còn tab mặc định là
+              'gioithieu' chứ không phải 'hocsinh' — đặt trong StudentArea thì người vừa
+              đăng ký sẽ không thấy gì. Bài học từ Đợt 2b: một tính năng từng nằm sau
+              activeTab === 'hocmai' mà nút mở tab đó đã bị ẩn khỏi menu — không ai tới
+              được. Chỉ coi là đơn khi ĐỦ hai điều: còn pendingRole 'teacher' VÀ vai hiện
+              tại vẫn là 'student' — thiếu vế sau thì sau khi duyệt (vai đã thành teacher)
+              băng vẫn còn nếu pendingRole chưa kịp xoá. */}
+          {currentUser?.pendingRole === 'teacher' && currentUser.role === 'student' && (
+            <Alert
+              severity="info"
+              sx={{ mb: 3, borderRadius: 0, border: '1px solid var(--vien)' }}
+            >
+              <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                Đơn xin làm giáo viên đang chờ duyệt
+              </Typography>
+              <Typography variant="caption" sx={{ display: 'block', mt: 0.5, lineHeight: 1.6 }}>
+                Quản trị sẽ xem xét đơn của bạn. Trong lúc chờ, bạn dùng web như học sinh —
+                mọi lịch sử học tập sẽ được giữ nguyên sau khi duyệt.
+              </Typography>
+            </Alert>
+          )}
+
           {/* ================= TAB 1: CÁC KHÓA HỌC (HỌC MÃI LAYOUT CHÍNH) ================= */}
           {activeTab === 'hocmai' && (
             <Box id="tab-content-courses">
