@@ -59,7 +59,7 @@ import {
 } from '../features/mascot';
 import { RichText } from '../core/components/RichText';
 import { ApiKeyDialog } from '../features/tutor/components/ApiKeyDialog';
-import { getEffectiveApiKey } from '../features/tutor/services/geminiTutorService';
+import { coGiaSuAI } from '../features/tutor/services/geminiTutorService';
 
 export const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
@@ -97,10 +97,10 @@ export const DashboardPage: React.FC = () => {
      geminiTutorService âm thầm rơi sang kịch bản mẫu, học sinh tưởng đang nói
      chuyện với AI. TutorChat trong bài học đã chặn đúng cách; iChat thì chưa. */
   const [apiKeyDialogOpen, setApiKeyDialogOpen] = useState(false);
-  /* Hỏi getEffectiveApiKey chứ KHÔNG đọc thẳng localStorage: key có thể đến từ
-     biến môi trường VITE_GEMINI_API_KEY. Đọc mỗi localStorage sẽ chặn nhầm
+  /* Hỏi coGiaSuAI chứ KHÔNG đọc thẳng localStorage: bản build gọi Gemini qua
+     Firebase AI Logic mà không cần key nào. Đọc mỗi localStorage sẽ chặn nhầm
      người dùng dù app thừa sức gọi Gemini. */
-  const coKey = () => getEffectiveApiKey() !== 'MISSING_API_KEY' && !!getEffectiveApiKey();
+  const coKey = coGiaSuAI;
   const [hasApiKey, setHasApiKey] = useState(coKey);
 
   // Lấy tổng số bài học

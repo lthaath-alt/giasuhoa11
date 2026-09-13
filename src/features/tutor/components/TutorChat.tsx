@@ -17,7 +17,7 @@ import { Lesson } from '../../lessons/types';
 import { KnowledgeTheoryCard } from './KnowledgeTheoryCard';
 import { SuggestedQuestionsCard } from './SuggestedQuestionsCard';
 import { ApiKeyDialog } from './ApiKeyDialog';
-import { getEffectiveApiKey } from '../services/geminiTutorService';
+import { coGiaSuAI } from '../services/geminiTutorService';
 import { getRemainingCooldown, getCooldownState, checkRateLimit, recordMessageSent } from '../services/cooldownService';
 import { RichText } from '../../../core/components/RichText';
 
@@ -45,10 +45,10 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
   const [remainingCooldown, setRemainingCooldown] = useState(0);
   const [offTopicStrikes, setOffTopicStrikes] = useState(0);
   const [apiKeyDialogOpen, setApiKeyDialogOpen] = useState(false);
-  /* Hỏi getEffectiveApiKey chứ KHÔNG đọc thẳng localStorage: key còn có thể đến
-     từ biến môi trường VITE_GEMINI_API_KEY. Nếu chỉ đọc localStorage thì trường
-     nào cấu hình key chung vẫn bị đòi từng học sinh tự nhập key riêng. */
-  const coKey = () => getEffectiveApiKey() !== 'MISSING_API_KEY' && !!getEffectiveApiKey();
+  /* Hỏi coGiaSuAI chứ KHÔNG đọc thẳng localStorage: bản build gọi Gemini qua
+     Firebase AI Logic mà không cần key nào. Nếu chỉ đọc localStorage thì
+     học sinh nào cũng bị đòi tự nhập key riêng. */
+  const coKey = coGiaSuAI;
   const [hasApiKey, setHasApiKey] = useState(coKey);
   const { systemSettings } = useApp();
 

@@ -90,7 +90,8 @@ export const ApiKeyDialog: React.FC<ApiKeyDialogProps> = ({ open, onClose }) => 
   const handleSave = () => {
     /* KHÔNG lưu một key vừa bị kiểm tra và báo là hỏng.
 
-       Key của người dùng ĐÈ LÊN key của web (xem getEffectiveApiKey), nên lưu
+       Key của người dùng ĐÈ LÊN đường gọi mặc định của web (Firebase AI Logic —
+       xem generateAIResponse trong geminiTutorService), nên lưu
        nhầm một key sai là tắt luôn gia sư — mà học sinh sẽ không hiểu vì sao,
        chỉ thấy thầy im lặng. Bản trước nút "Lưu Key" vẫn bật ngay sau khi hộp
        thoại báo "API Key không hợp lệ".

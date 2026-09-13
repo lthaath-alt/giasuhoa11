@@ -6,6 +6,8 @@ import { GEMINI_MODEL_NAME } from '../../../core/constants';
 import { buildLessonContext, buildLessonCatalog, buildProgramContext } from './lessonContext';
 import { dungPrompt } from './promptSuPham';
 import { nhanhCuaHocSinh } from '../../research/thucNghiem';
+import { RECAPTCHA_ENTERPRISE_SITE_KEY } from '../../../core/services/firebaseCongKhai';
+import { loiThanhChuoi } from './loiGemini';
 
 /* Chuỗi này có THỂ là một API key không?
 
@@ -26,9 +28,9 @@ export const coDangKeyGoogle = (key: string): boolean => {
   return k.length >= 20 && !/\s/.test(k);
 };
 
-// Get effective API key from localStorage or env
+// Get the user's own API key from localStorage
 export const getEffectiveApiKey = (): string => {
-  /* Key của người dùng được ưu tiên, nhưng chỉ khi nó TRÔNG như một key thật.
+  /* Chỉ trả key riêng người dùng tự nhập, và chỉ khi nó TRÔNG như một key thật.
 
      Bản trước nhận bất cứ chuỗi nào khác rỗng. Một chuỗi rác — hay một chuỗi
      toàn dấu cách còn sót trong localStorage — vẫn đè lên key của web và làm
@@ -38,8 +40,18 @@ export const getEffectiveApiKey = (): string => {
      sao chỗ đó cố tình kiểm lỏng. */
   const userKey = (localStorage.getItem('gemini_api_key_user') ?? '').trim();
   if (coDangKeyGoogle(userKey)) return userKey;
-  return import.meta.env.VITE_GEMINI_API_KEY || import.meta.env.GEMINI_API_KEY || 'MISSING_API_KEY';
+  /* Không còn key của web ở đây. Key đọc từ biến VITE_ bị Vite chép nguyên
+     văn vào gói JS — ngày 13/09/2026 nó nằm trên Netlify. Web nay gọi qua
+     Firebase AI Logic (giaSuFirebaseAI.ts); hàm này chỉ còn trả key RIÊNG
+     người dùng tự nhập. */
+  return 'MISSING_API_KEY';
 };
+
+/* Gia sư có gọi được AI thật không. TutorChat và DashboardPage dựa vào đây để
+   quyết định có đòi học sinh nhập key riêng không — hỏi ở MỘT chỗ để ba nơi
+   không nói khác nhau. */
+export const coGiaSuAI = (): boolean =>
+  getEffectiveApiKey() !== 'MISSING_API_KEY' || RECAPTCHA_ENTERPRISE_SITE_KEY.length > 0;
 
 // Create a new instance dynamically
 const getAiInstance = () => {
@@ -57,7 +69,7 @@ const getAiInstance = () => {
 function buildGeminiHistory(history: ChatMessage[], currentUserMessage: string) {
   // Trích xuất history, mapping các sender thành role phù hợp
   const geminiHistory = history.map((msg) => ({
-    role: msg.sender === 'user' ? 'user' : 'model',
+    role: msg.sender === 'user' ? ('user' as const) : ('model' as const),
     parts: [{ text: msg.content }],
   }));
 
@@ -106,8 +118,8 @@ export const generateAIResponse = async (
   history: ChatMessage[],
   userEmail: string = 'guest'
 ): Promise<string> => {
-  if (getEffectiveApiKey() === 'MISSING_API_KEY' || !getEffectiveApiKey()) {
-    console.warn('Thiếu GEMINI_API_KEY. Fallback sang mock service.');
+  if (!coGiaSuAI()) {
+    console.warn('Chưa cấu hình gia sư AI. Fallback sang mock service.');
     // Lazy load mock service để tránh import circular hoặc phụ thuộc cứng
     const { generateAIResponse: mockGenerate } = await import('./aiMockService');
     return mockGenerate(lessonId, userQuestion, history, userEmail);
@@ -139,27 +151,41 @@ export const generateAIResponse = async (
        bài đó rồi, thêm dàn bài chỉ làm loãng trọng tâm. */
     const danBaiChung = nguCanhBai ? '' : buildProgramContext();
 
-    const response = await getAiInstance().models.generateContent({
+    const yeuCau = {
       model: GEMINI_MODEL_NAME,
-      contents: formattedHistory.concat({ role: 'user', parts: [{ text: latestMessage }] }),
-      config: {
-        systemInstruction: [
-          /* Chia nhóm thực nghiệm ngay tại đây, chỗ duy nhất câu lệnh được ghép.
-             Khi KHÔNG chạy nghiên cứu (mặc định) hàm này luôn trả 'socratic',
-             tức là web chạy y như cũ. */
-          dungPrompt(nhanhCuaHocSinh(userEmail)),
-          '='.repeat(60),
-          danhMucBai,
-          ...(nguCanhBai ? ['='.repeat(60), nguCanhBai] : []),
-          ...(danBaiChung ? ['='.repeat(60), danBaiChung] : []),
-        ].join('\n\n'),
-        temperature: 0.7, // Nhiệt độ vừa phải để sáng tạo nhưng vẫn giữ chuẩn kiến thức
-        topP: 0.9,
-      }
-    });
+      contents: formattedHistory.concat({ role: 'user' as const, parts: [{ text: latestMessage }] }),
+      systemInstruction: [
+        /* Chia nhóm thực nghiệm ngay tại đây, chỗ duy nhất câu lệnh được ghép.
+           Khi KHÔNG chạy nghiên cứu (mặc định) hàm này luôn trả 'socratic',
+           tức là web chạy y như cũ. */
+        dungPrompt(nhanhCuaHocSinh(userEmail)),
+        '='.repeat(60),
+        danhMucBai,
+        ...(nguCanhBai ? ['='.repeat(60), nguCanhBai] : []),
+        ...(danBaiChung ? ['='.repeat(60), danBaiChung] : []),
+      ].join('\n\n'),
+      temperature: 0.7, // Nhiệt độ vừa phải để sáng tạo nhưng vẫn giữ chuẩn kiến thức
+      topP: 0.9,
+    };
 
-    if (response.text) {
-        return response.text;
+    /* Hai đường, CÙNG một yêu cầu `yeuCau` — model, câu lệnh và tham số không
+       thể lệch nhau giữa các đường, vì dữ liệu nghiên cứu cần model ổn định:
+       - Key riêng người dùng tự nhập: @google/genai.
+       - Còn lại (bản build cho học sinh): Firebase AI Logic. */
+    const traLoi = getEffectiveApiKey() !== 'MISSING_API_KEY'
+      ? (await getAiInstance().models.generateContent({
+          model: yeuCau.model,
+          contents: yeuCau.contents,
+          config: {
+            systemInstruction: yeuCau.systemInstruction,
+            temperature: yeuCau.temperature,
+            topP: yeuCau.topP,
+          },
+        })).text
+      : await (await import('./giaSuFirebaseAI')).hoiGeminiQuaFirebase(yeuCau);
+
+    if (traLoi) {
+        return traLoi;
     }
     
     return 'Xin lỗi em, thầy/cô đang gặp chút sự cố kỹ thuật. Em có thể nhắc lại câu hỏi được không?';
@@ -174,13 +200,21 @@ export const generateAIResponse = async (
       userEmail: userEmail
     });
 
-    const msg = error?.message?.toLowerCase() || '';
-    const hetLuot = thongBaoHetLuot(error?.message || '');
+    const chuoiLoi = loiThanhChuoi(error);
+    const msg = chuoiLoi.toLowerCase();
+    const hetLuot = thongBaoHetLuot(chuoiLoi);
     if (hetLuot) return hetLuot;
 
     // Check for 400 bad request / Invalid API Key
     if (msg.includes('api_key_invalid') || msg.includes('api key not valid')) {
       return 'API key không hợp lệ. Vui lòng kiểm tra lại API key trong cài đặt ⚙️ nhé!';
+    }
+
+    /* Lỗi ở đường Firebase (App Check từ chối, AI Logic chưa bật, máy chủ lỗi)
+       thì BÁO THẬT, không rơi sang kịch bản mẫu: kịch bản mẫu trông như AI trả
+       lời, học sinh không biết là hỏng, và chủ dự án cũng không biết mà sửa. */
+    if (msg.includes('firebasevertexai') || msg.includes('app check') || msg.includes('appcheck')) {
+      return 'Gia sư AI đang tạm mất kết nối với máy chủ. Em thử lại sau ít phút nhé!';
     }
 
     // Fallback sang mock service nếu gọi thật bị lỗi (nhưng không phải do quota/key)
