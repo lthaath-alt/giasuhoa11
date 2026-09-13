@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",
-    "kiem-tra": "npm run kiem-tra:luyen-tap && npm run kiem-tra:chuong-trinh && npm run kiem-tra:ngan-hang && npm run kiem-tra:de-chuong && npm run kiem-tra:het-luot && npm run kiem-tra:mau && npm run kiem-tra:thuc-nghiem && npm run kiem-tra:ran-thang && npm run kiem-tra:tai-lieu && npm run kiem-tra:dong-bo && npm run kiem-tra:an-ninh",
+    "kiem-tra": "npm run kiem-tra:luyen-tap && npm run kiem-tra:chuong-trinh && npm run kiem-tra:ngan-hang && npm run kiem-tra:de-chuong && npm run kiem-tra:het-luot && npm run kiem-tra:mau && npm run kiem-tra:thuc-nghiem && npm run kiem-tra:ran-thang && npm run kiem-tra:tai-lieu && npm run kiem-tra:dong-bo && npm run kiem-tra:an-ninh && npm run kiem-tra:luat",
     "kiem-tra:chuong-trinh": "tsx scripts/kiem-tra-chuong-trinh.mts",
     "kiem-tra:het-luot": "tsx scripts/kiem-tra-het-luot.mts",
     "thu:ai": "tsx scripts/thu-gia-su-ai.mts",
@@ -34,7 +34,8 @@
     "xoa:password": "tsx scripts/xoa-cot-password.mts",
     "kiem-tra:dong-bo": "tsx scripts/kiem-tra-dong-bo-ngan-hang.mts",
     "kiem-tra:tai-lieu": "tsx scripts/kiem-tra-tai-lieu.mts",
-    "kiem-tra:an-ninh": "tsx scripts/kiem-tra-an-ninh.mts"
+    "kiem-tra:an-ninh": "tsx scripts/kiem-tra-an-ninh.mts",
+    "kiem-tra:luat": "tsx scripts/kiem-tra-luat.mts"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -56,11 +57,13 @@
     "vite": "^6.2.3"
   },
   "devDependencies": {
+    "@firebase/rules-unit-testing": "^5.0.2",
     "@types/express": "^4.17.21",
     "@types/node": "^22.14.0",
     "autoprefixer": "^10.4.21",
     "docx": "^9.7.1",
     "esbuild": "^0.25.0",
+    "firebase-tools": "^15.30.0",
     "tailwindcss": "^4.1.14",
     "tsx": "^4.21.0",
     "typescript": "~5.8.2",
