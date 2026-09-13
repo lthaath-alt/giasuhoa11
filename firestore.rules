@@ -75,6 +75,24 @@ service cloud.firestore {
       return dangNhap() && vaiTro() in ['school_admin', 'admin'];
     }
 
+    /* CHỦ DỰ ÁN — đúng MỘT người, ghim bằng email 13/09/2026.
+
+       Vì sao không dùng vai trong hồ sơ: vai chính là thứ hàng rào này bảo
+       vệ. Ai sửa được `role` thì tự phong được, nên lấy `role` ra canh
+       `role` là khoá tự mở cho chính nó — đúng lỗ hổng `laQuanTri()` để
+       ngỏ trước bản này: một `school_admin` tự nâng mình lên `admin`.
+
+       Email đến từ token Firebase Auth ĐÃ XÁC THỰC nên không giả được, và
+       đọc token KHÔNG tốn lượt đọc nào — rẻ hơn hẳn `laQuanTri()` vốn phải
+       get() hồ sơ. Vì thế mệnh đề này đặt TRƯỚC trong mọi phép `||` bên
+       dưới: chủ dự án thao tác thì không tốn lượt đọc nào cả.
+
+       ĐỔI EMAIL LÀ PHẢI PUBLISH LẠI LUẬT. Ghim sai email thì không ai đặt
+       được vai nữa, và đường chữa duy nhất là bảng điều khiển Firebase. */
+    function laChuDuAn() {
+      return dangNhap() && email() == 'ktranquang713@gmail.com';
+    }
+
     // ── Trợ giúp: kiểm nội dung câu hỏi ─────────────────────────────────────
 
     // Một chuỗi có an toàn để đổ vào `dangerouslySetInnerHTML` không?
@@ -274,26 +292,26 @@ service cloud.firestore {
       allow list:   if laGiaoVien();
 
       allow create: if dangNhap() && (
-                      (request.auth.uid == userId
-                       && request.resource.data.role == 'student'
-                       && !('classId' in request.resource.data)
-                       && !('schoolId' in request.resource.data)
-                       && !('joinedClassId' in request.resource.data))
+                      laChuDuAn()
+                      || (request.auth.uid == userId
+                          && request.resource.data.role == 'student'
+                          && !('classId' in request.resource.data)
+                          && !('schoolId' in request.resource.data)
+                          && !('joinedClassId' in request.resource.data))
                       || (laGiaoVien() && request.resource.data.role == 'student')
-                      || laQuanTri()
                     );
 
       allow update: if dangNhap() && (
-                      (request.auth.uid == userId
-                       && !request.resource.data.diff(resource.data)
-                            .affectedKeys().hasAny(['role', 'classId', 'schoolId', 'joinedClassId', 'username', 'email']))
+                      laChuDuAn()
+                      || (request.auth.uid == userId
+                          && !request.resource.data.diff(resource.data)
+                               .affectedKeys().hasAny(['role', 'classId', 'schoolId', 'joinedClassId', 'username', 'email']))
                       || (laGiaoVien()
                           && !request.resource.data.diff(resource.data)
                                .affectedKeys().hasAny(['role']))
-                      || laQuanTri()
                     );
 
-      allow delete: if laQuanTri();
+      allow delete: if laChuDuAn();
     }
 
     // ── Mọi thứ khác: cấm ───────────────────────────────────────────────────

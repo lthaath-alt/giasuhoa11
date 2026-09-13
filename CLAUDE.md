@@ -372,7 +372,7 @@ Luật làm được điều đó nhờ hai thứ dựng sẵn ở đợt 1: id 
 và `progress`/`chats` trỏ tới người dùng bằng `userEmail` nên luật dùng thẳng
 `request.auth.token.email`, **không tốn lượt đọc nào**.
 
-**Năm điều về luật hiện hành, đọc trước khi sửa `firestore.rules`:**
+**Sáu điều về luật hiện hành, đọc trước khi sửa `firestore.rules`:**
 
 1. **`bank_questions` PHẢI giữ `allow read: if true`.** Workflow đồng bộ đêm
    (`.github/workflows/dong-bo-ngan-hang.yml`) đọc Firestore **không đăng nhập**.
@@ -395,16 +395,41 @@ và `progress`/`chats` trỏ tới người dùng bằng `userEmail` nên luật
    (`classId` *và* `joinedClassId`), và sổ lớp khớp học sinh bằng **chuỗi định
    danh** (`studentIdentifiers` so với `username`/`email`) chứ không bằng
    `classId`. Khoá một cửa mà quên cửa kia thì vẫn lọt.
-5. **Giáo viên thuần chỉ tạo được tài khoản `role: 'student'`.** Tạo giáo viên
-   hay admin trường là việc của `laQuanTri()`. Để `|| laGiaoVien()` trần ở
-   `create` là một giáo viên lấy uid mới qua API đăng ký công khai của Google rồi
-   tự ghi hồ sơ `role: admin` — leo quyền teacher → admin.
+5. **Giáo viên thuần chỉ tạo được tài khoản `role: 'student'`.** Để
+   `|| laGiaoVien()` trần ở `create` là một giáo viên lấy uid mới qua API đăng
+   ký công khai của Google rồi tự ghi hồ sơ `role: admin` — leo quyền teacher
+   → admin.
+6. **Đặt hay đổi `role` là việc của MỘT người: `laChuDuAn()`** (13/09/2026).
+   Ghim bằng email trong token Auth — không giả được, và không tốn lượt đọc
+   nào nên đặt TRƯỚC trong mọi phép `||`. Cố ý KHÔNG canh bằng vai trong hồ
+   sơ: vai chính là thứ đang được bảo vệ, lấy nó ra canh chính nó là khoá tự
+   mở. `allow delete` trên `users` cũng chỉ còn chủ dự án.
+   Đổi email chủ dự án thì PHẢI publish lại luật, không thì không ai đặt
+   được vai nữa.
 
-**Còn lại, đã biết và cố ý hoãn:** `laQuanTri()` ở cả `create` lẫn `update` không
-ràng buộc `role`, nên `school_admin` tự nâng mình lên `admin` được; và học sinh
-sửa được `status` (hôm nay vô hại — đã quét, không đường nào dùng `status` làm
-cổng). Hoãn được vì sửa chúng là sửa **luật**, mà publish lại luật **không cần
-build/deploy app** — nên để lại không làm tăng giá phải trả.
+**Lỗ hổng tự nâng vai: ĐÃ VÁ 13/09/2026.** Trước đó `laQuanTri()` ở cả
+`create` lẫn `update` không ràng buộc `role`, nên một `school_admin` tự nâng
+mình lên `admin` được. Nay cả hai chỗ đi qua `laChuDuAn()`.
+
+Hai hệ quả phải biết trước khi ngạc nhiên:
+
+- **Quản trị KHÔNG phải chủ dự án nay chỉ tạo được `role: 'student'`** và
+  **không xoá được hồ sơ nào**. Đó là chủ ý, không phải lỗi.
+- `deleteClass` ghi `{ classId: null, role: 'student' }` cho từng học sinh.
+  Học sinh vốn đã là `student` nên `role` KHÔNG nằm trong `affectedKeys()`
+  (hàm đó chỉ kể khoá thêm/bớt/ĐỔI GIÁ TRỊ) — giáo viên vẫn xoá lớp được.
+  Nhưng nếu trong `studentIdentifiers` lỡ có một email vai khác thì lệnh đó
+  ĐỔI vai thật, và sẽ bị từ chối. Đúng như mong muốn.
+
+**Còn lại, đã biết và cố ý hoãn:** học sinh sửa được `status` (hôm nay vô hại
+— đã quét, không đường nào dùng `status` làm cổng).
+
+**Luật KHÔNG với tới mật khẩu.** Mật khẩu nằm ở Firebase Auth, đã băm. Đăng
+ký email + mật khẩu là **công khai** — ai cũng lấy được một uid hợp lệ mà
+không cần đụng vào web. Điều luật làm được là chặn uid đó thành bất kỳ vai
+nào ngoài `student`. Trong mã hôm nay không có `updatePassword` và không có
+Admin SDK, nên **không ai đặt được mật khẩu cho người khác**, chỉ
+`sendPasswordResetEmail`.
 
 Khoá web của Firebase trong `firebaseCongKhai.ts` **không phải bí mật** (nó vốn
 nằm trong gói JS ai bấm F12 cũng đọc được); an toàn dựa vào Firestore Rules. Khoá
