@@ -153,6 +153,10 @@ export function parseAIJson(text: string, daCo: BankQuestion[]): ParseOutcome {
     // imgNote gom theo vị trí trong tài liệu để dán ảnh một lần cho nhiều câu
     if (it.imgNote) rec.imgNote = String(it.imgNote).trim().slice(0, 120);
     if (it.g !== undefined) rec.g = it.g as number | string;
+    // Câu đã gán sẵn bài học từ bên ngoài thì giữ lấy. Không giữ thì mọi câu nạp
+    // theo đường này đều thiếu lessonId, mà thiếu nó là không vào được đề của bài.
+    if (it.lessonId) rec.lessonId = String(it.lessonId).trim().slice(0, 40);
+    if (it.chapterId) rec.chapterId = String(it.chapterId).trim().slice(0, 40);
 
     if (t === 'mc') {
       const o = it.o as unknown[];
