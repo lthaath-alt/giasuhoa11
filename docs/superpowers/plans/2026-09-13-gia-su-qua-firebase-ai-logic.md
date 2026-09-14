@@ -45,7 +45,7 @@ Làm A1–A4 trước Việc 6. A5 chỉ làm ở Việc 8.
 - [x] **A1. Bật Firebase AI Logic.** Firebase Console → dự án `giasuhoa11` → **AI Logic** → **Get started** → chọn **Gemini Developer API**. Console tự bật API cần thiết và tự bật App Check cho AI Logic. Dự án vẫn ở gói Spark.
 - [x] **A2. Tạo key reCAPTCHA Enterprise.** Google Cloud Console (project `giasuhoa11`) → **Security → reCAPTCHA** → **Create key** → loại **Website**, tên miền: `<ten-site>.netlify.app`. **KHÔNG** thêm `localhost`, **KHÔNG** bật "Use checkbox challenge". Chép **site key** (dạng `6L…`, công khai) gửi cho Claude.
 - [x] **A3. Đăng ký App Check.** Firebase Console → **App Check** → **Apps** → web app → **reCAPTCHA Enterprise** → dán site key ở A2 → Save.
-- [ ] **A4. Debug token cho máy dev** (token Claude tạo sẵn trong `.env.development.local`, biến `VITE_APPCHECK_DEBUG_TOKEN` — nên bỏ qua được bước chờ Console in token): App Check → Apps → menu ⋮ của web app → **Manage debug tokens** → Add → dán token.
+- [x] **A4. Debug token cho máy dev** (token Claude tạo sẵn trong `.env.development.local`, biến `VITE_APPCHECK_DEBUG_TOKEN` — nên bỏ qua được bước chờ Console in token): App Check → Apps → menu ⋮ của web app → **Manage debug tokens** → Add → dán token.
 - [ ] **A5. Xoá hai key cũ** — CHỈ sau khi Việc 8 xác nhận production chạy: key đuôi `…hsiA` và key `web-hoc-sinh` trong AI Studio / Cloud Console → Credentials.
 
 ---
@@ -485,7 +485,7 @@ git commit -m "Tai lieu: web goi Gemini qua Firebase AI Logic, GEMINI_API_KEY ch
 
 ---
 
-## Việc 6: Thử trên máy dev
+## Việc 6: Thử trên máy dev — XONG 13/09/2026 (iChat: trả lời đúng phong cách, request `gemini-3.6-flash:generateContent` 200 do `giaSuFirebaseAI.ts` gửi)
 
 **Cần có:** A1, A2, A3.
 
@@ -497,7 +497,7 @@ git commit -m "Tai lieu: web goi Gemini qua Firebase AI Logic, GEMINI_API_KEY ch
 
 ---
 
-## Việc 7: Build, quét, thử CSP trên site nháp
+## Việc 7: Build, quét, thử CSP trên site nháp — XONG 13/09/2026 (site nháp `zingy-donut-062e57.netlify.app`: gia sư trả lời, Console không lỗi CSP). Build lại từ `dccfc0d` ngày 14/09: `index-C1cKNmsD.js`, `kiem-tra:an-ninh` ĐẠT
 
 - [ ] **Bước 1:** `npm run build` → thành công.
 - [ ] **Bước 2:** `npm run kiem-tra` → TẤT CẢ ĐẠT, trong đó `kiem-tra:an-ninh` báo "dist/ không chứa key Google nào ngoài khoá Firebase công khai".
@@ -507,7 +507,7 @@ git commit -m "Tai lieu: web goi Gemini qua Firebase AI Logic, GEMINI_API_KEY ch
 
 ---
 
-## Việc 8: Lên production và xoá key cũ
+## Việc 8: Lên production và xoá key cũ — ĐANG LÀM (14/09: hai lần deploy chưa đổi production, vẫn `index-Dq84-AVq.js`)
 
 - [ ] **Bước 1 (chủ dự án):** Kéo thả `dist` vào tab **Deploys** của site chính.
 - [ ] **Bước 2:** Hỏi gia sư trên site chính → trả lời; Network gọi `firebasevertexai.googleapis.com`.
