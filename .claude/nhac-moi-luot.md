@@ -29,6 +29,8 @@ LICH SU CAC DOT, BAI HOC DA TRA GIA, va moi thu ve luat / mau / an ninh:
   nam trong CLAUDE.md (nap dau phien). Truoc khi sua `firestore.rules`,
   `index.css`, `public/_headers` hay vung Auth: doc lai muc tuong ung o
   do, DUNG lam theo tri nho.
+  Sua `firestore.rules` xong: chay `npm run kiem-tra:luat` (may nay se BO QUA
+  vi thieu Java — xem ket qua that o tab Actions sau khi push).
 
 Doi viec khac thi SUA CHINH TEP NAY (.claude/nhac-moi-luot.md), khong
 phai sua .claude/settings.json. Hook chi lam moi viec `cat` tep nay ra.

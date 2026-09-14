@@ -194,7 +194,7 @@ Hằng ngày:
 |---|---|
 | `npm run dev` | Máy chủ phát triển, cổng 3000 |
 | `npm run lint` | `tsc --noEmit` — hàng rào chính, chạy MỘT LẦN trước khi báo xong |
-| `npm run kiem-tra` | Chạy cả 11 bộ kiểm, 282 mục. Chạy trước khi commit |
+| `npm run kiem-tra` | Chạy cả 12 bộ kiểm, 282 mục. Chạy trước khi commit |
 | `npm run build` | **Chỉ khi user yêu cầu** |
 
 Bộ kiểm chạy riêng khi cần: `kiem-tra:chuong-trinh` (dữ liệu 25 bài),
@@ -204,7 +204,10 @@ Bộ kiểm chạy riêng khi cần: `kiem-tra:chuong-trinh` (dữ liệu 25 bà
 `kiem-tra:tai-lieu`
 (mọi đường dẫn và lệnh npm mà CLAUDE.md / hiến chương nhắc tới đều phải có thật),
 `kiem-tra:an-ninh` (những hàng rào an ninh không được phép biến mất — xem mục
-"An ninh" bên dưới).
+"An ninh" bên dưới),
+`kiem-tra:luat` (19 phép thử luật Firestore trên emulator; cần Java 11+ nên
+máy nào thiếu thì tự bỏ qua — phép này chạy thật trên GitHub Actions, xem
+`.github/workflows/kiem-luat.yml`).
 
 Sinh lại dữ liệu — đọc `scripts/README.md` trước khi dùng:
 `soan` (từ tệp .docx sang `constants.ts`), `xuat:ngan-hang` (Firestore sang repo),
@@ -393,6 +396,12 @@ chạy Rules Playground cho đủ phép rồi mới bấm **Publish** — AI kh�
 và không được tự deploy. Nên khi sửa luật: đưa NGUYÊN TỆP cho chủ dự án (đừng chỉ
 trích đoạn trong chat), kèm bảng phép thử Playground. Sau khi chủ dự án báo đã
 publish, đo lại bằng REST không đăng nhập — đó là tư cách mà đồng bộ đêm dùng.
+
+Từ 13/09/2026 có `npm run kiem-tra:luat` — 19 phép chạy trên emulator, đọc
+thẳng `firestore.rules`. Nó bắt được thứ Playground không bắt được: `list`, và
+lỗi gõ nhầm tên trường. Nhưng nó CHỈ chứng minh tệp trong git đúng; luật đang
+chạy trên Firebase thì vẫn phải đo bằng REST sau khi publish. Hai việc khác
+nhau.
 
 Một cái bẫy của Playground, đã mất nửa buổi vì nó: ô "Build document" ghi thừa
 một dấu cách vào tên trường (`role␣`) là tạo ra một trường KHÁC, và luật đọc

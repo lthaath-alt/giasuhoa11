@@ -215,6 +215,34 @@ async function chayCacPhep(): Promise<number> {
   await duoc(updateDoc(doc(gv, 'users', NGUOI.hs3.uid), { role: 'student', classId: null }),
     '18. giáo viên ghi `role: student` đè lên hồ sơ vốn đã student');
 
+  /* PHÉP TỰ PHÁ. Một bộ kiểm luôn xanh mà chưa bao giờ bắt được gì thì đáng
+     ngờ hơn đáng mừng — bài học đã trả giá một lần, xem "Rút kinh nghiệm"
+     trong CLAUDE.md. Ở đây ta vá luật TRONG BỘ NHỚ cho `allow delete` mở
+     toang, rồi đòi phép 14 phải đổi kết quả. Không đổi nghĩa là bộ kiểm này
+     không thực sự đọc luật, và mọi dòng OK phía trên đều vô nghĩa.
+     Tệp `firestore.rules` trên đĩa KHÔNG bị đụng tới. */
+  const luatPha = docLuat().replace(
+    'allow delete: if laChuDuAn();',
+    'allow delete: if true;',
+  );
+  if (luatPha === docLuat()) {
+    dem(false, '19. phép tự phá',
+      'không tìm thấy dòng `allow delete: if laChuDuAn();` để vá — luật đã đổi, sửa lại phép này');
+  } else {
+    const moiPha = await initializeTestEnvironment({
+      projectId: CAU_HINH.DU_AN + '-pha',
+      firestore: { rules: luatPha, host: '127.0.0.1', port: CAU_HINH.CONG },
+    });
+    await gieo(moiPha);
+    const gvPha = nhu(moiPha, NGUOI.gv);
+    let choQua = false;
+    try { await assertSucceeds(deleteDoc(doc(gvPha, 'users', NGUOI.hs2.uid))); choQua = true; }
+    catch { choQua = false; }
+    dem(choQua, '19. phép tự phá — nới `allow delete` thì phép 14 phải đổi kết quả',
+      choQua ? '' : 'nới luật mà kết quả không đổi: bộ kiểm này KHÔNG đọc luật thật');
+    await moiPha.cleanup();
+  }
+
   await moi.cleanup();
   return sai;
 }
