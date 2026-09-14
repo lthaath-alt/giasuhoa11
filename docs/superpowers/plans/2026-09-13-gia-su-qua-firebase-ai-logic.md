@@ -507,9 +507,9 @@ git commit -m "Tai lieu: web goi Gemini qua Firebase AI Logic, GEMINI_API_KEY ch
 
 ---
 
-## Việc 8: Lên production và xoá key cũ — ĐANG LÀM (14/09: hai lần deploy chưa đổi production, vẫn `index-Dq84-AVq.js`)
+## Việc 8: Lên production và xoá key cũ — ĐANG LÀM. Bước 1 xong 14/09/2026 13:32: production phục vụ `index-C1cKNmsD.js`, CSP có reCAPTCHA, không key Google nào ngoài khoá Firebase (hai lần deploy trước tải nhầm bản cũ `index-Dq84-AVq.js`)
 
-- [ ] **Bước 1 (chủ dự án):** Kéo thả `dist` vào tab **Deploys** của site chính.
+- [x] **Bước 1 (chủ dự án):** Kéo thả `dist` vào tab **Deploys** của site chính.
 - [ ] **Bước 2:** Hỏi gia sư trên site chính → trả lời; Network gọi `firebasevertexai.googleapis.com`.
 - [ ] **Bước 3 (chủ dự án):** **A5** — xoá key `…hsiA` và `web-hoc-sinh`; xoá tên miền site nháp khỏi key reCAPTCHA; xoá site nháp trên Netlify.
 - [ ] **Bước 4:** Hỏi gia sư trên site chính lần nữa → vẫn trả lời (chứng minh không còn phụ thuộc key cũ).
