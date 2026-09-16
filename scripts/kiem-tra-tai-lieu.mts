@@ -49,6 +49,12 @@ const CO_Y_VANG = new Set([
 const KHONG_PHAI_DUONG_DAN = new Set(['PascalCase.tsx', '.tsx', '.json', 'pages/', '/login', '/*',
   'quan_tri/dong_quan_tri', 'auth/admin-restricted-operation']);
 
+/* Chuỗi khớp mẫu tên lệnh (`a-b:c-d`) nhưng KHÔNG phải lệnh npm. Hôm nay chỉ
+   có một: `about:srcdoc` là một lược đồ địa chỉ của trình duyệt, xuất hiện
+   trong mục cảnh báo CSP. Cũng liệt kê từng chuỗi một như danh sách trên —
+   bỏ qua theo mẫu là mở cửa cho tên lệnh viết sai lọt qua. */
+const KHONG_PHAI_LENH = new Set(['about:srcdoc']);
+
 function moiTep(thuMuc: string, ra: string[] = []): string[] {
   for (const t of readdirSync(thuMuc, { withFileTypes: true })) {
     if (['node_modules', '.git', 'dist', '.specify'].includes(t.name)) continue;
@@ -92,7 +98,22 @@ for (const tep of TAI_LIEU) {
   ok(thieu.length === 0, `${nhac.length} đường dẫn nhắc tới đều có thật`,
      thieu.length ? 'không tìm thấy: ' + thieu.join(', ') : '');
 
-  const lenh = [...new Set([...md.matchAll(/`npm run ([\w:-]+)`/g)].map(m => m[1]))];
+  /* Hai cách tài liệu gọi tên một lệnh, và PHẢI bắt cả hai.
+
+     Bản đầu chỉ bắt dạng `npm run x`. Nhưng phần lớn tài liệu viết TRẦN —
+     `kiem-tra:mau`, `xuat:ngan-hang` — để câu văn khỏi dài. Đo ngày 16/09/2026:
+     18 tên lệnh viết trần đang nằm NGOÀI tầm canh, tức đổi tên một bộ kiểm
+     trong `package.json` mà quên sửa tài liệu thì không gì kêu cả. Đúng loại
+     lỗi mà chính bộ kiểm này sinh ra để bắt.
+
+     Mẫu `^[a-z-]+:[a-z-]+$` cố ý hẹp: không nhận chữ số nên `sha256-…` không
+     lọt, và đòi phần sau dấu hai chấm không có dấu gạch chéo nên `https://…`
+     cũng không lọt. */
+  const dangDayDu = [...md.matchAll(/`npm run ([\w:-]+)`/g)].map(m => m[1]);
+  const dangTran = [...md.matchAll(/`([^`\n]+)`/g)].map(m => m[1])
+    .filter(t => /^[a-z-]+:[a-z-]+$/.test(t) && !KHONG_PHAI_LENH.has(t));
+  const lenh = [...new Set([...dangDayDu, ...dangTran])];
+
   const coLenh = Object.keys(
     JSON.parse(readFileSync(join(GOC, 'package.json'), 'utf8')).scripts as Record<string, string>);
   const lenhLa = lenh.filter(l => !coLenh.includes(l));
