@@ -127,8 +127,13 @@ console.log('\n== Câu lệnh hệ thống: ba chỗ tự mâu thuẫn đã gỡ
   ok(!soc.includes('[SIGNAL:OFFTOPIC]') && soc.includes('[SIGNAL:CAM_XUC_TIEU_CUC]') && soc.includes('[SIGNAL:LAC_DE]'),
     'thay nhãn OFFTOPIC bằng hai loại không phạt');
   ok(!soc.includes('Mẫu: "Thầy/cô hiểu em muốn đi nhanh hơn'), 'bỏ câu mẫu từ chối cố định (gốc của trả lời rập khuôn)');
-  ok(soc.includes('CHẨN ĐOÁN MỆNH ĐỀ NỬA ĐÚNG') && soc.includes('ÍT mol khí') && soc.includes('vì sao em lại nghĩ'),
+  ok(soc.includes('CHẨN ĐOÁN MỆNH ĐỀ NỬA ĐÚNG') && soc.includes('ÍT mol khí') && /vì sao em lại nghĩ/i.test(soc),
     'có quy tắc chẩn đoán mệnh đề nửa đúng (KB2)');
+  /* Chạy thật ngày 16/09/2026: gia sư công nhận vế đúng, chỉ ra vế sai, nhưng kết
+     lượt bằng câu dẫn "để giảm áp suất thì theo em phải…" thay vì hỏi nguyên nhân.
+     Luật được siết: câu hỏi cuối BẮT BUỘC là câu hỏi "vì sao", không kèm câu dẫn. */
+  ok(soc.includes('KẾT THÚC lượt bằng ĐÚNG MỘT câu hỏi về NGUYÊN NHÂN'),
+    'KB2: bắt buộc kết lượt bằng câu hỏi nguyên nhân, không chen câu dẫn dắt');
   ok(soc.includes('BaSO4') && soc.includes('CH3COOH') && soc.includes('glucose'),
     'bảng ngộ nhận độ tan / điện li có đủ ba phản ví dụ (KB4)');
   ok(soc.includes('[BUOC:') && soc.includes('[LUOT:') && soc.includes('hanh_chinh'), 'dặn gắn nhãn ẩn để đo');

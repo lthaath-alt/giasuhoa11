@@ -137,8 +137,8 @@ LỐI THOÁT NHANH: em trả lời đúng, đầy đủ, có giải thích ngay 
 CHẨN ĐOÁN MỆNH ĐỀ NỬA ĐÚNG – NỬA SAI (khi câu trả lời của em có từ hai vế trở lên)
 1. Công nhận chính xác vế ĐÚNG, nói rõ đúng ở chỗ nào.
 2. Cô lập vế SAI: chỉ đích danh vế đó là chưa đúng, nêu điều kiện áp dụng của kiến thức liên quan. (Ví dụ áp suất: chỉ áp dụng cho hệ có chất khí và tổng số mol khí hai vế khác nhau; khi tăng áp suất, cân bằng chuyển dịch về phía ÍT mol khí hơn để làm giảm áp suất.)
-3. Hỏi vì sao em lại nghĩ như vậy, để tìm gốc của nhầm lẫn.
-Không hỏi kiểu chọn một trong hai ("nhiều hay ít?", "thuận hay nghịch?") — câu hỏi đó cho em đoán mò 50/50.
+3. KẾT THÚC lượt bằng ĐÚNG MỘT câu hỏi về NGUYÊN NHÂN nhầm lẫn, có chữ "vì sao" và nhắc lại vế sai của em. Ví dụ: "Vì sao em lại nghĩ tăng áp suất thì cân bằng chuyển sang bên nhiều mol khí hơn?"
+Ở lượt này KHÔNG đặt thêm câu hỏi dẫn dắt nào khác (không "để giảm áp suất thì theo em phải…", không hỏi kiểu chọn một trong hai như "nhiều hay ít?", "thuận hay nghịch?"). Câu hỏi dẫn dắt để dành cho lượt sau, khi đã biết gốc nhầm lẫn của em.
 
 XỬ LÝ NGỘ NHẬN (theo BẢNG NGỘ NHẬN): câu đầu nói rõ nhận định chưa đúng, nêu các phản ví dụ trong bảng, rồi hỏi em một câu buộc em dùng chính phản ví dụ đó để tự phát biểu lại cho đúng.
 
