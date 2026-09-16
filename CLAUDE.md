@@ -530,10 +530,33 @@ khách có một `uid`, và CHỈ gọi khi khách **thật sự gửi tin** —
 
 Chưa bật thì hàng rào chống lạm dụng **lùi về đếm trong bộ nhớ phiên**: khách
 bấm F5 là 25 lượt về lại 25, khoá spam 15 phút cũng mất — đúng cái lỗ mà bản
-ghi `gioi_han_chat` dựng lên để bịt, nên phải nói đúng điều này trong báo cáo.
-Bật ở Firebase Console → Authentication → Sign-in method → Anonymous.
-Nghiệm thu: cửa sổ ẩn danh, gửi một câu, rồi F5 — số lượt còn lại KHÔNG được
-quay về 25.
+ghi `gioi_han_chat` dựng lên để bịt.
+
+**Hai công tắc chứ không phải một, và ĐÃ BẬT CẢ HAI ngày 16/09/2026:** (1)
+Anonymous ở Firebase Console → Authentication → Sign-in method; (2) luật phải
+được Publish, vì khối `gioi_han_chat` vào git ở commit `78f839e` mà luật đang
+chạy lúc đó vẫn là bản cũ hơn — bật mỗi công tắc 1 thì vẫn hỏng. Mã tự phân
+biệt hai ca nên đọc Console là biết ngay: `Không đăng nhập ẩn danh được` là
+công tắc 1, `Ghi Firestore bị từ chối` là công tắc 2.
+
+Đo bằng REST với token ẩn danh ngay sau khi Publish. Bảng này cũng là phép
+nghiệm thu nếu sau này phải dựng lại:
+
+| Đọc gì | Phải ra |
+|---|---|
+| `bank_questions` | 200 — đồng bộ đêm còn sống |
+| `users` | 403 |
+| bản ghi giới hạn của chính mình, khi chưa gửi tin | **404**, KHÔNG phải 403 |
+| sau khi gửi một tin | 200, đủ 5 trường, `luotKhach` = 1 |
+| F5 rồi đọc lại | uid KHÔNG đổi, `luotKhach` vẫn 1 |
+| đếm lùi `luotKhach` về 0 | 403 |
+| hạ `khoaDen` trong lúc đang khoá thật | 403 |
+
+`404` ở dòng thứ ba mới là đúng — luật CHO PHÉP đọc, chỉ là bản ghi chưa sinh;
+`403` mới là bị luật chặn. Và cái bẫy đã vấp khi đo: thử "hạ `khoaDen` về 0"
+trong lúc `khoaDen` vốn đang là 0 thì luôn ra 200, vì đó không phải hạ. Đó là
+phép thử vô nghĩa chứ không phải lỗ hổng — phải đặt khoá vào tương lai trước,
+rồi mới hạ, thì mới đo được điều muốn đo.
 
 ## KHÔNG biến app thành PWA / service worker
 - Dự án này KHÔNG phải PWA và phải giữ nguyên như vậy. ĐỪNG thêm `vite-plugin-pwa`, `workbox`, `manifest.webmanifest`, hay bất kỳ đoạn `navigator.serviceWorker.register(...)` nào.
@@ -683,3 +706,12 @@ Ghi lại để lần sau không vấp nữa. Tất cả đều là lỗi KHÔNG
    mà khung duyệt đơn nằm im, và cột "Đơn chờ" của giáo viên mù theo. Hai tính
    năng chết vì một dòng thiếu. Thêm trường vào kiểu `User` thì PHẢI
    `grep "as User"` rồi thêm vào từng chỗ.
+
+8. **Bộ đệm Console bắc qua cả lần tải lại trang — đừng tin một dòng cảnh báo
+   nếu chưa mở tab sạch.** Ngày 16/09/2026, dòng `[gioiHanChat] Không đăng nhập
+   ẩn danh được` vẫn nằm trong Console SAU KHI công tắc Anonymous đã bật, và
+   suýt dẫn tới kết luận "bật rồi mà vẫn hỏng". Nó là rác của lần tải trước.
+   Dấu hiệu nhận ra: cùng một lỗi xuất hiện HAI lần trong danh sách. Cách đo
+   đúng: mở một tab MỚI (bộ đệm theo tab, không theo lần tải), hoặc bỏ qua
+   Console và đo thẳng — REST cho luật, IndexedDB cho phiên đăng nhập. Cùng họ
+   với bài học số 3: ô xem trước cũng báo số sai khi cửa sổ đang ẩn.
