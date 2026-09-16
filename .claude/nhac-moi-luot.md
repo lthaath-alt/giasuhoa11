@@ -18,8 +18,6 @@ DA CHOT, dung dat lai:
     la "hoc sinh quen mat khau giua gio" thi loi giai la nut cap mat khau
     moi hien MOT LAN, can Cloud Function + Admin SDK (goi Blaze) — khong
     phai kho mat khau.
-
-DA CHOT, dung dat lai:
   - Duong "TAO TRUONG" da bi xoa het 16/09/2026, theo y chu du an, sau khi
     da neu ro cai gia. Bon lop xoa theo thu tu: SchoolTab.tsx ->
     CreateSchoolDialog -> AppContext.createSchool -> FirestoreService.addSchool.
