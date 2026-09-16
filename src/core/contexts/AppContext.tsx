@@ -148,12 +148,6 @@ export interface AppContextType {
 
   // ── Quản lý Trường học ──────────────────────────────────────────────────────
 
-  /** Admin hệ thống tạo trường mới và gán adminEmail */
-  createSchool: (name: string, adminEmail: string) => Promise<{
-    success: boolean;
-    message: string;
-    school?: School;
-  }>;
 
   /**
    * Super Admin tạo tài khoản Admin trường học.
@@ -783,24 +777,6 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   };
 
   // ── Quản lý Trường học ────────────────────────────────────────────────────
-
-  const createSchool = async (name: string, adminEmail: string) => {
-    const trimmed = name.trim();
-    if (!trimmed) return { success: false, message: 'Tên trường không được để trống.' };
-
-    const school: School = {
-      id: `school_${Date.now()}`,
-      name: trimmed,
-      adminEmails: [adminEmail.toLowerCase()],
-      createdAt: new Date().toISOString(),
-    };
-
-    const ok = await FirestoreService.addSchool(school);
-    if (!ok) return { success: false, message: 'Trường này đã tồn tại trong hệ thống.' };
-
-    setSchools(prev => [...prev, school]);
-    return { success: true, message: `Đã tạo trường "${trimmed}" thành công.`, school };
-  };
 
   const createTeacher = async (data: CreateTeacherData) => {
     if (!data.name.trim() || !data.email.trim()) {
@@ -1993,7 +1969,6 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         rejectUser,
         deleteUser,
         updateUserInfo,
-        createSchool,
         createSchoolAdmin,
         createTeacher,
         createClass,

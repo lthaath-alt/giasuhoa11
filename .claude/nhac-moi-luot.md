@@ -20,9 +20,11 @@ DA CHOT, dung dat lai:
     phai kho mat khau.
 
 MA CHET con lai, DA BAO chua xoa:
-  - `createSchool` trong AppContext.tsx (khai bao + ham + cho vao context)
-    thanh mo coi sau khi xoa CreateSchoolDialog 16/09/2026. Khong component
-    nao goi nua. Giu lai vi "tao truong" la viec co that; hoi truoc khi xoa.
+  - `FirestoreService.addSchool` (firestoreService.ts) thanh mo coi sau khi
+    xoa `createSchool` 16/09/2026 — khong ai goi nua. Giu lai vi no la mot
+    nuoc di Firestore thuan, va "tao truong" co the can lai. Hoi truoc khi xoa.
+    Chuoi ba lop da xoa theo thu tu: SchoolTab -> CreateSchoolDialog ->
+    createSchool. Neu xoa not addSchool thi ca duong "tao truong" bien mat.
 
 CHON KY NANG TRUOC KHI DOC HAY SUA MA (goi bang cong cu Skill):
   viec mo ho / nhieu duong lam        -> brainstorming
