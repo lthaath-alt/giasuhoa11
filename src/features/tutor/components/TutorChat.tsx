@@ -11,15 +11,13 @@ import {
   Alert,
   CircularProgress,
 } from '@mui/material';
-import { Send, Trash2, Sparkles, CheckCircle, Award, Lightbulb, HelpCircle, Clock, ShieldAlert, Settings, Key } from 'lucide-react';
+import { Send, Trash2, Sparkles, CheckCircle, Award, Lightbulb, HelpCircle, Clock } from 'lucide-react';
 import { useApp } from '../../../core/hooks/useApp';
 import { Lesson } from '../../lessons/types';
 import { KnowledgeTheoryCard } from './KnowledgeTheoryCard';
 import { SuggestedQuestionsCard } from './SuggestedQuestionsCard';
-import { ApiKeyDialog } from './ApiKeyDialog';
-import { coGiaSuAI } from '../services/geminiTutorService';
-import { getRemainingCooldown, getCooldownState, checkRateLimit, recordMessageSent } from '../services/cooldownService';
-import { RichText } from '../../../core/components/RichText';
+import { layTrangThaiGioiHan } from '../services/gioiHanChatService';
+import { MathMarkdownRenderer } from '../../../core/components/MathMarkdownRenderer';
 
 interface TutorChatProps {
   lesson: Lesson;
@@ -43,14 +41,6 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
   const [remainingCooldown, setRemainingCooldown] = useState(0);
-  const [offTopicStrikes, setOffTopicStrikes] = useState(0);
-  const [apiKeyDialogOpen, setApiKeyDialogOpen] = useState(false);
-  /* Hỏi coGiaSuAI chứ KHÔNG đọc thẳng localStorage: bản build gọi Gemini qua
-     Firebase AI Logic mà không cần key nào. Nếu chỉ đọc localStorage thì
-     học sinh nào cũng bị đòi tự nhập key riêng. */
-  const coKey = coGiaSuAI;
-  const [hasApiKey, setHasApiKey] = useState(coKey);
-  const { systemSettings } = useApp();
 
   // Load lịch sử chat từ Firestore khi vào bài học
   useEffect(() => {
@@ -71,53 +61,38 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
     scrollToBottom();
   }, [lessonChats, isSending]);
 
+  /* Thời gian khoá (khi bị phát hiện spam) nay nằm ở Firestore — đọc một lần
+     sau mỗi lượt gửi, rồi đếm lùi tại chỗ. Lạc đề và cảm xúc tiêu cực KHÔNG còn
+     bị tính lượt phạt, nên không còn chip "Cảnh báo lạc đề x/5". */
   useEffect(() => {
-    const emailStr = currentUser ? currentUser.email : 'guest';
-    const cooldown = getRemainingCooldown(emailStr);
-    const state = getCooldownState(emailStr);
-    setRemainingCooldown(cooldown);
-    setOffTopicStrikes(state.offTopicStrikeCount);
-
-    let interval: ReturnType<typeof setInterval>;
-    if (cooldown > 0) {
-      interval = setInterval(() => {
-        const cd = getRemainingCooldown(emailStr);
-        setRemainingCooldown(cd);
-        if (cd <= 0) {
-          clearInterval(interval);
-          setOffTopicStrikes(0);
+    let huy = false;
+    let interval: ReturnType<typeof setInterval> | undefined;
+    layTrangThaiGioiHan(!currentUser)
+      .then(({ conLaiKhoaMs }) => {
+        if (huy) return;
+        const het = Date.now() + conLaiKhoaMs;
+        setRemainingCooldown(conLaiKhoaMs);
+        if (conLaiKhoaMs > 0) {
+          interval = setInterval(() => {
+            const cd = Math.max(0, het - Date.now());
+            setRemainingCooldown(cd);
+            if (cd <= 0 && interval) clearInterval(interval);
+          }, 1000);
         }
-      }, 1000);
-    }
-    
+      })
+      .catch(() => { /* không đọc được thì không hiện khoá; lượt gửi vẫn tự kiểm */ });
+
     return () => {
+      huy = true;
       if (interval) clearInterval(interval);
     };
-  }, [currentUser, chats, isSending]);
+  }, [currentUser, isSending]);
 
   const handleSend = async (textToSend?: string) => {
-    if (systemSettings?.allowUserApiKey && !hasApiKey) {
-      setApiKeyDialogOpen(true);
-      return;
-    }
-
     const text = (textToSend || inputMessage).trim();
     if (!text) return;
 
-    const emailStr = currentUser ? currentUser.email : 'guest';
-    const rateLimit = checkRateLimit(emailStr);
-    
-    if (!rateLimit.allowed) {
-      if (rateLimit.reason === 'fast') {
-        setErrorMsg(`Bạn đang hỏi quá nhanh. Vui lòng đợi thêm ${Math.ceil((rateLimit.waitMs || 0)/1000)} giây.`);
-      } else {
-        setErrorMsg(`Bạn đã hỏi tối đa 3 câu trong 1 phút. Vui lòng đợi thêm ${Math.ceil((rateLimit.waitMs || 0)/1000)} giây.`);
-      }
-      return;
-    }
-
-    recordMessageSent(emailStr);
-
+    /* Giới hạn tốc độ và spam nay kiểm trong addMessage, ở Firestore. */
     setInputMessage('');
     setIsSending(true);
     setErrorMsg(null);
@@ -279,14 +254,6 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
                 variant="outlined"
                 sx={{ fontWeight: 'bold' }}
               />
-            ) : offTopicStrikes > 0 ? (
-              <Chip 
-                icon={<ShieldAlert size={14} color="var(--vang)" />} 
-                label={`Cảnh báo lạc đề: ${offTopicStrikes}/5`} 
-                color="warning" 
-                size="small" 
-                variant="outlined"
-              />
             ) : null}
 
             {lessonChats.length > 0 && (
@@ -302,28 +269,8 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
               </Button>
             )}
 
-            {systemSettings?.allowUserApiKey && (
-              <Button
-                size="small"
-                variant="outlined"
-                color="primary"
-                onClick={() => setApiKeyDialogOpen(true)}
-                sx={{ minWidth: 0, p: 0.5, borderRadius: 0 }}
-              >
-                <Settings size={18} />
-              </Button>
-            )}
           </Box>
         </Box>
-
-        {/* Api Key Dialog */}
-        <ApiKeyDialog 
-          open={apiKeyDialogOpen} 
-          onClose={() => {
-            setApiKeyDialogOpen(false);
-            setHasApiKey(coKey());
-          }} 
-        />
 
         {/* Cảnh báo khách vãng lai hoặc tài khoản */}
         {!currentUser && (
@@ -357,39 +304,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
             gap: 2,
           }}
         >
-          {systemSettings?.allowUserApiKey && !hasApiKey ? (
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                height: '100%',
-                gap: 2,
-                p: 4,
-                textAlign: 'center',
-              }}
-            >
-              <Avatar sx={{ width: 64, height: 64, bgcolor: 'var(--nen-luc-nhat2)', color: 'var(--luc-tham)' }}>
-                <Key size={32} />
-              </Avatar>
-              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                Mời cài đặt API Key
-              </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 450, mb: 1 }}>
-                Hệ thống yêu cầu bạn tự cung cấp Gemini API Key để tiếp tục trò chuyện. API Key của bạn chỉ được lưu trên trình duyệt này.
-              </Typography>
-              <Button
-                variant="contained"
-                color="primary"
-                startIcon={<Settings size={18} />}
-                onClick={() => setApiKeyDialogOpen(true)}
-                sx={{ borderRadius: 0, textTransform: 'none', boxShadow: 'none' }}
-              >
-                Cài đặt Key ngay
-              </Button>
-            </Box>
-          ) : lessonChats.length === 0 ? (
+          {lessonChats.length === 0 ? (
             <Box
               sx={{
                 display: 'flex',
@@ -458,8 +373,8 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
                         boxShadow: 'none',
                       }}
                     >
-                      <Typography variant="body2" sx={{ whiteSpace: 'pre-line', lineHeight: 1.6, fontSize: '0.9rem' }}>
-                        <RichText text={msg.content} linkColor={isAi ? 'var(--xanh)' : 'var(--chu-nguoc)'} />
+                      <Typography component="div" variant="body2" sx={{ lineHeight: 1.6, fontSize: '0.9rem' }}>
+                        <MathMarkdownRenderer text={msg.content} linkColor={isAi ? 'var(--xanh)' : 'var(--chu-nguoc)'} />
                       </Typography>
                     </Paper>
                     <Typography

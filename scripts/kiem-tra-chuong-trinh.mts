@@ -177,10 +177,12 @@ console.log('\n== Dàn bài cả chương trình (khung iChat tư vấn chung) =
   }
   ok(lot === 0, 'KHÔNG đáp án luyện tập nào lọt vào dàn bài', lot + ' câu lọt');
 
-  /* Lời dặn cách dùng nằm ở CUỐI khối. Còn đọc được nghĩa là chưa bị cắt mất —
-     mất nó thì thầy sẽ bỏ bước bắt học sinh xác định chương. */
-  ok(dan.includes('Ở bước A1/B1 VẪN hỏi học sinh'),
-     'còn nguyên lời dặn giữ bước xác định chương');
+  /* Lời dặn cách dùng nằm ở CUỐI khối. Còn đọc được nghĩa là chưa bị cắt mất.
+     Nội dung lời dặn đổi ngày 14/09/2026: bản cũ bảo "VẪN hỏi học sinh thuộc
+     chương nào", mâu thuẫn với câu lệnh hệ thống ("đừng bắt em đoán mò") —
+     biên bản thẩm định bắt được. Nay gia sư tự nói bài/chương, không bắt đoán. */
+  ok(dan.includes('KHÔNG bắt học sinh đoán chương') && !dan.includes('VẪN hỏi học sinh'),
+     'còn nguyên lời dặn bước xác định chương, và không bắt học sinh đoán chương');
 }
 
 console.log('\n' + (hong === 0 ? '>>> TẤT CẢ ĐẠT' : `>>> CÓ ${hong} MỤC HỎNG`) + '\n');

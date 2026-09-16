@@ -215,6 +215,30 @@ async function chayCacPhep(): Promise<number> {
   await duoc(updateDoc(doc(gv, 'users', NGUOI.hs3.uid), { role: 'student', classId: null }),
     '18. giáo viên ghi `role: student` đè lên hồ sơ vốn đã student');
 
+  // 20: bộ đếm lượt thử của khách + khoá spam (14/09/2026). Khách dùng uid
+  //     ĐĂNG NHẬP ẨN DANH; luật cấm đếm lùi, cấm tăng quá 1 lượt, cấm rút ngắn khoá.
+  const gioiHan = (luotKhach: number, khoaDen = 0, luotPhatSpam = 0) =>
+    ({ luotKhach, thoiDiemGui: [1], bamTinGanDay: ['0a1b2c3d'], luotPhatSpam, khoaDen });
+  const anDanh = moi.authenticatedContext('uid_khach_an_danh', {
+    firebase: { sign_in_provider: 'anonymous' },
+  }).firestore();
+  await duoc(setDoc(doc(anDanh, 'gioi_han_chat', 'uid_khach_an_danh'), gioiHan(1)),
+    '20a. khách ẩn danh tạo bộ đếm của chính mình');
+  await duoc(setDoc(doc(anDanh, 'gioi_han_chat', 'uid_khach_an_danh'), gioiHan(2)),
+    '20b. khách tăng đúng một lượt');
+  await chan(setDoc(doc(anDanh, 'gioi_han_chat', 'uid_khach_an_danh'), gioiHan(0)),
+    '20c. khách đếm lùi bộ đếm về 0');
+  await chan(setDoc(doc(anDanh, 'gioi_han_chat', 'uid_khach_an_danh'), gioiHan(5)),
+    '20d. khách tăng vọt nhiều lượt một lần');
+  await duoc(setDoc(doc(anDanh, 'gioi_han_chat', 'uid_khach_an_danh'), gioiHan(2, 9_000_000_000_000, 1)),
+    '20e. ghi khoá spam');
+  await chan(setDoc(doc(anDanh, 'gioi_han_chat', 'uid_khach_an_danh'), gioiHan(2, 0, 1)),
+    '20f. khách tự gỡ khoá spam');
+  await chan(getDoc(doc(hs, 'gioi_han_chat', 'uid_khach_an_danh')),
+    '20g. học sinh đọc bộ đếm của người khác');
+  await chan(getDoc(doc(khach, 'gioi_han_chat', 'uid_khach_an_danh')),
+    '20h. chưa đăng nhập đọc bộ đếm');
+
   /* PHÉP TỰ PHÁ. Một bộ kiểm luôn xanh mà chưa bao giờ bắt được gì thì đáng
      ngờ hơn đáng mừng — bài học đã trả giá một lần, xem "Rút kinh nghiệm"
      trong CLAUDE.md. Ở đây ta vá luật TRONG BỘ NHỚ cho `allow delete` mở

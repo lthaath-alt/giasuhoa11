@@ -57,8 +57,7 @@ import {
   GameDoodles, GameDoodlesTren, GameDoodlesDuoi,
   MascotDauVai,
 } from '../features/mascot';
-import { RichText } from '../core/components/RichText';
-import { ApiKeyDialog } from '../features/tutor/components/ApiKeyDialog';
+import { MathMarkdownRenderer } from '../core/components/MathMarkdownRenderer';
 import { coGiaSuAI } from '../features/tutor/services/geminiTutorService';
 
 export const DashboardPage: React.FC = () => {
@@ -93,15 +92,11 @@ export const DashboardPage: React.FC = () => {
   const [isIchatSending, setIsIchatSending] = useState(false);
   const [ichatError, setIchatError] = useState<string | null>(null);
 
-  /* Tab iChat trước đây KHÔNG có lối nhập API key nào. Chưa có key thì
-     geminiTutorService âm thầm rơi sang kịch bản mẫu, học sinh tưởng đang nói
-     chuyện với AI. TutorChat trong bài học đã chặn đúng cách; iChat thì chưa. */
-  const [apiKeyDialogOpen, setApiKeyDialogOpen] = useState(false);
-  /* Hỏi coGiaSuAI chứ KHÔNG đọc thẳng localStorage: bản build gọi Gemini qua
-     Firebase AI Logic mà không cần key nào. Đọc mỗi localStorage sẽ chặn nhầm
-     người dùng dù app thừa sức gọi Gemini. */
-  const coKey = coGiaSuAI;
-  const [hasApiKey, setHasApiKey] = useState(coKey);
+  /* Bỏ hộp nhập API key riêng ngày 14/09/2026 (key lưu trần trong localStorage,
+     và điều khoản Gemini API cấm ứng dụng cho người dưới 18 tuổi). Chỉ còn báo
+     thật khi máy này chưa cấu hình gia sư AI, để học sinh không tưởng kịch bản
+     mẫu là AI đang trả lời. */
+  const coGiaSuThat = coGiaSuAI();
 
   // Lấy tổng số bài học
   const allLessons = curriculum.flatMap((c) => c.lessons);
@@ -174,12 +169,6 @@ export const DashboardPage: React.FC = () => {
   const handleSendGlobalIchat = async (textToSend?: string) => {
     const text = (textToSend || ichatInput).trim();
     if (!text) return;
-
-    // Chưa có key thì mời nhập, đừng để rơi sang kịch bản mẫu mà không báo gì
-    if (!hasApiKey) {
-      setApiKeyDialogOpen(true);
-      return;
-    }
 
     setIchatInput('');
     setIsIchatSending(true);
@@ -720,22 +709,12 @@ export const DashboardPage: React.FC = () => {
                         Gia sư tận tình • Hướng dẫn giải bài tập từng bước • Giải đáp Hóa 11
                       </Typography>
                     </Box>
-                    <Box sx={{ flex: 1 }} />
-                    <Tooltip title={hasApiKey ? 'Đổi API key Gemini' : 'Chưa có API key — bấm để nhập'}>
-                      <Button size="small" variant={hasApiKey ? 'text' : 'contained'}
-                        color={hasApiKey ? 'inherit' : 'warning'}
-                        onClick={() => setApiKeyDialogOpen(true)}
-                        sx={{ minWidth: 0, whiteSpace: 'nowrap' }}>
-                        {hasApiKey ? 'API key' : 'Nhập API key'}
-                      </Button>
-                    </Tooltip>
                   </Box>
 
-                  {/* Chưa có key thì nói thẳng, đừng để học sinh tưởng đang chat với AI */}
-                  {!hasApiKey && (
+                  {/* Máy chưa cấu hình gia sư AI thì nói thẳng, đừng để học sinh tưởng đang chat với AI */}
+                  {!coGiaSuThat && (
                     <Alert severity="warning" sx={{ borderRadius: 0, py: 0.5, px: 2, '.MuiAlert-message': { fontSize: '0.8rem' } }}>
-                      Chưa có API key nên thầy chưa trả lời được. Bấm <strong>Nhập API key</strong> ở
-                      trên, làm theo hướng dẫn lấy key miễn phí từ Google AI Studio.
+                      Gia sư AI chưa được cấu hình trên bản web này, nên câu trả lời là kịch bản mẫu, không phải AI.
                     </Alert>
                   )}
 
@@ -792,8 +771,8 @@ export const DashboardPage: React.FC = () => {
                                   border: isAi ? '1px solid var(--vien)' : 'none',
                                 }}
                               >
-                                <Typography variant="body2" sx={{ whiteSpace: 'pre-line', lineHeight: 1.6, fontSize: '0.9rem' }}>
-                                  <RichText text={msg.content} linkColor={isAi ? 'var(--xanh)' : 'var(--chu-nguoc)'} />
+                                <Typography component="div" variant="body2" sx={{ lineHeight: 1.6, fontSize: '0.9rem' }}>
+                                  <MathMarkdownRenderer text={msg.content} linkColor={isAi ? 'var(--xanh)' : 'var(--chu-nguoc)'} />
                                 </Typography>
                               </Paper>
                               <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5, textAlign: isAi ? 'left' : 'right' }}>
@@ -846,14 +825,6 @@ export const DashboardPage: React.FC = () => {
                     </Button>
                   </Box>
                 </Paper>
-
-                <ApiKeyDialog
-                  open={apiKeyDialogOpen}
-                  onClose={() => {
-                    setApiKeyDialogOpen(false);
-                    setHasApiKey(coKey());
-                  }}
-                />
 
               </Box>
             </Box>

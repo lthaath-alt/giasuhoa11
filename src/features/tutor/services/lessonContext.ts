@@ -106,13 +106,14 @@ export function buildProgramContext(): string {
   });
 
   /* Dàn bài là để thầy BIẾT, không phải để thầy trả lời thay.
-     Bước A1/B1 vẫn bắt học sinh tự xác định chương — đó là chủ ý sư phạm, bỏ đi
-     là hỏng cả quy trình. Nói rõ chỗ này, nếu không hai lời dặn sẽ đá nhau và
-     thầy lúc hỏi lúc không. */
+     Bản trước dặn ở đây "bước A1/B1 VẪN hỏi học sinh thuộc chương nào", trong
+     khi câu lệnh hệ thống dặn "ĐỪNG bắt em đoán mò" — hai lời dặn đá nhau và
+     biên bản thẩm định 14/09/2026 bắt được. Nay chỉ còn MỘT luật, nằm trong
+     promptSuPham.ts (mục XÁC ĐỊNH BÀI/CHƯƠNG); chỗ này nhắc lại đúng luật đó. */
   L.push('\nCÁCH DÙNG DÀN BÀI TRÊN:');
-  L.push('- Ở bước A1/B1 VẪN hỏi học sinh kiến thức thuộc chương nào. Khác trước ở chỗ '
-    + 'nay thầy biết chắc đáp án, nên xác nhận hay chỉnh lại cho đúng chứ không đoán '
-    + 'và không bao giờ nói sai tên chương.');
+  L.push('- Ở bước A1/B1: tự nói kiến thức này thuộc bài/chương nào theo dàn bài, gộp vào '
+    + 'lượt với bước kế tiếp. KHÔNG bắt học sinh đoán chương rồi chấm đúng sai, và không '
+    + 'bao giờ nói sai tên chương.');
   L.push('- Học sinh hỏi thuần tuý tra cứu ("cái này học ở bài nào thầy?", "chương 3 có '
     + 'những bài gì?") thì trả lời thẳng — đó là câu hỏi tra mục lục, không phải bài '
     + 'tập, không cần chạy quy trình 6 bước.');

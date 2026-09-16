@@ -32,7 +32,7 @@ const ok = (dieu: boolean, ten: string, chiTiet = '') => {
 const soc = dungPrompt('socratic');
 const tt = dungPrompt('truc-tiep');
 
-console.log('\n== Nhánh Socratic phải giống NGUYÊN VĂN bản trước khi tách ==');
+console.log('\n== Nhánh Socratic phải giống NGUYÊN VĂN bản chụp đã duyệt ==');
 {
   /* Bản chụp lấy từ chính mã nguồn ngay trước lúc tách. Đây là lưới an toàn cho
      việc tách prompt: sai một dấu cách cũng lộ ra ngay, chứ không phải chờ tới
@@ -40,7 +40,10 @@ console.log('\n== Nhánh Socratic phải giống NGUYÊN VĂN bản trước khi
   /* Chuẩn hoá kiểu xuống dòng trước khi so. Trên Windows, cả Python lúc ghi
      lẫn git lúc lấy mã về đều có thể đổi xuống-dòng-Unix thành xuống-dòng-Windows
      — lệch đúng một ký tự mỗi dòng, nội dung không sai một chữ nào mà phép thử
-     vẫn báo hỏng. Đã mắc đúng lỗi này: lệch 111 ký tự trên 112 dòng. */
+     vẫn báo hỏng. Đã mắc đúng lỗi này: lệch 111 ký tự trên 112 dòng.
+     CHỤP LẠI có chủ ý ngày 14/09/2026 khi viết lại toàn bộ câu lệnh theo biên
+     bản thẩm định (Trục 3). Đổi câu lệnh lần sau cũng phải chụp lại có chủ ý:
+     npx tsx -e "import('./src/features/tutor/services/promptSuPham.ts').then(m=>process.stdout.write(m.dungPrompt('socratic')))" > scripts/du-lieu/prompt-socratic-goc.txt */
   const chup = readFileSync(join(HERE, 'du-lieu', 'prompt-socratic-goc.txt'), 'utf8')
     .replace(/\r\n/g, '\n');
   ok(soc === chup, 'ghép lại khớp từng ký tự với bản chụp',
@@ -56,9 +59,14 @@ console.log('\n== Hai nhánh chỉ khác nhau ở CÁCH DẠY ==');
     ['cấm dùng 22,4 và đktc', '22,4'],
     ['dấu phẩy thập phân kiểu Việt', 'Số thập phân viết theo kiểu Việt Nam'],
     ['danh pháp IUPAC', 'IUPAC'],
-    ['cấm LaTeX', 'KHÔNG dùng LaTeX'],
+    ['không tự sửa số liệu đề chép "đktc"', 'KHÔNG tự ý sửa các số liệu đề cho'],
+    ['định dạng công thức bằng LaTeX + mhchem', 'ĐỊNH DẠNG CÔNG THỨC'],
+    ['bảng ngộ nhận', 'BẢNG NGỘ NHẬN'],
     ['giới hạn phạm vi Hoá 11', 'Chỉ Hóa học 11'],
-    ['nhãn lạc đề', '[SIGNAL:OFFTOPIC]'],
+    ['trung thực học thuật trong giờ kiểm tra', 'Trung thực học thuật'],
+    ['nhãn lạc đề (không phạt)', '[SIGNAL:LAC_DE]'],
+    ['nhãn cảm xúc tiêu cực (không phạt)', '[SIGNAL:CAM_XUC_TIEU_CUC]'],
+    ['nhãn ẩn để đo', '[LUOT:'],
     ['nhãn xong bài', '[SIGNAL:XONG_BAI:'],
     ['nhãn xong chương', '[SIGNAL:XONG_CHUONG]'],
     ['nhãn xin đề', '[SIGNAL:YEU_CAU_DE:'],

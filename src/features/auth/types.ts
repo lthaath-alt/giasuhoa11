@@ -217,6 +217,30 @@ export interface ChatMessage {
   sender: 'user' | 'ai';
   content: string;
   timestamp: string;
+
+  /* ── Telemetry cho đề tài (thêm 14/09/2026, xem telemetryService.ts) ──────
+     Tên trường theo đúng đặc tả số liệu của đề tài (gạch dưới), khác lối
+     camelCase của ba trường đầu. CỐ Ý KHÔNG đổi tên `userEmail`/`lessonId`/
+     `sender`: luật Firestore của `chats` kiểm quyền bằng `userEmail`, và các
+     tin đã lưu đều mang tên cũ. Mọi trường dưới đây là TÙY CHỌN — tin lưu
+     trước ngày này không có chúng. */
+  /** Mã phiên giải một vấn đề; đổi khi xong bài hoặc ngừng 30 phút */
+  session_id?: string;
+  /** Mã băm FNV-1a của email (giả danh, KHÔNG phải ẩn danh tuyệt đối) */
+  user_hash?: string;
+  nhanh?: 'socratic' | 'truc-tiep';
+  buoc?: 'A1' | 'A2' | 'A3' | 'A4' | 'A5' | 'A6' | 'B1' | 'B2' | 'B3' | 'B4' | 'B5' | 'B6' | 'loc';
+  loai_luot?: 'goi_mo' | 'kiem_tra_hieu' | 'giai_thich' | 'tra_cuu' | 'hanh_chinh';
+  /** Nấc giàn giáo máy trạng thái đã áp cho lượt trả lời này */
+  muc_goi_y?: 0 | 1 | 2 | 3;
+  /** Tin của học sinh là tin bế tắc (do mã nhận diện) */
+  be_tac?: boolean;
+  ma_ngo_nhan?: string;
+  /** Loại ngoài môn: hai loại đầu do mô hình gắn nhãn, hai loại sau do mã phát hiện */
+  ngoai_mon?: 'CAM_XUC_TIEU_CUC' | 'LAC_DE' | 'SPAM_ATTACK' | 'GIAN_LAN';
+  model_name?: string;
+  /** Thời gian gọi mô hình thật (ms), KHÔNG gồm độ trễ giả lập */
+  latency_ms?: number;
 }
 
 export interface QuizAttempt {

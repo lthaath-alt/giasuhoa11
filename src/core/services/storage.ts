@@ -2,8 +2,7 @@
  * storage.ts
  * ──────────────────────────────────────────────────────────────────────────────
  * Chỉ còn các hàm localStorage thuần tuý dành cho:
- *  - Guest chat count (số lượt dùng thử của khách vãng lai)
- *  - Session hiện tại (email đăng nhập)
+ *  - Dọn dữ liệu nhạy cảm đời cũ (`donDepLuuTruCu`)
  *  - Curriculum helpers (generate IDs, passwords, invite codes)
  *
  * ⚠️  Tất cả dữ liệu ứng dụng (users, schools, classes, questions, exams,
@@ -89,33 +88,29 @@ export function generateClassPassword(className: string, studentNumber: number):
   return `${cleanClassName}_${sbd}_${chars.join('')}`;
 }
 
-// ─── Guest Chat Count (localStorage — thuộc máy cá nhân, không sync) ─────────
+// ─── Dọn dữ liệu nhạy cảm đời cũ trong localStorage ──────────────────────────
 
-export const GuestChatStorage = {
-  getCount(): number {
-    /* `parseInt` trả NaN khi giá trị trong localStorage không phải số (người
-       dùng tự sửa, hoặc một bản cũ ghi sai). Hậu quả đo được: `NaN >= 25` là
-       `false` nên giới hạn dùng thử NGỪNG ÁP DỤNG vĩnh viễn, và `25 - NaN`
-       cũng là NaN nên trường "Gia sư AI" ở trang chủ hiện đúng chữ
-       "còn NaN/25 câu hỏi thử".
-       Coi giá trị hỏng như chưa dùng lần nào: thà đếm lại từ đầu còn hơn mở
-       toang, và người dùng thấy một con số thật thay vì chữ NaN. */
-    const tho = localStorage.getItem(GUEST_CHAT_COUNT_KEY);
-    const so = tho ? parseInt(tho, 10) : 0;
-    return Number.isFinite(so) && so >= 0 ? so : 0;
-  },
-
-  increment(): number {
-    const current = this.getCount();
-    const next = current + 1;
-    localStorage.setItem(GUEST_CHAT_COUNT_KEY, next.toString());
-    return next;
-  },
-
-  reset(): void {
-    localStorage.setItem(GUEST_CHAT_COUNT_KEY, '0');
-  },
-};
+/* Bộ đếm lượt thử của khách và khoá phạt lạc đề đã chuyển lên Firestore
+   (features/tutor/services/gioiHanChatService.ts) ngày 14/09/2026, vì ở
+   localStorage thì xoá một khoá là hết giới hạn. Hàm dưới gỡ những gì bản cũ
+   để lại trên máy học sinh — thường là máy dùng chung ở phòng máy:
+     - `gemini_api_key_user`: API key Gemini riêng, lưu dạng chữ trần;
+     - `h11_cooldown_<email>` và `h11_cooldown_logs`: có NGUYÊN VĂN tin lạc đề,
+       kể cả tin tục, và email học sinh trong tên khoá;
+     - bộ đếm khách cũ.
+   Chạy mỗi lần mở app, rẻ và không hỏng gì nếu khoá không tồn tại. */
+export function donDepLuuTruCu(): void {
+  try {
+    const xoa: string[] = ['gemini_api_key_user', GUEST_CHAT_COUNT_KEY, 'h11_cooldown_logs'];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith('h11_cooldown_')) xoa.push(k);
+    }
+    xoa.forEach(k => localStorage.removeItem(k));
+  } catch {
+    /* Trình duyệt chặn localStorage (chế độ riêng tư) thì không có gì để dọn. */
+  }
+}
 
 // ─── Curriculum Local Cache ───────────────────────────────────────────────────
 // Curriculum được load từ Firestore (overrides) + constants. Hàm này chỉ merge.

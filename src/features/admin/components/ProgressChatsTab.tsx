@@ -20,7 +20,7 @@ import {
 import { Users, MessageSquare } from 'lucide-react';
 import { User, ChatMessage, LearningProgress } from '../../auth/types';
 import { CHEMISTRY_11_CURRICULUM } from '../../lessons/constants';
-import { RichText } from '../../../core/components/RichText';
+import { MathMarkdownRenderer } from '../../../core/components/MathMarkdownRenderer';
 
 interface ProgressChatsTabProps {
   students: User[];
@@ -288,8 +288,8 @@ export const ProgressChatsTab: React.FC<ProgressChatsTabProps> = ({
                             >
                               {isAi ? 'Gia sư AI' : selectedStudent?.name}
                             </Typography>
-                            <Typography variant="body2" sx={{ whiteSpace: 'pre-line', fontSize: '0.85rem' }}>
-                              <RichText text={msg.content} />
+                            <Typography component="div" variant="body2" sx={{ fontSize: '0.85rem' }}>
+                              <MathMarkdownRenderer text={msg.content} />
                             </Typography>
                           </Paper>
                           <Typography

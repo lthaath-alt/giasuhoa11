@@ -52,7 +52,8 @@ hướng dẫn vận hành hằng ngày và không được mâu thuẫn với t
 | Icons / Animation | `lucide-react`, `@mui/icons-material` / `motion` |
 | Backend | Firebase Firestore |
 | Auth | **Firebase Auth** (email + mật khẩu). Hồ sơ ở `users/{uid}` — xem "Vài điểm dễ vấp" |
-| AI | Gemini qua **Firebase AI Logic** (gói firebase/ai + App Check reCAPTCHA Enterprise) ở bản build — xem `src/features/tutor/services/giaSuFirebaseAI.ts`. `@google/genai` còn dùng cho key riêng người dùng tự nhập và script trong `scripts/` |
+| AI | Gemini qua **Firebase AI Logic** (gói firebase/ai + App Check reCAPTCHA Enterprise) ở bản build — xem `src/features/tutor/services/giaSuFirebaseAI.ts`. Trước khi gọi, `pedagogicalStateMachine.ts` đếm bế tắc / chặn gian lận phòng thi. `@google/genai` chỉ còn dùng trong script `scripts/` (đường "key riêng người dùng tự nhập" đã bỏ ngày 14/09/2026) |
+| Hiển thị chat | `MathMarkdownRenderer.tsx` (react-markdown + remark-math + rehype-sanitize + rehype-katex + mhchem), thay cho RichText/mathText đã xoá |
 | Routing | `react-router-dom` v7 |
 | Form | Không có thư viện form — viết tay bằng state |
 
@@ -194,10 +195,11 @@ Hằng ngày:
 |---|---|
 | `npm run dev` | Máy chủ phát triển, cổng 3000 |
 | `npm run lint` | `tsc --noEmit` — hàng rào chính, chạy MỘT LẦN trước khi báo xong |
-| `npm run kiem-tra` | Chạy cả 12 bộ kiểm, 282 mục. Chạy trước khi commit |
+| `npm run kiem-tra` | Chạy cả 13 bộ kiểm. Chạy trước khi commit |
 | `npm run build` | **Chỉ khi user yêu cầu** |
 
-Bộ kiểm chạy riêng khi cần: `kiem-tra:chuong-trinh` (dữ liệu 25 bài),
+Bộ kiểm chạy riêng khi cần: `kiem-tra:su-pham` (máy trạng thái sư phạm, chuẩn
+hoá + dựng công thức KaTeX, telemetry), `kiem-tra:chuong-trinh` (dữ liệu 25 bài),
 `kiem-tra:ngan-hang`, `kiem-tra:de-chuong`, `kiem-tra:het-luot`, `kiem-tra:mau`
 (biến màu + tương phản), `kiem-tra:thuc-nghiem`, `kiem-tra:ran-thang`,
 `kiem-tra:dong-bo` (cần mạng, mất mạng thì tự bỏ qua), `kiem-tra:luyen-tap`,

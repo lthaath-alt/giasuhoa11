@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",
-    "kiem-tra": "npm run kiem-tra:luyen-tap && npm run kiem-tra:chuong-trinh && npm run kiem-tra:ngan-hang && npm run kiem-tra:de-chuong && npm run kiem-tra:het-luot && npm run kiem-tra:mau && npm run kiem-tra:thuc-nghiem && npm run kiem-tra:ran-thang && npm run kiem-tra:tai-lieu && npm run kiem-tra:dong-bo && npm run kiem-tra:an-ninh && npm run kiem-tra:luat",
+    "kiem-tra": "npm run kiem-tra:luyen-tap && npm run kiem-tra:chuong-trinh && npm run kiem-tra:ngan-hang && npm run kiem-tra:de-chuong && npm run kiem-tra:het-luot && npm run kiem-tra:mau && npm run kiem-tra:thuc-nghiem && npm run kiem-tra:su-pham && npm run kiem-tra:ran-thang && npm run kiem-tra:tai-lieu && npm run kiem-tra:dong-bo && npm run kiem-tra:an-ninh && npm run kiem-tra:luat",
     "kiem-tra:chuong-trinh": "tsx scripts/kiem-tra-chuong-trinh.mts",
     "kiem-tra:het-luot": "tsx scripts/kiem-tra-het-luot.mts",
     "thu:ai": "tsx scripts/thu-gia-su-ai.mts",
@@ -35,7 +35,8 @@
     "kiem-tra:dong-bo": "tsx scripts/kiem-tra-dong-bo-ngan-hang.mts",
     "kiem-tra:tai-lieu": "tsx scripts/kiem-tra-tai-lieu.mts",
     "kiem-tra:an-ninh": "tsx scripts/kiem-tra-an-ninh.mts",
-    "kiem-tra:luat": "tsx scripts/kiem-tra-luat.mts"
+    "kiem-tra:luat": "tsx scripts/kiem-tra-luat.mts",
+    "kiem-tra:su-pham": "tsx scripts/kiem-tra-su-pham.mts"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -48,12 +49,18 @@
     "dotenv": "^17.2.3",
     "express": "^4.21.2",
     "firebase": "^12.16.0",
+    "katex": "^0.16.47",
     "lucide-react": "^0.546.0",
     "mammoth": "^1.12.0",
     "motion": "^12.23.24",
     "react": "^19.0.1",
     "react-dom": "^19.0.1",
+    "react-markdown": "^10.1.0",
     "react-router-dom": "^7.18.1",
+    "rehype-katex": "^7.0.1",
+    "rehype-sanitize": "^6.0.0",
+    "remark-breaks": "^4.0.0",
+    "remark-math": "^6.0.0",
     "vite": "^6.2.3"
   },
   "devDependencies": {

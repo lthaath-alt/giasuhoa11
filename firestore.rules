@@ -350,6 +350,39 @@ service cloud.firestore {
       allow delete: if laChuDuAn();
     }
 
+    // ── Giới hạn chat: lượt thử của khách + khoá tạm khi spam (14/09/2026) ───
+    /* Thay cho bộ đếm trong localStorage (xoá là hết giới hạn). Id tài liệu là
+       uid: học sinh dùng uid tài khoản, khách dùng uid ĐĂNG NHẬP ẨN DANH trên
+       app phụ. Chỉ lưu số và mã băm tin gần đây, không lưu chữ.
+       Luật chặn ba đường gian lận phổ thông: đếm lùi lượt khách, tăng quá một
+       lượt mỗi lần ghi (để "đốt" rồi xoá), và rút ngắn thời gian khoá.
+       KHÔNG chặn được người xoá cả dữ liệu site để lấy uid ẩn danh mới — việc đó
+       cần máy chủ. Xem giới hạn ở đầu gioiHanChatService.ts.
+       Không dùng get(): đây là chỗ ghi mỗi lượt chat, không được tốn lượt đọc. */
+    function gioiHanHopLe(d) {
+      return d.keys().hasOnly(['luotKhach', 'thoiDiemGui', 'bamTinGanDay', 'luotPhatSpam', 'khoaDen'])
+        && d.luotKhach is int && d.luotKhach >= 0 && d.luotKhach <= 25
+        && d.thoiDiemGui is list && d.thoiDiemGui.size() <= 10
+        && d.bamTinGanDay is list && d.bamTinGanDay.size() <= 3
+        && d.luotPhatSpam is int && d.luotPhatSpam >= 0
+        && d.khoaDen is int && d.khoaDen >= 0;
+    }
+
+    match /gioi_han_chat/{uid} {
+      allow read: if dangNhap() && request.auth.uid == uid;
+      allow create: if dangNhap() && request.auth.uid == uid
+        && gioiHanHopLe(request.resource.data)
+        && request.resource.data.luotKhach <= 1
+        && request.resource.data.luotPhatSpam <= 1;
+      allow update: if dangNhap() && request.auth.uid == uid
+        && gioiHanHopLe(request.resource.data)
+        && request.resource.data.luotKhach >= resource.data.luotKhach
+        && request.resource.data.luotKhach <= resource.data.luotKhach + 1
+        && request.resource.data.luotPhatSpam >= resource.data.luotPhatSpam
+        && request.resource.data.khoaDen >= resource.data.khoaDen;
+      allow delete: if false;
+    }
+
     // ── Mọi thứ khác: cấm ───────────────────────────────────────────────────
     // Mười ba collection trên là toàn bộ những gì mã nguồn dùng tới, liệt kê
     // bằng cách quét `collection(db, …)` và các hằng `COL_*` ngày 10/09/2026.

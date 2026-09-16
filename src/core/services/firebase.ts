@@ -79,6 +79,19 @@ export function taoAuthPhu(): { authPhu: Auth; huy: () => Promise<void> } {
   };
 }
 
+/* App phụ CỐ ĐỊNH cho khách vãng lai — khác `taoAuthPhu` ở trên (tạo xong huỷ).
+   Khách đăng nhập ẨN DANH trên app này để có một `uid` mà luật Firestore
+   nhận ra, nhờ vậy bộ đếm lượt thử nằm ở Firestore chứ không ở localStorage.
+   Để trên app PHỤ vì `AppContext` nghe `onAuthStateChanged` của app chính và
+   coi mọi phiên đăng nhập là một tài khoản học sinh: đăng nhập ẩn danh trên
+   app chính sẽ biến khách thành "người dùng" không có hồ sơ. */
+const TEN_APP_KHACH = 'khach-vang-lai';
+
+export function layAppKhach(): { authKhach: Auth; dbKhach: ReturnType<typeof getFirestore> } {
+  const appKhach = getApps().find(a => a.name === TEN_APP_KHACH) ?? initializeApp(firebaseConfig, TEN_APP_KHACH);
+  return { authKhach: getAuth(appKhach), dbKhach: getFirestore(appKhach) };
+}
+
 export default db;
 
 

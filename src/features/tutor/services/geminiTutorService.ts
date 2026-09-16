@@ -1,84 +1,36 @@
-import { GoogleGenAI } from '@google/genai';
 import { ChatMessage } from '../../auth/types';
-import { getSession } from './aiMockService';
 import { ErrorLogService } from '../../../core/services/errorLog';
 import { GEMINI_MODEL_NAME } from '../../../core/constants';
 import { buildLessonContext, buildLessonCatalog, buildProgramContext } from './lessonContext';
-import { dungPrompt } from './promptSuPham';
+import { dungPrompt, THAM_SO_SINH } from './promptSuPham';
 import { nhanhCuaHocSinh } from '../../research/thucNghiem';
 import { RECAPTCHA_ENTERPRISE_SITE_KEY } from '../../../core/services/firebaseCongKhai';
 import { loiThanhChuoi } from './loiGemini';
+import { xuLyTruocLuot } from './pedagogicalStateMachine';
 
-/* Chuỗi này có THỂ là một API key không?
+/* ── Không còn đường "key riêng người dùng tự nhập" (bỏ ngày 14/09/2026) ──────
+   Trước đây học sinh được dán API key Gemini của chính mình; key nằm trần trong
+   localStorage (`gemini_api_key_user`), và thông báo hết lượt còn khuyên em
+   "vào cài đặt để dùng một API key khác". Hai vấn đề: key lộ trên máy dùng
+   chung, và điều khoản Gemini API cấm ứng dụng dành cho người dưới 18 tuổi —
+   xui học sinh lớp 11 tự tạo key là đẩy các em vào đúng chỗ đó.
+   Nay web chỉ còn MỘT đường: Firebase AI Logic (giaSuFirebaseAI.ts). Key cũ còn
+   sót trên máy được xoá trong `donDepLuuTruCu()` (core/services/storage.ts). */
 
-   Cố ý kiểm rất lỏng, và KHÔNG kiểm theo tiền tố. Google AI Studio đã đổi hình
-   dạng key: key cũ bắt đầu bằng "AIza", key cấp gần đây bắt đầu bằng "AQ.".
-   Bản trước chỉ nhận "AIza" nên người dùng dán một key MỚI hoàn toàn hợp lệ vào
-   vẫn bị bỏ qua lặng lẽ — hộp thoại đóng như đã lưu xong mà gia sư thì vẫn chạy
-   bằng key của web. Google còn có thể đổi hình dạng nữa, nên ở đây chỉ loại
-   những thứ chắc chắn không phải key: chuỗi rỗng, chuỗi toàn dấu cách, chuỗi
-   quá ngắn, hay cả một câu người dùng gõ nhầm vào ô.
-
-   Đây là kiểm cho đỡ hỏng, KHÔNG phải kiểm bảo mật hay kiểm tính hợp lệ: key
-   sai thì Google tự từ chối, và nút "Kiểm tra Key" mới là chỗ biết chắc.
-
-   Tách riêng để hộp thoại cài đặt dùng CHUNG một luật với chỗ đọc key ở dưới. */
-export const coDangKeyGoogle = (key: string): boolean => {
-  const k = (key ?? '').trim();
-  return k.length >= 20 && !/\s/.test(k);
-};
-
-// Get the user's own API key from localStorage
-export const getEffectiveApiKey = (): string => {
-  /* Chỉ trả key riêng người dùng tự nhập, và chỉ khi nó TRÔNG như một key thật.
-
-     Bản trước nhận bất cứ chuỗi nào khác rỗng. Một chuỗi rác — hay một chuỗi
-     toàn dấu cách còn sót trong localStorage — vẫn đè lên key của web và làm
-     gia sư câm hẳn, trong khi web thừa sức tự gọi được.
-
-     Xem coDangKeyGoogle ở trên để biết "trông như key thật" nghĩa là gì và vì
-     sao chỗ đó cố tình kiểm lỏng. */
-  const userKey = (localStorage.getItem('gemini_api_key_user') ?? '').trim();
-  if (coDangKeyGoogle(userKey)) return userKey;
-  /* Không còn key của web ở đây. Key đọc từ biến VITE_ bị Vite chép nguyên
-     văn vào gói JS — ngày 13/09/2026 nó nằm trên Netlify. Web nay gọi qua
-     Firebase AI Logic (giaSuFirebaseAI.ts); hàm này chỉ còn trả key RIÊNG
-     người dùng tự nhập. */
-  return 'MISSING_API_KEY';
-};
-
-/* Gia sư có gọi được AI thật không. TutorChat và DashboardPage dựa vào đây để
-   quyết định có đòi học sinh nhập key riêng không — hỏi ở MỘT chỗ để ba nơi
-   không nói khác nhau. */
-export const coGiaSuAI = (): boolean =>
-  getEffectiveApiKey() !== 'MISSING_API_KEY' || RECAPTCHA_ENTERPRISE_SITE_KEY.length > 0;
-
-// Create a new instance dynamically
-const getAiInstance = () => {
-  return new GoogleGenAI({ apiKey: getEffectiveApiKey() });
-};
-
-
-/* Câu lệnh hệ thống nay nằm ở promptSuPham.ts, tách theo nhánh thực nghiệm.
-   Xem tệp đó để biết vì sao phải tách và ranh giới giữa hai nhánh ở đâu. */
+/* Gia sư có gọi được AI thật không. Bản build luôn có khoá reCAPTCHA của App
+   Check; thiếu (máy dev chưa cấu hình) thì rơi về kịch bản mẫu. */
+export const coGiaSuAI = (): boolean => RECAPTCHA_ENTERPRISE_SITE_KEY.length > 0;
 
 /**
  * Xử lý chuỗi tin nhắn để định dạng thành mảng theo yêu cầu của Gemini API.
  * Gemini API yêu cầu alternating roles (user/model) và kết thúc bằng user.
  */
 function buildGeminiHistory(history: ChatMessage[], currentUserMessage: string) {
-  // Trích xuất history, mapping các sender thành role phù hợp
   const geminiHistory = history.map((msg) => ({
     role: msg.sender === 'user' ? ('user' as const) : ('model' as const),
     parts: [{ text: msg.content }],
   }));
-
-  // Gắn thêm tin nhắn mới nhất
-  geminiHistory.push({
-    role: 'user',
-    parts: [{ text: currentUserMessage }],
-  });
-
+  geminiHistory.push({ role: 'user', parts: [{ text: currentUserMessage }] });
   return geminiHistory;
 }
 
@@ -86,11 +38,11 @@ function buildGeminiHistory(history: ChatMessage[], currentUserMessage: string) 
  * Đọc lỗi 429 của Gemini và nói cho học sinh biết phải làm gì.
  *
  * Bậc miễn phí có HAI hạn mức khác hẳn nhau, và cách xử lý cũng khác hẳn:
- *   - 5 lượt / phút  -> chờ vài chục giây là hỏi tiếp được
- *   - 20 lượt / NGÀY -> hết sạch, phải đợi sang ngày hôm sau
+ *   - theo phút  -> chờ vài chục giây là hỏi tiếp được
+ *   - theo NGÀY  -> hết sạch cho CẢ WEB, phải đợi sang ngày hôm sau
  *
- * Trước đây cả hai trường hợp đều báo chung "thử lại sau ít phút", nên học sinh
- * hết lượt của ngày sẽ ngồi bấm lại cả buổi mà không bao giờ được trả lời.
+ * Hạn mức tính theo PROJECT, không theo học sinh: thông báo không được nói
+ * "em đã dùng hết", vì em có thể mới hỏi câu đầu tiên.
  *
  * Trả về chuỗi thông báo, hoặc '' nếu lỗi này không phải hết lượt.
  */
@@ -99,126 +51,129 @@ export const thongBaoHetLuot = (loi: string): string => {
   if (!(m.includes('429') || m.includes('quota') || m.includes('rate limit'))) return '';
 
   if (m.includes('perday')) {
-    return 'Em đã dùng hết lượt hỏi miễn phí trong ngày của API key này rồi. '
-      + 'Google cấp lại lượt mới vào đầu ngày hôm sau. '
-      + 'Em chờ sang ngày mai, hoặc vào cài đặt ⚙️ để dùng một API key khác nhé!';
+    return 'Gia sư AI đã dùng hết lượt trả lời trong ngày của toàn hệ thống, '
+      + 'nên tạm thời chưa trả lời được. Lượt mới được cấp lại vào đầu ngày mai. '
+      + 'Trong lúc chờ, em xem lại bài giảng hoặc làm phần luyện tập của bài này nhé.';
   }
 
   const giay = loi.match(/"retryDelay":\s*"(\d+)s"/)?.[1];
-  return 'Em hỏi hơi nhanh nên chạm giới hạn số câu mỗi phút rồi. Em chờ khoảng '
+  return 'Gia sư đang nhận quá nhiều câu hỏi nên chạm giới hạn số câu mỗi phút. Em chờ khoảng '
     + (giay ? `${giay} giây` : 'một phút') + ' rồi hỏi lại nhé!';
 };
 
+/** Kết quả một lượt, kèm số đo cho telemetry. */
+export interface KetQuaGiaSu {
+  text: string;
+  nhanh: 'socratic' | 'truc-tiep';
+  /** Thời gian gọi mô hình thật (ms); không có khi không gọi mô hình */
+  latencyMs?: number;
+  modelName?: string;
+  /** Nấc giàn giáo đã áp (0 = không bế tắc; 3 = từ lần 3 trở lên) */
+  mucGoiY: 0 | 1 | 2 | 3;
+  beTac: boolean;
+  /** Mã phát hiện ngữ cảnh gian lận phòng thi và từ chối, không gọi mô hình */
+  gianLan: boolean;
+}
+
+/** Nhãn gọn cho nhật ký lỗi — không chép toàn văn lỗi của nhà cung cấp. */
+const loaiLoi = (msg: string): string => {
+  if (msg.includes('429') || msg.includes('quota')) return msg.includes('perday') ? 'het-luot-ngay' : 'het-luot-phut';
+  if (msg.includes('app check') || msg.includes('appcheck')) return 'app-check';
+  if (msg.includes('firebasevertexai')) return 'ai-logic';
+  return 'khac';
+};
+
 /**
- * Hàm gọi API Gemini để lấy câu trả lời.
+ * Gọi gia sư cho một lượt: chạy máy trạng thái sư phạm trước, rồi mới gọi mô hình.
  */
-export const generateAIResponse = async (
+export const generateAIResponseChiTiet = async (
   lessonId: string,
   userQuestion: string,
   history: ChatMessage[],
   userEmail: string = 'guest'
-): Promise<string> => {
+): Promise<KetQuaGiaSu> => {
+  const nhanh = nhanhCuaHocSinh(userEmail);
+  const truoc = xuLyTruocLuot(history, userQuestion, nhanh);
+  const mucGoiY = Math.min(truoc.soLanBeTac, 3) as 0 | 1 | 2 | 3;
+  const coBan = { nhanh, mucGoiY, beTac: truoc.soLanBeTac > 0, gianLan: truoc.laGianLan };
+
+  /* Gian lận phòng thi: trả lời ngay, không tốn lượt gọi AI. */
+  if (truoc.traLoiNgay) return { ...coBan, text: truoc.traLoiNgay };
+
   if (!coGiaSuAI()) {
     console.warn('Chưa cấu hình gia sư AI. Fallback sang mock service.');
-    // Lazy load mock service để tránh import circular hoặc phụ thuộc cứng
     const { generateAIResponse: mockGenerate } = await import('./aiMockService');
-    return mockGenerate(lessonId, userQuestion, history, userEmail);
+    return { ...coBan, text: await mockGenerate(lessonId, userQuestion, history, userEmail) };
   }
 
   try {
     const formattedHistory = buildGeminiHistory(history, userQuestion);
-    
-    // Rút trích user message cuối ra khỏi history để truyền vào tham số message riêng
     const latestMessage = formattedHistory.pop()?.parts[0].text || '';
 
-    /* Đính kèm nội dung bài học sinh đang mở. Không có bài nào khớp — ví dụ
-       cuộc tư vấn chung — thì chuỗi rỗng và câu lệnh giữ nguyên như cũ. */
+    /* Nội dung bài đang mở; không mở bài nào (khung iChat chung) thì rỗng. */
     const nguCanhBai = buildLessonContext(lessonId);
-
-    /* Danh mục mã bài thì LUÔN đính kèm, kể cả ở cuộc tư vấn chung.
-       Chính khung tư vấn chung mới là nơi học sinh hỏi lung tung về nhiều bài,
-       nên đó là nơi cần mã bài nhất — mà lại là nơi `nguCanhBai` rỗng. */
+    /* Danh mục mã bài LUÔN đính kèm, để nhãn ra đề mang đúng mã bài. */
     const danhMucBai = buildLessonCatalog();
-
-    /* Không mở bài nào (khung iChat tư vấn chung) thì đưa DÀN BÀI CẢ CHƯƠNG
-       TRÌNH thay vào chỗ trống đó.
-
-       Trước đây khung này chỉ có danh mục TÊN 25 bài — thầy biết bài nào tồn
-       tại nhưng không biết trong bài có gì, nên hỏi "cái này học ở bài nào"
-       là phải đoán. Mà đây lại đúng là nơi học sinh hỏi vắt qua nhiều bài nhất.
-
-       Khi ĐANG mở một bài thì KHÔNG kèm dàn bài: `nguCanhBai` đã có toàn văn
-       bài đó rồi, thêm dàn bài chỉ làm loãng trọng tâm. */
+    /* Không mở bài nào thì đưa dàn bài cả chương trình vào chỗ trống. */
     const danBaiChung = nguCanhBai ? '' : buildProgramContext();
 
     const yeuCau = {
       model: GEMINI_MODEL_NAME,
       contents: formattedHistory.concat({ role: 'user' as const, parts: [{ text: latestMessage }] }),
       systemInstruction: [
-        /* Chia nhóm thực nghiệm ngay tại đây, chỗ duy nhất câu lệnh được ghép.
-           Khi KHÔNG chạy nghiên cứu (mặc định) hàm này luôn trả 'socratic',
-           tức là web chạy y như cũ. */
-        dungPrompt(nhanhCuaHocSinh(userEmail)),
+        dungPrompt(nhanh),
         '='.repeat(60),
         danhMucBai,
         ...(nguCanhBai ? ['='.repeat(60), nguCanhBai] : []),
         ...(danBaiChung ? ['='.repeat(60), danBaiChung] : []),
+        /* Chỉ dẫn của máy trạng thái đặt CUỐI CÙNG: gần lượt hỏi nhất, và câu
+           lệnh đã dặn mục "TRẠNG THÁI" được ưu tiên hơn quy tắc bước. */
+        ...(truoc.chiDanThem ? ['='.repeat(60), truoc.chiDanThem] : []),
       ].join('\n\n'),
-      temperature: 0.7, // Nhiệt độ vừa phải để sáng tạo nhưng vẫn giữ chuẩn kiến thức
-      topP: 0.9,
+      temperature: THAM_SO_SINH.temperature,
+      topP: THAM_SO_SINH.topP,
     };
 
-    /* Hai đường, CÙNG một yêu cầu `yeuCau` — model, câu lệnh và tham số không
-       thể lệch nhau giữa các đường, vì dữ liệu nghiên cứu cần model ổn định:
-       - Key riêng người dùng tự nhập: @google/genai.
-       - Còn lại (bản build cho học sinh): Firebase AI Logic. */
-    const traLoi = getEffectiveApiKey() !== 'MISSING_API_KEY'
-      ? (await getAiInstance().models.generateContent({
-          model: yeuCau.model,
-          contents: yeuCau.contents,
-          config: {
-            systemInstruction: yeuCau.systemInstruction,
-            temperature: yeuCau.temperature,
-            topP: yeuCau.topP,
-          },
-        })).text
-      : await (await import('./giaSuFirebaseAI')).hoiGeminiQuaFirebase(yeuCau);
+    const batDau = performance.now();
+    const traLoi = await (await import('./giaSuFirebaseAI')).hoiGeminiQuaFirebase(yeuCau);
+    const latencyMs = Math.round(performance.now() - batDau);
 
-    if (traLoi) {
-        return traLoi;
-    }
-    
-    return 'Xin lỗi em, thầy/cô đang gặp chút sự cố kỹ thuật. Em có thể nhắc lại câu hỏi được không?';
-    
-  } catch (error: any) {
+    if (traLoi) return { ...coBan, text: traLoi, latencyMs, modelName: GEMINI_MODEL_NAME };
+    return {
+      ...coBan, latencyMs, modelName: GEMINI_MODEL_NAME,
+      text: 'Xin lỗi em, thầy/cô đang gặp chút sự cố kỹ thuật. Em có thể nhắc lại câu hỏi được không?',
+    };
+  } catch (error: unknown) {
+    const chuoiLoi = loiThanhChuoi(error);
+    const msg = chuoiLoi.toLowerCase();
     console.error('Lỗi khi gọi Gemini API:', error);
-    
+
     ErrorLogService.logError({
       level: 'Lỗi API/AI Service',
       component: 'geminiTutorService',
-      message: error?.message || 'Lỗi gọi API Google GenAI',
-      userEmail: userEmail
+      message: `Gọi Gemini lỗi: ${loaiLoi(msg)}`,
+      userEmail,
     });
 
-    const chuoiLoi = loiThanhChuoi(error);
-    const msg = chuoiLoi.toLowerCase();
     const hetLuot = thongBaoHetLuot(chuoiLoi);
-    if (hetLuot) return hetLuot;
-
-    // Check for 400 bad request / Invalid API Key
-    if (msg.includes('api_key_invalid') || msg.includes('api key not valid')) {
-      return 'API key không hợp lệ. Vui lòng kiểm tra lại API key trong cài đặt ⚙️ nhé!';
-    }
+    if (hetLuot) return { ...coBan, text: hetLuot };
 
     /* Lỗi ở đường Firebase (App Check từ chối, AI Logic chưa bật, máy chủ lỗi)
        thì BÁO THẬT, không rơi sang kịch bản mẫu: kịch bản mẫu trông như AI trả
        lời, học sinh không biết là hỏng, và chủ dự án cũng không biết mà sửa. */
     if (msg.includes('firebasevertexai') || msg.includes('app check') || msg.includes('appcheck')) {
-      return 'Gia sư AI đang tạm mất kết nối với máy chủ. Em thử lại sau ít phút nhé!';
+      return { ...coBan, text: 'Gia sư AI đang tạm mất kết nối với máy chủ. Em thử lại sau ít phút nhé!' };
     }
 
-    // Fallback sang mock service nếu gọi thật bị lỗi (nhưng không phải do quota/key)
     const { generateAIResponse: mockGenerate } = await import('./aiMockService');
-    return mockGenerate(lessonId, userQuestion, history, userEmail);
+    return { ...coBan, text: await mockGenerate(lessonId, userQuestion, history, userEmail) };
   }
 };
+
+/** Giữ chữ ký cũ cho nơi chỉ cần chuỗi trả lời. */
+export const generateAIResponse = async (
+  lessonId: string,
+  userQuestion: string,
+  history: ChatMessage[],
+  userEmail: string = 'guest'
+): Promise<string> => (await generateAIResponseChiTiet(lessonId, userQuestion, history, userEmail)).text;

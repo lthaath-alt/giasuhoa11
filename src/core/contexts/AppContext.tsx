@@ -1,14 +1,11 @@
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
 import { User, ChatMessage, LearningProgress, School, SchoolClass } from '../../features/auth/types';
 import { Chapter, Lesson } from '../../features/lessons/types';
-import { generateRandomPassword, generateInviteCode, generateClassPassword, GuestChatStorage, mergeCurriculumWithConstants } from '../services/storage';
-import { generateAIResponse } from '../../features/tutor/services/geminiTutorService';
-import {
-  getRemainingCooldown,
-  recordOffTopicStrike,
-  formatCooldownMessage,
-  formatCooldownActivationNotice
-} from '../../features/tutor/services/cooldownService';
+import { generateRandomPassword, generateInviteCode, generateClassPassword, mergeCurriculumWithConstants, donDepLuuTruCu } from '../services/storage';
+import { generateAIResponseChiTiet } from '../../features/tutor/services/geminiTutorService';
+import { kiemTraVaGhiNhanLuotGui, layTrangThaiGioiHan, thongBaoBiChan } from '../../features/tutor/services/gioiHanChatService';
+import { tachNhanAn, laTinBeTac } from '../../features/tutor/services/pedagogicalStateMachine';
+import { laySessionId, ketThucPhien, userHash } from '../../features/tutor/services/telemetryService';
 import { GoogleUserInfo } from '../services/googleAuth';
 import { QuizService } from '../../features/quiz/quizService';
 import { BankFirestore } from '../../features/bank/bankStore';
@@ -392,8 +389,12 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       // 4. Merge curriculum với constants
       setCurriculum(mergeCurriculumWithConstants(curriculumOverrides));
 
-      // 6. Guest chat count (vẫn từ localStorage — thuộc thiết bị)
-      setGuestChatCount(GuestChatStorage.getCount());
+      // 6. Dọn dữ liệu nhạy cảm đời cũ trong localStorage (API key riêng, tin
+      //    lạc đề nguyên văn, bộ đếm khách cũ), rồi đọc bộ đếm khách từ Firestore.
+      donDepLuuTruCu();
+      layTrangThaiGioiHan(true)
+        .then(t => setGuestChatCount(t.luotKhach))
+        .catch(() => { /* chưa đọc được thì giữ 0; lượt gửi sẽ tự kiểm lại */ });
 
       // 7. Phiên nay do Firebase Auth quản — xem useEffect riêng ngay bên dưới.
       //    Hai khoá localStorage này là tàn dư của hệ đăng nhập cũ, dọn cho sạch.
@@ -1163,16 +1164,18 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
   const addMessage = async (lessonId: string, content: string) => {
     const userEmail = currentUser ? currentUser.email : 'guest';
+    const laKhach = !currentUser;
 
-    if (!currentUser) {
-      const currentCount = GuestChatStorage.getCount();
-      if (currentCount >= 25) {
-        throw new Error(
-          'Bạn đã hết lượt dùng thử miễn phí (tối đa 25 câu hỏi). ' +
-          'Vui lòng đăng ký tài khoản để tiếp tục học tập không giới hạn.'
-        );
-      }
+    /* Bước 0: giới hạn — lượt thử của khách và khoá tạm khi spam, kiểm ở
+       Firestore (xem gioiHanChatService.ts). Kiểm TRƯỚC khi gọi AI: chính kẻ
+       spam đang đốt hạn mức gọi AI chung của cả web. */
+    const gioiHan = await kiemTraVaGhiNhanLuotGui(laKhach, content);
+    if (laKhach) setGuestChatCount(gioiHan.luotKhach);
+    if (!gioiHan.choPhep && gioiHan.lyDo === 'het-luot-khach') {
+      throw new Error(thongBaoBiChan(gioiHan));
     }
+
+    const nhanDo = { session_id: laySessionId(userEmail, lessonId), user_hash: userHash(userEmail) };
 
     const userMsg: ChatMessage = {
       id: `m-user-${Date.now()}`,
@@ -1181,32 +1184,32 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       sender: 'user',
       content,
       timestamp: new Date().toISOString(),
+      ...nhanDo,
+      be_tac: laTinBeTac(content) || undefined,
+      ngoai_mon: gioiHan.lyDo === 'spam' ? 'SPAM_ATTACK' : undefined,
     };
 
     // Cập nhật state ngay (optimistic)
     setChats(prev => [...prev, userMsg]);
 
     // Lưu Firestore (chỉ với user đăng nhập; guest không lưu)
-    if (currentUser) {
-      FirestoreService.addChatMessage(userMsg);
-    } else {
-      const nextCount = GuestChatStorage.increment();
-      setGuestChatCount(nextCount);
-    }
+    if (currentUser) FirestoreService.addChatMessage(userMsg);
 
-    // Bước 1: Kiểm tra cooldown trước khi gọi AI
-    const remainingCooldown = getRemainingCooldown(userEmail);
-    if (remainingCooldown > 0) {
-      const cooldownMsg: ChatMessage = {
+    // Bước 1: đang bị khoá, hoặc vừa bị phát hiện spam → báo, không gọi AI
+    if (!gioiHan.choPhep) {
+      const khoaMsg: ChatMessage = {
         id: `m-ai-cooldown-${Date.now()}`,
         userEmail,
         lessonId,
         sender: 'ai',
-        content: formatCooldownMessage(remainingCooldown),
+        content: thongBaoBiChan(gioiHan),
         timestamp: new Date().toISOString(),
+        ...nhanDo,
+        buoc: 'loc',
+        loai_luot: 'hanh_chinh',
       };
-      setChats(prev => [...prev, cooldownMsg]);
-      if (currentUser) FirestoreService.addChatMessage(cooldownMsg);
+      setChats(prev => [...prev, khoaMsg]);
+      if (currentUser) FirestoreService.addChatMessage(khoaMsg);
       return;
     }
 
@@ -1215,23 +1218,20 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       c => c.userEmail === userEmail && c.lessonId === lessonId
     );
 
-    // Giả lập độ trễ suy nghĩ của gia sư từ 5 đến 10 giây
+    /* Giả lập độ trễ suy nghĩ của gia sư từ 5 đến 10 giây.
+       CHÚ Ý khi báo cáo độ trễ: con số người dùng thấy gồm cả khoảng chờ giả
+       này. Thời gian gọi mô hình thật nằm ở trường `latency_ms`. */
     const thinkingDelayMs = Math.floor(Math.random() * 5000) + 5000;
-    const [aiResponseTextObj] = await Promise.all([
-      generateAIResponse(lessonId, content, currentHistory, userEmail),
+    const [ketQua] = await Promise.all([
+      generateAIResponseChiTiet(lessonId, content, currentHistory, userEmail),
       new Promise(resolve => setTimeout(resolve, thinkingDelayMs))
     ]);
-    let aiResponseText = aiResponseTextObj as string;
 
-    // Bước 2: Đọc nhãn tín hiệu AI trả về
-    if (aiResponseText.includes('[SIGNAL:OFFTOPIC]')) {
-      const userName = currentUser?.name || 'Khách vãng lai';
-      const { cooldownActivated } = recordOffTopicStrike(userEmail, content, userName);
-      aiResponseText = aiResponseText.replace(/\[SIGNAL:OFFTOPIC\]/g, '').trim();
-      if (cooldownActivated) {
-        aiResponseText += formatCooldownActivationNotice();
-      }
-    }
+    /* Bước 2: gỡ nhãn ẩn (bước, loại lượt, ngộ nhận, ngoài môn). Hai nhãn ngoài
+       môn KHÔNG còn tính lượt phạt — chỉ spam do mã phát hiện mới bị khoá.
+       Nhãn ra đề (XONG_CHUONG, XONG_BAI, YEU_CAU_DE) còn nguyên để xử lý dưới. */
+    const nhan = tachNhanAn(ketQua.text);
+    const aiResponseText = nhan.noiDung;
 
     let finalAiResponse = aiResponseText;
 
@@ -1330,10 +1330,22 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       sender: 'ai',
       content: finalAiResponse,
       timestamp: new Date().toISOString(),
+      ...nhanDo,
+      nhanh: ketQua.nhanh,
+      buoc: nhan.buoc,
+      loai_luot: nhan.loaiLuot,
+      ma_ngo_nhan: nhan.maNgoNhan,
+      muc_goi_y: ketQua.mucGoiY,
+      ngoai_mon: ketQua.gianLan ? 'GIAN_LAN' : nhan.ngoaiMon,
+      model_name: ketQua.modelName,
+      latency_ms: ketQua.latencyMs,
     };
 
     setChats(prev => [...prev, aiMsg]);
     if (currentUser) FirestoreService.addChatMessage(aiMsg);
+
+    /* Gia sư xác nhận em đã giải xong vấn đề → lượt sau là một phiên mới. */
+    if (nhanRaDe?.[1] === 'XONG_BAI') ketThucPhien(userEmail, lessonId);
   };
 
   // ── Tiến độ học tập ───────────────────────────────────────────────────────
@@ -1543,9 +1555,10 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     return Object.values(progress.details).some(lp => lp.advancedUnlocked);
   };
 
+  /* Bộ đếm khách nay nằm ở Firestore và luật CẤM đếm lùi, nên hàm này chỉ còn
+     xoá tin chat của khách trong bộ nhớ. Không chỗ nào gọi nó (kiểm 14/09/2026). */
   const resetGuestChats = () => {
-    GuestChatStorage.reset();
-    setGuestChatCount(0);
+    setChats(prev => prev.filter(c => c.userEmail !== 'guest'));
   };
 
   // ── Chương trình học ─────────────────────────────────────────────────────

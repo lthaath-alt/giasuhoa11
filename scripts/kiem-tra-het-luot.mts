@@ -51,7 +51,12 @@ console.log('\n== Hết lượt theo NGÀY (20/ngày) ==');
 console.log('   ' + tNgay);
 ok(tNgay.includes('trong ngày'), 'nói rõ là hết lượt của ngày');
 ok(tNgay.includes('ngày mai'), 'hướng dẫn chờ sang ngày mai');
-ok(tNgay.includes('API key khác'), 'gợi ý đổi API key');
+/* Đảo chiều ngày 14/09/2026: bản cũ khuyên "vào cài đặt để dùng một API key
+   khác" — tức xui học sinh lớp 11 tự tạo key Gemini, trong khi điều khoản Gemini
+   API cấm ứng dụng dành cho người dưới 18 tuổi, và hạn mức tính theo PROJECT
+   chứ không phải của riêng em. */
+ok(!/API key/i.test(tNgay), 'KHÔNG xui học sinh tự dùng API key riêng');
+ok(tNgay.includes('toàn hệ thống'), 'nói rõ hạn mức là của cả hệ thống, không phải của riêng em');
 ok(!/\d+ giây/.test(tNgay), 'KHÔNG báo nhầm là chỉ chờ vài giây');
 
 console.log('\n== Lỗi khác thì không nhận nhầm ==');
