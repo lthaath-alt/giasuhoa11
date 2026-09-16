@@ -194,7 +194,7 @@ Hằng ngày:
 |---|---|
 | `npm run dev` | Máy chủ phát triển, cổng 3000 |
 | `npm run lint` | `tsc --noEmit` — hàng rào chính, chạy MỘT LẦN trước khi báo xong |
-| `npm run kiem-tra` | Chạy cả 12 bộ kiểm, 282 mục. Chạy trước khi commit |
+| `npm run kiem-tra` | Chạy cả 12 bộ kiểm, 288 mục trên máy thiếu Java (thêm 26 mục nữa trên CI, khi `kiem-tra:luat` chạy thật). Chạy trước khi commit |
 | `npm run build` | **Chỉ khi user yêu cầu** |
 
 Bộ kiểm chạy riêng khi cần: `kiem-tra:chuong-trinh` (dữ liệu 25 bài),
