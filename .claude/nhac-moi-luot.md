@@ -19,12 +19,14 @@ DA CHOT, dung dat lai:
     moi hien MOT LAN, can Cloud Function + Admin SDK (goi Blaze) — khong
     phai kho mat khau.
 
-MA CHET con lai, DA BAO chua xoa:
-  - `FirestoreService.addSchool` (firestoreService.ts) thanh mo coi sau khi
-    xoa `createSchool` 16/09/2026 — khong ai goi nua. Giu lai vi no la mot
-    nuoc di Firestore thuan, va "tao truong" co the can lai. Hoi truoc khi xoa.
-    Chuoi ba lop da xoa theo thu tu: SchoolTab -> CreateSchoolDialog ->
-    createSchool. Neu xoa not addSchool thi ca duong "tao truong" bien mat.
+DA CHOT, dung dat lai:
+  - Duong "TAO TRUONG" da bi xoa het 16/09/2026, theo y chu du an, sau khi
+    da neu ro cai gia. Bon lop xoa theo thu tu: SchoolTab.tsx ->
+    CreateSchoolDialog -> AppContext.createSchool -> FirestoreService.addSchool.
+    Trong ma HOM NAY khong con duong nao tao mot tai lieu `schools` moi —
+    chi con doc/sua/xoa. Muon co lai thi phai viet lai tu dau (xem
+    `git show 62bcf27` va commit ke tiep de lay lai ma cu).
+    Truong dang co trong Firestore van chay binh thuong.
 
 CHON KY NANG TRUOC KHI DOC HAY SUA MA (goi bang cong cu Skill):
   viec mo ho / nhieu duong lam        -> brainstorming

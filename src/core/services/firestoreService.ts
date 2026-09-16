@@ -280,19 +280,6 @@ export const FirestoreService = {
     }
   },
 
-  /** Thêm trường. Dùng school.id làm document ID. Trả về false nếu đã tồn tại. */
-  async addSchool(school: School): Promise<boolean> {
-    try {
-      const docRef = doc(db, COL_SCHOOLS, school.id);
-      const existing = await getDoc(docRef);
-      if (existing.exists()) return false;
-      await setDoc(docRef, cleanForFirestore(school));
-      return true;
-    } catch (err) {
-      handleError('addSchool', err);
-      return false;
-    }
-  },
 
   async updateSchool(schoolId: string, updates: Partial<School>): Promise<boolean> {
     try {
