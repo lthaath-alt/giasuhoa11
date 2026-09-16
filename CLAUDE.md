@@ -405,6 +405,15 @@ lỗi gõ nhầm tên trường. Nhưng nó CHỈ chứng minh tệp trong git �
 chạy trên Firebase thì vẫn phải đo bằng REST sau khi publish. Hai việc khác
 nhau.
 
+Máy chủ dự án KHÔNG chạy được bộ kiểm đó, và đã đo kỹ ngày 16/09/2026 — đừng
+đi dò lại. Máy có đúng hai bản Java, cả hai đều là 8: Zulu 8 JRE 32-bit (chỗ
+`JAVA_HOME` đang trỏ tới) và AdoptOpenJDK 8 64-bit. `winget install` bản JDK
+mới không chạy được. Antigravity chạy ngay trên chính máy Windows này, không
+container không WSL, nên bên đó cũng in BỎ QUA y hệt. Cổng 8080 trống, không
+cần `firebase login` — hai thứ đó không phải vấn đề. Vấn đề chỉ là Java.
+Đường chưa thử, nếu sau này thấy phiền: tải JDK dạng `.zip` giải nén vào thư
+mục người dùng (không cần quyền quản trị) rồi đặt `JAVA_HOME` cho riêng phiên.
+
 Một cái bẫy của Playground, đã mất nửa buổi vì nó: ô "Build document" ghi thừa
 một dấu cách vào tên trường (`role␣`) là tạo ra một trường KHÁC, và luật đọc
 `role` vẫn thấy giá trị cũ — phép thử ra ALLOWED trong khi luật hoàn toàn đúng.
