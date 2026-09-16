@@ -11,11 +11,15 @@ BON DIEU CAM, khong bao gio tu y lam:
   4. KHONG lam kho mat khau dang chu thuong. Kieu `User` khong co truong
      `password`; 4 phep kiem canh dieu do.
 
-DANG TREO, hoi truoc khi thiet ke:
-  - Kho mat khau cho quan tri: DA TU CHOI 2 lan, chua duoc tra loi cau
-    "nhu cau that la hoc sinh quen mat khau giua gio, hay chi la bi voi
-    dong tai khoan thu?". Mat khau cu DA BAM nen kho moi KHONG cuu duoc
-    tai khoan da quen. Cap lai ngay can Cloud Function + Admin SDK (Blaze).
+DA CHOT, dung dat lai:
+  - Kho mat khau cho quan tri: KHONG LAM. Chu du an tra loi 16/09/2026 —
+    nhu cau that chi la "bi voi dong tai khoan thu", ma
+    `npm run liet-ke:tai-khoan` da giai xong. Neu sau nay co nhu cau THAT
+    la "hoc sinh quen mat khau giua gio" thi loi giai la nut cap mat khau
+    moi hien MOT LAN, can Cloud Function + Admin SDK (goi Blaze) — khong
+    phai kho mat khau.
+
+DANG TREO:
   - `CreateSchoolDialog` (SchoolDialogs.tsx) thanh mo coi sau khi xoa
     SchoolTab.tsx. Giu lai, hoi truoc khi xoa.
 
