@@ -44,9 +44,10 @@ const CO_Y_VANG = new Set([
    và đường dẫn TÀI LIỆU FIRESTORE (`quan_tri/dong_quan_tri` là một document
    trên Firestore, không phải tệp trên đĩa — 13/09/2026). Liệt kê từng chuỗi
    một chứ đừng bỏ qua theo mẫu: bỏ theo mẫu là mở cửa cho đường dẫn tệp thật
-   viết sai lọt qua. */
+   viết sai lọt qua. Cùng lý do đó, MÃ LỖI của Firebase cũng mang dấu gạch
+   chéo (`auth/admin-restricted-operation`) mà không phải tệp — 16/09/2026. */
 const KHONG_PHAI_DUONG_DAN = new Set(['PascalCase.tsx', '.tsx', '.json', 'pages/', '/login', '/*',
-  'quan_tri/dong_quan_tri']);
+  'quan_tri/dong_quan_tri', 'auth/admin-restricted-operation']);
 
 function moiTep(thuMuc: string, ra: string[] = []): string[] {
   for (const t of readdirSync(thuMuc, { withFileTypes: true })) {

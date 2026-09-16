@@ -372,6 +372,19 @@ build` hay `npm run lint` bắt** — vì chúng không phải lỗi mã.
    thật thì phải phục vụ `dist/` bằng một máy chủ có áp `_headers`, hoặc deploy
    bản nháp. Đây là lý do gốc khiến hai cái bẫy trên lọt.
 
+**Một lỗi CSP trong Console là BÌNH THƯỜNG, đừng đi chữa.** Bản Netlify miễn
+phí tự chèn huy hiệu "Powered by Netlify" dưới dạng một khung `srcdoc`
+(`id="nl-badge-frame"`), mà khung kiểu đó **thừa kế CSP của trang cha**, nên
+script nội tuyến bên trong nó bị chặn. Đo ngày 16/09/2026 trên tab sạch, không
+chạm vào gì: Console có ĐÚNG một lỗi, và là lỗi này.
+
+**ĐỪNG băm hash cho nó.** Hash sẽ hợp thức hoá một đoạn script của bên thứ ba
+mà Netlify đổi lúc nào ta không biết — CSP chặn nó chính là CSP đang làm đúng
+việc. Cách nhận ra trong một giây: thông báo lỗi ghi nguồn là `about:srcdoc`.
+Cả `src/` không có chỗ nào dựng khung `srcdoc`; ba khung của app
+(`SlidesSection.tsx`, `GameHubSection.tsx`, `PhongThiNghiem.tsx`) đều dùng
+`src`. Thấy `about:srcdoc` là biết ngay không phải mã mình.
+
 **Lỗ hổng mật khẩu chữ thường: ĐÃ VÁ ngày 10/09/2026.** Chuyển sang Firebase
 Auth, và xoá cột `password` khỏi cả 17 tài liệu `users` còn mang nó. Mật khẩu
 nay đã băm và không bao giờ về tới trình duyệt. Bốn phép kiểm trong
@@ -507,6 +520,20 @@ Hai điều phải giữ:
 - **CSP phải cho phép reCAPTCHA** (`https://www.google.com/recaptcha/`,
   `https://www.gstatic.com/recaptcha/`, `https://recaptcha.google.com/recaptcha/`) — thiếu thì
   gia sư chết trên Netlify mà máy dev vẫn chạy.
+
+**Lỗi 400 lúc KHÁCH gửi câu hỏi cho gia sư = chưa bật Anonymous.** Console in
+`auth/admin-restricted-operation` kèm cảnh báo `[gioiHanChat]`. Đây là đường
+lùi đã tính trước, không phải hỏng:
+`src/features/tutor/services/gioiHanChatService.ts` gọi `signInAnonymously` để
+khách có một `uid`, và CHỈ gọi khi khách **thật sự gửi tin** — mở trang thì chỉ
+đọc, không tạo phiên (đo 16/09/2026: tab sạch, không chạm gì, KHÔNG có 400).
+
+Chưa bật thì hàng rào chống lạm dụng **lùi về đếm trong bộ nhớ phiên**: khách
+bấm F5 là 25 lượt về lại 25, khoá spam 15 phút cũng mất — đúng cái lỗ mà bản
+ghi `gioi_han_chat` dựng lên để bịt, nên phải nói đúng điều này trong báo cáo.
+Bật ở Firebase Console → Authentication → Sign-in method → Anonymous.
+Nghiệm thu: cửa sổ ẩn danh, gửi một câu, rồi F5 — số lượt còn lại KHÔNG được
+quay về 25.
 
 ## KHÔNG biến app thành PWA / service worker
 - Dự án này KHÔNG phải PWA và phải giữ nguyên như vậy. ĐỪNG thêm `vite-plugin-pwa`, `workbox`, `manifest.webmanifest`, hay bất kỳ đoạn `navigator.serviceWorker.register(...)` nào.
