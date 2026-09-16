@@ -19,6 +19,8 @@ import {
   tienDoRong, TienDoPhan, SO_LUOT_MOI_CHU_KY, NGUONG_DAT, PHUT_KHOA,
 } from '../src/features/practice/types';
 import type { BankQuestion } from '../src/features/bank/types';
+import type { Question } from '../src/features/library/types';
+import { xaoPhuongAnBank, xaoPhuongAnWeb } from '../src/features/bank/xaoDapAn';
 
 let hong = 0;
 const ok = (dieu: boolean, ten: string, chiTiet = '') => {
@@ -278,6 +280,65 @@ console.log('\n== Thứ tự ba phần trong một bài ==');
   const datNhungThieu = { tf: { ...tienDoRong(), dat: true } };
   ok(trangThaiPhan('tf', datNhungThieu, thieu) === 'da-dat',
     'đã đạt thì kho hụt câu sau đó cũng không mất thành tích');
+}
+
+console.log('\n== Xáo vị trí phương án ==');
+{
+  /* Trong kho, đáp án đúng rơi vào B ở 48% số câu trắc nghiệm, và ý đầu của câu
+     đúng/sai là "Đúng" ở 74% (đo ngày 14/09/2026). Xáo lúc giao đề chữa chỗ đó,
+     nhưng chỉ đúng khi đáp án đi theo phương án — sai chỗ này thì học sinh bị
+     chấm sai mà điểm vẫn ra một con số trông hợp lý. */
+  const goc = cauMC('mc-xao', 1);
+  goc.o = ['ph.an A', 'ph.an B', 'ph.an C', 'ph.an D'];
+
+  let giuDapAn = true;
+  const demViTri = [0, 0, 0, 0];
+  for (let i = 0; i < 400; i++) {
+    const moi = xaoPhuongAnBank(goc);
+    if (moi.o!.length !== 4 || new Set(moi.o).size !== 4) { giuDapAn = false; break; }
+    if (moi.o![moi.a!] !== goc.o[goc.a!]) { giuDapAn = false; break; }
+    demViTri[moi.a!]++;
+  }
+  ok(giuDapAn, 'xáo xong, `a` vẫn trỏ đúng nội dung phương án đúng');
+  ok(demViTri.every(n => n > 40), 'đáp án rơi đều bốn vị trí, không dồn vào một chữ cái',
+    demViTri.join(' / '));
+  ok(goc.o[goc.a!] === 'ph.an B', 'câu gốc trong kho KHÔNG bị sửa tại chỗ');
+
+  const tf = cauTF('tf-xao', [true, false, false, false]);
+  let yDauLaDung = 0;
+  let giuSoYDung = true;
+  for (let i = 0; i < 400; i++) {
+    const moi = xaoPhuongAnBank(tf);
+    if (moi.st!.filter(y => y.v).length !== 1) { giuSoYDung = false; break; }
+    if (moi.st![0].v) yDauLaDung++;
+  }
+  ok(giuSoYDung, 'câu đúng/sai giữ nguyên số ý đúng sau khi xáo');
+  ok(yDauLaDung > 40 && yDauLaDung < 360, 'ý "Đúng" không còn nằm cố định ở vị trí đầu',
+    `${yDauLaDung}/400 lượt ý đầu là Đúng`);
+
+  const web: Question = {
+    id: 'web-1', type: 'Trắc nghiệm', difficulty: 'Thấp', points: 1,
+    content: 'Câu hỏi', images: [], correctAnswer: 'C', createdAt: '2026-09-16T00:00:00Z',
+    options: [
+      { key: 'A', text: 'nội dung A' }, { key: 'B', text: 'nội dung B' },
+      { key: 'C', text: 'nội dung C' }, { key: 'D', text: 'nội dung D' },
+    ],
+  };
+  let webOk = true;
+  const demChu: Record<string, number> = { A: 0, B: 0, C: 0, D: 0 };
+  for (let i = 0; i < 400; i++) {
+    const moi = xaoPhuongAnWeb(web);
+    const chu = moi.options.map(o => o.key).join('');
+    const dung = moi.options.find(o => o.key === moi.correctAnswer);
+    if (chu !== 'ABCD' || dung?.text !== 'nội dung C') { webOk = false; break; }
+    demChu[moi.correctAnswer!]++;
+  }
+  ok(webOk, 'đề kiểm tra: chữ cái vẫn A, B, C, D và đáp án trỏ đúng nội dung cũ');
+  ok(Object.values(demChu).every(n => n > 40), 'đề kiểm tra: đáp án rải đều bốn chữ cái',
+    Object.entries(demChu).map(([k, v]) => `${k}:${v}`).join(' '));
+
+  const tuLuan: Question = { ...web, type: 'Tự luận', options: [], correctAnswer: undefined };
+  ok(xaoPhuongAnWeb(tuLuan) === tuLuan, 'câu tự luận trả về nguyên vẹn');
 }
 
 console.log(hong === 0

@@ -9,6 +9,7 @@
 // ngắn thành Tự luận — mất đúng thứ cần để chấm theo thang Bộ.
 
 import { BankQuestion } from '../bank/types';
+import { xaoPhuongAnBank } from '../bank/xaoDapAn';
 import {
   PhanLuyenTap, THU_TU_PHAN, SO_CAU_MOI_LUOT, NGUONG_DAT, NGUONG_MO_BAI,
   SO_LUOT_MOI_CHU_KY, PHUT_KHOA, DIEM_DUNG_SAI,
@@ -66,8 +67,10 @@ export function chonCauTuKho(
     chon.push(...xaoTron(bac).slice(0, can - chon.length));
   }
 
-  // Xáo lần cuối để câu mới không dồn hết lên đầu đề.
-  return xaoTron(chon);
+  /* Xáo lần cuối để câu mới không dồn hết lên đầu đề, rồi xáo vị trí phương án
+     trong từng câu: trong kho, đáp án đúng dồn vào B ở 48% số câu trắc nghiệm
+     (xem xaoDapAn.ts). */
+  return xaoTron(chon).map(xaoPhuongAnBank);
 }
 
 // ─── Chấm điểm ───────────────────────────────────────────────────────────────

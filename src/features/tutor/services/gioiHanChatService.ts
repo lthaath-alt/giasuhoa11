@@ -67,14 +67,22 @@ function bam(noiDung: string): string {
 const cucBo: BanGhiGioiHan = { ...MAC_DINH, thoiDiemGui: [], bamTinGanDay: [] };
 let daBaoCucBo = false;
 
-async function layDiaChi(laKhach: boolean) {
+/**
+ * @param taoPhienNeuThieu Chưa có phiên ẩn danh thì có tạo mới không. Chỉ tạo
+ *   khi khách THẬT SỰ gửi câu hỏi. Lúc mở trang chỉ đọc: tạo phiên ở đó nghĩa
+ *   là ai ghé qua cũng sinh một tài khoản ẩn danh trong Firebase, và máy nào
+ *   chưa bật Anonymous thì Console đỏ lỗi 400 ngay từ màn đăng nhập.
+ */
+async function layDiaChi(laKhach: boolean, taoPhienNeuThieu: boolean) {
   if (!laKhach) {
     const uid = auth.currentUser?.uid;
     return uid ? doc(db, COL_GIOI_HAN_CHAT, uid) : null;
   }
   try {
     const { authKhach, dbKhach } = layAppKhach();
-    const user = authKhach.currentUser ?? (await signInAnonymously(authKhach)).user;
+    const sanCo = authKhach.currentUser;
+    if (!sanCo && !taoPhienNeuThieu) return null;
+    const user = sanCo ?? (await signInAnonymously(authKhach)).user;
     return doc(dbKhach, COL_GIOI_HAN_CHAT, user.uid);
   } catch (err) {
     if (!daBaoCucBo) {
@@ -86,8 +94,8 @@ async function layDiaChi(laKhach: boolean) {
   }
 }
 
-async function docBanGhi(laKhach: boolean) {
-  const diaChi = await layDiaChi(laKhach);
+async function docBanGhi(laKhach: boolean, taoPhienNeuThieu = true) {
+  const diaChi = await layDiaChi(laKhach, taoPhienNeuThieu);
   if (!diaChi) return { diaChi: null, banGhi: cucBo };
   try {
     const snap = await getDoc(diaChi);
@@ -111,7 +119,7 @@ async function ghi(diaChi: Awaited<ReturnType<typeof layDiaChi>>, banGhi: BanGhi
 
 /** Trạng thái hiện tại, không ghi gì — dùng để vẽ giao diện. */
 export async function layTrangThaiGioiHan(laKhach: boolean): Promise<{ luotKhach: number; conLaiKhoaMs: number }> {
-  const { banGhi } = await docBanGhi(laKhach);
+  const { banGhi } = await docBanGhi(laKhach, false);
   return { luotKhach: banGhi.luotKhach, conLaiKhoaMs: Math.max(0, banGhi.khoaDen - Date.now()) };
 }
 

@@ -1,5 +1,6 @@
 import { Quiz, QuizQuestionResult } from './types';
 import { chonCauChoDeChuong } from './deChuong';
+import { xaoPhuongAnWeb } from '../bank/xaoDapAn';
 import { QuizStorage } from './quizStorage';
 import { Question, QuestionType, DifficultyLevel } from '../library/types';
 import {
@@ -218,7 +219,7 @@ export const QuizService = {
       lessonId,
       chapterId,
       userEmail,
-      questions: finalSelection,
+      questions: finalSelection.map(xaoPhuongAnWeb),
       answers: {},
       status: 'pending',
       score: 0,
@@ -252,7 +253,7 @@ export const QuizService = {
       lessonId: chapterId,
       chapterId,
       userEmail,
-      questions: chon,
+      questions: chon.map(xaoPhuongAnWeb),
       answers: {},
       status: 'pending',
       score: 0,
@@ -324,7 +325,9 @@ export const QuizService = {
       lessonId,
       chapterId,
       userEmail,
-      questions: finalSelection,
+      /* Xáo vị trí phương án ngay khi tạo đề: đề đã lưu mang thứ tự mới, nên
+         chấm điểm và xem lại bài đều khớp. Lý do xáo: xem xaoDapAn.ts. */
+      questions: finalSelection.map(xaoPhuongAnWeb),
       answers: {},
       status: 'pending',
       score: 0,

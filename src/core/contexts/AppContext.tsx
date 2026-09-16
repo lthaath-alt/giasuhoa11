@@ -1218,14 +1218,14 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       c => c.userEmail === userEmail && c.lessonId === lessonId
     );
 
-    /* Giả lập độ trễ suy nghĩ của gia sư từ 5 đến 10 giây.
-       CHÚ Ý khi báo cáo độ trễ: con số người dùng thấy gồm cả khoảng chờ giả
-       này. Thời gian gọi mô hình thật nằm ở trường `latency_ms`. */
-    const thinkingDelayMs = Math.floor(Math.random() * 5000) + 5000;
-    const [ketQua] = await Promise.all([
-      generateAIResponseChiTiet(lessonId, content, currentHistory, userEmail),
-      new Promise(resolve => setTimeout(resolve, thinkingDelayMs))
-    ]);
+    /* Gỡ khoảng chờ giả 5–10 giây (16/09/2026).
+       Bản trước cố ý chờ thêm `Math.random() * 5000 + 5000` ms cho "giống người
+       đang suy nghĩ". Cái giá: mỗi câu hỏi mất thêm trung bình 7,5 giây, và độ
+       trễ đo được của hệ thống (trung vị 8,9 giây trong biên bản thẩm định
+       14/09/2026) phần lớn là khoảng chờ này chứ không phải thời gian gọi mô
+       hình — tức là số liệu của đề tài bị chính mình làm nhiễu. Thời gian gọi
+       thật nằm ở trường `latency_ms`, xem telemetryService.ts. */
+    const ketQua = await generateAIResponseChiTiet(lessonId, content, currentHistory, userEmail);
 
     /* Bước 2: gỡ nhãn ẩn (bước, loại lượt, ngộ nhận, ngoài môn). Hai nhãn ngoài
        môn KHÔNG còn tính lượt phạt — chỉ spam do mã phát hiện mới bị khoá.

@@ -1,77 +1,48 @@
-import React, { useState } from 'react';
-import { Box, Typography, Paper, Switch, FormControlLabel, CircularProgress, Alert } from '@mui/material';
+import React from 'react';
+import { Box, Typography, Paper, Alert } from '@mui/material';
 import { Settings, ShieldAlert } from 'lucide-react';
-import { useApp } from '../hooks/useApp';
 
-export const SystemSettingsManagement: React.FC = () => {
-  const { systemSettings, updateSystemSettings } = useApp();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+/* Công tắc "Cho phép người dùng tự cung cấp Gemini API Key" đã gỡ ngày
+   16/09/2026, cùng đợt bỏ hộp nhập key riêng: key nằm trần trong localStorage
+   của máy dùng chung, và điều khoản Gemini API cấm ứng dụng dành cho người dưới
+   18 tuổi, nên không thể xui học sinh lớp 11 tự tạo key. Từ đó công tắc không
+   còn tác dụng gì, nhưng vẫn vẽ ra một cái nút gạt được — quản trị bật/tắt mà
+   hệ thống không đổi hành vi.
 
-  const handleToggleApiKey = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    setLoading(true);
-    setError(null);
-    const newVal = e.target.checked;
-    
-    const success = await updateSystemSettings({ allowUserApiKey: newVal });
-    if (!success) {
-      setError('Cập nhật cài đặt thất bại. Vui lòng thử lại.');
-    }
-    setLoading(false);
-  };
+   Giữ lại trang này (AdminPage có một tab trỏ tới) và thay bằng phần nói thật
+   hạn mức đang dùng, vì đó mới là thứ quản trị cần biết khi gia sư ngừng trả lời. */
 
-  return (
-    <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Box>
-          <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)', display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Settings size={22} color="var(--chu-dam)" />
-            Cài đặt Hệ thống
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-            Quản lý các cấu hình chung của nền tảng
-          </Typography>
-        </Box>
-      </Box>
-
-      {error && <Alert severity="error" sx={{ mb: 3, borderRadius: 0 }}>{error}</Alert>}
-
-      <Paper sx={{ p: 3, borderRadius: 0, border: '1px solid var(--vien)', boxShadow: 'none' }}>
-        <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-          <ShieldAlert size={18} color="var(--luc-tham)" />
-          Giới hạn sử dụng & API Key
-        </Typography>
-
-        <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', p: 2, bgcolor: 'var(--nen-trang)', borderRadius: 0 }}>
-          <Box sx={{ pr: 3 }}>
-            <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--chu-dam-2)' }}>
-              Cho phép người dùng tự cung cấp Gemini API Key
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-              Khi bật, học sinh và giáo viên sẽ bị chặn chat nếu chưa cung cấp API Key cá nhân trong cài đặt của họ. 
-              Điều này giúp giảm tải quota cho hệ thống. Khi tắt, người dùng sẽ dùng API Key mặc định của hệ thống.
-            </Typography>
-          </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            {loading && <CircularProgress size={16} sx={{ mr: 1 }} />}
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={Boolean(systemSettings?.allowUserApiKey)}
-                  onChange={handleToggleApiKey}
-                  disabled={loading}
-                  color="primary"
-                />
-              }
-              label={systemSettings?.allowUserApiKey ? 'Đang bật' : 'Đã tắt'}
-              labelPlacement="start"
-              sx={{ m: 0, '& .MuiFormControlLabel-label': { fontSize: '0.875rem', fontWeight: 'bold', color: 'var(--chu)', mr: 1 } }}
-            />
-          </Box>
-        </Box>
-      </Paper>
+export const SystemSettingsManagement: React.FC = () => (
+  <Box>
+    <Box sx={{ mb: 3 }}>
+      <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)', display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Settings size={22} color="var(--chu-dam)" />
+        Cài đặt Hệ thống
+      </Typography>
+      <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+        Quản lý các cấu hình chung của nền tảng
+      </Typography>
     </Box>
-  );
-};
+
+    <Paper sx={{ p: 3, borderRadius: 0, border: '1px solid var(--vien)', boxShadow: 'none' }}>
+      <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+        <ShieldAlert size={18} color="var(--luc-tham)" />
+        Hạn mức gọi gia sư AI
+      </Typography>
+
+      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+        Gia sư AI gọi Gemini qua Firebase AI Logic bằng hạn mức của dự án Firebase, không phải của
+        từng người dùng. Bậc miễn phí cho 20 lượt trả lời mỗi ngày cho cả website; hết lượt thì mọi
+        học sinh đều nhận thông báo chờ sang ngày hôm sau. Muốn nâng hạn mức thì bật thanh toán cho
+        dự án trong Firebase Console, trang này không đổi được.
+      </Typography>
+
+      <Alert severity="info" sx={{ borderRadius: 0 }}>
+        Ô nhập API key riêng của người dùng đã gỡ ngày 16/09/2026. Điều khoản Gemini API không cho
+        phép ứng dụng dành cho người dưới 18 tuổi, nên học sinh không tự tạo key được.
+      </Alert>
+    </Paper>
+  </Box>
+);
 
 export default SystemSettingsManagement;
