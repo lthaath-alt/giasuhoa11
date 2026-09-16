@@ -16,7 +16,18 @@
  *   npm run liet-ke:tai-khoan
  *   npm run liet-ke:tai-khoan -- ten@email.com     (điền sẵn email cho nhanh)
  *   npm run liet-ke:tai-khoan -- --hien            (hiện mật khẩu dạng chữ)
+ *
+ * Lọc và xuất (16/09/2026) — sinh ra vì "bí với đống tài khoản thử": bản đầu
+ * in hết mọi hồ sơ, mỗi hồ sơ 3-5 dòng, nên tìm một tài khoản phải cuộn dài.
+ *
+ *   -- --tim demo          chỉ hiện hồ sơ có "demo" trong email/tên/uid
+ *   -- --vai teacher       chỉ một vai
+ *   -- --gon               mỗi tài khoản MỘT dòng, dạng bảng
+ *   -- --csv ds.csv        xuất ra tệp mở bằng Excel
+ *
+ * Các cờ ghép được: `-- --vai student --tim thu --gon`.
  */
+import { writeFileSync } from 'node:fs';
 import readline from 'node:readline';
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth, signInWithEmailAndPassword, signOut } from 'firebase/auth';
@@ -127,10 +138,45 @@ async function chinh() {
     process.exit(1);
   }
 
-  /* Cờ tách khỏi email, để `-- --hien` và `-- mail@x --hien` đều chạy. */
+  /* Cờ tách khỏi email, để `-- --hien` và `-- mail@x --hien` đều chạy.
+
+     Cờ CÓ GIÁ TRỊ phải được nuốt cùng giá trị của nó TRƯỚC khi đi tìm email.
+     Bản cũ lấy email bằng `find(t => !t.startsWith('--'))`, nên thêm
+     `--vai teacher` là `teacher` bị hiểu thành email, script hỏi mật khẩu rồi
+     mới báo đăng nhập hỏng — người chạy không đời nào đoán ra vì sao. */
   const thamSo = process.argv.slice(2);
-  const hienMatKhau = thamSo.includes('--hien');
-  const emailSan = thamSo.find(t => !t.startsWith('--'));
+  const CO_GIA_TRI: Record<string, string> = { '--tim': 'demo', '--vai': 'teacher', '--csv': 'ds.csv' };
+  const co: Record<string, string> = {};
+  const conLai: string[] = [];
+  for (let i = 0; i < thamSo.length; i++) {
+    const t = thamSo[i];
+    if (t in CO_GIA_TRI) {
+      const giaTri = thamSo[i + 1];
+      if (!giaTri || giaTri.startsWith('--')) {
+        console.error(`Cờ ${t} cần một giá trị đi kèm. Ví dụ: ${t} ${CO_GIA_TRI[t]}`);
+        process.exit(1);
+      }
+      co[t] = giaTri;
+      i++;                                   // nuốt luôn giá trị, khỏi lọt vào email
+    } else if (t.startsWith('--')) {
+      co[t] = '1';
+    } else {
+      conLai.push(t);
+    }
+  }
+
+  const hienMatKhau = co['--hien'] === '1';
+  const inGon = co['--gon'] === '1';
+  const timChu = (co['--tim'] ?? '').toLowerCase();
+  const vaiLoc = co['--vai'] ?? '';
+  const tepCsv = co['--csv'] ?? '';
+  const emailSan = conLai[0];
+
+  if (vaiLoc && !TEN_VAI[vaiLoc]) {
+    console.error(`Vai không hợp lệ: ${vaiLoc}`);
+    console.error(`Chọn một trong: ${Object.keys(TEN_VAI).join(', ')}`);
+    process.exit(1);
+  }
 
   console.log('Đăng nhập để đọc danh sách tài khoản.');
   console.log('Phải là tài khoản GIÁO VIÊN trở lên — luật chỉ cho vai đó đọc `users`.\n');
@@ -187,30 +233,93 @@ async function chinh() {
   }
   const laDongQuanTri = (u: HoSo) => Boolean(u.email && dongQuanTri.has(u.email.toLowerCase()));
 
-  for (const vai of ['admin', 'school_admin', 'teacher', 'student']) {
-    const nhom = hoSo.filter(u => u.role === vai);
-    if (!nhom.length) continue;
-    console.log(`\n═══ ${TEN_VAI[vai]} — ${nhom.length} tài khoản ═══`);
-    for (const u of nhom) {
-      const dangNhapBang = u.email || u.username || '(KHÔNG CÓ — không đăng nhập được)';
-      console.log(`  ${dangNhapBang}${laDongQuanTri(u) ? '   ★ ĐỒNG QUẢN TRỊ' : ''}`);
-      console.log(`      uid : ${u.id}${uidThat(u.id) ? '' : '   ⚠ KHÔNG phải uid Auth — hồ sơ mồ côi'}`);
-      if (u.name) console.log(`      tên : ${u.name}`);
-      if (u.classId) console.log(`      lớp : ${u.classId}`);
-      if (u.pendingClassCode) console.log(`      đơn chờ duyệt, mã: ${u.pendingClassCode}`);
+  /* Lọc CHỈ đổi phần liệt kê và tệp CSV. Các cảnh báo ở cuối (hồ sơ mồ côi,
+     đồng quản trị còn vai student) vẫn tính trên TOÀN BỘ dữ liệu — một cảnh
+     báo bị bộ lọc giấu đi là cảnh báo vô dụng, và người chạy sẽ tưởng đã hết
+     vấn đề chỉ vì đang gõ `--vai teacher`. */
+  const khop = (u: HoSo) => {
+    if (vaiLoc && u.role !== vaiLoc) return false;
+    if (timChu) {
+      const kho = [u.email, u.username, u.name, u.id].filter(Boolean).join(' ').toLowerCase();
+      if (!kho.includes(timChu)) return false;
+    }
+    return true;
+  };
+  const hoSoLoc = hoSo.filter(khop);
+
+  if (vaiLoc || timChu) {
+    const dieuKien = [vaiLoc && `vai=${vaiLoc}`, timChu && `tìm="${timChu}"`].filter(Boolean).join(', ');
+    console.log(`Đang lọc: ${dieuKien}  →  ${hoSoLoc.length}/${hoSo.length} hồ sơ\n`);
+    if (!hoSoLoc.length) console.log('Không hồ sơ nào khớp. Thử bỏ bớt điều kiện.\n');
+  }
+
+  if (inGon) {
+    /* Xếp theo vai rồi theo tên đăng nhập, để mắt quét được theo cụm. */
+    const THU_TU = ['admin', 'school_admin', 'teacher', 'student'];
+    const hang = (u: HoSo) => { const i = THU_TU.indexOf(u.role ?? ''); return i < 0 ? 99 : i; };
+    const ten = (u: HoSo) => u.email || u.username || '';
+    const dsGon = [...hoSoLoc].sort((a, b) => hang(a) - hang(b) || ten(a).localeCompare(ten(b)));
+
+    console.log('  VAI                ĐĂNG NHẬP BẰNG                      TÊN                     LỚP');
+    console.log('  ' + '─'.repeat(96));
+    for (const u of dsGon) {
+      const dau = [laDongQuanTri(u) ? '★' : '', uidThat(u.id) ? '' : '⚠mồ côi', u.pendingClassCode ? '⏳đơn' : '']
+        .filter(Boolean).join(' ');
+      console.log('  '
+        + (TEN_VAI[u.role ?? ''] ?? u.role ?? '(không vai)').padEnd(19)
+        + (u.email || u.username || '(không đăng nhập được)').padEnd(36)
+        + (u.name ?? '').padEnd(24)
+        + (u.classId ?? '—').padEnd(8)
+        + dau);
+    }
+  } else {
+    for (const vai of ['admin', 'school_admin', 'teacher', 'student']) {
+      const nhom = hoSoLoc.filter(u => u.role === vai);
+      if (!nhom.length) continue;
+      console.log(`\n═══ ${TEN_VAI[vai]} — ${nhom.length} tài khoản ═══`);
+      for (const u of nhom) {
+        const dangNhapBang = u.email || u.username || '(KHÔNG CÓ — không đăng nhập được)';
+        console.log(`  ${dangNhapBang}${laDongQuanTri(u) ? '   ★ ĐỒNG QUẢN TRỊ' : ''}`);
+        console.log(`      uid : ${u.id}${uidThat(u.id) ? '' : '   ⚠ KHÔNG phải uid Auth — hồ sơ mồ côi'}`);
+        if (u.name) console.log(`      tên : ${u.name}`);
+        if (u.classId) console.log(`      lớp : ${u.classId}`);
+        if (u.pendingClassCode) console.log(`      đơn chờ duyệt, mã: ${u.pendingClassCode}`);
+      }
+    }
+
+    const laVai = (u: HoSo) => Boolean(u.role && TEN_VAI[u.role]);
+    const khac = hoSoLoc.filter(u => !laVai(u));
+    if (khac.length) {
+      console.log(`\n═══ VAI LẠ hoặc KHÔNG CÓ VAI — ${khac.length} ═══`);
+      for (const u of khac) console.log(`  ${u.id}   role=${u.role ?? '(trống)'}`);
     }
   }
 
-  const laVai = (u: HoSo) => Boolean(u.role && TEN_VAI[u.role]);
-  const khac = hoSo.filter(u => !laVai(u));
-  if (khac.length) {
-    console.log(`\n═══ VAI LẠ hoặc KHÔNG CÓ VAI — ${khac.length} ═══`);
-    for (const u of khac) console.log(`  ${u.id}   role=${u.role ?? '(trống)'}`);
+  if (tepCsv) {
+    const oCsv = (v: unknown) => {
+      const s = v === undefined || v === null ? '' : String(v);
+      return /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    };
+    const dauCot = ['vai', 'email', 'ten_dang_nhap', 'ten', 'uid', 'lop', 'don_cho_duyet', 'dong_quan_tri', 'ho_so_mo_coi'];
+    const cacDong = hoSoLoc.map(u => [
+      u.role ?? '', u.email ?? '', u.username ?? '', u.name ?? '', u.id,
+      u.classId ?? '', u.pendingClassCode ?? '',
+      laDongQuanTri(u) ? 'x' : '', uidThat(u.id) ? '' : 'x',
+    ].map(oCsv).join(','));
+
+    /* Dấu BOM ở đầu tệp: thiếu nó thì Excel trên Windows đọc UTF-8 theo bảng
+       mã ANSI, tên tiếng Việt nát thành ký tự lạ — và người dùng sẽ đổ cho
+       script chứ không đổ cho Excel. CSV xuống dòng bằng CRLF theo RFC 4180. */
+    writeFileSync(tepCsv, '﻿' + [dauCot.join(','), ...cacDong].join('\r\n') + '\r\n', 'utf8');
+    console.log(`\n✔ Đã ghi ${cacDong.length} dòng vào ${tepCsv}`);
+    console.log('  ⚠ Tệp này CHỨA EMAIL HỌC SINH. Đừng commit, đừng gửi ra ngoài.');
   }
 
   const moCoi = hoSo.filter(u => !uidThat(u.id));
   console.log(`\n───────────────────────────────────────────────`);
-  console.log(`Tổng ${hoSo.length} hồ sơ.`);
+  console.log(`Tổng ${hoSo.length} hồ sơ${hoSoLoc.length !== hoSo.length ? ` (đang hiện ${hoSoLoc.length} sau khi lọc)` : ''}.`);
+  /* Mọi dòng dưới đây tính trên TOÀN BỘ, không theo bộ lọc — xem chú thích ở
+     chỗ khai `hoSoLoc`. */
 
   /* Nói rõ đồng quản trị là quyền CỘNG THÊM, không phải một vai — nếu không,
      người đọc thấy tên họ nằm trong nhóm HỌC SINH và tưởng chỉ định đã hỏng. */
