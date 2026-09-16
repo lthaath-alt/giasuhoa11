@@ -441,6 +441,11 @@ Ra kết quả lạ thì đòi xem `request.resource.data` trước khi đoán b
    mở. `allow delete` trên `users` cũng chỉ còn chủ dự án.
    Đổi email chủ dự án thì PHẢI publish lại luật, không thì không ai đặt
    được vai nữa.
+   Email đó nằm ở BA nơi và phải khớp từng ký tự: `laChuDuAn()` trong
+   `firestore.rules` (hàng rào thật), `EMAIL_CHU_DU_AN` trong
+   `src/core/services/quanTri.ts` (chỉ để vẽ giao diện), và nhân vật `chu`
+   trong `scripts/kiem-tra-luat.mts` (bộ kiểm luật). `kiem-tra:an-ninh` canh
+   cả ba và gọi tên đúng chỗ lệch.
 7. **Đồng quản trị đọc bằng `get()`, nên tốn một lượt đọc mỗi lần gọi.**
    `laDongQuanTri()` đọc `quan_tri/dong_quan_tri`, vì thế nó phải đứng SAU
    `laChuDuAn()` trong mọi phép `||` — chủ dự án không tốn lượt đọc nào.

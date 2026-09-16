@@ -449,21 +449,42 @@ console.log('\n== Email chủ dự án khớp giữa luật và mã ==');
   /* Vì sao cần phép kiểm này: `laChuDuAn()` trong luật là hàng rào THẬT, còn
      hằng trong `src/` chỉ để quyết định vẽ hay không vẽ nút. Lệch nhau thì
      người dùng thấy nút mà bấm vào bị từ chối, hoặc tệ hơn là không thấy nút
-     dù có quyền — và build vẫn xanh. */
-  const R = join(GOC, 'firestore.rules');
-  const S = join(GOC, 'src/core/services/quanTri.ts');
+     dù có quyền — và build vẫn xanh.
 
-  if (!existsSync(R)) {
-    truot('email chủ dự án khớp giữa luật và mã', 'thiếu firestore.rules');
-  } else if (!existsSync(S)) {
-    truot('email chủ dự án khớp giữa luật và mã', 'thiếu src/core/services/quanTri.ts');
-  } else {
-    const mLuat = /function\s+laChuDuAn\s*\(\s*\)[\s\S]{0,200}?email\(\)\s*==\s*'([^']+)'/.exec(readFileSync(R, 'utf8'));
-    const mNguon = /EMAIL_CHU_DU_AN\s*=\s*'([^']+)'/.exec(readFileSync(S, 'utf8'));
-    if (!mLuat) truot('email chủ dự án khớp giữa luật và mã', 'không đọc được email trong laChuDuAn() của firestore.rules');
-    else if (!mNguon) truot('email chủ dự án khớp giữa luật và mã', 'không đọc được EMAIL_CHU_DU_AN trong quanTri.ts');
-    else if (mLuat[1] !== mNguon[1]) truot('email chủ dự án khớp giữa luật và mã', `luật nói "${mLuat[1]}", mã nói "${mNguon[1]}"`);
-    else dat('email chủ dự án khớp giữa luật và mã');
+     Từ 16/09/2026 soi thêm nơi thứ BA: nhân vật `chu` trong bộ kiểm luật.
+     Lệch ở đó thì phép 9 ("chủ dự án đặt vai") sẽ đỏ trên CI — nhưng đỏ
+     chậm (sau khi push) và đỏ khó hiểu, mà máy thiếu Java thì vẫn xanh vì
+     `kiem-tra:luat` tự bỏ qua. Phép kiểm này chạy ở mọi máy, tức thì, và
+     gọi đúng tên chỗ lệch. */
+  const NOI = [
+    { ten: 'firestore.rules (laChuDuAn)',
+      tep: 'firestore.rules',
+      mau: /function\s+laChuDuAn\s*\(\s*\)[\s\S]{0,200}?email\(\)\s*==\s*'([^']+)'/ },
+    { ten: 'quanTri.ts (EMAIL_CHU_DU_AN)',
+      tep: 'src/core/services/quanTri.ts',
+      mau: /EMAIL_CHU_DU_AN\s*=\s*'([^']+)'/ },
+    { ten: 'kiem-tra-luat.mts (nhân vật chu)',
+      tep: 'scripts/kiem-tra-luat.mts',
+      mau: /\bchu\s*:\s*\{[^}]*?email\s*:\s*'([^']+)'/ },
+  ];
+
+  const TEN = 'email chủ dự án khớp ở cả ba nơi';
+  const daDoc: { ten: string; email: string }[] = [];
+  let hong = false;
+  for (const n of NOI) {
+    const d = join(GOC, n.tep);
+    if (!existsSync(d)) { truot(TEN, `thiếu ${n.tep}`); hong = true; break; }
+    const m = n.mau.exec(readFileSync(d, "utf8"));
+    if (!m) { truot(TEN, `không đọc được email ở ${n.ten}`); hong = true; break; }
+    daDoc.push({ ten: n.ten, email: m[1] });
+  }
+  if (!hong) {
+    const khac = daDoc.filter(d => d.email !== daDoc[0].email);
+    if (khac.length) {
+      truot(TEN, daDoc.map(d => `${d.ten} nói "${d.email}"`).join("; "));
+    } else {
+      dat(`${TEN} — ${daDoc[0].email}`);
+    }
   }
 }
 
