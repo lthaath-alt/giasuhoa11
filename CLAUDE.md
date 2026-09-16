@@ -216,6 +216,29 @@ Sinh lại dữ liệu — đọc `scripts/README.md` trước khi dùng:
 `gan:cau-hoi`, `sinh:ran-thang`, `nhung:ran-thang`, `word`, `phan-tich`, `do-chi-phi`,
 `thu:ai`.
 
+Xem tài khoản đang có — `npm run liet-ke:tai-khoan`. CHỈ ĐỌC, không ghi gì
+Firestore. Phải đăng nhập bằng vai giáo viên trở lên, vì luật chặn `list` trên
+`users`; mật khẩu hỏi ngay tại máy, hiện dấu sao, KHÔNG nhận qua tham số dòng
+lệnh và không lưu ở đâu. Bốn cờ ghép được với nhau:
+
+| Cờ | Làm gì |
+|---|---|
+| `--tim <chữ>` | lọc theo email / tên / tên đăng nhập / uid |
+| `--vai <vai>` | chỉ một nhóm |
+| `--gon` | mỗi tài khoản một dòng, dạng bảng |
+| `--csv <tệp>` | xuất ra tệp mở bằng Excel |
+
+Hai điều cố ý, đừng "sửa" thành khác: bộ lọc KHÔNG đụng tới các cảnh báo ở
+cuối (hồ sơ mồ côi, đồng quản trị còn vai `student`) — chúng luôn tính trên
+TOÀN BỘ, vì một cảnh báo bị bộ lọc giấu đi là cảnh báo vô dụng. Và tệp CSV có
+dấu BOM ở đầu, thiếu nó thì Excel trên Windows đọc UTF-8 thành ký tự rác.
+
+Tệp CSV xuất ra **chứa email học sinh** — xem xong thì xoá, đừng commit.
+
+Đây là lời giải đã chốt cho nhu cầu "bí với đống tài khoản thử". Kho mật khẩu
+cho quản trị là **KHÔNG LÀM** — xem điều 3 mục Auth, và bốn phép kiểm canh
+cho kiểu `User` không bao giờ có lại trường mật khẩu.
+
 ## Kỹ năng trong repo (`.claude/skills/`)
 
 Mở Claude Code ở thư mục dự án thì các kỹ năng này tự nạp, gọi bằng dấu gạch chéo:
