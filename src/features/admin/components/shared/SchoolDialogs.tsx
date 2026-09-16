@@ -3,7 +3,7 @@ import {
   Dialog, DialogTitle, DialogContent, DialogActions, Box, Typography,
   Alert, Paper, Divider, IconButton, Button, TextField, Chip
 } from '@mui/material';
-import { Eye, EyeOff, Copy, UserPlus, Plus, GraduationCap, Building2, ShieldCheck } from 'lucide-react';
+import { Eye, EyeOff, Copy, UserPlus, Plus, GraduationCap, ShieldCheck } from 'lucide-react';
 import { useApp } from '../../../../core/hooks/useApp';
 import { CreateTeacherData, CreateSchoolAdminData } from '../../../../core/contexts/AppContext';
 
@@ -164,50 +164,6 @@ export const CreateClassDialog: React.FC<{ open: boolean; onClose: () => void; s
         <Button onClick={handleClose} disabled={loading} sx={{ textTransform: 'none', borderRadius: 0 }}>Hủy</Button>
         <Button variant="contained" color="primary" onClick={handleCreate} disabled={loading} startIcon={<Plus size={16} />} sx={{ textTransform: 'none', borderRadius: 0, boxShadow: 'none' }}>
           {loading ? 'Đang tạo...' : 'Tạo lớp'}
-        </Button>
-      </DialogActions>
-    </Dialog>
-  );
-};
-
-// ─── Create School Dialog ─────────────────────────────────────────────────────
-
-export const CreateSchoolDialog: React.FC<{ open: boolean; onClose: () => void; adminEmail: string }> = ({ open, onClose, adminEmail }) => {
-  const { createSchool } = useApp();
-  const [name, setName] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-
-  const handleCreate = async () => {
-    if (!name.trim()) { setError('Tên trường không được để trống.'); return; }
-    setLoading(true);
-    const res = await createSchool(name.trim(), adminEmail);
-    setLoading(false);
-    if (res.success) { setName(''); setError(null); onClose(); }
-    else setError(res.message);
-  };
-
-  return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle sx={{ fontWeight: 'bold' }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Building2 size={20} color="var(--chu-dam)" />  Thêm trường học mới
-        </Box>
-      </DialogTitle>
-      <DialogContent>
-        {error && <Alert severity="error" sx={{ mb: 2, borderRadius: 0 }}>{error}</Alert>}
-        <TextField
-          autoFocus label="Tên trường học *" fullWidth value={name}
-          onChange={e => setName(e.target.value)} disabled={loading}
-          sx={{ mt: 1, '& .MuiOutlinedInput-root': { borderRadius: 0 } }}
-          placeholder="VD: THPT Nguyễn Du"
-        />
-      </DialogContent>
-      <DialogActions sx={{ px: 3, pb: 2.5, gap: 1 }}>
-        <Button onClick={onClose} disabled={loading} sx={{ textTransform: 'none', borderRadius: 0 }}>Hủy</Button>
-        <Button variant="contained" color="primary" onClick={handleCreate} disabled={loading}
-          startIcon={<Plus size={16} />} sx={{ textTransform: 'none', borderRadius: 0, boxShadow: 'none' }}>
-          {loading ? 'Đang tạo...' : 'Tạo trường'}
         </Button>
       </DialogActions>
     </Dialog>

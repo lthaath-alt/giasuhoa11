@@ -19,9 +19,10 @@ DA CHOT, dung dat lai:
     moi hien MOT LAN, can Cloud Function + Admin SDK (goi Blaze) — khong
     phai kho mat khau.
 
-DANG TREO:
-  - `CreateSchoolDialog` (SchoolDialogs.tsx) thanh mo coi sau khi xoa
-    SchoolTab.tsx. Giu lai, hoi truoc khi xoa.
+MA CHET con lai, DA BAO chua xoa:
+  - `createSchool` trong AppContext.tsx (khai bao + ham + cho vao context)
+    thanh mo coi sau khi xoa CreateSchoolDialog 16/09/2026. Khong component
+    nao goi nua. Giu lai vi "tao truong" la viec co that; hoi truoc khi xoa.
 
 CHON KY NANG TRUOC KHI DOC HAY SUA MA (goi bang cong cu Skill):
   viec mo ho / nhieu duong lam        -> brainstorming
