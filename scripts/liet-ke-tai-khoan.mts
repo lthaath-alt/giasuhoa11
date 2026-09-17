@@ -42,7 +42,11 @@ function hoi(cauHoi: string): Promise<string> {
        KHÔNG gọi callback — thiếu dòng này là script lặng lẽ thoát, người chạy
        tưởng nó hỏng. */
     rl.on('close', () => xong(''));
-    rl.question(cauHoi, v => { rl.close(); xong(v.trim()); });
+    /* Trả giá trị TRƯỚC rồi mới đóng. `rl.close()` phát sự kiện `close` NGAY
+       LẬP TỨC, nên bản cũ (đóng trước, trả sau) để dòng trên chốt chuỗi rỗng
+       trước — email gõ đúng vẫn ra "Chưa nhập email". Lỗi sống từ 13/09 tới
+       17/09/2026, lộ ra khi chủ dự án gõ email thay vì truyền qua tham số. */
+    rl.question(cauHoi, v => { xong(v.trim()); rl.close(); });
   });
 }
 
