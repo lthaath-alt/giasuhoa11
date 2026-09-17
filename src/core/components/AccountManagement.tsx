@@ -497,21 +497,37 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({
       {/* ─── Dialogs ──────────────────────────────────────────────────────── */}
       
 
-      {/* Dialog xác nhận xóa người dùng */}
+      {/* Dialog xác nhận xóa người dùng.
+
+          Nút này CHỈ xoá tài liệu `users/{uid}` (FirestoreService.deleteUserById).
+          Bản ghi đăng nhập ở Firebase Authentication còn nguyên, vì trình duyệt
+          không xoá được tài khoản Auth của người khác — cần Admin SDK, tức gói
+          Blaze. Câu cũ ghi "xóa vĩnh viễn dữ liệu … khỏi hệ thống" là SAI, và
+          ngày 17/09/2026 chủ dự án xoá xong rồi tạo lại cùng email thì bị báo
+          "Email này đã có tài khoản rồi" mà không hiểu vì sao. Hộp này phải nói
+          đúng điều đó, kèm luôn email để dán vào ô tìm kiếm của Console. */}
       <Dialog open={Boolean(userToDelete)} onClose={() => setUserToDelete(null)}>
-        <DialogTitle sx={{ fontWeight: 'bold' }}>Xác nhận xóa tài khoản</DialogTitle>
+        <DialogTitle sx={{ fontWeight: 'bold' }}>Xoá hồ sơ người dùng</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            Bạn có chắc chắn muốn xóa tài khoản <strong>{userToDelete?.name}</strong>? 
-            Hành động này sẽ xóa vĩnh viễn dữ liệu của người dùng này khỏi hệ thống.
+          <DialogContentText sx={{ mb: 2 }}>
+            Xoá hồ sơ của <strong>{userToDelete?.name}</strong>
+            {userToDelete?.email ? <> ({userToDelete.email})</> : null}? Người này sẽ
+            không vào được web nữa.
           </DialogContentText>
+          <Alert severity="warning" sx={{ borderRadius: 0 }}>
+            <strong>Email vẫn còn bị giữ.</strong> Nút này chỉ xoá hồ sơ (tên, vai,
+            lớp). Tài khoản đăng nhập vẫn nằm trong Firebase Authentication, nên tạo
+            lại tài khoản với email này sẽ báo "Email này đã có tài khoản rồi".
+            Muốn dùng lại email: vào Firebase Console → Authentication → Users, tìm
+            email trên rồi chọn Delete account.
+          </Alert>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
           <Button onClick={() => setUserToDelete(null)} sx={{ textTransform: 'none', borderRadius: 0 }}>
             Hủy
           </Button>
           <Button onClick={confirmDeleteUser} color="error" variant="contained" sx={{ textTransform: 'none', borderRadius: 0, boxShadow: 'none' }}>
-            Xóa tài khoản
+            Xoá hồ sơ
           </Button>
         </DialogActions>
       </Dialog>
