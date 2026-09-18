@@ -13,6 +13,7 @@ import {
 import { useApp } from '../core/hooks/useApp';
 import { CreateStudentData } from '../core/contexts/AppContext';
 import { TeacherClassManager } from '../features/teacher/components/TeacherClassManager';
+import { TheoDoiHocSinh } from '../features/teacher/components/TheoDoiHocSinh';
 import { ManagementLayout } from '../core/components/ManagementLayout';
 import AccountManagement from '../core/components/AccountManagement';
 import ClassManagement from '../core/components/ClassManagement';
@@ -352,6 +353,7 @@ export const TeacherPage: React.FC = () => {
         accountCount={myStudents.length}
         questionCount={0}
         examCount={0}
+        progressContent={<TheoDoiHocSinh students={myStudents} />}
         accountContent={
           <AccountManagement
             users={myStudents}

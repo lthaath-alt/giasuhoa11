@@ -96,6 +96,22 @@ export const StudentArea: React.FC = () => {
   const completedCount = progress?.completedLessons.length || 0;
   const progressPercent = allLessonsCount > 0 ? Math.round((completedCount / allLessonsCount) * 100) : 0;
 
+  /* Lịch sử làm bài THẬT (18/09/2026). Trước đây là hai dòng điểm gõ cứng
+     (9.5 và 7.0) mà học sinh nào cũng thấy, kể cả em chưa làm bài nào —
+     không được để lọt vào ảnh minh chứng của báo cáo NCKH. Đọc QuizStorage
+     của chính máy em: `list` trên `bai_nop` chỉ giáo viên được phép. */
+  const tenBai = new Map(curriculum.flatMap(c => c.lessons).map(l => [l.id, l.title]));
+  const baiDaNop = QuizStorage.getQuizzes()
+    .filter(q => q.status === 'submitted' && (q.userEmail || '').toLowerCase() === currentUser.email.toLowerCase())
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  const diem10 = (q: { score: number; maxScore: number }) =>
+    q.maxScore > 0 ? Math.round((q.score / q.maxScore) * 100) / 10 : 0;
+  const xepLoai = (d: number) =>
+    d >= 8 ? { nhan: 'Giỏi', mau: 'success' as const }
+    : d >= 6.5 ? { nhan: 'Khá', mau: 'warning' as const }
+    : d >= 5 ? { nhan: 'Trung bình', mau: 'default' as const }
+    : { nhan: 'Chưa đạt', mau: 'error' as const };
+
   return (
     <Box>
       <Paper sx={{ mb: 4, px: 3, py: 2, borderRadius: 0, display: 'flex', alignItems: 'center', gap: 2, backgroundColor: 'var(--nen-dam)', color: 'var(--chu-nguoc)' }}>
@@ -318,33 +334,37 @@ export const StudentArea: React.FC = () => {
                   <CheckCircle size={18} color="var(--luc)" /> Lịch sử làm bài
                 </Typography>
                 <Paper sx={{ borderRadius: 0, border: '1px solid var(--vien)', overflow: 'hidden' }}>
+                  {baiDaNop.length === 0 ? (
+                    <Typography variant="body2" color="text.secondary" sx={{ p: 3, textAlign: 'center' }}>
+                      Em chưa nộp bài kiểm tra nào trên máy này.
+                    </Typography>
+                  ) : (
                   <List disablePadding>
-                    {/* Fake data for demo */}
-                    <ListItem divider sx={{ py: 2 }}>
-                      <ListItemIcon>
-                        <Avatar sx={{ bgcolor: 'var(--nen-luc-nhat)', color: 'var(--luc-dam2)', width: 40, height: 40 }}>
-                          <Typography variant="caption" sx={{ fontWeight: 'bold' }}>9.5</Typography>
-                        </Avatar>
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary={<Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>Đề kiểm tra 15 phút - Chương 1</Typography>}
-                        secondary="Nộp lúc: Hôm nay, 08:30"
-                      />
-                      <Chip size="small" label="Giỏi" color="success" />
-                    </ListItem>
-                    <ListItem sx={{ py: 2 }}>
-                      <ListItemIcon>
-                        <Avatar sx={{ bgcolor: 'var(--nen-vang-nhat)', color: 'var(--vang-dam)', width: 40, height: 40 }}>
-                          <Typography variant="caption" sx={{ fontWeight: 'bold' }}>7.0</Typography>
-                        </Avatar>
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary={<Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>Bài tập về nhà - Cân bằng hóa học</Typography>}
-                        secondary="Nộp lúc: Hôm qua, 19:45"
-                      />
-                      <Chip size="small" label="Khá" color="warning" />
-                    </ListItem>
+                    {baiDaNop.map((q, i) => {
+                      const d = diem10(q);
+                      const loai = xepLoai(d);
+                      const dat = d >= 6.5;
+                      return (
+                        <ListItem key={q.id} divider={i < baiDaNop.length - 1} sx={{ py: 2 }}>
+                          <ListItemIcon>
+                            <Avatar sx={{
+                              bgcolor: dat ? 'var(--nen-luc-nhat)' : 'var(--nen-vang-nhat)',
+                              color: dat ? 'var(--luc-dam2)' : 'var(--vang-dam)',
+                              width: 40, height: 40,
+                            }}>
+                              <Typography variant="caption" sx={{ fontWeight: 'bold', fontVariantNumeric: 'tabular-nums' }}>{d.toFixed(1)}</Typography>
+                            </Avatar>
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={<Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>{tenBai.get(q.lessonId) || 'Bài kiểm tra'}</Typography>}
+                            secondary={`Làm lúc: ${new Date(q.createdAt).toLocaleString('vi-VN')} · ${q.score}/${q.maxScore} điểm`}
+                          />
+                          <Chip size="small" label={loai.nhan} color={loai.mau} />
+                        </ListItem>
+                      );
+                    })}
                   </List>
+                  )}
                 </Paper>
               </Grid>
             </Grid>

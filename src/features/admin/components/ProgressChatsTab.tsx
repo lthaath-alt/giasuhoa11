@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Card,
@@ -26,12 +26,15 @@ interface ProgressChatsTabProps {
   students: User[];
   chats: ChatMessage[];
   getUserProgress: (email: string) => LearningProgress | null;
+  /** Báo cho bên ngoài biết em nào vừa được chọn, để nạp chat của em đó. */
+  onSelectStudent?: (email: string) => void;
 }
 
 export const ProgressChatsTab: React.FC<ProgressChatsTabProps> = ({
   students,
   chats,
   getUserProgress,
+  onSelectStudent,
 }) => {
   const [selectedStudentEmail, setSelectedStudentEmail] = useState<string>('');
   const [selectedLessonId, setSelectedLessonId] = useState<string>('');
@@ -40,10 +43,21 @@ export const ProgressChatsTab: React.FC<ProgressChatsTabProps> = ({
 
   const handleSelectStudent = (email: string) => {
     setSelectedStudentEmail(email);
+    onSelectStudent?.(email);
     if (!selectedLessonId && allLessons.length > 0) {
       setSelectedLessonId(allLessons[0].id);
     }
   };
+
+  /* Số tin của em đang chọn ở từng bài, để ô chọn bài chỉ ra bài nào có hội
+     thoại. Chat nạp xong mà bài đang chọn trống thì nhảy sang bài đầu có tin. */
+  const soTinTheoBai = new Map<string, number>();
+  chats.filter((c) => c.userEmail === selectedStudentEmail)
+    .forEach((c) => soTinTheoBai.set(c.lessonId, (soTinTheoBai.get(c.lessonId) || 0) + 1));
+  const baiDauCoTin = allLessons.find((l) => soTinTheoBai.has(l.id))?.id;
+  useEffect(() => {
+    if (baiDauCoTin && !soTinTheoBai.has(selectedLessonId)) setSelectedLessonId(baiDauCoTin);
+  }, [selectedStudentEmail, baiDauCoTin]);
 
   const selectedStudent = students.find((s) => s.email === selectedStudentEmail);
   const selectedStudentProgress = selectedStudent ? getUserProgress(selectedStudent.email) : null;
@@ -237,7 +251,9 @@ export const ProgressChatsTab: React.FC<ProgressChatsTabProps> = ({
                       onChange={(e) => setSelectedLessonId(e.target.value as string)}
                     >
                       {allLessons.map((l) => (
-                        <MenuItem key={l.id} value={l.id}>{l.title}</MenuItem>
+                        <MenuItem key={l.id} value={l.id}>
+                          {l.title}{soTinTheoBai.has(l.id) ? ` (${soTinTheoBai.get(l.id)} tin)` : ''}
+                        </MenuItem>
                       ))}
                     </Select>
                   </FormControl>
