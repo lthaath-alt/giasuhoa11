@@ -355,7 +355,7 @@ export const ManagementLayout: React.FC<ManagementLayoutProps> = ({
         />
         <StatCard
           topLabel="NGÂN HÀNG DỮ LIỆU"
-          mainContent={`${questionCount} Câu hỏi & ${examCount} Đề`}
+          mainContent={`${questionCount} Câu hỏi, ${examCount} Đề`}
           description="Nhấp để đi nhanh tới ngân hàng dữ liệu"
           accentColor="var(--vang)"
           icon={<Database size={20} color="var(--vang)" />}

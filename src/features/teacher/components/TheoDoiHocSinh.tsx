@@ -94,8 +94,8 @@ export const TheoDoiHocSinh: React.FC<{ students: User[] }> = ({ students }) => 
       <Paper sx={{ borderRadius: 0, border: '1px solid var(--vien)', boxShadow: 'none', mb: 2.5 }}>
         <Tabs value={the} onChange={(_, v) => setThe(v)} variant="scrollable" scrollButtons="auto">
           <Tab icon={<BarChart3 size={16} />} iconPosition="start" label="Tổng quan lớp" sx={{ textTransform: 'none', fontWeight: 'bold' }} />
-          <Tab icon={<ClipboardCheck size={16} />} iconPosition="start" label="Bài kiểm tra & chấm tự luận" sx={{ textTransform: 'none', fontWeight: 'bold' }} />
-          <Tab icon={<MessageSquare size={16} />} iconPosition="start" label="Tiến độ & hội thoại AI" sx={{ textTransform: 'none', fontWeight: 'bold' }} />
+          <Tab icon={<ClipboardCheck size={16} />} iconPosition="start" label="Bài kiểm tra và chấm tự luận" sx={{ textTransform: 'none', fontWeight: 'bold' }} />
+          <Tab icon={<MessageSquare size={16} />} iconPosition="start" label="Tiến độ và hội thoại AI" sx={{ textTransform: 'none', fontWeight: 'bold' }} />
         </Tabs>
       </Paper>
 
