@@ -219,6 +219,41 @@ service cloud.firestore {
       allow read, write: if dangNhap() && (email() == userId || laGiaoVien());
     }
 
+    /* Bài kiểm tra ĐÃ NỘP (18/09/2026). Trước đó bài chỉ nằm trong
+       localStorage của máy học sinh, còn trang giáo viên đọc localStorage của
+       máy GIÁO VIÊN — nên giáo viên không bao giờ thấy bài nào, và điểm tự
+       luận chấm lại không bao giờ về tới học sinh.
+
+       Học sinh TẠO bài của chính mình: chỉ so email trong token, KHÔNG get().
+       Học sinh không sửa được bài đã nộp; giáo viên chỉ sửa `score` và
+       `results` (chấm lại tự luận). Không ai xoá.
+
+       GIỚI HẠN ĐÃ BIẾT: điểm do trình duyệt chấm. Luật chặn được điểm vượt
+       tối đa và bài đứng tên người khác, KHÔNG chặn được một học sinh tự dựng
+       bài điểm cao. Chặn thật phải chấm lại ở máy chủ (Cloud Function, gói
+       Blaze trả tiền). */
+    function baiNopHopLe(d, id) {
+      return d.keys().hasOnly(['id', 'lessonId', 'chapterId', 'userEmail', 'questions',
+                               'answers', 'status', 'score', 'maxScore', 'createdAt',
+                               'expiresAt', 'results'])
+        && d.id == id
+        && d.status == 'submitted'
+        && d.score is number && d.maxScore is number
+        && d.score >= 0 && d.score <= d.maxScore;
+    }
+    match /bai_nop/{id} {
+      allow get:    if dangNhap() && (resource.data.userEmail == email() || laGiaoVien());
+      allow list:   if laGiaoVien();
+      allow create: if dangNhap() && request.resource.data.userEmail == email()
+        && baiNopHopLe(request.resource.data, id);
+      allow update: if laGiaoVien()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['score', 'results'])
+        && request.resource.data.score is number
+        && request.resource.data.score >= 0
+        && request.resource.data.score <= resource.data.maxScore;
+      allow delete: if false;
+    }
+
     /* App đọc chats bằng query(where('userEmail','==',…), where('lessonId','==',…)),
        tức truy vấn CÓ RÀNG BUỘC trên đúng trường luật kiểm — điều kiện bắt buộc
        để Firestore cho phép một truy vấn. Xem `getChatsByUserLesson` trong

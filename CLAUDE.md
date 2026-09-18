@@ -517,6 +517,37 @@ Hai hệ quả phải biết trước khi ngạc nhiên:
 **Còn lại, đã biết và cố ý hoãn:** học sinh sửa được `status` (hôm nay vô hại
 — đã quét, không đường nào dùng `status` làm cổng).
 
+**Bài kiểm tra đã nộp nằm ở `bai_nop/{quizId}`** (18/09/2026). Trước đó
+`QuizStorage` ghi mọi bài vào localStorage của máy đang dùng, còn trang giáo
+viên (`QuizProgressTab.tsx`) đọc localStorage của máy GIÁO VIÊN — học sinh
+làm ở nhà thì giáo viên thấy trống trơn mà không có lỗi nào, và điểm tự luận
+chấm lại chỉ nằm trên máy giáo viên. Phát hiện khi định chụp màn giáo viên
+cho báo cáo NCKH.
+
+localStorage VẪN là kho làm việc của học sinh (đề đang làm, chống trùng đề —
+cần chạy đồng bộ). `src/features/quiz/baiNopService.ts` chỉ thêm một bản sao
+của mỗi bài ĐÃ NỘP. Bốn điều phải biết:
+
+1. **Nộp bài không chờ Firestore.** Mất mạng hay luật chưa publish thì học
+   sinh vẫn nộp và xem điểm như cũ; lần đăng nhập sau `dayBaiCuLen` đẩy lại.
+   Lỗi GÌ cũng không đánh dấu "đã đẩy", kể cả `permission-denied` — coi bị từ
+   chối là xong thì web lên trước luật sẽ làm mất vĩnh viễn các bài trong
+   khoảng đó.
+2. **Email lưu chữ thường** (`baiNopChuan.ts`), vì luật so `userEmail` với
+   token Auth vốn luôn chữ thường. Và phải bỏ mọi `undefined` — Firestore từ
+   chối cả tài liệu nếu gặp một giá trị `undefined`, mà câu hỏi từ kho hay
+   mang `image: undefined`.
+3. **Học sinh tạo, không sửa; giáo viên chỉ sửa `score` + `results`; không ai
+   xoá.** Tạo bài không dùng `get()` (chỉ so email trong token).
+4. **GIỚI HẠN ĐÃ BIẾT: điểm do trình duyệt chấm.** Luật chặn được điểm vượt
+   tối đa và bài đứng tên người khác, KHÔNG chặn được học sinh tự dựng một bài
+   điểm cao. Chặn thật cần chấm lại ở máy chủ (Cloud Function, gói Blaze).
+
+Nội dung câu hỏi trong bài nộp do học sinh ghi lên, nên phải coi là không tin
+cậy: trang giáo viên hiện nó qua `ChemicalText`, tức qua `locHtml`. Đừng bỏ lớp
+lọc đó. `kiem-tra:luyen-tap` canh cho trang giáo viên không đọc lại
+`QuizStorage`; `kiem-tra:luat` có 12 phép (21a–21l) cho collection này.
+
 **Luật KHÔNG với tới mật khẩu.** Mật khẩu nằm ở Firebase Auth, đã băm. Đăng
 ký email + mật khẩu là **công khai** — ai cũng lấy được một uid hợp lệ mà
 không cần đụng vào web. Điều luật làm được là chặn uid đó thành bất kỳ vai

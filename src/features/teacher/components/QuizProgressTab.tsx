@@ -1,5 +1,5 @@
 import { locHtml } from '../../../core/services/locHtml';
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   Box, Card, CardContent, Typography, Divider, List, ListItem,
   Avatar, ListItemText, Paper, FormControl, InputLabel, Select,
@@ -12,7 +12,7 @@ import {
   XCircle, ArrowRight, Download, Filter, ChevronDown, Check, Edit2, Info
 } from 'lucide-react';
 import { useApp } from '../../../core/hooks/useApp';
-import { QuizStorage } from '../../quiz/quizStorage';
+import { docBaiNopCuaCacEm } from '../../quiz/baiNopService';
 import { CHEMISTRY_11_CURRICULUM } from '../../lessons/constants';
 import type { User } from '../../auth/types';
 import type { Quiz, QuizQuestionResult } from '../../quiz/types';
@@ -38,9 +38,29 @@ export const QuizProgressTab: React.FC<QuizProgressTabProps> = ({ students, isAd
   const [editingScore, setEditingScore] = useState<Record<string, number>>({}); // key: quizId_questionId, value: score
   const [gradingError, setGradingError] = useState<string | null>(null);
   const [gradingSuccess, setGradingSuccess] = useState<string | null>(null);
-  const [, forceUpdate] = useState(0);
 
-  const refresh = () => forceUpdate(n => n + 1);
+  /* Bài đã nộp đọc từ FIRESTORE (18/09/2026). Bản cũ đọc QuizStorage, tức
+     localStorage của chính máy giáo viên — học sinh làm ở nhà thì trang này
+     trống trơn mà không báo gì. `kiem-tra:luyen-tap` canh cho nó không quay lại. */
+  const [baiNop, setBaiNop] = useState<Quiz[]>([]);
+  const [dangTai, setDangTai] = useState(true);
+  const [loiTai, setLoiTai] = useState<string | null>(null);
+  const khoaEmail = students.map(s => s.email.toLowerCase()).sort().join('|');
+  const napBaiNop = useCallback(async () => {
+    setDangTai(true);
+    setLoiTai(null);
+    try {
+      setBaiNop(await docBaiNopCuaCacEm(khoaEmail ? khoaEmail.split('|') : []));
+    } catch (e) {
+      console.warn('[baiNop] không tải được bài làm', e);
+      setLoiTai('Không tải được bài làm của học sinh. Kiểm tra mạng rồi tải lại trang.');
+    } finally {
+      setDangTai(false);
+    }
+  }, [khoaEmail]);
+  useEffect(() => { void napBaiNop(); }, [napBaiNop]);
+  const baiCua = (email: string) =>
+    baiNop.filter(q => q.userEmail === email.toLowerCase() && q.status === 'submitted');
 
   // 1. Lọc lớp học đối với Admin
   const filteredStudentsByClass = students.filter(s => {
@@ -59,11 +79,7 @@ export const QuizProgressTab: React.FC<QuizProgressTabProps> = ({ students, isAd
   const selectedStudent = students.find(s => s.email === selectedStudentEmail);
 
   // 3. Lấy toàn bộ bài thi của học sinh đang chọn
-  const quizzes = selectedStudent
-    ? QuizStorage.getQuizzes().filter(
-        q => q.userEmail.toLowerCase() === selectedStudent.email.toLowerCase() && q.status === 'submitted'
-      ).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-    : [];
+  const quizzes = selectedStudent ? baiCua(selectedStudent.email) : [];   // đã xếp mới nhất trước
 
   // Thống kê điểm trung bình
   const avgScore = quizzes.length > 0
@@ -113,7 +129,7 @@ export const QuizProgressTab: React.FC<QuizProgressTabProps> = ({ students, isAd
     if (res.success) {
       setGradingSuccess('Cập nhật điểm thi thành công!');
       setTimeout(() => setGradingSuccess(null), 3000);
-      refresh();
+      await napBaiNop();   // đọc lại bản vừa ghi lên máy chủ
     } else {
       setGradingError(res.message);
     }
@@ -199,6 +215,13 @@ export const QuizProgressTab: React.FC<QuizProgressTabProps> = ({ students, isAd
 
             <Divider sx={{ mb: 1.5 }} />
 
+            {loiTai && <Alert severity="error" sx={{ mb: 1.5, borderRadius: 0 }}>{loiTai}</Alert>}
+            {dangTai && !loiTai && (
+              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
+                Đang tải bài làm của học sinh…
+              </Typography>
+            )}
+
             {filteredStudents.length === 0 ? (
               <Typography variant="body2" color="text.secondary" align="center" sx={{ py: 4 }}>
                 Không tìm thấy học sinh nào phù hợp.
@@ -208,9 +231,7 @@ export const QuizProgressTab: React.FC<QuizProgressTabProps> = ({ students, isAd
                 {filteredStudents.map(stud => {
                   const active = selectedStudentEmail === stud.email;
                   // Đếm số câu cần review của học sinh này
-                  const studQuizzes = QuizStorage.getQuizzes().filter(
-                    q => q.userEmail.toLowerCase() === stud.email.toLowerCase() && q.status === 'submitted'
-                  );
+                  const studQuizzes = baiCua(stud.email);
                   let flagCount = 0;
                   studQuizzes.forEach(qz => {
                     if (qz.results) {

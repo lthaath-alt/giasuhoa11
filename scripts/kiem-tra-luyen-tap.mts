@@ -21,6 +21,9 @@ import {
 import type { BankQuestion } from '../src/features/bank/types';
 import type { Question } from '../src/features/library/types';
 import { xaoPhuongAnBank, xaoPhuongAnWeb } from '../src/features/bank/xaoDapAn';
+import { chuanBiBaiNop } from '../src/features/quiz/baiNopChuan';
+import type { Quiz } from '../src/features/quiz/types';
+import { readFileSync } from 'node:fs';
 
 let hong = 0;
 const ok = (dieu: boolean, ten: string, chiTiet = '') => {
@@ -339,6 +342,37 @@ console.log('\n== Xáo vị trí phương án ==');
 
   const tuLuan: Question = { ...web, type: 'Tự luận', options: [], correctAnswer: undefined };
   ok(xaoPhuongAnWeb(tuLuan) === tuLuan, 'câu tự luận trả về nguyên vẹn');
+}
+
+/* Bài đã nộp lên Firestore (18/09/2026). Trước đó bài chỉ nằm trong
+   localStorage của máy học sinh, và trang giáo viên đọc localStorage của máy
+   GIÁO VIÊN — nên luôn trống mà không báo lỗi gì. */
+console.log('\n== Bài nộp lên Firestore ==');
+{
+  const goc = {
+    id: 'quiz_1', lessonId: 'b1', chapterId: 'c1', userEmail: '  HS@Truong.Local ',
+    questions: [{ id: 'q1', type: 'Trắc nghiệm', content: 'x', points: 1, image: undefined }],
+    answers: { q1: 'A' }, status: 'submitted', score: 1, maxScore: 1,
+    createdAt: '2026-09-18T00:00:00Z', expiresAt: '2026-09-19T00:00:00Z',
+    results: { q1: { questionId: 'q1', score: 1, maxScore: 1, correct: true, studentAnswer: 'A', correctAnswer: 'A', feedback: 'ok', confidence: 'high' } },
+  } as unknown as Quiz;
+  const ra = chuanBiBaiNop(goc);
+  ok(ra.userEmail === 'hs@truong.local', 'email về chữ thường, bỏ khoảng trắng (luật so với token Auth)');
+  ok(!('image' in ra.questions[0]), 'không còn trường undefined (Firestore từ chối nó)');
+  ok(goc.userEmail === '  HS@Truong.Local ' && 'image' in goc.questions[0], 'không sửa đối tượng gốc');
+  ok(ra.results?.q1.score === 1 && ra.answers.q1 === 'A', 'giữ nguyên điểm và câu trả lời');
+
+  // Bắt CHỖ GỌI và dòng import, không bắt chữ trong chú thích giải thích lịch sử.
+  const dungQuizStorage = /QuizStorage\s*\.|from\s+['"][^'"]*quizStorage['"]/;
+  const tab = readFileSync('src/features/teacher/components/QuizProgressTab.tsx', 'utf8');
+  ok(!dungQuizStorage.test(tab), 'trang giáo viên KHÔNG đọc QuizStorage (đó là localStorage của máy giáo viên)');
+  const ctx = readFileSync('src/core/contexts/AppContext.tsx', 'utf8');
+  const dau = ctx.indexOf('const updateQuizEssayScore');
+  const cham = ctx.slice(dau, ctx.indexOf('\n  };', dau));
+  ok(dau > 0 && /docBaiNop\(/.test(cham) && /ghiDiemChamLai\(/.test(cham) && !dungQuizStorage.test(cham),
+    'chấm lại tự luận đọc và ghi Firestore, không đụng localStorage');
+  const nop = readFileSync('src/features/quiz/quizService.ts', 'utf8');
+  ok(/luuBaiNop\(updatedQuiz\)/.test(nop), 'nộp bài xong có đẩy bản sao lên Firestore');
 }
 
 console.log(hong === 0

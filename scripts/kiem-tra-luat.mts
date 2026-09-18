@@ -26,8 +26,15 @@ import {
   type RulesTestEnvironment,
 } from '@firebase/rules-unit-testing';
 import {
-  doc, getDoc, setDoc, updateDoc, deleteDoc, collection, getDocs,
+  doc, getDoc, setDoc, updateDoc, deleteDoc, collection, getDocs, query, where,
 } from 'firebase/firestore';
+
+/** Một bài kiểm tra đã nộp, đúng hình dạng `Quiz` mà web ghi lên `bai_nop`. */
+const baiMau = (id: string, email: string, score: number, maxScore: number) => ({
+  id, lessonId: 'b1', chapterId: 'c1', userEmail: email, questions: [], answers: {},
+  status: 'submitted', score, maxScore, createdAt: '2026-09-18T00:00:00Z',
+  expiresAt: '2026-09-19T00:00:00Z', results: {},
+});
 
 const GOC = join(dirname(fileURLToPath(import.meta.url)), '..');
 const DU_AN = 'demo-giasuhoa11';   // tiền tố `demo-` = không bao giờ chạm hạ tầng thật
@@ -115,6 +122,7 @@ async function gieo(moi: RulesTestEnvironment) {
     await setDoc(doc(db, 'classes', 'lop_1'), { name: '11H', inviteCode: '11H01' });
     await setDoc(doc(db, 'progress', NGUOI.hs.email), { diem: 8 });
     await setDoc(doc(db, 'chats', 'chat_1'), { userEmail: NGUOI.hs.email, noiDung: 'chao' });
+    await setDoc(doc(db, 'bai_nop', 'bn_1'), baiMau('bn_1', NGUOI.hs.email, 5, 10));
   });
 }
 
@@ -238,6 +246,33 @@ async function chayCacPhep(): Promise<number> {
     '20g. học sinh đọc bộ đếm của người khác');
   await chan(getDoc(doc(khach, 'gioi_han_chat', 'uid_khach_an_danh')),
     '20h. chưa đăng nhập đọc bộ đếm');
+
+  // 21: bài kiểm tra đã nộp (18/09/2026)
+  const hs2 = nhu(moi, NGUOI.hs2);
+  await duoc(setDoc(doc(hs, 'bai_nop', 'bn_2'), baiMau('bn_2', NGUOI.hs.email, 3, 10)),
+    '21a. học sinh nộp bài của chính mình');
+  await chan(setDoc(doc(hs, 'bai_nop', 'bn_3'), baiMau('bn_3', NGUOI.hs2.email, 3, 10)),
+    '21b. học sinh nộp bài đứng tên bạn khác');
+  await chan(setDoc(doc(hs, 'bai_nop', 'bn_4'), baiMau('bn_4', NGUOI.hs.email, 11, 10)),
+    '21c. điểm lớn hơn điểm tối đa');
+  await chan(setDoc(doc(hs, 'bai_nop', 'bn_5'), baiMau('bn_x', NGUOI.hs.email, 3, 10)),
+    '21d. id trong dữ liệu khác id tài liệu');
+  await chan(updateDoc(doc(hs, 'bai_nop', 'bn_1'), { score: 10 }),
+    '21e. học sinh tự nâng điểm bài đã nộp');
+  await duoc(getDoc(doc(hs, 'bai_nop', 'bn_1')),
+    '21f. học sinh đọc bài của chính mình');
+  await chan(getDoc(doc(hs2, 'bai_nop', 'bn_1')),
+    '21g. học sinh đọc bài của bạn');
+  await duoc(getDocs(query(collection(gv, 'bai_nop'), where('userEmail', 'in', [NGUOI.hs.email]))),
+    '21h. giáo viên liệt kê bài của học sinh');
+  await duoc(updateDoc(doc(gv, 'bai_nop', 'bn_1'), { score: 7, results: {} }),
+    '21i. giáo viên chấm lại điểm');
+  await chan(updateDoc(doc(gv, 'bai_nop', 'bn_1'), { userEmail: NGUOI.hs2.email }),
+    '21j. giáo viên đổi chủ bài nộp');
+  await chan(getDocs(collection(khach, 'bai_nop')),
+    '21k. chưa đăng nhập liệt kê bài nộp');
+  await chan(getDocs(collection(hs, 'bai_nop')),
+    '21l. học sinh liệt kê bài của cả lớp');
 
   /* PHÉP TỰ PHÁ. Một bộ kiểm luôn xanh mà chưa bao giờ bắt được gì thì đáng
      ngờ hơn đáng mừng — bài học đã trả giá một lần, xem "Rút kinh nghiệm"

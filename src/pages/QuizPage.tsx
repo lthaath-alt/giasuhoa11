@@ -14,6 +14,7 @@ import {
 import { useApp } from '../core/hooks/useApp';
 import { QuizStorage } from '../features/quiz/quizStorage';
 import { QuizService } from '../features/quiz/quizService';
+import { docBaiNop } from '../features/quiz/baiNopService';
 import type { Quiz, QuizQuestionResult } from '../features/quiz/types';
 
 // Helper render Hóa học (giữ sub/sup)
@@ -47,6 +48,18 @@ export const QuizPage: React.FC = () => {
       setQuiz(q);
       setAnswers(q.answers || {});
     }
+    /* Bài đã nộp: bản trên Firestore mang điểm giáo viên chấm lại, và mở được
+       cả khi máy này không có bài (học sinh đổi máy). Bài đang làm dở thì chỉ
+       có trong máy, không cần hỏi mạng. */
+    if (q && q.status !== 'submitted') return;
+    let huy = false;
+    void docBaiNop(quizId).then(ban => {
+      if (huy || !ban) return;
+      setQuiz(ban);
+      setAnswers(ban.answers || {});
+      if (q) QuizStorage.updateQuiz(quizId, ban);
+    });
+    return () => { huy = true; };
   }, [quizId]);
 
   // 2. Tính thời gian còn lại của link

@@ -2,6 +2,7 @@ import { Quiz, QuizQuestionResult } from './types';
 import { chonCauChoDeChuong } from './deChuong';
 import { xaoPhuongAnWeb } from '../bank/xaoDapAn';
 import { QuizStorage } from './quizStorage';
+import { luuBaiNop } from './baiNopService';
 import { Question, QuestionType, DifficultyLevel } from '../library/types';
 import {
   layCauHoiCuaBai,
@@ -404,6 +405,10 @@ export const QuizService = {
     };
 
     QuizStorage.updateQuiz(quizId, updatedQuiz);
+    /* Bản sao lên Firestore để giáo viên thấy. KHÔNG chờ: mất mạng hay luật
+       chưa publish thì học sinh vẫn nộp và xem điểm bình thường; lần đăng
+       nhập sau `dayBaiCuLen` đẩy lại. */
+    void luuBaiNop(updatedQuiz);
     return updatedQuiz;
   },
 

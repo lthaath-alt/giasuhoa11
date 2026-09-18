@@ -10,7 +10,7 @@ import { GoogleUserInfo } from '../services/googleAuth';
 import { QuizService } from '../../features/quiz/quizService';
 import { BankFirestore } from '../../features/bank/bankStore';
 import { toLegacy, toChapter } from '../../features/bank/convert';
-import { QuizStorage } from '../../features/quiz/quizStorage';
+import { dayBaiCuLen, docBaiNop, ghiDiemChamLai } from '../../features/quiz/baiNopService';
 import { loginWithFirestore, createAccountWithFirestore, resetPasswordWithFirestore } from '../services/firestoreAuth';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
@@ -468,6 +468,10 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
       await loadProgressForUser(hoSo.email);
       persistSession(hoSo);
+
+      /* Bài kiểm tra nộp trước 18/09/2026 chỉ nằm trong máy — đẩy lên để giáo
+         viên thấy. Không chờ, không báo lỗi cho học sinh. */
+      if (hoSo.role === 'student') void dayBaiCuLen(hoSo.email);
 
       /* `classes` thì học sinh đọc được (luật chỉ đòi đã đăng nhập) và màn
          "xin vào lớp" cần nó. `users` thì chỉ giáo viên/quản trị đọc được. */
@@ -1862,8 +1866,11 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
   // ── Giáo viên/Admin chấm lại điểm câu tự luận của học sinh ────────────
 
+  /* Đọc và ghi FIRESTORE, không phải localStorage (18/09/2026). Bản cũ sửa
+     bài trong localStorage của máy giáo viên — học sinh không bao giờ thấy
+     điểm chấm lại. */
   const updateQuizEssayScore = async (quizId: string, questionId: string, newScore: number) => {
-    const quiz = QuizStorage.getQuizById(quizId);
+    const quiz = await docBaiNop(quizId);
     if (!quiz || !quiz.results) return { success: false, message: 'Không tìm thấy bài kiểm tra.' };
 
     const result = quiz.results[questionId];
@@ -1880,7 +1887,12 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     const totalScore = Object.values(quiz.results).reduce((sum, r) => sum + r.score, 0);
     quiz.score = Math.round(totalScore * 100) / 100;
 
-    QuizStorage.updateQuiz(quizId, quiz);
+    try {
+      await ghiDiemChamLai(quizId, quiz.score, quiz.results);
+    } catch (e) {
+      console.warn('[baiNop] không lưu được điểm chấm lại', e);
+      return { success: false, message: 'Không lưu được điểm lên máy chủ. Kiểm tra mạng rồi thử lại.' };
+    }
 
     // Trigger re-render
     setClasses(prev => [...prev]);
