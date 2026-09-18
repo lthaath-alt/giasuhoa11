@@ -81,9 +81,12 @@ console.log('\n== Hai nhánh chỉ khác nhau ở CÁCH DẠY ==');
   }
 
   /* Và phải khác nhau thật ở đúng chỗ cần khác. */
-  ok(soc.includes('KHÔNG BAO GIỜ giải bài giùm') && !tt.includes('KHÔNG BAO GIỜ giải bài giùm'),
-     'chỉ nhánh socratic mới cấm giải bài giùm');
-  ok(soc.includes('tiến trình 6 bước') && !tt.includes('tiến trình 6 bước'),
+  /* Từ 18/09/2026 nhánh socratic mang nguyên văn năm quy tắc của chủ đề tài,
+     nên hai phép dưới đây neo vào chính câu chữ đó thay cho câu cũ. */
+  ok(soc.includes('Nhiệm vụ của bạn KHÔNG phải là cung cấp đáp án')
+     && !tt.includes('Nhiệm vụ của bạn KHÔNG phải là cung cấp đáp án'),
+     'chỉ nhánh socratic mới cấm cung cấp đáp án');
+  ok(soc.includes('NHÁNH B: BÀI TOÁN TÍNH TOÁN') && !tt.includes('NHÁNH B: BÀI TOÁN TÍNH TOÁN'),
      'chỉ nhánh socratic mới ép quy trình 6 bước');
   ok(tt.includes('LỜI GIẢI MẪU') && !soc.includes('LỜI GIẢI MẪU'),
      'chỉ nhánh đối chứng mới trình bày lời giải mẫu');

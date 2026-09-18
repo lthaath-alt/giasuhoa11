@@ -61,14 +61,15 @@ export const CUM_TU_CAM_KHI_BE_TAC = ['rất dễ', 'dễ thôi', 'dễ dàng', 
  * BỐN nấc (18/09/2026, trước đó là ba):
  *   1  chẩn đoán chỗ vướng bằng câu hỏi ba lựa chọn;
  *   2  THU HẸP câu hỏi — cho sẵn một dữ kiện trung gian rồi hỏi một bước nhỏ,
- *      hoặc đổi câu hỏi mở thành câu hỏi có sẵn lựa chọn. Vẫn không đáp án;
- *   3  giải mẫu một bài cùng dạng khác số liệu;
- *   4+ làm hộ đúng bước hiện tại của bài gốc.
+ *      hoặc đổi câu hỏi mở thành câu hỏi có sẵn lựa chọn;
+ *   3  giải mẫu một bài cùng dạng KHÁC số liệu, không giải bài gốc;
+ *   4+ thu hẹp tới mức nhỏ nhất (câu hỏi có/không), hoặc chỉ phần bài giảng
+ *      cần đọc lại.
  *
- * Nấc 2 được chèn thêm theo yêu cầu của chủ đề tài: bế tắc sau hai lượt hỏi
- * thì hạ độ mở của câu hỏi trước đã, đừng nhảy ngay sang giải mẫu. Thứ tự này
- * giữ đúng nguyên tắc tăng dần mức hỗ trợ, và mỗi nấc vẫn trả việc lại cho
- * học sinh.
+ * KHÔNG nấc nào được đưa đáp án của bài gốc. Trước 18/09/2026 nấc cuối làm hộ
+ * một bước của bài gốc; quy tắc 3 của chủ đề tài ("vẫn không được đưa đáp án")
+ * là luật cao hơn nên phần làm hộ đã bị bỏ. Đổi lại, học sinh bế tắc lâu sẽ
+ * được chỉ về bài giảng thay vì nhận lời giải.
  */
 export function chiDanGianGiao(soLanBeTac: number): string {
   if (soLanBeTac <= 0) return '';
@@ -103,8 +104,9 @@ export function chiDanGianGiao(soLanBeTac: number): string {
   }
   return [
     `TRẠNG THÁI (do hệ thống đếm): HỌC SINH BẾ TẮC LẦN ${soLanBeTac}.`,
-    'Việc của lượt này: giải thích chi tiết và LÀM HỘ BƯỚC HIỆN TẠI của bài gốc (kể cả phép tính của bước đó), nói rõ vì sao làm vậy.',
-    'Sau đó giao BƯỚC KẾ TIẾP cho em tự làm, kèm một gợi ý nhỏ. Không làm hộ quá một bước.',
+    'Việc của lượt này: THU HẸP TỚI MỨC NHỎ NHẤT. Hỏi một câu chỉ cần trả lời có/không, hoặc chọn một trong hai.',
+    'Nếu chỗ vướng là kiến thức nền, chỉ cho em phần bài giảng cần đọc lại rồi hỏi một câu về đúng phần đó.',
+    'TUYỆT ĐỐI KHÔNG đưa đáp án, KHÔNG làm hộ bước của bài gốc, KHÔNG nêu sẵn công thức hay kết quả tính.',
     cam,
   ].join('\n');
 }

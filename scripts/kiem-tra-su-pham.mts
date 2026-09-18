@@ -68,9 +68,13 @@ console.log('\n== Máy trạng thái: bế tắc và giàn giáo ==');
   ok(n2.includes('THU HẸP CÂU HỎI') && n2.includes('KHÔNG đưa đáp án') && n2.includes('KHÔNG giải mẫu'),
     'nấc 2: thu hẹp câu hỏi, chưa đưa đáp án và chưa giải mẫu');
   ok(n3.includes('GIẢI MẪU') && n3.includes('KHÁC số liệu'), 'nấc 3: giải mẫu bài tương tự với số liệu khác');
-  ok(n4.includes('LÀM HỘ BƯỚC HIỆN TẠI') && n4.includes('BƯỚC KẾ TIẾP'), 'nấc 4+: làm hộ một bước, giao bước sau');
-  ok(!n2.includes('GIẢI MẪU') && !n3.includes('LÀM HỘ BƯỚC HIỆN TẠI'),
-    'mức hỗ trợ tăng dần, không nấc nào làm hộ phần của nấc sau');
+  ok(n4.includes('THU HẸP TỚI MỨC NHỎ NHẤT') && n4.includes('KHÔNG đưa đáp án'),
+    'nấc 4+: thu hẹp tới mức nhỏ nhất, vẫn không đưa đáp án');
+  ok(!n2.includes('GIẢI MẪU'), 'nấc 2 chưa giải mẫu, để dành cho nấc 3');
+  /* Quy tắc 3 của chủ đề tài: bế tắc mấy lần cũng KHÔNG được đưa đáp án. Trước
+     18/09/2026 nấc cuối làm hộ một bước của bài gốc; nay bỏ. */
+  ok([n1, n2, n3, n4].every(n => !/LÀM HỘ BƯỚC HIỆN TẠI/.test(n)),
+    'không nấc nào làm hộ bước của bài gốc');
   ok([n1, n2, n3, n4].every(n => n.includes('KHÔNG kết thúc phiên') && n.includes('bài kiểm tra')),
     'cả bốn nấc đều cấm ngắt phiên và đẩy sang làm bài kiểm tra');
   ok([n1, n2, n3, n4].every(n => CUM_TU_CAM_KHI_BE_TAC.every(c => n.includes(`"${c}"`))),
@@ -133,8 +137,8 @@ console.log('\n== Câu lệnh hệ thống: ba chỗ tự mâu thuẫn đã gỡ
   ok(!soc.includes('[SIGNAL:OFFTOPIC]') && soc.includes('[SIGNAL:CAM_XUC_TIEU_CUC]') && soc.includes('[SIGNAL:LAC_DE]'),
     'thay nhãn OFFTOPIC bằng hai loại không phạt');
   ok(!soc.includes('Mẫu: "Thầy/cô hiểu em muốn đi nhanh hơn'), 'bỏ câu mẫu từ chối cố định (gốc của trả lời rập khuôn)');
-  ok(soc.includes('CHẨN ĐOÁN MỆNH ĐỀ NỬA ĐÚNG') && soc.includes('ÍT mol khí') && /vì sao em lại nghĩ/i.test(soc),
-    'có quy tắc chẩn đoán mệnh đề nửa đúng (KB2)');
+  ok(soc.includes('CÂU TRẢ LỜI NỬA ĐÚNG – NỬA SAI') && /vì sao em lại nghĩ/i.test(soc),
+    'có quy tắc xử lý câu trả lời nửa đúng (KB2)');
   /* Chạy thật ngày 16/09/2026: gia sư công nhận vế đúng, chỉ ra vế sai, nhưng kết
      lượt bằng câu dẫn "để giảm áp suất thì theo em phải…" thay vì hỏi nguyên nhân.
      Luật được siết: câu hỏi cuối BẮT BUỘC là câu hỏi "vì sao", không kèm câu dẫn. */
@@ -154,14 +158,28 @@ console.log('\n== Câu lệnh hệ thống: ba chỗ tự mâu thuẫn đã gỡ
       `nhánh ${ten}: có luật xử lý bài làm nghi sao chép, không kết tội`);
     ok(p.includes('không mỉa mai, không chê, không hạ thấp em'), `nhánh ${ten}: dặn giữ giọng tôn trọng`);
   }
-  ok(soc.includes('KHÔNG nêu sẵn công thức, phương trình hay kết quả tính ở dạng khẳng định trước khi em tự đề xuất'),
-    'nhánh gợi mở: cấm nêu sẵn công thức trước khi học sinh tự đề xuất');
-  ok(soc.includes('bế tắc lần 4 trở lên') && !soc.includes('bế tắc lần 3 trở lên'),
-    'nhánh gợi mở: làm hộ một bước chỉ từ nấc 4, khớp với bốn nấc trong máy trạng thái');
-  ok(soc.includes('KHI EM TRẢ LỜI SAI HOẶC TÍNH SAI') && soc.includes('KHÔNG sửa hộ phép tính')
-     && soc.includes('Chỉ ra ĐÚNG MỘT chỗ cần xem lại'),
-    'nhánh gợi mở: em tính sai thì chỉ chỗ cần xem lại rồi hỏi, không chữa hộ');
-  ok(!tt.includes('KHÔNG sửa hộ phép tính'),
+  /* Năm quy tắc của chủ đề tài phải nằm NGUYÊN VĂN trong nhánh gợi mở: đây là
+     luật cao nhất, mọi mục khác của câu lệnh đã được viết lại cho khớp. */
+  const NAM_QUY_TAC = [
+    'Không bao giờ đưa ra công thức, phương trình, hoặc kết quả tính toán trước khi học sinh tự đề xuất.',
+    'Khi học sinh trả lời sai, không chỉ ra lỗi trực tiếp — hãy đặt câu hỏi để học sinh tự kiểm tra lại.',
+    'được phép thu hẹp câu hỏi để dễ trả lời hơn (giảm "độ mở" của câu hỏi), nhưng vẫn không được đưa đáp án',
+    'hãy yêu cầu học sinh giải thích lại bằng lời của chính mình, hoặc áp dụng cách giải vào một dữ kiện khác',
+    'mục tiêu là khuyến khích tư duy, không phải hạ thấp học sinh',
+  ];
+  NAM_QUY_TAC.forEach((q, i) => ok(soc.includes(q), `quy tắc ${i + 1} của chủ đề tài còn nguyên văn`));
+  ok(soc.startsWith('VAI TRÒ\nBạn là Chemai — một gia sư Hóa học theo phong cách Socrates.'),
+    'mở đầu câu lệnh đúng nguyên văn vai Chemai');
+  ok(soc.includes('KHI EM TRẢ LỜI SAI') && soc.includes('KHÔNG nói "em sai"')
+     && soc.includes('KHÔNG sửa hộ phép tính'),
+    'em trả lời sai thì hỏi để em tự kiểm, không chỉ lỗi trực tiếp (quy tắc 2)');
+  ok(soc.includes('Không tuyên bố nhận định đó sai'),
+    'ngộ nhận cũng xử bằng phản ví dụ và câu hỏi, không tuyên bố sai (quy tắc 2)');
+  ok(soc.includes('Hỏi em TỰ nêu công thức hoặc định luật cần dùng') && soc.includes('mới thu hẹp thành 4 lựa chọn'),
+    'bước B3 hỏi em tự đề xuất trước, chỉ thu hẹp khi em không nêu được (quy tắc 1 và 3)');
+  ok(!soc.includes('bế tắc lần 4 trở lên') && !soc.includes('bế tắc lần 3 trở lên'),
+    'bỏ ngoại lệ làm hộ một bước, khớp với máy trạng thái');
+  ok(!tt.includes('KHÔNG sửa hộ phép tính') && !tt.includes('phong cách Socrates'),
     'nhánh đối chứng KHÔNG nhận luật của nhánh gợi mở (giữ biến đối chứng)');
   ok(THAM_SO_SINH.temperature === 0.3 && THAM_SO_SINH.topP === 0.85, 'temperature 0,3 và topP 0,85');
   const thuAi = readFileSync(`${GOC}scripts/thu-gia-su-ai.mts`, 'utf8');
