@@ -4,7 +4,7 @@
  * Chạy:  npm run kiem-tra:su-pham
  * Không gọi mạng, không tốn lượt API. Hành vi THẬT của mô hình thì đo bằng
  * `npm run thu:ai`; bộ này canh phần do MÃ quyết định:
- *   1. Máy trạng thái: đếm bế tắc, giàn giáo ba nấc, chặn gian lận phòng thi,
+ *   1. Máy trạng thái: đếm bế tắc, giàn giáo bốn nấc, chặn gian lận phòng thi,
  *      phát hiện spam, tách nhãn ẩn.
  *   2. Câu lệnh hệ thống không còn ba chỗ tự mâu thuẫn mà biên bản bắt được.
  *   3. Bộ chuẩn hoá + dựng công thức: đúng từng ca đã hỏng ở bộ regex cũ, và
@@ -60,15 +60,21 @@ console.log('\n== Máy trạng thái: bế tắc và giàn giáo ==');
     'em đã thử trả lời thì chuỗi bế tắc bị cắt, đếm lại từ 1');
   ok(demBeTacLienTiep(ls, 'Dạ số mol HCl là 0,01') === 0, 'tin không bế tắc thì đếm 0');
 
-  const n1 = chiDanGianGiao(1), n2 = chiDanGianGiao(2), n3 = chiDanGianGiao(3);
+  /* Bốn nấc từ 18/09/2026: nấc 2 "thu hẹp câu hỏi" được chèn thêm, đẩy giải
+     mẫu xuống nấc 3 và làm hộ một bước xuống nấc 4. */
+  const n1 = chiDanGianGiao(1), n2 = chiDanGianGiao(2), n3 = chiDanGianGiao(3), n4 = chiDanGianGiao(4);
   ok(chiDanGianGiao(0) === '', 'không bế tắc thì không gắn chỉ dẫn');
   ok(/A\..*B\..*C\./s.test(n1) && n1.includes('CHẨN ĐOÁN'), 'nấc 1: câu hỏi chẩn đoán có đủ A, B, C');
-  ok(n2.includes('GIẢI MẪU') && n2.includes('KHÁC số liệu'), 'nấc 2: giải mẫu bài tương tự với số liệu khác');
-  ok(n3.includes('LÀM HỘ BƯỚC HIỆN TẠI') && n3.includes('BƯỚC KẾ TIẾP'), 'nấc 3+: làm hộ một bước, giao bước sau');
-  ok([n1, n2, n3].every(n => n.includes('KHÔNG kết thúc phiên') && n.includes('bài kiểm tra')),
-    'cả ba nấc đều cấm ngắt phiên và đẩy sang làm bài kiểm tra');
-  ok([n1, n2, n3].every(n => CUM_TU_CAM_KHI_BE_TAC.every(c => n.includes(`"${c}"`))),
-    'cả ba nấc đều liệt kê cụm từ gây ức chế bị cấm', CUM_TU_CAM_KHI_BE_TAC.join(', '));
+  ok(n2.includes('THU HẸP CÂU HỎI') && n2.includes('KHÔNG đưa đáp án') && n2.includes('KHÔNG giải mẫu'),
+    'nấc 2: thu hẹp câu hỏi, chưa đưa đáp án và chưa giải mẫu');
+  ok(n3.includes('GIẢI MẪU') && n3.includes('KHÁC số liệu'), 'nấc 3: giải mẫu bài tương tự với số liệu khác');
+  ok(n4.includes('LÀM HỘ BƯỚC HIỆN TẠI') && n4.includes('BƯỚC KẾ TIẾP'), 'nấc 4+: làm hộ một bước, giao bước sau');
+  ok(!n2.includes('GIẢI MẪU') && !n3.includes('LÀM HỘ BƯỚC HIỆN TẠI'),
+    'mức hỗ trợ tăng dần, không nấc nào làm hộ phần của nấc sau');
+  ok([n1, n2, n3, n4].every(n => n.includes('KHÔNG kết thúc phiên') && n.includes('bài kiểm tra')),
+    'cả bốn nấc đều cấm ngắt phiên và đẩy sang làm bài kiểm tra');
+  ok([n1, n2, n3, n4].every(n => CUM_TU_CAM_KHI_BE_TAC.every(c => n.includes(`"${c}"`))),
+    'cả bốn nấc đều liệt kê cụm từ gây ức chế bị cấm', CUM_TU_CAM_KHI_BE_TAC.join(', '));
 
   const doiChung = xuLyTruocLuot(ls, cau, 'truc-tiep');
   ok(doiChung.chiDanThem === '' && doiChung.soLanBeTac === 3,
@@ -137,6 +143,26 @@ console.log('\n== Câu lệnh hệ thống: ba chỗ tự mâu thuẫn đã gỡ
   ok(soc.includes('BaSO4') && soc.includes('CH3COOH') && soc.includes('glucose'),
     'bảng ngộ nhận độ tan / điện li có đủ ba phản ví dụ (KB4)');
   ok(soc.includes('[BUOC:') && soc.includes('[LUOT:') && soc.includes('hanh_chinh'), 'dặn gắn nhãn ẩn để đo');
+
+  /* Năm quy tắc chủ đề tài đưa ra ngày 18/09/2026. Quy tắc chống sao chép và
+     câu về giọng điệu nằm ở phần DÙNG CHUNG nên phải có ở CẢ HAI nhánh; hai
+     quy tắc còn lại thuộc cách dạy nên chỉ ở nhánh gợi mở. */
+  const tt = dungPrompt('truc-tiep');
+  for (const [ten, p] of [['gợi mở', soc], ['đối chứng', tt]] as const) {
+    ok(p.includes('BÀI LÀM CÓ DẤU HIỆU KHÔNG PHẢI CỦA EM') && p.includes('ÍT NHẤT HAI dấu hiệu')
+       && p.includes('KHÔNG kết tội') && p.includes('bằng lời của chính em') && p.includes('đổi dữ kiện'),
+      `nhánh ${ten}: có luật xử lý bài làm nghi sao chép, không kết tội`);
+    ok(p.includes('không mỉa mai, không chê, không hạ thấp em'), `nhánh ${ten}: dặn giữ giọng tôn trọng`);
+  }
+  ok(soc.includes('KHÔNG nêu sẵn công thức, phương trình hay kết quả tính ở dạng khẳng định trước khi em tự đề xuất'),
+    'nhánh gợi mở: cấm nêu sẵn công thức trước khi học sinh tự đề xuất');
+  ok(soc.includes('bế tắc lần 4 trở lên') && !soc.includes('bế tắc lần 3 trở lên'),
+    'nhánh gợi mở: làm hộ một bước chỉ từ nấc 4, khớp với bốn nấc trong máy trạng thái');
+  ok(soc.includes('KHI EM TRẢ LỜI SAI HOẶC TÍNH SAI') && soc.includes('KHÔNG sửa hộ phép tính')
+     && soc.includes('Chỉ ra ĐÚNG MỘT chỗ cần xem lại'),
+    'nhánh gợi mở: em tính sai thì chỉ chỗ cần xem lại rồi hỏi, không chữa hộ');
+  ok(!tt.includes('KHÔNG sửa hộ phép tính'),
+    'nhánh đối chứng KHÔNG nhận luật của nhánh gợi mở (giữ biến đối chứng)');
   ok(THAM_SO_SINH.temperature === 0.3 && THAM_SO_SINH.topP === 0.85, 'temperature 0,3 và topP 0,85');
   const thuAi = readFileSync(`${GOC}scripts/thu-gia-su-ai.mts`, 'utf8');
   ok(thuAi.includes('THAM_SO_SINH') && !/temperature:\s*0\.7/.test(thuAi), 'bộ thử AI dùng CHUNG tham số với web');

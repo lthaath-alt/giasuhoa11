@@ -191,7 +191,7 @@ Phương pháp Socrates có hai thao tác. Thao tác thứ nhất là chất v�
 
 Từ cách làm này, nhóm rút ra ba yêu cầu đối với câu hỏi của gia sư. Yêu cầu thứ nhất là câu hỏi nhắm vào lí do của chính học sinh: câu "Vì sao em nghĩ tăng áp suất thì cân bằng chuyển sang phía nhiều mol khí hơn?" buộc học sinh nói ra lí do, và lí do đó là chỗ cần sửa. Yêu cầu thứ hai là kết luận do học sinh tự phát biểu. Yêu cầu thứ ba là câu hỏi không gợi sẵn đáp án: câu hỏi chọn một trong hai như "nhiều hay ít?", "thuận hay nghịch?" cho học sinh cơ hội đoán đúng mà không cần hiểu. Ba yêu cầu này là cách hiểu của nhóm, dùng để viết câu lệnh cho gia sư.
 
-Hỏi liên tục cũng có giới hạn: khi học sinh thiếu kiến thức nền, thêm một câu hỏi không giúp em suy luận được. Wood, Bruner và Ross (1976) quan sát người dạy hướng dẫn trẻ từ 3 đến 5 tuổi lắp một mô hình ba chiều bằng các khối lồng vào nhau, và dùng hình ảnh giàn giáo (scaffolding) để mô tả sáu chức năng của người dạy: thu hút người học vào nhiệm vụ, giảm bậc tự do của nhiệm vụ, duy trì hướng tới mục tiêu, đánh dấu những đặc điểm quan trọng, kiểm soát sự nản chí, và làm mẫu (tài liệu [15]). Đối tượng và nhiệm vụ trong nghiên cứu đó khác hẳn đề tài này, nên đề tài chỉ mượn cách chia chức năng để thiết kế ba nấc hỗ trợ khi học sinh bế tắc (mục D.2.1.1). Theo cách đối chiếu của nhóm, nấc 2 (giải mẫu một bài cùng dạng) ứng với chức năng làm mẫu; nấc 3 (làm hộ đúng một bước rồi trả bước sau cho học sinh) ứng với chức năng giảm bậc tự do; lệnh cấm gia sư nói "dễ thôi" ứng với chức năng kiểm soát sự nản chí.
+Hỏi liên tục cũng có giới hạn: khi học sinh thiếu kiến thức nền, thêm một câu hỏi không giúp em suy luận được. Wood, Bruner và Ross (1976) quan sát người dạy hướng dẫn trẻ từ 3 đến 5 tuổi lắp một mô hình ba chiều bằng các khối lồng vào nhau, và dùng hình ảnh giàn giáo (scaffolding) để mô tả sáu chức năng của người dạy: thu hút người học vào nhiệm vụ, giảm bậc tự do của nhiệm vụ, duy trì hướng tới mục tiêu, đánh dấu những đặc điểm quan trọng, kiểm soát sự nản chí, và làm mẫu (tài liệu [15]). Đối tượng và nhiệm vụ trong nghiên cứu đó khác hẳn đề tài này, nên đề tài chỉ mượn cách chia chức năng để thiết kế bốn nấc hỗ trợ khi học sinh bế tắc (mục D.2.1.1). Theo cách đối chiếu của nhóm, nấc 2 (thu hẹp câu hỏi, cho sẵn một dữ kiện trung gian rồi hỏi một bước nhỏ) ứng với chức năng giảm bậc tự do và đánh dấu đặc điểm quan trọng; nấc 3 (giải mẫu một bài cùng dạng) ứng với chức năng làm mẫu; nấc 4 (làm hộ đúng một bước rồi trả bước sau cho học sinh) ứng với chức năng giảm bậc tự do ở mức cao nhất; lệnh cấm gia sư nói "dễ thôi" ứng với chức năng kiểm soát sự nản chí.
 
 Chi và Wylie (2014) chia mức độ tham gia nhận thức của người học thành bốn mức theo hành vi quan sát được là thụ động, chủ động, kiến tạo và tương tác, với giả thuyết rằng người học học được nhiều hơn khi đi từ mức thụ động tới mức tương tác (tài liệu [16]). Nhóm vận dụng cách chia đó như sau: học sinh đọc lời giải mẫu ở mức thụ động hoặc chủ động, học sinh tự tính và tự giải thích ở mức kiến tạo. Gia sư gợi mở được thiết kế để giữ học sinh ở mức kiến tạo và tương tác, còn nhánh đối chứng giảng thẳng có lời giải mẫu.
 
@@ -360,15 +360,18 @@ Hình 7. Đoạn mã phát hiện giờ kiểm tra trong tệp pedagogicalStateM
 
 Bước hai, đếm bế tắc. Tin nhắn ngắn (không quá 90 ký tự) có cụm như "không biết", "bí quá", "chịu rồi" được tính là một lần bế tắc. Mã đếm số lần bế tắc liên tiếp và gắn chỉ dẫn tương ứng vào câu lệnh (Bảng 10). Chỉ dẫn này chỉ áp dụng cho nhánh gợi mở; nhánh đối chứng vẫn được đếm để lấy số liệu.
 
-Bảng 10. Ba nấc hỗ trợ khi học sinh bế tắc
+Bảng 10. Bốn nấc hỗ trợ khi học sinh bế tắc
 
 | Số lần bế tắc liên tiếp | Việc gia sư phải làm |
 |---|---|
 | 1 | Hỏi một câu chẩn đoán có ba lựa chọn: chưa hiểu đề, chưa nhớ kiến thức, hay vướng phép tính |
-| 2 | Giải mẫu trọn một bài cùng dạng khác số liệu, rồi mời em làm bài gốc từ bước đầu |
-| 3 trở lên | Làm hộ bước hiện tại của bài gốc, giải thích vì sao, rồi giao bước kế tiếp cho em |
+| 2 | Thu hẹp câu hỏi: cho sẵn một dữ kiện trung gian rồi hỏi đúng một bước nhỏ liền sau đó, hoặc đổi câu hỏi mở thành câu hỏi có sẵn 2 đến 4 lựa chọn. Chưa đưa đáp án, chưa giải mẫu |
+| 3 | Giải mẫu trọn một bài cùng dạng khác số liệu, rồi mời em làm bài gốc từ bước đầu |
+| 4 trở lên | Làm hộ bước hiện tại của bài gốc, giải thích vì sao, rồi giao bước kế tiếp cho em |
 
-Ở cả ba nấc, gia sư không được nói "dễ thôi", "đơn giản thôi" và không được đẩy em sang làm bài kiểm tra. Cách thiết kế ba nấc dựa trên các chức năng giàn giáo trình bày ở mục C.2.1.2.
+Ở cả bốn nấc, gia sư không được nói "dễ thôi", "đơn giản thôi" và không được đẩy em sang làm bài kiểm tra. Cách thiết kế bốn nấc dựa trên các chức năng giàn giáo trình bày ở mục C.2.1.2.
+
+Nấc 2 được chèn thêm ngày 18/09/2026 theo yêu cầu của chủ dự án: khi em bế tắc sau hai lượt hỏi thì hạ độ mở của câu hỏi trước đã, chưa nhảy sang giải mẫu. Cùng đợt này, câu lệnh nhận thêm hai luật cho nhánh gợi mở (không nêu sẵn công thức trước khi em tự đề xuất; em tính sai thì chỉ chỗ cần xem lại rồi hỏi để em tự kiểm, không chữa hộ) và một luật dùng chung cho cả hai nhánh: bài làm có dấu hiệu không phải của em thì gia sư mời em giải thích lại bằng lời của chính mình hoặc đổi dữ kiện, không kết tội em.
 
 Bước ba, chặn spam. Mã coi là spam khi một người gửi từ 6 tin trong 60 giây, hoặc gửi cùng một nội dung 3 lần liền. Spam do mã phát hiện để kẻ spam không đốt lượt gọi mô hình. Học sinh than mệt, bực bội hay hỏi nhầm môn thì không bị tính là spam.
 
@@ -586,7 +589,7 @@ Bảng 19. Việc của học sinh, giáo viên và sản phẩm đánh giá tro
 
 Ví dụ đề xuất cho Bài 1 (Khái niệm về cân bằng hoá học) như sau. Ở nhà, học sinh làm hai bài: một bài tính nồng độ các chất ở trạng thái cân bằng như Hội thoại 1 ở Phụ lục 3, và một câu hỏi về điều kiện tổng hợp ammonia có gài ngộ nhận về áp suất như Hội thoại 2. Đầu tiết, đoạn hỏi đáp cho giáo viên biết em nào tự làm đúng ngay và em nào được gia sư hỏi lại lí do ở câu áp suất; giáo viên có thể giao câu này cho một em thuộc nhóm sau trình bày, vì em đó vừa tự sửa quan niệm sai của mình. Giữa tiết, bài biến thể là phản ứng toả nhiệt 2SO₂(g) + O₂(g) ⇌ 2SO₃(g): học sinh nêu điều kiện để tăng hiệu suất và giải thích vì sao dùng chất xúc tác. Bài này kiểm tra học sinh có chuyển được quy tắc áp suất sang một hệ khác (3 mol khí thành 2 mol khí) và có còn giữ ngộ nhận "chất xúc tác làm cân bằng chuyển dịch" hay không. Cuối tiết, lớp chơi trò Rắn và Thang Hoá 11 ở màn ứng với Bài 1.
 
-Ba nấc hỗ trợ ở Bảng 10 phân hoá học sinh ngay khi tự học ở nhà. Theo thiết kế, học sinh tự làm được thì không chạm nấc nào; học sinh bế tắc nhận hỗ trợ tăng theo số lần bế tắc liên tiếp, và ở nấc cao nhất gia sư chỉ làm hộ một bước. Hệ thống ghi lại nấc gợi ý của từng lượt (Bảng 16), nên giáo viên biết học sinh nào cần kèm thêm. Học sinh dựa vào nấc 3 để lấy lời giải sẽ bị lộ ở bài biến thể làm không có gia sư.
+Bốn nấc hỗ trợ ở Bảng 10 phân hoá học sinh ngay khi tự học ở nhà. Theo thiết kế, học sinh tự làm được thì không chạm nấc nào; học sinh bế tắc nhận hỗ trợ tăng theo số lần bế tắc liên tiếp, và ở nấc cao nhất gia sư chỉ làm hộ một bước. Hệ thống ghi lại nấc gợi ý của từng lượt (Bảng 16), nên giáo viên biết học sinh nào cần kèm thêm. Học sinh dựa vào nấc 4 để lấy lời giải sẽ bị lộ ở bài biến thể làm không có gia sư.
 
 Điều kiện: phòng học có máy chiếu hoặc tivi nối được với máy tính hay điện thoại, có Internet; học sinh dùng tài khoản học sinh để không bị giới hạn 25 lượt hỏi của chế độ dùng thử; hạn mức gọi Gemini đủ cho cả lớp (mục 4.1.1).
 
@@ -781,8 +784,11 @@ Bảng 25. Hội thoại 3 (minh hoạ, do nhóm tự soạn)
 | Hệ thống | Đếm được bế tắc lần 1; chèn chỉ dẫn nấc 1 vào câu lệnh. |   |
 | Gia sư | Không sao, mình tìm xem em vướng ở đâu trước. Em thấy mình đang ở trường hợp nào: (1) chưa hiểu đề hỏi gì, (2) chưa nhớ đồng phản ứng với acid đặc ra sao, hay (3) biết phản ứng nhưng vướng phần tính? | B2; kiểm tra hiểu |
 | Học sinh | em cũng không biết nữa |   |
-| Hệ thống | Đếm được bế tắc lần 2 liên tiếp; chèn chỉ dẫn nấc 2 vào câu lệnh. |   |
-| Gia sư | Thầy giải mẫu cho em một bài cùng dạng, khác số liệu nhé. Đề mẫu: cho 3,2 gam Cu tác dụng hết với H₂SO₄ đặc, nóng, dư, tính thể tích SO₂ ở đkc.<br>Bước 1, viết phương trình: Cu + 2H₂SO₄ (đặc) → CuSO₄ + SO₂ + 2H₂O (đun nóng). Đồng không tác dụng với H₂SO₄ loãng, nhưng H₂SO₄ đặc, nóng oxi hoá được đồng và bị khử thành SO₂.<br>Bước 2, tính số mol Cu: n = 3,2 / 64 = 0,05 mol.<br>Bước 3, theo phương trình, 1 mol Cu tạo 1 mol SO₂, nên n(SO₂) = 0,05 mol.<br>Bước 4, ở đkc (25 °C, 1 bar): V = 0,05 × 24,79 = 1,2395 L ≈ 1,24 L.<br>Giờ em làm bài gốc với 6,4 gam Cu từ bước đầu. Số mol Cu của em là bao nhiêu? | B2; giải thích (nấc 2) |
+| Hệ thống | Đếm được bế tắc lần 2 liên tiếp; chèn chỉ dẫn nấc 2 (thu hẹp câu hỏi) vào câu lệnh. |   |
+| Gia sư | Mình thu hẹp lại cho dễ nhé. Thầy cho sẵn em một ý: đồng đứng sau hydrogen trong dãy hoạt động hoá học, nên không tác dụng với H₂SO₄ loãng. Vậy với H₂SO₄ đặc, nóng thì khí sinh ra là khí nào: $\ce{H2}$, $\ce{SO2}$ hay $\ce{O2}$? | B2; kiểm tra hiểu (nấc 2) |
+| Học sinh | em chịu thôi |   |
+| Hệ thống | Đếm được bế tắc lần 3 liên tiếp; chèn chỉ dẫn nấc 3 (giải mẫu) vào câu lệnh. |   |
+| Gia sư | Thầy giải mẫu cho em một bài cùng dạng, khác số liệu nhé. Đề mẫu: cho 3,2 gam Cu tác dụng hết với H₂SO₄ đặc, nóng, dư, tính thể tích SO₂ ở đkc.<br>Bước 1, viết phương trình: Cu + 2H₂SO₄ (đặc) → CuSO₄ + SO₂ + 2H₂O (đun nóng). Đồng không tác dụng với H₂SO₄ loãng, nhưng H₂SO₄ đặc, nóng oxi hoá được đồng và bị khử thành SO₂.<br>Bước 2, tính số mol Cu: n = 3,2 / 64 = 0,05 mol.<br>Bước 3, theo phương trình, 1 mol Cu tạo 1 mol SO₂, nên n(SO₂) = 0,05 mol.<br>Bước 4, ở đkc (25 °C, 1 bar): V = 0,05 × 24,79 = 1,2395 L ≈ 1,24 L.<br>Giờ em làm bài gốc với 6,4 gam Cu từ bước đầu. Số mol Cu của em là bao nhiêu? | B2; giải thích (nấc 3) |
 | Học sinh | n Cu = 6,4 / 64 = 0,1 mol, n SO₂ = 0,1 mol, V = 0,1 × 22,4 = 2,24 L. |   |
 | Gia sư | Phần số mol em làm đúng hết. Chỗ còn lại là thể tích mol: 22,4 L/mol là quy ước "đktc" (0 °C, 1 atm) của chương trình cũ, còn đề hỏi ở đkc theo Chương trình 2018 là 25 °C và 1 bar. Hai trạng thái khác nhau nên thể tích tính ra khác nhau. Ở đkc thể tích mol khí là bao nhiêu, và thể tích SO₂ của em là bao nhiêu? | B5; gợi mở |
 | Học sinh | 24,79 L/mol, vậy V = 0,1 × 24,79 = 2,479 L. |   |

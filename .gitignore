@@ -54,3 +54,6 @@ __pycache__/
 
 # So ghi tien do cua subagent-driven-development (nhap, khong len git)
 .superpowers/
+
+# Tệp khoá tạm Word/Excel tạo khi đang mở tài liệu
+~$*

@@ -57,6 +57,18 @@ export const CUM_TU_CAM_KHI_BE_TAC = ['rất dễ', 'dễ thôi', 'dễ dàng', 
 /**
  * Chỉ dẫn gắn thêm vào câu lệnh hệ thống cho lượt này, theo nấc giàn giáo.
  * Trả chuỗi rỗng nếu học sinh không bế tắc.
+ *
+ * BỐN nấc (18/09/2026, trước đó là ba):
+ *   1  chẩn đoán chỗ vướng bằng câu hỏi ba lựa chọn;
+ *   2  THU HẸP câu hỏi — cho sẵn một dữ kiện trung gian rồi hỏi một bước nhỏ,
+ *      hoặc đổi câu hỏi mở thành câu hỏi có sẵn lựa chọn. Vẫn không đáp án;
+ *   3  giải mẫu một bài cùng dạng khác số liệu;
+ *   4+ làm hộ đúng bước hiện tại của bài gốc.
+ *
+ * Nấc 2 được chèn thêm theo yêu cầu của chủ đề tài: bế tắc sau hai lượt hỏi
+ * thì hạ độ mở của câu hỏi trước đã, đừng nhảy ngay sang giải mẫu. Thứ tự này
+ * giữ đúng nguyên tắc tăng dần mức hỗ trợ, và mỗi nấc vẫn trả việc lại cho
+ * học sinh.
  */
 export function chiDanGianGiao(soLanBeTac: number): string {
   if (soLanBeTac <= 0) return '';
@@ -73,6 +85,16 @@ export function chiDanGianGiao(soLanBeTac: number): string {
   if (soLanBeTac === 2) {
     return [
       'TRẠNG THÁI (do hệ thống đếm): HỌC SINH BẾ TẮC LẦN 2.',
+      'Việc của lượt này: THU HẸP CÂU HỎI, vẫn KHÔNG đưa đáp án và KHÔNG giải mẫu.',
+      'Cách thu hẹp: cho sẵn một dữ kiện trung gian mà em chưa tìm ra, rồi hỏi đúng MỘT bước nhỏ liền sau đó;',
+      'hoặc đổi câu hỏi mở thành câu hỏi có 2–4 lựa chọn để em chỉ phải nhận ra, không phải tự nghĩ ra.',
+      'Câu hỏi thu hẹp phải nhỏ tới mức em trả lời được bằng một dòng.',
+      cam,
+    ].join('\n');
+  }
+  if (soLanBeTac === 3) {
+    return [
+      'TRẠNG THÁI (do hệ thống đếm): HỌC SINH BẾ TẮC LẦN 3.',
       'Việc của lượt này: GIẢI MẪU trọn vẹn MỘT bài tương tự, CÙNG DẠNG nhưng KHÁC số liệu (worked example), trình bày từng bước ngắn gọn.',
       'Sau đó mời em áp dụng đúng các bước đó cho bài gốc, bắt đầu từ bước đầu tiên. Không giải bài gốc.',
       'Được phép dài hơn giới hạn độ dài thông thường ở lượt này.',
@@ -216,7 +238,7 @@ export function xuLyTruocLuot(lichSu: TinNhanToiThieu[], tinMoi: string, nhanh: 
     return { traLoiNgay: LOI_TU_CHOI_GIAN_LAN, chiDanThem: '', soLanBeTac: 0, laGianLan: true };
   }
   const soLanBeTac = demBeTacLienTiep(lichSu, tinMoi);
-  /* Nhánh đối chứng vốn giảng thẳng có lời giải mẫu — giàn giáo ba nấc là
+  /* Nhánh đối chứng vốn giảng thẳng có lời giải mẫu — giàn giáo bốn nấc là
      biến can thiệp của nhánh Socratic, gắn cho cả hai là xoá mất khác biệt
      cần đo. Nhánh đối chứng vẫn được đếm để làm số liệu. */
   const chiDanThem = nhanh === 'socratic' ? chiDanGianGiao(soLanBeTac) : '';

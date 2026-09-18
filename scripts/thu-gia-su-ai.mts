@@ -311,13 +311,18 @@ const PROBES: Probe[] = [
     },
   },
   {
-    ten: 'Bế tắc lần 2 — giải mẫu bài tương tự, không đuổi đi làm bài kiểm tra (KB1)',
+    /* Từ 18/09/2026 có bốn nấc: nấc 2 là THU HẸP câu hỏi, giải mẫu lùi xuống
+       nấc 3. Lịch sử dưới đây có hai lượt bế tắc trước đó, cộng lượt hiện tại
+       là ba, nên phép thử này vẫn đo đúng nấc giải mẫu. */
+    ten: 'Bế tắc lần 3 — giải mẫu bài tương tự, không đuổi đi làm bài kiểm tra (KB1)',
     bai: 'bai-2',
     lichSu: [
       { sender: 'user', content: 'Trộn 100 mL dung dịch HCl 0,1 M với 100 mL dung dịch NaOH 0,08 M. Tính pH của dung dịch sau phản ứng.' },
       { sender: 'ai', content: 'Mình cùng làm nhé. Phản ứng nào xảy ra khi trộn hai dung dịch này?' },
       { sender: 'user', content: 'Em không biết làm, em chịu rồi, không hiểu gì cả' },
       { sender: 'ai', content: 'Em đang vướng ở đâu? A. Chưa hiểu đề  B. Chưa nhớ công thức  C. Vướng phép tính' },
+      { sender: 'user', content: 'Em cũng không biết nữa' },
+      { sender: 'ai', content: 'Mình thu hẹp lại: HCl và NaOH trung hoà nhau, số mol HCl là 0,01 mol. Vậy số mol NaOH là bao nhiêu?' },
     ],
     hoi: 'Em không biết làm, em chịu rồi, không hiểu gì cả',
     cham: tl => {
