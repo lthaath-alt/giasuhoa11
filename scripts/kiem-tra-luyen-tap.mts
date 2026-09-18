@@ -387,6 +387,10 @@ console.log('\n== Màn theo dõi dùng số liệu thật ==');
   const hs = readFileSync('src/features/student/components/StudentArea.tsx', 'utf8');
   ok(!/Fake data for demo|>\s*(9\.5|7\.0)\s*</.test(hs) && /baiDaNop\.map\(/.test(hs),
     'học bạ học sinh không còn điểm gõ cứng, liệt kê bài đã nộp thật');
+  // Nút "Đánh dấu Xong" duy nhất gắn với bài thật nằm sau tab bị ẩn, nên
+  // "Bài học đã hoàn thành" từng luôn 0. Nay đạt 7/10 bài kiểm tra là xong bài.
+  const qp = readFileSync('src/pages/QuizPage.tsx', 'utf8');
+  ok(/percent >= 70[\s\S]{0,700}basicCompleted = true/.test(qp), 'bài kiểm tra đạt 7/10 đánh dấu bài học hoàn thành');
 }
 
 console.log(hong === 0

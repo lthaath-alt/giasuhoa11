@@ -93,14 +93,20 @@ export const StudentArea: React.FC = () => {
   // Tab 4: Học bạ thông minh
   const progress = getUserProgress(currentUser.email);
   const allLessonsCount = curriculum.flatMap(c => c.lessons).length;
-  const completedCount = progress?.completedLessons.length || 0;
+  /* Chỉ đếm bài CÓ THẬT: nút "Đánh dấu Xong" của khung chat chung ghi cả mã
+     'student-free-chat' vào completedLessons. */
+  const maBaiThat = new Set(curriculum.flatMap(c => c.lessons).map(l => l.id));
+  const completedCount = (progress?.completedLessons || []).filter(id => maBaiThat.has(id)).length;
   const progressPercent = allLessonsCount > 0 ? Math.round((completedCount / allLessonsCount) * 100) : 0;
 
   /* Lịch sử làm bài THẬT (18/09/2026). Trước đây là hai dòng điểm gõ cứng
      (9.5 và 7.0) mà học sinh nào cũng thấy, kể cả em chưa làm bài nào —
      không được để lọt vào ảnh minh chứng của báo cáo NCKH. Đọc QuizStorage
      của chính máy em: `list` trên `bai_nop` chỉ giáo viên được phép. */
-  const tenBai = new Map(curriculum.flatMap(c => c.lessons).map(l => [l.id, l.title]));
+  const tenBai = new Map<string, string>([
+    ...curriculum.map(c => [c.id, `Kiểm tra tổng hợp: ${c.title}`] as [string, string]),   // đề cả chương mang mã chương
+    ...curriculum.flatMap(c => c.lessons).map(l => [l.id, l.title] as [string, string]),
+  ]);
   const baiDaNop = QuizStorage.getQuizzes()
     .filter(q => q.status === 'submitted' && (q.userEmail || '').toLowerCase() === currentUser.email.toLowerCase())
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
