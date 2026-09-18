@@ -39,7 +39,7 @@ Ba điều cộng lại, và phải cộng lại mới thành khác biệt — c
    điều này vì nó làm ngược lại mục đích.
 2. **Bám sát 25 bài Kết nối tri thức 2018**, không phải kiến thức chung chung hay sách
    cũ. Nội dung khớp đúng sách học sinh đang cầm trên tay.
-3. **Ngân hàng câu hỏi do chính giáo viên soạn và duyệt** — 252 câu tính tới 08/09/2026,
+3. **Ngân hàng câu hỏi do chính giáo viên soạn và duyệt** — 1.554 câu theo bản chụp đồng bộ ngày 14/09/2026,
    không phải kho câu hỏi mua sẵn.
 
 ## Operating Context
@@ -56,7 +56,7 @@ Ba điều cộng lại, và phải cộng lại mới thành khác biệt — c
 
 ## Capabilities and Constraints
 
-**Đang có:** 25 bài giảng + trình đọc SGK · gia sư AI Gemini · ngân hàng 252 câu ·
+**Đang có:** 25 bài giảng + trình đọc SGK · gia sư AI Gemini · ngân hàng 1.554 câu ·
 sinh đề kiểm tra theo chương · bốn trò chơi · khu quản trị trường và quản trị hệ thống ·
 hai chế độ màu sáng/tối đồng bộ toàn hệ thống.
 
@@ -91,9 +91,9 @@ giữ nó, nên nhận diện màu được phép thay khi dựng thế giới t
 ## Evidence on Hand
 
 - 25 bài giảng thật, sinh từ tệp `.docx` của chính giáo viên → `src/features/lessons/constants.ts`.
-- 252 câu hỏi thật, do giáo viên soạn và duyệt → `public/bank/ngan-hang.json`.
+- 1.554 câu hỏi thật, do giáo viên soạn và duyệt → `public/bank/ngan-hang.json`.
 - Bốn trò chơi chạy được → `public/games/`.
-- Đề cương nghiên cứu khoa học → `docs/de-cuong-nghien-cuu.md`.
+- Báo cáo nghiên cứu khoa học → `docs/bao-cao-nckh-gia-su-hoa-11.md` (bản Word: `docs/Bao-cao-NCKH-Gia-su-Hoa-11.docx`).
 
 **Chưa có, và không được bịa ra:** con số học sinh đang dùng, lời chứng thực của người
 dùng, kết quả thực nghiệm (đợt thực nghiệm chưa chạy), giải thưởng, đối tác, bảng giá.
