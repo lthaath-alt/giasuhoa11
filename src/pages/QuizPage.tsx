@@ -247,6 +247,14 @@ export const QuizPage: React.FC = () => {
 
         if (percent >= 70) {
           updates.advancedUnlocked = true;
+          /* Đạt 7/10 thì tính bài học là HOÀN THÀNH (18/09/2026). Trước đây chỉ
+             nút "Đánh dấu Xong" ở mục Các khóa học mới đặt được, mà mục đó bị
+             ẩn khỏi menu — nên "Bài học đã hoàn thành" luôn 0 với mọi em.
+             Đề cả chương mang `lessonId` = mã CHƯƠNG, không phải bài: bỏ qua,
+             kẻo đếm một chương thành một bài. */
+          if (curriculum.some(c => c.lessons.some(l => l.id === updated.lessonId))) {
+            updates.basicCompleted = true;
+          }
           setShowUnlockDialog(true);
         } else {
           setShowRetryDialog(true);

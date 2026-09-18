@@ -21,7 +21,10 @@ import type { Quiz } from '../../quiz/types';
  * đọc thẳng Firestore — không có dòng dữ liệu mẫu nào.
  */
 
-const TONG_SO_BAI = CHEMISTRY_11_CURRICULUM.flatMap(c => c.lessons).length;
+const MA_BAI = new Set(CHEMISTRY_11_CURRICULUM.flatMap(c => c.lessons).map(l => l.id));
+const TONG_SO_BAI = MA_BAI.size;
+/** Chỉ đếm bài có thật — khung chat chung ghi cả mã 'student-free-chat'. */
+const soBaiXong = (p: LearningProgress | null) => (p?.completedLessons || []).filter(id => MA_BAI.has(id)).length;
 
 const diem10 = (q: Quiz) => (q.maxScore > 0 ? (q.score / q.maxScore) * 10 : 0);
 
@@ -77,7 +80,7 @@ export const TheoDoiHocSinh: React.FC<{ students: User[] }> = ({ students }) => 
   // ── Số liệu tổng quan ──────────────────────────────────────────────────────
   const hang = students.map(s => {
     const bai = baiNop.filter(q => q.userEmail === s.email.toLowerCase());
-    const soBaiHoc = layTienDo(s.email)?.completedLessons.length || 0;
+    const soBaiHoc = soBaiXong(layTienDo(s.email));
     const tb = bai.length ? bai.reduce((t, q) => t + diem10(q), 0) / bai.length : null;
     return { s, soBaiHoc, soBaiKT: bai.length, tb, ganNhat: bai[0]?.createdAt };   // bai đã xếp mới nhất trước
   });

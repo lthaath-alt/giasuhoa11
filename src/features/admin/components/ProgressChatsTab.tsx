@@ -61,7 +61,10 @@ export const ProgressChatsTab: React.FC<ProgressChatsTabProps> = ({
 
   const selectedStudent = students.find((s) => s.email === selectedStudentEmail);
   const selectedStudentProgress = selectedStudent ? getUserProgress(selectedStudent.email) : null;
-  const completedCount = selectedStudentProgress ? selectedStudentProgress.completedLessons.length : 0;
+  // Chỉ đếm bài có thật — khung chat chung ghi cả mã 'student-free-chat'
+  const completedCount = selectedStudentProgress
+    ? selectedStudentProgress.completedLessons.filter((id) => allLessons.some((l) => l.id === id)).length
+    : 0;
   const progressPercent = allLessons.length > 0 ? Math.round((completedCount / allLessons.length) * 100) : 0;
 
   const studentChatsOnLesson = chats.filter(
@@ -94,7 +97,7 @@ export const ProgressChatsTab: React.FC<ProgressChatsTabProps> = ({
               <List sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                 {students.map((stud) => {
                   const studProg = getUserProgress(stud.email);
-                  const completed = studProg ? studProg.completedLessons.length : 0;
+                  const completed = studProg ? studProg.completedLessons.filter((id) => allLessons.some((l) => l.id === id)).length : 0;
                   const active = selectedStudentEmail === stud.email;
 
                   return (
