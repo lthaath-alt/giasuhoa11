@@ -375,6 +375,20 @@ console.log('\n== Bài nộp lên Firestore ==');
   ok(/luuBaiNop\(updatedQuiz\)/.test(nop), 'nộp bài xong có đẩy bản sao lên Firestore');
 }
 
+/* Màn theo dõi (18/09/2026). QuizProgressTab từng được sửa cho đọc Firestore mà
+   KHÔNG trang nào gắn nó vào; còn "Học bạ thông minh" của học sinh hiện hai
+   dòng điểm gõ cứng. Cả hai sẽ bị chụp vào báo cáo NCKH. */
+console.log('\n== Màn theo dõi dùng số liệu thật ==');
+{
+  const gv = readFileSync('src/pages/TeacherPage.tsx', 'utf8');
+  ok(/progressContent=\{<TheoDoiHocSinh\b/.test(gv), 'trang giáo viên có gắn mục "Theo dõi học sinh"');
+  const td = readFileSync('src/features/teacher/components/TheoDoiHocSinh.tsx', 'utf8');
+  ok(/<QuizProgressTab\b/.test(td) && /<ProgressChatsTab\b/.test(td), 'mục đó dựng cả bài kiểm tra lẫn hội thoại AI');
+  const hs = readFileSync('src/features/student/components/StudentArea.tsx', 'utf8');
+  ok(!/Fake data for demo|>\s*(9\.5|7\.0)\s*</.test(hs) && /baiDaNop\.map\(/.test(hs),
+    'học bạ học sinh không còn điểm gõ cứng, liệt kê bài đã nộp thật');
+}
+
 console.log(hong === 0
   ? '\n✅ Tất cả phép thử đều đạt.\n'
   : `\n❌ ${hong} phép thử HỎNG.\n`);

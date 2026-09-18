@@ -20,6 +20,7 @@ import {
   X,
   Construction,
   Settings,
+  LineChart,
 } from 'lucide-react';
 
 // ─── Sidebar menu items ───────────────────────────────────────────────────────
@@ -31,7 +32,8 @@ interface SidebarItem {
 }
 
 const SIDEBAR_ITEMS: SidebarItem[] = [
-  { id: 'accounts',   label: 'Quản lý Tài khoản',          icon: <Users size={18} /> },
+  { id: 'progress',   label: 'Theo dõi học sinh',          icon: <LineChart size={18} /> },
+  { id: 'accounts',  label: 'Quản lý Tài khoản',          icon: <Users size={18} /> },
   { id: 'classes',    label: 'Quản lý Lớp học',             icon: <GraduationCap size={18} /> },
   { id: 'library',    label: 'Quản lý Kho bài tập chung',   icon: <BookOpen size={18} /> },
   { id: 'databank',   label: 'Ngân hàng dữ liệu',          icon: <Database size={18} /> },
@@ -181,6 +183,9 @@ export interface ManagementLayoutProps {
   errorContent?: ReactNode;
   /** Nội dung tùy chỉnh cho mục "Cài đặt Hệ thống" */
   settingsContent?: ReactNode;
+  /** Mục "Theo dõi học sinh". Không truyền thì mục này ẩn khỏi menu — trang
+   *  quản trị không có lớp riêng để theo dõi. Có truyền thì mở trang ở mục này. */
+  progressContent?: ReactNode;
 }
 
 export const ManagementLayout: React.FC<ManagementLayoutProps> = ({
@@ -196,8 +201,10 @@ export const ManagementLayout: React.FC<ManagementLayoutProps> = ({
   passwordContent,
   errorContent,
   settingsContent,
+  progressContent,
 }) => {
-  const [activeItem, setActiveItem] = useState('accounts');
+  const [activeItem, setActiveItem] = useState(progressContent ? 'progress' : 'accounts');
+  const menu = SIDEBAR_ITEMS.filter((i) => i.id !== 'progress' || progressContent);
   const [mobileOpen, setMobileOpen] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -211,6 +218,8 @@ export const ManagementLayout: React.FC<ManagementLayoutProps> = ({
 
   const renderContent = () => {
     switch (activeItem) {
+      case 'progress':
+        return progressContent || <PlaceholderContent title="Theo dõi học sinh" />;
       case 'classes':
         return classContent || <PlaceholderContent title="Quản lý Lớp học" />;
       case 'accounts':
@@ -249,7 +258,7 @@ export const ManagementLayout: React.FC<ManagementLayoutProps> = ({
         TỔNG QUAN
       </Typography>
 
-      {SIDEBAR_ITEMS.map((item) => {
+      {menu.map((item) => {
         const isActive = activeItem === item.id;
         return (
           <Box
@@ -369,7 +378,7 @@ export const ManagementLayout: React.FC<ManagementLayoutProps> = ({
               <Menu size={20} />
             </IconButton>
             <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--chu)' }}>
-              {SIDEBAR_ITEMS.find((i) => i.id === activeItem)?.label || 'Menu'}
+              {menu.find((i) => i.id === activeItem)?.label || 'Menu'}
             </Typography>
           </Box>
           <Drawer
