@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useCheDoMau } from '../../../core/hooks/useCheDoMau';
+import { useApp } from '../../../core/hooks/useApp';
 import { Box, Typography, Button, Paper } from '@mui/material';
 import { Presentation, Maximize2 } from 'lucide-react';
 
@@ -25,6 +26,7 @@ const diaChiSlide = (toi: boolean) =>
 export const SlidesSection: React.FC = () => {
   const frameRef = useRef<HTMLIFrameElement>(null);
   const { laToi } = useCheDoMau();
+  const { curriculum, isLessonCompleted, updateLessonProgress } = useApp();
   /* Địa chỉ chốt một lần lúc dựng, KHÔNG dựng lại theo `laToi`.
      Để nó đổi theo thì mỗi lần bấm đổi nền là iframe nạp lại, ai đang xem dở
      một bài sẽ bị đá về đầu danh sách. Đổi nền giữa chừng nhắn tin sang. */
@@ -41,6 +43,26 @@ export const SlidesSection: React.FC = () => {
     const hen = window.setTimeout(gui, 400);
     return () => window.clearTimeout(hen);
   }, [laToi]);
+
+  /* Trang slide báo "đã xem đủ mọi slide của bài X" -> tính bài X là đã học.
+     Đây là đường thứ hai, bên cạnh làm đạt đề kiểm tra (QuizPage). Trước đây
+     đọc bài giảng không được ghi gì, nên ô Bài giảng mãi "đã học 0/25".
+     Chỉ nhận mã có thật trong `curriculum`, và bỏ qua bài đã tính rồi để
+     khỏi ghi Firestore mỗi lần em lật lại slide cuối. Khách thì
+     `updateLessonProgress` tự bỏ qua. */
+  useEffect(() => {
+    const nghe = (e: MessageEvent) => {
+      if (e.origin !== window.location.origin) return;
+      if (e.source !== frameRef.current?.contentWindow) return;
+      const d = e.data;
+      if (!d || d.loai !== 'hoa11:doc-xong-bai' || typeof d.bai !== 'string') return;
+      if (!curriculum.some((c) => c.lessons.some((l) => l.id === d.bai))) return;
+      if (isLessonCompleted(d.bai)) return;
+      updateLessonProgress(d.bai, { basicCompleted: true });
+    };
+    window.addEventListener('message', nghe);
+    return () => window.removeEventListener('message', nghe);
+  }, [curriculum, isLessonCompleted, updateLessonProgress]);
 
   const handleFullscreen = () => {
     /* PHẢI có catch. Trình duyệt từ chối toàn màn hình trong khá nhiều trường

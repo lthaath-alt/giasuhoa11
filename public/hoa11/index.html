@@ -95,6 +95,10 @@ body.nhung .grid{padding-bottom:24px}
 .vb{border:1px solid var(--line);background:transparent;color:var(--dim);font:inherit;
   font-size:.87rem;padding:7px 12px;border-radius:8px;cursor:pointer;white-space:nowrap}
 .vb:hover{color:var(--ink);border-color:var(--acc)}
+/* "đã xem 4/6" khi còn sót slide, thành "✓ Xong" khi đã xem đủ từng slide */
+.xong{font-size:.84rem;color:var(--dim);font-variant-numeric:tabular-nums;white-space:nowrap}
+.xong.on{color:var(--acc);font-weight:700;background:var(--acc-soft);padding:4px 10px;border-radius:20px}
+.seen.done{color:var(--acc);font-weight:650}
 .pos{font-variant-numeric:tabular-nums;color:var(--dim);font-size:.89rem;min-width:56px;
   text-align:center}
 
@@ -146,6 +150,7 @@ body.nhung .grid{padding-bottom:24px}
   <div class="vbar">
     <button class="vb" id="back">← Tất cả bài</button>
     <span class="vt" id="vt"></span>
+    <span class="xong" id="xong"></span>
     <span class="pos" id="pos"></span>
     <button class="vb" id="dl" hidden>Tải .pptx</button>
     <button class="vb" id="fs">Toàn màn hình</button>
@@ -215,12 +220,14 @@ function draw(f){
   if (!hit.length){ grid.innerHTML = '<p class="empty">Không tìm thấy bài nào.</p>'; return; }
   grid.innerHTML = hit.map(function(l){
     var at = +lsGet('pos:' + l.slug) || 0;
+    var het = soDaXem(l) >= l.slides;
     return '<a class="card" href="#' + l.slug + '">' +
       '<img src="thumbs/' + l.slug + '.webp" loading="lazy" decoding="async" ' +
         'width="400" height="225" alt="Bài ' + l.n + '">' +
       '<div class="meta"><span class="tt">Bài ' + l.n + '</span>' +
       '<span class="cnt">' + l.slides + ' slide</span></div>' +
-      (at > 1 ? '<div class="seen">Đang xem dở — slide ' + at + '</div>' : '') +
+      (het ? '<div class="seen done">✓ Xong</div>'
+        : at > 1 ? '<div class="seen">Đang xem dở — slide ' + at + '</div>' : '') +
       '</a>';
   }).join('');
 }
@@ -266,11 +273,34 @@ function show(){
   if (c) c.scrollIntoView({ block:'nearest', inline:'center', behavior:'smooth' });
 
   lsSet('pos:' + cur.slug, idx);
+  ghiDaXem(cur, idx);
   if (idx < cur.slides) new Image().src = url(cur.slug, idx + 1);   /* tải trước 1 slide */
 
   /* Trên giao thức file:// một số trình duyệt chặn replaceState -> bỏ qua, không để vỡ trang */
   var want = '#' + cur.slug + '/' + idx;
   if (location.hash !== want) { try { history.replaceState(null, '', want); } catch (e) {} }
+}
+
+/* Xem đủ MỌI slide của một bài thì báo web chính để tính "đã học".
+   Cố ý đòi đủ từng slide chứ không chỉ chạm slide cuối: bấm End hay ô thu nhỏ
+   cuối là tới đó ngay, tính vậy thì con số tiến độ không nói lên gì.
+   Mã bài gửi đi là 'bai-' + số (vd 'bai-1'), khớp `curriculum` của web —
+   KHÁC slug thư mục ảnh ở đây ('bai-01'). Nhắn lại mỗi lần tới slide cuối
+   cũng không sao: web tự bỏ qua bài đã tính rồi. */
+function dsDaXem(l){ return (lsGet('daxem:' + l.slug) || '').split(',').filter(Boolean); }
+function soDaXem(l){ return dsDaXem(l).length; }
+
+function ghiDaXem(l, i){
+  var ds = dsDaXem(l);
+  if (ds.indexOf(String(i)) < 0){ ds.push(String(i)); lsSet('daxem:' + l.slug, ds.join(',')); }
+  var het = ds.length >= l.slides;
+
+  var x = $('xong');
+  x.textContent = het ? '✓ Xong' : 'đã xem ' + ds.length + '/' + l.slides;
+  x.className = het ? 'xong on' : 'xong';
+
+  if (het && window.parent !== window)
+    window.parent.postMessage({ loai: 'hoa11:doc-xong-bai', bai: 'bai-' + l.n }, location.origin);
 }
 
 function go(d){

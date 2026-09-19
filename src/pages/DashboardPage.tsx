@@ -103,7 +103,11 @@ export const DashboardPage: React.FC = () => {
 
   // Tính toán tiến độ của học sinh hiện tại
   const progress = currentUser ? getUserProgress(currentUser.email) : null;
-  const completedCount = progress ? progress.completedLessons.length : 0;
+  /* Chỉ đếm mã bài có thật, như StudentArea — mảng này từng lẫn mã rác
+     ('student-free-chat'). */
+  const completedCount = progress
+    ? progress.completedLessons.filter((id) => allLessons.some((l) => l.id === id)).length
+    : 0;
   const progressPercent =
     allLessons.length > 0 ? Math.round((completedCount / allLessons.length) * 100) : 0;
 
