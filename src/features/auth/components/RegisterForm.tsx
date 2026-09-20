@@ -26,12 +26,18 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleForm }) => {
     return (
       <StudentRegisterForm
         onBackToLogin={() => setShowStudentForm(false)}
+        onDangKyXong={onToggleForm}
       />
     );
   }
 
   if (showTeacherForm) {
-    return <TeacherRegisterForm onBackToLogin={() => setShowTeacherForm(false)} />;
+    return (
+      <TeacherRegisterForm
+        onBackToLogin={() => setShowTeacherForm(false)}
+        onDangKyXong={onToggleForm}
+      />
+    );
   }
 
   return (

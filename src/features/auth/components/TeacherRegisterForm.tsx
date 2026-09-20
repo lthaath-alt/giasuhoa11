@@ -7,10 +7,11 @@ import {
   UserPlus, Eye, EyeOff, Key, Mail, User, ArrowLeft, CheckCircle,
 } from 'lucide-react';
 import { useApp } from '../../../core/hooks/useApp';
-import { useNavigate } from 'react-router-dom';
 
 interface TeacherRegisterFormProps {
   onBackToLogin: () => void;
+  /** Đăng ký xong thì mở màn ĐĂNG NHẬP (không phải quay về màn chọn kiểu tài khoản) */
+  onDangKyXong: () => void;
 }
 
 /**
@@ -21,9 +22,8 @@ interface TeacherRegisterFormProps {
  * làm giáo viên" trong `AccountManagement.tsx`). Trong lúc chờ, tài khoản
  * dùng web như học sinh bình thường.
  */
-export const TeacherRegisterForm: React.FC<TeacherRegisterFormProps> = ({ onBackToLogin }) => {
-  const { registerTeacherApplicant } = useApp();
-  const navigate = useNavigate();
+export const TeacherRegisterForm: React.FC<TeacherRegisterFormProps> = ({ onBackToLogin, onDangKyXong }) => {
+  const { registerTeacherApplicant, logout } = useApp();
 
   const [name, setName]         = useState('');
   const [email, setEmail]       = useState('');
@@ -79,8 +79,12 @@ export const TeacherRegisterForm: React.FC<TeacherRegisterFormProps> = ({ onBack
 
     if (res.success) {
       setSuccessInfo(true);
-      // Điều hướng sang dashboard sau 1.5 giây
-      setTimeout(() => navigate('/dashboard'), 1500);
+      /* Giống luồng học sinh: đẩy ra MÀN ĐĂNG NHẬP, không vào thẳng trang học.
+         Tài khoản được tạo trên app CHÍNH nên Firebase đăng nhập luôn; không
+         `logout()` thì màn đăng nhập thấy phiên còn sống và hiện "Tiếp tục
+         với ...", trong khi người ta chưa gõ mật khẩu lần nào. */
+      void logout();
+      setTimeout(() => onDangKyXong(), 1500);
     } else {
       setError(res.message);
     }
@@ -102,7 +106,8 @@ export const TeacherRegisterForm: React.FC<TeacherRegisterFormProps> = ({ onBack
           Đăng ký thành công!
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          Đang chuyển hướng vào trang học tập...
+          Mời thầy cô đăng nhập bằng email và mật khẩu vừa tạo. Trong lúc chờ duyệt,
+          tài khoản dùng web như học sinh.
         </Typography>
       </Box>
     );

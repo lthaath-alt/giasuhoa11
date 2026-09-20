@@ -44,8 +44,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({
     const res = await login(identifier.trim(), password);
     setLoading(false);
 
-    if (res.success && res.user) {
-      const userRole = res.user.role;
+    /* Chỉ cần `res.success`. ĐỪNG đòi thêm hồ sơ đầy đủ ở đây: hồ sơ về sau,
+       qua `onAuthStateChanged`, nên đòi nó là bắt học sinh chờ một thứ không
+       bao giờ tới — đúng lỗi đã sống tới 20/09/2026. */
+    if (res.success) {
+      const userRole = res.role;
       // Kiểm tra khớp vai trò đã chọn
       if (selectedRole === 'teacher' && userRole !== 'teacher' && userRole !== 'admin' && userRole !== 'school_admin') {
         logout();

@@ -2,6 +2,7 @@ import { test as setup, expect } from '@playwright/test';
 import { mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { taiKhoanThu, TEP_PHIEN } from './moiTruong';
+import { vaoTrongApp } from './chung';
 
 /**
  * Đăng nhập MỘT LẦN, cất phiên ra tệp cho mọi phép thử sau dùng lại.
@@ -41,24 +42,42 @@ setup('đăng nhập bằng tài khoản học sinh thử', async ({ page }) => 
   await page.locator('#login-password-field').fill(tk.matKhau);
   await page.locator('#login-submit-btn').click();
 
-  /* Sai mật khẩu thì web hiện khung lỗi chứ không đứng im. Bắt lấy nó để
-     báo đúng bệnh, thay vì để phép thử chết vì hết giờ chờ. */
+  /* Gõ mật khẩu xong phải VÀO THẲNG. Màn "Chào mừng trở lại" chỉ dành cho lần
+     mở lại tab khi phiên cũ còn sống — vừa gõ mật khẩu mà web còn hỏi "tiếp
+     tục?" thì thành hỏi hai lần cho một lần đăng nhập.
+     Đua hai bên chứ không chỉ xem cuối cùng ra gì: nếu màn hỏi-tiếp-tục hiện
+     ra dù chỉ thoáng qua, phép thử này phải kêu. */
   const khungLoi = page.locator('#login-error-alert');
-  await expect
-    .poll(
-      async () => (await khungLoi.isVisible())
-        ? 'loi'
-        : (await page.locator('#nav-practice-btn').isVisible()) ? 'vao-duoc' : 'dang-cho',
-      { message: 'chờ đăng nhập xong', timeout: 45_000 },
-    )
-    .not.toBe('dang-cho');
+  const thanhDieuHuong = page.locator('#nav-practice-btn');
+  const tiepTuc = page.locator('#continue-session-btn');
 
-  if (await khungLoi.isVisible()) {
-    throw new Error(`Web từ chối đăng nhập: ${await khungLoi.innerText()}`);
+  const ai = await Promise.race([
+    thanhDieuHuong.waitFor({ state: 'visible', timeout: 45_000 }).then(() => 'vao-thang'),
+    tiepTuc.waitFor({ state: 'visible', timeout: 45_000 }).then(() => 'hoi-tiep-tuc'),
+  ]).catch(() => 'khong-vao-duoc');
+
+  if (ai === 'khong-vao-duoc') {
+    const bao = (await khungLoi.isVisible()) ? (await khungLoi.innerText()).trim() : '';
+    throw new Error(bao ? `Web không cho vào, nó báo: "${bao}"` : 'Hết giờ chờ mà không vào được');
   }
+  expect(ai, 'gõ mật khẩu xong phải vào thẳng, không hỏi "Tiếp tục với ..."').toBe('vao-thang');
 
-  await expect(page.locator('#nav-practice-btn')).toBeVisible();
+  /* Và không được có khung đỏ nào khi đã vào đúng. Web từng nhét chính câu
+     "Đăng nhập thành công!" vào khung lỗi màu đỏ — xem ghi chú cuối tệp. */
+  await expect(khungLoi).toBeHidden();
+
+  await vaoTrongApp(page);
 
   mkdirSync(dirname(TEP_PHIEN), { recursive: true });
   await page.context().storageState({ path: TEP_PHIEN, indexedDB: true });
 });
+
+/* GHI CHÚ — lỗi của WEB, bộ này bắt được ngay lượt chạy đầu, ĐÃ SỬA 20/09/2026.
+   Học sinh đăng nhập ĐÚNG mật khẩu vẫn thấy một khung ĐỎ ghi "Đăng nhập thành
+   công!", và không được đưa thẳng vào trong; phải bấm thêm "Tiếp tục với ...".
+   Nguyên nhân: `AppContext.login()` trả `user: users.find(u => u.id === uid)`,
+   mà `users` chỉ có dữ liệu khi tài khoản được quyền `list` trên collection
+   `users` — tức từ giáo viên trở lên. Với học sinh, `users` rỗng nên `user`
+   là `undefined`, `LoginForm` rơi vào nhánh `else` và đem chính câu báo THÀNH
+   CÔNG đi `setError`. Nay `login()` chỉ trả về VAI, lấy thẳng từ hồ sơ vừa
+   đọc. Hai phép canh ở trên giữ cho nó không quay lại. */

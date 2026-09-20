@@ -125,6 +125,29 @@ này từng được ghi ở đây nhưng chưa bao giờ tồn tại.
   4. **Phiên sống qua F5.** Trước đây `AppContext` cố ý xoá session mỗi lần mở trang;
      Firebase Auth giữ phiên trong IndexedDB.
 
+  **Ba lối vào, ba hành vi khác nhau** (20/09/2026). Đừng gộp chúng lại:
+
+  - **Gõ mật khẩu xong → VÀO THẲNG.** Không hỏi thêm câu nào.
+  - **Mở lại tab mà chưa đăng xuất → hỏi "Tiếp tục với ..."** Đây là màn "Chào
+    mừng trở lại" trong `LoginPage`, và nó CÓ LÝ DO: phiên còn sống thì không
+    bắt gõ lại mật khẩu, nhưng cũng không tự nhảy vào — máy chung ở trường có
+    thể đang là tài khoản bạn khác.
+  - **Đăng ký xong → đẩy ra MÀN ĐĂNG NHẬP**, không vào thẳng trang học.
+    `registerStudent` tạo tài khoản trên app CHÍNH nên Firebase đăng nhập luôn;
+    vì thế `StudentRegisterForm` phải `logout()` trước khi chuyển màn, nếu
+    không em sẽ gặp "Tiếp tục với ..." trong khi chưa gõ mật khẩu lần nào —
+    tức chưa hề xác nhận mình nhớ mật khẩu gì.
+
+  **`login()` trả về VAI, không trả về hồ sơ.** Bản cũ trả
+  `users.find(u => u.id === uid)`, mà mảng `users` chỉ có dữ liệu khi tài khoản
+  được quyền `list` trên `users` — tức **từ giáo viên trở lên**. Với học sinh nó
+  luôn rỗng, nên `LoginForm` rơi vào nhánh thất bại và đem chính câu "Đăng nhập
+  thành công!" đi `setError`: **mọi em đăng nhập đúng đều thấy một khung ĐỎ báo
+  lỗi**, rồi phải bấm thêm một nút nữa mới vào được. Lỗi này sống nhiều ngày mà
+  `tsc` và 13 bộ kiểm đều xanh, vì không bộ nào mở nổi trình duyệt; `kiem-tra:e2e`
+  bắt được ngay lượt chạy đầu tiên của nó. Hai phép canh trong
+  `tests/dangnhap.setup.ts` giữ cho nó không quay lại.
+
   **"Vào lớp bằng mã mời" nay là ĐƠN CHỜ DUYỆT** (12/09/2026). Học sinh nhập mã
   → mã cất vào `users.pendingClassCode` của chính em, **em chưa vào lớp**. Giáo
   viên mở màn quản lý lớp, thấy cột "Đơn chờ", bấm Duyệt → **chính giáo viên**

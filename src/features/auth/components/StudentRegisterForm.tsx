@@ -7,10 +7,11 @@ import {
   UserPlus, Eye, EyeOff, Key, Mail, User, ArrowLeft, CheckCircle,
 } from 'lucide-react';
 import { useApp } from '../../../core/hooks/useApp';
-import { useNavigate } from 'react-router-dom';
 
 interface StudentRegisterFormProps {
   onBackToLogin: () => void;
+  /** Đăng ký xong thì mở màn ĐĂNG NHẬP (không phải quay về màn chọn kiểu tài khoản) */
+  onDangKyXong: () => void;
 }
 
 /**
@@ -23,9 +24,8 @@ interface StudentRegisterFormProps {
  * Học sinh vào rồi chọn lớp ở tab Học sinh (`JoinClassForm`), chỗ đó đọc được
  * danh sách lớp thật.
  */
-export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBackToLogin }) => {
-  const { registerStudent } = useApp();
-  const navigate = useNavigate();
+export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBackToLogin, onDangKyXong }) => {
+  const { registerStudent, logout } = useApp();
 
   const [name, setName]         = useState('');
   const [email, setEmail]       = useState('');
@@ -82,8 +82,14 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
 
     if (res.success) {
       setSuccessInfo({});
-      // Điều hướng sang dashboard sau 1.5 giây
-      setTimeout(() => navigate('/dashboard'), 1500);
+      /* Đăng ký xong ĐẨY VỀ MÀN ĐĂNG NHẬP, không vào thẳng trang học.
+         `registerStudent` tạo tài khoản trên app CHÍNH nên Firebase đăng nhập
+         luôn bằng tài khoản vừa tạo; không `logout()` thì màn đăng nhập thấy
+         phiên còn sống và hiện "Tiếp tục với ..." — em không hề gõ mật khẩu
+         lần nào, tức là chưa biết mình đặt mật khẩu gì. Gõ một lần ngay lúc
+         còn nhớ thì lần sau mới vào được. */
+      void logout();
+      setTimeout(() => onDangKyXong(), 1500);
     } else {
       setError(res.message);
     }
@@ -105,7 +111,7 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
           Đăng ký thành công!
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          Đang chuyển hướng vào trang học tập...
+          Mời em đăng nhập bằng email và mật khẩu vừa tạo để bắt đầu học.
         </Typography>
       </Box>
     );

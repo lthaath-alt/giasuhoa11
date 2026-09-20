@@ -1,5 +1,6 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, Page } from '@playwright/test';
 import { taiKhoanThu } from '../moiTruong';
+import { vaoTrongApp } from '../chung';
 
 /**
  * Hai thứ thêm ngày 20/09/2026 mà KHÔNG bộ kiểm nào trong `scripts/` nhìn
@@ -16,6 +17,14 @@ import { taiKhoanThu } from '../moiTruong';
  * khoản thử. Hãy dùng một tài khoản học sinh riêng để thử, đừng dùng tài
  * khoản của một em đang học.
  */
+/* Tìm nút theo CHỮ NHÌN THẤY, đừng tìm theo tên trợ năng.
+   `<Tooltip>` của MUI mặc định LÀM NHÃN cho phần tử con, nên tên trợ năng của
+   nút này là câu trong tooltip ("Ôn bài này bằng trò chơi — màn N") chứ không
+   phải chữ "Chơi để ôn" in trên nút. `getByRole('button', { name: 'Chơi để
+   ôn' })` vì thế không tìm thấy gì, trong khi nút hiện rành rành trên màn
+   hình — đã mất một lượt chạy vì chỗ này. */
+const NUT_CHOI = (page: Page) => page.locator('button:has-text("Chơi để ôn")');
+
 test.describe('Luyện tập (đã đăng nhập)', () => {
   test.skip(
     !taiKhoanThu(),
@@ -24,6 +33,9 @@ test.describe('Luyện tập (đã đăng nhập)', () => {
 
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
+    /* Phiên đã lưu vẫn còn sống, nên web hỏi "Tiếp tục với <tên>?" trước khi
+       cho vào trong — giống hệt lúc vừa gõ mật khẩu. */
+    await vaoTrongApp(page);
     await page.locator('#nav-practice-btn').click();
   });
 
@@ -35,13 +47,14 @@ test.describe('Luyện tập (đã đăng nhập)', () => {
   });
 
   test('mỗi bài có nút "Chơi để ôn"', async ({ page }) => {
-    const nut = page.getByRole('button', { name: 'Chơi để ôn' });
-    await expect(nut.first()).toBeVisible({ timeout: 30_000 });
+    await expect(NUT_CHOI(page).first()).toBeVisible({ timeout: 30_000 });
+    /* Có ở NHIỀU bài, không phải chỉ đúng một chỗ lẻ. */
+    expect(await NUT_CHOI(page).count()).toBeGreaterThan(1);
   });
 
   test('bấm "Chơi để ôn" thì mở khu Trò chơi, KHÔNG mở tab mới', async ({ page, context }) => {
     const soTabTruoc = context.pages().length;
-    await page.getByRole('button', { name: 'Chơi để ôn' }).first().click();
+    await NUT_CHOI(page).first().click();
 
     /* Vì sao canh chỗ này: trò chơi gửi tiến độ về bằng `postMessage` tới cửa
        sổ CHA. Mở ở tab mới là tiến độ rơi vào hư không, và em chơi xong mà

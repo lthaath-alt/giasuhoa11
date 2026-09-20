@@ -52,4 +52,18 @@ test.describe('Khách vãng lai', () => {
     const that = loi.filter(t => !/srcdoc/i.test(t));
     expect(that, `Console có lỗi:\n${that.join('\n')}`).toEqual([]);
   });
+
+  test('mở được màn đăng ký học sinh', async ({ page }) => {
+    /* Không tạo tài khoản ở đây — phép thử chỉ đi tới cái form rồi dừng.
+       Nó canh đúng một điều: đường vào màn tự đăng ký của học sinh còn sống,
+       và màn đó dựng được (sau 20/09/2026 màn này nhận thêm một prop để biết
+       đăng ký xong thì mở màn ĐĂNG NHẬP, chứ không đẩy thẳng vào trang học). */
+    await page.goto('/');
+    await page.getByRole('button', { name: /Đăng ký ngay/i }).click();
+    await expect(page.locator('#register-option-student-self')).toBeVisible();
+
+    await page.locator('#register-option-student-self').click();
+    await expect(page.getByLabel('Email *')).toBeVisible();
+    await expect(page.getByLabel('Họ và tên *')).toBeVisible();
+  });
 });

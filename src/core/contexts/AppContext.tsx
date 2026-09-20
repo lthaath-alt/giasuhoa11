@@ -77,7 +77,8 @@ export interface AppContextType {
   // ── Xác thực ────────────────────────────────────────────────────────────────
 
   /** Đăng nhập bằng email/username + mật khẩu */
-  login: (identifier: string, password: string) => Promise<{ success: boolean; message: string; user?: User }>;
+  /* Trả về VAI chứ không trả cả hồ sơ — xem ghi chú trong `login`. */
+  login: (identifier: string, password: string) => Promise<{ success: boolean; message: string; role?: UserRole }>;
 
   /**
    * Xử lý sau khi Google trả về thông tin user.
@@ -521,15 +522,29 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       return { success: false, message: fsRes.message || 'Sai email hoặc mật khẩu' };
     }
 
-    /* KHÔNG tự dựng `appUser` ở đây nữa: `onAuthStateChanged` chạy ngay sau khi
+    /* KHÔNG tự dựng `appUser` ở đây: `onAuthStateChanged` chạy ngay sau khi
        đăng nhập thành công và tự đặt `currentUser` từ hồ sơ Firestore. Dựng hai
        lần là hai nguồn sự thật.
        Bản cũ còn nguy hơn thế: khi không tìm thấy user trong state nó bịa ra
        email dạng `<username>@firestore.local`. Mà `progress` và `chats` trỏ tới
        người dùng BẰNG EMAIL — nên tiến độ học sẽ ghi vào một địa chỉ không có
-       thật, và người dùng thấy mình mất sạch tiến độ. */
-    const stateUser = users.find(u => u.id === fsRes.user!.uid);
-    return { success: true, message: 'Đăng nhập thành công!', user: stateUser };
+       thật, và người dùng thấy mình mất sạch tiến độ.
+
+       Chỉ trả về VAI, và lấy thẳng từ hồ sơ `users/{uid}` vừa đọc xong. Màn
+       đăng nhập chỉ cần đúng một thứ đó: để chặn người chọn nhầm thẻ vai.
+
+       Trước 20/09/2026 chỗ này trả `users.find(u => u.id === uid)`. Mảng `users`
+       chỉ có dữ liệu khi tài khoản được quyền `list` trên collection `users`,
+       tức TỪ GIÁO VIÊN TRỞ LÊN. Với học sinh nó luôn rỗng, nên `user` luôn
+       `undefined`, `LoginForm` rơi vào nhánh thất bại và đem chính câu "Đăng
+       nhập thành công!" đi `setError` — mọi em đăng nhập đúng đều thấy một
+       khung ĐỎ báo lỗi, rồi phải bấm thêm "Tiếp tục với ..." mới vào được.
+       Phép thử đầu-cuối bắt được ngày 20/09/2026. */
+    return {
+      success: true,
+      message: 'Đăng nhập thành công!',
+      role: chuanHoaVaiTro(fsRes.user.role),
+    };
   };
 
   // ── Đăng nhập / Đăng ký bằng Google ──────────────────────────────────────
