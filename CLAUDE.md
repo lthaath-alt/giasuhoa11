@@ -408,6 +408,31 @@ vẫn đưa [H₂O] vào biểu thức Kc — đã kiểm tay). Nên:
 - **Đừng kết luận "bài này sạch"** sau một lượt. Nhiều nhất chỉ nói được là
   "lượt này không thấy gì".
 
+**Hai lượt chữa được sót NGẪU NHIÊN, KHÔNG chữa được sót HỆ THỐNG** (đo
+20/09/2026). Phép đối chứng mù: xuất đề dẫn Bài 1 — 154 câu, trong đó có **ba
+câu đã kiểm tay và biết chắc là sai** (ba câu Kc ghi `H₂O (l)` nhưng lời giải
+vẫn đưa [H₂O] vào biểu thức). Mô hình không được mách câu nào.
+
+| Lượt | Bắt được |
+|---|---|
+| API `gemini-3.6-flash`, lượt 1 và 2 (15:27) | `04avv`, `frynt` — **2/3** |
+| Antigravity, lượt 1 (23:18) | `04avv`, `frynt` — **2/3** |
+| Antigravity, lượt 2 (23:29) | `04avv`, `frynt` — **2/3** |
+
+Bốn lượt, hai đường khác nhau, **cùng sót đúng một câu**: `bq_1789371866328_eg7es`.
+Đó là câu đúng/sai mà bốn ý đều đúng sẵn, chỉ phần đề mang kí hiệu trạng thái
+sai — tức lỗi kín nhất trong ba câu. Người tìm ra nó là người, không phải máy.
+
+Ba điều rút ra:
+
+1. **Đường dẫn tay qua Antigravity CHẠY THẬT** ở cỡ ~95.000 ký tự / 154 câu. Nó
+   không "giả vờ đọc rồi trả mảng rỗng".
+2. **Tỉ lệ bắt khoảng 2/3 ngay trên lỗi đã biết chắc.** Con số đó là trần chứ
+   không phải sàn — lỗi trong kho còn kín hơn ba câu này.
+3. **`0 nghi ngờ` KHÔNG bằng `sạch`.** Nếu cái sót là sót hệ thống thì chạy bao
+   nhiêu lượt cũng ra cùng một kết quả, và con số `k/N lượt cùng nêu` không hề
+   cảnh báo điều đó. Soát máy là cái lưới thưa, không phải phép nghiệm thu.
+
 ### Quy trình soát — năm bước, chủ dự án chốt ở bước 3 và 4
 
 Chốt ngày 20/09/2026. Cố ý KHÔNG tự động hoá trọn gói:
@@ -420,10 +445,54 @@ Chốt ngày 20/09/2026. Cố ý KHÔNG tự động hoá trọn gói:
    đề nghị cách sửa sai.
 3. **Chủ dự án quyết** sửa thế nào. Một câu sai thường có hơn một cách chữa,
    và chọn cách nào là việc của người dạy.
-4. **Chủ dự án tự sửa trên Firestore.** Không có script nào ghi đè ngân hàng —
-   đó là dữ liệu thật của 1554 câu, một lỗi trong script là hỏng hàng loạt.
+4. **Chủ dự án tự sửa trên Firestore**, bằng Console hoặc bằng
+   `npm run sua:cau-hoi` (xem ngay dưới). Không có script nào sửa ngân hàng
+   theo ý mình — đó là dữ liệu thật của 1554 câu, một lỗi trong script là hỏng
+   hàng loạt.
 5. **Đồng bộ lại:** `npm run xuat:ngan-hang` rồi `npm run gan:cau-hoi`, để bản
    chụp trong repo khớp Firestore. Quên bước này thì lần soát sau đọc bản cũ.
+
+### `npm run sua:cau-hoi` — sửa vài câu theo phiếu, KHÔNG phải sửa hàng loạt
+
+Thêm 20/09/2026, vì dán tay công thức hoá học vào Firebase Console rất dễ gõ
+lệch một ký tự mà không ai phát hiện. Nó KHÔNG mâu thuẫn với điều 4 ở trên:
+thứ điều 4 cấm là một script tự quyết định sửa gì.
+
+```bash
+npm run sua:cau-hoi -- docs/soat-hoa-hoc/sua-3-cau-Kc.json          # chạy thử
+npm run sua:cau-hoi -- docs/soat-hoa-hoc/sua-3-cau-Kc.json --that   # ghi thật
+```
+
+Năm cái trói, **đừng nới cái nào mà không hỏi chủ dự án**:
+
+1. **Không tự biết phải sửa gì** — mọi thứ nằm trong một *phiếu sửa* JSON theo
+   git, do người soạn sau khi đã kiểm tay.
+2. **Chỉ ghi trường trong danh sách trắng**, hiện chỉ có `q`. `a`/`num`/`tol`
+   là ĐÁP ÁN — sửa nhầm là cả lớp bị chấm sai mà điểm vẫn trông hợp lý.
+3. **Điều kiện tiên quyết khớp từng ký tự**: giá trị trên Firestore phải bằng
+   đúng `cuPhaiLa`. Nhờ vậy chạy lại lần hai không làm gì, và phiếu soạn từ bản
+   chụp cũ không đè mất thứ người khác vừa sửa.
+4. **Mặc định KHÔNG ghi.** Chạy thử không cần đăng nhập (`bank_questions` đọc
+   công khai), nên xem được sẽ đổi gì trước khi quyết định gõ mật khẩu.
+5. **`updateDoc`, không `setDoc`; không tạo, không xoá.** `setDoc` thay cả tài
+   liệu, tức mọi trường không nhắc tới sẽ biến mất.
+
+Ghi xong nó tự đọc lại từ Firestore để xác nhận — bài học số 1, đừng tin dòng
+chữ "xong" của chính script mình viết. Rồi nhắc chạy `xuat:ngan-hang` +
+`gan:cau-hoi`.
+
+**Tài khoản để ghi: `GIAO_VIEN_EMAIL` + `GIAO_VIEN_MATKHAU` trong `.env.local`**
+(20/09/2026), cùng lối với `E2E_EMAIL`/`E2E_MATKHAU`; `.gitignore` chặn `.env*`.
+Bỏ trống thì script hỏi ngay tại máy, hiện dấu sao. Dù đường nào cũng **KHÔNG
+nhận mật khẩu qua tham số dòng lệnh** — dòng lệnh nằm trong lịch sử shell và
+trong danh sách tiến trình của cả máy. Chung module `scripts/hoi-ban-phim.mts`
+với `liet-ke:tai-khoan`.
+
+Tài khoản đó chỉ cần vai **`teacher`**. **Đừng dùng `admin`:** ghi
+`bank_questions` không cần tới nó, mà một tài khoản quản trị nằm trong tệp trên
+đĩa thì mở thêm cả `users` nếu máy bị lộ — và việc đặt/đổi vai vốn đã ghim vào
+`laChuDuAn()` nên `admin` cũng không mở thêm được gì hữu ích. Script in VAI ra
+ngay sau khi đăng nhập, dừng luôn nếu là `student`, và nhắc nếu là quản trị.
 
 Phạm vi sẽ mở rộng dần: ngân hàng câu hỏi trước, rồi nội dung 25 bài giảng, rồi
 đề cương NCKH. **Câu trả lời của gia sư AI để CUỐI CÙNG** và phải lọc sạch

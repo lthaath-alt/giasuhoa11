@@ -31,6 +31,7 @@
     "gan:cau-hoi": "tsx scripts/gan-cau-hoi-theo-bai.mts && npm run nhung:ran-thang",
     "xuat:ngan-hang": "tsx scripts/xuat-ngan-hang.mts",
     "liet-ke:tai-khoan": "tsx scripts/liet-ke-tai-khoan.mts",
+    "sua:cau-hoi": "tsx scripts/sua-cau-hoi.mts",
     "chuyen:users": "tsx scripts/chuyen-users-sang-uid.mts",
     "xoa:password": "tsx scripts/xoa-cot-password.mts",
     "kiem-tra:dong-bo": "tsx scripts/kiem-tra-dong-bo-ngan-hang.mts",

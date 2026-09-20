@@ -1,0 +1,14 @@
+[
+  {
+    "id": "bq_1789371866328_04avv",
+    "tin": "cao",
+    "loi": "Phương trình hoá học trong đề bài viết H₂O ở trạng thái lỏng: H₂O (l) cùng các chất tan (aq). Theo quy ước tính hằng số cân bằng Kc trong SGK Hoá học 11 (bài 1), nồng độ của dung môi/chất lỏng nguyên chất H₂O (l) không có mặt trong biểu thức Kc. Tuy nhiên lời giải lại đưa [H₂O] = 0,05 M vào tử số tính ra Kc = 0,33, gây mâu thuẫn giữa kí hiệu trạng thái ở đề và biểu thức Kc.",
+    "sua": "Bỏ các kí hiệu trạng thái (aq) và (l) trong phương trình phản ứng ở đề bài (phản ứng ester hoá diễn ra trong hệ lỏng đồng thể không có nước làm dung môi ban đầu): CH₃COOH + (CH₃)₂CHCH₂CH₂−OH ⇌ CH₃COOCH₂CH₂CH(CH₃)₂ + H₂O. Hoặc nếu giữ nguyên quy ước bỏ [H₂O (l)] thì sửa đáp án đúng thành 6,67 (Kc = 0,05 / (0,05 × 0,15) ≈ 6,67)."
+  },
+  {
+    "id": "bq_1789371866328_frynt",
+    "tin": "cao",
+    "loi": "Phương trình hoá học trong đề bài ghi H₂O (l) cùng các chất tan (aq). Theo quy ước SGK Hoá học 11, nồng độ của chất lỏng nguyên chất không có mặt trong biểu thức Kc. Lời giải lại đưa [H₂O] = 0,05 M vào tử số tính ra Kc = 0,33 (khớp phương án 0). Nếu áp dụng đúng quy ước bỏ [H₂O (l)] thì Kc = 0,05 / (0,05 × 0,15) ≈ 6,67 và không có phương án nào đúng.",
+    "sua": "Bỏ các kí hiệu trạng thái (aq) và (l) trong phương trình ở đề bài: CH₃COOH + (CH₃)₂CHCH₂CH₂−OH ⇌ CH₃COOCH₂CH₂CH(CH₃)₂ + H₂O. Hoặc sửa các phương án lựa chọn và đáp án đúng thành 6,67."
+  }
+]

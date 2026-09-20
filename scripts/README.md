@@ -264,3 +264,30 @@ Thay vào đó danh sách Luyện tập vẽ bằng tiến độ trong localStor
 hiện số câu; số câu chỉ được hỏi khi học sinh bấm vào một bài, đọc đúng bài đó
 từ Firestore. Chi tiết và số đo: mục "Hạn mức đọc" trong `CLAUDE.md`, và
 `docs/superpowers/plans/2026-09-20-giam-luot-doc-firestore.md`.
+
+## `npm run sua:cau-hoi` — sửa vài câu trong ngân hàng theo phiếu
+
+```bash
+npm run sua:cau-hoi -- docs/soat-hoa-hoc/sua-3-cau-Kc.json          # chạy thử
+npm run sua:cau-hoi -- docs/soat-hoa-hoc/sua-3-cau-Kc.json --that   # ghi thật
+```
+
+Phiếu sửa là một mảng JSON, mỗi mục bốn trường:
+
+```json
+[{ "id": "bq_...", "truong": "q", "cuPhaiLa": "<đề hiện tại, khớp từng ký tự>", "moi": "<đề mới>" }]
+```
+
+Chạy thử KHÔNG cần đăng nhập và không ghi gì — `bank_questions` đọc công khai.
+Ghi thật cần một tài khoản GIÁO VIÊN — luật Firestore đòi vai đó mới ghi được
+`bank_questions`. Đặt `GIAO_VIEN_EMAIL` + `GIAO_VIEN_MATKHAU` trong `.env.local`
+(xem `.env.example`), hoặc bỏ trống để script hỏi ngay tại máy, hiện dấu sao.
+Dù đường nào cũng KHÔNG nhận mật khẩu qua tham số dòng lệnh.
+
+Cấp vai `teacher` THÔI, đừng cấp `admin`: xem lý do trong `CLAUDE.md`.
+
+`cuPhaiLa` lệch một dấu cách là câu đó bị bỏ qua. Đó là chủ ý: chạy lại lần hai
+không làm gì, và phiếu soạn từ bản chụp cũ không đè mất thứ người khác vừa sửa.
+
+Chi tiết năm cái trói và vì sao chúng tồn tại: mục "`npm run sua:cau-hoi`"
+trong `CLAUDE.md`. **Ghi xong phải `npm run xuat:ngan-hang && npm run gan:cau-hoi`.**
