@@ -156,6 +156,27 @@ while (i < dong.length) {
   const d = dong[i];
   const t = d.trim();
 
+  /* Khối mã rào bằng ``` — giữ NGUYÊN từng dòng, kể cả khoảng trắng đầu dòng.
+     Không có nhánh này thì mọi dòng rơi xuống nhánh "đoạn văn thường" ở cuối:
+     bị trim mất thụt đầu dòng, bị căn đều hai bên, và dòng bắt đầu bằng `-`
+     thành gạch đầu dòng. Với tệp đề dẫn `soat:hoa-hoc` thì đó là hỏng thật —
+     cả ngân hàng câu hỏi nằm trong MỘT khối JSON vài nghìn dòng, hỏng là mô
+     hình đọc ra sai id rồi báo lỗi cho câu khác. */
+  if (t.startsWith('```')) {
+    i++;
+    while (i < dong.length && !dong[i].trim().startsWith('```')) {
+      khoi.push(new Paragraph({
+        spacing: { before: 0, after: 0, line: 240 },
+        alignment: AlignmentType.LEFT,
+        children: [new TextRun({ text: dong[i], font: 'Consolas', size: 16 })],
+      }));
+      i++;
+    }
+    i++;   // bỏ dòng rào đóng
+    khoi.push(new Paragraph({ text: '', spacing: { after: 120 } }));
+    continue;
+  }
+
   // Đường kẻ ngang
   if (/^-{3,}$/.test(t)) {
     khoi.push(new Paragraph({

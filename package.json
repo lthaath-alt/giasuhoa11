@@ -24,6 +24,7 @@
     "kiem-tra:ran-thang": "tsx scripts/kiem-tra-ran-thang.mts",
     "phan-tich": "tsx scripts/phan-tich-thuc-nghiem.mts",
     "word": "node scripts/md-sang-word.cjs",
+    "pdf": "tsx scripts/md-sang-pdf.mts",
     "do-chi-phi": "tsx scripts/do-chi-phi.mts",
     "sinh:ran-thang": "tsx scripts/sinh-ran-thang.mts && npm run nhung:ran-thang",
     "nhung:ran-thang": "tsx scripts/nhung-du-lieu-ran-thang.mts",

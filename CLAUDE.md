@@ -387,6 +387,11 @@ dẫn vào `docs/soat-hoa-hoc/de-dan-*.md`; repo nằm sẵn trong workspace c�
 Antigravity nên không phải dán gì — chỉ cần bảo nó đọc tệp đó rồi ghi kết quả
 ra JSON. `--nap` chịu được tệp có rào ```json và có lời dẫn thừa.
 
+Đường B cũng phải theo luật "một lượt là không đủ": bảo Antigravity soát
+HAI lần ra hai tệp, rồi `--nap a.json,b.json` (ngăn bằng dấu phẩy, không có
+dấu cách). Báo cáo ghi `k/2 lượt cùng nêu` y như đường A. Tệp đề dẫn tự sinh
+ra sẵn hai tên tệp và cả dòng lệnh nạp.
+
 Ngày làm việc điển hình: hết 20 lượt miễn phí thì chuyển sang đường B, hôm sau
 lại có 20 lượt mới.
 

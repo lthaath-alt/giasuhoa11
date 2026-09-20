@@ -310,8 +310,18 @@ async function chay() {
     const noi = [
       `# Đề dẫn soát nội dung — ${ds.length} câu`, '',
       `Mở tệp này trong Antigravity rồi bảo nó: *"làm đúng yêu cầu trong tệp,`,
-      `ghi kết quả ra \`docs/soat-hoa-hoc/${tenTraLoi}\`"*.`, '',
-      `Xong thì nạp lại:  \`npm run soat:hoa-hoc -- --nap docs/soat-hoa-hoc/${tenTraLoi}\``, '',
+      `ghi kết quả ra \`docs/soat-hoa-hoc/${tenTraLoi.replace('.json', '-1.json')}\`"*.`, '',
+      `**Rồi làm lại LẦN NỮA**, trong một phiên mới, ghi ra`,
+      `\`docs/soat-hoa-hoc/${tenTraLoi.replace('.json', '-2.json')}\`. Một lượt soát`,
+      `KHÔNG đủ: đo 20/09/2026, cùng 16 câu chạy ba lượt cho ra 3, 3, rồi 0 câu`,
+      `nghi ngờ — và ba câu bị bỏ sót ở lượt thứ ba là lỗi THẬT.`, '',
+      'Xong thì nạp CẢ HAI, ngăn bằng dấu phẩy, KHÔNG có dấu cách:', '',
+      '```bash',
+      `npm run soat:hoa-hoc -- --nap docs/soat-hoa-hoc/${tenTraLoi.replace('.json', '-1.json')},docs/soat-hoa-hoc/${tenTraLoi.replace('.json', '-2.json')}`,
+      '```', '',
+      'Báo cáo sẽ ghi `k/2 lượt cùng nêu` cho từng câu — câu nào cả hai lượt',
+      'cùng chỉ ra thì đáng tin hơn hẳn. Chỉ có một tệp thì nạp một tệp cũng được,',
+      'báo cáo sẽ ghi `1/1`.', '',
       '---', '', CAU_LENH, '', '## Dữ liệu', '', '```json',
       JSON.stringify(ds.map(goiDi), null, 1), '```', '',
     ].join('\n');
@@ -319,30 +329,51 @@ async function chay() {
     writeFileSync(duong(tenDeDan), noi, 'utf8');
     console.log(`\nĐã ghi đề dẫn ${ds.length} câu: ${tenDeDan}`);
     console.log('KHÔNG gọi mạng, không tốn lượt nào.');
-    console.log(`\nBước tiếp: mở tệp đó trong Antigravity, rồi\n`
-      + `  npm run soat:hoa-hoc -- --nap docs/soat-hoa-hoc/${tenTraLoi}`);
+    console.log('\nBước tiếp: mở tệp đó trong Antigravity, bảo nó soát HAI LẦN ra hai tệp,\nrồi nạp cả hai:\n'
+      + `  npm run soat:hoa-hoc -- --nap docs/soat-hoa-hoc/${tenTraLoi.replace('.json', '-1.json')},docs/soat-hoa-hoc/${tenTraLoi.replace('.json', '-2.json')}`);
     return;
   }
 
   if (napTep) {
-    let tho: string;
-    try { tho = readFileSync(duong(napTep), 'utf8'); } catch {
-      console.error(`Không đọc được tệp trả lời: ${napTep}`);
+    /* NHẬN NHIỀU TỆP, ngăn bằng dấu phẩy. Vì sao: đường dẫn tay cũng phải theo
+       đúng luật "một lượt soát là không đủ" như đường gọi thẳng. Bảo Antigravity
+       soát hai lần, ghi ra hai tệp, rồi nạp cả hai — báo cáo sẽ ghi `k/N lượt
+       cùng nêu` y như khi gọi API. Nạp một tệp vẫn chạy, chỉ là N = 1. */
+    const dsTep = napTep.split(',').map(t => t.trim()).filter(Boolean);
+    let soHongNap = 0;
+
+    for (const t of dsTep) {
+      let tho: string;
+      try { tho = readFileSync(duong(t), 'utf8'); } catch {
+        console.error(`  Không đọc được tệp trả lời: ${t}`);
+        soHongNap++;
+        continue;
+      }
+      /* Antigravity hay bọc JSON trong rào ```json, và đôi khi kèm lời dẫn. Lấy
+         mảng JSON đầu tiên tìm được thay vì đòi tệp phải sạch tuyệt đối. */
+      const khop = tho.match(/\[[\s\S]*\]/);
+      if (!khop) {
+        console.error(`  Trong ${t} không thấy mảng JSON nào.`);
+        soHongNap++;
+        continue;
+      }
+      try {
+        const mang = JSON.parse(khop[0]) as Nghi[];
+        nhan(mang);
+        console.log(`  ${t}: ${mang.length} câu nghi ngờ`);
+      } catch (e) {
+        console.error(`  Mảng JSON trong ${t} đọc không ra: ${(e as Error).message}`);
+        soHongNap++;
+      }
+    }
+
+    if (soHongNap === dsTep.length) {
+      console.error('\nKhông nạp được tệp nào. Dừng.');
       process.exit(1);
     }
-    /* Antigravity hay bọc JSON trong rào ```json, và đôi khi kèm lời dẫn. Lấy
-       mảng JSON đầu tiên tìm được thay vì đòi tệp phải sạch tuyệt đối. */
-    const khop = tho.match(/\[[\s\S]*\]/);
-    if (!khop) {
-      console.error(`Trong ${napTep} không thấy mảng JSON nào.`);
-      process.exit(1);
-    }
-    try { nhan(JSON.parse(khop[0]) as Nghi[]); } catch (e) {
-      console.error(`Mảng JSON trong ${napTep} đọc không ra: ${(e as Error).message}`);
-      process.exit(1);
-    }
-    console.log(`\nNạp từ ${napTep}: ${gom.size} câu nghi ngờ, trên ${ds.length} câu trong phạm vi.`);
-    viet(ds, gom, bac, 1, 'Antigravity (dẫn tay)');
+    console.log(`\nGộp ${dsTep.length - soHongNap}/${dsTep.length} tệp: `
+      + `${gom.size} câu nghi ngờ, trên ${ds.length} câu trong phạm vi.`);
+    viet(ds, gom, bac, dsTep.length, 'Antigravity (dẫn tay)', soHongNap);
     return;
   }
 

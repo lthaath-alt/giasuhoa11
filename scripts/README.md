@@ -200,7 +200,7 @@ ra danh sách để người tự kiểm chứng.
 | `--xem` | chỉ tính kế hoạch, KHÔNG gọi Gemini |
 | `--lan N` | soát mấy lượt mỗi lô (mặc định 2 — một lượt BỎ SÓT) |
 | `--xuat-de-dan` | ghi tệp đề dẫn để đưa Antigravity, KHÔNG gọi mạng |
-| `--nap <tệp>` | nạp câu trả lời của Antigravity rồi dựng báo cáo |
+| `--nap a.json,b.json` | nạp câu trả lời của Antigravity (NHIỀU tệp, ngăn bằng dấu phẩy) rồi dựng báo cáo |
 | `--qua cli` \| `--qua key` | gọi qua `gemini` CLI (mặc định) hay qua khoá API |
 
 Hạn mức: 20 lượt/ngày ở bậc miễn phí, mà soát cả kho tốn 63 lượt — script tự
@@ -218,3 +218,35 @@ Báo cáo ghi vào `docs/soat-hoa-hoc/<ngày>-<phạm vi>.md` và theo git.
 
 Chỉ nội dung câu hỏi được gửi đi. Không email, không tên học sinh, không tiến độ.
 
+
+### Đưa tệp đề dẫn sang Antigravity — `npm run pdf`
+
+Đường rẻ nhất vẫn là **gõ đường dẫn tệp `.md` vào chat của Antigravity**: repo
+nằm sẵn trong workspace của nó nên nó tự mở, không phải đính kèm gì, và không
+qua lớp chuyển đổi nào.
+
+Khi đường đó không dùng được — ô đính kèm của Antigravity không nhận `.md` lẫn
+`.docx` — thì chuyển sang PDF:
+
+```bash
+npm run pdf -- docs/soat-hoa-hoc/de-dan-2026-09-20-2154-bai-2.md
+```
+
+Ra tệp `.pdf` cùng chỗ, cùng tên. Cách làm: dựng HTML rồi nhờ **Chrome** in ra.
+Máy không có pandoc, mà tự sinh PDF thì vướng font — nội dung có dấu tiếng Việt
+VÀ chỉ số hoá học (`₂`, `⁺`, `⇌`), trong khi 14 font dựng sẵn của PDF chỉ với
+tới WinAnsi. Chrome nhúng font hộ nên không mất chữ. Đã đo trên đề dẫn Bài 2:
+230 câu, 54 trang, 249 KB, chỉ số dưới và dấu tiếng Việt ra đúng.
+
+Hai chỗ phải biết:
+
+- **Khối mã rào ` ``` ` giữ nguyên từng dòng**, vì cả ngân hàng câu hỏi nằm
+  trong một khối JSON vài nghìn dòng. Dòng dài (phần `giai_thich`) vẫn bị ngắt
+  mềm cho vừa khổ A4 — chấp nhận được, vì `"id"` luôn nằm gọn một dòng ngắn và
+  đó mới là thứ phải đọc ra đúng từng ký tự.
+- `md-sang-pdf.mts` và `md-sang-word.cjs` có **hai** bộ đọc Markdown riêng, cố
+  ý chỉ xử lý những cú pháp tài liệu trong repo đang dùng. Thêm cú pháp mới thì
+  phải sửa CẢ HAI.
+
+`npm run word -- vao.md "ra.docx"` vẫn còn cho việc nộp đề cương NCKH — đó mới
+là lý do nó sinh ra.
