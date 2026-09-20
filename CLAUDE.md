@@ -18,12 +18,12 @@ nhảy thẳng:
 | Sắp đụng vào | Đọc mục |
 |---|---|
 | Đăng nhập, vai trò, vào lớp, đăng ký | Vài điểm dễ vấp |
-| `firestore.rules` | An ninh → "Bảy điều về luật hiện hành" |
+| `firestore.rules` | An ninh dự án → "Bảy điều về luật hiện hành" |
 | `index.css`, màu, chế độ tối | Bảng màu & chế độ sáng / tối |
-| `public/_headers`, CSP, deploy | An ninh → "Ba cái bẫy của `_headers`" |
+| `public/_headers`, CSP, deploy | An ninh dự án → "Ba cái bẫy của `_headers`" |
 | Giao diện, bố cục, kiểu dáng | Thế giới thị giác |
-| Ngân hàng câu hỏi, đồng bộ | Ngân hàng câu hỏi nằm ở Firestore |
-| Gia sư AI, hạn mức, khoá Gemini | An ninh + Nhờ Gemini soi nội dung hoá học |
+| Ngân hàng câu hỏi, bài đã nộp, đồng bộ | **Kiến trúc dự án** |
+| Gia sư AI, hạn mức, khoá Gemini | An ninh dự án + Nhờ Gemini soi nội dung |
 | Viết/sửa phép kiểm | Lệnh + Rút kinh nghiệm |
 
 **Chín bài học ở mục "Rút kinh nghiệm" là phần đắt nhất của tệp này** — mỗi cái
@@ -263,7 +263,7 @@ hoá + dựng công thức KaTeX, telemetry), `kiem-tra:chuong-trinh` (dữ li�
 `kiem-tra:tai-lieu`
 (mọi đường dẫn và lệnh npm mà CLAUDE.md / hiến chương nhắc tới đều phải có thật),
 `kiem-tra:an-ninh` (những hàng rào an ninh không được phép biến mất — xem mục
-"An ninh" bên dưới),
+"An ninh dự án" bên dưới),
 `kiem-tra:luat` (19 phép thử luật Firestore trên emulator; cần Java 11+ nên
 máy nào thiếu thì tự bỏ qua — phép này chạy thật trên GitHub Actions, xem
 `.github/workflows/kiem-luat.yml`).
@@ -536,19 +536,6 @@ Một điểm nữa: bản chép này KHÔNG có hook lúc mở phiên như bả
 theo được `git pull` sang máy khác. Phần còn lại của `.claude/` (vd `settings.local.json`)
 vẫn bị chặn vì chứa cấu hình riêng từng máy.
 
-## Ngân hàng câu hỏi nằm ở Firestore, không nằm trong repo
-
-Bản thật ở collection `bank_questions`. Trong repo chỉ có bản chụp
-`public/bank/ngan-hang.json`, và mọi thứ chạy ngoài trình duyệt đều dùng bản chụp đó:
-trò chơi lúc mất mạng, `npm run soan:sinh`, `npm run gan:cau-hoi`, các bộ kiểm.
-
-Việc đồng bộ **tự chạy**: `.github/workflows/dong-bo-ngan-hang.yml` xuất lại lúc 02:00
-mỗi đêm rồi commit nếu có gì đổi. Làm tay thì `npm run xuat:ngan-hang` rồi
-`npm run gan:cau-hoi`. Quên đồng bộ thì hai bên lệch dần mà **không có dấu hiệu nào** —
-web vẫn đúng vì nó đọc thẳng Firestore; `kiem-tra:dong-bo` sinh ra để chặn điều đó.
-
-`src/features/lessons/constants.ts` **do máy sinh ra**, sửa tay sẽ bị ghi đè.
-
 ## Deploy lên Netlify (kéo thả thư mục `dist/`)
 - Học viên deploy bằng cách `npm run build` rồi kéo-thả thư mục `dist/` lên Netlify (KHÔNG qua git).
 - **Bắt buộc có `public/_redirects`** với nội dung `/*  /index.html  200`. Vite tự copy file này vào `dist/` khi build. ĐỪNG xoá nó.
@@ -563,13 +550,67 @@ web vẫn đúng vì nó đọc thẳng Firestore; `kiem-tra:dong-bo` sinh ra đ
   (F12) rồi mới chẩn đoán.
   - (Khoá web của Firebase không phải bí mật — nó vốn nằm trong mã JavaScript đã dựng
     trên Netlify, ai bấm F12 cũng đọc được. An toàn dựa vào Firestore Rules, và
-    từ 12/09/2026 luật đã siết theo vai — xem mục "An ninh". `bank_questions` nay
+    từ 12/09/2026 luật đã siết theo vai — xem mục "An ninh dự án". `bank_questions` nay
     chỉ giáo viên ghi được, nhưng vẫn **đọc công khai** vì đồng bộ đêm cần.)
 - **Web KHÔNG cần key Gemini** (từ 13/09/2026): gia sư gọi qua Firebase AI Logic, xem `src/features/tutor/services/giaSuFirebaseAI.ts`. `.env.local` chỉ cần `GEMINI_API_KEY` cho script trong `scripts/` (xem `.env.example`). **Đừng bao giờ** đặt key Gemini vào biến `VITE_*` — Vite chép nguyên văn vào gói JS; `kiem-tra:an-ninh` bắt điều đó.
 - Máy dev gọi Firebase AI Logic cần `VITE_APPCHECK_DEBUG_TOKEN` trong `.env.development.local` (token đăng ký ở Firebase Console → App Check → Manage debug tokens). Nếu gia sư báo "tạm mất kết nối với máy chủ": trên máy dev thường là thiếu hoặc sai token đó; trên Netlify thường là CSP trong `public/_headers` hoặc tên miền chưa có trong key reCAPTCHA. Mở F12 xem lỗi thật trước khi sửa.
 - ĐỪNG commit `.env.local` (đã nằm trong `.gitignore`).
 
-## An ninh
+## Kiến trúc dự án — dữ liệu thật nằm ở đâu
+
+Mục này và mục "An ninh dự án" tách ra từ MỘT mục "An ninh" cũ, ngày
+20/09/2026, bằng đúng một cây thước:
+**kiến trúc** trả lời *dữ liệu nằm ở đâu, ai ghi, luồng đi thế nào*; **an ninh**
+trả lời *ai có thể lạm dụng, và hàng rào nào chặn*. Khối nào vừa là kiến trúc
+vừa có ràng buộc an ninh thì để ở đây và để lại một dòng trỏ ở mục kia.
+
+### Ngân hàng câu hỏi nằm ở Firestore, không nằm trong repo
+
+Bản thật ở collection `bank_questions`. Trong repo chỉ có bản chụp
+`public/bank/ngan-hang.json`, và mọi thứ chạy ngoài trình duyệt đều dùng bản chụp đó:
+trò chơi lúc mất mạng, `npm run soan:sinh`, `npm run gan:cau-hoi`, các bộ kiểm.
+
+Việc đồng bộ **tự chạy**: `.github/workflows/dong-bo-ngan-hang.yml` xuất lại lúc 02:00
+mỗi đêm rồi commit nếu có gì đổi. Làm tay thì `npm run xuat:ngan-hang` rồi
+`npm run gan:cau-hoi`. Quên đồng bộ thì hai bên lệch dần mà **không có dấu hiệu nào** —
+web vẫn đúng vì nó đọc thẳng Firestore; `kiem-tra:dong-bo` sinh ra để chặn điều đó.
+
+`src/features/lessons/constants.ts` **do máy sinh ra**, sửa tay sẽ bị ghi đè.
+
+### Bài kiểm tra đã nộp nằm ở `bai_nop/{quizId}`
+
+Chuyển sang Firestore ngày 18/09/2026. Trước đó
+`QuizStorage` ghi mọi bài vào localStorage của máy đang dùng, còn trang giáo
+viên (`QuizProgressTab.tsx`) đọc localStorage của máy GIÁO VIÊN — học sinh
+làm ở nhà thì giáo viên thấy trống trơn mà không có lỗi nào, và điểm tự luận
+chấm lại chỉ nằm trên máy giáo viên. Phát hiện khi định chụp màn giáo viên
+cho báo cáo NCKH.
+
+localStorage VẪN là kho làm việc của học sinh (đề đang làm, chống trùng đề —
+cần chạy đồng bộ). `src/features/quiz/baiNopService.ts` chỉ thêm một bản sao
+của mỗi bài ĐÃ NỘP. Bốn điều phải biết:
+
+1. **Nộp bài không chờ Firestore.** Mất mạng hay luật chưa publish thì học
+   sinh vẫn nộp và xem điểm như cũ; lần đăng nhập sau `dayBaiCuLen` đẩy lại.
+   Lỗi GÌ cũng không đánh dấu "đã đẩy", kể cả `permission-denied` — coi bị từ
+   chối là xong thì web lên trước luật sẽ làm mất vĩnh viễn các bài trong
+   khoảng đó.
+2. **Email lưu chữ thường** (`baiNopChuan.ts`), vì luật so `userEmail` với
+   token Auth vốn luôn chữ thường. Và phải bỏ mọi `undefined` — Firestore từ
+   chối cả tài liệu nếu gặp một giá trị `undefined`, mà câu hỏi từ kho hay
+   mang `image: undefined`.
+3. **Học sinh tạo, không sửa; giáo viên chỉ sửa `score` + `results`; không ai
+   xoá.** Tạo bài không dùng `get()` (chỉ so email trong token).
+4. **GIỚI HẠN ĐÃ BIẾT: điểm do trình duyệt chấm.** Luật chặn được điểm vượt
+   tối đa và bài đứng tên người khác, KHÔNG chặn được học sinh tự dựng một bài
+   điểm cao. Chặn thật cần chấm lại ở máy chủ (Cloud Function, gói Blaze).
+
+Nội dung câu hỏi trong bài nộp do học sinh ghi lên, nên phải coi là không tin
+cậy: trang giáo viên hiện nó qua `ChemicalText`, tức qua `locHtml`. Đừng bỏ lớp
+lọc đó. `kiem-tra:luyen-tap` canh cho trang giáo viên không đọc lại
+`QuizStorage`; `kiem-tra:luat` có 12 phép (21a–21l) cho collection này.
+
+## An ninh dự án — lỗ hổng, hàng rào, và luật
 
 Rà soát ngày 10/09/2026 tìm ra một lỗ hổng **XSS lưu trữ** đã sống trong dự án
 từ lâu. Chuỗi tấn công:
@@ -754,36 +795,10 @@ Hai hệ quả phải biết trước khi ngạc nhiên:
 **Còn lại, đã biết và cố ý hoãn:** học sinh sửa được `status` (hôm nay vô hại
 — đã quét, không đường nào dùng `status` làm cổng).
 
-**Bài kiểm tra đã nộp nằm ở `bai_nop/{quizId}`** (18/09/2026). Trước đó
-`QuizStorage` ghi mọi bài vào localStorage của máy đang dùng, còn trang giáo
-viên (`QuizProgressTab.tsx`) đọc localStorage của máy GIÁO VIÊN — học sinh
-làm ở nhà thì giáo viên thấy trống trơn mà không có lỗi nào, và điểm tự luận
-chấm lại chỉ nằm trên máy giáo viên. Phát hiện khi định chụp màn giáo viên
-cho báo cáo NCKH.
-
-localStorage VẪN là kho làm việc của học sinh (đề đang làm, chống trùng đề —
-cần chạy đồng bộ). `src/features/quiz/baiNopService.ts` chỉ thêm một bản sao
-của mỗi bài ĐÃ NỘP. Bốn điều phải biết:
-
-1. **Nộp bài không chờ Firestore.** Mất mạng hay luật chưa publish thì học
-   sinh vẫn nộp và xem điểm như cũ; lần đăng nhập sau `dayBaiCuLen` đẩy lại.
-   Lỗi GÌ cũng không đánh dấu "đã đẩy", kể cả `permission-denied` — coi bị từ
-   chối là xong thì web lên trước luật sẽ làm mất vĩnh viễn các bài trong
-   khoảng đó.
-2. **Email lưu chữ thường** (`baiNopChuan.ts`), vì luật so `userEmail` với
-   token Auth vốn luôn chữ thường. Và phải bỏ mọi `undefined` — Firestore từ
-   chối cả tài liệu nếu gặp một giá trị `undefined`, mà câu hỏi từ kho hay
-   mang `image: undefined`.
-3. **Học sinh tạo, không sửa; giáo viên chỉ sửa `score` + `results`; không ai
-   xoá.** Tạo bài không dùng `get()` (chỉ so email trong token).
-4. **GIỚI HẠN ĐÃ BIẾT: điểm do trình duyệt chấm.** Luật chặn được điểm vượt
-   tối đa và bài đứng tên người khác, KHÔNG chặn được học sinh tự dựng một bài
-   điểm cao. Chặn thật cần chấm lại ở máy chủ (Cloud Function, gói Blaze).
-
-Nội dung câu hỏi trong bài nộp do học sinh ghi lên, nên phải coi là không tin
-cậy: trang giáo viên hiện nó qua `ChemicalText`, tức qua `locHtml`. Đừng bỏ lớp
-lọc đó. `kiem-tra:luyen-tap` canh cho trang giáo viên không đọc lại
-`QuizStorage`; `kiem-tra:luat` có 12 phép (21a–21l) cho collection này.
+**Bài kiểm tra đã nộp (`bai_nop`)** chuyển sang mục "Kiến trúc dự án" — ở đó
+có ghi rõ một GIỚI HẠN AN NINH đã biết: điểm do trình duyệt chấm, luật chặn
+được điểm vượt tối đa và bài đứng tên người khác, nhưng KHÔNG chặn được học
+sinh tự dựng một bài điểm cao.
 
 **Khoá Gemini riêng của học sinh: CÓ LẠI ngày 20/09/2026**, sau khi đã bỏ ngày
 14/09/2026. Khác bản cũ ở ba điểm, và cả ba đều có phép kiểm canh:
