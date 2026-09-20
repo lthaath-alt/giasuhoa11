@@ -180,3 +180,41 @@ trong `GEMINI_MODEL_NAME`.
 Muốn hết lo hạn mức thì bật thanh toán cho dự án Google Cloud đang giữ API key.
 Đây cũng là việc phải làm trước khi mở web cho nhiều học sinh: 20 lượt/ngày cho
 mỗi key nghĩa là mỗi em chỉ hỏi được khoảng 20 câu một ngày.
+
+## `npm run soat:hoa-hoc` — nhờ Gemini soi nội dung hoá học
+
+Đọc `public/bank/ngan-hang.json`, chia lô rồi hỏi Gemini xem câu nào có vẻ sai
+đáp án, sai công thức, hay lời giải mâu thuẫn với đề. **Không sửa gì** — chỉ in
+ra danh sách để người tự kiểm chứng.
+
+| Cờ | Làm gì |
+|---|---|
+| `--bai bai-1` | chỉ một bài |
+| `--chuong 1` | cả chương |
+| `--muc vdc` | một mức (`nb`/`th`/`vd`/`vdc`) |
+| `--loai mc` | một loại (`mc`/`tf`/`tn`) |
+| `--so 40` | giới hạn số câu |
+| `--lo 25` | số câu mỗi lượt gọi (mặc định 25) |
+| `--model ...` | đổi model, mặc định lấy `GEMINI_MODEL_NAME` |
+| `--ra bc.md` | ghi báo cáo ra tệp |
+| `--xem` | chỉ tính kế hoạch, KHÔNG gọi Gemini |
+| `--lan N` | soát mấy lượt mỗi lô (mặc định 2 — một lượt BỎ SÓT) |
+| `--xuat-de-dan` | ghi tệp đề dẫn để đưa Antigravity, KHÔNG gọi mạng |
+| `--nap <tệp>` | nạp câu trả lời của Antigravity rồi dựng báo cáo |
+| `--qua cli` \| `--qua key` | gọi qua `gemini` CLI (mặc định) hay qua khoá API |
+
+Hạn mức: 20 lượt/ngày ở bậc miễn phí, mà soát cả kho tốn 63 lượt — script tự
+dừng và bảo cách chia nhỏ. Mỗi bài tốn chừng 3–7 lượt, tức một ngày soát được
+khoảng 3–6 bài.
+
+Muốn gỡ hẳn trần đó thì **bật thanh toán** cho dự án Google Cloud giữ API key.
+Đăng nhập bằng tài khoản Google KHÔNG còn là đường đi: Google chấm dứt lối đó
+cho tài khoản cá nhân từ 18/06/2026, kể cả gói AI Pro và Ultra.
+
+Cả kho là 369.813 token vào (đo 20/09/2026). Tra đơn giá hiện hành rồi tự nhân
+— ở đây không ghi cứng giá, vì giá đổi theo thời gian.
+
+Báo cáo ghi vào `docs/soat-hoa-hoc/<ngày>-<phạm vi>.md` và theo git.
+
+Chỉ nội dung câu hỏi được gửi đi. Không email, không tên học sinh, không tiến độ.
+
