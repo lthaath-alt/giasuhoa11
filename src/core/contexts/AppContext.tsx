@@ -1260,9 +1260,10 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         );
       } else {
         try {
-          const bank = await BankFirestore.getAll();
-          const cuaChuong = bank
-            .filter(q => q.ch === toChapter(chapter.id))
+          /* Lọc ngay trên Firestore thay vì tải cả kho về rồi lọc tại máy.
+             Cùng một kết quả, nhưng 583 lượt đọc thay vì 1.554 ở chương nặng
+             nhất (chương 2, đo 20/09/2026), và ít hơn nhiều ở các chương sau. */
+          const cuaChuong = (await BankFirestore.getByChapter(toChapter(chapter.id)))
             .map(q => toLegacy(q));
           const quiz = QuizService.createChapterQuiz(chapter.id, userEmail, cuaChuong);
           if (quiz) {

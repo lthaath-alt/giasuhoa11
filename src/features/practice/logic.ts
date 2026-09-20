@@ -213,11 +213,19 @@ export function soLuotConLai(tienDo: TienDoPhan | undefined): number {
 export function trangThaiPhan(
   phan: PhanLuyenTap,
   tienDoBai: Partial<Record<PhanLuyenTap, TienDoPhan>> | undefined,
-  soCau: Record<PhanLuyenTap, number>,
+  /* Bỏ trống = CHƯA BIẾT bài này có bao nhiêu câu.
+     Danh sách Luyện tập cố ý vẽ TRƯỚC khi hỏi Firestore: hỏi ngay lúc mở tab
+     nghĩa là tải cả ngân hàng, 1.554 lượt đọc cho mỗi em mỗi phiên, mà bậc
+     miễn phí chỉ có 50.000 lượt/ngày.
+     Chưa biết thì KHÔNG được đoán là thiếu câu — đoán sai theo hướng đó là
+     giấu mất một bài mà ngân hàng vẫn đủ câu, và không ai biết vì sao. Số thật
+     được hỏi lúc học sinh bấm vào bài, xem `demTuoiCuaBai` trong
+     practiceService.ts. */
+  soCau?: Record<PhanLuyenTap, number>,
 ): TrangThaiPhan {
   const tienDo = tienDoBai?.[phan];
   if (tienDo?.dat) return 'da-dat';
-  if (soCau[phan] < NGUONG_MO_BAI[phan]) return 'thieu-cau';
+  if (soCau && soCau[phan] < NGUONG_MO_BAI[phan]) return 'thieu-cau';
 
   // Phải qua hết các phần đứng trước
   const viTri = THU_TU_PHAN.indexOf(phan);

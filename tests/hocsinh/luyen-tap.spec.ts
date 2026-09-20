@@ -52,6 +52,43 @@ test.describe('Luyện tập (đã đăng nhập)', () => {
     expect(await NUT_CHOI(page).count()).toBeGreaterThan(1);
   });
 
+  /**
+   * Hạn mức đọc Firestore — phép canh DUY NHẤT đo được điều này.
+   *
+   * Trước 20/09/2026, mở tab Luyện tập là tải cả ngân hàng: 1.554 lượt đọc +
+   * 5,74 MB cho MỖI em MỖI phiên. Bậc miễn phí cho 50.000 lượt đọc/ngày, tức
+   * một lớp 40 em mở cùng một tiết là 62.160 lượt — vỡ hạn mức giữa buổi, và
+   * cả trường mất ngân hàng tới sáng hôm sau.
+   *
+   * Không bộ kiểm nào trong `scripts/` thấy được chuyện này: nó không làm đỏ
+   * `tsc`, không làm hỏng build, và trên máy một người dùng thì chạy y như
+   * thường. Chỉ đếm request thật mới lộ ra.
+   */
+  test('mở tab Luyện tập KHÔNG đọc ngân hàng; bấm vào bài mới đọc', async ({ page }) => {
+    const goi: string[] = [];
+    page.on('request', r => {
+      /* Firestore SDK đi bằng WebChannel/gRPC-Web qua
+         firestore.googleapis.com. Lọc theo host thay vì theo đường dẫn cho
+         khỏi phụ thuộc hình dạng URL nội bộ của SDK. */
+      if (r.url().includes('firestore.googleapis.com')) goi.push(r.url());
+    });
+
+    // Mở lại tab Luyện tập từ đầu để đếm cho sạch
+    await page.locator('#nav-practice-btn').click();
+    await expect(NUT_CHOI(page).first()).toBeVisible({ timeout: 30_000 });
+    await page.waitForTimeout(2_000);   // cho mọi request kịp bay đi
+    const sauKhiMo = goi.length;
+
+    /* Bấm vào một phần của một bài: LÚC NÀY mới được phép đọc, và chỉ đọc
+       đúng bài đó (~80 câu, nhiều nhất 230). */
+    await page.locator('button:has-text("Nhiều lựa chọn")').first().click();
+    await page.waitForTimeout(3_000);
+    const sauKhiBam = goi.length;
+
+    expect(sauKhiBam, 'bấm vào bài thì PHẢI đọc ngân hàng').toBeGreaterThan(sauKhiMo);
+    console.log(`  [đo] mở tab: ${sauKhiMo} request Firestore · sau khi bấm bài: ${sauKhiBam}`);
+  });
+
   test('bấm "Chơi để ôn" thì mở khu Trò chơi, KHÔNG mở tab mới', async ({ page, context }) => {
     const soTabTruoc = context.pages().length;
     await NUT_CHOI(page).first().click();

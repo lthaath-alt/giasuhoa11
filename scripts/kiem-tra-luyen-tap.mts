@@ -16,7 +16,7 @@ import {
   baiDaXong, conKhoa, soLuotConLai, daChoiSauKhi,
 } from '../src/features/practice/logic';
 import {
-  tienDoRong, TienDoPhan, SO_LUOT_MOI_CHU_KY, NGUONG_DAT, PHUT_KHOA,
+  tienDoRong, TienDoPhan, SO_LUOT_MOI_CHU_KY, NGUONG_DAT, PHUT_KHOA, THU_TU_PHAN,
 } from '../src/features/practice/types';
 import type { BankQuestion } from '../src/features/bank/types';
 import type { Question } from '../src/features/library/types';
@@ -283,6 +283,77 @@ console.log('\n== Thứ tự ba phần trong một bài ==');
   const datNhungThieu = { tf: { ...tienDoRong(), dat: true } };
   ok(trangThaiPhan('tf', datNhungThieu, thieu) === 'da-dat',
     'đã đạt thì kho hụt câu sau đó cũng không mất thành tích');
+}
+
+// ─── Vẽ danh sách khi CHƯA biết số câu ───────────────────────────────────────
+//
+// Tab Luyện tập không đọc Firestore lúc mở nữa: tải cả ngân hàng là 1.554 lượt
+// đọc mỗi em mỗi phiên, mà bậc miễn phí chỉ cho 50.000 lượt/ngày — một lớp 40
+// em mở cùng một tiết là vỡ hạn mức. Xem
+// docs/superpowers/plans/2026-09-20-giam-luot-doc-firestore.md
+//
+// Nên `trangThaiPhan` phải vẽ được khi CHƯA biết bài có bao nhiêu câu. Lúc đó
+// nó tính bằng tiến độ, và tuyệt đối không được kết luận là thiếu câu — đoán
+// sai theo hướng đó là giấu mất một bài mà ngân hàng vẫn đủ câu.
+console.log('\n== Vẽ được khi chưa biết số câu ==');
+{
+  ok(trangThaiPhan('mc', {}, undefined) === 'san-sang',
+    'chưa biết số câu + chưa làm gì → san-sang',
+    trangThaiPhan('mc', {}, undefined));
+
+  ok(trangThaiPhan('tf', {}, undefined) === 'chua-mo',
+    'chưa biết số câu + chưa qua phần trước → chua-mo',
+    trangThaiPhan('tf', {}, undefined));
+
+  const daDat = { mc: { ...tienDoRong(), dat: true } };
+  ok(trangThaiPhan('mc', daDat, undefined) === 'da-dat',
+    'chưa biết số câu + đã đạt → da-dat',
+    trangThaiPhan('mc', daDat, undefined));
+
+  const moiPhan = THU_TU_PHAN.map(p => trangThaiPhan(p, {}, undefined));
+  ok(!moiPhan.includes('thieu-cau'),
+    'chưa biết số câu thì KHÔNG kết luận thiếu câu',
+    moiPhan.join(', '));
+
+  // Đã biết số câu thì hành vi cũ phải giữ nguyên
+  ok(trangThaiPhan('mc', {}, { mc: 0, tf: 0, tn: 0 }) === 'thieu-cau',
+    'biết số câu = 0 → vẫn báo thieu-cau như cũ');
+}
+
+// ─── Màn học sinh không tải cả ngân hàng ─────────────────────────────────────
+//
+// `BankFirestore.getAll()` = 1.554 lượt đọc + 5,74 MB MỖI LẦN gọi. Bậc miễn phí
+// cho 50.000 lượt đọc/ngày, nên một màn học sinh gọi nó là 32 lượt mở hết sạch
+// hạn mức của cả trường trong một ngày.
+//
+// Đây là loại lỗi không làm đỏ `tsc`, không làm hỏng build, và trên máy một
+// người dùng thì chạy y như thường — nên phải có phép canh.
+console.log('\n== Màn học sinh không tải cả ngân hàng ==');
+{
+  /* Bỏ chú thích ra khỏi phép quét: mấy tệp này CÓ nhắc tên hàm trong phần
+     giải thích lịch sử, và đó là điều nên khuyến khích chứ không nên phạt. */
+  const boChuThich = (s: string) =>
+    s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+
+  for (const tep of [
+    'src/features/practice/practiceService.ts',
+    'src/features/practice/components/PracticeList.tsx',
+    'src/core/contexts/AppContext.tsx',
+  ]) {
+    ok(!/BankFirestore\.getAll\s*\(/.test(boChuThich(readFileSync(tep, 'utf8'))),
+      `${tep.replace('src/', '')} không gọi getAll()`,
+      'dùng getByLesson / getByChapter / getByIds thay thế');
+  }
+
+  /* GameHubSection VẪN được gọi getAll() — nhưng chỉ SAU khi đã canh vai, vì
+     lời gọi đó vốn dành cho giáo viên mở trên máy chiếu, không dành cho học
+     sinh. */
+  const game = boChuThich(readFileSync('src/features/games/GameHubSection.tsx', 'utf8'));
+  const viTriCanh = game.search(/vai\s*!==\s*'teacher'/);
+  const viTriGoi = game.search(/BankFirestore\.getAll\s*\(/);
+  ok(viTriCanh >= 0 && viTriGoi > viTriCanh,
+    'GameHubSection chỉ tải cả ngân hàng SAU khi canh vai giáo viên',
+    `canh ở ${viTriCanh}, gọi ở ${viTriGoi}`);
 }
 
 console.log('\n== Xáo vị trí phương án ==');

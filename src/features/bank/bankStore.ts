@@ -15,7 +15,7 @@
 // CỐ Ý dùng collection MỚI thay vì ghi đè `questions`: dữ liệu cũ giữ nguyên làm
 // đường lùi, chuyển đổi sai vẫn khôi phục được.
 
-import { collection, doc, getDocs, setDoc, deleteDoc, writeBatch, getCountFromServer, query, where } from 'firebase/firestore';
+import { collection, doc, getDocs, setDoc, deleteDoc, writeBatch, getCountFromServer, query, where, documentId } from 'firebase/firestore';
 import { db } from '../../core/services/firebase';
 import { BankQuestion, BankStore, emptyStore, chuanHoaCau } from './types';
 
@@ -144,6 +144,49 @@ export const BankFirestore = {
       console.error('[Quiz] Không đọc được bank_questions cho bài', lessonId, err);
       return [];
     }
+  },
+
+  /**
+   * Lấy đúng mấy câu theo id. Dùng cho phần "những câu em còn sai".
+   *
+   * `where(documentId(), 'in', …)` chỉ nhận tối đa 30 giá trị mỗi lượt nên chia
+   * lô; danh sách câu sai của một em thường dưới 30, tức một lượt gọi.
+   *
+   * Trước 20/09/2026 chỗ này tải CẢ ngân hàng rồi lọc tại máy — 1.554 lượt đọc
+   * để lấy về dăm câu.
+   */
+  async getByIds(ids: string[]): Promise<BankQuestion[]> {
+    if (!ids.length) return [];
+    const ra: BankQuestion[] = [];
+    for (let i = 0; i < ids.length; i += 30) {
+      const lo = ids.slice(i, i + 30);
+      try {
+        const snap = await getDocs(
+          query(collection(db, COL_BANK), where(documentId(), 'in', lo)),
+        );
+        ra.push(...snap.docs.map(d => chuanHoaCau({ ...(d.data() as BankQuestion), id: d.id })));
+      } catch (err) {
+        // Mất mạng / thiếu quyền: bỏ lô này, KHÔNG chặn cả màn ôn lại.
+        console.error('[Luyện tập] Không đọc được câu theo id', lo, err);
+      }
+    }
+    return ra;
+  },
+
+  /**
+   * Câu hỏi của cả một chương, cho đề tổng hợp cuối chương.
+   *
+   * `getByLesson` không đủ vì đề này gom câu của nhiều bài; nhưng tải cả ngân
+   * hàng thì quá tay. Đo 20/09/2026: chương nặng nhất là chương 2 với 583 câu,
+   * tức vẫn chưa bằng 40% của 1.554.
+   *
+   * CỐ Ý không bọc try/catch — chỗ gọi trong AppContext đang bắt lỗi và nói
+   * thật với học sinh. Nuốt lỗi ở đây là biến "chưa đọc được ngân hàng" thành
+   * "chương này chưa có câu nào", sai hẳn nguyên nhân.
+   */
+  async getByChapter(ch: number): Promise<BankQuestion[]> {
+    const snap = await getDocs(query(collection(db, COL_BANK), where('ch', '==', ch)));
+    return snap.docs.map(d => chuanHoaCau({ ...(d.data() as BankQuestion), id: d.id }));
   },
 
   async save(q: BankQuestion): Promise<boolean> {

@@ -15,42 +15,60 @@ import { BangDemCau, chonCauTuKho } from './logic';
 export * from './logic';
 
 // ─── Kho câu hỏi ─────────────────────────────────────────────────────────────
+//
+// Đọc Firestore THEO TỪNG BÀI, và chỉ khi học sinh thật sự mở bài đó.
+//
+// Trước 20/09/2026 chỗ này tải cả ngân hàng ngay lúc mở tab Luyện tập, chỉ để
+// đếm xem mỗi bài có bao nhiêu câu: 1.554 lượt đọc + 5,74 MB mỗi em mỗi phiên.
+// Bậc miễn phí cho 50.000 lượt đọc/NGÀY, tức một lớp 40 em mở cùng một tiết là
+// 62.160 lượt — vỡ hạn mức giữa buổi, và cả trường mất ngân hàng tới sáng hôm
+// sau.
+//
+// Danh sách nay vẽ bằng TIẾN ĐỘ trong localStorage, không cần số câu — xem chú
+// thích trong `trangThaiPhan` ở logic.ts. Số câu chỉ được hỏi khi em bấm vào
+// một bài, và lượt hỏi đó đằng nào cũng phải có vì còn lấy câu để làm.
+//
+// CỐ Ý không dựng bảng đếm sẵn ở đâu (tệp sinh sẵn, bản chụp, localStorage):
+// web deploy bằng kéo-thả `dist/` nên mọi con số nằm trong tệp tĩnh chỉ mới tới
+// lần deploy gần nhất. Thầy cô nhập câu hỏi xong mà phải deploy lại thì con số
+// mới đúng — đó là một nguồn hiểu nhầm, không phải một cách tiết kiệm.
 
-/**
- * Tải cả ngân hàng MỘT lần cho mỗi phiên rồi lọc tại máy.
- *
- * Giữ nguyên Promise chứ không giữ mảng kết quả: hai chỗ cùng gọi lúc mới vào
- * trang sẽ dùng chung một lượt tải thay vì bắn hai request.
- */
-let khoDangTai: Promise<BankQuestion[]> | null = null;
+/** Câu của từng bài, giữ trong phiên để em làm lại không phải đọc lại. */
+const khoTheoBai = new Map<string, Promise<BankQuestion[]>>();
 
 export function xoaCacheKho(): void {
-  khoDangTai = null;
+  khoTheoBai.clear();
 }
 
-function taiKho(): Promise<BankQuestion[]> {
-  if (!khoDangTai) {
-    khoDangTai = BankFirestore.getAll().catch(err => {
-      // Tải hỏng thì bỏ cache đi, lần sau còn thử lại được.
-      khoDangTai = null;
+function cauCuaBai(lessonId: string): Promise<BankQuestion[]> {
+  let p = khoTheoBai.get(lessonId);
+  if (!p) {
+    p = BankFirestore.getByLesson(lessonId).catch(err => {
+      // Tải hỏng thì bỏ đi, lần sau còn thử lại được.
+      khoTheoBai.delete(lessonId);
       throw err;
     });
+    khoTheoBai.set(lessonId, p);
   }
-  return khoDangTai;
+  return p;
 }
 
-/** Đếm số câu mỗi bài có, tách theo từng phần */
-export async function demCauTheoBai(): Promise<BangDemCau> {
-  const kho = await taiKho();
-  const bang: BangDemCau = {};
-  for (const cau of kho) {
-    if (!cau.lessonId) continue;   // câu chưa gắn bài thì không vào đề được
+/**
+ * Đếm số câu của MỘT bài, hỏi thẳng Firestore.
+ *
+ * Đây là con số DUY NHẤT dùng để quyết định "bài này đủ câu để mở một lượt
+ * chưa". Không có bảng đếm dựng sẵn ở đâu cả, nên không có gì cũ được: thầy cô
+ * nhập câu bằng JSON xong là em thấy ngay ở lần bấm kế tiếp.
+ */
+export async function demTuoiCuaBai(
+  lessonId: string,
+): Promise<Record<PhanLuyenTap, number>> {
+  const ra: Record<PhanLuyenTap, number> = { mc: 0, tf: 0, tn: 0 };
+  for (const cau of await cauCuaBai(lessonId)) {
     const phan = cau.t as PhanLuyenTap;
-    if (!THU_TU_PHAN.includes(phan)) continue;   // bỏ câu tự luận
-    if (!bang[cau.lessonId]) bang[cau.lessonId] = { mc: 0, tf: 0, tn: 0 };
-    bang[cau.lessonId][phan]++;
+    if (THU_TU_PHAN.includes(phan)) ra[phan]++;   // bỏ câu tự luận
   }
-  return bang;
+  return ra;
 }
 
 /** Rút câu cho một lượt làm. Luật chọn xem `chonCauTuKho` trong logic.ts. */
@@ -59,15 +77,12 @@ export async function layCauChoLuot(
   phan: PhanLuyenTap,
   tienDo: TienDoPhan,
 ): Promise<BankQuestion[]> {
-  const kho = (await taiKho()).filter(
-    c => c.lessonId === lessonId && (c.t as PhanLuyenTap) === phan,
-  );
+  // `getByLesson` đã lọc lessonId trên máy chủ rồi, ở đây chỉ còn lọc phần.
+  const kho = (await cauCuaBai(lessonId)).filter(c => (c.t as PhanLuyenTap) === phan);
   return chonCauTuKho(kho, phan, tienDo);
 }
 
 /** Lấy lại câu hỏi theo id — dùng để dựng phần "những câu em còn sai" */
 export async function layCauTheoId(ids: string[]): Promise<BankQuestion[]> {
-  if (!ids.length) return [];
-  const can = new Set(ids);
-  return (await taiKho()).filter(c => can.has(c.id));
+  return BankFirestore.getByIds(ids);
 }

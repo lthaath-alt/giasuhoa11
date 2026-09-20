@@ -250,3 +250,17 @@ Hai chỗ phải biết:
 
 `npm run word -- vao.md "ra.docx"` vẫn còn cho việc nộp đề cương NCKH — đó mới
 là lý do nó sinh ra.
+
+## Hạn mức đọc Firestore — không sinh bảng đếm nào cho web
+
+`xuat:ngan-hang` và `gan:cau-hoi` **cố ý KHÔNG sinh bảng đếm câu hỏi** cho tab
+Luyện tập, dù làm vậy sẽ tiết kiệm được lượt đọc.
+
+Lý do: web deploy bằng kéo-thả `dist/`, nên mọi con số nằm trong tệp tĩnh chỉ
+mới tới lần deploy gần nhất. Thầy cô nhập câu hỏi xong mà phải build và deploy
+lại thì số mới đúng — đó là một nguồn hiểu nhầm, không phải một cách tiết kiệm.
+
+Thay vào đó danh sách Luyện tập vẽ bằng tiến độ trong localStorage và không
+hiện số câu; số câu chỉ được hỏi khi học sinh bấm vào một bài, đọc đúng bài đó
+từ Firestore. Chi tiết và số đo: mục "Hạn mức đọc" trong `CLAUDE.md`, và
+`docs/superpowers/plans/2026-09-20-giam-luot-doc-firestore.md`.

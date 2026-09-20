@@ -3,19 +3,18 @@ import {
   Box, Paper, Typography, Button, Chip, Stack, Tooltip, LinearProgress,
   Divider,
 } from '@mui/material';
-import { Lock, CheckCircle, Clock, PlayCircle, BookOpen, AlertCircle, Gamepad2 } from 'lucide-react';
+import { Lock, CheckCircle, Clock, PlayCircle, BookOpen, Gamepad2 } from 'lucide-react';
 import { Chapter, Lesson } from '../../lessons/types';
 import {
   PhanLuyenTap, THU_TU_PHAN, TEN_PHAN_NGAN, TienDoLuyenTap, TrangThaiPhan,
   SO_CAU_MOI_LUOT, NGUONG_DAT,
 } from '../types';
 import {
-  BangDemCau, demCuaBai, trangThaiPhan, baiDaXong, moTaThieuCau, soLuotKhacNhau,
+  trangThaiPhan, baiDaXong,
 } from '../practiceService';
 
 interface Props {
   curriculum: Chapter[];
-  bangDem: BangDemCau;
   tienDo: TienDoLuyenTap;
   onChon: (bai: Lesson, phan: PhanLuyenTap) => void;
   /** Mở trò chơi ôn đúng bài này. Không truyền thì không hiện nút. */
@@ -40,16 +39,19 @@ const GIAI_THICH: Record<TrangThaiPhan, string> = {
   'thieu-cau': 'Ngân hàng chưa đủ câu cho phần này',
 };
 
-export const PracticeList: React.FC<Props> = ({ curriculum, bangDem, tienDo, onChon, onChoiOn }) => {
+/* Danh sách này CỐ Ý không biết ngân hàng có bao nhiêu câu.
+   Biết được thì phải tải cả 1.554 câu ngay lúc mở tab = 1.554 lượt đọc
+   Firestore cho mỗi em mỗi phiên, mà bậc miễn phí chỉ có 50.000 lượt/ngày —
+   một lớp 40 em mở cùng một tiết là vỡ hạn mức.
+   Nên mọi trạng thái ở đây tính bằng TIẾN ĐỘ trong localStorage. Riêng
+   "thiếu câu" thì chỉ xác định được sau khi hỏi Firestore, nên nó được để
+   dành tới lúc em bấm vào một phần — xem `chonPhan` trong PracticeSection. */
+export const PracticeList: React.FC<Props> = ({ curriculum, tienDo, onChon, onChoiOn }) => {
   /* Thứ tự bài trong cả chương trình (0-24) — "Rắn và Thang" có 25 màn ứng
      đúng 25 bài nên màn của bài này chính là thứ tự đó cộng một. */
   const thuTuBai = new Map(curriculum.flatMap(c => c.lessons).map((l, i) => [l.id, i]));
   const tatCaBai = curriculum.flatMap(c => c.lessons);
   const soXong = tatCaBai.filter(b => baiDaXong(tienDo[b.id])).length;
-  const soMoDuoc = tatCaBai.filter(b => {
-    const dem = demCuaBai(bangDem, b.id);
-    return THU_TU_PHAN.some(p => trangThaiPhan(p, tienDo[b.id], dem) !== 'thieu-cau');
-  }).length;
 
   return (
     <Box>
@@ -69,30 +71,9 @@ export const PracticeList: React.FC<Props> = ({ curriculum, bangDem, tienDo, onC
           sx={{ height: 8, borderRadius: 4, mb: 1 }}
         />
         <Typography variant="caption" color="text.secondary">
-          Đã hoàn thành <b>{soXong}</b>/{tatCaBai.length} bài · {soMoDuoc} bài đang mở
+          Đã hoàn thành <b>{soXong}</b>/{tatCaBai.length} bài
         </Typography>
       </Paper>
-
-      {soMoDuoc === 0 && (
-        <Box sx={{ mb: 3 }}>
-          <Paper sx={{ p: 2.5 }}>
-            <Stack direction="row" spacing={1.5} sx={{ alignItems: 'flex-start' }}>
-              <AlertCircle size={20} color="var(--vang)" />
-              <Box>
-                <Typography sx={{ fontWeight: 'bold', mb: 0.5 }}>
-                  Ngân hàng câu hỏi chưa đủ để mở bài nào
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Mỗi phần cần tối thiểu {SO_CAU_MOI_LUOT.mc} câu nhiều lựa chọn,{' '}
-                  {SO_CAU_MOI_LUOT.tf} câu đúng sai và {SO_CAU_MOI_LUOT.tn} câu trả
-                  lời ngắn. Thầy cô bổ sung câu vào mục Ngân hàng dữ liệu là các
-                  bài tự mở, không cần chỉnh gì thêm.
-                </Typography>
-              </Box>
-            </Stack>
-          </Paper>
-        </Box>
-      )}
 
       {curriculum.map(chuong => (
         <Box key={chuong.id} sx={{ mb: 4 }}>
@@ -103,9 +84,7 @@ export const PracticeList: React.FC<Props> = ({ curriculum, bangDem, tienDo, onC
 
           <Stack spacing={1.5}>
             {chuong.lessons.map(bai => {
-              const dem = demCuaBai(bangDem, bai.id);
               const xong = baiDaXong(tienDo[bai.id]);
-              const thieu = moTaThieuCau(dem);
 
               return (
                 <Paper
@@ -113,7 +92,6 @@ export const PracticeList: React.FC<Props> = ({ curriculum, bangDem, tienDo, onC
                   sx={{
                     p: 2,
                     borderLeft: `4px solid ${xong ? 'var(--luc)' : 'var(--vien)'}`,
-                    opacity: thieu && !xong ? 0.75 : 1,
                   }}
                 >
                   <Stack
@@ -131,32 +109,19 @@ export const PracticeList: React.FC<Props> = ({ curriculum, bangDem, tienDo, onC
                           : <BookOpen size={18} color="var(--chu-mo)" />}
                         <Typography sx={{ fontWeight: 600 }}>{bai.title}</Typography>
                       </Stack>
-                      {thieu && (
-                        <Typography variant="caption" color="text.secondary">
-                          Đang bổ sung câu hỏi — {thieu}
-                        </Typography>
-                      )}
                     </Box>
 
                     <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: 'wrap' }}>
                       {THU_TU_PHAN.map(phan => {
-                        const tt = trangThaiPhan(phan, tienDo[bai.id], dem);
+                        /* Không truyền số câu: danh sách chưa hỏi Firestore nên
+                           chưa biết, và `trangThaiPhan` khi đó không bao giờ
+                           trả 'thieu-cau'. Xem chú thích ở đầu tệp. */
+                        const tt = trangThaiPhan(phan, tienDo[bai.id]);
                         const bamDuoc = tt === 'san-sang' || tt === 'dang-khoa'
                           || tt === 'can-on-lai' || tt === 'da-dat';
-                        const soLuot = soLuotKhacNhau(dem[phan], phan);
 
                         return (
-                          <Tooltip
-                            key={phan}
-                            title={
-                              <span>
-                                {GIAI_THICH[tt]}
-                                <br />
-                                Kho có {dem[phan]} câu
-                                {soLuot > 0 && ` — đủ ${soLuot} lượt khác nhau`}
-                              </span>
-                            }
-                          >
+                          <Tooltip key={phan} title={GIAI_THICH[tt]}>
                             <span>
                               <Button
                                 size="small"

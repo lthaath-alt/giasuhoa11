@@ -185,6 +185,19 @@ export const GameHubSection: React.FC = () => {
    * ghi đè mất phần đang có trong máy.
    */
   useEffect(() => {
+    /* CHỈ bơm khi người đang xem là GIÁO VIÊN trở lên.
+
+       Lời gọi dưới tải CẢ ngân hàng = 1.554 lượt đọc Firestore mỗi lần mở tab
+       này. Bậc miễn phí cho 50.000 lượt đọc/ngày, nên để học sinh chạm vào là
+       một lớp 40 em ăn 62.160 lượt trong một tiết — vỡ hạn mức, cả trường mất
+       ngân hàng tới sáng hôm sau.
+
+       Mà nó vốn KHÔNG nhắm vào học sinh: xem chú thích ngay trên, cảnh dùng là
+       thầy cô mở trên máy chiếu ở lớp. Học sinh vẫn chơi bình thường bằng kho
+       đã có sẵn trong IndexedDB của máy đó. */
+    const vai = currentUser?.role;
+    if (vai !== 'teacher' && vai !== 'school_admin' && vai !== 'admin') return;
+
     let huy = false;
     (async () => {
       try {
@@ -195,7 +208,7 @@ export const GameHubSection: React.FC = () => {
       }
     })();
     return () => { huy = true; };
-  }, []);
+  }, [currentUser]);
 
   /* Mở trò chơi thì vào luôn toàn màn hình.
      Trình duyệt CHỈ cho gọi requestFullscreen từ trong một cú bấm thật của

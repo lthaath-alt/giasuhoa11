@@ -9,8 +9,8 @@ import { Lesson } from '../lessons/types';
 import { BankQuestion } from '../bank/types';
 import { PhanLuyenTap, TEN_PHAN, TienDoLuyenTap, TienDoPhan, KetQuaLuot, PHUT_KHOA } from './types';
 import {
-  demCauTheoBai, demCuaBai, layCauChoLuot, layCauTheoId, trangThaiPhan,
-  capLaiLuot, tienDoCuaPhan, xoaCacheKho, BangDemCau,
+  demTuoiCuaBai, layCauChoLuot, layCauTheoId, trangThaiPhan, moTaThieuCau,
+  capLaiLuot, tienDoCuaPhan, xoaCacheKho,
 } from './practiceService';
 import { PracticeList } from './components/PracticeList';
 import { PracticeRunner } from './components/PracticeRunner';
@@ -54,7 +54,6 @@ export const PracticeSection: React.FC<Props> = ({ onDangNhap, onMoTroChoi }) =>
 
   const [dangTai, setDangTai] = useState(true);
   const [loiTai, setLoiTai] = useState<string | null>(null);
-  const [bangDem, setBangDem] = useState<BangDemCau>({});
   const [tienDo, setTienDo] = useState<TienDoLuyenTap>({});
 
   const [man, setMan] = useState<Man>('danh-sach');
@@ -67,24 +66,17 @@ export const PracticeSection: React.FC<Props> = ({ onDangNhap, onMoTroChoi }) =>
 
   const email = currentUser?.email || '';
 
-  // ── Nạp số câu trong kho + tiến độ của học sinh ────────────────────────────
+  /* ── Nạp tiến độ của học sinh ──────────────────────────────────────────────
+     CỐ Ý không đọc ngân hàng ở đây. Danh sách bài vẽ được bằng tiến độ, và
+     đếm số câu lúc mở tab nghĩa là tải cả 1.554 câu cho mỗi em mỗi phiên —
+     bậc miễn phí chỉ cho 50.000 lượt đọc/ngày. Số câu được hỏi lúc em bấm vào
+     một bài, xem `chonPhan`. */
   const nap = useCallback(async () => {
     setDangTai(true);
     setLoiTai(null);
-    try {
-      const bang = await demCauTheoBai();
-      setBangDem(bang);
-      const tt = getUserProgress(email);
-      setTienDo((tt?.luyenTap || {}) as TienDoLuyenTap);
-    } catch (err) {
-      console.error('[Luyện tập] Không đọc được ngân hàng câu hỏi:', err);
-      /* Nói rõ là LỖI TẢI chứ không im lặng hiện danh sách trống. Kho rỗng và
-         mất mạng nhìn giống hệt nhau trên màn hình, mà cách xử lý thì khác
-         hẳn. */
-      setLoiTai('Không tải được ngân hàng câu hỏi. Em kiểm tra lại mạng rồi bấm Thử lại.');
-    } finally {
-      setDangTai(false);
-    }
+    const tt = getUserProgress(email);
+    setTienDo((tt?.luyenTap || {}) as TienDoLuyenTap);
+    setDangTai(false);
   }, [email, getUserProgress]);
 
   useEffect(() => {
@@ -124,7 +116,28 @@ export const PracticeSection: React.FC<Props> = ({ onDangNhap, onMoTroChoi }) =>
 
   const chonPhan = async (b: Lesson, p: PhanLuyenTap) => {
     const td = tienDoCuaPhan(tienDo, b.id, p);
-    const tt = trangThaiPhan(p, tienDo[b.id], demCuaBai(bangDem, b.id));
+
+    /* Danh sách vẽ bằng tiến độ nên chưa biết bài này có bao nhiêu câu. Hỏi ở
+       ĐÂY, đúng bài em vừa bấm, và đây là con số thật — không có bảng đếm dựng
+       sẵn ở đâu cả, nên thầy cô nhập câu hỏi xong là em thấy ngay, không phải
+       chờ deploy lại.
+       Lượt đọc này không phải chi phí thêm: `demTuoiCuaBai` và `layCauChoLuot`
+       bên dưới dùng chung một lần tải, giữ lại suốt phiên. */
+    setDangTai(true);
+    let dem: Record<PhanLuyenTap, number>;
+    try {
+      dem = await demTuoiCuaBai(b.id);
+    } catch (err) {
+      console.error('[Luyện tập] Không đọc được ngân hàng câu hỏi:', err);
+      /* Nói rõ là LỖI TẢI chứ không im lặng coi như bài trống. Kho rỗng và mất
+         mạng nhìn giống hệt nhau trên màn hình, mà cách xử lý khác hẳn. */
+      setLoiTai('Không tải được ngân hàng câu hỏi. Em kiểm tra lại mạng rồi bấm Thử lại.');
+      return;
+    } finally {
+      setDangTai(false);
+    }
+
+    const tt = trangThaiPhan(p, tienDo[b.id], dem);
 
     if (tt === 'dang-khoa' || tt === 'can-on-lai') {
       setCauLamSai(await layCauTheoId(td.daSai || []));
@@ -133,7 +146,12 @@ export const PracticeSection: React.FC<Props> = ({ onDangNhap, onMoTroChoi }) =>
       setMan('on-lai');
       return;
     }
-    if (tt === 'chua-mo' || tt === 'thieu-cau') return;
+    if (tt === 'chua-mo') return;
+    if (tt === 'thieu-cau') {
+      setLoiTai(`Bài "${b.title}" chưa đủ câu cho phần ${TEN_PHAN[p]}. `
+        + `${moTaThieuCau(dem)}. Em báo thầy/cô bổ sung giúp nhé.`);
+      return;
+    }
 
     /* Phần đã đạt: cho làm lại thoải mái để ôn. `capNhatSauLuot` chỉ khóa khi
        CHƯA đạt, nên em luyện thêm không bao giờ bị khóa ngược lại. */
@@ -222,7 +240,6 @@ export const PracticeSection: React.FC<Props> = ({ onDangNhap, onMoTroChoi }) =>
       {man === 'danh-sach' && (
         <PracticeList
           curriculum={curriculum}
-          bangDem={bangDem}
           tienDo={tienDo}
           onChon={(b, p) => { void chonPhan(b, p); }}
           onChoiOn={onMoTroChoi ? moTroChoiCuaBai : undefined}
