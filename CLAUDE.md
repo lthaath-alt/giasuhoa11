@@ -11,6 +11,24 @@ hướng dẫn vận hành hằng ngày và không được mâu thuẫn với t
 > File này mô tả dự án ĐANG như thế nào, để bạn (AI) khỏi phải dò lại toàn bộ code mỗi phiên.
 > Đây là mặc định, KHÔNG phải xiềng: nếu user muốn đổi UI/Auth/nhà cung cấp AI/cấu trúc, cứ làm theo user — chỉ cần báo trước là sẽ lệch khỏi mô tả dưới đây.
 
+**Sắp sửa vùng nào thì đọc mục đó TRƯỚC, đừng làm theo trí nhớ.** Tệp dài
+~11.600 từ; cái hại của nó không phải tốn chỗ mà là bị đọc lướt. Bảng này để
+nhảy thẳng:
+
+| Sắp đụng vào | Đọc mục |
+|---|---|
+| Đăng nhập, vai trò, vào lớp, đăng ký | Vài điểm dễ vấp |
+| `firestore.rules` | An ninh → "Bảy điều về luật hiện hành" |
+| `index.css`, màu, chế độ tối | Bảng màu & chế độ sáng / tối |
+| `public/_headers`, CSP, deploy | An ninh → "Ba cái bẫy của `_headers`" |
+| Giao diện, bố cục, kiểu dáng | Thế giới thị giác |
+| Ngân hàng câu hỏi, đồng bộ | Ngân hàng câu hỏi nằm ở Firestore |
+| Gia sư AI, hạn mức, khoá Gemini | An ninh + Nhờ Gemini soi nội dung hoá học |
+| Viết/sửa phép kiểm | Lệnh + Rút kinh nghiệm |
+
+**Chín bài học ở mục "Rút kinh nghiệm" là phần đắt nhất của tệp này** — mỗi cái
+đổi bằng một lần hỏng đã tới tay người dùng. Đọc trước khi tin trí nhớ.
+
 ## Cách làm việc (luôn áp dụng)
 - Trả lời bằng tiếng Việt; giữ nguyên tiếng Anh cho tên biến/hàm/file/lệnh/code.
 - Trả lời gọn, đi thẳng việc. Yêu cầu chưa rõ hoặc thiếu thông tin → HỎI LẠI trước, đừng đoán rồi làm sai.
@@ -26,12 +44,28 @@ hướng dẫn vận hành hằng ngày và không được mâu thuẫn với t
   | Sắp nói "xong" | `verification-before-completion` |
   | Việc nhiều bước, nhiều tệp | `writing-plans` rồi `executing-plans` |
 
-  Vì sao phải viết ra đây: bản chép superpowers này KHÔNG có hook lúc mở phiên
-  như bản plugin, nên **không có gì tự nhắc** — chỉ dòng này nhắc. Đã lỡ hai lần
-  thấy rõ cái giá: một lần định đọc ~18.000 dòng mã trò chơi để "chuyển chúng
-  sang thế giới mới", trong khi `brainstorming` hỏi đúng một câu ("trò chơi có
-  cần thế giới của app không?") là việc co lại còn sửa một chỗ nối; một lần đoán
-  nguyên nhân lỗi CSP thay vì chạy `systematic-debugging` ngay từ đầu.
+  **Việc chạm từ 3 TỆP trở lên: NÓI RA một dòng TRƯỚC KHI gõ dòng mã đầu tiên**
+  — *"việc này ~N tệp, tôi gọi `writing-plans`"*, hoặc *"~N tệp, tôi không gọi
+  kỹ năng nào, vì …"*. Nói ra là đủ; không cần dài.
+
+  Vì sao siết thành "nói ra" (20/09/2026): bảng trên vốn chỉ là lời nhắc thụ
+  động, và nó **thất bại có bằng chứng**. Hôm đó hook nhắc đúng bảng này **25
+  lượt liên tiếp**, mà cả hai việc lớn trong ngày đều bỏ qua nó — dựng Playwright
+  (9 tệp) và làm `soat:hoa-hoc` + `kiem-tra:gemini` (5 tệp) đều chạy tuỳ cơ ứng
+  biến, không gọi `writing-plans` lần nào. Kết quả vẫn dùng được, nên **không ai
+  phát hiện ra là quy tắc đang bị bỏ** cho tới lúc ngồi rà lại cuối ngày.
+
+  Đó là bài học chung, không riêng chỗ này: **một quy tắc không ai NHÌN THẤY
+  được thì không ai kiểm được.** Bắt nói ra biến nó thành thứ chủ dự án bắt lỗi
+  được ngay trong lượt đó. Giống hệt lý do mọi luật khác của dự án đều có một
+  phép kiểm đi kèm — khác mỗi chỗ luật này chỉ người kiểm được, không có script
+  nào kiểm hộ.
+
+  Hai lần khác đã trả giá, giữ lại để nhớ: một lần định đọc ~18.000 dòng mã trò
+  chơi để "chuyển chúng sang thế giới mới", trong khi `brainstorming` hỏi đúng
+  một câu ("trò chơi có cần thế giới của app không?") là việc co lại còn sửa một
+  chỗ nối; một lần đoán nguyên nhân lỗi CSP thay vì chạy `systematic-debugging`
+  ngay từ đầu.
 
   Kỹ năng `find-skills` là việc KHÁC: nó đi tìm kỹ năng **chưa có** trên
   Internet (chạy `npx skills find`, cần mạng). Đừng lẫn hai việc.
@@ -313,12 +347,8 @@ npm run soat:hoa-hoc -- --bai bai-1 --ra bao-cao.md
    lượt/NGÀY cho từng model; soát cả kho tốn 63 lượt. Script tính trước rồi
    dừng kèm cách chia nhỏ, thay vì chạy một phần ba rồi chết.
 
-**Hai đường gọi, khác nhau ở chỗ TIÊU HẠN MỨC CỦA AI:**
-
-| `--qua` | Đi đường nào | Hạn mức |
-|---|---|---|
-| `cli` (mặc định) | `gemini` CLI | theo tài khoản Google đã đăng nhập |
-| `key` | `@google/genai` + `GEMINI_API_KEY` | bậc miễn phí: 5 lượt/phút, 20 lượt/ngày |
+Có hai cờ `--qua`: `cli` (mặc định, qua `gemini` CLI) và `key` (qua
+`@google/genai`). **Cả hai nay đều đi bằng khoá API.**
 
 **Gói Gemini Pro/Ultra KHÔNG dùng cho CLI được nữa.** Google chấm dứt đăng nhập
 bằng tài khoản cá nhân cho Gemini CLI và Code Assist từ **18/06/2026**, áp dụng
@@ -336,21 +366,9 @@ Cloud đang giữ API key. Đo 20/09/2026: cả 1554 câu là **369.813 token v�
 gian, tra bảng giá hiện hành rồi nhân với con số trên. Cùng lý do mà
 `do-chi-phi.mts` cũng không ghi cứng đơn giá.
 
-Script tự đọc giá trị đó để biết có dựng hàng rào hạn mức hay không, và **tìm
-`selectedType` ở mọi độ sâu** chứ không ghim đường dẫn: Google đã đổi chỗ khoá
-này ít nhất một lần, mà đọc hụt thì hàng rào tự tắt — hỏng đúng thứ nó sinh ra
-để giữ.
-
-Ba điều nữa về đường `cli`, đã trả giá để biết:
-
-- **`-p` được NỐI VÀO stdin.** Nên đẩy cả câu lệnh lẫn dữ liệu qua stdin, để
-  `-p` chỉ còn một câu ngắn. Nhét cả lô vào tham số dòng lệnh là đụng giới hạn
-  độ dài của Windows.
-- **`--approval-mode plan` = CHỈ ĐỌC.** Gemini CLI vốn có công cụ sửa tệp; cờ
-  này khoá hết. Đừng bỏ nó đi.
-- **`shell: true` trên Windows không tự bọc nháy**, nên tham số nào có dấu cách
-  phải tự bọc — không thì yargs tưởng là tham số thừa và in nguyên trang trợ
-  giúp ra stderr, trông như lỗi mạng.
+Ba chi tiết kỹ thuật của đường `cli` (`-p` nối vào stdin, `--approval-mode
+plan` = chỉ đọc, và `shell: true` trên Windows không tự bọc nháy) nằm trong
+chú thích của chính hàm `goiQuaCli` — đọc ở đó, đúng lúc cần sửa.
 
 **Báo cáo luôn ghi ra `docs/soat-hoa-hoc/<ngày>-<phạm vi>.md`** và theo git.
 Đó là vết của quy trình kiểm định nội dung — thứ hội đồng NCKH hỏi tới, và là
@@ -783,19 +801,6 @@ môi trường tiền tố VITE). Khoá ở đây do chính người dùng gõ l
 trong mã nguồn. Vì phép kiểm quét cả CHÚ THÍCH, đừng viết tên biến môi trường
 đó ra trong bình luận — sẽ bị báo SAI, và phép kiểm nên tiếp tục nghiêm như vậy.
 
-**Khách vãng lai còn 5 lượt** (20/09/2026, trước đó 25). Khách dùng chung hạn
-mức Gemini theo ngày với học sinh; ngày 18/09/2026 cả web hết lượt giữa buổi.
-Con số khai ở `TRAN_LUOT_KHACH`; mọi chỗ hiển thị phải đọc hằng số đó, đừng
-chép cứng — `kiem-tra:het-luot` bắt chỗ nào chép.
-
-**Trò chơi mở khoá được Luyện tập** (20/09/2026). Trượt hết lượt thì bị khoá 10
-phút; chơi xong màn của đúng bài đó là được làm lại ngay. Tiến độ trò chơi nay
-ghi thêm `luc` — mốc thời gian lần chơi XONG gần nhất. Thiếu mốc đó thì một màn
-chơi từ tuần trước cũng mở được khoá. Ba điều đi kèm: chỉ ghi `luc` khi lượt
-chơi thật sự XONG; chơi lại mà không hơn điểm cũ vẫn phải ghi (nếu không, em
-chơi xong mà khoá không mở); và trò chơi phải mở TRONG tab Trò chơi của web,
-vì nó gửi tiến độ về bằng `postMessage` tới cửa sổ cha.
-
 **Luật KHÔNG với tới mật khẩu.** Mật khẩu nằm ở Firebase Auth, đã băm. Đăng
 ký email + mật khẩu là **công khai** — ai cũng lấy được một uid hợp lệ mà
 không cần đụng vào web. Điều luật làm được là chặn uid đó thành bất kỳ vai
@@ -859,6 +864,25 @@ nghiệm thu nếu sau này phải dựng lại:
 trong lúc `khoaDen` vốn đang là 0 thì luôn ra 200, vì đó không phải hạ. Đó là
 phép thử vô nghĩa chứ không phải lỗ hổng — phải đặt khoá vào tương lai trước,
 rồi mới hạ, thì mới đo được điều muốn đo.
+
+## Tính năng đã chốt — ghi để khỏi sửa ngược
+
+Hai khối dưới đây trước nằm trong mục "An ninh", nhưng chúng là ghi chú
+TÍNH NĂNG chứ không phải hàng rào an ninh. Xếp nhầm chỗ thì người đi tìm
+"trò chơi mở khoá" không bao giờ nghĩ tới việc mở mục An ninh ra đọc.
+
+**Khách vãng lai còn 5 lượt** (20/09/2026, trước đó 25). Khách dùng chung hạn
+mức Gemini theo ngày với học sinh; ngày 18/09/2026 cả web hết lượt giữa buổi.
+Con số khai ở `TRAN_LUOT_KHACH`; mọi chỗ hiển thị phải đọc hằng số đó, đừng
+chép cứng — `kiem-tra:het-luot` bắt chỗ nào chép.
+
+**Trò chơi mở khoá được Luyện tập** (20/09/2026). Trượt hết lượt thì bị khoá 10
+phút; chơi xong màn của đúng bài đó là được làm lại ngay. Tiến độ trò chơi nay
+ghi thêm `luc` — mốc thời gian lần chơi XONG gần nhất. Thiếu mốc đó thì một màn
+chơi từ tuần trước cũng mở được khoá. Ba điều đi kèm: chỉ ghi `luc` khi lượt
+chơi thật sự XONG; chơi lại mà không hơn điểm cũ vẫn phải ghi (nếu không, em
+chơi xong mà khoá không mở); và trò chơi phải mở TRONG tab Trò chơi của web,
+vì nó gửi tiến độ về bằng `postMessage` tới cửa sổ cha.
 
 ## KHÔNG biến app thành PWA / service worker
 - Dự án này KHÔNG phải PWA và phải giữ nguyên như vậy. ĐỪNG thêm `vite-plugin-pwa`, `workbox`, `manifest.webmanifest`, hay bất kỳ đoạn `navigator.serviceWorker.register(...)` nào.
@@ -1017,3 +1041,24 @@ Ghi lại để lần sau không vấp nữa. Tất cả đều là lỗi KHÔNG
    đúng: mở một tab MỚI (bộ đệm theo tab, không theo lần tải), hoặc bỏ qua
    Console và đo thẳng — REST cho luật, IndexedDB cho phiên đăng nhập. Cùng họ
    với bài học số 3: ô xem trước cũng báo số sai khi cửa sổ đang ẩn.
+
+9. **Đọc mã KHÔNG thay được chỗ hỏi máy chủ.** Ngày 20/09/2026 sai ba lần trong
+   một buổi, cả ba cùng một bệnh là kết luận từ thứ đọc được thay vì từ thứ đo
+   được:
+
+   - `grep` thấy `LOGIN_WITH_GOOGLE` còn trong gói Gemini CLI → kết luận đăng
+     nhập tài khoản Google còn dùng được → **bảo chủ dự án đi đăng nhập**. Thực
+     tế Google đã ngừng phục vụ tài khoản cá nhân từ 18/06/2026; chuỗi đó là mã
+     thừa. Chủ dự án mất công, và CLI rơi vào trạng thái `oauth-personal` chết.
+     Một lượt gọi thật đã cho ngay câu trả lời: `IneligibleTierError`.
+   - Ghim cứng đường dẫn `auth.selectedType` trong khi nó nằm ở
+     `security.auth.selectedType`. Hàm dò trả `'khong-ro'`, mà `'khong-ro'` lúc
+     đó bị hiểu là "đang dùng tài khoản trả phí" → **hàng rào hạn mức tự tắt**.
+     Nay hàm tìm khoá ở mọi độ sâu, và không biết thì hiểu theo hướng an toàn.
+   - Tên tệp báo cáo chỉ có NGÀY, không có giờ → lượt soát thứ hai **ghi đè mất
+     một báo cáo có 3 phát hiện thật**.
+
+   Cả ba đều tự bắt được bằng chính việc đo sau đó, nên quy trình không hỏng —
+   chỉ là áp dụng muộn. Thứ tự đúng: đo trước, kết luận sau. Cái gì hỏi được
+   máy chủ thì đừng suy ra từ mã nguồn.
+
