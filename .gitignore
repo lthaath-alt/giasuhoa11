@@ -57,3 +57,10 @@ __pycache__/
 
 # Tệp khoá tạm Word/Excel tạo khi đang mở tài liệu
 ~$*
+
+# Playwright sinh ra khi chạy `npm run kiem-tra:e2e`
+test-results/
+playwright-report/
+blob-report/
+# Phiên đăng nhập đã lưu — CHỨA TOKEN THẬT của tài khoản thử, không lên git
+tests/.auth/

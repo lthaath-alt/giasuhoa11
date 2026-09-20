@@ -36,7 +36,9 @@
     "kiem-tra:tai-lieu": "tsx scripts/kiem-tra-tai-lieu.mts",
     "kiem-tra:an-ninh": "tsx scripts/kiem-tra-an-ninh.mts",
     "kiem-tra:luat": "tsx scripts/kiem-tra-luat.mts",
-    "kiem-tra:su-pham": "tsx scripts/kiem-tra-su-pham.mts"
+    "kiem-tra:su-pham": "tsx scripts/kiem-tra-su-pham.mts",
+    "kiem-tra:e2e": "playwright test",
+    "kiem-tra:e2e:khach": "playwright test --project=khach"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -65,6 +67,7 @@
   },
   "devDependencies": {
     "@firebase/rules-unit-testing": "^5.0.2",
+    "@playwright/test": "^1.63.0",
     "@types/express": "^4.17.21",
     "@types/node": "^22.14.0",
     "autoprefixer": "^10.4.21",

@@ -39,6 +39,10 @@ const CO_Y_VANG = new Set([
   // Tệp cấu hình riêng từng máy: nhắc tới để nói rõ nó VẪN bị .gitignore chặn,
   // nên trên máy chưa sinh ra nó thì đường dẫn này không tồn tại là đúng.
   'settings.local.json',
+  // Phiên đăng nhập Playwright cất ra: chỉ sinh ra sau khi chạy
+  // `npm run kiem-tra:e2e` với tài khoản thử, và `.gitignore` chặn nó vì nó
+  // mang token thật. Máy vừa clone về KHÔNG có thư mục này, và đó là đúng.
+  'tests/.auth/',
 ]);
 /* Không phải đường dẫn: mẫu đặt tên, đường dẫn URL, đuôi tệp đứng một mình,
    và đường dẫn TÀI LIỆU FIRESTORE (`quan_tri/dong_quan_tri` là một document

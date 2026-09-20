@@ -211,6 +211,52 @@ hoá + dựng công thức KaTeX, telemetry), `kiem-tra:chuong-trinh` (dữ li�
 máy nào thiếu thì tự bỏ qua — phép này chạy thật trên GitHub Actions, xem
 `.github/workflows/kiem-luat.yml`).
 
+## Kiểm thử đầu-cuối bằng trình duyệt (`npm run kiem-tra:e2e`)
+
+Thêm 20/09/2026. Playwright mở trình duyệt thật, bấm nút thật. Sinh ra vì một
+lỗ hổng cụ thể: mười ba bộ kiểm trên **không mở nổi trình duyệt**, nên mọi thứ
+chỉ hiện ra SAU KHI đăng nhập đều không ai canh. Hai thứ thêm hôm 20/09 (nút
+"Chơi để ôn", hộp thoại khoá riêng) đã phải nhờ chủ dự án xem hộ, vì AI không
+được phép gõ mật khẩu.
+
+| Lệnh | Làm gì |
+|---|---|
+| `npm run kiem-tra:e2e` | Cả bộ. Cần tài khoản thử, xem bên dưới |
+| `npm run kiem-tra:e2e:khach` | Chỉ phần khách vãng lai — không cần tài khoản nào |
+
+Đích mặc định là máy dev (`npm run dev` tự bật). Soi bản đã deploy thì đặt
+`E2E_URL=https://giasuhoa11.pages.dev` trước lệnh.
+
+**CỐ Ý KHÔNG nằm trong `npm run kiem-tra`.** Bộ kia phải nhanh và chạy được ở
+mọi máy để còn gọi trước mỗi commit; bộ này cần mạng, cần trình duyệt, cần tài
+khoản thật, mỗi lượt vài chục giây. Trộn vào là hàng rào chính bị bỏ qua vì
+chậm. Đây là hai việc khác nhau, giữ riêng.
+
+**Sáu điều đã trả giá để biết:**
+
+1. **`storageState` phải có `indexedDB: true`.** Firebase Auth giữ phiên trong
+   IndexedDB, không phải cookie hay localStorage. Thiếu cờ đó thì tệp phiên
+   vẫn ghi ra "thành công" nhưng rỗng, và mọi phép sau mở ra là màn đăng nhập
+   — hỏng mà thông báo lỗi không hề nhắc tới đăng nhập.
+2. **Dùng Chrome ĐÃ CÀI trên máy (`channel: 'chrome'`), không dùng bản
+   Chromium đi kèm.** Đo 20/09/2026: `npx playwright install chromium` gãy hai
+   lần, đứt giữa chừng lúc tải (host vẫn trả lời, chỉ tệp lớn là gãy). Máy nào
+   tải được thì bỏ dòng `channel` đi cũng không sao.
+3. **KHÔNG quay video.** Video cần tệp ffmpeg tải riêng, mà đường tải đó cũng
+   bị chặn. Bật lên thì MỌI phép thử trượt ngay từ lúc mở trang với thông báo
+   nói về ffmpeg chứ không nói về web. Ảnh chụp và trace không cần tệp ngoài.
+4. **`workers: 1`.** Các phép dùng chung một tài khoản học sinh thật; chạy
+   song song là hai phép cùng ghi tiến độ của một người rồi đá nhau.
+5. **Phép thử GHI DỮ LIỆU THẬT.** Web luôn nối Firestore thật, kể cả ở máy dev
+   (phần web không có emulator). Dùng một tài khoản học sinh RIÊNG để thử,
+   đừng dùng tài khoản của một em đang học.
+6. **Mật khẩu ở `.env.local`, không ở đâu khác.** Hai biến `E2E_EMAIL` và
+   `E2E_MATKHAU` (xem `.env.example`); `.gitignore` chặn bằng `.env*`. Kịch
+   bản gõ mật khẩu vào ô — không ai phải đọc nó, và AI thì không được đọc.
+   Tệp phiên `tests/.auth/` mang token thật nên cũng bị chặn. Thiếu tài khoản
+   thì phần cần đăng nhập tự BỎ QUA chứ không báo trượt: để nó đỏ sẵn thì
+   người ta quen mắt với màu đỏ, rồi hôm trượt thật cũng không ai nhìn.
+
 Sinh lại dữ liệu — đọc `scripts/README.md` trước khi dùng:
 `soan` (từ tệp .docx sang `constants.ts`), `xuat:ngan-hang` (Firestore sang repo),
 `gan:cau-hoi`, `sinh:ran-thang`, `nhung:ran-thang`, `word`, `phan-tich`, `do-chi-phi`,
