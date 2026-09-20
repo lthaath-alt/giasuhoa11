@@ -190,7 +190,28 @@ export const PracticeList: React.FC<Props> = ({ curriculum, bangDem, tienDo, onC
                             color="secondary"
                             onClick={() => onChoiOn(bai, thuTuBai.get(bai.id) ?? 0)}
                             startIcon={<Gamepad2 size={14} />}
-                            sx={{ textTransform: 'none', whiteSpace: 'nowrap' }}
+                            sx={{
+                              textTransform: 'none',
+                              whiteSpace: 'nowrap',
+                              /* Phải TÔ NỀN, đừng để viền suông. Hai nút phần sau
+                                 khi chưa mở cũng là "viền mảnh, nền trắng", nên nút
+                                 này để mặc định trông y như một nút đang bị khoá —
+                                 đo 20/09/2026: viền của nó là lục mờ 50%, còn nút bị
+                                 khoá là xám mờ 12%, mắt không phân biệt được ở cỡ
+                                 nhỏ. Nền lục nhạt + viền đặc thì nhìn phát biết là
+                                 bấm được.
+                                 KHÔNG dùng đỏ tín hiệu: đỏ chỉ dành cho hành động
+                                 chính, mà hành động chính của hàng này là nút phần
+                                 luyện tập kế tiếp. */
+                              color: 'var(--luc-tham)',
+                              borderColor: 'var(--luc-tham)',
+                              backgroundColor: 'var(--nen-luc-nhat)',
+                              '&:hover': {
+                                borderColor: 'var(--luc-tham)',
+                                backgroundColor: 'var(--luc-tham-nen)',
+                                color: 'var(--chu-nguoc)',
+                              },
+                            }}
                           >
                             Chơi để ôn
                           </Button>
