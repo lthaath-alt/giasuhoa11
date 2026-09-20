@@ -488,5 +488,38 @@ console.log('\n== Email chủ dự án khớp giữa luật và mã ==');
   }
 }
 
+/* ── Khoá Gemini riêng của học sinh (20/09/2026) ────────────────────────────
+   Khoá do chính em gõ vào, tính tiền theo tài khoản Google của em. Nó chỉ được
+   nằm trong `localStorage` của máy em: đẩy lên Firestore là biến bí mật cá
+   nhân thành dữ liệu dùng chung, in ra console hay nhật ký lỗi là ai mượn máy
+   cũng đọc được. Khác hẳn lỗ hổng 13/09/2026 (khoá nằm trong gói JS đã dựng) —
+   chỗ đó vẫn do các phép kiểm bên trên canh. */
+console.log('\n== Khoá riêng của học sinh không rời khỏi máy em ==');
+{
+  const TEP_KEY = 'src/features/tutor/services/keyRieng.ts';
+  const TEP_GOI = 'src/features/tutor/services/giaSuKeyRieng.ts';
+  const maKey = doc(TEP_KEY);
+
+  if (!/localStorage/.test(maKey)) truot('khoá riêng cất trong localStorage', 'không thấy localStorage');
+  else dat('khoá riêng cất trong localStorage');
+
+  const ghiXa = /setDoc\(|addDoc\(|updateDoc\(|collection\(/;
+  const cho = [TEP_KEY, TEP_GOI].filter(f => ghiXa.test(doc(f)));
+  if (cho.length) truot('khoá riêng KHÔNG bị ghi ra Firestore', cho.join(', '));
+  else dat('khoá riêng KHÔNG bị ghi ra Firestore');
+
+  /* Bắt cả `console.log(key)` lẫn `console.log('...', apiKey)`. */
+  const inRa = /console\.(log|warn|error|info)\([^)]*\b(key|apiKey|khoa)\b/i;
+  const choIn = [TEP_KEY, TEP_GOI].filter(f => inRa.test(doc(f)));
+  if (choIn.length) truot('khoá riêng KHÔNG bị in ra console', choIn.join(', '));
+  else dat('khoá riêng KHÔNG bị in ra console');
+
+  /* Nhật ký lỗi gửi lên Firestore, nên tuyệt đối không được mang khoá theo. */
+  const maGiaSu = doc('src/features/tutor/services/geminiTutorService.ts');
+  const logCoKey = /logError\(\{[\s\S]{0,400}?\b(key|apiKey)\b/i.test(maGiaSu);
+  if (logCoKey) truot('nhật ký lỗi không mang theo khoá', 'geminiTutorService.ts');
+  else dat('nhật ký lỗi không mang theo khoá');
+}
+
 console.log(soLoi === 0 ? '\n>>> TẤT CẢ ĐẠT\n' : `\n>>> CÓ ${soLoi} MỤC KHÔNG ĐẠT\n`);
 process.exit(soLoi === 0 ? 0 : 1);

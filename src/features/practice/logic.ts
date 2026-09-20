@@ -249,6 +249,24 @@ export function moTaThieuCau(soCau: Record<PhanLuyenTap, number>): string {
   return thieu.length ? `Còn thiếu ${thieu.join(', ')}` : '';
 }
 
+/**
+ * Em có chơi XONG đúng màn của bài này SAU mốc thời gian đã cho không?
+ *
+ * Dùng để mở khoá Luyện tập bằng trò chơi (20/09/2026). Đòi mốc thời gian chứ
+ * không chỉ hỏi "đã xong chưa": một màn em chơi từ tuần trước cũng sẽ mở được
+ * khoá, và khoá 15 phút thành vô nghĩa. Bản ghi cũ chưa có `luc` cũng không
+ * tính, vì không biết em chơi lúc nào.
+ */
+export function daChoiSauKhi(
+  tienDo: { troChoi?: Record<string, Record<string, { xong: boolean; luc?: number }>> } | null | undefined,
+  troId: string,
+  man: number,
+  moc: number,
+): boolean {
+  const m = tienDo?.troChoi?.[troId]?.[String(man)];
+  return !!m && m.xong === true && typeof m.luc === 'number' && m.luc >= moc;
+}
+
 /** Lấy tiến độ của một phần, luôn trả về object dùng được */
 export function tienDoCuaPhan(
   tienDo: TienDoLuyenTap | undefined,

@@ -5,6 +5,7 @@ import { DetectiveArt, BoardGameArt, RescueArt, SnakeLadderArt } from './GameArt
 import { BankFirestore, pushToGame } from '../bank/bankStore';
 import { useApp } from '../../core/hooks/useApp';
 import { useCheDoMau } from '../../core/hooks/useCheDoMau';
+import { layYeuCauMoTroChoi } from './yeuCauMoTroChoi';
 
 interface GameData {
   id: string;
@@ -207,6 +208,20 @@ export const GameHubSection: React.FC = () => {
     datDiaChiKhung(`${game.path}?theme=${laToi ? 'dark' : 'light'}`);
     document.documentElement.requestFullscreen?.().catch(() => {});
   };
+
+  /* Luyện tập nhắn sang "mở giúp trò này" (20/09/2026). Không gọi
+     requestFullscreen ở đây: cú bấm của người dùng xảy ra ở màn Luyện tập, qua
+     tới đây thì trình duyệt không còn coi là cử chỉ người dùng nữa và sẽ từ
+     chối im lặng. Trò chơi vẫn mở bình thường, chỉ là không tràn màn hình. */
+  useEffect(() => {
+    const xin = layYeuCauMoTroChoi();
+    if (!xin) return;
+    const game = GAMES.find(g => g.id === xin);
+    if (!game) return;
+    setActiveGame(game);
+    datDiaChiKhung(`${game.path}?theme=${laToi ? 'dark' : 'light'}`);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleCloseGame = () => {
     setActiveGame(null);

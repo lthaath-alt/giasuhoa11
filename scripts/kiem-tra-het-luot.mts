@@ -14,6 +14,11 @@
  */
 import { thongBaoHetLuot } from '../src/features/tutor/services/geminiTutorService';
 import { loiThanhChuoi } from '../src/features/tutor/services/loiGemini';
+import { readFileSync } from 'node:fs';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const GOC = join(dirname(fileURLToPath(import.meta.url)), '..');
 
 const LOI_PHUT = '{"error":{"code":429,"message":"You exceeded your current quota. \\n* Quota'
   + ' exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests,'
@@ -91,6 +96,50 @@ console.log('   ' + fNgay);
 ok(fPhut.includes('mỗi phút') && fPhut.includes('41 giây'), 'Firebase: hết lượt PHÚT, đúng số giây');
 ok(fNgay.includes('trong ngày') && !/\d+ giây/.test(fNgay), 'Firebase: hết lượt NGÀY, không báo nhầm thành chờ giây');
 ok(thongBaoHetLuot(loiThanhChuoi(new Error(LOI_NGAY))) === tNgay, 'lỗi @google/genai đi qua loiThanhChuoi vẫn ra y như cũ');
+
+/* Hết hạn mức theo NGÀY là hết cho CẢ WEB. Lúc đó chỉ còn một lối đi tiếp
+   trong hôm nay: em tự lấy một khoá miễn phí của Google. Thông báo phải chỉ
+   đường, và phải động viên — em đang bị chặn giữa lúc học, không phải lúc để
+   nhận một câu cụt lủn. */
+console.log('\n== Hết hạn mức thì chỉ đường cho em tự lấy khoá ==');
+{
+  const chuaCoKhoa = thongBaoHetLuot(LOI_NGAY, false);
+  console.log('   ' + chuaCoKhoa);
+  ok(/aistudio\.google\.com/.test(chuaCoKhoa), 'nói rõ chỗ lấy khoá');
+  ok(/miễn phí/.test(chuaCoKhoa), 'nói rõ là miễn phí');
+  ok(!/em đã dùng hết/i.test(chuaCoKhoa), 'không đổ lỗi cho em — hạn mức tính cho cả web');
+  ok(chuaCoKhoa.length > 200, 'có câu động viên chứ không cụt lủn');
+  /* Điều khoản Gemini API đòi người tạo khoá từ 18 tuổi, mà người dùng web là
+     học sinh lớp 11. Câu hướng dẫn PHẢI đẩy việc tạo khoá sang người lớn —
+     bỏ dòng này là web đang xui trẻ vị thành niên làm sai điều khoản. */
+  ok(/bố mẹ|phụ huynh|thầy cô/.test(chuaCoKhoa), 'bảo em nhờ người lớn lấy khoá giúp');
+  ok(/18 tuổi/.test(chuaCoKhoa), 'nói rõ Google đòi người tạo khoá từ 18 tuổi');
+
+  const daCoKhoa = thongBaoHetLuot(LOI_NGAY, true);
+  ok(!/aistudio\.google\.com/.test(daCoKhoa), 'em đã có khoá rồi thì đừng chỉ lại cách lấy');
+
+  ok(!/aistudio\.google\.com/.test(thongBaoHetLuot(LOI_PHUT, false)),
+    'hết lượt theo PHÚT thì chỉ cần chờ, không cần khoá riêng');
+}
+
+/* Trần lượt khách: một chỗ khai, mọi chỗ khác phải đọc từ đó.
+   Chép cứng con số ra giao diện thì đổi hằng số xong web vẫn nói số cũ, và
+   không ai thấy cho tới khi học sinh kêu. */
+console.log('\n== Trần lượt khách chỉ khai MỘT chỗ ==');
+{
+  /* Đọc hằng số từ MÃ NGUỒN chứ không import: `gioiHanChatService` kéo theo
+     `firebase.ts`, mà tệp đó đọc `import.meta.env` nên chỉ chạy được trong
+     trình duyệt. */
+  const maGioiHan = readFileSync(join(GOC, 'src/features/tutor/services/gioiHanChatService.ts'), 'utf8');
+  const tran = Number(maGioiHan.match(/TRAN_LUOT_KHACH\s*=\s*(\d+)/)?.[1]);
+  ok(tran === 5, `trần lượt khách là 5 (đang là ${tran})`);
+  for (const t of ['src/pages/DashboardPage.tsx', 'src/pages/LoginPage.tsx',
+                   'src/features/tutor/components/TutorChat.tsx']) {
+    const ma = readFileSync(join(GOC, t), 'utf8');
+    const chepCung = ma.match(/\b\d+\s*(?:câu hỏi|lượt (?:chat|hỏi))|\/\s*\d+\s*câu hỏi/g) || [];
+    ok(chepCung.length === 0, `${t}: không chép cứng số lượt${chepCung.length ? ' — ' + chepCung.join(' | ') : ''}`);
+  }
+}
 
 console.log('\n' + (hong === 0 ? '>>> TẤT CẢ ĐẠT' : `>>> CÓ ${hong} MỤC HỎNG`) + '\n');
 process.exit(hong === 0 ? 0 : 1);

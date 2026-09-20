@@ -11,12 +11,14 @@ import {
   Alert,
   CircularProgress,
 } from '@mui/material';
-import { Send, Trash2, Sparkles, CheckCircle, Award, Lightbulb, HelpCircle, Clock } from 'lucide-react';
+import { Send, Trash2, Sparkles, CheckCircle, Award, Lightbulb, HelpCircle, Clock, KeyRound } from 'lucide-react';
+import { coKeyRieng } from '../services/keyRieng';
+import { KeyRiengDialog } from './KeyRiengDialog';
 import { useApp } from '../../../core/hooks/useApp';
 import { Lesson } from '../../lessons/types';
 import { KnowledgeTheoryCard } from './KnowledgeTheoryCard';
 import { SuggestedQuestionsCard } from './SuggestedQuestionsCard';
-import { layTrangThaiGioiHan } from '../services/gioiHanChatService';
+import { layTrangThaiGioiHan, TRAN_LUOT_KHACH } from '../services/gioiHanChatService';
 import { MathMarkdownRenderer } from '../../../core/components/MathMarkdownRenderer';
 
 interface TutorChatProps {
@@ -42,6 +44,12 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
   
   const [remainingCooldown, setRemainingCooldown] = useState(0);
 
+  /* Khoá Gemini riêng của em (20/09/2026). Chỉ mời khi lượt vừa rồi bị chặn vì
+     CẢ WEB hết hạn mức trong ngày — đọc từ chính câu trả lời cuối, vì đó là
+     nơi thông báo đó hiện ra. */
+  const [moKey, setMoKey] = useState(false);
+  const [daCoKeyRieng, setDaCoKeyRieng] = useState(() => coKeyRieng());
+
   // Load lịch sử chat từ Firestore khi vào bài học
   useEffect(() => {
     loadLessonChats(lesson.id);
@@ -51,6 +59,11 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
   // Lọc tin nhắn của bài học hiện tại và user hiện tại
   const email = currentUser ? currentUser.email : 'guest';
   const lessonChats = chats.filter((c) => c.userEmail === email && c.lessonId === lesson.id);
+
+  /* Câu trả lời cuối có phải thông báo hết hạn mức THEO NGÀY không. Bám vào
+     đúng cụm chữ mà `thongBaoHetLuot` sinh ra cho trường hợp đó. */
+  const vuaHetHanMuc = /hết lượt trả lời trong ngày của toàn hệ thống/
+    .test(lessonChats[lessonChats.length - 1]?.content || '');
 
   // Cuộn xuống đáy khi có tin nhắn mới
   const scrollToBottom = () => {
@@ -196,7 +209,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
               setInputMessage(q);
               handleSend(q);
             } else {
-              setErrorMsg('Bạn đã dùng hết 25 lượt chat thử. Hãy đăng ký tài khoản để hỏi Gia sư câu này nhé!');
+              setErrorMsg(`Bạn đã dùng hết ${TRAN_LUOT_KHACH} lượt chat thử. Hãy đăng ký tài khoản để hỏi Gia sư câu này nhé!`);
             }
           }}
         />
@@ -284,7 +297,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
             ) : (
               <span>
                 Bạn đang dùng bản trải nghiệm miễn phí. Còn lại:{' '}
-                <strong>{guestRemainingCount}/25 câu hỏi</strong>.
+                <strong>{guestRemainingCount}/{TRAN_LUOT_KHACH} câu hỏi</strong>.
               </span>
             )}
             {' Đăng ký tài khoản học sinh để học tập không giới hạn!'}
@@ -432,6 +445,28 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
             {errorMsg}
           </Alert>
         )}
+
+        {/* Khoá riêng: chỉ mời khi CẢ WEB vừa hết hạn mức trong ngày và em
+            chưa có khoá. Không bày thường trực — học sinh không cần biết tới
+            nó cho tới lúc thật sự bị chặn. */}
+        {vuaHetHanMuc && !daCoKeyRieng && (
+          <Box sx={{ px: 2, py: 1.5, borderTop: '1px solid var(--vien)' }}>
+            <Button
+              variant="outlined"
+              size="small"
+              startIcon={<KeyRound size={16} />}
+              onClick={() => setMoKey(true)}
+              sx={{ textTransform: 'none' }}
+            >
+              Khoá riêng của em — hỏi tiếp ngay hôm nay
+            </Button>
+          </Box>
+        )}
+        <KeyRiengDialog
+          mo={moKey}
+          onDong={() => setMoKey(false)}
+          onDoi={() => setDaCoKeyRieng(coKeyRieng())}
+        />
 
         {/* Khung nhập tin nhắn */}
         <Box

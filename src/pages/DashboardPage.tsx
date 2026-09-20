@@ -37,7 +37,8 @@ import {
   ShieldCheck,
   Zap,
   RefreshCw,
-  BookMarked
+  BookMarked,
+  KeyRound
 } from 'lucide-react';
 import { useApp } from '../core/hooks/useApp';
 import { Lesson } from '../features/lessons/types';
@@ -59,6 +60,9 @@ import {
 } from '../features/mascot';
 import { MathMarkdownRenderer } from '../core/components/MathMarkdownRenderer';
 import { coGiaSuAI } from '../features/tutor/services/geminiTutorService';
+import { TRAN_LUOT_KHACH } from '../features/tutor/services/gioiHanChatService';
+import { coKeyRieng } from '../features/tutor/services/keyRieng';
+import { KeyRiengDialog } from '../features/tutor/components/KeyRiengDialog';
 
 export const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
@@ -92,10 +96,15 @@ export const DashboardPage: React.FC = () => {
   const [isIchatSending, setIsIchatSending] = useState(false);
   const [ichatError, setIchatError] = useState<string | null>(null);
 
-  /* Bỏ hộp nhập API key riêng ngày 14/09/2026 (key lưu trần trong localStorage,
-     và điều khoản Gemini API cấm ứng dụng cho người dưới 18 tuổi). Chỉ còn báo
-     thật khi máy này chưa cấu hình gia sư AI, để học sinh không tưởng kịch bản
-     mẫu là AI đang trả lời. */
+  /* Khoá riêng quay lại ngày 20/09/2026, theo quyết định của chủ dự án, nhưng
+     KHÁC bản bị bỏ ngày 14/09/2026 ở ba điểm: chỉ hiện khi cả web vừa hết hạn
+     mức theo NGÀY (không bày thường trực), hướng dẫn nói rõ Google đòi người
+     tạo khoá từ 18 tuổi nên phải nhờ bố mẹ hoặc thầy cô làm giúp, và khoá
+     không bao giờ rời khỏi máy — `kiem-tra:an-ninh` canh điều đó.
+     Vẫn báo thật khi máy chưa cấu hình gia sư AI, để học sinh không tưởng kịch
+     bản mẫu là AI đang trả lời. */
+  const [moKeyRieng, setMoKeyRieng] = useState(false);
+  const [daCoKeyRieng, setDaCoKeyRieng] = useState(() => coKeyRieng());
   const coGiaSuThat = coGiaSuAI();
 
   // Lấy tổng số bài học
@@ -132,7 +141,7 @@ export const DashboardPage: React.FC = () => {
       ten: 'Gia sư AI',
       trangThai: currentUser
         ? 'Thầy Hùng gợi mở từng bước, không đưa đáp số'
-        : `còn ${Math.max(0, 25 - guestChatCount)}/25 câu hỏi thử`,
+        : `còn ${Math.max(0, TRAN_LUOT_KHACH - guestChatCount)}/${TRAN_LUOT_KHACH} câu hỏi thử`,
       /* Thầy Hùng đứng ở mép phải ĐÚNG trường này, không phải giữa màn —
          hợp đồng hướng chỉ định vậy, và ở đây nhân vật nói đúng việc mình làm
          thay vì làm nền trang trí cho cả trang. */
@@ -165,6 +174,11 @@ export const DashboardPage: React.FC = () => {
   // Lấy lịch sử iChat toàn cục (chúng ta dùng lessonId là 'global-advisor' cho cuộc chat tư vấn chung)
   const userEmail = currentUser ? currentUser.email : 'guest';
   const globalChats = chats.filter(c => c.userEmail === userEmail && c.lessonId === 'global-advisor');
+
+  /* Lượt vừa rồi có bị chặn vì CẢ WEB hết hạn mức trong ngày không — bám vào
+     đúng cụm chữ mà `thongBaoHetLuot` sinh ra cho trường hợp đó. */
+  const ichatVuaHetHanMuc = /hết lượt trả lời trong ngày của toàn hệ thống/
+    .test(globalChats[globalChats.length - 1]?.content || '');
 
   const handleSendGlobalIchat = async (textToSend?: string) => {
     const text = (textToSend || ichatInput).trim();
@@ -496,7 +510,10 @@ export const DashboardPage: React.FC = () => {
               <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 1 }}>
                 <MascotDauVai tab="luyentap" />
               </Box>
-              <PracticeSection onDangNhap={() => setActiveTab('hocsinh')} />
+              <PracticeSection
+                onDangNhap={() => setActiveTab('hocsinh')}
+                onMoTroChoi={() => setActiveTab('trochoi')}
+              />
             </Box>
           )}
 
@@ -722,9 +739,9 @@ export const DashboardPage: React.FC = () => {
                   {!currentUser && (
                     <Alert severity={guestRemainingCount === 0 ? 'error' : 'warning'} sx={{ borderRadius: 0, py: 0.5, px: 2, '.MuiAlert-message': { fontSize: '0.8rem' } }}>
                       {guestRemainingCount === 0 ? (
-                        <strong>Em đã dùng hết 25 lượt hỏi thử miễn phí.</strong>
+                        <strong>Em đã dùng hết {TRAN_LUOT_KHACH} lượt hỏi thử miễn phí.</strong>
                       ) : (
-                        <span>Em đang dùng bản dùng thử. Còn lại: <strong>{guestRemainingCount}/25 lượt hỏi</strong>.</span>
+                        <span>Em đang dùng bản dùng thử. Còn lại: <strong>{guestRemainingCount}/{TRAN_LUOT_KHACH} lượt hỏi</strong>.</span>
                       )}
                       {' Đăng ký tài khoản học sinh để hỏi Thầy không giới hạn!'}
                     </Alert>
@@ -803,6 +820,23 @@ export const DashboardPage: React.FC = () => {
                     </Alert>
                   )}
 
+                  {/* Khoá riêng: chỉ mời khi CẢ WEB vừa hết hạn mức trong ngày
+                      và máy này chưa có khoá. Không bày thường trực — em không
+                      cần biết tới nó cho tới lúc thật sự bị chặn. */}
+                  {ichatVuaHetHanMuc && !daCoKeyRieng && (
+                    <Box sx={{ px: 2, py: 1.5, borderTop: '1px solid var(--vien)' }}>
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        startIcon={<KeyRound size={16} />}
+                        onClick={() => setMoKeyRieng(true)}
+                        sx={{ borderRadius: 0, textTransform: 'none' }}
+                      >
+                        Khoá riêng của em — hỏi tiếp ngay hôm nay
+                      </Button>
+                    </Box>
+                  )}
+
                   {/* Vùng Nhập */}
                   <Box sx={{ p: 2, bgcolor: 'var(--nen-trang)', borderTop: '1px solid var(--vien)', display: 'flex', gap: 1.5 }}>
                     <TextField
@@ -824,6 +858,12 @@ export const DashboardPage: React.FC = () => {
                       Gửi Thầy
                     </Button>
                   </Box>
+
+                  <KeyRiengDialog
+                    mo={moKeyRieng}
+                    onDong={() => setMoKeyRieng(false)}
+                    onDoi={() => setDaCoKeyRieng(coKeyRieng())}
+                  />
                 </Paper>
 
               </Box>
@@ -871,7 +911,7 @@ export const DashboardPage: React.FC = () => {
                       <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.7 }}>
                         Hệ thống tự học Gia sư Hóa Học 11 AI được cung cấp <strong>hoàn toàn miễn phí 100%</strong> dành cho học sinh THPT có tinh thần tự học. 
                         <br /><br />
-                        Đối với <strong>khách dùng thử (chưa đăng nhập)</strong>, hệ thống hỗ trợ dùng thử tối đa <strong>25 câu hỏi</strong> thảo luận với Gia sư AI. Để học tập hoàn toàn không giới hạn và lưu giữ toàn bộ tiến độ, các em chỉ cần đăng ký cho mình một tài khoản học sinh.
+                        Đối với <strong>khách dùng thử (chưa đăng nhập)</strong>, hệ thống hỗ trợ dùng thử tối đa <strong>{TRAN_LUOT_KHACH} câu hỏi</strong> thảo luận với Gia sư AI. Để học tập hoàn toàn không giới hạn và lưu giữ toàn bộ tiến độ, các em chỉ cần đăng ký cho mình một tài khoản học sinh.
                       </Typography>
                     </AccordionDetails>
                   </Accordion>

@@ -3,7 +3,7 @@ import {
   Box, Paper, Typography, Button, Chip, Stack, Tooltip, LinearProgress,
   Divider,
 } from '@mui/material';
-import { Lock, CheckCircle, Clock, PlayCircle, BookOpen, AlertCircle } from 'lucide-react';
+import { Lock, CheckCircle, Clock, PlayCircle, BookOpen, AlertCircle, Gamepad2 } from 'lucide-react';
 import { Chapter, Lesson } from '../../lessons/types';
 import {
   PhanLuyenTap, THU_TU_PHAN, TEN_PHAN_NGAN, TienDoLuyenTap, TrangThaiPhan,
@@ -18,6 +18,8 @@ interface Props {
   bangDem: BangDemCau;
   tienDo: TienDoLuyenTap;
   onChon: (bai: Lesson, phan: PhanLuyenTap) => void;
+  /** Mở trò chơi ôn đúng bài này. Không truyền thì không hiện nút. */
+  onChoiOn?: (bai: Lesson, chiSoBai: number) => void;
 }
 
 const MAU: Record<TrangThaiPhan, 'inherit' | 'success' | 'warning' | 'error' | 'primary'> = {
@@ -38,7 +40,10 @@ const GIAI_THICH: Record<TrangThaiPhan, string> = {
   'thieu-cau': 'Ngân hàng chưa đủ câu cho phần này',
 };
 
-export const PracticeList: React.FC<Props> = ({ curriculum, bangDem, tienDo, onChon }) => {
+export const PracticeList: React.FC<Props> = ({ curriculum, bangDem, tienDo, onChon, onChoiOn }) => {
+  /* Thứ tự bài trong cả chương trình (0-24) — "Rắn và Thang" có 25 màn ứng
+     đúng 25 bài nên màn của bài này chính là thứ tự đó cộng một. */
+  const thuTuBai = new Map(curriculum.flatMap(c => c.lessons).map((l, i) => [l.id, i]));
   const tatCaBai = curriculum.flatMap(c => c.lessons);
   const soXong = tatCaBai.filter(b => baiDaXong(tienDo[b.id])).length;
   const soMoDuoc = tatCaBai.filter(b => {
@@ -173,6 +178,24 @@ export const PracticeList: React.FC<Props> = ({ curriculum, bangDem, tienDo, onC
                           </Tooltip>
                         );
                       })}
+
+                      {/* Ôn bằng trò chơi: cùng câu hỏi của bài này, chỉ khác
+                          cách hỏi. Đặt cạnh ba phần luyện tập để em thấy nó là
+                          một lối ôn nữa, không phải mục giải trí ở tab khác. */}
+                      {onChoiOn && (
+                        <Tooltip title={`Ôn bài này bằng trò chơi — màn ${(thuTuBai.get(bai.id) ?? 0) + 1}`}>
+                          <Button
+                            size="small"
+                            variant="outlined"
+                            color="secondary"
+                            onClick={() => onChoiOn(bai, thuTuBai.get(bai.id) ?? 0)}
+                            startIcon={<Gamepad2 size={14} />}
+                            sx={{ textTransform: 'none', whiteSpace: 'nowrap' }}
+                          >
+                            Chơi để ôn
+                          </Button>
+                        </Tooltip>
+                      )}
                     </Stack>
                   </Stack>
 

@@ -5,7 +5,7 @@ import {
   Accordion, AccordionSummary, AccordionDetails, LinearProgress,
 } from '@mui/material';
 import {
-  ArrowLeft, Clock, BookOpen, Lightbulb, ChevronDown, CheckCircle, Sigma,
+  ArrowLeft, Clock, BookOpen, Lightbulb, ChevronDown, CheckCircle, Sigma, Gamepad2,
 } from 'lucide-react';
 import { Lesson } from '../../lessons/types';
 import { BankQuestion } from '../../bank/types';
@@ -20,6 +20,12 @@ interface Props {
   /** Những câu em làm sai gần đây, kèm lời giải — phần ôn sát sườn nhất */
   cauLamSai: BankQuestion[];
   onOnXong: () => void;
+  /** Trò chơi ôn được cho bài này (tên + màn), để mời em chơi thay vì ngồi chờ */
+  troChoi?: { id: string; ten: string; man: number };
+  /** Em đã chơi xong màn đó SAU khi bị khoá — chơi rồi thì mở lượt ngay */
+  daChoiDeMoKhoa?: boolean;
+  /** Mở trò chơi. Không truyền thì không hiện lối chơi. */
+  onChoiNgay?: () => void;
   onThoat: () => void;
   dangLuu?: boolean;
 }
@@ -40,6 +46,7 @@ function dinhDangConLai(ms: number): string {
  */
 export const ReviewGate: React.FC<Props> = ({
   bai, phan, khoaDenLuc, cauLamSai, onOnXong, onThoat, dangLuu,
+  troChoi, daChoiDeMoKhoa = false, onChoiNgay,
 }) => {
   const [conLai, setConLai] = useState<number>(() =>
     khoaDenLuc ? khoaDenLuc - Date.now() : 0);
@@ -213,15 +220,33 @@ export const ReviewGate: React.FC<Props> = ({
           <Button
             variant="contained"
             size="large"
-            disabled={conKhoa || !daDoc || dangLuu}
+            disabled={(conKhoa && !daChoiDeMoKhoa) || (!daDoc && !daChoiDeMoKhoa) || dangLuu}
             onClick={onOnXong}
           >
-            {conKhoa
-              ? `Chờ thêm ${dinhDangConLai(conLai)}`
-              : `Ôn xong — cho em làm lại ${SO_LUOT_MOI_CHU_KY} lượt`}
+            {daChoiDeMoKhoa
+              ? `Chơi xong rồi — cho em làm lại ${SO_LUOT_MOI_CHU_KY} lượt`
+              : conKhoa
+                ? `Chờ thêm ${dinhDangConLai(conLai)}`
+                : `Ôn xong — cho em làm lại ${SO_LUOT_MOI_CHU_KY} lượt`}
           </Button>
         </Box>
-        {conKhoa && (
+
+        {/* Lối thứ hai: chơi xong một màn của đúng bài này thì mở lượt ngay,
+            không phải ngồi chờ. Chơi cũng là ôn — cùng câu hỏi của bài, chỉ
+            khác cách hỏi — nên không phải là bỏ qua hình phạt. */}
+        {troChoi && onChoiNgay && !daChoiDeMoKhoa && (
+          <Box sx={{ mt: 2, pt: 2, borderTop: '1px solid var(--vien)' }}>
+            <Typography variant="body2" sx={{ mb: 1 }}>
+              Không muốn ngồi chờ? Chơi xong <b>màn {troChoi.man}</b> của <b>{troChoi.ten}</b> là
+              em được làm lại ngay.
+            </Typography>
+            <Button variant="outlined" color="secondary" startIcon={<Gamepad2 size={16} />} onClick={onChoiNgay}>
+              Chơi màn {troChoi.man} để mở lại lượt
+            </Button>
+          </Box>
+        )}
+
+        {conKhoa && !daChoiDeMoKhoa && (
           <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
             Em có thể rời trang, thời gian vẫn chạy. Quay lại khi hết giờ là làm
             tiếp được.

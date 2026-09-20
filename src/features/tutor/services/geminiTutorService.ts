@@ -7,15 +7,21 @@ import { nhanhCuaHocSinh } from '../../research/thucNghiem';
 import { RECAPTCHA_ENTERPRISE_SITE_KEY } from '../../../core/services/firebaseCongKhai';
 import { loiThanhChuoi } from './loiGemini';
 import { xuLyTruocLuot } from './pedagogicalStateMachine';
+import { docKey, coKeyRieng } from './keyRieng';
 
-/* ── Không còn đường "key riêng người dùng tự nhập" (bỏ ngày 14/09/2026) ──────
-   Trước đây học sinh được dán API key Gemini của chính mình; key nằm trần trong
-   localStorage (`gemini_api_key_user`), và thông báo hết lượt còn khuyên em
-   "vào cài đặt để dùng một API key khác". Hai vấn đề: key lộ trên máy dùng
-   chung, và điều khoản Gemini API cấm ứng dụng dành cho người dưới 18 tuổi —
-   xui học sinh lớp 11 tự tạo key là đẩy các em vào đúng chỗ đó.
-   Nay web chỉ còn MỘT đường: Firebase AI Logic (giaSuFirebaseAI.ts). Key cũ còn
-   sót trên máy được xoá trong `donDepLuuTruCu()` (core/services/storage.ts). */
+/* ── Hai đường gọi AI, và thứ tự giữa chúng ──────────────────────────────────
+   Đường CHÍNH: Firebase AI Logic (`giaSuFirebaseAI.ts`) — không mang khoá nào
+   trong gói JS, chặn lạm dụng bằng App Check.
+   Đường DỰ PHÒNG: khoá riêng của học sinh (`giaSuKeyRieng.ts`), CHỈ dùng khi
+   đường chính báo hết hạn mức theo NGÀY. Hết theo PHÚT thì chờ vài chục giây
+   là xong, không tiêu lượt của em.
+
+   Đường dự phòng này từng bị bỏ ngày 14/09/2026 vì key nằm trần trong
+   localStorage (`gemini_api_key_user`) và vì điều khoản Gemini API đòi người
+   tạo khoá từ 18 tuổi. Chủ dự án cho quay lại ngày 20/09/2026, với ba ràng
+   buộc: chỉ mời khi thật sự bị chặn, hướng dẫn nói rõ phải nhờ bố mẹ hoặc thầy
+   cô tạo giúp, và khoá không bao giờ rời khỏi máy em. Khoá cũ còn sót vẫn bị
+   xoá trong `donDepLuuTruCu()`; khoá mới dùng tên khác (`keyRieng.ts`). */
 
 /* Gia sư có gọi được AI thật không. Bản build luôn có khoá reCAPTCHA của App
    Check; thiếu (máy dev chưa cấu hình) thì rơi về kịch bản mẫu. */
@@ -46,14 +52,24 @@ function buildGeminiHistory(history: ChatMessage[], currentUserMessage: string) 
  *
  * Trả về chuỗi thông báo, hoặc '' nếu lỗi này không phải hết lượt.
  */
-export const thongBaoHetLuot = (loi: string): string => {
+export const thongBaoHetLuot = (loi: string, coKeyRieng = false): string => {
   const m = (loi || '').toLowerCase();
   if (!(m.includes('429') || m.includes('quota') || m.includes('rate limit'))) return '';
 
   if (m.includes('perday')) {
-    return 'Gia sư AI đã dùng hết lượt trả lời trong ngày của toàn hệ thống, '
+    const chung = 'Gia sư AI đã dùng hết lượt trả lời trong ngày của toàn hệ thống, '
       + 'nên tạm thời chưa trả lời được. Lượt mới được cấp lại vào đầu ngày mai. '
       + 'Trong lúc chờ, em xem lại bài giảng hoặc làm phần luyện tập của bài này nhé.';
+    /* Em đã có khoá riêng mà vẫn ra lỗi này thì chính khoá của em cũng hết
+       lượt — chỉ lại cách lấy khoá lúc đó là vô nghĩa. */
+    if (coKeyRieng) return chung;
+    return chung
+      + '\n\nNếu em muốn hỏi tiếp ngay hôm nay: nhờ bố mẹ hoặc thầy cô lấy giúp em một khoá '
+      + 'miễn phí của Google tại aistudio.google.com, rồi dán vào mục "Khoá riêng của em" ngay '
+      + 'dưới ô chat. Google yêu cầu người tạo khoá phải từ 18 tuổi, nên bước này để người lớn '
+      + 'làm giúp em. Khoá đó cho em hạn mức riêng, không ai giành của ai, và chỉ nằm trong máy '
+      + 'em thôi. Làm một lần là dùng được mãi, mất chừng hai phút. Trong lúc chờ, em cứ ôn tiếp '
+      + 'phần luyện tập nhé — hỏi được hay chưa thì bài vẫn đang tiến.';
   }
 
   const giay = loi.match(/"retryDelay":\s*"(\d+)s"/)?.[1];
@@ -135,7 +151,18 @@ export const generateAIResponseChiTiet = async (
     };
 
     const batDau = performance.now();
-    const traLoi = await (await import('./giaSuFirebaseAI')).hoiGeminiQuaFirebase(yeuCau);
+    let traLoi: string;
+    try {
+      traLoi = await (await import('./giaSuFirebaseAI')).hoiGeminiQuaFirebase(yeuCau);
+    } catch (loiChung) {
+      /* Hạn mức chung hết theo NGÀY mà em đã tự lấy khoá riêng thì đi tiếp
+         bằng khoá của em. Hết theo PHÚT thì KHÔNG đụng tới khoá riêng: chờ
+         vài chục giây là hỏi được, tiêu lượt của em làm gì. */
+      const s = loiThanhChuoi(loiChung).toLowerCase();
+      const key = s.includes('perday') ? docKey() : null;
+      if (!key) throw loiChung;
+      traLoi = await (await import('./giaSuKeyRieng')).hoiGeminiBangKeyRieng(yeuCau, key);
+    }
     const latencyMs = Math.round(performance.now() - batDau);
 
     if (traLoi) return { ...coBan, text: traLoi, latencyMs, modelName: GEMINI_MODEL_NAME };
@@ -155,7 +182,7 @@ export const generateAIResponseChiTiet = async (
       userEmail,
     });
 
-    const hetLuot = thongBaoHetLuot(chuoiLoi);
+    const hetLuot = thongBaoHetLuot(chuoiLoi, coKeyRieng());
     if (hetLuot) return { ...coBan, text: hetLuot };
 
     /* Lỗi ở đường Firebase (App Check từ chối, AI Logic chưa bật, máy chủ lỗi)

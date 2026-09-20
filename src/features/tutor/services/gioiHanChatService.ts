@@ -28,7 +28,12 @@ import { auth, db, layAppKhach } from '../../../core/services/firebase';
 import { laSpam, SPAM_LAP_LAI } from './pedagogicalStateMachine';
 
 export const COL_GIOI_HAN_CHAT = 'gioi_han_chat';
-export const TRAN_LUOT_KHACH = 25;
+/* 5 chứ không phải 25 (20/09/2026). Khách dùng CHUNG hạn mức Gemini theo ngày
+   với học sinh: ngày 18/09/2026 cả web hết lượt giữa buổi chiều, học sinh
+   không hỏi được nữa. Khách chỉ cần đủ lượt để xem thử; lớp mới là người phải
+   được ưu tiên. Mọi chỗ hiển thị con số này PHẢI đọc hằng số —
+   `kiem-tra:het-luot` bắt chỗ nào chép cứng. */
+export const TRAN_LUOT_KHACH = 5;
 export const PHUT_KHOA_SPAM = 15;
 const SO_THOI_DIEM_GIU = 10;
 

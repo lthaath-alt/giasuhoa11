@@ -7,7 +7,7 @@ import { LogIn, RefreshCw, Target } from 'lucide-react';
 import { useApp } from '../../core/hooks/useApp';
 import { Lesson } from '../lessons/types';
 import { BankQuestion } from '../bank/types';
-import { PhanLuyenTap, TEN_PHAN, TienDoLuyenTap, TienDoPhan, KetQuaLuot } from './types';
+import { PhanLuyenTap, TEN_PHAN, TienDoLuyenTap, TienDoPhan, KetQuaLuot, PHUT_KHOA } from './types';
 import {
   demCauTheoBai, demCuaBai, layCauChoLuot, layCauTheoId, trangThaiPhan,
   capLaiLuot, tienDoCuaPhan, xoaCacheKho, BangDemCau,
@@ -15,16 +15,42 @@ import {
 import { PracticeList } from './components/PracticeList';
 import { PracticeRunner } from './components/PracticeRunner';
 import { ReviewGate } from './components/ReviewGate';
+import { troChoiCuaBai } from './troChoiOn';
+import { datYeuCauMoTroChoi } from '../games/yeuCauMoTroChoi';
+import { daChoiSauKhi } from './logic';
 
 type Man = 'danh-sach' | 'lam-bai' | 'on-lai';
 
 interface Props {
+  /** Chuyển sang tab Trò chơi. Không truyền thì Luyện tập không hiện nút chơi. */
+  onMoTroChoi?: () => void;
   /** Đưa học sinh sang tab đăng nhập / khu vực học sinh */
   onDangNhap?: () => void;
 }
 
-export const PracticeSection: React.FC<Props> = ({ onDangNhap }) => {
+export const PracticeSection: React.FC<Props> = ({ onDangNhap, onMoTroChoi }) => {
   const { currentUser, curriculum, getUserProgress, luuTienDoLuyenTap } = useApp();
+
+  /* Mở trò chơi ôn đúng bài này. Phải đi qua tab Trò chơi của web chứ không mở
+     tab trình duyệt mới: trò chơi gửi tiến độ về bằng postMessage tới cửa sổ
+     cha, mở rời ra là mất tiến độ — mà tiến độ chính là thứ mở khoá lượt. */
+  const moTroChoiCuaBai = (b: Lesson, thuTu: number) => {
+    datYeuCauMoTroChoi(troChoiCuaBai(b.id, thuTu).id);
+    onMoTroChoi?.();
+  };
+
+  /** Thứ tự bài trong cả chương trình, tính từ 0. */
+  const chiSoBai = (lessonId: string) =>
+    Math.max(0, curriculum.flatMap(c => c.lessons).findIndex(l => l.id === lessonId));
+
+  /* Em có chơi xong màn của bài này SAU khi bị khoá không. Mốc là lúc BẮT ĐẦU
+     khoá = hết khoá trừ đi độ dài khoá; chơi trước đó thì không tính. */
+  const daChoiDeMoKhoa = (lessonId: string, p: PhanLuyenTap): boolean => {
+    const het = tienDoCuaPhan(tienDo, lessonId, p).khoaDenLuc;
+    if (!het) return false;
+    const tro = troChoiCuaBai(lessonId, chiSoBai(lessonId));
+    return daChoiSauKhi(getUserProgress(email), tro.id, tro.man, het - PHUT_KHOA * 60 * 1000);
+  };
 
   const [dangTai, setDangTai] = useState(true);
   const [loiTai, setLoiTai] = useState<string | null>(null);
@@ -199,6 +225,7 @@ export const PracticeSection: React.FC<Props> = ({ onDangNhap }) => {
           bangDem={bangDem}
           tienDo={tienDo}
           onChon={(b, p) => { void chonPhan(b, p); }}
+          onChoiOn={onMoTroChoi ? moTroChoiCuaBai : undefined}
         />
       )}
 
@@ -225,6 +252,9 @@ export const PracticeSection: React.FC<Props> = ({ onDangNhap }) => {
           onOnXong={() => { void onXong(); }}
           onThoat={() => setMan('danh-sach')}
           dangLuu={dangLuu}
+          troChoi={troChoiCuaBai(bai.id, chiSoBai(bai.id))}
+          daChoiDeMoKhoa={daChoiDeMoKhoa(bai.id, phan)}
+          onChoiNgay={onMoTroChoi ? () => moTroChoiCuaBai(bai, chiSoBai(bai.id)) : undefined}
         />
       )}
 

@@ -270,7 +270,9 @@ export interface LearningProgress {
   /* `hang` là danh hiệu cao nhất từng đạt ở màn đó: 'xuatsac' | 'gioi' | 'kha'.
      Để dạng chuỗi tự do chứ không dựng kiểu chung, vì trò chơi là tệp HTML tĩnh
      nằm ngoài phần biên dịch của web — hai bên không dùng chung được kiểu nào. */
-  troChoi?: Record<string, Record<string, { xong: boolean; cauDung: number; hang?: string }>>;
+  /* `luc` là mốc thời gian (ms) của lần chơi XONG gần nhất — thêm 20/09/2026 để
+     Luyện tập biết em chơi trước hay sau khi bị khoá. Bản ghi cũ không có nó. */
+  troChoi?: Record<string, Record<string, { xong: boolean; cauDung: number; hang?: string; luc?: number }>>;
   /* Tiến độ mục Luyện tập: { 'bai-2': { mc: {...}, tf: {...}, tn: {...} } }.
      Kiểu đầy đủ là `TienDoLuyenTap` trong `features/practice/types.ts`. Để
      `unknown` ở đây vì `features/auth` nằm dưới cùng chuỗi import — khai kiểu

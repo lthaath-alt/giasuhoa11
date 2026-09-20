@@ -8,6 +8,7 @@ import RegisterForm from '../features/auth/components/RegisterForm';
 import ForgotPasswordForm from '../features/auth/components/ForgotPasswordForm';
 import GoogleSetPasswordForm from '../features/auth/components/GoogleSetPasswordForm';
 import { GoogleUserInfo } from '../core/services/googleAuth';
+import { TRAN_LUOT_KHACH } from '../features/tutor/services/gioiHanChatService';
 
 // ─── Trạng thái màn hình ──────────────────────────────────────────────────────
 
@@ -377,7 +378,7 @@ export const LoginPage: React.FC = () => {
                   align="center"
                   sx={{ display: 'block', mt: 1, px: 2 }}
                 >
-                  *Bản dùng thử miễn phí giới hạn tối đa 25 câu hỏi với Gia sư AI.
+                  *Bản dùng thử miễn phí giới hạn tối đa {TRAN_LUOT_KHACH} câu hỏi với Gia sư AI.
                 </Typography>
               </Box>
             )}

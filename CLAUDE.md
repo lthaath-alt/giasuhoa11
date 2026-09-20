@@ -548,6 +548,35 @@ cậy: trang giáo viên hiện nó qua `ChemicalText`, tức qua `locHtml`. Đ�
 lọc đó. `kiem-tra:luyen-tap` canh cho trang giáo viên không đọc lại
 `QuizStorage`; `kiem-tra:luat` có 12 phép (21a–21l) cho collection này.
 
+**Khoá Gemini riêng của học sinh: CÓ LẠI ngày 20/09/2026**, sau khi đã bỏ ngày
+14/09/2026. Khác bản cũ ở ba điểm, và cả ba đều có phép kiểm canh:
+
+1. **Chỉ mời khi thật sự bị chặn** — tức khi cả web hết hạn mức theo NGÀY. Hết
+   theo PHÚT thì chờ vài chục giây, không đụng tới khoá của em.
+2. **Hướng dẫn nói rõ Google đòi người tạo khoá từ 18 tuổi**, nên bố mẹ hoặc
+   thầy cô làm giúp. Đây chính là lý do bản cũ bị bỏ; bỏ câu này đi là web
+   đang xui trẻ vị thành niên làm sai điều khoản. `kiem-tra:het-luot` canh.
+3. **Khoá không rời khỏi máy em**: chỉ `localStorage`, KHÔNG Firestore, KHÔNG
+   console, KHÔNG nhật ký lỗi. `kiem-tra:an-ninh` canh bốn điều đó.
+
+Đừng lẫn với lỗ hổng 13/09/2026: cái đó là khoá nằm trong gói JS đã dựng (biến
+môi trường tiền tố VITE). Khoá ở đây do chính người dùng gõ lúc chạy, không có
+trong mã nguồn. Vì phép kiểm quét cả CHÚ THÍCH, đừng viết tên biến môi trường
+đó ra trong bình luận — sẽ bị báo SAI, và phép kiểm nên tiếp tục nghiêm như vậy.
+
+**Khách vãng lai còn 5 lượt** (20/09/2026, trước đó 25). Khách dùng chung hạn
+mức Gemini theo ngày với học sinh; ngày 18/09/2026 cả web hết lượt giữa buổi.
+Con số khai ở `TRAN_LUOT_KHACH`; mọi chỗ hiển thị phải đọc hằng số đó, đừng
+chép cứng — `kiem-tra:het-luot` bắt chỗ nào chép.
+
+**Trò chơi mở khoá được Luyện tập** (20/09/2026). Trượt hết lượt thì bị khoá 10
+phút; chơi xong màn của đúng bài đó là được làm lại ngay. Tiến độ trò chơi nay
+ghi thêm `luc` — mốc thời gian lần chơi XONG gần nhất. Thiếu mốc đó thì một màn
+chơi từ tuần trước cũng mở được khoá. Ba điều đi kèm: chỉ ghi `luc` khi lượt
+chơi thật sự XONG; chơi lại mà không hơn điểm cũ vẫn phải ghi (nếu không, em
+chơi xong mà khoá không mở); và trò chơi phải mở TRONG tab Trò chơi của web,
+vì nó gửi tiến độ về bằng `postMessage` tới cửa sổ cha.
+
 **Luật KHÔNG với tới mật khẩu.** Mật khẩu nằm ở Firebase Auth, đã băm. Đăng
 ký email + mật khẩu là **công khai** — ai cũng lấy được một uid hợp lệ mà
 không cần đụng vào web. Điều luật làm được là chặn uid đó thành bất kỳ vai

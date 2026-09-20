@@ -1438,9 +1438,13 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
        ngắn không sai câu nào (🥇) vẫn ít câu đúng hơn ván dài sai mấy câu (🥉).
        Nên phải so cả hai mặt, và chỉ bỏ qua khi lần này không hơn ở mặt nào. */
     const bac = (h?: string) => (h === 'xuatsac' ? 3 : h === 'gioi' ? 2 : h === 'kha' ? 1 : 0);
-    if (cu && cu.xong && cu.cauDung >= ketQua.cauDung && bac(cu.hang) >= bac(ketQua.hang)) return;
+    /* Chơi lại mà không hơn được lần trước thì trước đây bỏ qua luôn. Nay vẫn
+       phải ghi nếu lần này XONG, vì Luyện tập mở khoá dựa vào mốc thời gian
+       chơi xong gần nhất — bỏ qua là em chơi xong mà khoá không mở. */
+    const khongHon = cu && cu.xong && cu.cauDung >= ketQua.cauDung && bac(cu.hang) >= bac(ketQua.hang);
+    if (khongHon && !ketQua.xong) return;
 
-    const ghi: { xong: boolean; cauDung: number; hang?: string } = {
+    const ghi: { xong: boolean; cauDung: number; hang?: string; luc?: number } = {
       xong: ketQua.xong || !!(cu && cu.xong),
       cauDung: Math.max(ketQua.cauDung, cu ? cu.cauDung : 0),
     };
@@ -1448,6 +1452,10 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
        gán undefined vào — gán thì cả lệnh ghi hỏng, mất luôn cả số câu đúng. */
     const hangTot = bac(ketQua.hang) >= bac(cu?.hang) ? ketQua.hang : cu?.hang;
     if (hangTot) ghi.hang = hangTot;
+    /* Chỉ đổi mốc khi lần này CHƠI XONG. Bỏ dở giữa chừng mà cũng đổi mốc thì
+       em vào game rồi thoát ngay cũng mở được khoá. */
+    const luc = ketQua.xong ? Date.now() : cu?.luc;
+    if (luc) ghi.luc = luc;
     cuaTro[bai] = ghi;
     troChoi[tro] = cuaTro;
 

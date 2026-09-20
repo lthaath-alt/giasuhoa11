@@ -13,7 +13,7 @@
 import {
   chamCau, chamLuot, capNhatSauLuot, capLaiLuot, chonCauTuKho,
   khopTraLoiNgan, doiRaSo, trangThaiPhan, soLuotKhacNhau, moTaThieuCau,
-  baiDaXong, conKhoa, soLuotConLai,
+  baiDaXong, conKhoa, soLuotConLai, daChoiSauKhi,
 } from '../src/features/practice/logic';
 import {
   tienDoRong, TienDoPhan, SO_LUOT_MOI_CHU_KY, NGUONG_DAT, PHUT_KHOA,
@@ -342,6 +342,20 @@ console.log('\n== Xáo vị trí phương án ==');
 
   const tuLuan: Question = { ...web, type: 'Tự luận', options: [], correctAnswer: undefined };
   ok(xaoPhuongAnWeb(tuLuan) === tuLuan, 'câu tự luận trả về nguyên vẹn');
+}
+
+/* Mở khoá luyện tập bằng trò chơi (20/09/2026). Em bị khoá 15 phút vì trượt
+   hết lượt; chơi xong một màn của đúng bài đó thì được cấp lượt mới ngay. */
+console.log('\n== Mở khoá luyện tập bằng trò chơi ==');
+{
+  const td = (xong: boolean, luc?: number) =>
+    ({ troChoi: { 'ran-va-thang': { '3': { xong, cauDung: 6, ...(luc ? { luc } : {}) } } } }) as any;
+  ok(daChoiSauKhi(td(true, 1_000), 'ran-va-thang', 3, 500), 'chơi xong SAU khi bị khoá → được mở lại');
+  ok(!daChoiSauKhi(td(true, 1_000), 'ran-va-thang', 3, 2_000), 'màn chơi từ trước lúc khoá KHÔNG mở khoá được');
+  ok(!daChoiSauKhi(td(true, 1_000), 'ran-va-thang', 4, 500), 'chơi màn của bài khác thì không tính');
+  ok(!daChoiSauKhi(td(false, 9_000), 'ran-va-thang', 3, 500), 'bỏ dở giữa chừng thì không tính');
+  ok(!daChoiSauKhi(td(true), 'ran-va-thang', 3, 500), 'bản ghi cũ chưa có mốc thời gian thì không tính');
+  ok(!daChoiSauKhi(null, 'ran-va-thang', 3, 500), 'chưa có tiến độ nào thì không tính');
 }
 
 /* Bài đã nộp lên Firestore (18/09/2026). Trước đó bài chỉ nằm trong
