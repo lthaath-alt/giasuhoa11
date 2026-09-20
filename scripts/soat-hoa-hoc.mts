@@ -181,6 +181,9 @@ function viet(
   bac: Record<string, number>,
   soLuot: number,
   nguon: string,
+  /** Số lượt gọi HỎNG. Phải vào báo cáo: một lô chỉ chạy được 1/2 lượt thì
+   *  phần đó soát nông hơn phần khác, mà nhìn báo cáo không thể biết. */
+  soHong = 0,
 ): void {
   const theoId = new Map(ds.map(c => [c.id, c]));
   /* Xếp câu được NHIỀU lượt cùng nêu lên trước, rồi mới tới nhãn tin. */
@@ -193,6 +196,12 @@ function viet(
     `Soát ${ds.length} câu bằng ${nguon}, mỗi lô ${soLuot} lượt. `
     + `Nghi ngờ: **${nghiNgo.length}** câu.`,
     '',
+    ...(soHong > 0 ? [
+      `> **SOÁT CHƯA ĐỦ: ${soHong} lượt gọi bị hỏng.** Phần nằm trong các lô đó`,
+      '> chỉ được soi ít lượt hơn phần còn lại, nên "không thấy gì" ở đó yếu hơn',
+      '> hẳn. Chạy lại đúng phạm vi này khi có hạn mức.',
+      '',
+    ] : []),
     '> Đây là ý kiến của một mô hình, KHÔNG phải kết luận. Tự kiểm chứng từng chỗ',
     '> trước khi sửa ngân hàng. Và một lượt soát KHÔNG đủ để kết luận "sạch":',
     '> đo 20/09/2026, cùng 16 câu chạy ba lượt cho ra 3, 3, rồi 0 câu nghi ngờ.',
@@ -403,6 +412,8 @@ async function chay() {
      ở lượt thứ ba là lỗi THẬT — đã kiểm tay. Nên một lượt soát KHÔNG đủ để
      kết luận "bài này sạch", và số lượt cùng nêu chính là thước đo độ tin cậy
      đáng tin hơn cái nhãn `tin` do chính mô hình tự chấm. */
+  let soHong = 0;
+
   for (let i = 0; i < soLo; i++) {
     const lo = ds.slice(i * moiLo, (i + 1) * moiLo);
     const noiDung = JSON.stringify(lo.map(goiDi), null, 1);
@@ -449,7 +460,11 @@ async function chay() {
         console.log(`${mang.length} câu nghi ngờ`);
       } catch (loi) {
         /* Một lượt hỏng không được giết cả lượt chạy: các lượt trước đã tốn hạn
-           mức rồi, vứt đi là phí. Ghi lại rồi đi tiếp. */
+           mức rồi, vứt đi là phí. Ghi lại rồi đi tiếp — NHƯNG phải ĐẾM, và con
+           số đó phải vào báo cáo. Không đếm thì báo cáo ghi "mỗi lô 2 lượt"
+           trong khi có lô chỉ chạy được 1, và người đọc tưởng đã soát đủ. Đúng
+           loại sai im lặng mà dự án này chống. Đã suýt lọt ngày 20/09/2026. */
+        soHong++;
         console.log(`LỖI — ${String(loi).split('\n')[0].slice(0, 120)}`);
       }
       const conNua = !(i === soLo - 1 && l === soLan - 1);
@@ -457,7 +472,10 @@ async function chay() {
     }
   }
 
-  viet(ds, gom, bac, soLan, `${model} (${qua === 'cli' ? 'gemini CLI' : 'khoá API'})`);
+  if (soHong > 0) {
+    console.log(`\n  ${soHong} lượt gọi bị hỏng — phần trong các lô đó soát NÔNG hơn.`);
+  }
+  viet(ds, gom, bac, soLan, `${model} (${qua === 'cli' ? 'gemini CLI' : 'khoá API'})`, soHong);
 }
 
 chay();
