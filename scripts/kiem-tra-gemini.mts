@@ -184,4 +184,21 @@ if (!existsSync(mayChu)) {
 }
 
 console.log('\n' + (hong === 0 ? '>>> TẤT CẢ ĐẠT' : `>>> CÓ ${hong} MỤC KHÔNG ĐẠT`) + '\n');
-process.exit(hong === 0 ? 0 : 1);
+
+/* ĐẶT MÃ THOÁT, ĐỪNG GỌI `process.exit()` — bộ này có một lượt `fetch`.
+ *
+ * Đo ngày 21/09/2026 trên Windows, Node v24.18.0: gọi `process.exit()` ngay sau
+ * lượt hỏi danh sách model làm Node chết lúc dọn dẹp, in
+ * `Assertion failed: !(handle->flags & UV_HANDLE_CLOSING), file src\win\async.c`
+ * rồi thoát với mã 127. Bộ kiểm vẫn in "TẤT CẢ ĐẠT" trước khi chết, nên nhìn
+ * bảng kết quả thì tưởng đạt — mà mã 127 làm chuỗi `npm run kiem-tra` DỪNG
+ * ngay đó, `kiem-tra:luat` không bao giờ chạy tới.
+ *
+ * Nguyên nhân: `fetch` (undici) còn giữ một socket keep-alive đang đóng dở;
+ * `process.exit()` giật nền ra khỏi nó giữa chừng. Lặp lại 3/3 lần với đúng
+ * lượt fetch này, và biến mất khi cắt lượt fetch đi.
+ *
+ * Đặt `process.exitCode` thì Node tự đóng nốt rồi thoát — đo lại: sạch, hết
+ * 2,6 giây. Các bộ kiểm khác gọi `process.exit()` vẫn không sao vì chúng không
+ * gọi mạng; nhưng bộ nào thêm `fetch` thì phải theo lối này. */
+process.exitCode = hong === 0 ? 0 : 1;
