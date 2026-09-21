@@ -11,6 +11,7 @@ import {
   BookOpen, CheckCircle, Clock, Key,
 } from 'lucide-react';
 import { useApp } from '../core/hooks/useApp';
+import { hocSinhCuaLop } from '../features/auth/thanhVienLop';
 import { CreateStudentData } from '../core/contexts/AppContext';
 import { TeacherClassManager } from '../features/teacher/components/TeacherClassManager';
 import { TheoDoiHocSinh } from '../features/teacher/components/TheoDoiHocSinh';
@@ -259,15 +260,12 @@ export const TeacherPage: React.FC = () => {
   const [codeCopied, setCodeCopied] = useState(false);
 
   const myClass = getMyClass();
-  const studentIdentifiers = myClass?.studentIdentifiers || [];
 
-  // Lấy danh sách User object của học sinh trong lớp
-  const myStudents = users.filter(u =>
-    studentIdentifiers.some(id =>
-      id.toLowerCase() === u.email.toLowerCase() ||
-      (u.username && id.toLowerCase() === u.username.toLowerCase())
-    )
-  );
+  /* Danh sách học sinh của lớp — hỏi `hocSinhCuaLop`, đừng tự lọc.
+     Bản cũ chỉ soi `studentIdentifiers`, nên em nào được xếp lớp bằng cách
+     sửa hồ sơ (màn Quản lý tài khoản chỉ ghi `classId`) thì vào lớp rồi mà
+     danh sách vẫn trống chỗ của em. Xem `thanhVienLop.ts`. */
+  const myStudents = myClass ? hocSinhCuaLop(users, myClass) : [];
 
   const copyInviteCode = () => {
     if (!myClass?.inviteCode) return;

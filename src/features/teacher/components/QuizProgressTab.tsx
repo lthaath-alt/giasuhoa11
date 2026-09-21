@@ -15,6 +15,7 @@ import { useApp } from '../../../core/hooks/useApp';
 import { docBaiNopCuaCacEm } from '../../quiz/baiNopService';
 import { CHEMISTRY_11_CURRICULUM } from '../../lessons/constants';
 import type { User } from '../../auth/types';
+import { laThanhVienLop } from '../../auth/thanhVienLop';
 import type { Quiz, QuizQuestionResult } from '../../quiz/types';
 
 // Helper render Hóa học (giữ sub/sup)
@@ -62,10 +63,12 @@ export const QuizProgressTab: React.FC<QuizProgressTabProps> = ({ students, isAd
   const baiCua = (email: string) =>
     baiNop.filter(q => q.userEmail === email.toLowerCase() && q.status === 'submitted');
 
-  // 1. Lọc lớp học đối với Admin
+  /* 1. Lọc lớp học đối với Admin — dùng chung luật thành viên lớp với danh
+     sách lớp của giáo viên, để hai màn không đếm ra hai sĩ số khác nhau. */
   const filteredStudentsByClass = students.filter(s => {
     if (isAdmin && selectedClassId !== 'all') {
-      return s.classId === selectedClassId || s.joinedClassId === selectedClassId;
+      const cls = classes.find(c => c.id === selectedClassId);
+      return cls ? laThanhVienLop(s, cls) : false;
     }
     return true;
   });

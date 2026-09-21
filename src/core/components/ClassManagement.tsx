@@ -7,6 +7,7 @@ import {
 } from '@mui/material';
 import { GraduationCap, Copy, Edit, Trash2, Plus, Download } from 'lucide-react';
 import { SchoolClass, User } from '../../features/auth/types';
+import { hocSinhCuaLop, siSoLop } from '../../features/auth/thanhVienLop';
 import { useApp } from '../../core/hooks/useApp';
 import { generateClassPassword } from '../../core/services/storage';
 import { FirestoreService } from '../../core/services/firestoreService';
@@ -83,12 +84,7 @@ export const ClassManagement: React.FC<ClassManagementProps> = ({
 
   const handleExportCSV = async (cls: SchoolClass) => {
     setExporting(true);
-    const classStudents = users
-      .filter(u => cls.studentIdentifiers.some(id =>
-        id.toLowerCase() === u.email.toLowerCase() ||
-        (u.username && id.toLowerCase() === u.username.toLowerCase())
-      ))
-      .sort((a, b) => (a.studentNumber ?? 999) - (b.studentNumber ?? 999));
+    const classStudents = hocSinhCuaLop(users, cls);
 
     /* KHÔNG còn cột mật khẩu, và không còn đặt lại mật khẩu.
      *
@@ -198,7 +194,7 @@ export const ClassManagement: React.FC<ClassManagementProps> = ({
                   <TableCell>
                     <Chip
                       size="small"
-                      label={`${cls.studentIdentifiers.length} học sinh`}
+                      label={`${siSoLop(users, cls)} học sinh`}
                       sx={{
                         fontWeight: 'bold',
                         bgcolor: 'var(--nen-xanh-nhat2)',
@@ -260,7 +256,7 @@ export const ClassManagement: React.FC<ClassManagementProps> = ({
               return (
                 <>
                   Bạn có chắc chắn muốn xóa lớp <strong>{cls.name}</strong> không?<br /><br />
-                  <span style={{ color: 'var(--do)', fontWeight: 'bold' }}>Cảnh báo:</span> Lớp này hiện có <strong>{cls.studentIdentifiers.length} học sinh</strong>. 
+                  <span style={{ color: 'var(--do)', fontWeight: 'bold' }}>Cảnh báo:</span> Lớp này hiện có <strong>{siSoLop(users, cls)} học sinh</strong>.
                   Nếu xóa, tất cả học sinh này sẽ bị gỡ khỏi lớp và trở thành học sinh tự do.
                   Hành động này không thể hoàn tác.
                 </>
@@ -340,10 +336,7 @@ export const ClassManagement: React.FC<ClassManagementProps> = ({
             {(() => {
               const cls = classes.find(c => c.id === exportClassId);
               if (!cls) return '';
-              const count = users.filter(u => cls.studentIdentifiers.some(id =>
-                id.toLowerCase() === u.email.toLowerCase() ||
-                (u.username && id.toLowerCase() === u.username.toLowerCase())
-              )).length;
+              const count = siSoLop(users, cls);
               return (
                 <>
                   Tải về tệp CSV gồm số báo danh, họ tên và <strong>tên đăng nhập</strong> của{' '}

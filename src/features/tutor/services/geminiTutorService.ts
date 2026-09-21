@@ -188,6 +188,29 @@ export const generateAIResponseChiTiet = async (
     /* Lỗi ở đường Firebase (App Check từ chối, AI Logic chưa bật, máy chủ lỗi)
        thì BÁO THẬT, không rơi sang kịch bản mẫu: kịch bản mẫu trông như AI trả
        lời, học sinh không biết là hỏng, và chủ dự án cũng không biết mà sửa. */
+    /* Chờ quá hạn (45 giây, xem `HAN_CHO_MS`) hoặc rớt mạng giữa chừng. Nói
+       thật là lượt này không tới nơi, và bảo em gửi lại — im lặng rồi rơi
+       sang kịch bản mẫu là tệ nhất: em tưởng đó là câu trả lời của thầy. */
+    if (msg.includes('abort') || msg.includes('timeout') || msg.includes('network')
+        || msg.includes('failed to fetch')) {
+      return {
+        ...coBan,
+        text: 'Lượt hỏi này chờ máy chủ lâu quá nên thầy đành dừng lại. Em bấm gửi lại câu hỏi '
+          + 'giúp thầy nhé — nếu vẫn không được thì mạng đang chập chờn, em thử lại sau vài phút.',
+      };
+    }
+
+    /* Máy chủ Firebase AI Logic trả 5xx: lỗi bên Google, không phải lỗi của em
+       và cũng không phải hết lượt. Đo ngày 21/09/2026 trên bản đang chạy. */
+    if (/\[5\d\d\s/.test(chuoiLoi) || /"?status"?:\s*5\d\d/.test(chuoiLoi)
+        || msg.includes('internal server error') || msg.includes('service unavailable')) {
+      return {
+        ...coBan,
+        text: 'Máy chủ của gia sư AI đang trục trặc (lỗi phía máy chủ, không phải do em). '
+          + 'Em thử gửi lại sau một phút nhé; trong lúc chờ, em xem lại bài giảng hoặc làm phần luyện tập.',
+      };
+    }
+
     if (msg.includes('firebasevertexai') || msg.includes('app check') || msg.includes('appcheck')) {
       return { ...coBan, text: 'Gia sư AI đang tạm mất kết nối với máy chủ. Em thử lại sau ít phút nhé!' };
     }

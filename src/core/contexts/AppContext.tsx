@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
 import { User, ChatMessage, LearningProgress, School, SchoolClass } from '../../features/auth/types';
+import { dinhDanhHocSinh, laThanhVienLop } from '../../features/auth/thanhVienLop';
 import { Chapter, Lesson } from '../../features/lessons/types';
 import { generateRandomPassword, generateInviteCode, generateClassPassword, mergeCurriculumWithConstants, donDepLuuTruCu } from '../services/storage';
 import { generateAIResponseChiTiet } from '../../features/tutor/services/geminiTutorService';
@@ -776,8 +777,41 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   };
 
   const updateUserInfo = (id: string, updates: Partial<User>) => {
+    const truoc = users.find(u => u.id === id);
     setUsers(prev => prev.map(u => u.id === id ? { ...u, ...updates } : u));
     FirestoreService.updateUserById(id, updates);
+
+    /* Đổi lớp thì phải ghi CẢ HAI phía (21/09/2026).
+       Trước đợt này, màn "Quản lý tài khoản" chỉ ghi `classId` lên hồ sơ em,
+       còn `classes.studentIdentifiers` giữ nguyên — nên em đã vào lớp mà danh
+       sách lớp vẫn không có tên em, và sĩ số đếm thiếu. Chỗ đọc nay đã nhận em
+       qua cả hai đường (`thanhVienLop.ts`), nhưng dữ liệu vẫn phải khớp: báo
+       cáo, xuất CSV và cả việc xoá lớp đều đi qua danh sách phía lớp. */
+    if (!truoc || !('classId' in updates)) return;
+    const lopCu = truoc.classId;
+    const lopMoi = updates.classId || undefined;
+    if (lopCu === lopMoi) return;
+
+    const dinhDanh = dinhDanhHocSinh({ ...truoc, ...updates } as User);
+    void (async () => {
+      try {
+        if (lopCu) await FirestoreService.removeStudentFromClass(lopCu, dinhDanh);
+        if (lopMoi) await FirestoreService.addStudentToClass(lopMoi, dinhDanh);
+      } catch (err) {
+        console.warn('[updateUserInfo] Không đồng bộ được danh sách lớp', err);
+      }
+    })();
+
+    const trungDinhDanh = (s: string) => s.trim().toLowerCase() === dinhDanh.trim().toLowerCase();
+    setClasses(prev => prev.map(c => {
+      if (lopCu && c.id === lopCu) {
+        return { ...c, studentIdentifiers: (c.studentIdentifiers || []).filter(s => !trungDinhDanh(s)) };
+      }
+      if (lopMoi && c.id === lopMoi && !(c.studentIdentifiers || []).some(trungDinhDanh)) {
+        return { ...c, studentIdentifiers: [...(c.studentIdentifiers || []), dinhDanh] };
+      }
+      return c;
+    }));
   };
 
   // ── Quản lý Trường học ────────────────────────────────────────────────────
@@ -995,7 +1029,10 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
     // Gỡ học sinh khỏi lớp (chuyển về học sinh tự do hoặc xoá classId)
     // Để an toàn, cập nhật tất cả học sinh trong lớp thành học sinh chưa có lớp: classId = null
-    const studentUsers = users.filter(u => targetClass.studentIdentifiers.includes(u.email) || targetClass.studentIdentifiers.includes(u.username!));
+    /* Gỡ đúng những em mà mọi màn hình coi là thành viên lớp — kể cả em chỉ
+       có `classId` mà chưa có tên trong `studentIdentifiers`. Bản cũ so khớp
+       nguyên văn nên bỏ sót em viết hoa khác và em xếp lớp qua hồ sơ. */
+    const studentUsers = users.filter(u => laThanhVienLop(u, targetClass));
     for (const student of studentUsers) {
       await FirestoreService.updateUserById(student.id, { classId: null, role: 'student' });
     }
@@ -1795,7 +1832,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     const student = users.find(u => u.id === studentId);
     if (!student) return { success: false, message: 'Không tìm thấy học sinh.' };
 
-    const identifier = student.username || student.email;
+    const identifier = dinhDanhHocSinh(student);
 
     const okHoSo = await FirestoreService.updateUserById(studentId, {
       classId: cls.id,
@@ -1804,16 +1841,31 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     });
     if (!okHoSo) return { success: false, message: 'Không cập nhật được hồ sơ học sinh.' };
 
-    await FirestoreService.addStudentToClass(cls.id, identifier);
+    /* Lượt ghi thứ hai từng bị bỏ qua lặng lẽ: hồ sơ em đã có `classId` mà
+       danh sách lớp thì không, nên em vào lớp rồi mà thầy cô không thấy tên.
+       Nay hỏng thì nói ra, vì hai phía lệch nhau là lỗi phải sửa ngay. */
+    const okDanhSach = await FirestoreService.addStudentToClass(cls.id, identifier);
     await FirestoreService.clearPendingClassCode(studentId);
 
     setUsers(prev => prev.map(u => u.id === studentId
       ? { ...u, classId: cls.id, joinedClassId: cls.id, schoolId: cls.schoolId, pendingClassCode: undefined }
       : u));
     setClasses(prev => prev.map(c => c.id === cls.id
-      ? { ...c, studentIdentifiers: [...c.studentIdentifiers, identifier] }
+      ? {
+          ...c,
+          studentIdentifiers: c.studentIdentifiers.some(
+            s => s.trim().toLowerCase() === identifier.trim().toLowerCase(),
+          ) ? c.studentIdentifiers : [...c.studentIdentifiers, identifier],
+        }
       : c));
 
+    if (!okDanhSach) {
+      return {
+        success: true,
+        message: `Đã xếp ${student.name} vào lớp "${cls.name}", nhưng chưa ghi được vào danh sách lớp trên máy chủ.`
+          + ' Thầy/cô tải lại trang để kiểm tra; nếu vẫn thiếu tên em thì báo chủ dự án.',
+      };
+    }
     return { success: true, message: `Đã thêm ${student.name} vào lớp "${cls.name}".` };
   };
 
