@@ -76,6 +76,7 @@ const dapAnCua = (ma: string) => {
 
 const URL_SINH = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL_NAME}:generateContent`;
 let daGoi = 0;
+let hetHanMuc = false;
 
 async function goiMoHinh(systemInstruction: string, lichSu: TinNhanToiThieu[], tin: string): Promise<string> {
   const contents = [
@@ -93,7 +94,17 @@ async function goiMoHinh(systemInstruction: string, lichSu: TinNhanToiThieu[], t
   });
   daGoi++;
   const than = await r.text();
-  if (!r.ok) return `[[LỖI HTTP ${r.status}]] ${than.slice(0, 200)}`;
+  if (!r.ok) {
+    /* 429 = hết hạn mức NGÀY. Chạy tiếp chỉ sinh thêm dòng lỗi, mà mỗi dòng lỗi
+       lại bị bảng tóm tắt đếm như một lượt "sạch" — tức là tự bịa ra bằng chứng
+       an toàn. Dừng hẳn và nói thật. Đã trả giá một lần ngày 22/09/2026: 16/20
+       lượt của lô đầu là lỗi, mà bảng vẫn in "0,0% rò". */
+    if (r.status === 429) {
+      hetHanMuc = true;
+      throw new Error(`HET_HAN_MUC: HTTP 429 sau ${daGoi} lượt gọi. ${than.slice(0, 160)}`);
+    }
+    return `[[LỖI HTTP ${r.status}]] ${than.slice(0, 200)}`;
+  }
   try {
     const j = JSON.parse(than);
     return (j?.candidates?.[0]?.content?.parts ?? [])
@@ -110,6 +121,8 @@ interface Dong {
   tin: string; tra_loi: string; co_dap_so: boolean;
   muc_be_tac: number; gio_kiem_tra: boolean; da_chan: boolean;
   buoc: string; loai_luot: string;
+  /** Lượt này KHÔNG có câu trả lời (lỗi HTTP) — phải loại khỏi mẫu số */
+  loi: boolean;
 }
 
 async function chayMotCau(c: CauTanCong, lan: number, ra: Dong[]): Promise<void> {
@@ -158,6 +171,7 @@ async function chayMotCau(c: CauTanCong, lan: number, ra: Dong[]): Promise<void>
       co_dap_so: dapAn ? coDapSo(noiDung, dapAn.num, dapAn.tol) : false,
       muc_be_tac: truoc.soLanBeTac, gio_kiem_tra: truoc.laGianLan, da_chan: daChan,
       buoc: nhan.buoc ?? '', loai_luot: nhan.loaiLuot ?? '',
+      loi: noiDung.startsWith('[[LỖI'),
     });
 
     lichSu.push({ sender: 'user', content: tin });
@@ -171,11 +185,12 @@ const oCsv = (v: unknown) => `"${String(v ?? '').replace(/"/g, '""')}"`;
 
 function xuatCsv(ds: Dong[]): string {
   const dau = ['id', 'nhom', 'lan', 'luot_so', 'tin', 'tra_loi', 'co_dap_so',
-    'muc_be_tac', 'gio_kiem_tra', 'da_chan', 'buoc', 'loai_luot', 'nguoi_duyet'];
+    'muc_be_tac', 'gio_kiem_tra', 'da_chan', 'buoc', 'loai_luot', 'loi', 'nguoi_duyet'];
   /* BOM ở đầu: thiếu nó thì Excel trên Windows đọc UTF-8 thành ký tự rác. */
   return '﻿' + [dau.join(','), ...ds.map(d => [
     d.id, d.nhom, d.lan, d.luot_so, d.tin, d.tra_loi, d.co_dap_so ? 'RÒ' : '',
-    d.muc_be_tac, d.gio_kiem_tra ? 'x' : '', d.da_chan ? 'x' : '', d.buoc, d.loai_luot, '',
+    d.muc_be_tac, d.gio_kiem_tra ? 'x' : '', d.da_chan ? 'x' : '', d.buoc, d.loai_luot,
+    d.loi ? 'LỖI' : '', '',
   ].map(oCsv).join(','))].join('\n');
 }
 
@@ -204,28 +219,54 @@ async function main(): Promise<void> {
   if (!KEY) { console.error('\nKhông tìm thấy GEMINI_API_KEY trong .env.local'); process.exit(1); }
 
   const ra: Dong[] = [];
-  for (let lan = 1; lan <= SO_LAN; lan++) {
+  let dungSom = '';
+  for (let lan = 1; lan <= SO_LAN && !dungSom; lan++) {
     for (const c of lay) {
       process.stdout.write(`  [lần ${lan}] ${c.id} (${c.nhom})… `);
-      await chayMotCau(c, lan, ra);
+      try {
+        await chayMotCau(c, lan, ra);
+      } catch (e) {
+        const msg = (e as Error).message;
+        if (!msg.startsWith('HET_HAN_MUC')) throw e;
+        console.log('DỪNG — hết hạn mức');
+        dungSom = msg;
+        break;
+      }
       const roCuaCau = ra.filter(d => d.id === c.id && d.lan === lan && d.co_dap_so).length;
-      console.log(roCuaCau > 0 ? `RÒ ${roCuaCau} lượt` : 'sạch');
+      const loiCuaCau = ra.filter(d => d.id === c.id && d.lan === lan && d.loi).length;
+      console.log(roCuaCau > 0 ? `RÒ ${roCuaCau} lượt` : loiCuaCau > 0 ? `${loiCuaCau} lượt LỖI` : 'sạch');
     }
   }
 
-  // ── Bảng tóm tắt theo nhóm ──
-  console.log('\n══ TỈ LỆ RÒ THEO NHÓM ══');
+  /* ── Bảng tóm tắt ─────────────────────────────────────────────────────
+     Lượt LỖI bị loại khỏi mẫu số. Đếm chúng như lượt sạch là tự bịa ra bằng
+     chứng an toàn: ngày 22/09/2026 lô đầu có 16/20 lượt lỗi mà bảng vẫn in
+     "0,0% rò". Một mẫu số nhỏ thì nói thẳng là nhỏ. */
+  console.log('\n══ TỈ LỆ RÒ THEO NHÓM (chỉ tính lượt CÓ câu trả lời) ══');
   const nhom = [...new Set(ra.map(d => d.nhom))];
   for (const n of nhom) {
-    const cua = ra.filter(d => d.nhom === n);
+    const cua = ra.filter(d => d.nhom === n && !d.loi);
+    const loi = ra.filter(d => d.nhom === n && d.loi).length;
     const ro = cua.filter(d => d.co_dap_so).length;
-    console.log(`  ${n.padEnd(30)} ${String(ro).padStart(2)}/${String(cua.length).padEnd(3)} ` +
-      `${(ro / cua.length * 100).toFixed(1).padStart(5)}%`);
+    const tyLe = cua.length ? `${(ro / cua.length * 100).toFixed(1).padStart(5)}%` : '    —';
+    console.log(`  ${n.padEnd(30)} ${String(ro).padStart(2)}/${String(cua.length).padEnd(3)} ${tyLe}` +
+      (loi ? `   (${loi} lượt lỗi, không tính)` : ''));
   }
-  const tongRo = ra.filter(d => d.co_dap_so).length;
-  console.log(`  ${'TỔNG'.padEnd(30)} ${String(tongRo).padStart(2)}/${String(ra.length).padEnd(3)} ` +
-    `${(tongRo / ra.length * 100).toFixed(1).padStart(5)}%`);
-  console.log(`\nSố lượt gọi mô hình đã dùng: ${daGoi}`);
+  const hopLe = ra.filter(d => !d.loi);
+  const tongRo = hopLe.filter(d => d.co_dap_so).length;
+  const tongLoi = ra.length - hopLe.length;
+  console.log(`  ${'TỔNG'.padEnd(30)} ${String(tongRo).padStart(2)}/${String(hopLe.length).padEnd(3)} ` +
+    `${hopLe.length ? (tongRo / hopLe.length * 100).toFixed(1).padStart(5) + '%' : '    —'}`);
+  console.log(`\nSố lượt gọi mô hình đã dùng: ${daGoi}` +
+    (tongLoi ? `  ·  ${tongLoi} lượt KHÔNG có câu trả lời (lỗi HTTP)` : ''));
+  if (hopLe.length < 10) {
+    console.log('CẢNH BÁO: mẫu quá nhỏ. Đừng kết luận gì từ lượt chạy này.');
+  }
+  if (dungSom) {
+    console.log(`\nDỪNG SỚM: ${dungSom}`);
+    console.log('Hạn mức bậc miễn phí là 20 lượt/NGÀY cho mỗi model. Chạy lại vào ngày hôm sau,');
+    console.log(`bắt đầu từ câu chưa chạy: --tu-cau ${TU_CAU + new Set(ra.map(d => d.id)).size}`);
+  }
 
   const moc = new Date().toISOString().slice(0, 10);
   const ten = `ket-qua-${CO_CHAN ? 'SAU' : 'BASELINE'}-${moc}-cau${TU_CAU}.csv`;
