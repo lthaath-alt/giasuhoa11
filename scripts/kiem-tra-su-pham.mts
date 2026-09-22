@@ -267,6 +267,59 @@ console.log('\n== Telemetry và chỉ số Socratic ==');
     'CSV không có email, không có nội dung tin nhắn');
 }
 
+console.log('\n== Gỡ nhãn ẩn an toàn (P0-6) ==');
+{
+  /* Học sinh KHÔNG BAO GIỜ được thấy thẻ thô, kể cả khi mô hình viết sai định
+     dạng. Ba ca dưới đều là nhãn hỏng mà bốn regex cũ không khớp. */
+  const hong = [
+    'Em thử lại nhé. [BUOC: b3 ] [LUOT:goi_mo',      // thiếu ngoặc đóng
+    'Em thử lại nhé. [BUOC:Z9] [LUOT:khong_co_loai]', // nhãn bịa
+    'Em thử lại nhé. [ NGO_NHAN : xuc-tac-chuyen-dich ]',
+    'Em thử lại nhé. [LUOT]',                          // nhãn rỗng
+  ];
+  for (const t of hong) {
+    const r = tachNhanAn(t);
+    ok(!/\[\s*(BUOC|LUOT|NGO_NHAN)/i.test(r.noiDung),
+      `không còn thẻ thô: "${t.slice(-26)}"`, r.noiDung);
+  }
+  ok(tachNhanAn('Em thử lại nhé. [BUOC:Z9] [LUOT:goi_mo]').buoc === undefined,
+    'nhãn bịa vẫn không được ghi nhận');
+  ok(tachNhanAn('Không có nhãn gì cả.').thieuNhan === true,
+    'lượt thiếu nhãn bị đánh dấu để ghi log');
+  ok(tachNhanAn('Xong rồi em. [BUOC:A6] [LUOT:goi_mo]').thieuNhan === false,
+    'lượt đủ hai nhãn thì không bị đánh dấu thiếu');
+  ok(tachNhanAn('Em thử lại nhé. [BUOC: b3 ] [LUOT:goi_mo').nhanHong === true,
+    'nhãn sai định dạng bị đánh dấu để ghi log');
+
+  /* Nhãn RA ĐỀ phải còn nguyên — AppContext xử lý chúng sau tachNhanAn. */
+  const raDe = tachNhanAn('Giỏi lắm em. [SIGNAL:XONG_BAI:bai-3] [BUOC:A6] [LUOT:goi_mo]');
+  ok(raDe.noiDung.includes('[SIGNAL:XONG_BAI:bai-3]'), 'nhãn ra đề KHÔNG bị gỡ nhầm');
+}
+
+console.log('\n== Trần cho nấc câu hỏi có/không (P0-3) ==');
+{
+  const n4 = chiDanGianGiao(4), n5 = chiDanGianGiao(5), n6 = chiDanGianGiao(6);
+  const n7 = chiDanGianGiao(7), n9 = chiDanGianGiao(9);
+
+  ok([n4, n5, n6].every(s => /có\/không|một trong hai/i.test(s)),
+    'bế tắc lần 4–6 vẫn được hỏi câu có/không');
+  /* Nấc dừng VẪN nhắc chữ "có/không" — nó phải nói rõ là dừng loại câu hỏi đó.
+     Nên đừng kiểm bằng "không chứa chữ có/không" (phép kiểm đầu tiên viết vậy và
+     bắt nhầm chính câu đúng); kiểm bằng hai mệnh lệnh phải có. */
+  ok(/DỪNG chuỗi câu hỏi có\/không/i.test(n7) && /KHÔNG hỏi thêm câu có\/không/i.test(n7)
+    && /quay lại một câu hỏi mở|hỏi trực tiếp thầy|bài giảng cần đọc lại/i.test(n7),
+    'bế tắc lần 7 (lượt thứ 4 ở nấc có/không) thì DỪNG chuỗi có/không');
+  ok(/quay lại|câu hỏi mở|hỏi trực tiếp thầy|bài giảng/i.test(n9),
+    'bế tắc lần 9 vẫn ở trạng thái dừng, không quay lại hỏi có/không');
+  ok([n4, n5, n6, n7, n9].every(s => /đáp số có phải|kết quả có lớn hơn|có phải khoảng/i.test(s) === false
+      || /cấm mọi câu dạng/i.test(s)),
+    'không nấc nào cho phép hỏi dò giá trị đáp số');
+  ok([n4, n5, n6].every(s => /cấm mọi câu dạng "đáp số có phải/i.test(s)),
+    'nấc có/không nói rõ cấm hỏi dò giá trị đáp số');
+  ok([n4, n5, n6, n7, n9].every(s => /KHÔNG đưa đáp án/i.test(s)),
+    'mọi nấc vẫn cấm đưa đáp án');
+}
+
 console.log('\n== Bộ dò đáp số trong câu trả lời (P0-2, P0-4) ==');
 {
   /* Mỗi ca là một lối viết số mà học sinh hoặc mô hình thật sự dùng. Ba lối
