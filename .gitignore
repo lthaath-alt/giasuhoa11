@@ -69,3 +69,9 @@ tests/.auth/
 # bộ hội thoại của học sinh với gia sư — nặng hơn mọi thứ khác trong danh sách
 # này về mặt riêng tư. `kiem-tra:an-ninh` canh cho dòng này không biến mất.
 sao-luu/
+
+# Bản xuất dữ liệu nghiên cứu do `npm run xuat:nghien-cuu` sinh ra. Bảng theo
+# học sinh chỉ mang mã băm, nhưng tệp mẫu chấm CHỨA NGUYÊN VĂN hội thoại. Và
+# cho tới khi làm xong P1-7 (xin đồng ý tham gia nghiên cứu), bản xuất còn gồm
+# cả tài khoản chưa đồng ý.
+xuat-nghien-cuu/

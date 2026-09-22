@@ -31,7 +31,7 @@ import { dungPrompt, THAM_SO_SINH } from '../src/features/tutor/services/promptS
 import { buildProgramContext } from '../src/features/tutor/services/lessonContext';
 import { chuanHoaCongThuc } from '../src/core/components/chuanHoaCongThuc';
 import { LUOC_DO_LOC, TUY_CHON_KATEX, taoTheLink } from '../src/core/components/markdownCauHinh';
-import { tinhChiSo, xuatCsv } from '../src/features/tutor/services/telemetryService';
+import { tinhChiSo, xuatCsv, gopTheoHocSinh, csvHocSinh } from '../src/features/tutor/services/telemetryService';
 import { coDapSo, timDapAnChoTin } from '../src/features/tutor/services/chanRoDapSo';
 import type { ChatMessage } from '../src/features/auth/types';
 
@@ -265,6 +265,68 @@ console.log('\n== Telemetry và chỉ số Socratic ==');
   const csv = xuatCsv(mau);
   ok(!csv.includes('@') && !csv.includes('nội dung bí mật') && csv.split('\n')[0].startsWith('user_hash,'),
     'CSV không có email, không có nội dung tin nhắn');
+}
+
+console.log('\n== Gộp chỉ số theo từng học sinh (P0-5) ==');
+{
+  const t = (p: Partial<ChatMessage>): ChatMessage => ({
+    id: Math.random().toString(36), userEmail: 'hs01@truong.edu.vn', lessonId: 'bai-1',
+    sender: 'ai', content: 'nội dung bí mật', timestamp: '2026-09-20T08:00:00.000Z',
+    session_id: 's1', user_hash: 'h1', nhanh: 'socratic', ...p,
+  });
+  /* Mẫu dựng theo đúng những trường mã THẬT SỰ đang ghi xuống `chats` (xem
+     khối `aiMsg` trong AppContext): `chan_ro`, `nhan_hong`, `muc_goi_y`,
+     `be_tac`, `ngoai_mon`. Kế hoạch P0-5 còn nhắc `nghi_sao_chep` và
+     `gio_kiem_tra` — hai trường đó chưa có chỗ nào ghi, nên cố tình KHÔNG đo:
+     một cột luôn rỗng trong bản xuất nghiên cứu tệ hơn là không có cột. */
+  const mau = [
+    t({ sender: 'user', be_tac: true }),
+    t({ loai_luot: 'goi_mo', muc_goi_y: 1 }),
+    t({ sender: 'user', be_tac: true }),
+    t({ loai_luot: 'goi_mo', muc_goi_y: 3, chan_ro: true,
+        timestamp: '2026-09-20T08:10:00.000Z' }),
+    t({ sender: 'user', user_hash: 'h2', session_id: 's2' }),
+    t({ loai_luot: 'giai_thich', user_hash: 'h2', session_id: 's2',
+        nhan_hong: true, ngoai_mon: 'GIAN_LAN' }),
+    t({ user_hash: 'h2', session_id: 's2' }),   // lượt gia sư KHÔNG có nhãn loai_luot
+  ];
+
+  const dong = gopTheoHocSinh(mau);
+  ok(dong.length === 2, 'tách đúng hai học sinh', String(dong.length));
+
+  const h1 = dong.find(d => d.user_hash === 'h1')!;
+  ok(h1.soLuot === 4 && h1.soLuotHocSinh === 2 && h1.soPhien === 1,
+    'đếm đúng số lượt, số lượt của em, số phiên của h1');
+  ok(h1.mucCaoNhat === 3, 'nấc giàn giáo cao nhất của h1 = 3', String(h1.mucCaoNhat));
+  ok(h1.soPhienMuc3 === 1, 'đếm đúng số phiên chạm nấc trần', String(h1.soPhienMuc3));
+  ok(h1.tyLeGoiMo !== null && Math.abs(h1.tyLeGoiMo - 1) < 1e-9,
+    'tỉ lệ gợi mở của h1 = 1', String(h1.tyLeGoiMo));
+  ok(h1.tyLeBeTac !== null && Math.abs(h1.tyLeBeTac - 1) < 1e-9,
+    'tỉ lệ bế tắc của h1 = 1', String(h1.tyLeBeTac));
+  ok(h1.soLanChanRo === 1, 'đếm đúng số lượt bị bộ chặn rò can thiệp', String(h1.soLanChanRo));
+  ok(h1.tongThoiGianMs === 10 * 60 * 1000,
+    'thời gian cộng TRONG từng phiên, không lấy mốc đầu trừ mốc cuối', String(h1.tongThoiGianMs));
+
+  const h2 = dong.find(d => d.user_hash === 'h2')!;
+  ok(h2.soNhanThieu === 1, 'đếm đúng lượt gia sư thiếu nhãn loai_luot', String(h2.soNhanThieu));
+  ok(h2.soLanNhanHong === 1, 'đếm đúng lượt nhãn hỏng', String(h2.soLanNhanHong));
+  ok(h2.soLanGianLan === 1, 'đếm đúng lượt bị chặn vì gian lận phòng thi', String(h2.soLanGianLan));
+
+  ok(gopTheoHocSinh(mau, '2026-09-21', '2026-09-22').length === 0,
+    'lọc theo khoảng ngày loại hết tin ngoài khoảng');
+  ok(gopTheoHocSinh(mau, '2026-09-20', '2026-09-20').length === 2,
+    '`denNgay` tính TRỌN ngày đó, không cắt lúc 00:00');
+
+  /* Tệp CSV này mở bằng Excel trên Windows. Thiếu BOM là tiếng Việt ra ký tự
+     rác — đã ghi trong CLAUDE.md, và `liet-ke:tai-khoan` từng vấp đúng chỗ đó. */
+  const csv = csvHocSinh(dong, 'CHUA_LOC_DONG_Y');
+  ok(csv.startsWith('﻿'), 'CSV theo học sinh có BOM ở đầu');
+  ok(csv.slice(1).split('\n')[0].startsWith('canh_bao,user_hash,'),
+    'cột cảnh báo đứng ĐẦU, không nấp ở cuối bảng', csv.slice(1).split('\n')[0]);
+  ok(csv.split('\n').slice(1).every(d => !d || d.startsWith('CHUA_LOC_DONG_Y,')),
+    'MỌI dòng đều mang cảnh báo chưa lọc đồng ý tham gia nghiên cứu');
+  ok(!csv.includes('@') && !csv.includes('nội dung bí mật'),
+    'bảng theo học sinh không mang email và không mang nội dung hội thoại');
 }
 
 console.log('\n== Gỡ nhãn ẩn an toàn (P0-6) ==');
