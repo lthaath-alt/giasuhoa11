@@ -236,8 +236,19 @@ export const SYSTEM_PROMPT = dungPrompt('socratic');
 
 /**
  * Tham số sinh văn bản, dùng CHUNG cho web và bộ thử `thu-gia-su-ai.mts`.
- * Hạ từ 0,7 / 0,9 xuống 0,3 / 0,85 (14/09/2026) để câu trả lời ổn định và tái
- * lập được hơn khi đo cho đề tài. Đặt ở đây vì tệp này không import gì, script
- * Node nạp được mà không kéo theo Firebase.
+ * Hạ từ 0,7 / 0,9 xuống 0,3 / 0,85 (14/09/2026) để giảm độ tản mạn của câu trả
+ * lời. Đặt ở đây vì tệp này không import gì, script Node nạp được mà không kéo
+ * theo Firebase.
+ *
+ * ĐỪNG nói hai tham số này làm kết quả "tái lập được" — đã đo và SAI
+ * (22/09/2026, `docs/P0-1-tham-so-sinh.md`): ba lượt cùng một câu hỏi ở
+ * `temperature = 0` cho ba câu trả lời khác nhau, dài 254 / 394 / 359 ký tự.
+ * Model bật "thinking" nên không tất định kể cả ở nhiệt độ 0. Muốn số liệu
+ * chắc thì chạy lại nhiều lượt rồi lấy hợp, đừng tin một lượt.
+ *
+ * Nhưng tham số KHÔNG bị bỏ qua: gửi `temperature: 99` thì API trả 400
+ * "temperature must be in the range [0.0, 2.0]", và metadata của model khai
+ * temperature 1 / topP 0,95 / topK 64. Tài liệu Google Cloud nói model không
+ * nhận tham số tuỳ chỉnh — chỗ đó không khớp với hành vi đo được.
  */
 export const THAM_SO_SINH = { temperature: 0.3, topP: 0.85 } as const;
