@@ -315,6 +315,33 @@ chậm. Đây là hai việc khác nhau, giữ riêng.
    thì phần cần đăng nhập tự BỎ QUA chứ không báo trượt: để nó đỏ sẵn thì
    người ta quen mắt với màu đỏ, rồi hôm trượt thật cũng không ai nhìn.
 
+**KHÔNG lái được GIA SƯ AI bằng Playwright trên bản đã deploy** — và đó là
+App Check đang làm ĐÚNG việc của nó. Đo 21/09/2026, chạy cả headless lẫn
+headed, đều hỏng như nhau:
+
+```
+POST .../exchangeRecaptchaEnterpriseToken  → 403  "App attestation failed."
+GET  .../recaptcha/enterprise/clr          → net::ERR_ABORTED
+POST .../gemini-3.6-flash:generateContent  → 401  "App Check token is invalid."
+```
+
+reCAPTCHA Enterprise nhận ra trình duyệt tự động và từ chối cấp token, nên
+Firebase AI Logic chặn lượt gọi. Học sinh thật thì không sao; cùng câu hỏi đó
+gõ trong trình duyệt thường vẫn được trả lời bình thường.
+
+Hai hệ quả phải nhớ:
+
+- **Muốn chụp ảnh hội thoại thật cho báo cáo thì PHẢI có người ngồi gõ.** Không
+  có đường vòng nào, trừ khi tắt App Check — mà tắt thì mất hàng rào chống lạm
+  dụng khoá Gemini.
+- **Hỏng một lần là App Check khoá hồ sơ trình duyệt đó 24 GIỜ** — Console ghi
+  mã lỗi appCheck rồi tới initial-throttle. Thử lại trong ngày chỉ tốn công.
+
+Và một cái bẫy khi viết phép thử cho vùng này: nhánh hỏng của gia sư hiện câu
+"Gia sư AI đang tạm mất kết nối với máy chủ" chứ không ném lỗi. Phép thử nào
+chỉ canh "AI không đưa đáp án" sẽ báo ĐẠT ngay cả khi AI không hề trả lời —
+đã dính đúng lần đầu. Canh AI THẬT SỰ TRẢ LỜI TRƯỚC, rồi mới canh nội dung.
+
 Sinh lại dữ liệu — đọc `scripts/README.md` trước khi dùng:
 `soan` (từ tệp .docx sang `constants.ts`), `xuat:ngan-hang` (Firestore sang repo),
 `gan:cau-hoi`, `sinh:ran-thang`, `nhung:ran-thang`, `word`, `phan-tich`, `do-chi-phi`,

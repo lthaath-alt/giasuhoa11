@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Sơ đồ kiến trúc — Gia sư Hóa 11</title>
+<!--
+  Nguồn của Hình 1 trong báo cáo NCKH. Kết xuất ra PNG bằng:
+      node scripts/ve-so-do-kien-truc.mjs
+
+  MỌI nhãn ở đây phải là thứ ĐO ĐƯỢC trong mã, không phải mô tả mong muốn.
+  Đã đối chiếu ngày 21/09/2026:
+    - gemini-3.6-flash              src/core/constants.ts
+    - temperature 0,3 · topP 0,85   THAM_SO_SINH, promptSuPham.ts:243
+    - 4 mức bế tắc                  chiDanGianGiao(), pedagogicalStateMachine.ts
+    - 5 loại nhãn lượt              LOAI_LUOT_HOP_LE, cùng tệp, dòng 176
+    - 1.554 câu / 6 chương / 25 bài bản chụp public/bank/ngan-hang.json
+    - 4 trò chơi, 4 hiện vật 3D     GameHubSection.tsx, public/thi-nghiem.html
+  Sửa số nào thì phải đo lại số đó trước.
+
+  Bảng màu theo thế giới thị giác của dự án: nét kẻ chứ không bóng đổ, góc
+  vuông, đỏ tín hiệu CHỈ dành cho đường đi của câu hỏi học sinh.
+-->
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700&family=Inter:wght@400;500;600&display=swap');
+
+  :root {
+    --muc:        #14110E;
+    --giay:       #F2F1ED;
+    --nhan:       #FFFFFF;
+    --tin-hieu:   #C4000E;
+    --luc:        #0F5A44;
+    --vang:       #F5C400;
+    --xam:        #6B6560;
+    --vien:       #14110E;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 28px;
+    background: var(--giay);
+    font-family: Inter, system-ui, sans-serif;
+    color: var(--muc);
+  }
+  #khung { width: 1260px; margin: 0 auto; background: var(--giay); }
+
+  h1 {
+    font-family: Archivo, sans-serif; font-weight: 700;
+    font-size: 21px; letter-spacing: .01em; margin: 0 0 2px;
+  }
+  .phu { font-size: 13.5px; color: var(--xam); margin: 0 0 18px; }
+
+  /* ── Một lớp kiến trúc ─────────────────────────────────────────────── */
+  .lop {
+    border: 2px solid var(--vien); background: var(--nhan);
+    margin-bottom: 12px; display: grid; grid-template-columns: 172px 1fr;
+  }
+  .lop > .ten {
+    border-right: 2px solid var(--vien); padding: 13px 14px;
+    display: flex; flex-direction: column; justify-content: center; gap: 3px;
+  }
+  .so {
+    font-family: Archivo, sans-serif; font-weight: 700; font-size: 11px;
+    letter-spacing: .1em; color: var(--tin-hieu);
+  }
+  .ten b {
+    font-family: Archivo, sans-serif; font-weight: 700;
+    font-size: 15px; line-height: 1.22;
+  }
+  .ten i { font-style: normal; font-size: 12px; color: var(--xam); line-height: 1.35; }
+
+  .than { padding: 11px 13px; display: flex; flex-wrap: wrap; gap: 8px; align-items: stretch; }
+
+  .hop {
+    border: 1px solid var(--vien); padding: 7px 10px; min-width: 128px;
+    background: var(--nhan);
+  }
+  .hop u { display: block; font-weight: 600; font-size: 13.5px; text-decoration: none; }
+  .hop s { display: block; font-size: 12px; color: var(--xam); text-decoration: none; margin-top: 2px; line-height: 1.35; }
+  .hop.nhan-manh { border-width: 2px; border-color: var(--tin-hieu); }
+  .hop.luc { border-color: var(--luc); }
+
+  .ma { font-family: 'Consolas', ui-monospace, monospace; font-size: 12px; }
+
+  /* ── Mũi tên giữa các lớp ──────────────────────────────────────────── */
+  .noi {
+    display: flex; align-items: center; gap: 9px;
+    margin: -6px 0 6px 186px; font-size: 12.5px; color: var(--xam);
+  }
+  .noi .mui { color: var(--tin-hieu); font-size: 15px; line-height: 1; }
+  .noi b { color: var(--muc); font-weight: 600; }
+
+  /* ── Dải chân trang ────────────────────────────────────────────────── */
+  .chan {
+    border: 2px solid var(--vien); background: var(--muc); color: var(--giay);
+    padding: 10px 14px; display: flex; gap: 26px; flex-wrap: wrap;
+    font-size: 12.5px; margin-top: 4px;
+  }
+  .chan span b { color: var(--vang); font-weight: 600; }
+
+  .ghi { font-size: 12px; color: var(--xam); margin-top: 10px; line-height: 1.5; }
+</style>
+</head>
+<body>
+<div id="khung">
+
+  <h1>Kiến trúc hệ thống Gia sư Hóa 11</h1>
+  <p class="phu">
+    Toàn bộ phần xử lý chạy trên trình duyệt của học sinh — dự án KHÔNG có máy chủ ứng dụng riêng.
+  </p>
+
+  <!-- LỚP 1 -->
+  <div class="lop">
+    <div class="ten">
+      <span class="so">LỚP 1</span>
+      <b>Giao diện<br>người dùng</b>
+      <i>React 19 · Vite 6 · MUI v9</i>
+    </div>
+    <div class="than">
+      <div class="hop"><u>Bài giảng</u><s>25 bài · 6 chương</s></div>
+      <div class="hop"><u>Thí nghiệm</u><s>4 hiện vật, mô hình 3D</s></div>
+      <div class="hop"><u>Luyện tập</u><s>3 phần mỗi bài</s></div>
+      <div class="hop"><u>Đề kiểm tra</u><s>sinh theo chương</s></div>
+      <div class="hop"><u>Trò chơi</u><s>4 trò ôn tập</s></div>
+      <div class="hop nhan-manh"><u>iChat — Gia sư AI</u><s>khung hỏi đáp Socrates</s></div>
+    </div>
+  </div>
+
+  <div class="noi"><span class="mui">↓</span> <b>Câu hỏi của học sinh</b> đi vào máy trạng thái sư phạm trước khi tới AI</div>
+
+  <!-- LỚP 2 -->
+  <div class="lop">
+    <div class="ten">
+      <span class="so">LỚP 2</span>
+      <b>Xử lý logic<br>sư phạm</b>
+      <i>chạy ngay trên trình duyệt</i>
+    </div>
+    <div class="than">
+      <div class="hop nhan-manh">
+        <u>Đếm lượt bế tắc</u>
+        <s>4 mức: chẩn đoán → cho dữ kiện → giải mẫu → hỏi có/không.<br>Phần mềm đếm, KHÔNG để mô hình tự phán đoán</s>
+      </div>
+      <div class="hop"><u>Chặn gian lận giờ kiểm tra</u><s>từ chối trước khi gọi AI</s></div>
+      <div class="hop"><u>Dựng prompt 3 lớp</u><s>vai trò · kỹ thuật hỏi · kịch bản chủ đề</s></div>
+      <div class="hop luc">
+        <u>Gỡ nhãn &amp; ghi telemetry</u>
+        <s>5 loại lượt: gợi mở · kiểm tra hiểu · giải thích · tra cứu · hành chính<br>+ mã ngộ nhận</s>
+      </div>
+    </div>
+  </div>
+
+  <div class="noi"><span class="mui">↓</span> lời nhắc đã dựng xong, kèm ngữ cảnh bài đang mở</div>
+
+  <!-- LỚP 3 -->
+  <div class="lop">
+    <div class="ten">
+      <span class="so">LỚP 3</span>
+      <b>Tích hợp<br>AI tạo sinh</b>
+      <i>Firebase AI Logic</i>
+    </div>
+    <div class="than">
+      <div class="hop nhan-manh">
+        <u>Gemini 3.6 Flash</u>
+        <s class="ma">temperature 0,3 · topP 0,85</s>
+      </div>
+      <div class="hop luc">
+        <u>App Check</u>
+        <s>reCAPTCHA Enterprise — chặn lạm dụng khoá</s>
+      </div>
+      <div class="hop">
+        <u>Không có khoá API trong mã</u>
+        <s>bản dựng không mang khoá nào</s>
+      </div>
+    </div>
+  </div>
+
+  <div class="noi"><span class="mui">↓</span> câu hỏi dẫn dắt trả về, nhãn ẩn được gỡ trước khi hiện cho học sinh</div>
+
+  <!-- LỚP 4 -->
+  <div class="lop">
+    <div class="ten">
+      <span class="so">LỚP 4</span>
+      <b>Dữ liệu<br>học liệu</b>
+      <i>Cloud Firestore</i>
+    </div>
+    <div class="than">
+      <div class="hop"><u class="ma">bank_questions</u><s>1.554 câu hỏi</s></div>
+      <div class="hop"><u class="ma">bai_nop</u><s>bài kiểm tra đã nộp</s></div>
+      <div class="hop"><u class="ma">chats · progress</u><s>hội thoại &amp; tiến độ</s></div>
+      <div class="hop"><u class="ma">users · classes</u><s>hồ sơ &amp; lớp học</s></div>
+      <div class="hop luc"><u>Firebase Auth</u><s>mật khẩu đã băm, không về trình duyệt</s></div>
+      <div class="hop luc"><u>Firestore Rules</u><s>phân quyền theo 4 vai</s></div>
+    </div>
+  </div>
+
+  <div class="chan">
+    <span><b>Lưu trữ tĩnh:</b> Cloudflare Pages — giasuhoa11.pages.dev</span>
+    <span><b>Đồng bộ tự động:</b> GitHub Actions, 02:00 mỗi đêm</span>
+    <span><b>Không máy chủ ứng dụng riêng</b></span>
+  </div>
+
+  <p class="ghi">
+    Hình 1. Kiến trúc bốn lớp của Gia sư Hóa 11. Mũi tên đỏ là đường đi của một câu hỏi từ học sinh:
+    giao diện → máy trạng thái sư phạm → mô hình ngôn ngữ → trở lại màn hình. Điểm khác biệt của hệ
+    thống nằm ở Lớp 2: mức nâng đỡ do phần mềm đếm chứ không do mô hình tự quyết, nên AI không thể
+    tự ý rút ngắn quá trình bằng cách đưa thẳng đáp án.
+  </p>
+
+</div>
+</body>
+</html>
