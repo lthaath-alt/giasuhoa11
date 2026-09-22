@@ -36,6 +36,7 @@ import { TutorChat } from '../../tutor/components/TutorChat';
    biết vì sao lối vào phải nằm ở đây chứ không ở `DashboardPage`. */
 import { JoinClassForm } from '../../auth/components/JoinClassForm';
 import { QuizStorage } from '../../quiz/quizStorage';
+import { DeCoGiaoList } from './DeCoGiaoList';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -158,6 +159,11 @@ export const StudentArea: React.FC = () => {
             <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
               Bài tập bắt buộc được giao từ Thầy/Cô
             </Typography>
+
+            {/* Đề kiểm tra THẬT do giáo viên giao (22/09/2026). Khối `exams`
+                bên dưới là kho tài liệu Drive đời trước, không phải đề chấm
+                điểm được — hai thứ khác nhau nên để cạnh nhau, không gộp. */}
+            {myClass && <DeCoGiaoList classId={myClass.id} email={currentUser.email} />}
 
             {!myClass ? (
               /* Chưa vào lớp: đặt THẲNG ô chọn lớp vào đây.
@@ -362,7 +368,7 @@ export const StudentArea: React.FC = () => {
                             </Avatar>
                           </ListItemIcon>
                           <ListItemText
-                            primary={<Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>{tenBai.get(q.lessonId) || 'Bài kiểm tra'}</Typography>}
+                            primary={<Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>{q.tenDe || tenBai.get(q.lessonId) || 'Bài kiểm tra'}</Typography>}
                             secondary={`Làm lúc: ${new Date(q.createdAt).toLocaleString('vi-VN')} · ${q.score}/${q.maxScore} điểm`}
                           />
                           <Chip size="small" label={loai.nhan} color={loai.mau} />

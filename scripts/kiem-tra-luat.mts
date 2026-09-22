@@ -36,6 +36,16 @@ const baiMau = (id: string, email: string, score: number, maxScore: number) => (
   expiresAt: '2026-09-19T00:00:00Z', results: {},
 });
 
+/** Một đề giáo viên giao, đúng hình dạng `DeGiao` mà web ghi lên `de_giao`. */
+const deMau = (id: string, teacherEmail: string, soCau = 10) => ({
+  id, tieuDe: 'Kiểm tra 15 phút', classId: 'lop_1', tenLop: '11H',
+  teacherEmail, teacherName: 'GV',
+  questions: Array.from({ length: soCau }, (_, i) => ({ id: 'q' + i, content: 'Câu ' + i })),
+  maxScore: soCau, soPhut: 15,
+  moLuc: '2026-09-22T00:00:00Z', dongLuc: '2026-09-29T00:00:00Z',
+  createdAt: '2026-09-22T00:00:00Z', dong: false,
+});
+
 const GOC = join(dirname(fileURLToPath(import.meta.url)), '..');
 const DU_AN = 'demo-giasuhoa11';   // tiền tố `demo-` = không bao giờ chạm hạ tầng thật
 const CONG = 8080;
@@ -123,6 +133,7 @@ async function gieo(moi: RulesTestEnvironment) {
     await setDoc(doc(db, 'progress', NGUOI.hs.email), { diem: 8 });
     await setDoc(doc(db, 'chats', 'chat_1'), { userEmail: NGUOI.hs.email, noiDung: 'chao' });
     await setDoc(doc(db, 'bai_nop', 'bn_1'), baiMau('bn_1', NGUOI.hs.email, 5, 10));
+    await setDoc(doc(db, 'de_giao', 'de_1'), deMau('de_1', NGUOI.gv.email));
   });
 }
 
@@ -273,6 +284,32 @@ async function chayCacPhep(): Promise<number> {
     '21k. chưa đăng nhập liệt kê bài nộp');
   await chan(getDocs(collection(hs, 'bai_nop')),
     '21l. học sinh liệt kê bài của cả lớp');
+
+  // 22: đề giáo viên giao cho lớp (22/09/2026)
+  await duoc(setDoc(doc(gv, 'de_giao', 'de_2'), deMau('de_2', NGUOI.gv.email)),
+    '22a. giáo viên giao đề đứng tên mình');
+  await chan(setDoc(doc(gv, 'de_giao', 'de_3'), deMau('de_3', NGUOI.dong.email)),
+    '22b. giáo viên giao đề đứng tên cô khác');
+  await chan(setDoc(doc(gv, 'de_giao', 'de_4'), deMau('de_x', NGUOI.gv.email)),
+    '22c. id trong dữ liệu khác id tài liệu');
+  await chan(setDoc(doc(gv, 'de_giao', 'de_5'), deMau('de_5', NGUOI.gv.email, 51)),
+    '22d. đề quá 50 câu');
+  await duoc(getDoc(doc(hs, 'de_giao', 'de_1')),
+    '22e. học sinh mở link đề của lớp');
+  await duoc(getDocs(query(collection(hs, 'de_giao'), where('classId', '==', 'lop_1'))),
+    '22f. học sinh liệt kê đề của lớp mình');
+  await chan(setDoc(doc(hs, 'de_giao', 'de_6'), deMau('de_6', NGUOI.hs.email)),
+    '22g. học sinh tự giao đề');
+  await chan(updateDoc(doc(hs, 'de_giao', 'de_1'), { dong: true }),
+    '22h. học sinh đóng đề của cô');
+  await chan(deleteDoc(doc(hs, 'de_giao', 'de_1')),
+    '22i. học sinh xoá đề');
+  await chan(getDoc(doc(khach, 'de_giao', 'de_1')),
+    '22j. chưa đăng nhập mở link đề');
+  await duoc(updateDoc(doc(gv, 'de_giao', 'de_1'), { dong: true }),
+    '22k. giáo viên đóng đề của mình');
+  await chan(deleteDoc(doc(nhu(moi, NGUOI.dong), 'de_giao', 'de_1')),
+    '22l. giáo viên khác xoá đề không phải của mình');
 
   /* PHÉP TỰ PHÁ. Một bộ kiểm luôn xanh mà chưa bao giờ bắt được gì thì đáng
      ngờ hơn đáng mừng — bài học đã trả giá một lần, xem "Rút kinh nghiệm"

@@ -235,7 +235,7 @@ service cloud.firestore {
     function baiNopHopLe(d, id) {
       return d.keys().hasOnly(['id', 'lessonId', 'chapterId', 'userEmail', 'questions',
                                'answers', 'status', 'score', 'maxScore', 'createdAt',
-                               'expiresAt', 'results'])
+                               'expiresAt', 'results', 'deGiaoId', 'tenDe'])
         && d.id == id
         && d.status == 'submitted'
         && d.score is number && d.maxScore is number
@@ -252,6 +252,42 @@ service cloud.firestore {
         && request.resource.data.score >= 0
         && request.resource.data.score <= resource.data.maxScore;
       allow delete: if false;
+    }
+
+    /* ── Đề giáo viên GIAO cho lớp (22/09/2026) ────────────────────────────
+       Chiều ngược của `bai_nop`: đề đi TỪ máy giáo viên TỚI máy học sinh.
+       Xem `src/features/quiz/deGiaoService.ts`.
+
+       `read` mở cho MỌI người đã đăng nhập, cả `get` lẫn `list`. Học sinh cần
+       `get` để mở link thông báo, và cần `list` để màn "Đề cô giao" trong
+       StudentArea liệt kê đề của lớp mình
+       (`where('classId','==',…)`).
+
+       GIỚI HẠN ĐÃ BIẾT, CÙNG LOẠI VỚI `bai_nop` MỤC 4: đáp án nằm ngay trong
+       tài liệu này. Chấm điểm chạy trên trình duyệt của học sinh, nên đáp án
+       BẮT BUỘC phải tới được máy em — ai mở devtools là đọc được trước khi
+       làm. Siết luật không chữa được điều đó; chữa thật là chấm lại ở máy chủ
+       bằng Cloud Function, tức gói Blaze trả tiền. Đừng tưởng thêm một điều
+       kiện ở đây là đã chặn.
+
+       Hệ quả thứ hai của `list` mở: một em đọc được đề của lớp khác. Chấp
+       nhận, đúng như `classes` ngay bên dưới đã chấp nhận cho học sinh thấy
+       email bạn cùng trường.
+
+       GHI thì chỉ giáo viên, và phải đứng tên CHÍNH MÌNH — không ai giao đề
+       hộ người khác rồi để cô kia chịu trách nhiệm. `update` cố ý không siết
+       theo trường: giáo viên sửa lại đề của mình là việc bình thường, khác
+       hẳn `bai_nop` nơi bài đã nộp phải đứng yên. */
+    match /de_giao/{id} {
+      allow read:   if dangNhap();
+      allow create: if laGiaoVien()
+        && request.resource.data.id == id
+        && request.resource.data.teacherEmail == email()
+        && request.resource.data.questions.size() <= 50;
+      allow update: if laGiaoVien()
+        && resource.data.teacherEmail == email()
+        && request.resource.data.teacherEmail == email();
+      allow delete: if laGiaoVien() && resource.data.teacherEmail == email();
     }
 
     /* App đọc chats bằng query(where('userEmail','==',…), where('lessonId','==',…)),

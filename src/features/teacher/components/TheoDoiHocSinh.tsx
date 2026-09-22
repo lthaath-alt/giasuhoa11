@@ -3,10 +3,11 @@ import {
   Alert, Box, LinearProgress, Paper, Tab, Table, TableBody, TableCell,
   TableContainer, TableHead, TableRow, Tabs, Typography,
 } from '@mui/material';
-import { BarChart3, ClipboardCheck, MessageSquare } from 'lucide-react';
+import { BarChart3, ClipboardCheck, MessageSquare, Send } from 'lucide-react';
 import { CHEMISTRY_11_CURRICULUM } from '../../lessons/constants';
 import { docBaiNopCuaCacEm } from '../../quiz/baiNopService';
 import { docChatCuaEm, docTienDoCacEm } from '../services/theoDoiService';
+import { GiaoDeTab } from './GiaoDeTab';
 import { QuizProgressTab } from './QuizProgressTab';
 import { ProgressChatsTab } from '../../admin/components/ProgressChatsTab';
 import type { ChatMessage, LearningProgress, User } from '../../auth/types';
@@ -17,7 +18,8 @@ import type { Quiz } from '../../quiz/types';
  *
  * `QuizProgressTab` và `ProgressChatsTab` đã viết xong từ trước nhưng không
  * trang nào gắn vào, nên giáo viên không có chỗ nào xem kết quả của lớp. Tệp
- * này gom hai khối đó, thêm một bảng tổng quan cả lớp ở thẻ đầu. Mọi số liệu
+ * này gom hai khối đó, thêm một bảng tổng quan cả lớp ở thẻ đầu và thẻ "Giao đề
+ * kiểm tra" (22/09/2026, xem `GiaoDeTab.tsx`). Mọi số liệu
  * đọc thẳng Firestore — không có dòng dữ liệu mẫu nào.
  */
 
@@ -94,6 +96,7 @@ export const TheoDoiHocSinh: React.FC<{ students: User[] }> = ({ students }) => 
       <Paper sx={{ borderRadius: 0, border: '1px solid var(--vien)', boxShadow: 'none', mb: 2.5 }}>
         <Tabs value={the} onChange={(_, v) => setThe(v)} variant="scrollable" scrollButtons="auto">
           <Tab icon={<BarChart3 size={16} />} iconPosition="start" label="Tổng quan lớp" sx={{ textTransform: 'none', fontWeight: 'bold' }} />
+          <Tab icon={<Send size={16} />} iconPosition="start" label="Giao đề kiểm tra" sx={{ textTransform: 'none', fontWeight: 'bold' }} />
           <Tab icon={<ClipboardCheck size={16} />} iconPosition="start" label="Bài kiểm tra và chấm tự luận" sx={{ textTransform: 'none', fontWeight: 'bold' }} />
           <Tab icon={<MessageSquare size={16} />} iconPosition="start" label="Tiến độ và hội thoại AI" sx={{ textTransform: 'none', fontWeight: 'bold' }} />
         </Tabs>
@@ -162,9 +165,11 @@ export const TheoDoiHocSinh: React.FC<{ students: User[] }> = ({ students }) => 
         </Box>
       )}
 
-      {the === 1 && <QuizProgressTab students={students} />}
+      {the === 1 && <GiaoDeTab students={students} />}
 
-      {the === 2 && (
+      {the === 2 && <QuizProgressTab students={students} />}
+
+      {the === 3 && (
         <ProgressChatsTab
           students={students}
           chats={chats}

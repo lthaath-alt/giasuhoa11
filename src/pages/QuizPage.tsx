@@ -229,7 +229,20 @@ export const QuizPage: React.FC = () => {
       const updated = QuizService.submitQuiz(quiz!.id, answers);
       if (updated) {
         setQuiz(updated);
-        
+
+        /* Đề GIÁO VIÊN GIAO dừng ở đây (22/09/2026). Hai việc bên dưới đều sai
+           với nó:
+           - Mời "làm lại một đề khác": đề của cô chỉ nộp một lần, và mã bài suy
+             ra từ email nên lượt thứ hai sẽ GHI ĐÈ điểm cô đang chấm.
+           - Ghi tiến độ bài học: `lessonId` của nó là `de-giao:<id>`, không phải
+             bài nào trong chương trình, nên đó chỉ là rác trong hồ sơ tiến độ.
+           Xem `features/quiz/taoDeGiao.ts`. */
+        if (updated.deGiaoId) {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          setSubmitting(false);
+          return;
+        }
+
         const percent = Math.round((updated.score / updated.maxScore) * 100);
         const attempt = {
           quizId: updated.id,
@@ -330,6 +343,14 @@ export const QuizPage: React.FC = () => {
             <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
               Học sinh: <strong>{currentUser.name}</strong> ({currentUser.email})
             </Typography>
+
+            {quiz.deGiaoId && (
+              <Alert severity="info" sx={{ borderRadius: 0, textAlign: 'left', mb: 2 }}>
+                <AlertTitle sx={{ fontWeight: 'bold' }}>Bài đã gửi cho giáo viên</AlertTitle>
+                Đề "{quiz.tenDe}" — giáo viên xem được điểm và từng câu trả lời của em.
+                Điểm tự luận (nếu có) là điểm AI chấm sơ bộ, giáo viên sẽ chấm lại.
+              </Alert>
+            )}
 
             <Grid container spacing={2} sx={{ mb: 2, justifyContent: 'center' }}>
               <Grid size={{ xs: 6, sm: 4 }}>
@@ -449,6 +470,21 @@ export const QuizPage: React.FC = () => {
                           ? q.essayPoints?.map(p => `${p.label}: ${p.content}`).join('\n')
                           : q.correctAnswer
                         }
+                      </Typography>
+                    </Box>
+                  )}
+
+                  {/* Lời giải — hiện cho CẢ câu đúng lẫn câu sai (22/09/2026).
+                      Em làm đúng do đoán mò thì vẫn cần biết vì sao đúng, và
+                      chỗ này trước nay bỏ trống dù ngân hàng có sẵn lời giải
+                      cho cả 1.554 câu — xem `giaiThich` trong library/types.ts. */}
+                  {q.giaiThich && (
+                    <Box sx={{ mt: 2, p: 2, bgcolor: 'var(--nen-nhat)', borderRadius: 0, borderLeft: '3px solid var(--vien-2)' }}>
+                      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5, fontWeight: 'bold' }}>
+                        LỜI GIẢI:
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: 'var(--chu)', lineHeight: 1.7 }}>
+                        <ChemicalText html={q.giaiThich} />
                       </Typography>
                     </Box>
                   )}
