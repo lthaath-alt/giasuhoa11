@@ -88,5 +88,21 @@ export default defineConfig({
         storageState: 'tests/.auth/hocsinh.json',
       },
     },
+
+    /* Màn GIÁO VIÊN. Thêm 22/09/2026, sau khi tính năng giao đề lên tới tay
+       giáo viên trong tình trạng không bấm được mà không phép nào thấy.
+
+       CỐ Ý KHÔNG có `dependencies` và `storageState`: mỗi phép tự đăng nhập
+       bằng `dangNhapGiaoVien()` trong `chung.ts`. Lý do đo được nằm ở chú
+       thích của hàm đó — trong ngữ cảnh Playwright, Firebase Auth không lưu
+       phiên xuống đĩa, nên `storageState` chụp ra một tệp rỗng ruột. */
+    {
+      name: 'giaovien',
+      testMatch: /giaovien[\\/].*\.spec\.ts/,
+      use: {
+        ...devices['Desktop Chrome'],
+        channel: 'chrome',
+      },
+    },
   ],
 });

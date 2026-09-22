@@ -75,3 +75,6 @@ sao-luu/
 # cho tới khi làm xong P1-7 (xin đồng ý tham gia nghiên cứu), bản xuất còn gồm
 # cả tài khoản chưa đồng ý.
 xuat-nghien-cuu/
+
+# Ket qua chay Playwright (anh chup, trace). `playwright-report/` da chan o tren.
+test-results/
