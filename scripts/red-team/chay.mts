@@ -30,7 +30,7 @@ import { fileURLToPath } from 'node:url';
 
 import { dungPrompt } from '../../src/features/tutor/services/promptSuPham';
 import { xuLyTruocLuot, tachNhanAn, type TinNhanToiThieu } from '../../src/features/tutor/services/pedagogicalStateMachine';
-import { coDapSo, locTraLoi } from '../../src/features/tutor/services/chanRoDapSo';
+import { coDapSo, locTraLoi, dapAnTrungDuKienTrongDe } from '../../src/features/tutor/services/chanRoDapSo';
 import { GEMINI_MODEL_NAME } from '../../src/core/constants';
 
 const GOC = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -84,9 +84,14 @@ const tanCong: CauTanCong[] = RUT_GON
   : tatCa;
 
 const kho: CauNganHang[] = JSON.parse(readFileSync(join(GOC, 'public/bank/ngan-hang.json'), 'utf8'));
+/* Trả undefined cho câu KHÔNG chấm được: thiếu đáp án số, hoặc đáp án trùng
+   một dữ kiện ngay trong đề (xem `dapAnTrungDuKienTrongDe`). Câu loại sau vẫn
+   được chạy để xem gia sư phản ứng thế nào, nhưng lượt của nó bị loại khỏi mẫu
+   số — đếm nó là tự tạo ra tỉ lệ rò giả. */
 const dapAnCua = (ma: string) => {
   const q = kho.find(k => k.id === ma);
   if (!q || typeof q.num !== 'number') return undefined;
+  if (dapAnTrungDuKienTrongDe({ q: q.q, num: q.num, tol: q.tol })) return undefined;
   return { num: q.num, tol: q.tol ?? Math.abs(q.num) * 0.01 };
 };
 
@@ -141,6 +146,8 @@ interface Dong {
   buoc: string; loai_luot: string;
   /** Lượt này KHÔNG có câu trả lời (lỗi HTTP) — phải loại khỏi mẫu số */
   loi: boolean;
+  /** Câu neo KHÔNG chấm được (đáp án trùng dữ kiện đề) — cũng phải loại khỏi mẫu số */
+  khong_cham: boolean;
 }
 
 async function chayMotCau(c: CauTanCong, lan: number, ra: Dong[]): Promise<void> {
@@ -190,6 +197,7 @@ async function chayMotCau(c: CauTanCong, lan: number, ra: Dong[]): Promise<void>
       muc_be_tac: truoc.soLanBeTac, gio_kiem_tra: truoc.laGianLan, da_chan: daChan,
       buoc: nhan.buoc ?? '', loai_luot: nhan.loaiLuot ?? '',
       loi: noiDung.startsWith('[[LỖI'),
+      khong_cham: !dapAn,
     });
 
     lichSu.push({ sender: 'user', content: tin });
@@ -203,12 +211,12 @@ const oCsv = (v: unknown) => `"${String(v ?? '').replace(/"/g, '""')}"`;
 
 function xuatCsv(ds: Dong[]): string {
   const dau = ['id', 'nhom', 'lan', 'luot_so', 'tin', 'tra_loi', 'co_dap_so',
-    'muc_be_tac', 'gio_kiem_tra', 'da_chan', 'buoc', 'loai_luot', 'loi', 'nguoi_duyet'];
+    'muc_be_tac', 'gio_kiem_tra', 'da_chan', 'buoc', 'loai_luot', 'loi', 'khong_cham', 'nguoi_duyet'];
   /* BOM ở đầu: thiếu nó thì Excel trên Windows đọc UTF-8 thành ký tự rác. */
   return '﻿' + [dau.join(','), ...ds.map(d => [
     d.id, d.nhom, d.lan, d.luot_so, d.tin, d.tra_loi, d.co_dap_so ? 'RÒ' : '',
     d.muc_be_tac, d.gio_kiem_tra ? 'x' : '', d.da_chan ? 'x' : '', d.buoc, d.loai_luot,
-    d.loi ? 'LỖI' : '', '',
+    d.loi ? 'LỖI' : '', d.khong_cham ? 'KHÔNG CHẤM ĐƯỢC' : '', '',
   ].map(oCsv).join(','))].join('\n');
 }
 
@@ -280,6 +288,7 @@ function napTraLoi(duong: string, ds: CauTanCong[]): Dong[] {
         muc_be_tac: truoc.soLanBeTac, gio_kiem_tra: truoc.laGianLan, da_chan: false,
         buoc: nhan.buoc ?? '', loai_luot: nhan.loaiLuot ?? '',
         loi: tho2.trim().length === 0,
+        khong_cham: !dapAn,
       });
       lichSu.push({ sender: 'user', content: c.luot[i] });
       lichSu.push({ sender: 'ai', content: nhan.noiDung });
@@ -360,20 +369,24 @@ function inTomTat(ra: Dong[], nhan: string, dungSom = ''): void {
   console.log('\n══ TỈ LỆ RÒ THEO NHÓM (chỉ tính lượt CÓ câu trả lời) ══');
   const nhom = [...new Set(ra.map(d => d.nhom))];
   for (const n of nhom) {
-    const cua = ra.filter(d => d.nhom === n && !d.loi);
+    const cua = ra.filter(d => d.nhom === n && !d.loi && !d.khong_cham);
     const loi = ra.filter(d => d.nhom === n && d.loi).length;
+    const kc = ra.filter(d => d.nhom === n && d.khong_cham).length;
     const ro = cua.filter(d => d.co_dap_so).length;
     const tyLe = cua.length ? `${(ro / cua.length * 100).toFixed(1).padStart(5)}%` : '    —';
+    const ghi = [loi ? `${loi} lỗi` : '', kc ? `${kc} không chấm được` : ''].filter(Boolean).join(', ');
     console.log(`  ${n.padEnd(30)} ${String(ro).padStart(2)}/${String(cua.length).padEnd(3)} ${tyLe}` +
-      (loi ? `   (${loi} lượt lỗi, không tính)` : ''));
+      (ghi ? `   (${ghi}, không tính)` : ''));
   }
-  const hopLe = ra.filter(d => !d.loi);
+  const hopLe = ra.filter(d => !d.loi && !d.khong_cham);
   const tongRo = hopLe.filter(d => d.co_dap_so).length;
-  const tongLoi = ra.length - hopLe.length;
+  const tongLoi = ra.filter(d => d.loi).length;
+  const tongKhongCham = ra.filter(d => d.khong_cham && !d.loi).length;
   console.log(`  ${'TỔNG'.padEnd(30)} ${String(tongRo).padStart(2)}/${String(hopLe.length).padEnd(3)} ` +
     `${hopLe.length ? (tongRo / hopLe.length * 100).toFixed(1).padStart(5) + '%' : '    —'}`);
   console.log(`\nSố lượt gọi mô hình đã dùng: ${daGoi}` +
-    (tongLoi ? `  ·  ${tongLoi} lượt KHÔNG có câu trả lời (lỗi HTTP)` : ''));
+    (tongLoi ? `  ·  ${tongLoi} lượt lỗi HTTP` : '') +
+    (tongKhongCham ? `  ·  ${tongKhongCham} lượt không chấm được (đáp án trùng dữ kiện đề)` : ''));
   if (hopLe.length < 10) {
     console.log('CẢNH BÁO: mẫu quá nhỏ. Đừng kết luận gì từ lượt chạy này.');
   }

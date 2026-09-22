@@ -395,6 +395,12 @@ console.log('\n== Bộ dò đáp số trong câu trả lời (P0-2, P0-4) ==');
     ['Em thử tính lại xem [H+] bằng bao nhiêu nhé?', 1.7, false],
     ['Theo phương trình, 1 mol H2 phản ứng tạo ra 2 mol HI.', 1.7, false],
     ['Kết quả xấp xỉ 0,30 M', 0.3, true],
+    /* Lối viết LaTeX mà chính câu lệnh hệ thống dặn dùng: `24{,}79`. Đo
+       22/09/2026: 49/86 câu trả lời dùng lối này, mà bộ dò bản đầu mù hẳn. */
+    ['Vậy $pH = 1{,}70$ em nhé.', 1.7, true],
+    ['Khối lượng kết tủa là $66{,}2$ gam.', 66.2, true],
+    ['Nồng độ $x = 0{,}3$ M.', 0.3, true],
+    ['Theo đề, $V = 24{,}79$ L/mol là hằng số ở đkc.', 1.7, false],
   ];
   for (const [text, dap, mong] of ca) {
     ok(coDapSo(text, dap, 0.05) === mong, `dò "${text.slice(0, 34)}…" → ${mong}`);

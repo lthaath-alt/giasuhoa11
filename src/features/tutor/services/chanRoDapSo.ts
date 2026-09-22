@@ -24,6 +24,12 @@
 export function timSoTrongVanBan(s: string): number[] {
   const MU = '⁰¹²³⁴⁵⁶⁷⁸⁹';
   const t = (s ?? '')
+    /* Dấu thập phân kiểu LaTeX, PHẢI xử lý đầu tiên. Câu lệnh hệ thống dặn mô
+       hình viết `24{,}79` trong công thức (để KaTeX không giãn chữ số), nên
+       một đáp số rò ra thường mang đúng lối này. Đo 22/09/2026: 49 trong 86
+       câu trả lời dùng lối viết đó, mà bộ dò bản đầu đọc `$1{,}70$` thành hai
+       số 1 và 70 — tức mù đúng chỗ dễ rò nhất. */
+    .replace(/(\d)\s*\{\s*[,.]\s*\}\s*(\d)/g, '$1,$2')
     /* Chuẩn hoá luỹ thừa 10 về ký hiệu e trước, vì phần sau chỉ bắt số thường.
        Ba lối viết: ×10^-2, ×10⁻², .10^-2 — đều gặp trong lời giải của ngân hàng. */
     .replace(/[×x*]\s*10\s*\^?\s*([−\-]?\d+)/gi, 'e$1')
@@ -79,6 +85,27 @@ function chuanHoaDeSo(s: string): string {
 const NGUONG_KHOP = 0.8;
 
 /**
+ * Giá trị đáp án có TRÙNG một dữ kiện ngay trong đề không.
+ *
+ * Câu như vậy không chấm được bằng cách so số: thấy số đó trong câu trả lời
+ * thì không biết gia sư đang nhắc lại dữ kiện của đề hay đang lộ đáp số. Bộ
+ * kiểm thử tấn công cũng loại những câu này khỏi mẫu số thay vì đếm bừa.
+ */
+export function dapAnTrungDuKienTrongDe(c: CauCoDapSo): boolean {
+  if (typeof c.num !== 'number') return false;
+  const tol = c.tol ?? Math.abs(c.num) * 0.01;
+  const soCuaDe = timSoTrongVanBan(c.q);
+
+  /* So cả các bội/ước của 10, vì đổi đơn vị là việc gia sư PHẢI làm: mL sang L,
+     g sang kg, mmol sang mol. Ca đã đo 22/09/2026: bài "200 mL H₂SO₄ x M vừa
+     đủ 300 mL NaOH 0,4 M" có đáp án x = 0,3 — đề chỉ ghi 300, nhưng gia sư đổi
+     300 mL thành 0,3 L là ra đúng con số đáp án. Không so bội số thì quy tắc
+     này mù đúng ca nó sinh ra để bắt. */
+  const he = [1, 10, 100, 1000, 0.1, 0.01, 0.001];
+  return soCuaDe.some(v => he.some(k => Math.abs(v * k - c.num!) <= tol));
+}
+
+/**
  * Tìm đáp án số của bài học sinh đang hỏi, bằng cách khớp tin nhắn với các câu
  * ĐÃ NẠP SẴN của bài đang mở.
  *
@@ -101,6 +128,13 @@ export function timDapAnChoTin(
 
   for (const c of cauCuaBai) {
     if (typeof c.num !== 'number') continue;
+    /* Bỏ qua câu mà chính ĐỀ đã chứa giá trị đáp án. Đo 22/09/2026 trên 86
+       lượt: cả ba lượt bị đánh dấu rò đều là báo nhầm kiểu này — bài "200 mL
+       H₂SO₄ x M vừa đủ 300 mL NaOH 0,4 M" có đáp án x = 0,3, mà 300 mL đổi ra
+       0,3 L. Gia sư đổi đơn vị là việc dạy đúng đắn, chặn nó là phá chính thứ
+       cần bảo vệ. Ở những câu này bộ dò không phân biệt được, nên KHÔNG chặn —
+       thà bỏ sót một câu còn hơn chặn nhầm hàng loạt lượt dạy tử tế. */
+    if (dapAnTrungDuKienTrongDe(c)) continue;
     const tuCuaDe = chuanHoaDeSo(c.q).split(' ').filter(w => w.length > 2);
     if (tuCuaDe.length < 5) continue;    // đề quá ngắn thì khớp kiểu gì cũng không tin được
     const chung = tuCuaDe.filter(w => t.includes(w)).length;
