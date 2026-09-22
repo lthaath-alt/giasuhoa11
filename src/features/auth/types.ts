@@ -241,6 +241,10 @@ export interface ChatMessage {
   model_name?: string;
   /** Thời gian gọi mô hình thật (ms), KHÔNG gồm độ trễ giả lập */
   latency_ms?: number;
+  /** Bộ chặn rò đáp số (P0-2) đã can thiệp vào lượt này */
+  chan_ro?: boolean;
+  /** Mô hình quên nhãn ẩn hoặc viết sai định dạng (P0-6) — đếm để biết nhãn hụt bao nhiêu */
+  nhan_hong?: boolean;
 }
 
 export interface QuizAttempt {

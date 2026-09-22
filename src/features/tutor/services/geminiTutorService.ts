@@ -8,6 +8,7 @@ import { RECAPTCHA_ENTERPRISE_SITE_KEY } from '../../../core/services/firebaseCo
 import { loiThanhChuoi } from './loiGemini';
 import { xuLyTruocLuot } from './pedagogicalStateMachine';
 import { docKey, coKeyRieng } from './keyRieng';
+import { locTraLoi, timDapAnChoTin, type CauCoDapSo } from './chanRoDapSo';
 
 /* ── Hai đường gọi AI, và thứ tự giữa chúng ──────────────────────────────────
    Đường CHÍNH: Firebase AI Logic (`giaSuFirebaseAI.ts`) — không mang khoá nào
@@ -89,6 +90,8 @@ export interface KetQuaGiaSu {
   beTac: boolean;
   /** Mã phát hiện ngữ cảnh gian lận phòng thi và từ chối, không gọi mô hình */
   gianLan: boolean;
+  /** Bộ chặn rò đáp số (P0-2) đã can thiệp vào lượt này */
+  daChanRo?: boolean;
 }
 
 /** Nhãn gọn cho nhật ký lỗi — không chép toàn văn lỗi của nhà cung cấp. */
@@ -98,6 +101,34 @@ const loaiLoi = (msg: string): string => {
   if (msg.includes('firebasevertexai')) return 'ai-logic';
   return 'khac';
 };
+
+/* ── Đáp án của bài đang mở, cho bộ chặn rò (P0-2) ───────────────────────────
+   Nhớ theo bài trong SUỐT PHIÊN, vì `getByLesson` tốn khoảng 80 lượt đọc mỗi
+   lần gọi (nhiều nhất 230 ở bài 2 — đo 20/09/2026). Hỏi lại mỗi lượt chat thì
+   một lớp 40 em học một tiết đã đủ vỡ hạn mức 50.000 lượt đọc/ngày; nhớ lại
+   thì mỗi em mỗi bài chỉ tốn một lần.
+
+   Đọc HỎNG thì nhớ mảng rỗng và KHÔNG thử lại: mất mạng giữa buổi mà cứ gọi
+   lại mỗi lượt là vừa chậm vừa tốn. Bộ chặn khi đó không có đáp án để so —
+   đúng giới hạn đã ghi trong báo cáo. */
+const dapAnTheoBai = new Map<string, CauCoDapSo[]>();
+
+async function layCauCoDapSo(lessonId: string): Promise<CauCoDapSo[]> {
+  if (!lessonId || lessonId === 'global-advisor') return [];
+  const daNho = dapAnTheoBai.get(lessonId);
+  if (daNho) return daNho;
+  try {
+    const { BankFirestore } = await import('../../bank/bankStore');
+    const cau = (await BankFirestore.getByLesson(lessonId))
+      .filter(c => typeof c.num === 'number')
+      .map(c => ({ q: c.q, num: c.num, tol: c.tol }));
+    dapAnTheoBai.set(lessonId, cau);
+    return cau;
+  } catch {
+    dapAnTheoBai.set(lessonId, []);
+    return [];
+  }
+}
 
 /**
  * Gọi gia sư cho một lượt: chạy máy trạng thái sư phạm trước, rồi mới gọi mô hình.
@@ -133,7 +164,7 @@ export const generateAIResponseChiTiet = async (
     /* Không mở bài nào thì đưa dàn bài cả chương trình vào chỗ trống. */
     const danBaiChung = nguCanhBai ? '' : buildProgramContext();
 
-    const yeuCau = {
+    const dungYeuCau = (chiThiChan?: string) => ({
       model: GEMINI_MODEL_NAME,
       contents: formattedHistory.concat({ role: 'user' as const, parts: [{ text: latestMessage }] }),
       systemInstruction: [
@@ -145,27 +176,67 @@ export const generateAIResponseChiTiet = async (
         /* Chỉ dẫn của máy trạng thái đặt CUỐI CÙNG: gần lượt hỏi nhất, và câu
            lệnh đã dặn mục "TRẠNG THÁI" được ưu tiên hơn quy tắc bước. */
         ...(truoc.chiDanThem ? ['='.repeat(60), truoc.chiDanThem] : []),
+        /* Chỉ thị của bộ chặn rò đứng sau cùng, chỉ có ở lượt sinh lại. */
+        ...(chiThiChan ? ['='.repeat(60), chiThiChan] : []),
       ].join('\n\n'),
       temperature: THAM_SO_SINH.temperature,
       topP: THAM_SO_SINH.topP,
+    });
+
+    const goiMoHinh = async (chiThiChan?: string): Promise<string> => {
+      try {
+        return await (await import('./giaSuFirebaseAI')).hoiGeminiQuaFirebase(dungYeuCau(chiThiChan));
+      } catch (loiChung) {
+        /* Hạn mức chung hết theo NGÀY mà em đã tự lấy khoá riêng thì đi tiếp
+           bằng khoá của em. Hết theo PHÚT thì KHÔNG đụng tới khoá riêng: chờ
+           vài chục giây là hỏi được, tiêu lượt của em làm gì. */
+        const s = loiThanhChuoi(loiChung).toLowerCase();
+        const key = s.includes('perday') ? docKey() : null;
+        if (!key) throw loiChung;
+        return await (await import('./giaSuKeyRieng')).hoiGeminiBangKeyRieng(dungYeuCau(chiThiChan), key);
+      }
     };
 
     const batDau = performance.now();
-    let traLoi: string;
-    try {
-      traLoi = await (await import('./giaSuFirebaseAI')).hoiGeminiQuaFirebase(yeuCau);
-    } catch (loiChung) {
-      /* Hạn mức chung hết theo NGÀY mà em đã tự lấy khoá riêng thì đi tiếp
-         bằng khoá của em. Hết theo PHÚT thì KHÔNG đụng tới khoá riêng: chờ
-         vài chục giây là hỏi được, tiêu lượt của em làm gì. */
-      const s = loiThanhChuoi(loiChung).toLowerCase();
-      const key = s.includes('perday') ? docKey() : null;
-      if (!key) throw loiChung;
-      traLoi = await (await import('./giaSuKeyRieng')).hoiGeminiBangKeyRieng(yeuCau, key);
-    }
+    let traLoi = await goiMoHinh();
     const latencyMs = Math.round(performance.now() - batDau);
 
-    if (traLoi) return { ...coBan, text: traLoi, latencyMs, modelName: GEMINI_MODEL_NAME };
+    /* ── P0-2: chặn rò đáp số (22/09/2026) ─────────────────────────────────
+       Đặt Ở ĐÂY chứ không ở component: cả ba đường gọi (Firebase AI Logic,
+       khoá riêng của em, và mock) đều đi qua hàm này. Chặn ở component thì
+       hai đường sau lọt.
+
+       Dò trên bản ĐÃ GỠ NHÃN, không dò trên bản thô: nhãn ẩn mang số
+       ([BUOC:A6] có số 6), mà đáp án của một số câu cũng là 6 hay 8 — dò
+       trên bản thô là tự tạo ra báo động giả. Nhưng khi không rò thì trả lại
+       bản THÔ, vì AppContext còn cần nhãn ra đề trong đó.
+
+       CHỈ áp cho nhánh 'socratic'. Nhánh đối chứng 'truc-tiep' vốn được giao
+       việc giảng thẳng kèm lời giải mẫu có đáp số — chặn cả hai nhánh là xoá
+       mất đúng biến mà đề tài đang đo, và `kiem-tra:thuc-nghiem` sinh ra để
+       canh cho hai nhánh chỉ khác nhau ở cách dạy. */
+    let daChanRo = false;
+    const dapAn = nhanh === 'socratic'
+      ? timDapAnChoTin(userQuestion, await layCauCoDapSo(lessonId))
+      : undefined;
+    if (dapAn && traLoi) {
+      const { tachNhanAn } = await import('./pedagogicalStateMachine');
+      const loc = await locTraLoi({
+        traLoi: tachNhanAn(traLoi).noiDung,
+        dapAn,
+        sinhLai: async (chiThi) => tachNhanAn(await goiMoHinh(chiThi)).noiDung,
+      });
+      if (loc.daChan) {
+        daChanRo = true;
+        traLoi = loc.noiDung;
+        console.warn('[chanRoDapSo] đã chặn một lượt rò đáp số', {
+          lessonId, dapAn: dapAn.num, mucGoiY, phaiDungDuPhong: loc.phaiDungDuPhong,
+          luc: new Date().toISOString(),
+        });
+      }
+    }
+
+    if (traLoi) return { ...coBan, text: traLoi, latencyMs, modelName: GEMINI_MODEL_NAME, daChanRo };
     return {
       ...coBan, latencyMs, modelName: GEMINI_MODEL_NAME,
       text: 'Xin lỗi em, thầy/cô đang gặp chút sự cố kỹ thuật. Em có thể nhắc lại câu hỏi được không?',
