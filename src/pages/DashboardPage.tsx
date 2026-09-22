@@ -63,6 +63,7 @@ import { coGiaSuAI } from '../features/tutor/services/geminiTutorService';
 import { TRAN_LUOT_KHACH } from '../features/tutor/services/gioiHanChatService';
 import { coKeyRieng } from '../features/tutor/services/keyRieng';
 import { KeyRiengDialog } from '../features/tutor/components/KeyRiengDialog';
+import { useGiayDaCho, chuDangCho } from '../features/tutor/components/useGiayDaCho';
 
 export const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
@@ -95,6 +96,9 @@ export const DashboardPage: React.FC = () => {
   const [ichatInput, setIchatInput] = useState('');
   const [isIchatSending, setIsIchatSending] = useState(false);
   const [ichatError, setIchatError] = useState<string | null>(null);
+  /* Đếm giây chờ để dòng "Thầy đang viết câu trả lời..." không đứng im suốt
+     cả phút — xem `useGiayDaCho.ts`. */
+  const giayDaChoIchat = useGiayDaCho(isIchatSending);
 
   /* Khoá riêng quay lại ngày 20/09/2026, theo quyết định của chủ dự án, nhưng
      KHÁC bản bị bỏ ngày 14/09/2026 ở ba điểm: chỉ hiện khi cả web vừa hết hạn
@@ -124,8 +128,8 @@ export const DashboardPage: React.FC = () => {
      Moi dong trang thai la SO THAT doc tu du lieu dang chay:
        - so bai va so chuong tu `curriculum`;
        - so bai da hoc tu tien do that cua nguoi dang dang nhap;
-       - so cau hoi thu con lai tu `guestChatCount` (tran 25, cung con so
-         khu quan tri hien o "Reset Khach thu (n/25)").
+       - so cau hoi thu con lai tu `guestChatCount`, tran doc tu hang so
+         `TRAN_LUOT_KHACH` (20/09/2026 ha tu 25 xuong 5).
      Cho nao chua co so that thi ghi nang luc CO THAT, khong dat mot con so
      vao cho trong. */
   const laHocSinh = currentUser?.role === 'student';
@@ -216,9 +220,10 @@ export const DashboardPage: React.FC = () => {
     'Phương pháp lập công thức phân tử hợp chất hữu cơ CxHyOz như thế nào ạ?',
   ];
 
-  // Trạng thái dùng thử còn lại của iChat
-  const guestLimitReached = !currentUser && guestChatCount >= 25;
-  const guestRemainingCount = !currentUser ? Math.max(0, 25 - guestChatCount) : 0;
+  /* Trạng thái dùng thử còn lại của iChat — ĐỌC HẰNG SỐ `TRAN_LUOT_KHACH`.
+     Chép cứng 25 ở đây là lý do bản pages.dev ghi số còn lại 24 trên nền trần 5. */
+  const guestLimitReached = !currentUser && guestChatCount >= TRAN_LUOT_KHACH;
+  const guestRemainingCount = !currentUser ? Math.max(0, TRAN_LUOT_KHACH - guestChatCount) : 0;
 
   return (
     <Box
@@ -812,7 +817,7 @@ export const DashboardPage: React.FC = () => {
                         </Avatar>
                         <Paper sx={{ p: 1.5, bgcolor: 'var(--nen-nhat)', border: '1px solid var(--vien)', borderRadius: 0, display: 'flex', alignItems: 'center', gap: 1 }}>
                           <RefreshCw size={14} className="animate-spin" />
-                          <Typography variant="caption" color="text.secondary">Thầy đang viết câu trả lời...</Typography>
+                          <Typography variant="caption" color="text.secondary">{chuDangCho(giayDaChoIchat)}</Typography>
                         </Paper>
                       </Box>
                     )}

@@ -138,6 +138,13 @@ console.log('\n== Trần lượt khách chỉ khai MỘT chỗ ==');
     const ma = readFileSync(join(GOC, t), 'utf8');
     const chepCung = ma.match(/\b\d+\s*(?:câu hỏi|lượt (?:chat|hỏi))|\/\s*\d+\s*câu hỏi/g) || [];
     ok(chepCung.length === 0, `${t}: không chép cứng số lượt${chepCung.length ? ' — ' + chepCung.join(' | ') : ''}`);
+    /* Thêm 21/09/2026: phép kiểm trên chỉ soi CHỮ hiện ra màn hình, nên nó mù
+       đúng chỗ đã hỏng thật — `guestChatCount >= 25` và `25 - guestChatCount`
+       nằm trong phần TÍNH TOÁN, không có chữ "câu hỏi" nào bên cạnh. Trần hạ
+       xuống 5 ngày 20/09/2026 mà hai dòng đó giữ nguyên 25, nên bản pages.dev
+       hiện số còn lại 24 trên nền trần 5 — số trước đọc hằng cũ, số sau đọc hằng mới. */
+    const tinhCung = ma.match(/guestChatCount\s*(?:>=|>|<=|<|===|!==)\s*\d+|\b\d+\s*-\s*guestChatCount/g) || [];
+    ok(tinhCung.length === 0, `${t}: không so sánh/trừ với số cứng${tinhCung.length ? ' — ' + tinhCung.join(' | ') : ''}`);
   }
 }
 

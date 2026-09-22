@@ -19,6 +19,7 @@ import { Lesson } from '../../lessons/types';
 import { KnowledgeTheoryCard } from './KnowledgeTheoryCard';
 import { SuggestedQuestionsCard } from './SuggestedQuestionsCard';
 import { layTrangThaiGioiHan, TRAN_LUOT_KHACH } from '../services/gioiHanChatService';
+import { useGiayDaCho, chuDangCho } from './useGiayDaCho';
 import { MathMarkdownRenderer } from '../../../core/components/MathMarkdownRenderer';
 
 interface TutorChatProps {
@@ -43,6 +44,8 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
   const [remainingCooldown, setRemainingCooldown] = useState(0);
+  /* Số giây đã chờ lượt này — để dòng "đang chuẩn bị gợi ý" không đứng im. */
+  const giayDaCho = useGiayDaCho(isSending);
 
   /* Khoá Gemini riêng của em (20/09/2026). Chỉ mời khi lượt vừa rồi bị chặn vì
      CẢ WEB hết hạn mức trong ngày — đọc từ chính câu trả lời cuối, vì đó là
@@ -132,9 +135,11 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
     }
   };
 
-  // Tính số lượt dùng thử còn lại
-  const guestLimitReached = !currentUser && guestChatCount >= 25;
-  const guestRemainingCount = !currentUser ? Math.max(0, 25 - guestChatCount) : 0;
+  /* Tính số lượt dùng thử còn lại — ĐỌC HẰNG SỐ, đừng chép cứng con số.
+     Ngày 20/09/2026 trần hạ từ 25 xuống 5 nhưng hai dòng này còn nguyên 25,
+     nên bản pages.dev hiện "còn 24" trên nền trần 5 sau câu đầu tiên. */
+  const guestLimitReached = !currentUser && guestChatCount >= TRAN_LUOT_KHACH;
+  const guestRemainingCount = !currentUser ? Math.max(0, TRAN_LUOT_KHACH - guestChatCount) : 0;
 
   return (
     <Box
@@ -430,7 +435,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
               >
                 <CircularProgress size={16} thickness={5} color="primary" />
                 <Typography variant="caption" color="text.secondary">
-                  Gia sư AI đang chuẩn bị gợi ý...
+                  {chuDangCho(giayDaCho, 'Gia sư AI đang chuẩn bị gợi ý...')}
                 </Typography>
               </Paper>
             </Box>
