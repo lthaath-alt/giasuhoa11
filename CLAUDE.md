@@ -107,9 +107,9 @@ src/
 │   └── services/     # firebase.ts, firestoreAuth.ts, firestoreService.ts, googleAuth.ts…
 ├── features/         # 12 module: admin, auth, bank, games, lessons, library,
 │                     #   mascot, quiz, research, student, teacher, tutor
-├── pages/            # AdminPage, DashboardPage, LoginPage, NotFoundPage,
-│                     #   QuizPage, SchoolAdminPage, TeacherPage
-├── App.tsx           # 14 <Route>, và khối `palette` của MUI
+├── pages/            # AdminPage, DashboardPage, DeGiaoPage, LoginPage,
+│                     #   NotFoundPage, QuizPage, SchoolAdminPage, TeacherPage
+├── App.tsx           # 15 <Route>, và khối `palette` của MUI
 ├── index.css         # TOÀN BỘ biến màu, hai chế độ sáng/tối
 └── main.tsx
 ```
@@ -253,21 +253,27 @@ Hằng ngày:
 |---|---|
 | `npm run dev` | Máy chủ phát triển, cổng 3000 |
 | `npm run lint` | `tsc --noEmit` — hàng rào chính, chạy MỘT LẦN trước khi báo xong |
-| `npm run kiem-tra` | Chạy cả 13 bộ kiểm, 361 mục trên máy thiếu Java (thêm 26 mục nữa trên CI, khi `kiem-tra:luat` chạy thật). Chạy trước khi commit |
+| `npm run kiem-tra` | Chạy cả 14 bộ kiểm trên máy thiếu Java (thêm các phép luật nữa trên CI, khi `kiem-tra:luat` chạy thật). Chạy trước khi commit |
 | `npm run build` | **Chỉ khi user yêu cầu** |
 
 Bộ kiểm chạy riêng khi cần: `kiem-tra:su-pham` (máy trạng thái sư phạm, chuẩn
 hoá + dựng công thức KaTeX, telemetry), `kiem-tra:chuong-trinh` (dữ liệu 25 bài),
-`kiem-tra:ngan-hang`, `kiem-tra:de-chuong`, `kiem-tra:het-luot`, `kiem-tra:mau`
+`kiem-tra:ngan-hang`, `kiem-tra:de-chuong`, `kiem-tra:de-giao` (đề giáo viên
+giao cho lớp), `kiem-tra:het-luot`, `kiem-tra:mau`
 (biến màu + tương phản), `kiem-tra:thuc-nghiem`, `kiem-tra:ran-thang`,
 `kiem-tra:dong-bo` (cần mạng, mất mạng thì tự bỏ qua), `kiem-tra:luyen-tap`,
 `kiem-tra:tai-lieu`
 (mọi đường dẫn và lệnh npm mà CLAUDE.md / hiến chương nhắc tới đều phải có thật),
 `kiem-tra:an-ninh` (những hàng rào an ninh không được phép biến mất — xem mục
 "An ninh dự án" bên dưới),
-`kiem-tra:luat` (19 phép thử luật Firestore trên emulator; cần Java 11+ nên
+`kiem-tra:luat` (phép thử luật Firestore trên emulator; cần Java 11+ nên
 máy nào thiếu thì tự bỏ qua — phép này chạy thật trên GitHub Actions, xem
 `.github/workflows/kiem-luat.yml`).
+
+Khi thêm một collection MỚI: `npm run do:luat` hỏi thẳng Firebase xem luật của
+nó đã publish chưa (CHỈ ĐỌC, cần `.env.local`). Tệp `firestore.rules` trong git
+chỉ là bản thảo, nên `kiem-tra:luat` xanh **không** có nghĩa là luật đang chạy đã
+đúng — hai việc khác nhau. Xem `do-luat-dang-chay.mts`.
 
 ## Kiểm thử đầu-cuối bằng trình duyệt (`npm run kiem-tra:e2e`)
 
@@ -281,6 +287,7 @@ chỉ hiện ra SAU KHI đăng nhập đều không ai canh. Hai thứ thêm hô
 |---|---|
 | `npm run kiem-tra:e2e` | Cả bộ. Cần tài khoản thử, xem bên dưới |
 | `npm run kiem-tra:e2e:khach` | Chỉ phần khách vãng lai — không cần tài khoản nào |
+| `npm run kiem-tra:e2e:giaovien` | Chỉ màn giáo viên. Cần `GIAO_VIEN_EMAIL` / `GIAO_VIEN_MATKHAU` |
 
 Đích mặc định là máy dev (`npm run dev` tự bật). Soi bản đã deploy thì đặt
 `E2E_URL=https://giasuhoa11.pages.dev` trước lệnh.
@@ -314,6 +321,35 @@ chậm. Đây là hai việc khác nhau, giữ riêng.
    Tệp phiên `tests/.auth/` mang token thật nên cũng bị chặn. Thiếu tài khoản
    thì phần cần đăng nhập tự BỎ QUA chứ không báo trượt: để nó đỏ sẵn thì
    người ta quen mắt với màu đỏ, rồi hôm trượt thật cũng không ai nhìn.
+
+**Bộ `giaovien` ĐANG ĐỎ HAI PHÉP, và cả hai là lỗi THẬT của web** (22/09/2026).
+Thêm khi dựng mục giao đề; cố ý không vá vì cả hai nằm ở luồng đăng nhập và
+luồng nạp dữ liệu, không thuộc mục giao đề:
+
+1. **Gõ mật khẩu xong, giáo viên vẫn bị hỏi "Tiếp tục với ..."** — trái đặc tả
+   "Ba lối vào". Ảnh chụp lúc trượt cho thấy màn đó hiện kèm ĐÚNG email vừa gõ,
+   tức `currentUser` đã về mà cờ `dangVao` chưa kịp bật: một cuộc đua giữa
+   `onAuthStateChanged` và `handleSuccess` trong `LoginPage.tsx`. Lộ ra ở vai
+   giáo viên vì `login()` của vai này đọc thêm dữ liệu nên trả về muộn hơn.
+2. **Màn giáo viên báo "0 Lớp học" trên hồ sơ trình duyệt SẠCH** dù tài khoản
+   đúng là chủ nhiệm lớp đó (đã đối chiếu thẳng với Firestore). Console báo
+   `getClasses`, `getUsers`, `getUserProgress` đều "Missing or insufficient
+   permissions" ngay sau khi đăng nhập, trong khi CÙNG tài khoản đó đọc
+   `classes` được từ Node. Nghi là các lời gọi này chạy trước khi `request.auth`
+   sẵn sàng và không có lần thử lại. **Nếu đúng vậy thì giáo viên đăng nhập lần
+   đầu trên máy mới sẽ thấy màn quản lý trống trơn** — đáng soi trước khi đem
+   web đi trình bày.
+
+Một điều khác đo được ở đây, ghi để khỏi tìm lại: **trong ngữ cảnh Playwright,
+Firebase Auth KHÔNG lưu phiên xuống đĩa.** Kho `firebaseLocalStorageDb/
+firebaseLocalStorage` rỗng 0 bản ghi sau 30 giây chờ, `localStorage` không có
+khoá `firebase:authUser:…`, và F5 là văng về `/#/login`. Vì thế bộ `giaovien`
+CỐ Ý không dùng `storageState` như bộ `hocsinh` — mỗi phép tự đăng nhập bằng
+`dangNhapGiaoVien()` trong `tests/chung.ts`.
+
+Phép `giao-de.spec.ts` **GHI DỮ LIỆU THẬT**: nó tạo một đề tên `[E2E] …` cho
+lớp thật rồi xoá ở cuối. Chết giữa chừng thì đề đó còn sót — xoá tay trong bảng
+"Đề đã giao"; bài đã nộp không mất theo.
 
 Sinh lại dữ liệu — đọc `scripts/README.md` trước khi dùng:
 `soan` (từ tệp .docx sang `constants.ts`), `xuat:ngan-hang` (Firestore sang repo),
@@ -652,6 +688,19 @@ web vẫn đúng vì nó đọc thẳng Firestore; `kiem-tra:dong-bo` sinh ra đ
 
 `src/features/lessons/constants.ts` **do máy sinh ra**, sửa tay sẽ bị ghi đè.
 
+**`toLegacy` từng đánh rơi lời giải, đã vá 22/09/2026.** Ngân hàng dùng mô hình
+`BankQuestion` (trường `e` = lời giải), còn Đề kiểm tra dùng mô hình `Question`
+đời cũ; `toLegacy` trong `features/bank/convert.ts` là cầu nối giữa hai bên và
+nó **không chép `e` sang**. Đo hôm đó: **1.554/1.554 câu đều CÓ lời giải**, mà
+không câu nào tới được màn Đề kiểm tra — em làm sai chỉ đọc được đúng một chữ
+cái đáp án. Luyện tập và trò chơi không dính, vì chúng đọc thẳng `BankQuestion`.
+
+Đúng kiểu lỗi mà cả `tsc` lẫn 13 bộ kiểm đều không thấy: trường THIẾU thì không
+ai báo, đề vẫn dựng ra, điểm vẫn đúng, chỉ có một khối giao diện lặng lẽ không
+bao giờ hiện. Nay `Question.giaiThich` giữ nó, `fromLegacy` trả nó về `e`, và
+`QuizPage` hiện khối "LỜI GIẢI" cho **cả câu đúng lẫn câu sai** — em đoán mò mà
+trúng thì vẫn cần biết vì sao. `kiem-tra:de-giao` canh cả hai chiều chuyển đổi.
+
 ### Hạn mức đọc: đừng tải cả ngân hàng ở màn học sinh
 
 Bậc miễn phí cho **50.000 lượt đọc/ngày**, mà ngân hàng có **1.554 tài liệu,
@@ -730,6 +779,67 @@ Nội dung câu hỏi trong bài nộp do học sinh ghi lên, nên phải coi l
 cậy: trang giáo viên hiện nó qua `ChemicalText`, tức qua `locHtml`. Đừng bỏ lớp
 lọc đó. `kiem-tra:luyen-tap` canh cho trang giáo viên không đọc lại
 `QuizStorage`; `kiem-tra:luat` có 12 phép (21a–21l) cho collection này.
+
+### Đề giáo viên GIAO nằm ở `de_giao/{id}`
+
+Thêm 22/09/2026 — chiều NGƯỢC của `bai_nop`: đề đi từ máy giáo viên tới máy
+học sinh. Trước đó mọi đề chỉ sinh ra khi chính học sinh bấm trong màn học, nên
+giáo viên không có đường nào giao một đề chung cho cả lớp.
+
+Luồng đầy đủ, ba bước, KHÔNG có đường chấm điểm thứ hai:
+
+1. **Giáo viên**: mục "Theo dõi học sinh" → thẻ **Giao đề kiểm tra**
+   (`features/teacher/components/GiaoDeTab.tsx`). Chọn chương/bài, bấm "Lấy câu
+   từ ngân hàng" (`getByLesson` hoặc `getByChapter` — **không bao giờ**
+   `getAll()`), đặt số phút và hạn nộp, bấm Giao. Nhận lại một đoạn thông báo
+   kèm link `#/de/<id>` để dán vào nhóm lớp.
+2. **Học sinh**: mở link → `pages/DeGiaoPage.tsx`. Trang này **cố ý không hiện
+   câu hỏi nào**, chỉ nói đề gì / lớp nào / bao lâu / hạn khi nào. Bấm "Bắt đầu
+   làm bài" thì `taoBaiLam` dựng một `Quiz` rồi đẩy sang `/quiz/<id>`.
+   Đề cũng hiện lại trong tab "Bài tập GV giao" (`DeCoGiaoList.tsx`) cho em nào
+   mất link.
+3. **Nộp**: đi đúng `QuizPage` + `bai_nop` đã có từ trước. Giáo viên xem điểm ở
+   thẻ "Bài kiểm tra và chấm tự luận" như mọi bài khác.
+
+Bảy điều phải biết:
+
+1. **Đề mang NGUYÊN câu hỏi, không mang danh sách id.** Câu trong
+   `bank_questions` sửa được bất cứ lúc nào, mà đề đã giao thì phải đứng yên —
+   cả lớp làm đúng một đề, và cô chấm lại sau một tháng vẫn thấy đúng đề đó.
+2. **Mã bài làm suy ra được**: `dg_<mã đề>_<email đã lọc>` (`maBaiLam`). Nhờ vậy
+   mở lại link giữa chừng là gặp lại bài đang làm dở, và mỗi em chỉ có MỘT dòng
+   điểm cho mỗi đề. Sinh mã ngẫu nhiên là hỏng cả hai.
+3. **`lessonId` của bài mang tiền tố `de-giao:`**, không trùng bài nào trong
+   chương trình. Hai chỗ dựa vào đúng tính chất đó: `QuizPage` khoá bài kiểm tra
+   khi bài học trước chưa xong (trùng mã bài thật là em bị chặn khỏi chính bài
+   cô giao), và chỗ đánh dấu bài học hoàn thành khi đạt 7/10.
+4. **Hết giờ lấy mốc SỚM HƠN** giữa "bắt đầu + số phút" và hạn nộp của đề
+   (`hetGioLuc`). Bỏ vế thứ hai là em mở link lúc 23h50 vẫn có trọn 45 phút.
+5. **GIỚI HẠN ĐÃ BIẾT: đáp án nằm trong tài liệu học sinh đọc được.** Cùng gốc
+   với giới hạn số 4 của `bai_nop` — chấm điểm chạy trên trình duyệt của em nên
+   đáp án bắt buộc phải tới máy em. Siết luật không chữa được; chữa thật là chấm
+   lại ở máy chủ (Cloud Function, gói Blaze). Đừng vá bằng cách giấu đáp án.
+6. **Có một đề DỰNG SẴN 10 câu** ở `features/quiz/deMauCanBang.ts` — đề giấy của
+   giáo viên, gõ tay từ ảnh chụp ngày 22/09/2026, chủ đề Cân bằng hoá học. Nút
+   "Đề mẫu 10 câu" trong `GiaoDeTab` nạp thẳng bộ này, **không đọc Firestore**.
+   Cố ý KHÔNG nạp vào `bank_questions`: ghi ngân hàng là sửa dữ liệu thật của
+   1.554 câu, và quy trình bắt chủ dự án tự làm việc đó. Hai đáp án dễ chấm
+   nhầm đã ghi lý do ngay trong chú thích đầu tệp (câu 7 là *giảm áp suất* chứ
+   không phải giảm nhiệt độ; câu 10 là *0,1 M* chứ không phải 0,534 M — Kc đòi
+   0,534 mol CO₂ trong 1 L mà cả bình chỉ có 0,1 mol CaCO₃).
+7. **Câu có phương án "Tất cả đều đúng" / "cả A và B" KHÔNG được xáo.**
+   `coPhuongAnNeo` trong `features/bank/xaoDapAn.ts` chặn cả hai hàm xáo
+   (`xaoPhuongAnWeb` cho Đề kiểm tra, `xaoPhuongAnBank` cho Luyện tập và trò
+   chơi). Xáo lên thì phương án A hoá ra "Tất cả đều sai", hoặc "cả A và B" trỏ
+   vào chính nó — câu hỏi thành vô nghĩa mà điểm vẫn ra một con số hợp lý. Đo
+   22/09/2026: **12 trong 1.554 câu** của ngân hàng dính mẫu này. Cái giá phải
+   trả là 12 câu đó giữ nguyên thế lệch đáp án; chữa tận gốc là viết lại nội
+   dung chúng, việc của người soạn đề.
+
+Phép canh: `kiem-tra:de-giao` (logic thuần — trạng thái đề, mã bài, hết giờ, và
+đối chiếu trường của bài nộp với `hasOnly` trong `firestore.rules`);
+`kiem-tra:luat` có 12 phép (22a–22l) cho collection này.
+
 
 ## An ninh dự án — lỗ hổng, hàng rào, và luật
 
