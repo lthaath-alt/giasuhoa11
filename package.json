@@ -32,6 +32,7 @@
     "xuat:ngan-hang": "tsx scripts/xuat-ngan-hang.mts",
     "liet-ke:tai-khoan": "tsx scripts/liet-ke-tai-khoan.mts",
     "sua:cau-hoi": "tsx scripts/sua-cau-hoi.mts",
+    "sao-luu": "tsx scripts/sao-luu-firestore.mts",
     "chuyen:users": "tsx scripts/chuyen-users-sang-uid.mts",
     "xoa:password": "tsx scripts/xoa-cot-password.mts",
     "kiem-tra:dong-bo": "tsx scripts/kiem-tra-dong-bo-ngan-hang.mts",
