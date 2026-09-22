@@ -32,6 +32,7 @@ import { buildProgramContext } from '../src/features/tutor/services/lessonContex
 import { chuanHoaCongThuc } from '../src/core/components/chuanHoaCongThuc';
 import { LUOC_DO_LOC, TUY_CHON_KATEX, taoTheLink } from '../src/core/components/markdownCauHinh';
 import { tinhChiSo, xuatCsv } from '../src/features/tutor/services/telemetryService';
+import { coDapSo, timDapAnChoTin } from '../src/features/tutor/services/chanRoDapSo';
 import type { ChatMessage } from '../src/features/auth/types';
 
 const GOC = fileURLToPath(new URL('..', import.meta.url));
@@ -264,6 +265,38 @@ console.log('\n== Telemetry và chỉ số Socratic ==');
   const csv = xuatCsv(mau);
   ok(!csv.includes('@') && !csv.includes('nội dung bí mật') && csv.split('\n')[0].startsWith('user_hash,'),
     'CSV không có email, không có nội dung tin nhắn');
+}
+
+console.log('\n== Bộ dò đáp số trong câu trả lời (P0-2, P0-4) ==');
+{
+  /* Mỗi ca là một lối viết số mà học sinh hoặc mô hình thật sự dùng. Ba lối
+     luỹ thừa cuối lấy từ chính lời giải trong ngân hàng (trường `e`). */
+  const ca: [string, number, boolean][] = [
+    ['Vậy pH của dung dịch là 1,70 em nhé.', 1.7, true],
+    ['pH = 1.70', 1.7, true],
+    ['nồng độ còn lại 1,45.10^-2 M', 0.0145, true],
+    ['nồng độ còn lại 1.45e-2 M', 0.0145, true],
+    ['giá trị 1,45×10⁻² mol/L', 0.0145, true],
+    ['Em thử tính lại xem [H+] bằng bao nhiêu nhé?', 1.7, false],
+    ['Theo phương trình, 1 mol H2 phản ứng tạo ra 2 mol HI.', 1.7, false],
+    ['Kết quả xấp xỉ 0,30 M', 0.3, true],
+  ];
+  for (const [text, dap, mong] of ca) {
+    ok(coDapSo(text, dap, 0.05) === mong, `dò "${text.slice(0, 34)}…" → ${mong}`);
+  }
+
+  const kho = [{
+    q: 'Trộn 100 mL dung dịch HCl 0,1 M với 100 mL dung dịch NaOH 0,06 M. Tính pH của dung dịch sau phản ứng.',
+    num: 1.7, tol: 0.05,
+  }];
+  ok(timDapAnChoTin(
+    'tron 100 ml dung dich hcl 0,1 m voi 100 ml dung dich naoh 0,06 m tinh ph cua dung dich sau phan ung giup em voi a',
+    kho)?.num === 1.7,
+    'khớp được câu ngân hàng dù em gõ không dấu');
+  ok(timDapAnChoTin('em khong biet lam bai nay', kho) === undefined,
+    'tin ngắn hoặc khác đề thì không khớp bừa');
+  ok(timDapAnChoTin('Tính pH của dung dịch thu được khi trộn hai dung dịch acid mạnh có cùng nồng độ', kho) === undefined,
+    'bài cùng chủ đề nhưng khác đề thì không khớp');
 }
 
 console.log('\n' + (hong === 0 ? '>>> TẤT CẢ ĐẠT' : `>>> CÓ ${hong} MỤC KHÔNG ĐẠT`) + '\n');

@@ -1034,6 +1034,30 @@ deploy. Việc deploy bản preview cần tài khoản Cloudflare của bạn ch
 
 ---
 
+## Đính chính sau khi làm Việc 1 (22/09/2026)
+
+Năm chỗ trong kế hoạch này viết sai so với mã thật, đã kiểm chứng và sửa khi thực thi.
+Ghi lại để việc sau không chép lại cái sai:
+
+1. **Danh sách collection sai cả hai chiều.** Thật ra có **15** collection (khớp giữa `src/`
+   và `firestore.rules`): `bank_questions`, `questions`, `curriculum_chapters`, `exams`,
+   `equations`, `matrix_resources`, `system_settings`, `schools`, `users`, `classes`,
+   `progress`, `chats`, `bai_nop`, `quan_tri`, `gioi_han_chat`. Kế hoạch bịa ra `quizzes`
+   và `library_questions` (không tồn tại), và sót sáu cái đọc công khai — sót kiểu nguy
+   hiểm vì không có lỗi nào báo, bản sao chỉ lặng lẽ thiếu.
+2. **`scripts/kiem-tra-an-ninh.mts` không có hàm `ok(...)`** mà dùng `dat(ten)` /
+   `truot(ten, chiTiet)` với biến đếm `soLoi`. (Bộ `kiem-tra-su-pham.mts` thì CÓ `ok(...)`,
+   nên các phép kiểm ở Việc 3–7 viết đúng.)
+3. **`hoiMatKhau` không tồn tại.** `scripts/hoi-ban-phim.mts` xuất `hoi` và `hoiKin(cauHoi, hien)`.
+4. **Export cấu hình Firebase tên là `FIREBASE_CONG_KHAI`**, không phải `firebaseCongKhai`;
+   và lối của repo cho script Node là `cauHinh(docEnv())` từ `ngan-hang-chung.mts`, để
+   `VITE_FIREBASE_*` còn thắng khi cần trỏ sang dự án Firebase khác.
+5. **`gioi_han_chat` sẽ báo `permission-denied`** khi sao lưu: luật chỉ cho mỗi người đọc bản
+   ghi của chính mình, không cho `list`. Đó là đúng luật, không phải hỏng.
+
+Ngoài phạm vi, chỉ báo chứ chưa vá: chú thích cuối `firestore.rules` (dòng 422) còn ghi
+"Mười ba collection trên là toàn bộ những gì mã nguồn dùng tới" — nay là 15.
+
 ## Những gì kế hoạch này CỐ Ý không làm
 
 - **P1-1 (chuyển logic lên server)** — việc lớn nhất trong cả danh sách, cần chọn nền tảng và
