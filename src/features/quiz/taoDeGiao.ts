@@ -77,6 +77,93 @@ export function tongDiem(questions: Question[]): number {
   return questions.reduce((t, q) => t + (q.points || 1), 0);
 }
 
+// ─── Kết quả cả lớp cho một đề ───────────────────────────────────────────────
+
+/** Một dòng trong bảng kết quả: một em, một đề. */
+export interface KetQuaEm {
+  email: string;
+  ten: string;
+  /** Số báo danh, để đánh số cột đầu giống các bảng khác của màn giáo viên */
+  soBaoDanh?: number;
+  daNop: boolean;
+  /** Điểm quy về thang 10; `null` khi em chưa nộp */
+  diem10: number | null;
+  soDung: number;
+  soSai: number;
+  soCau: number;
+  /** ISO, lúc em bắt đầu bài — `Quiz.createdAt`. Vắng khi chưa nộp. */
+  nopLuc?: string;
+}
+
+/**
+ * Kết quả của CẢ LỚP cho một đề, kể cả em chưa nộp.
+ *
+ * Giữ nguyên thứ tự `hocSinh` truyền vào chứ không tự sắp xếp: danh sách đó đã
+ * theo sổ lớp, và mọi bảng khác của màn giáo viên đang đánh số theo đúng thứ
+ * tự ấy. Sắp lại ở đây là cùng một lớp mà hai bảng đánh số khác nhau.
+ *
+ * Em CHƯA nộp vẫn có một dòng. Bỏ các em đó đi thì bảng chỉ còn người đã làm,
+ * và cô không nhìn ra ai chưa làm — mà đó mới là thứ cô cần trước giờ trả bài.
+ *
+ * Câu bỏ trống tính là SAI: `soSai = soCau − soDung`. Đếm riêng "chưa trả lời"
+ * thì cột số phải cộng lại mới bằng tổng, còn thang điểm của Bộ vốn đã coi ý
+ * bỏ trống là sai — xem `chamCau` trong `features/practice/logic.ts`.
+ */
+export function thongKeDeGiao(
+  deGiaoId: string,
+  hocSinh: { email: string; name: string; studentNumber?: number }[],
+  baiNop: Quiz[],
+): KetQuaEm[] {
+  /* Chỉ lấy bài của ĐÚNG đề này. `docBaiNopCuaCacEm` trả về MỌI bài của lớp,
+     gồm cả đề tự ôn của từng em. */
+  const cuaDe = new Map<string, Quiz>();
+  for (const q of baiNop) {
+    if (q.deGiaoId !== deGiaoId || q.status !== 'submitted') continue;
+    const e = (q.userEmail || '').trim().toLowerCase();
+    const cu = cuaDe.get(e);
+    /* Mã bài suy ra được nên mỗi em chỉ có một bài cho mỗi đề. Phòng khi dữ
+       liệu cũ còn hai bản, lấy bản MỚI hơn — đó là bản cô đang chấm. */
+    if (!cu || q.createdAt > cu.createdAt) cuaDe.set(e, q);
+  }
+
+  return hocSinh.map(hs => {
+    const email = (hs.email || '').trim().toLowerCase();
+    const bai = cuaDe.get(email);
+    if (!bai) {
+      return {
+        email, ten: hs.name, soBaoDanh: hs.studentNumber,
+        daNop: false, diem10: null, soDung: 0, soSai: 0, soCau: 0,
+      };
+    }
+
+    const soCau = bai.questions.length;
+    const soDung = Object.values(bai.results || {}).filter(r => r.correct).length;
+    return {
+      email, ten: hs.name, soBaoDanh: hs.studentNumber,
+      daNop: true,
+      diem10: bai.maxScore > 0 ? (bai.score / bai.maxScore) * 10 : 0,
+      soDung,
+      soSai: soCau - soDung,
+      soCau,
+      nopLuc: bai.createdAt,
+    };
+  });
+}
+
+/** Mấy con số tóm tắt trên đầu bảng kết quả. `diemTB` chỉ tính trên em ĐÃ nộp. */
+export function tomTatDeGiao(ds: KetQuaEm[]): {
+  siSo: number; daNop: number; diemTB: number | null;
+} {
+  const nop = ds.filter(k => k.daNop && k.diem10 !== null);
+  return {
+    siSo: ds.length,
+    daNop: nop.length,
+    /* Chia cho SỐ EM ĐÃ NỘP, không phải sĩ số. Chia cho sĩ số là mỗi em chưa
+       làm kéo trung bình lớp xuống như thể em ấy được 0 — sai hẳn ý nghĩa. */
+    diemTB: nop.length ? nop.reduce((t, k) => t + (k.diem10 as number), 0) / nop.length : null,
+  };
+}
+
 /**
  * Dựng bài làm cho một em từ đề đã giao.
  *

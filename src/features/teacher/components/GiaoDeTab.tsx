@@ -15,7 +15,7 @@ import { docBaiNopCuaCacEm } from '../../quiz/baiNopService';
 import {
   datTrangThaiDong, docDeCuaLop, luuDeGiao, xoaDeGiao,
 } from '../../quiz/deGiaoService';
-import { tongDiem, trangThaiDe } from '../../quiz/taoDeGiao';
+import { thongKeDeGiao, tomTatDeGiao, tongDiem, trangThaiDe } from '../../quiz/taoDeGiao';
 import type { TrangThaiDe } from '../../quiz/taoDeGiao';
 import { DE_MAU_CAN_BANG, TEN_DE_MAU } from '../../quiz/deMauCanBang';
 import type { DeGiao, Quiz } from '../../quiz/types';
@@ -74,6 +74,26 @@ const NHAN_TRANG_THAI: Record<TrangThaiDe, { chu: string; mau: 'default' | 'succ
   'da-dong': { chu: 'Đã đóng', mau: 'default' },
 };
 
+/**
+ * Thẻ số liệu trên đầu bảng kết quả.
+ *
+ * CỐ Ý chép lại thay vì dùng chung với `TheoDoiHocSinh.tsx`: tệp đó đã import
+ * GiaoDeTab, nên import ngược lại là một vòng phụ thuộc. Mười dòng chép ra rẻ
+ * hơn một vòng lặp mô-đun, và nếu sau này có thẻ thứ ba cần nó thì lúc ấy mới
+ * tách ra chỗ dùng chung.
+ */
+const TheSo: React.FC<{ nhan: string; so: string; ghiChu: string }> = ({ nhan, so, ghiChu }) => (
+  <Paper sx={{ p: 2, borderRadius: 0, border: '1px solid var(--vien)', boxShadow: 'none' }}>
+    <Typography variant="overline" sx={{ fontWeight: 'bold', color: 'var(--chu-2)', fontSize: '0.65rem', letterSpacing: '0.08em', display: 'block', lineHeight: 1.4 }}>
+      {nhan}
+    </Typography>
+    <Typography sx={{ fontWeight: 800, fontSize: '1.6rem', color: 'var(--chu-dam)', fontVariantNumeric: 'tabular-nums', lineHeight: 1.2 }}>
+      {so}
+    </Typography>
+    <Typography variant="caption" sx={{ color: 'var(--chu-mo)' }}>{ghiChu}</Typography>
+  </Paper>
+);
+
 function xaoTron<T>(ds: T[]): T[] {
   const a = [...ds];
   for (let i = a.length - 1; i > 0; i--) {
@@ -92,7 +112,7 @@ function dungDuoc(q: Question): boolean {
 }
 
 export const GiaoDeTab: React.FC<{ students: User[] }> = ({ students }) => {
-  const { currentUser, curriculum, getMyClass } = useApp();
+  const { currentUser, curriculum, getMyClass, loiNapLop } = useApp();
   const lop = getMyClass();
 
   // ── Biểu mẫu soạn đề ───────────────────────────────────────────────────────
@@ -116,6 +136,9 @@ export const GiaoDeTab: React.FC<{ students: User[] }> = ({ students }) => {
   const [baiNop, setBaiNop] = useState<Quiz[]>([]);
   const [dangTai, setDangTai] = useState(true);
   const [deVuaGiao, setDeVuaGiao] = useState<DeGiao | null>(null);
+  /* Đề đang xem kết quả. `null` = chưa chọn, và khi đó lấy đề MỚI NHẤT — cô
+     vừa giao xong thì thứ cô muốn xem gần như luôn là đề đó. */
+  const [deDangXem, setDeDangXem] = useState<string | null>(null);
   const [hoiXoa, setHoiXoa] = useState<DeGiao | null>(null);
   const [daChep, setDaChep] = useState<string | null>(null);
 
@@ -279,7 +302,27 @@ export const GiaoDeTab: React.FC<{ students: User[] }> = ({ students }) => {
   const soEmDaNop = (deId: string) =>
     new Set(baiNop.filter(q => q.deGiaoId === deId).map(q => q.userEmail)).size;
 
+  /* Đề đang xem kết quả: đề cô vừa bấm, hoặc đề mới nhất. `dsDe` đã xếp mới
+     nhất trước (xem `docDeCuaLop`). Đề vừa bị xoá thì `find` trả undefined và
+     cả khối kết quả ẩn đi — đúng ý. */
+  const maDeDangXem = deDangXem ?? dsDe[0]?.id ?? null;
+  const deXem = dsDe.find(d => d.id === maDeDangXem) ?? null;
+  const ketQua = deXem ? thongKeDeGiao(deXem.id, students, baiNop) : [];
+  const tomTat = tomTatDeGiao(ketQua);
+
   if (!lop) {
+    /* Hai ca KHÁC HẲN nhau, đừng gộp (23/09/2026). "Chưa có lớp" bảo cô đi
+       tạo lớp; nếu thật ra chỉ là không đọc được danh sách thì cô sẽ tạo
+       thêm một lớp trùng với lớp đang có. Xem `loiNapLop` trong AppContext. */
+    if (loiNapLop) {
+      return (
+        <Alert severity="error" sx={{ borderRadius: 0 }}>
+          Không tải được danh sách lớp ({loiNapLop}), nên chưa biết bạn chủ nhiệm lớp nào.
+          <strong> Đừng tạo lớp mới</strong> — hãy tải lại trang (F5). Còn lỗi thì đăng xuất
+          rồi đăng nhập lại.
+        </Alert>
+      );
+    }
     return (
       <Alert severity="info" sx={{ borderRadius: 0 }}>
         Bạn chưa có lớp nào. Tạo lớp ở mục "Quản lý Lớp học" rồi quay lại đây để giao đề.
@@ -486,7 +529,12 @@ export const GiaoDeTab: React.FC<{ students: User[] }> = ({ students }) => {
             ) : dsDe.map(de => {
               const tt = NHAN_TRANG_THAI[trangThaiDe(de)];
               return (
-                <TableRow key={de.id} hover data-de-id={de.id}>
+                <TableRow
+                  key={de.id} hover data-de-id={de.id}
+                  onClick={() => setDeDangXem(de.id)}
+                  selected={de.id === maDeDangXem}
+                  sx={{ cursor: 'pointer' }}
+                >
                   <TableCell sx={{ fontWeight: 600 }}>{de.tieuDe}</TableCell>
                   <TableCell align="right" sx={{ fontVariantNumeric: 'tabular-nums' }}>{de.questions.length}</TableCell>
                   <TableCell sx={{ color: 'text.secondary' }}>{gioDep(de.dongLuc)}</TableCell>
@@ -494,7 +542,10 @@ export const GiaoDeTab: React.FC<{ students: User[] }> = ({ students }) => {
                   <TableCell align="right" sx={{ fontVariantNumeric: 'tabular-nums', fontWeight: 'bold' }}>
                     {soEmDaNop(de.id)}/{students.length}
                   </TableCell>
-                  <TableCell align="right">
+                  {/* Bấm nút trong ô này KHÔNG được coi là chọn đề để xem kết
+                      quả — cô bấm "xoá" mà bảng dưới nhảy sang đề khác thì
+                      nhìn nhầm ngay. */}
+                  <TableCell align="right" onClick={e => e.stopPropagation()}>
                     <Tooltip title={daChep === de.id ? 'Đã chép!' : 'Chép link thông báo'}>
                       <IconButton size="small" onClick={() => chep(loiThongBao(de), de.id)}>
                         {daChep === de.id ? <Copy size={15} color="var(--luc-tham)" /> : <Link2 size={15} />}
@@ -515,6 +566,92 @@ export const GiaoDeTab: React.FC<{ students: User[] }> = ({ students }) => {
           </TableBody>
         </Table>
       </TableContainer>
+
+      {/* ── KẾT QUẢ CẢ LỚP CHO ĐỀ ĐANG CHỌN (23/09/2026) ─────────────────
+          Trước đó muốn xem điểm phải sang thẻ "Bài kiểm tra và chấm tự luận"
+          rồi chọn từng em một — ba cú bấm cho một câu hỏi mà cô hỏi ngay sau
+          khi hết giờ: "lớp làm được bao nhiêu?". Bảng này trả lời tại chỗ.
+          Số liệu đọc từ `bai_nop` trên Firestore, không phải localStorage máy
+          cô — xem `baiNopService.ts`. */}
+      {deXem && (
+        <Box sx={{ mt: 4 }}>
+          <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 0.5 }}>
+            Kết quả: {deXem.tieuDe}
+          </Typography>
+          <Typography variant="caption" sx={{ color: 'var(--chu-mo)', display: 'block', mb: 1.5 }}>
+            {dsDe.length > 1 ? 'Bấm một dòng ở bảng trên để xem đề khác.' : 'Đề duy nhất của lớp.'}
+          </Typography>
+
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr 1fr', md: 'repeat(3, 1fr)' }, gap: 2, mb: 2 }}>
+            <TheSo nhan="ĐÃ NỘP" so={`${tomTat.daNop}/${tomTat.siSo}`} ghiChu="em trong lớp" />
+            <TheSo
+              nhan="ĐIỂM TRUNG BÌNH"
+              so={tomTat.diemTB === null ? '—' : tomTat.diemTB.toFixed(1)}
+              ghiChu="thang 10, chỉ tính em đã nộp"
+            />
+            <TheSo nhan="SỐ CÂU" so={`${deXem.questions.length}`} ghiChu="mỗi câu 1 điểm" />
+          </Box>
+
+          <TableContainer component={Paper} sx={{ borderRadius: 0, border: '1px solid var(--vien)', boxShadow: 'none' }}>
+            <Table size="small">
+              <TableHead>
+                <TableRow sx={{ bgcolor: 'var(--nen-nhat)' }}>
+                  <TableCell sx={{ fontWeight: 'bold' }}>STT</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Học sinh</TableCell>
+                  <TableCell align="right" sx={{ fontWeight: 'bold' }}>Điểm</TableCell>
+                  <TableCell align="right" sx={{ fontWeight: 'bold' }}>Câu đúng</TableCell>
+                  <TableCell align="right" sx={{ fontWeight: 'bold' }}>Câu sai</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Nộp lúc</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {ketQua.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} align="center" sx={{ py: 4, color: 'text.secondary' }}>
+                      Lớp chưa có học sinh nào.
+                    </TableCell>
+                  </TableRow>
+                ) : ketQua.map((k, i) => (
+                  <TableRow key={k.email} hover>
+                    <TableCell sx={{ fontVariantNumeric: 'tabular-nums' }}>{k.soBaoDanh ?? i + 1}</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>{k.ten}</TableCell>
+
+                    {k.daNop ? (
+                      <>
+                        {/* Dưới 5,0 là chỗ cô cần nhìn thấy ngay. Đỏ tín hiệu
+                            dành cho đúng loại việc này — xem "Thế giới thị
+                            giác" trong CLAUDE.md. */}
+                        <TableCell
+                          align="right"
+                          sx={{
+                            fontVariantNumeric: 'tabular-nums', fontWeight: 'bold',
+                            color: (k.diem10 as number) < 5 ? 'var(--tin-hieu)' : 'var(--chu-dam)',
+                          }}
+                        >
+                          {(k.diem10 as number).toFixed(1)}
+                        </TableCell>
+                        <TableCell align="right" sx={{ fontVariantNumeric: 'tabular-nums', color: 'var(--luc-tham)' }}>
+                          {k.soDung}
+                        </TableCell>
+                        <TableCell align="right" sx={{ fontVariantNumeric: 'tabular-nums', color: 'var(--chu-2)' }}>
+                          {k.soSai}
+                        </TableCell>
+                        <TableCell sx={{ color: 'text.secondary' }}>
+                          {k.nopLuc ? gioDep(k.nopLuc) : '—'}
+                        </TableCell>
+                      </>
+                    ) : (
+                      <TableCell colSpan={4} sx={{ color: 'var(--chu-mo)' }}>
+                        <Chip label="Chưa nộp" size="small" />
+                      </TableCell>
+                    )}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
+      )}
 
       {/* ── HỘP THOẠI: LINK THÔNG BÁO ────────────────────────────────────── */}
       <Dialog open={Boolean(deVuaGiao)} onClose={() => setDeVuaGiao(null)} maxWidth="sm" fullWidth>

@@ -24,7 +24,7 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
 import {
-  TIEN_TO_DE_GIAO, hetGioLuc, maBaiLam, taoBaiLam, tongDiem, trangThaiDe,
+  TIEN_TO_DE_GIAO, hetGioLuc, maBaiLam, taoBaiLam, thongKeDeGiao, tomTatDeGiao, tongDiem, trangThaiDe,
 } from '../src/features/quiz/taoDeGiao';
 import { coPhuongAnNeo, xaoPhuongAnWeb } from '../src/features/bank/xaoDapAn';
 import { fromLegacy, toLegacy } from '../src/features/bank/convert';
@@ -33,7 +33,12 @@ import type { BankQuestion } from '../src/features/bank/types';
 import { DE_MAU_CAN_BANG } from '../src/features/quiz/deMauCanBang';
 import { CHEMISTRY_11_CURRICULUM } from '../src/features/lessons/constants';
 import type { Question } from '../src/features/library/types';
-import type { DeGiao } from '../src/features/quiz/types';
+import type { DeGiao, Quiz } from '../src/features/quiz/types';
+import { soSanhHocSinh } from '../src/features/auth/thanhVienLop';
+import type { User } from '../src/features/auth/types';
+
+/** Tên riêng = chữ cuối, chỉ dùng để in kết quả cho dễ đọc. */
+const tenCuoi = (s: string) => s.trim().split(/\s+/).pop() ?? '';
 
 const GOC = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -203,6 +208,141 @@ console.log('\n== Trường của bài nộp khớp firestore.rules ==');
     ok(choPhep.has('deGiaoId') && choPhep.has('tenDe'),
       'luật đã khai deGiaoId và tenDe (thiếu là bài của đề giao không nộp được)');
   }
+}
+
+// ─── Bảng kết quả cả lớp ─────────────────────────────────────────────────────
+//
+// Cô đọc bảng này ngay sau khi hết giờ để biết lớp làm được bao nhiêu. Sai ở
+// đây thì KHÔNG AI THẤY: mỗi ô vẫn ra một con số trông hợp lý, chỉ là của
+// nhầm em, nhầm đề, hoặc đếm thiếu câu.
+
+console.log('\n== Bảng kết quả cả lớp cho một đề ==');
+{
+  const hocSinh = [
+    { email: 'An@Truong.local', name: 'An', studentNumber: 1 },
+    { email: 'binh@truong.local', name: 'Bình', studentNumber: 2 },
+    { email: 'chi@truong.local', name: 'Chi', studentNumber: 3 },
+  ];
+
+  const baiMau = (email: string, deGiaoId: string, score: number, dung: number, soCau = 10,
+                  createdAt = '2026-09-23T08:00:00.000Z'): Quiz => ({
+    id: maBaiLam(deGiaoId, email),
+    lessonId: TIEN_TO_DE_GIAO + deGiaoId,
+    chapterId: TIEN_TO_DE_GIAO + deGiaoId,
+    userEmail: email.toLowerCase(),
+    questions: Array.from({ length: soCau }, (_, i) => cau(i + 1)),
+    answers: {},
+    status: 'submitted',
+    score,
+    maxScore: soCau,
+    createdAt,
+    expiresAt: createdAt,
+    deGiaoId,
+    tenDe: 'Đề thử',
+    results: Object.fromEntries(Array.from({ length: soCau }, (_, i) => [
+      `q${i + 1}`,
+      { questionId: `q${i + 1}`, score: i < dung ? 1 : 0, maxScore: 1, correct: i < dung,
+        studentAnswer: 'A', correctAnswer: 'B', feedback: '', confidence: 'high' as const },
+    ])),
+  });
+
+  const de = deMau();
+  const kq = thongKeDeGiao(de.id, hocSinh, [baiMau('an@truong.local', de.id, 8, 8)]);
+
+  ok(kq.length === 3, 'mỗi em một dòng, kể cả em chưa nộp', `${kq.length} dòng`);
+  ok(kq[0].daNop && !kq[1].daNop && !kq[2].daNop, 'đánh dấu đúng ai đã nộp');
+  ok(kq[0].diem10 === 8, 'điểm quy về thang 10', String(kq[0].diem10));
+  ok(kq[0].soDung === 8 && kq[0].soSai === 2, 'đếm đúng/sai khớp số câu',
+    `${kq[0].soDung} đúng / ${kq[0].soSai} sai`);
+  ok(kq[0].soDung + kq[0].soSai === kq[0].soCau, 'đúng + sai = tổng số câu (bỏ trống tính là sai)');
+  ok(kq[1].diem10 === null, 'em chưa nộp KHÔNG có điểm 0 giả', String(kq[1].diem10));
+  ok(kq[0].ten === 'An' && kq[2].ten === 'Chi', 'giữ nguyên thứ tự sổ lớp');
+
+  /* Email trong sổ lớp viết hoa/thường lẫn lộn, còn `bai_nop` luôn chữ thường
+     (xem `baiNopChuan.ts`). So thẳng là bài của em rơi vào ô "chưa nộp". */
+  ok(kq[0].email === 'an@truong.local', 'khớp được email viết hoa với bài nộp chữ thường');
+
+  /* `docBaiNopCuaCacEm` tra về MOI bai cua lop, gom ca de tu on. */
+  const lanSang = thongKeDeGiao(de.id, hocSinh, [
+    baiMau('an@truong.local', de.id, 8, 8),
+    baiMau('binh@truong.local', 'de_KHAC', 10, 10),
+  ]);
+  ok(!lanSang[1].daNop, 'KHÔNG tính bài của đề khác vào đề đang xem');
+
+  /* Bài tự ôn không có `deGiaoId` — phải bị bỏ qua, nếu không điểm bài ôn của
+     em nhảy vào cột điểm bài kiểm tra của cô. */
+  const baiTuOn = { ...baiMau('binh@truong.local', de.id, 10, 10) };
+  delete (baiTuOn as { deGiaoId?: string }).deGiaoId;
+  ok(!thongKeDeGiao(de.id, hocSinh, [baiTuOn])[1].daNop, 'KHÔNG tính bài tự ôn (không có deGiaoId)');
+
+  /* Bài chưa nộp xong (`pending`) cũng không được tính là đã nộp. */
+  const dangLam = { ...baiMau('binh@truong.local', de.id, 0, 0), status: 'pending' as const };
+  ok(!thongKeDeGiao(de.id, hocSinh, [dangLam])[1].daNop, 'KHÔNG tính bài đang làm dở');
+
+  /* Dữ liệu cũ lỡ còn hai bản cho một em: lấy bản MỚI hơn, đó là bản cô chấm. */
+  const haiBan = thongKeDeGiao(de.id, hocSinh, [
+    baiMau('an@truong.local', de.id, 3, 3, 10, '2026-09-23T08:00:00.000Z'),
+    baiMau('an@truong.local', de.id, 9, 9, 10, '2026-09-23T09:00:00.000Z'),
+  ]);
+  ok(haiBan[0].diem10 === 9, 'trùng bài thì lấy bản mới hơn', String(haiBan[0].diem10));
+}
+
+console.log('\n== Mấy con số tóm tắt trên đầu bảng ==');
+{
+  const ds = [
+    { email: 'a@x', ten: 'A', daNop: true, diem10: 8, soDung: 8, soSai: 2, soCau: 10 },
+    { email: 'b@x', ten: 'B', daNop: true, diem10: 6, soDung: 6, soSai: 4, soCau: 10 },
+    { email: 'c@x', ten: 'C', daNop: false, diem10: null, soDung: 0, soSai: 0, soCau: 0 },
+  ];
+  const t = tomTatDeGiao(ds);
+  ok(t.siSo === 3 && t.daNop === 2, 'đếm đúng sĩ số và số em đã nộp', `${t.daNop}/${t.siSo}`);
+  /* Chia cho SỐ EM ĐÃ NỘP, không phải sĩ số. Chia cho sĩ số ra 4,67 — mỗi em
+     chưa làm kéo trung bình xuống như thể được 0 điểm. */
+  ok(t.diemTB === 7, 'điểm TB chỉ tính trên em đã nộp', String(t.diemTB));
+  ok(tomTatDeGiao([]).diemTB === null, 'chưa ai nộp thì không có điểm TB, không phải 0');
+}
+
+// ─── Thứ tự học sinh trong bảng ──────────────────────────────────────────────
+//
+// Bảng kết quả giữ nguyên thứ tự danh sách lớp truyền vào, mà danh sách đó do
+// `hocSinhCuaLop` sắp. Sai ở đây thì cô phải dò mắt qua 38 dòng không thứ tự —
+// không hỏng gì, chỉ là không ai dùng được.
+
+console.log('\n== Thứ tự học sinh trong danh sách lớp ==');
+{
+  const em = (name: string, studentNumber?: number) =>
+    ({ id: name, email: `${name}@x`, name, role: 'student', status: 'active',
+       createdAt: '', authProvider: 'local', canChangePassword: false,
+       ...(studentNumber === undefined ? {} : { studentNumber }) }) as unknown as User;
+
+  const coSo = [em('Trần Gia Hân', 10), em('Nguyễn Thanh An', 1), em('Phí Gia Bảo', 7)]
+    .sort(soSanhHocSinh);
+  ok(coSo.map(e => e.studentNumber).join(',') === '1,7,10',
+    'có số báo danh thì xếp theo số', coSo.map(e => e.studentNumber).join(','));
+
+  /* Sổ điểm Việt Nam xếp theo TÊN, không theo họ. Xếp theo cả chuỗi họ tên là
+     ra một danh sách toàn họ Nguyễn đứng đầu. */
+  const theoTen = [em('Nguyễn Gia Bảo'), em('Trần Thanh An'), em('Đỗ Ngọc Châu')]
+    .sort(soSanhHocSinh);
+  ok(theoTen.map(e => tenCuoi(e.name)).join(',') === 'An,Bảo,Châu',
+    'chưa có số thì xếp theo TÊN riêng, không theo họ', theoTen.map(e => e.name).join(' | '));
+
+  /* Vần tiếng Việt: A < Ă < Â, và có dấu đứng sau không dấu. `localeCompare`
+     với 'vi' biết điều đó; so bằng mã ký tự thì không. */
+  const vanViet = [em('Lê Thiên Ân'), em('Lê Ngọc Ánh'), em('Lê Thanh An')].sort(soSanhHocSinh);
+  ok(vanViet.map(e => tenCuoi(e.name)).join(',') === 'An,Ánh,Ân',
+    'xếp đúng vần tiếng Việt (An < Ánh < Ân)', vanViet.map(e => tenCuoi(e.name)).join(','));
+
+  /* Em CÓ số luôn đứng trước em chưa có — đừng để một em thiếu số chen vào
+     giữa sổ điểm. */
+  const tron = [em('Vũ Anh Khôi'), em('Trần Gia Hân', 10)].sort(soSanhHocSinh);
+  ok(tron[0].studentNumber === 10, 'em có số báo danh đứng trước em chưa có');
+
+  /* Trùng tên riêng thì thứ tự phải ỔN ĐỊNH giữa hai lần mở trang, nếu không
+     mỗi lần cô mở lại là hai em đổi chỗ cho nhau. */
+  const trungTen = () => [em('Đỗ Thiên Kim'), em('Đoàn Ngọc Thiên Kim')].sort(soSanhHocSinh)
+    .map(e => e.name).join('|');
+  ok(trungTen() === trungTen(), 'trùng tên riêng thì thứ tự vẫn ổn định', trungTen());
 }
 
 // ─── Đề mẫu 10 câu Cân bằng hoá học ──────────────────────────────────────────

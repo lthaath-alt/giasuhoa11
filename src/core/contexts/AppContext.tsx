@@ -74,6 +74,10 @@ export interface AppContextType {
   curriculum: Chapter[];
   schools: School[];
   classes: SchoolClass[];
+  /** Mã lỗi nếu KHÔNG đọc được danh sách lớp. `null` = đọc được, kể cả khi
+   *  danh sách rỗng thật. Màn nào vẽ theo `classes` phải phân biệt hai ca đó:
+   *  "chưa có lớp" và "không tải được" dẫn người đọc đi hai hướng ngược nhau. */
+  loiNapLop: string | null;
 
   // ── Xác thực ────────────────────────────────────────────────────────────────
 
@@ -332,6 +336,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [curriculum, setCurriculum] = useState<Chapter[]>([]);
   const [schools, setSchools] = useState<School[]>([]);
   const [classes, setClasses] = useState<SchoolClass[]>([]);
+  /* Mã lỗi nếu lần đọc danh sách lớp thất bại; null = đọc được (dù rỗng). */
+  const [loiNapLop, setLoiNapLop] = useState<string | null>(null);
   const [exams, setExams] = useState<LibraryExam[]>([]);
   const [equations, setEquations] = useState<Equation[]>([]);
   const [matrixResources, setMatrixResources] = useState<MatrixResource[]>([]);
@@ -477,7 +483,23 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
       /* `classes` thì học sinh đọc được (luật chỉ đòi đã đăng nhập) và màn
          "xin vào lớp" cần nó. `users` thì chỉ giáo viên/quản trị đọc được. */
-      setClasses(await FirestoreService.getClasses());
+      /* Đọc lớp, và THỬ LẠI một lần nếu hỏng (23/09/2026).
+         Đo được trong Playwright: ngay trong callback này, `auth.currentUser`
+         có lúc đã là null, nên Firestore gửi request không kèm token và trả
+         `permission-denied` cho cả `getClasses`, `getUsers` lẫn
+         `getUserProgress` — màn giáo viên hiện "0 Lớp học" dù lớp có thật.
+         Một nhịp chờ ngắn là đủ cho token về. Thử lại chỉ khi HỎNG, không thử
+         khi danh sách rỗng thật — trường mới chưa có lớp nào là chuyện bình
+         thường, thử lại chỉ tốn thêm một lượt đọc. */
+      let kqLop = await FirestoreService.getClassesHoacLoi();
+      if (kqLop.loi) {
+        await new Promise(r => setTimeout(r, 800));
+        kqLop = await FirestoreService.getClassesHoacLoi();
+      }
+      /* Nói THẬT khi vẫn hỏng. Để `classes` rỗng mà không đánh dấu gì thì mọi
+         màn đều hiểu nhầm thành "chưa có lớp nào". */
+      setLoiNapLop(kqLop.loi);
+      setClasses(kqLop.ds);
       if (hoSo.role !== 'student') {
         const dsNguoiDung = await FirestoreService.getUsers();
         setUsers(dsNguoiDung.map(u => {
@@ -2033,6 +2055,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     <AppContext.Provider
       value={{
         currentUser,
+        loiNapLop,
         users,
         chats,
         guestChatCount,
