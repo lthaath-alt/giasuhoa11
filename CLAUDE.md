@@ -335,10 +335,25 @@ luồng nạp dữ liệu, không thuộc mục giao đề:
    đúng là chủ nhiệm lớp đó (đã đối chiếu thẳng với Firestore). Console báo
    `getClasses`, `getUsers`, `getUserProgress` đều "Missing or insufficient
    permissions" ngay sau khi đăng nhập, trong khi CÙNG tài khoản đó đọc
-   `classes` được từ Node. Nghi là các lời gọi này chạy trước khi `request.auth`
-   sẵn sàng và không có lần thử lại. **Nếu đúng vậy thì giáo viên đăng nhập lần
-   đầu trên máy mới sẽ thấy màn quản lý trống trơn** — đáng soi trước khi đem
-   web đi trình bày.
+   `classes` được từ Node.
+
+   **Đã tìm ra gốc 23/09/2026, và nó KHÔNG phải "chưa sẵn sàng":** thêm log
+   tạm vào chính khối đó thì thấy `auth.currentUser` là `undefined` ngay giữa
+   callback `onAuthStateChanged` — tức phiên Auth đã biến mất, nên Firestore
+   gửi request không kèm token. Cùng gốc với "Firebase Auth không lưu phiên
+   xuống đĩa trong Playwright" ghi ở dưới.
+
+   **CHƯA chứng minh được là lỗi trên trình duyệt thường** — bản cũ của mục này
+   viết "giáo viên đăng nhập lần đầu trên máy mới sẽ thấy màn quản lý trống
+   trơn", đó là SUY ĐOÁN mạnh hơn bằng chứng, đã sửa lại. Muốn biết chắc thì
+   mở một cửa sổ ẩn danh và đăng nhập.
+
+   Đã vá phần vá được mà không đụng luồng đăng nhập: `getClassesHoacLoi()` trả
+   kèm mã lỗi thay vì nuốt, `AppContext` THỬ LẠI một lần sau 800ms rồi giữ
+   `loiNapLop`, và màn giáo viên phân biệt hai câu — "chưa có lớp" (đi tạo lớp)
+   với "không tải được danh sách lớp" (**đừng** tạo lớp mới, F5 đã). Nuốt lỗi
+   thành mảng rỗng là biến "chưa đọc được" thành "chưa có", hai câu dẫn người
+   đọc đi hai hướng ngược nhau.
 
 Một điều khác đo được ở đây, ghi để khỏi tìm lại: **trong ngữ cảnh Playwright,
 Firebase Auth KHÔNG lưu phiên xuống đĩa.** Kho `firebaseLocalStorageDb/
@@ -533,6 +548,41 @@ ngay sau khi đăng nhập, dừng luôn nếu là `student`, và nhắc nếu l
 Phạm vi sẽ mở rộng dần: ngân hàng câu hỏi trước, rồi nội dung 25 bài giảng, rồi
 đề cương NCKH. **Câu trả lời của gia sư AI để CUỐI CÙNG** và phải lọc sạch
 email/tên học sinh trước khi gửi đi — xem điều 2 ở trên.
+
+### `npm run gan:so-thu-tu` — gán số báo danh từ danh sách lớp
+
+Thêm 23/09/2026. Danh sách lớp của nhà trường có một thứ tự do người xếp,
+**không suy ra được bằng quy tắc chữ nghĩa nào**: sổ 11A3 để "Nguyễn Hoàng
+Thanh An" số 1 và "Nguyễn Bảo Ân" số 5, giữa hai em có ba em tên Anh/Ánh.
+`hocSinhCuaLop` xếp theo `studentNumber`, mà đo hôm đó **0/38 em có số** — nên
+mọi bảng đều rơi về thứ tự Firestore trả, tức ngẫu nhiên với người đọc.
+
+```bash
+npm run gan:so-thu-tu -- "C:\duong\dan\danh-sach-11A3.csv"          # chạy thử
+npm run gan:so-thu-tu -- "C:\duong\dan\danh-sach-11A3.csv" --that   # ghi thật
+```
+
+Năm cái trói, cùng lối với `sua:cau-hoi`:
+
+1. **Chỉ ghi ĐÚNG MỘT trường `studentNumber`.** Luật cho `laGiaoVien()` sửa hồ
+   sơ học sinh trừ `role`, nên vai `teacher` là đủ.
+2. **Mặc định KHÔNG ghi**, phải thêm `--that`.
+3. **KHÔNG đọc cột mật khẩu.** Sổ của trường hay có cột "Pass"; script chỉ lấy
+   ba cột STT / Họ tên / Gmail.
+4. **Khớp bằng EMAIL**, không khớp bằng tên — hai em trùng tên là chuyện thường.
+5. **Báo cáo từng dòng không khớp** thay vì im lặng bỏ qua.
+
+Tự tìm dòng tiêu đề (sổ hay có một dòng tên bảng ở trên cùng) và tự hiểu ô bọc
+nháy kép — `split(',')` trần gặp một ô có phẩy là lệch TOÀN BỘ cột sau nó, tức
+gán nhầm số cho cả lớp.
+
+Ghi xong nó **đọc lại Firestore để xác nhận** — bài học số 1.
+
+Lượt chạy đầu (23/09/2026): 39 dòng trong sổ, ghi được 35, **4 em không có tài
+khoản**. Một trong bốn là lỗi gõ trong sổ: email STT 18 thừa một chữ `i` ở cuối
+(`…@gmail.comi`). Ba em còn lại chưa từng tạo tài khoản.
+
+**Tệp CSV chứa email học sinh — để ngoài repo, đừng commit.**
 
 ### `npm run kiem-tra:gemini` — canh chừng Google đổi nền dưới chân
 
