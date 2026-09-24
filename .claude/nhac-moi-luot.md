@@ -16,7 +16,9 @@ NOI RA TRUOC KHI GO DONG DAU TIEN, khi viec cham tu 3 TEP tro len — mot dong:
 DO TRUOC KHI KET LUAN. Doc ma khong thay duoc cho hoi may chu.
 
 Tat ca phan CON LAI — lich su cac dot, bai hoc da tra gia, hai viec DA CHOT
-dung dat lai, luat / mau / an ninh — nam o CLAUDE.md. Doc muc lien quan
-truoc khi sua vung do, dung lam theo tri nho.
+dung dat lai, luat / mau / an ninh — nay nam o docs/claude-reference/ (11 tep),
+KHONG con trong CLAUDE.md. CLAUDE.md chi giu bang chi duong sang do.
+=> Mo CLAUDE.md ra roi doc bang do KHONG phai la da doc du. Sua vung nao thi
+   MO TEP cua vung do, dung lam theo tri nho.
 
 Doi noi dung nhac thi sua CHINH TEP NAY, khong phai .claude/settings.json.
