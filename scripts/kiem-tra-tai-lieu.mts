@@ -69,7 +69,22 @@ function moiTep(thuMuc: string, ra: string[] = []): string[] {
 }
 const TEN_TEP = new Set(moiTep(GOC).map(p => basename(p)));
 
-const TAI_LIEU = ['CLAUDE.md', '.specify/memory/constitution.md'];
+/* CLAUDE.md nay chỉ còn giữ quy tắc thường dùng; phần chi tiết tách sang
+   `docs/claude-reference/`. Nếu danh sách này vẫn chỉ có hai tệp như trước thì
+   90% tài liệu nằm NGOÀI tầm canh — mà lệch tài liệu chính là thứ bộ kiểm này
+   sinh ra để bắt. Đọc thư mục thay vì liệt kê tay, để tệp mới thêm vào là được
+   soi luôn, không phải nhớ sửa chỗ này. */
+const THU_MUC_THAM_CHIEU = 'docs/claude-reference';
+const TAI_LIEU = [
+  'CLAUDE.md',
+  '.specify/memory/constitution.md',
+  ...(existsSync(join(GOC, THU_MUC_THAM_CHIEU))
+    ? readdirSync(join(GOC, THU_MUC_THAM_CHIEU))
+        .filter(t => t.endsWith('.md'))
+        .sort()
+        .map(t => `${THU_MUC_THAM_CHIEU}/${t}`)
+    : []),
+];
 
 for (const tep of TAI_LIEU) {
   const duong = join(GOC, tep);
