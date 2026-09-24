@@ -65,6 +65,25 @@ const locBai = lay('--bai');
 const locChuong = lay('--chuong');
 const locMuc = lay('--muc');
 const locLoai = lay('--loai');
+
+/**
+ * Tên phạm vi dùng đặt tên tệp báo cáo và tệp đề dẫn.
+ *
+ * PHẢI gom MỌI bộ lọc đang bật, không chỉ cái đầu tiên. Bản cũ chỉ lấy
+ * `locBai || locChuong || locMuc`, nên ba lượt xuất đề dẫn của cùng một bài mà
+ * khác `--loai` (mc / tf / tn) đều ra CÙNG MỘT tên tệp, và hai bản đầu bị bản
+ * cuối đè mất — lặng lẽ, không một dòng cảnh báo.
+ *
+ * Đây đúng là bệnh đã trả giá một lần rồi: bản đầu tên tệp chỉ có NGÀY nên
+ * lượt soát thứ hai trong ngày ghi đè mất một báo cáo có 3 phát hiện thật.
+ * Lần đó chữa bằng cách thêm GIỜ; lần này chữa tận gốc — tên tệp phải nói đủ
+ * phạm vi.
+ */
+function tenPhamVi(): string {
+  const phan = [locBai, locChuong && `chuong-${locChuong}`, locMuc && `muc-${locMuc}`,
+    locLoai && `loai-${locLoai}`, soToiDa && `so-${soToiDa}`].filter(Boolean);
+  return phan.length ? phan.join('-') : 'tat-ca';
+}
 const soToiDa = Number(lay('--so') || 0);
 const moiLo = Number(lay('--lo') || 25);
 /* Soát MẤY LƯỢT cho mỗi lô. Mặc định 2, không phải 1 — xem ghi chú ở vòng lặp:
@@ -231,7 +250,7 @@ function viet(
   const luc = new Date();
   const gio = `${String(luc.getHours()).padStart(2, '0')}${String(luc.getMinutes()).padStart(2, '0')}`;
   const ten = tepRa || join('docs/soat-hoa-hoc',
-    `${luc.toISOString().slice(0, 10)}-${gio}-${locBai || locChuong || locMuc || 'tat-ca'}.md`);
+    `${luc.toISOString().slice(0, 10)}-${gio}-${tenPhamVi()}.md`);
   mkdirSync(dirname(duong(ten)), { recursive: true });
   writeFileSync(duong(ten), dong.join('\n'), 'utf8');
   console.log(`  đã ghi báo cáo: ${ten}`);
@@ -305,7 +324,7 @@ async function chay() {
     const luc0 = new Date();
     const gio0 = `${String(luc0.getHours()).padStart(2, '0')}${String(luc0.getMinutes()).padStart(2, '0')}`;
     const tenDeDan = join('docs/soat-hoa-hoc',
-      `de-dan-${luc0.toISOString().slice(0, 10)}-${gio0}-${locBai || locChuong || locMuc || 'tat-ca'}.md`);
+      `de-dan-${luc0.toISOString().slice(0, 10)}-${gio0}-${tenPhamVi()}.md`);
     const tenTraLoi = tenDeDan.replace(/^.*[\\/]/, '').replace(/^de-dan-/, 'tra-loi-').replace(/\.md$/, '.json');
     const noi = [
       `# Đề dẫn soát nội dung — ${ds.length} câu`, '',
