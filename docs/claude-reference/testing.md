@@ -95,11 +95,37 @@ gõ trong trình duyệt thường vẫn được trả lời bình thường.
 
 Hai hệ quả phải nhớ:
 
-- **Muốn chụp ảnh hội thoại thật cho báo cáo thì PHẢI có người ngồi gõ.** Không
-  có đường vòng nào, trừ khi tắt App Check — mà tắt thì mất hàng rào chống lạm
-  dụng khoá Gemini.
+- **Trên BẢN DEPLOY, muốn chụp ảnh hội thoại thật thì PHẢI có người ngồi gõ.**
+  Không có đường vòng nào ở đó, trừ khi tắt App Check — mà tắt thì mất hàng rào
+  chống lạm dụng khoá Gemini.
 - **Hỏng một lần là App Check khoá hồ sơ trình duyệt đó 24 GIỜ** — Console ghi
   mã lỗi appCheck rồi tới initial-throttle. Thử lại trong ngày chỉ tốn công.
+
+**Trên MÁY DEV thì Playwright lái được** (bổ sung 24/09/2026 — câu trên trước đó
+viết "không có đường vòng nào" trống trơn, và như thế là nói quá). Cơ chế:
+`batAppCheck()` trong `giaSuFirebaseAI.ts:32` có nhánh chỉ chạy khi
+`import.meta.env.DEV`, đặt `FIREBASE_APPCHECK_DEBUG_TOKEN`. Debug token KHÔNG đi
+qua reCAPTCHA nên nó không quan tâm trình duyệt có bị lái hay không. Đây là cơ
+chế chính thức của App Check, **không phải tắt App Check**.
+
+Ba điều kèm theo, thiếu cái nào cũng hỏng:
+
+1. **Token phải CỐ ĐỊNH và đã đăng ký.** Không có `.env.development.local` thì
+   biểu thức rơi về `true`, Firebase tự sinh token ngẫu nhiên cho từng hồ sơ
+   trình duyệt — mà Playwright tạo hồ sơ mới mỗi lượt chạy, nên vẫn 403. Đăng ký
+   ở Firebase Console → App Check → Manage debug tokens, rồi đặt
+   `VITE_APPCHECK_DEBUG_TOKEN` vào `.env.development.local` (`.gitignore` đã chặn
+   `.env*`). Bước này chỉ chủ dự án làm được.
+2. **Ảnh ra từ máy dev KHÔNG được chú thích là "chụp trên trang đã deploy".**
+   Cùng mã, cùng Gemini thật, cùng tài khoản thật, cùng Firestore thật — nhưng
+   địa chỉ là `localhost`. Nói khác đi là sai sự thật trong một báo cáo khoa học.
+3. **Đừng chạy phép đó với `E2E_URL` trỏ bản deploy.** Nó sẽ hỏng VÀ khoá hồ sơ
+   trình duyệt 24 giờ. Rẻ hơn là cho phép thử tự `skip` khi `baseURL` không phải
+   localhost, thay vì trông vào trí nhớ.
+
+Và nhớ `HAN_CHO_MS = 90_000` trong `giaSuFirebaseAI.ts`, trong khi
+`playwright.config.ts` đặt `timeout: 60_000` và `expect.timeout: 15_000` — không
+nới riêng cho phép thử này thì nó trượt vì hết giờ chứ không phải vì web sai.
 
 Và một cái bẫy khi viết phép thử cho vùng này: nhánh hỏng của gia sư hiện câu
 "Gia sư AI đang tạm mất kết nối với máy chủ" chứ không ném lỗi. Phép thử nào
