@@ -77,6 +77,9 @@ const TEN_TEP = new Set(moiTep(GOC).map(p => basename(p)));
 const THU_MUC_THAM_CHIEU = 'docs/claude-reference';
 const TAI_LIEU = [
   'CLAUDE.md',
+  /* Bản rút gọn cho trợ lý KHÔNG phải Claude Code (Antigravity, Cursor…). Nó
+     nhắc đường dẫn và lệnh y như CLAUDE.md nên cũng lệch được y như vậy. */
+  'AGENTS.md',
   '.specify/memory/constitution.md',
   ...(existsSync(join(GOC, THU_MUC_THAM_CHIEU))
     ? readdirSync(join(GOC, THU_MUC_THAM_CHIEU))
