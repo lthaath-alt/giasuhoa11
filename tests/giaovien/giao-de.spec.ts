@@ -41,10 +41,9 @@ async function moTheGiaoDe(page: Page): Promise<void> {
   /* Không có lớp thì GiaoDeTab chỉ vẽ một dòng "Bạn chưa có lớp nào" và KHÔNG
      vẽ nút nào — chờ nút cho hết giờ rồi báo "không tìm thấy phần tử" là giấu
      mất nguyên nhân. Bắt ca này riêng và nói thẳng ra.
-     Đo 22/09/2026: trên một hồ sơ trình duyệt SẠCH, `getClasses`, `getUsers`
-     và `getUserProgress` đều trả "Missing or insufficient permissions" ngay
-     sau khi đăng nhập, trong khi CÙNG tài khoản đó đọc `classes` được từ
-     Node. Hệ quả: màn giáo viên thấy "0 Lớp học" dù lớp có thật. */
+     Lần "0 Lớp học" đo ngày 22/09/2026 là do `dangNhapGiaoVien` quên bấm thẻ
+     "Giáo viên" nên phiên bị đăng xuất — đã sửa 23/09/2026, xem chú thích
+     của hàm đó trong `chung.ts`. */
   const khongCoLop = page.getByText('Bạn chưa có lớp nào', { exact: false });
   const nutDeMau = page.locator('#giao-de-mau-btn');
   const thay = await Promise.race([

@@ -4,19 +4,15 @@ import { taiKhoanGiaoVien } from './moiTruong';
 /**
  * Đăng nhập vai GIÁO VIÊN và dừng lại ở màn `/teacher`.
  *
- * Vì sao MỖI PHÉP THỬ tự đăng nhập, thay vì đăng nhập một lần rồi cất phiên ra
- * tệp như bản học sinh (22/09/2026): trong ngữ cảnh Playwright, Firebase Auth
- * **không lưu phiên xuống đĩa**. Đo được: sau khi đăng nhập thành công và vào
- * tới `#teacher-page`, kho `firebaseLocalStorageDb/firebaseLocalStorage` vẫn
- * RỖNG 0 bản ghi sau 30 giây chờ; `localStorage` không có khoá
- * `firebase:authUser:…` nào; và bấm F5 là văng thẳng về `/#/login`.
+ * PHẢI bấm thẻ "Giáo viên" trước (23/09/2026). Thẻ mặc định là Học sinh, và
+ * bản cũ của hàm này quên bấm: `LoginForm` thấy sai vai nên đăng xuất, rồi một
+ * lỗi đua trong `AppContext` đặt lại `currentUser` cho phiên đã chết. Từ đó
+ * sinh ra ba "phát hiện" sai trong CLAUDE.md — "gõ mật khẩu xong vẫn bị hỏi
+ * Tiếp tục", "0 Lớp học", và "Playwright không lưu phiên xuống đĩa". Chọn
+ * đúng thẻ thì vào thẳng `/teacher`, IndexedDB có phiên, F5 vẫn còn phiên.
  *
- * Nên `storageState` chụp ra một tệp nhìn như thành công mà không mang theo
- * phiên nào — mọi phép thử mở ra đều thấy màn đăng nhập trống. Đăng nhập lại
- * mỗi phép tốn thêm vài giây, đổi lại là nó CHẠY.
- *
- * Việc "phiên có sống qua F5 không" là chuyện của luồng đăng nhập, không phải
- * của mục giao đề — đã báo riêng cho chủ dự án, đừng vá ở đây.
+ * Mỗi phép vẫn tự đăng nhập (không dùng `storageState`) — giữ nguyên lối cũ
+ * cho khỏi đổi cấu hình, chỉ tốn thêm vài giây mỗi phép.
  */
 export async function dangNhapGiaoVien(page: Page): Promise<void> {
   const tk = taiKhoanGiaoVien();
@@ -25,6 +21,7 @@ export async function dangNhapGiaoVien(page: Page): Promise<void> {
   await page.goto('/');
   await expect(page.locator('#login-email-field')).toBeVisible({ timeout: 30_000 });
 
+  await page.locator('#role-option-teacher').click();
   await page.locator('#login-email-field').fill(tk.email);
   await page.locator('#login-password-field').fill(tk.matKhau);
   await page.locator('#login-submit-btn').click();

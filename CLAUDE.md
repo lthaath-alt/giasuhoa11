@@ -322,45 +322,39 @@ chậm. Đây là hai việc khác nhau, giữ riêng.
    thì phần cần đăng nhập tự BỎ QUA chứ không báo trượt: để nó đỏ sẵn thì
    người ta quen mắt với màu đỏ, rồi hôm trượt thật cũng không ai nhìn.
 
-**Bộ `giaovien` ĐANG ĐỎ HAI PHÉP, và cả hai là lỗi THẬT của web** (22/09/2026).
-Thêm khi dựng mục giao đề; cố ý không vá vì cả hai nằm ở luồng đăng nhập và
-luồng nạp dữ liệu, không thuộc mục giao đề:
+**Ba "lỗi" của bộ `giaovien` ghi ngày 22/09/2026 là MỘT lỗi của phép thử,
+che một lỗi thật của web** (đo lại 23/09/2026). Ba điều từng ghi ở đây —
+"gõ mật khẩu xong giáo viên vẫn bị hỏi Tiếp tục với ...", "màn giáo viên báo
+0 Lớp học kèm permission-denied", và "trong Playwright Firebase Auth không lưu
+phiên xuống đĩa" — đều SAI, và cùng một gốc: `dangNhapGiaoVien()` và
+`dang-nhap-vao-thang.spec.ts` **không bấm thẻ "Giáo viên"**. Thẻ mặc định là
+Học sinh, nên `LoginForm` thấy sai vai và đăng xuất ngay.
 
-1. **Gõ mật khẩu xong, giáo viên vẫn bị hỏi "Tiếp tục với ..."** — trái đặc tả
-   "Ba lối vào". Ảnh chụp lúc trượt cho thấy màn đó hiện kèm ĐÚNG email vừa gõ,
-   tức `currentUser` đã về mà cờ `dangVao` chưa kịp bật: một cuộc đua giữa
-   `onAuthStateChanged` và `handleSuccess` trong `LoginPage.tsx`. Lộ ra ở vai
-   giáo viên vì `login()` của vai này đọc thêm dữ liệu nên trả về muộn hơn.
-2. **Màn giáo viên báo "0 Lớp học" trên hồ sơ trình duyệt SẠCH** dù tài khoản
-   đúng là chủ nhiệm lớp đó (đã đối chiếu thẳng với Firestore). Console báo
-   `getClasses`, `getUsers`, `getUserProgress` đều "Missing or insufficient
-   permissions" ngay sau khi đăng nhập, trong khi CÙNG tài khoản đó đọc
-   `classes` được từ Node.
+Đối chứng, cùng tài khoản, cùng máy: bấm đúng thẻ thì vào thẳng `/teacher`
+sau khoảng 3 giây, không một lỗi quyền nào, IndexedDB có 1 bản ghi phiên, F5
+xong hiện "Tiếp tục với ..." đúng đặc tả. Bài học số 4 và số 9 cùng lúc: kết
+luận của lần trước đi từ triệu chứng thẳng tới một cơ chế nghe hợp lý (cuộc
+đua trong `LoginPage`, token về chậm), mà chưa lần nào đối chứng với một lượt
+chạy đúng.
 
-   **Đã tìm ra gốc 23/09/2026, và nó KHÔNG phải "chưa sẵn sàng":** thêm log
-   tạm vào chính khối đó thì thấy `auth.currentUser` là `undefined` ngay giữa
-   callback `onAuthStateChanged` — tức phiên Auth đã biến mất, nên Firestore
-   gửi request không kèm token. Cùng gốc với "Firebase Auth không lưu phiên
-   xuống đĩa trong Playwright" ghi ở dưới.
+**Lỗi thật mà nó che, đã vá:** chọn nhầm thẻ thì `LoginForm` gọi `logout()`,
+nhưng lượt `onAuthStateChanged` của lần đăng nhập vẫn đang chờ đọc hồ sơ và
+tiến độ. Lượt đăng xuất đặt `currentUser = null` xong, lượt cũ chạy tiếp tới
+`persistSession` và **đặt lại người vừa bị đăng xuất**: màn "Tiếp tục với ..."
+hiện ra với một phiên đã chết, bấm vào là "0 Lớp học" kèm hàng loạt
+permission-denied. Đo: lỗi sai vai ở 2659 ms, `currentUser` bị đặt lại ở
+3108 ms. Người dùng thật gặp được, vì giáo viên quên đổi thẻ là chuyện thường.
+Vá bằng `conHieuLuc()` trong `AppContext`: sau MỖI nhịp `await` hỏi lại phiên
+Auth còn là người này không, không thì dừng. Phép thứ hai trong
+`dang-nhap-vao-thang.spec.ts` canh cho nó không quay lại.
 
-   **CHƯA chứng minh được là lỗi trên trình duyệt thường** — bản cũ của mục này
-   viết "giáo viên đăng nhập lần đầu trên máy mới sẽ thấy màn quản lý trống
-   trơn", đó là SUY ĐOÁN mạnh hơn bằng chứng, đã sửa lại. Muốn biết chắc thì
-   mở một cửa sổ ẩn danh và đăng nhập.
+Phần đã làm hôm 23/09 vẫn giữ vì vẫn đúng khi mạng chập chờn:
+`getClassesHoacLoi()` trả kèm mã lỗi, `AppContext` thử lại một lần sau 800ms,
+và màn giáo viên phân biệt "chưa có lớp" với "không tải được danh sách lớp".
 
-   Đã vá phần vá được mà không đụng luồng đăng nhập: `getClassesHoacLoi()` trả
-   kèm mã lỗi thay vì nuốt, `AppContext` THỬ LẠI một lần sau 800ms rồi giữ
-   `loiNapLop`, và màn giáo viên phân biệt hai câu — "chưa có lớp" (đi tạo lớp)
-   với "không tải được danh sách lớp" (**đừng** tạo lớp mới, F5 đã). Nuốt lỗi
-   thành mảng rỗng là biến "chưa đọc được" thành "chưa có", hai câu dẫn người
-   đọc đi hai hướng ngược nhau.
-
-Một điều khác đo được ở đây, ghi để khỏi tìm lại: **trong ngữ cảnh Playwright,
-Firebase Auth KHÔNG lưu phiên xuống đĩa.** Kho `firebaseLocalStorageDb/
-firebaseLocalStorage` rỗng 0 bản ghi sau 30 giây chờ, `localStorage` không có
-khoá `firebase:authUser:…`, và F5 là văng về `/#/login`. Vì thế bộ `giaovien`
-CỐ Ý không dùng `storageState` như bộ `hocsinh` — mỗi phép tự đăng nhập bằng
-`dangNhapGiaoVien()` trong `tests/chung.ts`.
+Bộ `giaovien` vẫn để mỗi phép tự đăng nhập, không dùng `storageState` — lối
+đó chạy được nên không đổi. Nếu muốn nhanh hơn thì chuyển sang `storageState`
+như bộ `hocsinh`; lý do cũ để không làm vậy đã không còn.
 
 Phép `giao-de.spec.ts` **GHI DỮ LIỆU THẬT**: nó tạo một đề tên `[E2E] …` cho
 lớp thật rồi xoá ở cuối. Chết giữa chừng thì đề đó còn sót — xoá tay trong bảng
