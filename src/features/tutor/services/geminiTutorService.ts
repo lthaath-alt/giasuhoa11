@@ -78,6 +78,60 @@ export const thongBaoHetLuot = (loi: string, coKeyRieng = false): string => {
     + (giay ? `${giay} giây` : 'một phút') + ' rồi hỏi lại nhé!';
 };
 
+/**
+ * Diễn giải lỗi KẾT NỐI của lượt gọi gia sư thành câu nói cho học sinh.
+ * Trả '' nếu không nhận ra loại lỗi — khi đó đường gọi rơi về kịch bản mẫu.
+ *
+ * Tách thành hàm thuần để `kiem-tra:het-luot` kiểm được từng loại lỗi mà không
+ * cần trình duyệt, không cần mạng, không tốn lượt API.
+ */
+export const thongBaoLoiKetNoi = (chuoiLoi: string): string => {
+  const msg = (chuoiLoi || '').toLowerCase();
+
+  /* ── App Check bị khoá: bảo TẢI LẠI TRANG, đừng bảo thử lại ───────────────
+     Đo trên bản đang chạy lúc 22:31 ngày 25/09/2026: một lượt đổi thẻ App
+     Check trả 403 (nhất thời — cùng lúc đó tab khác vẫn đổi được thẻ, mã trả
+     về 200). `@firebase/app-check` coi 403 là lỗi cấu hình nên TỰ KHOÁ 24 GIỜ
+     (`appCheck/initial-throttle`) và từ đó không gửi thêm request nào; mọi
+     lượt hỏi sau đi kèm thẻ rỗng và máy chủ trả 401.
+
+     Khoá ấy chỉ sống trong MỘT phiên trang. Đo lại: tab đang kẹt "còn 23 giờ"
+     sau khi F5 thì hỏi được ngay, trả lời trong khoảng 30 giây.
+
+     Vì thế câu cũ "Em thử lại sau ít phút nhé" là lời khuyên SAI: bấm gửi lại
+     trong cùng phiên trang thì hỏng cho tới hết buổi, mà em không biết vì sao.
+     Phải nói đúng việc cần làm. */
+  if (msg.includes('app check token is invalid') || msg.includes('appcheck/throttled')
+      || msg.includes('initial-throttle') || msg.includes('attempts allowed again')) {
+    return 'Thầy đang không xác thực được với máy chủ nên chưa trả lời được. '
+      + 'Em TẢI LẠI TRANG (phím F5) rồi hỏi lại giúp thầy nhé — lỗi này không tự hết '
+      + 'nếu em chỉ bấm gửi lại.';
+  }
+
+  /* Chờ quá hạn (xem `HAN_CHO_MS`) hoặc rớt mạng giữa chừng. Nói thật là lượt
+     này không tới nơi, và bảo em gửi lại — im lặng rồi rơi sang kịch bản mẫu
+     là tệ nhất: em tưởng đó là câu trả lời của thầy. */
+  if (msg.includes('abort') || msg.includes('timeout') || msg.includes('network')
+      || msg.includes('failed to fetch')) {
+    return 'Lượt hỏi này chờ máy chủ lâu quá nên thầy đành dừng lại. Em bấm gửi lại câu hỏi '
+      + 'giúp thầy nhé — nếu vẫn không được thì mạng đang chập chờn, em thử lại sau vài phút.';
+  }
+
+  /* Máy chủ Firebase AI Logic trả 5xx: lỗi bên Google, không phải lỗi của em
+     và cũng không phải hết lượt. Đo ngày 21/09/2026 trên bản đang chạy. */
+  if (/\[5\d\d\s/.test(chuoiLoi) || /"?status"?:\s*5\d\d/.test(chuoiLoi)
+      || msg.includes('internal server error') || msg.includes('service unavailable')) {
+    return 'Máy chủ của gia sư AI đang trục trặc (lỗi phía máy chủ, không phải do em). '
+      + 'Em thử gửi lại sau một phút nhé; trong lúc chờ, em xem lại bài giảng hoặc làm phần luyện tập.';
+  }
+
+  if (msg.includes('firebasevertexai') || msg.includes('app check') || msg.includes('appcheck')) {
+    return 'Gia sư AI đang tạm mất kết nối với máy chủ. Em thử lại sau ít phút nhé!';
+  }
+
+  return '';
+};
+
 /** Kết quả một lượt, kèm số đo cho telemetry. */
 export interface KetQuaGiaSu {
   text: string;
@@ -259,32 +313,8 @@ export const generateAIResponseChiTiet = async (
     /* Lỗi ở đường Firebase (App Check từ chối, AI Logic chưa bật, máy chủ lỗi)
        thì BÁO THẬT, không rơi sang kịch bản mẫu: kịch bản mẫu trông như AI trả
        lời, học sinh không biết là hỏng, và chủ dự án cũng không biết mà sửa. */
-    /* Chờ quá hạn (45 giây, xem `HAN_CHO_MS`) hoặc rớt mạng giữa chừng. Nói
-       thật là lượt này không tới nơi, và bảo em gửi lại — im lặng rồi rơi
-       sang kịch bản mẫu là tệ nhất: em tưởng đó là câu trả lời của thầy. */
-    if (msg.includes('abort') || msg.includes('timeout') || msg.includes('network')
-        || msg.includes('failed to fetch')) {
-      return {
-        ...coBan,
-        text: 'Lượt hỏi này chờ máy chủ lâu quá nên thầy đành dừng lại. Em bấm gửi lại câu hỏi '
-          + 'giúp thầy nhé — nếu vẫn không được thì mạng đang chập chờn, em thử lại sau vài phút.',
-      };
-    }
-
-    /* Máy chủ Firebase AI Logic trả 5xx: lỗi bên Google, không phải lỗi của em
-       và cũng không phải hết lượt. Đo ngày 21/09/2026 trên bản đang chạy. */
-    if (/\[5\d\d\s/.test(chuoiLoi) || /"?status"?:\s*5\d\d/.test(chuoiLoi)
-        || msg.includes('internal server error') || msg.includes('service unavailable')) {
-      return {
-        ...coBan,
-        text: 'Máy chủ của gia sư AI đang trục trặc (lỗi phía máy chủ, không phải do em). '
-          + 'Em thử gửi lại sau một phút nhé; trong lúc chờ, em xem lại bài giảng hoặc làm phần luyện tập.',
-      };
-    }
-
-    if (msg.includes('firebasevertexai') || msg.includes('app check') || msg.includes('appcheck')) {
-      return { ...coBan, text: 'Gia sư AI đang tạm mất kết nối với máy chủ. Em thử lại sau ít phút nhé!' };
-    }
+    const loiKetNoi = thongBaoLoiKetNoi(chuoiLoi);
+    if (loiKetNoi) return { ...coBan, text: loiKetNoi };
 
     const { generateAIResponse: mockGenerate } = await import('./aiMockService');
     return { ...coBan, text: await mockGenerate(lessonId, userQuestion, history, userEmail) };
