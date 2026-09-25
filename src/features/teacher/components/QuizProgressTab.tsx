@@ -153,7 +153,9 @@ export const QuizProgressTab: React.FC<QuizProgressTabProps> = ({ students, isAd
       const lesson = chapter?.lessons.find(l => l.id === q.lessonId);
 
       const chapterName = chapter ? chapter.title.replace(/,/g, '-') : q.chapterId;
-      const lessonName = lesson ? lesson.title.replace(/,/g, '-') : q.lessonId;
+      /* Đề giáo viên giao không thuộc bài nào trong chương trình — lấy tên đề
+         đã chép sẵn trong bài nộp, nếu không cột này chỉ ra `de-giao:de_1758…`. */
+      const lessonName = q.tenDe ? q.tenDe.replace(/,/g, '-') : lesson ? lesson.title.replace(/,/g, '-') : q.lessonId;
       const dateStr = new Date(q.createdAt).toLocaleDateString('vi-VN');
       const ratio = Math.round((q.score / q.maxScore) * 100);
 

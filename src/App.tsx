@@ -14,6 +14,7 @@ import AdminPage from './pages/AdminPage';
 import SchoolAdminPage from './pages/SchoolAdminPage';
 import TeacherPage from './pages/TeacherPage';
 import QuizPage from './pages/QuizPage';
+import DeGiaoPage from './pages/DeGiaoPage';
 import NotFoundPage from './pages/NotFoundPage';
 
 // Tạo theme Material-UI cao cấp theo tone màu Giáo Viên Đổi Mới (Sáng, Cam & Teal)
@@ -278,6 +279,11 @@ export default function App() {
             <Route element={<ProtectedRoute />}>
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/quiz/:quizId" element={<QuizPage />} />
+              {/* Link thông báo bài kiểm tra giáo viên giao. Để trong
+                  `ProtectedRoute` (thẻ này cho cả khách đi qua, chỉ chờ nạp
+                  xong) vì trang tự hỏi đăng nhập bằng lời lẽ của nó — thẻ canh
+                  chặt hơn sẽ đá em về `/` và em không biết vì sao. */}
+              <Route path="/de/:deGiaoId" element={<DeGiaoPage />} />
             </Route>
 
             {/* SUPER ADMIN ONLY ROUTES */}

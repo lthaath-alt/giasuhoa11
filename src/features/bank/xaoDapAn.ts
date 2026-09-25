@@ -20,6 +20,30 @@
 import type { BankQuestion } from './types';
 import type { Question } from '../library/types';
 
+/**
+ * Phương án NEO — có mặt một cái là cả câu không được xáo (22/09/2026).
+ *
+ * "Tất cả đều sai", "cả A và B đều đúng", "cả A, B, C" chỉ có nghĩa khi nó
+ * đứng CUỐI và khi những chữ cái nó nhắc tới còn nguyên chỗ. Xáo lên là câu
+ * hỏi thành vô nghĩa: phương án A hoá ra "Tất cả đều sai", hoặc "cả A và B"
+ * trỏ vào chính nó.
+ *
+ * Đo trên `public/bank/ngan-hang.json` ngày 22/09/2026: **12 trong 1.554 câu**
+ * dính mẫu này, cộng thêm một câu trong đề mẫu `deMauCanBang.ts`. Ít, nhưng
+ * hỏng thì hỏng câm — học sinh đọc ra một câu hỏi vô lý và tưởng mình dốt,
+ * còn điểm vẫn ra một con số trông hợp lý.
+ *
+ * Cái giá phải trả: 12 câu đó giữ nguyên thế lệch đáp án mà `xaoPhuongAnWeb`
+ * sinh ra để chữa. Đổi lại được sự đúng đắn — và chữa thật thì phải viết lại
+ * nội dung 12 câu đó cho hết kiểu "tất cả đều đúng", việc của người soạn đề.
+ */
+const MAU_NEO = /^\s*(tất\s*cả|cả\s+[a-dA-D]\b|không\s+có\s+(đáp|phương|ý)|đáp\s*án\s*khác)/i;
+
+/** Câu này có phương án nào phải đứng nguyên chỗ không? */
+export function coPhuongAnNeo(noiDung: (string | undefined)[]): boolean {
+  return noiDung.some(s => MAU_NEO.test(String(s ?? '')));
+}
+
 /** Fisher–Yates: mọi hoán vị có xác suất bằng nhau. */
 function hoanVi(n: number): number[] {
   const idx = Array.from({ length: n }, (_, i) => i);
@@ -35,6 +59,7 @@ function hoanVi(n: number): number[] {
  * Câu trả lời ngắn và tự luận trả về nguyên vẹn.
  */
 export function xaoPhuongAnBank(cau: BankQuestion): BankQuestion {
+  if (coPhuongAnNeo(cau.o || [])) return cau;
   if (cau.t === 'mc' && cau.o && cau.o.length > 1 && typeof cau.a === 'number') {
     const idx = hoanVi(cau.o.length);
     return {
@@ -59,6 +84,7 @@ export function xaoPhuongAnBank(cau: BankQuestion): BankQuestion {
  */
 export function xaoPhuongAnWeb(cau: Question): Question {
   if (cau.type !== 'Trắc nghiệm' || !cau.options || cau.options.length < 2) return cau;
+  if (coPhuongAnNeo(cau.options.map(o => o.text))) return cau;
   const viTriDung = cau.options.findIndex(o => o.key === cau.correctAnswer);
   if (viTriDung < 0) return cau;   // đáp án không khớp chữ cái nào: để nguyên, đừng đoán
 

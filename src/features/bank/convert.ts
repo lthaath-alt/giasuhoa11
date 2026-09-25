@@ -78,6 +78,9 @@ export function fromLegacy(
   };
 
   if (q.topic) out.topic = q.topic;
+  /* Chiều ngược của `toLegacy`. Thiếu dòng này thì một vòng web → ngân hàng
+     là lời giải biến mất khỏi kho. */
+  if (q.giaiThich) out.e = q.giaiThich;
   if (typeof q.points === 'number' && q.points > 0) out.points = q.points;
   if (ctx.lessonId) out.lessonId = ctx.lessonId;
   if (ctx.chapterId) out.chapterId = ctx.chapterId;
@@ -133,6 +136,12 @@ export function toLegacy(b: BankQuestion): Question {
   };
 
   if (b.topic) out.topic = b.topic;
+
+  /* Lời giải. Dòng này VẮNG MẶT tới 22/09/2026, và đó là một mất mát câm: cả
+     1.554/1.554 câu trong ngân hàng đều có `e`, nhưng không câu nào tới được
+     màn Đề kiểm tra, nên em làm sai chỉ đọc được đúng một chữ cái đáp án.
+     Luyện tập không dính vì nó đọc thẳng `BankQuestion`, không qua hàm này. */
+  if (b.e) out.giaiThich = b.e;
 
   /* Giữ liên kết bài học khi đổi mô hình. Thiếu hai trường này thì câu bước ra
      khỏi ngân hàng là "mồ côi" — đề kiểm tra không biết nó thuộc bài nào. */

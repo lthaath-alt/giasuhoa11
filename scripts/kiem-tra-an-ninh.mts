@@ -521,5 +521,39 @@ console.log('\n== Khoá riêng của học sinh không rời khỏi máy em ==')
   else dat('nhật ký lỗi không mang theo khoá');
 }
 
+/* ── Script sao lưu Firestore chỉ được ĐỌC (22/09/2026) ────────────────────
+   `npm run sao-luu` đăng nhập bằng tài khoản giáo viên — tức tài khoản GHI
+   được `bank_questions`, `classes` và hồ sơ học sinh. Một lệnh ghi lọt vào đó
+   biến công cụ dựng ra để CỨU dữ liệu thành công cụ phá dữ liệu, và nó chạy
+   đúng lúc người ta tin nó nhất: ngay trước một đợt sửa lớn, khi chưa có bản
+   sao nào khác. Nên tệp đó không được mang lệnh ghi nào, kể cả dạng "tiện thể
+   dọn luôn mấy bản ghi rác". */
+console.log('\n== Script sao lưu Firestore chỉ được ĐỌC ==');
+{
+  const P = join(GOC, 'scripts/sao-luu-firestore.mts');
+  if (!existsSync(P)) {
+    truot('có scripts/sao-luu-firestore.mts', 'thiếu tệp — chưa có bản sao nào trước khi sửa dữ liệu thật');
+  } else {
+    /* Quét CẢ CHÚ THÍCH, cố ý. Viết tên một lệnh ghi ra trong chú thích cũng
+       bị báo SAI — cùng lối với phép kiểm khoá Gemini riêng, và cùng lý do:
+       một phép kiểm biết bỏ qua chú thích thì cũng bỏ qua được dòng mã ai đó
+       cố tình núp sau dấu `/*`. Nghiêm thừa rẻ hơn mù. */
+    const n = doc(P);
+    const LENH_GHI = ['setDoc(', 'updateDoc(', 'addDoc(', 'deleteDoc(',
+      'writeBatch(', 'runTransaction(', 'deleteField(', 'setLogLevel('];
+    const thay = LENH_GHI.filter(l => n.includes(l));
+    if (thay.length) truot('sao-luu-firestore.mts không gọi lệnh ghi nào', thay.join(', '));
+    else dat('sao-luu-firestore.mts không gọi lệnh ghi nào');
+  }
+
+  /* Bản sao mang email và tên thật của học sinh, cả nội dung hội thoại với gia
+     sư. Nó là thứ tuyệt đối không được lên git — mà thư mục sinh ra tự động
+     thì rất dễ bị `git add .` quét vào mà không ai nhìn. */
+  const gi = doc(join(GOC, '.gitignore'));
+  if (!/^\s*sao-luu\/\s*$/m.test(gi)) {
+    truot('.gitignore chặn thư mục sao-luu/', 'bản sao chứa email và hội thoại của học sinh — không được lên git');
+  } else dat('.gitignore chặn thư mục sao-luu/');
+}
+
 console.log(soLoi === 0 ? '\n>>> TẤT CẢ ĐẠT\n' : `\n>>> CÓ ${soLoi} MỤC KHÔNG ĐẠT\n`);
 process.exit(soLoi === 0 ? 0 : 1);

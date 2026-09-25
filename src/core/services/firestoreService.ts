@@ -301,14 +301,32 @@ export const FirestoreService = {
 
   // ── Classes ────────────────────────────────────────────────────────────────
 
-  async getClasses(): Promise<SchoolClass[]> {
+  /**
+   * Danh sách lớp, KÈM lý do nếu đọc hỏng (23/09/2026).
+   *
+   * Vì sao cần bản này bên cạnh `getClasses()`: bản cũ nuốt lỗi rồi trả mảng
+   * rỗng, nên chỗ gọi không phân biệt nổi "trường chưa có lớp nào" với "không
+   * đọc được danh sách lớp". Màn giáo viên vì thế báo "Bạn chưa có lớp nào"
+   * cho một giáo viên ĐANG chủ nhiệm một lớp — sai hẳn nguyên nhân, và cô đi
+   * tạo lớp mới thì thành hai lớp trùng.
+   *
+   * Cùng một bài học với `BankFirestore.getByChapter`: nuốt lỗi là biến
+   * "chưa đọc được" thành "chưa có", mà hai câu đó dẫn người đọc đi hai hướng
+   * ngược nhau.
+   */
+  async getClassesHoacLoi(): Promise<{ ds: SchoolClass[]; loi: string | null }> {
     try {
       const snap = await getDocs(collection(db, COL_CLASSES));
-      return snap.docs.map(d => ({ id: d.id, ...d.data() } as SchoolClass));
+      return { ds: snap.docs.map(d => ({ id: d.id, ...d.data() } as SchoolClass)), loi: null };
     } catch (err) {
       handleError('getClasses', err);
-      return [];
+      return { ds: [], loi: (err as { code?: string })?.code || String(err) };
     }
+  },
+
+  /** Bản cũ, giữ nguyên hành vi cho những chỗ không quan tâm lý do hỏng. */
+  async getClasses(): Promise<SchoolClass[]> {
+    return (await this.getClassesHoacLoi()).ds;
   },
 
   async addClass(schoolClass: SchoolClass): Promise<boolean> {

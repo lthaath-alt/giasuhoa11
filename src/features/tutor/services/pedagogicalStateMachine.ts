@@ -102,9 +102,30 @@ export function chiDanGianGiao(soLanBeTac: number): string {
       cam,
     ].join('\n');
   }
+  /* ── Trần cho nấc có/không (P0-3, 22/09/2026) ─────────────────────────
+     Vì sao phải có trần: một chuỗi câu có/không GHÉP LẠI ĐƯỢC thành đáp số.
+     Em hỏi "lớn hơn 1 không", "nhỏ hơn 2 không", "khoảng 1,7 không" là đang
+     nhị phân dần ra kết quả, mà từng lượt một thì lượt nào cũng đúng luật.
+     Ba lượt đủ để gỡ một chỗ vướng thật; quá ba lượt nghĩa là vướng không nằm
+     ở độ khó câu hỏi nữa, và hỏi tiếp chỉ còn tác dụng dò số. */
+  const SO_LUOT_CO_KHONG_TOI_DA = 3;
+  const luotTaiNac4 = soLanBeTac - 3;
+
+  if (luotTaiNac4 > SO_LUOT_CO_KHONG_TOI_DA) {
+    return [
+      `TRẠNG THÁI (do hệ thống đếm): HỌC SINH BẾ TẮC LẦN ${soLanBeTac}, đã qua ${SO_LUOT_CO_KHONG_TOI_DA} lượt câu hỏi có/không.`,
+      'Việc của lượt này: DỪNG chuỗi câu hỏi có/không. Chọn một trong ba: quay lại một câu hỏi mở về ý hiểu của em;',
+      'mời em hỏi trực tiếp thầy/cô trên lớp phần này; hoặc chỉ em phần bài giảng cần đọc lại.',
+      'KHÔNG hỏi thêm câu có/không nào nữa ở lượt này. TUYỆT ĐỐI KHÔNG đưa đáp án.',
+      cam,
+    ].join('\n');
+  }
+
   return [
     `TRẠNG THÁI (do hệ thống đếm): HỌC SINH BẾ TẮC LẦN ${soLanBeTac}.`,
     'Việc của lượt này: THU HẸP TỚI MỨC NHỎ NHẤT. Hỏi một câu chỉ cần trả lời có/không, hoặc chọn một trong hai.',
+    'Câu đó phải hỏi về MỘT BƯỚC hoặc MỘT KHÁI NIỆM, không được hỏi về giá trị của đáp số:',
+    'cấm mọi câu dạng "đáp số có phải là ... không", "kết quả có lớn hơn ... không", "có phải khoảng ... không".',
     'Nếu chỗ vướng là kiến thức nền, chỉ cho em phần bài giảng cần đọc lại rồi hỏi một câu về đúng phần đó.',
     'TUYỆT ĐỐI KHÔNG đưa đáp án, KHÔNG làm hộ bước của bài gốc, KHÔNG nêu sẵn công thức hay kết quả tính.',
     cam,
@@ -182,6 +203,10 @@ export interface NhanAn {
   loaiLuot?: LoaiLuot;
   maNgoNhan?: string;
   ngoaiMon?: Exclude<LoaiNgoaiMon, 'SPAM_ATTACK'>;
+  /** Thiếu một trong hai nhãn bắt buộc (bước, loại lượt) — ghi log, đừng chặn lượt */
+  thieuNhan?: boolean;
+  /** Có thẻ viết sai định dạng phải gỡ bằng lượt quét thứ hai — ghi log */
+  nhanHong?: boolean;
 }
 
 /**
@@ -203,7 +228,7 @@ export function tachNhanAn(traLoi: string): NhanAn {
   const luot = /\[LUOT:\s*([a-z_]+)\s*\]/i.exec(t);
   if (luot && LOAI_LUOT_HOP_LE.has(luot[1].toLowerCase())) kq.loaiLuot = luot[1].toLowerCase() as LoaiLuot;
 
-  const ngo = /\[NGO_NHAN:\s*([a-z0-9_-]{2,40})\s*\]/i.exec(t);
+  const ngo = /\[\s*NGO_NHAN\s*:\s*([a-z0-9_-]{2,40})\s*\]/i.exec(t);
   if (ngo) kq.maNgoNhan = ngo[1].toLowerCase();
 
   if (/\[SIGNAL:CAM_XUC_TIEU_CUC\]/i.test(t)) kq.ngoaiMon = 'CAM_XUC_TIEU_CUC';
@@ -215,6 +240,21 @@ export function tachNhanAn(traLoi: string): NhanAn {
     .replace(/\[NGO_NHAN:[^\]]*\]/gi, '')
     .replace(/\[SIGNAL:(CAM_XUC_TIEU_CUC|LAC_DE|OFFTOPIC)\]/gi, '');
 
+  /* ── P0-6: lượt quét thứ hai (22/09/2026) ────────────────────────────
+     Bốn phép thay ở trên đòi thẻ viết ĐÚNG: `[BUOC:` dính liền, có ngoặc
+     đóng. Mô hình viết sai một chút là thẻ lọt ra màn hình học sinh — đo
+     được hai ca thật: `[ NGO_NHAN : xuc-tac-chuyen-dich ]` (có khoảng
+     trắng quanh dấu hai chấm) và `[LUOT:goi_mo` (mô hình cắt ngang, thiếu
+     ngoặc đóng). Lượt quét này bắt cả hai.
+
+     KHÔNG gộp `SIGNAL` vào đây: ba nhãn ra đề (XONG_BAI, YEU_CAU_DE,
+     XONG_CHUONG) phải còn nguyên cho AppContext xử lý sau. */
+  const THE_HONG = /\[\s*(?:BUOC|LUOT|NGO_NHAN)\b[^\]]*\]?/gi;
+  kq.nhanHong = THE_HONG.test(t);
+  THE_HONG.lastIndex = 0;   // regex có cờ `g` giữ lastIndex giữa test và replace
+  t = t.replace(THE_HONG, '');
+
+  kq.thieuNhan = !kq.buoc || !kq.loaiLuot;
   kq.noiDung = t.replace(/[ \t]+\n/g, '\n').replace(/\n{3,}/g, '\n\n').trim();
   return kq;
 }

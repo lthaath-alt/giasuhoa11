@@ -74,6 +74,10 @@ export interface AppContextType {
   curriculum: Chapter[];
   schools: School[];
   classes: SchoolClass[];
+  /** Mã lỗi nếu KHÔNG đọc được danh sách lớp. `null` = đọc được, kể cả khi
+   *  danh sách rỗng thật. Màn nào vẽ theo `classes` phải phân biệt hai ca đó:
+   *  "chưa có lớp" và "không tải được" dẫn người đọc đi hai hướng ngược nhau. */
+  loiNapLop: string | null;
 
   // ── Xác thực ────────────────────────────────────────────────────────────────
 
@@ -332,6 +336,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [curriculum, setCurriculum] = useState<Chapter[]>([]);
   const [schools, setSchools] = useState<School[]>([]);
   const [classes, setClasses] = useState<SchoolClass[]>([]);
+  /* Mã lỗi nếu lần đọc danh sách lớp thất bại; null = đọc được (dù rỗng). */
+  const [loiNapLop, setLoiNapLop] = useState<string | null>(null);
   const [exams, setExams] = useState<LibraryExam[]>([]);
   const [equations, setEquations] = useState<Equation[]>([]);
   const [matrixResources, setMatrixResources] = useState<MatrixResource[]>([]);
@@ -446,11 +452,22 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
          ký xong: `createUserWithEmailAndPassword` bắn sự kiện này NGAY, chạy
          đua với `setDoc` ghi hồ sơ. Thua cuộc đua mà đá luôn ra thì người mới
          đăng ký xong bị văng về màn đăng nhập dù tài khoản hoàn toàn hợp lệ. */
+      /* Lượt gọi lại này CŨ đi ngay khi phiên đổi (23/09/2026). Nó chạy nhiều
+         nhịp `await`, và trong lúc đó `LoginForm` có thể đã đăng xuất (chọn
+         nhầm thẻ vai). Lượt mới của signOut đặt `currentUser = null` xong,
+         lượt cũ này chạy tiếp tới `persistSession` và ĐẶT LẠI người vừa bị
+         đăng xuất: màn "Tiếp tục với ..." hiện ra với một phiên đã chết, bấm
+         vào là "0 Lớp học" kèm hàng loạt permission-denied. Đo bằng Playwright:
+         lỗi sai vai ở 2659ms, `currentUser` bị đặt lại ở 3108ms. Nên sau MỖI
+         nhịp chờ phải hỏi lại: phiên còn là người này không? */
+      const conHieuLuc = () => auth.currentUser?.uid === nguoiAuth.uid;
+
       let anh = await getDoc(doc(db, 'users', nguoiAuth.uid));
       if (!anh.exists()) {
         await new Promise(r => setTimeout(r, 600));
         anh = await getDoc(doc(db, 'users', nguoiAuth.uid));
       }
+      if (!conHieuLuc()) return;
       if (!anh.exists()) {
         /* Có phiên Auth mà không có hồ sơ — đừng đoán, đừng tự tạo. Đây là dấu
            hiệu dữ liệu lệch, phải để người quản trị nhìn thấy. */
@@ -469,6 +486,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       };
 
       await loadProgressForUser(hoSo.email);
+      if (!conHieuLuc()) return;
       persistSession(hoSo);
 
       /* Bài kiểm tra nộp trước 18/09/2026 chỉ nằm trong máy — đẩy lên để giáo
@@ -477,9 +495,25 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
       /* `classes` thì học sinh đọc được (luật chỉ đòi đã đăng nhập) và màn
          "xin vào lớp" cần nó. `users` thì chỉ giáo viên/quản trị đọc được. */
-      setClasses(await FirestoreService.getClasses());
+      /* Đọc lớp, và THỬ LẠI một lần nếu hỏng (23/09/2026) — đỡ cho lúc mạng
+         chập chờn. Lần "0 Lớp học" đo được trong Playwright hôm đó KHÔNG phải
+         token về chậm như bản cũ của chú thích này viết: đó là phiên đã bị
+         đăng xuất (chọn nhầm thẻ vai), gốc đã vá bằng `conHieuLuc` ở trên.
+         Thử lại chỉ khi HỎNG, không thử khi danh sách rỗng thật — trường mới
+         chưa có lớp nào là chuyện bình thường. */
+      let kqLop = await FirestoreService.getClassesHoacLoi();
+      if (kqLop.loi) {
+        await new Promise(r => setTimeout(r, 800));
+        kqLop = await FirestoreService.getClassesHoacLoi();
+      }
+      if (!conHieuLuc()) return;
+      /* Nói THẬT khi vẫn hỏng. Để `classes` rỗng mà không đánh dấu gì thì mọi
+         màn đều hiểu nhầm thành "chưa có lớp nào". */
+      setLoiNapLop(kqLop.loi);
+      setClasses(kqLop.ds);
       if (hoSo.role !== 'student') {
         const dsNguoiDung = await FirestoreService.getUsers();
+        if (!conHieuLuc()) return;
         setUsers(dsNguoiDung.map(u => {
           const chuan = chuanHoaVaiTro(u.role as string);
           return chuan === u.role ? u : { ...u, role: chuan };
@@ -492,7 +526,9 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
       /* Đọc lỗi (người thường không có quyền) thì `docDongQuanTri` đã trả mảng
          rỗng — coi như không phải đồng quản trị, KHÔNG báo lỗi cho người dùng. */
-      setDongQuanTri(await FirestoreService.docDongQuanTri());
+      const dsDongQuanTri = await FirestoreService.docDongQuanTri();
+      if (!conHieuLuc()) return;
+      setDongQuanTri(dsDongQuanTri);
     });
 
     return () => thoi();   // huỷ đăng ký khi component rời đi
@@ -1372,6 +1408,11 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       ngoai_mon: ketQua.gianLan ? 'GIAN_LAN' : nhan.ngoaiMon,
       model_name: ketQua.modelName,
       latency_ms: ketQua.latencyMs,
+      /* Hai cờ cho bản xuất dữ liệu nghiên cứu (P0-5). Firestore từ chối cả
+         tài liệu nếu gặp một giá trị `undefined`, nên `|| undefined` ở đây là
+         cố ý: false phải biến mất hẳn chứ không được ghi xuống. */
+      chan_ro: ketQua.daChanRo || undefined,
+      nhan_hong: (nhan.nhanHong || nhan.thieuNhan) || undefined,
     };
 
     setChats(prev => [...prev, aiMsg]);
@@ -2028,6 +2069,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     <AppContext.Provider
       value={{
         currentUser,
+        loiNapLop,
         users,
         chats,
         guestChatCount,

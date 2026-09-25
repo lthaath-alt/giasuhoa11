@@ -74,6 +74,20 @@ export interface Question {
    */
   essayPoints?: EssayPoint[];
 
+  /**
+   * Lời giải, hiện cho học sinh SAU KHI nộp bài (22/09/2026).
+   *
+   * Tương ứng trường `e` của `BankQuestion`. Thêm vào vì `toLegacy` trước đây
+   * đánh rơi `e` hoàn toàn: đo ngày 22/09/2026, **cả 1.554/1.554 câu** trong
+   * ngân hàng đều có lời giải, mà không câu nào tới được màn Đề kiểm tra — học
+   * sinh làm sai chỉ đọc được đúng một chữ cái đáp án. Tab Luyện tập thì vẫn
+   * hiện, vì nó đọc thẳng `BankQuestion` chứ không đi qua `toLegacy`.
+   *
+   * Chứa HTML như `content` (giữ <sub>, <sup>, <br>), nên hiển thị PHẢI đi qua
+   * `locHtml`.
+   */
+  giaiThich?: string;
+
   createdBy?: string;
   createdAt: string;
 }

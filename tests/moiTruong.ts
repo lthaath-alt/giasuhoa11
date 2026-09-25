@@ -37,7 +37,25 @@ export function taiKhoanThu(): { email: string; matKhau: string } | null {
   return email && matKhau ? { email, matKhau } : null;
 }
 
+/**
+ * Tài khoản GIÁO VIÊN dùng để thử. Thiếu thì các phép cần nó tự bỏ qua.
+ *
+ * Dùng chung hai biến với `npm run sua:cau-hoi` (`GIAO_VIEN_EMAIL` /
+ * `GIAO_VIEN_MATKHAU`) thay vì đẻ thêm cặp biến thứ ba: cùng một vai, cùng một
+ * tệp `.env.local`, và mỗi biến phải khai thêm là một chỗ nữa để quên.
+ *
+ * Tài khoản này chỉ cần vai `teacher`. ĐỪNG dùng `admin` — xem lý do ở mục
+ * `sua:cau-hoi` trong CLAUDE.md.
+ */
+export function taiKhoanGiaoVien(): { email: string; matKhau: string } | null {
+  const env = docEnvE2E();
+  const email = process.env.GIAO_VIEN_EMAIL || env.GIAO_VIEN_EMAIL || '';
+  const matKhau = process.env.GIAO_VIEN_MATKHAU || env.GIAO_VIEN_MATKHAU || '';
+  return email && matKhau ? { email, matKhau } : null;
+}
+
 export const TEP_PHIEN = 'tests/.auth/hocsinh.json';
+export const TEP_PHIEN_GV = 'tests/.auth/giaovien.json';
 
 /**
  * Trần lượt của khách, đọc từ CHÍNH mã nguồn.

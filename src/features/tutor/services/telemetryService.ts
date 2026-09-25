@@ -129,6 +129,16 @@ export function tinhChiSo(tinNhan: ChatMessage[]): ChiSoHocTap {
 
 // ── Xuất số liệu cho phân tích ───────────────────────────────────────────────
 
+/**
+ * Bọc một ô CSV. Tách ra khỏi `xuatCsv` ngày 22/09/2026 để bản xuất nghiên cứu
+ * (P0-5) dùng CHUNG một cách bọc — hai cách bọc khác nhau trong cùng dự án thì
+ * sớm muộn một cái sẽ quên mất dấu nháy kép và làm lệch cả bảng.
+ */
+export const bocCsv = (v: unknown): string => {
+  const s = v === undefined || v === null ? '' : String(v);
+  return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+};
+
 const COT_CSV = [
   'user_hash', 'nhanh', 'session_id', 'lesson_id', 'timestamp', 'sender', 'buoc', 'loai_luot',
   'muc_goi_y', 'be_tac', 'ma_ngo_nhan', 'ngoai_mon', 'model_name', 'latency_ms', 'do_dai_noi_dung',
@@ -140,14 +150,154 @@ const COT_CSV = [
  * giáo viên xuất riêng, có kiểm soát.
  */
 export function xuatCsv(tinNhan: ChatMessage[]): string {
-  const boc = (v: unknown) => {
-    const s = v === undefined || v === null ? '' : String(v);
-    return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
-  };
   const dong = tinNhan.map(m => [
     m.user_hash ?? userHash(m.userEmail) ?? '', m.nhanh, m.session_id, m.lessonId, m.timestamp, m.sender,
     m.buoc, m.loai_luot, m.muc_goi_y, m.be_tac, m.ma_ngo_nhan, m.ngoai_mon, m.model_name, m.latency_ms,
     (m.content ?? '').length,
-  ].map(boc).join(','));
+  ].map(bocCsv).join(','));
   return [COT_CSV.join(','), ...dong].join('\n');
+}
+
+// ── Gộp theo từng học sinh, cho bản xuất nghiên cứu (P0-5) ───────────────────
+
+/**
+ * Một dòng trong bảng "mỗi học sinh một dòng" — đơn vị phân tích của đề tài.
+ *
+ * Mọi trường ở đây đều tính từ những trường mã THẬT SỰ đang ghi xuống `chats`
+ * (xem khối `aiMsg` trong `AppContext`). Kế hoạch P0-5 còn nhắc `nghi_sao_chep`
+ * và `gio_kiem_tra`; hôm nay chưa chỗ nào ghi hai trường đó nên CỐ Ý không có
+ * cột cho chúng: một cột luôn rỗng trông như "không em nào bị" chứ không như
+ * "chưa đo", và đó là kiểu nhầm tệ nhất trong một bảng số liệu nghiên cứu.
+ */
+export interface DongHocSinh {
+  user_hash: string;
+  /** Nhánh thực nghiệm; ghép bằng `|` nếu một em từng ở hai nhánh (đổi đợt) */
+  nhanh: string;
+  soPhien: number;
+  soLuot: number;
+  soLuotHocSinh: number;
+  /** Tổng thời gian CỘNG TRONG từng phiên, xem chú thích trong `gopTheoHocSinh` */
+  tongThoiGianMs: number;
+  /** Cùng mẫu số với `socraticRatio` của `tinhChiSo`; null khi không có lượt nào để tính */
+  tyLeGoiMo: number | null;
+  tyLeBeTac: number | null;
+  mucCaoNhat: number;
+  /** Số phiên chạm nấc trần. Trần hôm nay là 3 — đổi kiểu `muc_goi_y` thì đổi cả đây */
+  soPhienMuc3: number;
+  soLanChanRo: number;
+  soLanNhanHong: number;
+  soLanGianLan: number;
+  /** Lượt gia sư KHÔNG có nhãn `loai_luot`; cao thì `tyLeGoiMo` không đáng tin */
+  soNhanThieu: number;
+}
+
+/** Nấc giàn giáo cao nhất mà `ChatMessage.muc_goi_y` cho phép. */
+const MUC_TRAN = 3;
+
+/**
+ * Gộp chỉ số theo từng học sinh, dùng cho bản xuất nghiên cứu (P0-5).
+ *
+ * CHỈ ĐỌC: không sửa mảng đưa vào. Mốc ngày so thẳng trên chuỗi ISO nên
+ * `tuNgay`/`denNgay` viết dạng 'YYYY-MM-DD'; `denNgay` tính TRỌN ngày đó, vì
+ * người gõ `--den 2026-09-22` luôn có ý gồm cả hôm ấy.
+ */
+export function gopTheoHocSinh(tin: ChatMessage[], tuNgay?: string, denNgay?: string): DongHocSinh[] {
+  const trongKhoang = (ts: string) =>
+    (!tuNgay || ts >= tuNgay) && (!denNgay || ts <= `${denNgay}T23:59:59.999Z`);
+  const loc = tin.filter(m => trongKhoang(m.timestamp));
+
+  const theoHocSinh = new Map<string, ChatMessage[]>();
+  for (const m of loc) {
+    const khoa = m.user_hash ?? userHash(m.userEmail) ?? '';
+    const da = theoHocSinh.get(khoa);
+    if (da) da.push(m); else theoHocSinh.set(khoa, [m]);
+  }
+
+  return [...theoHocSinh.entries()].map(([user_hash, ms]) => {
+    const cuaHocSinh = ms.filter(m => m.sender === 'user');
+    const cuaGiaSu = ms.filter(m => m.sender === 'ai');
+    const coNhan = cuaGiaSu.filter(m => m.loai_luot);
+    /* Cùng mẫu số với `socraticRatio` trong `tinhChiSo`: lượt hành chính và
+       tra cứu không phải cơ hội dạy học. Hai chỗ mà khác mẫu số thì báo cáo có
+       hai con số "tỉ lệ Socratic" lệch nhau mà không ai giải thích được. */
+    const mauSo = coNhan.filter(m => m.loai_luot !== 'hanh_chinh' && m.loai_luot !== 'tra_cuu');
+
+    const mucTheoPhien = new Map<string, number>();
+    const mocTheoPhien = new Map<string, number[]>();
+    for (const m of ms) {
+      const phien = m.session_id ?? '';
+      mucTheoPhien.set(phien, Math.max(mucTheoPhien.get(phien) ?? 0, m.muc_goi_y ?? 0));
+      const moc = Date.parse(m.timestamp);
+      if (!Number.isNaN(moc)) {
+        const da = mocTheoPhien.get(phien);
+        if (da) da.push(moc); else mocTheoPhien.set(phien, [moc]);
+      }
+    }
+
+    /* Cộng TRONG từng phiên rồi mới cộng lại, chứ không lấy mốc cuối trừ mốc
+       đầu: một em học hai buổi cách nhau ba hôm sẽ ra "72 giờ học", con số đó
+       đi thẳng vào báo cáo thì không ai bắt được vì nó vẫn trông như một số. */
+    let tongThoiGianMs = 0;
+    for (const moc of mocTheoPhien.values()) {
+      if (moc.length > 1) tongThoiGianMs += Math.max(...moc) - Math.min(...moc);
+    }
+
+    const nhanh = [...new Set(ms.map(m => m.nhanh).filter(Boolean))].join('|');
+
+    return {
+      user_hash,
+      nhanh,
+      soPhien: new Set(ms.map(m => m.session_id ?? '')).size,
+      soLuot: ms.length,
+      soLuotHocSinh: cuaHocSinh.length,
+      tongThoiGianMs,
+      tyLeGoiMo: mauSo.length ? mauSo.filter(m => m.loai_luot === 'goi_mo').length / mauSo.length : null,
+      tyLeBeTac: cuaHocSinh.length ? cuaHocSinh.filter(m => m.be_tac).length / cuaHocSinh.length : null,
+      mucCaoNhat: Math.max(0, ...mucTheoPhien.values()),
+      soPhienMuc3: [...mucTheoPhien.values()].filter(v => v >= MUC_TRAN).length,
+      soLanChanRo: ms.filter(m => m.chan_ro).length,
+      soLanNhanHong: ms.filter(m => m.nhan_hong).length,
+      soLanGianLan: ms.filter(m => m.ngoai_mon === 'GIAN_LAN').length,
+      soNhanThieu: cuaGiaSu.length - coNhan.length,
+    };
+  });
+}
+
+/**
+ * Bảng "mỗi học sinh một dòng" dưới dạng CSV.
+ *
+ * Hai điều bắt buộc, đừng bỏ:
+ *   - BOM ở đầu. Tệp này mở bằng Excel trên Windows; thiếu BOM là tiếng Việt
+ *     ra ký tự rác (đã ghi trong CLAUDE.md, `liet-ke:tai-khoan` vấp rồi).
+ *   - `canhBao` thành cột ĐẦU TIÊN của MỌI dòng, không phải một dòng chú thích
+ *     trên đầu tệp. Dòng chú thích làm lệch cột khi nạp bằng pandas, còn một
+ *     cột thì vừa đập vào mắt người mở Excel vừa không phá công cụ nào.
+ *
+ * Số thập phân dùng dấu CHẤM, khác lối hiển thị cho học sinh: dấu phẩy vừa là
+ * dấu thập phân vừa là dấu ngăn cột thì bảng vỡ ngay dòng đầu.
+ */
+export function csvHocSinh(dong: DongHocSinh[], canhBao: string): string {
+  const lam = (v: number | null) => (v === null ? '' : v.toFixed(4));
+  const cot: [string, (d: DongHocSinh) => unknown][] = [
+    ['canh_bao', () => canhBao],
+    ['user_hash', d => d.user_hash],
+    ['nhanh', d => d.nhanh],
+    ['so_phien', d => d.soPhien],
+    ['so_luot', d => d.soLuot],
+    ['so_luot_hoc_sinh', d => d.soLuotHocSinh],
+    ['tong_thoi_gian_ms', d => d.tongThoiGianMs],
+    ['tong_thoi_gian_phut', d => (d.tongThoiGianMs / 60000).toFixed(1)],
+    ['ty_le_goi_mo', d => lam(d.tyLeGoiMo)],
+    ['ty_le_be_tac', d => lam(d.tyLeBeTac)],
+    ['muc_cao_nhat', d => d.mucCaoNhat],
+    [`so_phien_muc_${MUC_TRAN}`, d => d.soPhienMuc3],
+    ['so_lan_chan_ro', d => d.soLanChanRo],
+    ['so_lan_nhan_hong', d => d.soLanNhanHong],
+    ['so_lan_gian_lan', d => d.soLanGianLan],
+    ['so_nhan_thieu', d => d.soNhanThieu],
+  ];
+  return '﻿' + [
+    cot.map(c => c[0]).join(','),
+    ...dong.map(d => cot.map(c => bocCsv(c[1](d))).join(',')),
+  ].join('\n');
 }
