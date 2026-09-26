@@ -100,7 +100,7 @@ git clone … && npm install && npm run dev
 
 Chỉ vậy. Cấu hình Firebase nằm sẵn trong `src/core/services/firebaseCongKhai.ts`
 — sáu giá trị công khai theo thiết kế của Firebase, vốn đã nằm trong bản dựng
-trên Netlify. Biến `VITE_FIREBASE_*` trong `.env.local` vẫn được ưu tiên nếu
+trên web. Biến `VITE_FIREBASE_*` trong `.env.local` vẫn được ưu tiên nếu
 có, để còn trỏ sang dự án Firebase khác lúc thử nghiệm.
 
 Thứ **duy nhất** còn phải chép tay là `GEMINI_API_KEY` trong `.env.local`, và

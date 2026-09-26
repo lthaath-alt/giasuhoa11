@@ -14,7 +14,7 @@ Các mục gốc được giữ nguyên văn, mỗi mục xuất hiện trong đ
 | Kiểm thử đầu-cuối bằng trình duyệt (`npm run kiem-tra:e2e`) | [testing.md](testing.md) |
 | Nhờ Gemini soi nội dung hoá học (`npm run soat:hoa-hoc`) | [chemistry.md](chemistry.md) |
 | Kỹ năng trong repo (`.claude/skills/`) | [workflow.md](workflow.md) |
-| Deploy lên Netlify (kéo thả thư mục `dist/`) | [deployment.md](deployment.md) |
+| Deploy lên Cloudflare Pages (tải tay thư mục `dist/`) | [deployment.md](deployment.md) |
 | Biến môi trường & lỗi trắng trang | [deployment.md](deployment.md) |
 | Kiến trúc dự án — dữ liệu thật nằm ở đâu | [data.md](data.md) |
 | An ninh dự án — lỗ hổng, hàng rào, và luật | [security.md](security.md) |

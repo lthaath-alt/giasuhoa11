@@ -70,7 +70,7 @@ hai chế độ màu sáng/tối đồng bộ toàn hệ thống.
   canh 70 cặp mỗi chế độ (`npm run kiem-tra:mau`).
 - Gemini bậc miễn phí: **5 lượt/phút và 20 lượt/ngày** cho mỗi model. Đây là trần thật
   của trải nghiệm hỏi đáp, không phải con số ước lượng.
-- Kỹ thuật: React 19 + Vite 6 + MUI v9 + Tailwind v4, Firestore, triển khai Netlify.
+- Kỹ thuật: React 19 + Vite 6 + MUI v9 + Tailwind v4, Firestore, triển khai Cloudflare Pages (`giasuhoa11.pages.dev`).
   Toàn bộ màu khai bằng biến CSS trong `src/index.css`, hai bảng sáng/tối.
 
 **Lỗ hổng đã biết, chưa sửa:** đăng nhập là hệ tự viết, so mật khẩu dạng chữ thường ngay

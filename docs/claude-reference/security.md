@@ -67,13 +67,14 @@ build` hay `npm run lint` bắt** — vì chúng không phải lỗi mã.
    động trong `npm run build`. **ĐỪNG thêm `'unsafe-inline'`**: nó bật lại cả
    thuộc tính `on…=`, tức đúng `<img src=x onerror=…>` mà CSP sinh ra để chặn.
    Hash phải băm bản đã chuẩn hoá CRLF→LF, vì bộ phân tích HTML làm vậy trước.
-3. **Vite KHÔNG đọc `_headers`** — đó là tính năng của Netlify. Nên mọi lượt
+3. **Vite KHÔNG đọc `_headers`** — đó là tính năng của nền tảng phát hành (nay là Cloudflare Pages). Nên mọi lượt
    "đã thử CSP ở máy dev" đều không thật: `X-Frame-Options` chỉ tồn tại ở dạng
    header, và `frame-ancestors` bị bỏ qua khi đặt trong thẻ `<meta>`. Muốn thử
    thật thì phải phục vụ `dist/` bằng một máy chủ có áp `_headers`, hoặc deploy
    bản nháp. Đây là lý do gốc khiến hai cái bẫy trên lọt.
 
-**Một lỗi CSP trong Console là BÌNH THƯỜNG, đừng đi chữa.** Bản Netlify miễn
+**(Lịch sử, chỉ đúng khi còn chạy trên Netlify — web đã chuyển hẳn sang
+Cloudflare Pages ngày 26/09/2026.)** **Một lỗi CSP trong Console là BÌNH THƯỜNG, đừng đi chữa.** Bản Netlify miễn
 phí tự chèn huy hiệu "Powered by Netlify" dưới dạng một khung `srcdoc`
 (`id="nl-badge-frame"`), mà khung kiểu đó **thừa kế CSP của trang cha**, nên
 script nội tuyến bên trong nó bị chặn. Đo ngày 16/09/2026 trên tab sạch, không
@@ -241,7 +242,7 @@ Hai điều phải giữ:
   không đăng nhập được. (Từ 02/11/2026 Firebase bắt buộc App Check cho AI Logic.)
 - **CSP phải cho phép reCAPTCHA** (`https://www.google.com/recaptcha/`,
   `https://www.gstatic.com/recaptcha/`, `https://recaptcha.google.com/recaptcha/`) — thiếu thì
-  gia sư chết trên Netlify mà máy dev vẫn chạy.
+  gia sư chết trên web thật mà máy dev vẫn chạy.
 
 **Lỗi 400 lúc KHÁCH gửi câu hỏi cho gia sư = chưa bật Anonymous.** Console in
 `auth/admin-restricted-operation` kèm cảnh báo `[gioiHanChat]`. Đây là đường

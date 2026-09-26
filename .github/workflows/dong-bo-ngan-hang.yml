@@ -19,7 +19,7 @@ name: Đồng bộ ngân hàng câu hỏi
 on:
   schedule:
     # 19:00 UTC = 02:00 giờ Việt Nam hôm sau. Chọn giờ đó để nếu có commit thì
-    # Netlify dựng lại lúc không ai đang dùng.
+    # bản chụp đổi lúc không ai đang dùng.
     - cron: '0 19 * * *'
   workflow_dispatch:        # nút "Run workflow" trong tab Actions, chạy ngay
 

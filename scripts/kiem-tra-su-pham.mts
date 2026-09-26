@@ -206,7 +206,7 @@ console.log('\n== Chuẩn hoá công thức ==');
 
 console.log('\n== Dựng bằng KaTeX + mhchem (đúng cấu hình web) ==');
 {
-  const NGUON = 'https://giasuhoa11.netlify.app/';
+  const NGUON = 'https://giasuhoa11.pages.dev/';
   const dung = (t: string) => renderToStaticMarkup(createElement(ReactMarkdown, {
     remarkPlugins: [remarkMath, remarkBreaks],
     rehypePlugins: [[rehypeSanitize, LUOC_DO_LOC], [rehypeKatex, TUY_CHON_KATEX]],
@@ -234,8 +234,8 @@ console.log('\n== Dựng bằng KaTeX + mhchem (đúng cấu hình web) ==');
 
   const xss = dung('<img src=x onerror=alert(1)> [a](javascript:alert(1)) $\\href{javascript:alert(2)}{bấm}$ <script>alert(3)</script>');
   ok(!/<img|onerror=|<script|href="javascript/i.test(xss), 'không lọt thẻ img/script, thuộc tính on…, link javascript:');
-  const link = dung('[Làm bài](https://giasuhoa11.netlify.app/#/quiz/q1) [ngoài](https://vi.wikipedia.org/wiki/Hoa) [http](http://evil.example)');
-  ok(/<a href="https:\/\/giasuhoa11\.netlify\.app\/#\/quiz\/q1" rel="noopener noreferrer nofollow"(?! target)/.test(link),
+  const link = dung('[Làm bài](https://giasuhoa11.pages.dev/#/quiz/q1) [ngoài](https://vi.wikipedia.org/wiki/Hoa) [http](http://evil.example)');
+  ok(/<a href="https:\/\/giasuhoa11\.pages\.dev\/#\/quiz\/q1" rel="noopener noreferrer nofollow"(?! target)/.test(link),
     'link bài kiểm tra cùng nguồn: có rel, mở ở tab hiện tại');
   ok(/<a href="https:\/\/vi\.wikipedia\.org\/wiki\/Hoa" rel="noopener noreferrer nofollow" target="_blank"/.test(link),
     'link https ngoài: rel đầy đủ + target=_blank');

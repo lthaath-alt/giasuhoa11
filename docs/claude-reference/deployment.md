@@ -6,15 +6,18 @@
 
 Các đường dẫn code trong nội dung gốc tính từ gốc repo. Cụm “mục bên dưới”, “tệp này” hoặc tên mục không kèm file là tham chiếu của bản gốc: dùng INDEX.md để tìm đúng tài liệu mới.
 
-**Ghi chú đối chiếu:** Tài liệu này nói Netlify, trong khi ví dụ E2E dùng tên miền pages.dev. Xác nhận nền tảng đích thực trước khi thay cấu hình hoặc triển khai; không suy ra một nền tảng đã thay thế nền tảng kia.
+**Nền tảng đích: Cloudflare Pages, địa chỉ `https://giasuhoa11.pages.dev`** (chốt 26/09/2026, bỏ hẳn Netlify). Trước đó web chạy song song hai nơi và bản `giasuhoa11.netlify.app` bị bỏ quên ở bản cũ — QR trên poster trỏ vào đúng bản cũ đó. Các đoạn nhắc Netlify ở tài liệu khác là ghi chép lịch sử.
 
 ---
 
-## Deploy lên Netlify (kéo thả thư mục `dist/`)
-- Học viên deploy bằng cách `npm run build` rồi kéo-thả thư mục `dist/` lên Netlify (KHÔNG qua git).
-- **Bắt buộc có `public/_redirects`** với nội dung `/*  /index.html  200`. Vite tự copy file này vào `dist/` khi build. ĐỪNG xoá nó.
-- Lý do: đây là SPA (React Router). Không có file này thì F5/mở trực tiếp một route con (vd `/login`) sẽ báo **404 (Page not found)** trên Netlify, vì Netlify tìm file tên `login` không có. Rule `_redirects` bảo Netlify trả `index.html` cho mọi đường dẫn để React Router tự xử lý.
-- Nếu user báo "F5 bị 404 trên Netlify" hoặc "vào link con bị Page not found": kiểm tra `public/_redirects` còn không, và nó có nằm trong `dist/` sau khi build không.
+## Deploy lên Cloudflare Pages (tải tay thư mục `dist/`)
+- Chủ dự án deploy bằng cách `npm run build` rồi tải thư mục `dist/` lên dự án Cloudflare Pages `giasuhoa11` (KHÔNG qua git). AI không tự build hay deploy.
+- **Bắt buộc có `public/_redirects`** với nội dung `/*  /index.html  200`, và **`public/_headers`**. Vite tự copy cả hai vào `dist/` khi build. ĐỪNG xoá.
+- Lý do `_redirects`: đây là SPA (React Router). Không có tệp này thì F5/mở trực tiếp một route con (vd `/login`) sẽ báo 404, vì máy chủ tìm tệp tên `login` không có.
+- Cloudflare Pages đọc `_headers` và `_redirects` cùng cú pháp với Netlify. Đo 26/09/2026 bằng `curl -sI`: trang chủ có đủ CSP (kèm hash do `scripts/bam-csp.mts` thêm lúc build) và `X-Frame-Options: SAMEORIGIN`; `/login` trả 200; ảnh `/hoa11/slides/*` nhận đúng `max-age=3600`.
+- Sau mỗi lần deploy: `curl -sI https://giasuhoa11.pages.dev/` xem còn dòng `content-security-policy`, và mở thẳng một route con để chắc F5 không 404.
+- Nếu user báo "F5 bị 404" hoặc "vào link con bị Page not found": kiểm tra `public/_redirects` còn không, và nó có nằm trong `dist/` sau khi build không.
+- **Việc chỉ chủ dự án làm được khi bỏ Netlify:** xoá (hoặc để trống) site Netlify; gỡ `giasuhoa11.netlify.app` khỏi danh sách tên miền của khoá reCAPTCHA Enterprise và khỏi Authorized domains của Firebase Auth. Hai bản dùng chung hạn mức Gemini, nên bản cũ còn sống là còn tiêu lượt của cả web.
 
 
 ## Biến môi trường & lỗi trắng trang
@@ -24,10 +27,10 @@ Các đường dẫn code trong nội dung gốc tính từ gốc repo. Cụm �
   trang, ĐỪNG đi sửa Firebase config trước; xem lỗi thật trong Console trình duyệt
   (F12) rồi mới chẩn đoán.
   - (Khoá web của Firebase không phải bí mật — nó vốn nằm trong mã JavaScript đã dựng
-    trên Netlify, ai bấm F12 cũng đọc được. An toàn dựa vào Firestore Rules, và
+    trên web, ai bấm F12 cũng đọc được. An toàn dựa vào Firestore Rules, và
     từ 12/09/2026 luật đã siết theo vai — xem mục "An ninh dự án". `bank_questions` nay
     chỉ giáo viên ghi được, nhưng vẫn **đọc công khai** vì đồng bộ đêm cần.)
 - **Web KHÔNG cần key Gemini** (từ 13/09/2026): gia sư gọi qua Firebase AI Logic, xem `src/features/tutor/services/giaSuFirebaseAI.ts`. `.env.local` chỉ cần `GEMINI_API_KEY` cho script trong `scripts/` (xem `.env.example`). **Đừng bao giờ** đặt key Gemini vào biến `VITE_*` — Vite chép nguyên văn vào gói JS; `kiem-tra:an-ninh` bắt điều đó.
-- Máy dev gọi Firebase AI Logic cần `VITE_APPCHECK_DEBUG_TOKEN` trong `.env.development.local` (token đăng ký ở Firebase Console → App Check → Manage debug tokens). Nếu gia sư báo "tạm mất kết nối với máy chủ": trên máy dev thường là thiếu hoặc sai token đó; trên Netlify thường là CSP trong `public/_headers` hoặc tên miền chưa có trong key reCAPTCHA. Mở F12 xem lỗi thật trước khi sửa.
+- Máy dev gọi Firebase AI Logic cần `VITE_APPCHECK_DEBUG_TOKEN` trong `.env.development.local` (token đăng ký ở Firebase Console → App Check → Manage debug tokens). Nếu gia sư báo "tạm mất kết nối với máy chủ": trên máy dev thường là thiếu hoặc sai token đó; trên Cloudflare Pages thường là CSP trong `public/_headers` hoặc tên miền chưa có trong key reCAPTCHA. Mở F12 xem lỗi thật trước khi sửa.
 - ĐỪNG commit `.env.local` (đã nằm trong `.gitignore`).
 
