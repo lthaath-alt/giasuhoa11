@@ -1,0 +1,130 @@
+[
+ {
+  "id": "bq_1789371866327_zu2op",
+  "truong": "q",
+  "cuPhaiLa": "Đốt cháy hoàn toàn 4,4 gam hợp chất hữu cơ X (C, H, O). Dẫn sản phẩm cháy lần lượt qua bình (1) đựng dung dịch H₂SO₄ đặc, bình (2) đựng dung dịch Ca(OH)₂ dư. Sau thí nghiệm, khối lượng bình (1) tăng 3,6 gam, ở bình (2) có 20 gam kết tủa. Tỉ khối của X đối với hydrogen là 30. Công thức phân tử của X là",
+  "moi": "Đốt cháy hoàn toàn 6,0 gam hợp chất hữu cơ X (C, H, O). Dẫn sản phẩm cháy lần lượt qua bình (1) đựng dung dịch H₂SO₄ đặc, bình (2) đựng dung dịch Ca(OH)₂ dư. Sau thí nghiệm, khối lượng bình (1) tăng 3,6 gam, ở bình (2) có 20 gam kết tủa. Tỉ khối của X đối với hydrogen là 30. Công thức phân tử của X là"
+ },
+ {
+  "id": "bq_1789371866327_41i8e",
+  "truong": "q",
+  "cuPhaiLa": "Đốt cháy hoàn toàn 4,4 gam X (C, H, O), dẫn sản phẩm qua bình (1) H₂SO₄ đặc rồi bình (2) Ca(OH)₂ dư; bình (1) tăng 3,6 gam, bình (2) có 20 gam kết tủa, tỉ khối của X so với H₂ là 30.",
+  "moi": "Đốt cháy hoàn toàn 6,0 gam X (C, H, O), dẫn sản phẩm qua bình (1) H₂SO₄ đặc rồi bình (2) Ca(OH)₂ dư; bình (1) tăng 3,6 gam, bình (2) có 20 gam kết tủa, tỉ khối của X so với H₂ là 30."
+ },
+ {
+  "id": "bq_1789371866327_yqngn",
+  "truong": "q",
+  "cuPhaiLa": "Đốt cháy hoàn toàn 4,4 gam X (C, H, O) thu được 3,6 gam H₂O và 20 gam kết tủa CaCO₃; tỉ khối của X so với H₂ là 30. Phân tử khối của X là bao nhiêu?",
+  "moi": "Đốt cháy hoàn toàn 6,0 gam X (C, H, O) thu được 3,6 gam H₂O và 20 gam kết tủa CaCO₃; tỉ khối của X so với H₂ là 30. Phân tử khối của X là bao nhiêu?"
+ },
+ {
+  "id": "bq_1789371866327_zu2op",
+  "truong": "e",
+  "cuPhaiLa": "H₂O 0,2 mol cho H 0,4 mol; CaCO₃ 0,2 mol cho C 0,2 mol; m(O) = 4,4 − 2,4 − 0,4 = 1,6 gam tức 0,1 mol nên C : H : O = 2 : 4 : 1 và M = 60 cho C₂H₄O₂.",
+  "moi": "H₂O 0,2 mol cho H 0,4 mol; CaCO₃ 0,2 mol cho C 0,2 mol; m(O) = 6,0 − 2,4 − 0,4 = 3,2 gam tức 0,2 mol nên C : H : O = 1 : 2 : 1 (công thức đơn giản nhất CH₂O) và M = 60 cho C₂H₄O₂."
+ },
+ {
+  "id": "bq_1789371866327_41i8e",
+  "truong": "e",
+  "cuPhaiLa": "Tỉ lệ C : H : O = 2 : 4 : 1 cho công thức đơn giản nhất CH₂O (M = 30), nhưng M thực bằng 60 nên công thức phân tử là C₂H₄O₂.",
+  "moi": "m(O) = 6,0 − 2,4 − 0,4 = 3,2 g (0,2 mol) nên C : H : O = 0,2 : 0,4 : 0,2 = 1 : 2 : 1, công thức đơn giản nhất CH₂O (M = 30); M thực bằng 60 nên công thức phân tử là C₂H₄O₂, trong đó số nguyên tử O bằng số nguyên tử C."
+ },
+ {
+  "id": "bq_1789371866327_41i8e",
+  "truong": "st",
+  "y": 3,
+  "cuPhaiLa": "Trong X, số nguyên tử oxygen bằng số nguyên tử carbon.",
+  "moi": "Trong X, số nguyên tử oxygen gấp đôi số nguyên tử carbon."
+ },
+ {
+  "id": "bq_1789371866327_a6zhp",
+  "truong": "st",
+  "y": 1,
+  "cuPhaiLa": "Công thức phân tử của X là C₃H₈O₃.",
+  "moi": "X có thể là C₃H₈O₃."
+ },
+ {
+  "id": "bq_1789371866327_13zzr",
+  "truong": "q",
+  "cuPhaiLa": "Xét dẫn xuất hydrocarbon X có phân tử khối bằng 46.",
+  "moi": "Xét dẫn xuất hydrocarbon X chứa C, H, O và có phân tử khối bằng 46."
+ },
+ {
+  "id": "bq_1789371866327_13zzr",
+  "truong": "st",
+  "y": 0,
+  "cuPhaiLa": "Công thức phân tử của X là C₂H₆O.",
+  "moi": "X có thể là C₂H₆O."
+ },
+ {
+  "id": "bq_1789372198152_uegw5",
+  "truong": "q",
+  "cuPhaiLa": "[Hình 10.1: hai phổ khối lượng; (a) của naphthalene (vẽ kèm công thức hai vòng benzene ghép) có các peak thấp ở m/z 51, 64, 102 và peak cao nhất (100%) ở m/z 128; (b) của phenol (C₆H₅OH) có các peak nhỏ ở m/z 27, 40, 55, 66, 77 và peak cao nhất (100%) ở m/z 94] Quan sát hình, giá trị phân tử khối của naphthalene và phenol lần lượt là bao nhiêu? Biết phân tử khối tương ứng với peak có cường độ tương đối lớn nhất hiển thị trên phổ khối lượng.",
+  "moi": "[Hình 10.1: hai phổ khối lượng; (a) của naphthalene (vẽ kèm công thức hai vòng benzene ghép) có các peak thấp ở m/z 51, 64, 102 và peak cao nhất (100%) ở m/z 128; (b) của phenol (C₆H₅OH) có các peak nhỏ ở m/z 27, 40, 55, 66, 77 và peak cao nhất (100%) ở m/z 94] Quan sát hình, giá trị phân tử khối của naphthalene và phenol lần lượt là bao nhiêu? Biết phân tử khối tương ứng với peak ion phân tử [M⁺] có giá trị m/z lớn nhất trên phổ khối lượng."
+ },
+ {
+  "id": "bq_1789373737083_tgb3y",
+  "truong": "e",
+  "cuPhaiLa": "Peak mạnh nhất ở m/z = 93 cho phân tử khối 93; số nguyên tử C = 93·0,7742/12 = 6, H = 93·0,0753 = 7 và N = 93·0,1505/14 = 1, nên aniline là C₆H₇N.",
+  "moi": "Peak ion phân tử có m/z lớn nhất ở 93 cho phân tử khối 93; số nguyên tử C = 93·0,7742/12 = 6, H = 93·0,0753 = 7 và N = 93·0,1505/14 = 1, nên aniline là C₆H₇N."
+ },
+ {
+  "id": "bq_1789371866328_mwyt8",
+  "truong": "q",
+  "cuPhaiLa": "Số đồng phân cấu tạo mạch hở của C₃H₆O là bao nhiêu?",
+  "moi": "Số đồng phân cấu tạo mạch hở, bền của C₃H₆O là bao nhiêu?"
+ },
+ {
+  "id": "bq_1789371866328_gahmc",
+  "truong": "q",
+  "cuPhaiLa": "Xét các đồng phân cấu tạo của C₃H₉N.",
+  "moi": "[Nâng cao – ngoài SGK] Xét các đồng phân cấu tạo của C₃H₉N."
+ },
+ {
+  "id": "bq_1789371866327_cfgww",
+  "truong": "st",
+  "y": 0,
+  "cuPhaiLa": "Phương pháp cần điền là kết tinh.",
+  "moi": "Phương pháp đó là kết tinh."
+ },
+ {
+  "id": "bq_1789371866327_cfgww",
+  "truong": "st",
+  "y": 2,
+  "cuPhaiLa": "Phương pháp cần điền là chiết.",
+  "moi": "Phương pháp đó là chiết."
+ },
+ {
+  "id": "bq_1789371866327_yclel",
+  "truong": "st",
+  "y": 2,
+  "cuPhaiLa": "Định nghĩa trên là của phương pháp chưng cất.",
+  "moi": "Định nghĩa ở ý thứ nhất là của phương pháp chưng cất."
+ },
+ {
+  "id": "bq_1789371866327_yclel",
+  "truong": "st",
+  "y": 3,
+  "cuPhaiLa": "Định nghĩa trên là của phương pháp sắc kí cột.",
+  "moi": "Định nghĩa ở ý thứ nhất là của phương pháp sắc kí cột."
+ },
+ {
+  "id": "bq_1789371866327_fo3iq",
+  "truong": "st",
+  "y": 1,
+  "cuPhaiLa": "Phổ IR chỉ cho biết sự có mặt của các nhóm chức.",
+  "moi": "Phổ IR cho biết sự có mặt của các nhóm chức."
+ },
+ {
+  "id": "bq_1788161296550_c3axi",
+  "truong": "q",
+  "cuPhaiLa": "[Phổ IR: Trục hoành là số sóng (cm⁻¹), trục tung là độ truyền qua (%). Có tín hiệu hấp thụ ở vùng 3300 - 3400 cm⁻¹ và một peak hấp thụ mạnh ở khoảng 1650 - 1700 cm⁻¹]. Dựa vào phổ hồng ngoại, cho biết hợp chất X tương ứng là chất nào sau đây?",
+  "moi": "[Phổ IR: Trục hoành là số sóng (cm⁻¹), trục tung là độ truyền qua (%). Có tín hiệu hấp thụ ở vùng 3300 - 3400 cm⁻¹ và một peak hấp thụ mạnh ở khoảng 1650 - 1700 cm⁻¹; không có dải hấp thụ rộng ở vùng 2500 - 3300 cm⁻¹]. Dựa vào phổ hồng ngoại, cho biết hợp chất X tương ứng là chất nào sau đây?"
+ },
+ {
+  "id": "bq_1788161555460_4yuc7",
+  "truong": "q",
+  "cuPhaiLa": "[Đồ thị phổ hồng ngoại (IR): Trục hoành là số sóng (cm⁻¹), trục tung là độ truyền qua. Trên phổ có tín hiệu hấp thụ ở vùng 3300 - 3400 cm⁻¹ và một peak hấp thụ sắc nhọn ở khoảng 1650 - 1700 cm⁻¹]. Dựa vào tín hiệu phổ hồng ngoại của một số liên kết, cho biết chất X có phổ IR như mô tả là chất nào sau đây?",
+  "moi": "[Đồ thị phổ hồng ngoại (IR): Trục hoành là số sóng (cm⁻¹), trục tung là độ truyền qua. Trên phổ có tín hiệu hấp thụ ở vùng 3300 - 3400 cm⁻¹ và một peak hấp thụ sắc nhọn ở khoảng 1650 - 1700 cm⁻¹; không có dải hấp thụ rộng ở vùng 2500 - 3300 cm⁻¹]. Dựa vào tín hiệu phổ hồng ngoại của một số liên kết, cho biết chất X có phổ IR như mô tả là chất nào sau đây?"
+ }
+]

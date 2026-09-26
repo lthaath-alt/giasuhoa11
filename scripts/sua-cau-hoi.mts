@@ -83,6 +83,9 @@ const KIEU: Record<string, (v: unknown) => boolean> = {
   num: v => typeof v === 'number' && Number.isFinite(v),
   a: v => Number.isInteger(v) && (v as number) >= 0,
   stV: v => typeof v === 'boolean',
+  /* Câu CHƯA gắn bài không có `lessonId`: phiếu ghi `cuPhaiLa: null` (27/09/2026,
+     cho 9 câu Chương 3). `moi` vẫn phải là bai-N — kiểm ở vòng hình dạng. */
+  lessonId: v => v === null || (typeof v === 'string' && v.length > 0),
 };
 const kieuDung = (truong: string, v: unknown) =>
   (KIEU[truong] ?? ((x: unknown) => typeof x === 'string' && x.length > 0))(v);
@@ -107,6 +110,7 @@ const laMangSt = (truong: string) => truong === 'st' || truong === 'stV';
 
 /** Giá trị hiện tại của thứ phiếu nhắm tới (`st` → `st[y].s`, `stV` → `st[y].v`). */
 function giaTri(d: Record<string, unknown> | undefined, m: MucSua): unknown {
+  if (m.truong === 'lessonId') return d?.lessonId ?? null;
   if (!laMangSt(m.truong)) return d?.[m.truong];
   const st = d?.st;
   const y = Array.isArray(st) ? (st[m.y!] as Y | undefined) : undefined;
@@ -175,7 +179,7 @@ for (const [i, m] of phieu.entries()) {
     console.error(`Mục ${i + 1} (${m.id}) đổi \`num\` mà không đổi \`ansText\` của cùng câu — hai trường sẽ lệch nhau`);
     process.exit(1);
   }
-  if (m.truong === 'lessonId' && !(BAI_HOP_LE.test(m.cuPhaiLa as string) && BAI_HOP_LE.test(m.moi as string))) {
+  if (m.truong === 'lessonId' && !((m.cuPhaiLa === null || BAI_HOP_LE.test(m.cuPhaiLa as string)) && BAI_HOP_LE.test(m.moi as string))) {
     console.error(`Mục ${i + 1} (${m.id}) sửa \`lessonId\` nhưng giá trị không có dạng bai-N`);
     process.exit(1);
   }
@@ -353,6 +357,11 @@ if (uidToi) {
 }
 console.log('');
 
+/* Mảng `st` mà CHÍNH lượt này đã ghi, theo id. Một câu có thể có nhiều mục
+   `st` (hai ý của `cfgww`, 27/09/2026): ghi ý trước xong thì mảng trên
+   Firestore khác `stCu` chụp lúc đối chiếu, và trước đây mục sau bị bỏ qua như
+   thể người khác vừa sửa. So với bản mình vừa ghi thì mới phân biệt được. */
+const stDaGhi = new Map<string, string>();
 let xong = 0;
 let hong = 0;
 for (const { muc, stCu } of sanSang) {
@@ -363,14 +372,21 @@ for (const { muc, stCu } of sanSang) {
     let giaTriGhi: unknown = muc.moi;
     if (laMangSt(muc.truong)) {
       const stGio = (await getDoc(doc(db, COL, muc.id))).data()?.st as Y[];
-      if (JSON.stringify(stGio) !== stCu) {
+      if (JSON.stringify(stGio) !== (stDaGhi.get(muc.id) ?? stCu)) {
         console.log(`  BỎ QUA  ${muc.id} — mảng st đã đổi sau lúc đối chiếu`);
+        hong++;
+        continue;
+      }
+      /* Hai mục cùng một ý: mục sau không còn gặp chữ cũ nó chờ. */
+      if (giaTri({ st: stGio }, muc) !== muc.cuPhaiLa) {
+        console.log(`  BỎ QUA  ${muc.id} — ý ${muc.y} không còn là giá trị phiếu chờ`);
         hong++;
         continue;
       }
       giaTriGhi = mangMoiSt(stGio, muc);
     }
     await updateDoc(doc(db, COL, muc.id), { [laMangSt(muc.truong) ? 'st' : muc.truong]: giaTriGhi });
+    if (laMangSt(muc.truong)) stDaGhi.set(muc.id, JSON.stringify(giaTriGhi));
     console.log(`  ĐÃ GHI  ${muc.id}`);
     xong++;
   } catch (e) {
@@ -390,10 +406,11 @@ for (const { muc, stCu } of sanSang) {
   const anh = await getDoc(doc(db, COL, muc.id));
   const duLieu = anh.data() as Record<string, unknown> | undefined;
   let dung = giaTri(duLieu, muc) === muc.moi;
-  /* Với `st`/`stV` còn phải chắc mọi thứ khác trong mảng y như trước. */
+  /* Với `st`/`stV` còn phải chắc mọi thứ khác trong mảng y như trước — tức
+     đúng bằng mảng cuối cùng lượt này đã ghi cho câu đó (gồm cả các ý khác
+     của cùng câu trong phiếu). Câu chưa ghi được thì không có mảng để so. */
   if (dung && laMangSt(muc.truong) && stCu) {
-    try { dung = JSON.stringify(mangMoiSt(JSON.parse(stCu), muc)) === JSON.stringify(duLieu?.st); }
-    catch { dung = false; }
+    dung = stDaGhi.get(muc.id) === JSON.stringify(duLieu?.st);
   }
   if (dung) khop++;
   console.log(`  ${dung ? 'ĐÚNG' : 'SAI '}  ${muc.id}`);

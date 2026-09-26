@@ -175,6 +175,10 @@ Năm cái trói, **đừng nới cái nào mà không hỏi chủ dự án**:
    14 câu gắn nhầm bài: giá trị dạng `bai-N`, và **chỉ chuyển trong cùng
    chương** (chương của bài lấy từ bản chụp) — khác chương thì `ch`/`chapterId`
    lệch theo nên script dừng. Mẫu: `docs/soat-hoa-hoc/sua-14-cau-gan-nham-bai.json`.
+   Câu CHƯA gắn bài (không có `lessonId`) ghi `"cuPhaiLa": null` (27/09/2026).
+   Một phiếu có nhiều mục `st`/`stV` cho CÙNG một câu thì được: trước 27/09/2026
+   mục sau bị "BỎ QUA — mảng st đã đổi" vì so với ảnh chụp trước khi chính lượt
+   đó ghi mục trước (`cfgww`, `yclel`); nay so với mảng lượt đó vừa ghi.
    Cũng ngày đó mở **trường ĐÁP ÁN** `num`, `ansText`, `a`, `stV` (đáp án `v`
    của một ý) và `e` (lời giải) — cho ba câu sai khoá thật (bộ số SO₂/O₂, tính
    hiệu suất theo chất dư: 40 % thay vì 60 %). Trói: phiếu phải ghi
