@@ -31,6 +31,20 @@ các bài Fe + S, SO₂ + O₂ của Bài 7.
 Bài 7 còn khoảng 13 câu về ammonia, N₂, Fe + HNO₃ — nội dung đúng nhưng gắn
 nhầm bài (subagent đếm, chưa kiểm từng câu).
 
+## Đã xử lý (chủ dự án quyết, 26/09/2026)
+
+- `bdr93`: ý 4 viết lại thành "Fe là chất thiếu, hiệu suất tính theo Fe." —
+  vẫn Sai, hết mơ hồ. Phiếu `sua-1-cau-bdr93.json`.
+- Bảy câu ngoài chương trình **giữ lại, gắn nhãn đầu đề**, không đổi đáp án.
+  Phiếu `sua-7-cau-ngoai-chuong-trinh.json`:
+  - `[Nâng cao – ngoài SGK]`: `k8efc`, `wnwch` (Ka, đệm), `s430z` (Kp),
+    `5lv4x` (Ksp) — bốn câu lấy từ đề học sinh giỏi. `s430z` và `5lv4x` do
+    giám khảo Hoá của hội đồng giả lập nêu.
+  - `[Ngoài chương trình KNTT]`: `ivfj5`, `jd49p`, `uab7q` (phosphorus).
+- Các câu gắn nhầm bài: chưa xử lý.
+
+Cả hai phiếu đã ghi lên Firestore, đọc lại khớp; bản chụp xuất lại cùng ngày.
+
 ## Đã loại
 
 - `ly8os` (Bài 4): subagent lo phương án "cả A, B, C đều đúng." sẽ sai khi app
