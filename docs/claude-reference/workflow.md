@@ -120,13 +120,16 @@ Mở Claude Code ở thư mục dự án thì các kỹ năng này tự nạp, g
   component React ghép được, và hiệu năng React. Chép từ
   `github.com/vercel-labs/agent-skills` (MIT), bản ngày 10/09/2026. Chỉ lấy 2
   trong 9 kỹ năng của repo đó; bảy cái kia hoặc chỉ dùng cho Vercel (dự án này
-  lên Netlify), hoặc mâu thuẫn với hợp đồng hướng, hoặc phải tải hướng dẫn từ URL
+  lên Cloudflare Pages), hoặc mâu thuẫn với hợp đồng hướng, hoặc phải tải hướng dẫn từ URL
   lúc chạy. Lý do từng cái: `.claude/skills/VERCEL-SKILLS-LICENSE.md`.
 - **`find-skills`** — đi TÌM kỹ năng chưa có trên Internet (`npx skills find`,
   bảng xếp hạng skills.sh). Chép từ `github.com/vercel-labs/skills` (MIT) — repo
   này là **trình cài đặt CLI**, không phải bộ kỹ năng; chỉ lấy đúng tệp
   `SKILL.md` của `find-skills`, không cài CLI. **Phải hỏi user trước khi chạy
-  `npx skills`**: lệnh đó tải và chạy mã từ npm. Đừng lẫn nó với việc dùng kỹ
+  `npx skills`**: lệnh đó tải và chạy mã từ npm. **Ngoại lệ DUY NHẤT (26/09/2026,
+  chủ dự án cho phép):** `npx skills find …` được chạy không cần hỏi — chỉ tìm, không
+  cài; quyền nằm ở `.claude/settings.local.json` (máy riêng, không theo git).
+  `npx skills add`/`update` vẫn phải hỏi. Đừng lẫn nó với việc dùng kỹ
   năng đã có — việc đó nằm ở mục "Cách làm việc" bên trên.
 
 ### Ba chỗ superpowers nói khác dự án này — theo dự án

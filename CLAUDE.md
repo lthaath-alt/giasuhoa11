@@ -10,7 +10,7 @@ Nguyên tắc dài hạn: `.specify/memory/constitution.md`; hướng dẫn này
 - Xem danh sách kỹ năng có sẵn trước khi đọc mã, chỉ nạp kỹ năng liên quan. Mơ hồ → `brainstorming`; lỗi → `systematic-debugging`; nhiều bước/nhiều tệp → `writing-plans` rồi `executing-plans`; trước khi báo xong → `verification-before-completion`.
 - Chạm từ 3 tệp: nói rõ số tệp dự kiến và kỹ năng sẽ dùng, hoặc lý do không dùng, trước khi sửa.
 - Không tự build, push, deploy, publish luật hay chạy git nguy hiểm (reset/xóa/ghi đè). Người dùng tự làm; build chỉ khi được yêu cầu. Không tự thêm khung test mới.
-- Hỏi trước khi chạy `npx skills` để tải/chạy mã bên ngoài. Không sửa tay kỹ năng bên thứ ba; xem tài liệu quy trình khi cần cập nhật.
+- Hỏi trước khi chạy `npx skills` để tải/chạy mã bên ngoài; ngoại lệ duy nhất là `npx skills find` (chỉ tìm, xem `docs/claude-reference/workflow.md`). Không sửa tay kỹ năng bên thứ ba; xem tài liệu quy trình khi cần cập nhật.
 - Bắt đầu từ file/màn hình được chỉ ra; chỉ đọc rộng khi chưa đủ bằng chứng. Đo trước khi sửa; mã nguồn không thay được phép kiểm hành vi thực tế.
 - Chỉ đọc các tài liệu liên quan trong bảng dưới, không đọc cả bộ mỗi phiên. Đường dẫn là chỉ dẫn đọc khi cần, không phải lệnh import toàn bộ.
 
