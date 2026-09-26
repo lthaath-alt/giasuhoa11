@@ -1,0 +1,94 @@
+[
+ {
+  "id": "bq_1789373737083_c5p1u",
+  "truong": "q",
+  "cuPhaiLa": "Dung dịch H₂SO₄ đặc, nóng tác dụng với cặp chất nào sau đây thu được sản phẩm không có khí thoát ra?",
+  "moi": "Dung dịch H₂SO₄ loãng tác dụng với cặp chất nào sau đây thu được sản phẩm không có khí thoát ra?"
+ },
+ {
+  "id": "bq_1789373737083_c5p1u",
+  "truong": "e",
+  "cuPhaiLa": "Cu(OH)₂ và BaCl₂ đều có nguyên tố ở số oxi hóa cao nhất nên chỉ xảy ra phản ứng trao đổi; các cặp còn lại có P, Mg, Fe sinh SO₂ hoặc Na₂CO₃ sinh CO₂.",
+  "moi": "Với dung dịch H₂SO₄ loãng: Mg và Fe tạo khí H₂, Na₂CO₃ tạo khí CO₂; Cu(OH)₂ chỉ bị trung hòa tạo CuSO₄ và nước, BaCl₂ tạo kết tủa BaSO₄ còn HCl tan trong dung dịch, nên cặp Cu(OH)₂ và BaCl₂ không có khí thoát ra."
+ },
+ {
+  "id": "bq_1789373737083_cxsqq",
+  "truong": "st",
+  "y": 0,
+  "cuPhaiLa": "Cu(OH)₂ và BaCl₂ tác dụng với H₂SO₄ đặc, nóng không sinh ra khí.",
+  "moi": "Cu(OH)₂ tác dụng với H₂SO₄ đặc, nóng không sinh ra khí."
+ },
+ {
+  "id": "bq_1789371866328_4vsp7",
+  "truong": "st",
+  "y": 3,
+  "cuPhaiLa": "HNO₃ vừa thể hiện tính oxi hóa vừa thể hiện tính khử.",
+  "moi": "Xét theo nguyên tử nitrogen, HNO₃ vừa thể hiện tính oxi hóa vừa thể hiện tính khử."
+ },
+ {
+  "id": "bq_1789371866326_jm2z7",
+  "truong": "st",
+  "y": 3,
+  "cuPhaiLa": "Khối lượng chất rắn khan thu được từ hai dung dịch lần lượt là 22,9 gam và 12,7 gam.",
+  "moi": "Tổng khối lượng các ion trong hai dung dịch lần lượt là 22,9 gam và 12,7 gam."
+ },
+ {
+  "id": "bq_1789372198153_mx6e6",
+  "truong": "st",
+  "y": 1,
+  "cuPhaiLa": "Nước mưa bình thường có pH nhỏ hơn 7 một chút do có CO₂ hòa tan.",
+  "moi": "Nước mưa bình thường có pH khoảng 5,6 do có CO₂ hòa tan."
+ },
+ {
+  "id": "bq_1789371866326_7g1uq",
+  "truong": "st",
+  "y": 3,
+  "cuPhaiLa": "Khi tác dụng với H₂SO₄ đặc, số oxi hóa của sulfur giảm.",
+  "moi": "Khi tác dụng với H₂SO₄ đặc, số oxi hóa của đơn chất sulfur giảm."
+ },
+ {
+  "id": "bq_1789371866325_b1jgh",
+  "truong": "st",
+  "y": 3,
+  "cuPhaiLa": "Nguyên tử H nằm ở đỉnh hình chóp.",
+  "moi": "Một nguyên tử H nằm ở đỉnh hình chóp, nguyên tử N nằm ở đáy."
+ },
+ {
+  "id": "bq_1789372198146_92eq8",
+  "truong": "st",
+  "y": 3,
+  "cuPhaiLa": "Phần lớn ammonia được dùng phản ứng với acid để sản xuất các loại phân đạm.",
+  "moi": "Phần lớn ammonia được dùng để sản xuất phân đạm."
+ },
+ {
+  "id": "bq_1789371866325_rw5jh",
+  "truong": "st",
+  "y": 3,
+  "cuPhaiLa": "Nhiệt phân NH₄NO₃ tạo ra N₂.",
+  "moi": "Đun nhẹ NH₄NO₃ tạo ra khí N₂."
+ },
+ {
+  "id": "bq_1788161089232_chbq8",
+  "truong": "e",
+  "cuPhaiLa": "Quá trình nhường electron: 2FeS₂ + Cu₂S → 2Fe³⁺ + 2Cu²⁺ + 5S⁶⁺ + 40e. HNO₃ nhận 3e tạo NO, nên hệ số HNO₃ là 40.",
+  "moi": "Bảo toàn S cho FeS₂ : Cu₂S = 2 : 1. Mỗi FeS₂ nhường 15e (Fe +2→+3, 2S −1→+6), mỗi Cu₂S nhường 10e (2Cu +1→+2, S −2→+6); 6FeS₂ + 3Cu₂S nhường 120e, tạo 40NO. Mọi N của HNO₃ đều về NO nên hệ số HNO₃ là 40: 6FeS₂ + 3Cu₂S + 40HNO₃ → 3Fe₂(SO₄)₃ + 6CuSO₄ + 40NO + 20H₂O."
+ },
+ {
+  "id": "bq_1789371866328_60nvd",
+  "truong": "e",
+  "cuPhaiLa": "pH tỉ lệ nghịch với nồng độ H⁺ theo hàm logarit nên pH càng lớn thì môi trường càng ít acid, càng nhiều base.",
+  "moi": "pH = −lg[H⁺] nên [H⁺] càng lớn thì pH càng nhỏ (nghịch biến); pH càng lớn thì môi trường càng ít acid, càng nhiều base."
+ },
+ {
+  "id": "bq_1789371866326_5cxcq",
+  "truong": "q",
+  "cuPhaiLa": "[Nâng cao – ngoài SGK] Muối ammonium dichromate bị nhiệt phân theo phương trình (NH₄)₂Cr₂O₇ → Cr₂O₃ + N₂ + 4H₂O. Khi nhiệt phân 48 gam muối này thấy còn 30 gam hỗn hợp chất rắn gồm sản phẩm rắn và tạp chất không bị biến đổi. Phần trăm tạp chất trong muối là",
+  "moi": "[Nâng cao – ngoài SGK] Muối ammonium dichromate bị nhiệt phân theo phương trình (NH₄)₂Cr₂O₇ → Cr₂O₃ + N₂ + 4H₂O. Khi nhiệt phân hoàn toàn 48 gam muối này thấy còn 30 gam hỗn hợp chất rắn gồm sản phẩm rắn và tạp chất không bị biến đổi. Phần trăm tạp chất trong muối là"
+ },
+ {
+  "id": "bq_1789371866326_8ki3q",
+  "truong": "q",
+  "cuPhaiLa": "[Nâng cao – ngoài SGK] Nhiệt phân 48 gam mẫu ammonium dichromate có lẫn tạp chất trơ, thu được 30 gam chất rắn. Phần trăm tạp chất trong mẫu là bao nhiêu %?",
+  "moi": "[Nâng cao – ngoài SGK] Nhiệt phân hoàn toàn 48 gam mẫu ammonium dichromate có lẫn tạp chất trơ, thu được 30 gam chất rắn. Phần trăm tạp chất trong mẫu là bao nhiêu %?"
+ }
+]
