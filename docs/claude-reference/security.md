@@ -119,6 +119,11 @@ lỗi gõ nhầm tên trường. Nhưng nó CHỈ chứng minh tệp trong git �
 chạy trên Firebase thì vẫn phải đo bằng REST sau khi publish. Hai việc khác
 nhau.
 
+Khi thêm một collection MỚI: `npm run do:luat` hỏi thẳng Firebase xem luật của
+nó đã publish chưa (CHỈ ĐỌC, cần `.env.local`). Tệp `firestore.rules` trong git
+chỉ là bản thảo, nên `kiem-tra:luat` xanh **không** có nghĩa là luật đang chạy đã
+đúng — hai việc khác nhau. Xem `do-luat-dang-chay.mts`.
+
 Máy chủ dự án KHÔNG chạy được bộ kiểm đó, và đã đo kỹ ngày 16/09/2026 — đừng
 đi dò lại. Máy có đúng hai bản Java, cả hai đều là 8: Zulu 8 JRE 32-bit (chỗ
 `JAVA_HOME` đang trỏ tới) và AdoptOpenJDK 8 64-bit. `winget install` bản JDK

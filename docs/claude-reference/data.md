@@ -108,3 +108,101 @@ cậy: trang giáo viên hiện nó qua `ChemicalText`, tức qua `locHtml`. Đ�
 lọc đó. `kiem-tra:luyen-tap` canh cho trang giáo viên không đọc lại
 `QuizStorage`; `kiem-tra:luat` có 12 phép (21a–21l) cho collection này.
 
+
+### Đề giáo viên GIAO nằm ở `de_giao/{id}`
+
+Thêm 22/09/2026 — chiều NGƯỢC của `bai_nop`: đề đi từ máy giáo viên tới máy
+học sinh. Trước đó mọi đề chỉ sinh ra khi chính học sinh bấm trong màn học, nên
+giáo viên không có đường nào giao một đề chung cho cả lớp.
+
+Luồng đầy đủ, ba bước, KHÔNG có đường chấm điểm thứ hai:
+
+1. **Giáo viên**: mục "Theo dõi học sinh" → thẻ **Giao đề kiểm tra**
+   (`features/teacher/components/GiaoDeTab.tsx`). Chọn chương/bài, bấm "Lấy câu
+   từ ngân hàng" (`getByLesson` hoặc `getByChapter` — **không bao giờ**
+   `getAll()`), đặt số phút và hạn nộp, bấm Giao. Nhận lại một đoạn thông báo
+   kèm link `#/de/<id>` để dán vào nhóm lớp.
+2. **Học sinh**: mở link → `pages/DeGiaoPage.tsx`. Trang này **cố ý không hiện
+   câu hỏi nào**, chỉ nói đề gì / lớp nào / bao lâu / hạn khi nào. Bấm "Bắt đầu
+   làm bài" thì `taoBaiLam` dựng một `Quiz` rồi đẩy sang `/quiz/<id>`.
+   Đề cũng hiện lại trong tab "Bài tập GV giao" (`DeCoGiaoList.tsx`) cho em nào
+   mất link.
+3. **Nộp**: đi đúng `QuizPage` + `bai_nop` đã có từ trước. Giáo viên xem điểm ở
+   thẻ "Bài kiểm tra và chấm tự luận" như mọi bài khác.
+
+Bảy điều phải biết:
+
+1. **Đề mang NGUYÊN câu hỏi, không mang danh sách id.** Câu trong
+   `bank_questions` sửa được bất cứ lúc nào, mà đề đã giao thì phải đứng yên —
+   cả lớp làm đúng một đề, và cô chấm lại sau một tháng vẫn thấy đúng đề đó.
+2. **Mã bài làm suy ra được**: `dg_<mã đề>_<email đã lọc>` (`maBaiLam`). Nhờ vậy
+   mở lại link giữa chừng là gặp lại bài đang làm dở, và mỗi em chỉ có MỘT dòng
+   điểm cho mỗi đề. Sinh mã ngẫu nhiên là hỏng cả hai.
+3. **`lessonId` của bài mang tiền tố `de-giao:`**, không trùng bài nào trong
+   chương trình. Hai chỗ dựa vào đúng tính chất đó: `QuizPage` khoá bài kiểm tra
+   khi bài học trước chưa xong (trùng mã bài thật là em bị chặn khỏi chính bài
+   cô giao), và chỗ đánh dấu bài học hoàn thành khi đạt 7/10.
+4. **Hết giờ lấy mốc SỚM HƠN** giữa "bắt đầu + số phút" và hạn nộp của đề
+   (`hetGioLuc`). Bỏ vế thứ hai là em mở link lúc 23h50 vẫn có trọn 45 phút.
+5. **GIỚI HẠN ĐÃ BIẾT: đáp án nằm trong tài liệu học sinh đọc được.** Cùng gốc
+   với giới hạn số 4 của `bai_nop` — chấm điểm chạy trên trình duyệt của em nên
+   đáp án bắt buộc phải tới máy em. Siết luật không chữa được; chữa thật là chấm
+   lại ở máy chủ (Cloud Function, gói Blaze). Đừng vá bằng cách giấu đáp án.
+6. **Có một đề DỰNG SẴN 10 câu** ở `features/quiz/deMauCanBang.ts` — đề giấy của
+   giáo viên, gõ tay từ ảnh chụp ngày 22/09/2026, chủ đề Cân bằng hoá học. Nút
+   "Đề mẫu 10 câu" trong `GiaoDeTab` nạp thẳng bộ này, **không đọc Firestore**.
+   Cố ý KHÔNG nạp vào `bank_questions`: ghi ngân hàng là sửa dữ liệu thật của
+   1.554 câu, và quy trình bắt chủ dự án tự làm việc đó. Hai đáp án dễ chấm
+   nhầm đã ghi lý do ngay trong chú thích đầu tệp (câu 7 là *giảm áp suất* chứ
+   không phải giảm nhiệt độ; câu 10 là *0,1 M* chứ không phải 0,534 M — Kc đòi
+   0,534 mol CO₂ trong 1 L mà cả bình chỉ có 0,1 mol CaCO₃).
+7. **Câu có phương án "Tất cả đều đúng" / "cả A và B" KHÔNG được xáo.**
+   `coPhuongAnNeo` trong `features/bank/xaoDapAn.ts` chặn cả hai hàm xáo
+   (`xaoPhuongAnWeb` cho Đề kiểm tra, `xaoPhuongAnBank` cho Luyện tập và trò
+   chơi). Xáo lên thì phương án A hoá ra "Tất cả đều sai", hoặc "cả A và B" trỏ
+   vào chính nó — câu hỏi thành vô nghĩa mà điểm vẫn ra một con số hợp lý. Đo
+   22/09/2026: **12 trong 1.554 câu** của ngân hàng dính mẫu này. Cái giá phải
+   trả là 12 câu đó giữ nguyên thế lệch đáp án; chữa tận gốc là viết lại nội
+   dung chúng, việc của người soạn đề.
+
+Phép canh: `kiem-tra:de-giao` (logic thuần — trạng thái đề, mã bài, hết giờ, và
+đối chiếu trường của bài nộp với `hasOnly` trong `firestore.rules`);
+`kiem-tra:luat` có 12 phép (22a–22l) cho collection này.
+
+
+
+### `npm run gan:so-thu-tu` — gán số báo danh từ danh sách lớp
+
+Thêm 23/09/2026. Danh sách lớp của nhà trường có một thứ tự do người xếp,
+**không suy ra được bằng quy tắc chữ nghĩa nào**: sổ 11A3 để "Nguyễn Hoàng
+Thanh An" số 1 và "Nguyễn Bảo Ân" số 5, giữa hai em có ba em tên Anh/Ánh.
+`hocSinhCuaLop` xếp theo `studentNumber`, mà đo hôm đó **0/38 em có số** — nên
+mọi bảng đều rơi về thứ tự Firestore trả, tức ngẫu nhiên với người đọc.
+
+```bash
+npm run gan:so-thu-tu -- "C:\duong\dan\danh-sach-11A3.csv"          # chạy thử
+npm run gan:so-thu-tu -- "C:\duong\dan\danh-sach-11A3.csv" --that   # ghi thật
+```
+
+Năm cái trói, cùng lối với `sua:cau-hoi`:
+
+1. **Chỉ ghi ĐÚNG MỘT trường `studentNumber`.** Luật cho `laGiaoVien()` sửa hồ
+   sơ học sinh trừ `role`, nên vai `teacher` là đủ.
+2. **Mặc định KHÔNG ghi**, phải thêm `--that`.
+3. **KHÔNG đọc cột mật khẩu.** Sổ của trường hay có cột "Pass"; script chỉ lấy
+   ba cột STT / Họ tên / Gmail.
+4. **Khớp bằng EMAIL**, không khớp bằng tên — hai em trùng tên là chuyện thường.
+5. **Báo cáo từng dòng không khớp** thay vì im lặng bỏ qua.
+
+Tự tìm dòng tiêu đề (sổ hay có một dòng tên bảng ở trên cùng) và tự hiểu ô bọc
+nháy kép — `split(',')` trần gặp một ô có phẩy là lệch TOÀN BỘ cột sau nó, tức
+gán nhầm số cho cả lớp.
+
+Ghi xong nó **đọc lại Firestore để xác nhận** — bài học số 1.
+
+Lượt chạy đầu (23/09/2026): 39 dòng trong sổ, ghi được 35, **4 em không có tài
+khoản**. Một trong bốn là lỗi gõ trong sổ: email STT 18 thừa một chữ `i` ở cuối
+(`…@gmail.comi`). Ba em còn lại chưa từng tạo tài khoản.
+
+**Tệp CSV chứa email học sinh — để ngoài repo, đừng commit.**
+
