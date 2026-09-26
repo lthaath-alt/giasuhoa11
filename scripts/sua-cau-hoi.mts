@@ -46,11 +46,14 @@ interface MucSua {
   id: string;
   /** Tên trường được phép sửa: `q`, hoặc `st` (xem `y`). Mở rộng thì sửa DUOC_SUA. */
   truong: string;
-  /** Chỉ với `st`: số thứ tự ý (tính từ 0) cần đổi CHỮ. */
+  /** Chỉ với `st`/`stV`: số thứ tự ý (tính từ 0). */
   y?: number;
-  /** Giá trị hiện tại, phải khớp từng ký tự thì mới ghi. Với `st` là chữ `s` của ý `y`. */
-  cuPhaiLa: string;
-  moi: string;
+  /** Giá trị hiện tại, phải khớp từng ký tự thì mới ghi. Với `st` là chữ `s`,
+   *  với `stV` là đáp án `v` của ý `y`. Kiểu theo trường — xem KIEU. */
+  cuPhaiLa: string | number | boolean;
+  moi: string | number | boolean;
+  /** Bắt buộc `true` khi sửa trường ĐÁP ÁN (xem DAP_AN). */
+  doiDapAn?: boolean;
 }
 
 /* Danh sách trắng. Mở rộng thì phải tự hỏi: trường đó có phải thứ học sinh
@@ -62,7 +65,27 @@ interface MucSua {
    cả chữ (`s`) lẫn ĐÁP ÁN (`v`) của từng ý, nên nó bị trói chặt hơn `q`: chỉ
    đổi chữ của ĐÚNG MỘT ý; số ý, mọi `v`, và chữ các ý khác phải giữ nguyên —
    `mangMoiSt` kiểm lại điều đó trước khi ghi, và phần đọc lại kiểm lần nữa. */
-const DUOC_SUA = new Set(['q', 'st', 'lessonId']);
+const DUOC_SUA = new Set(['q', 'st', 'lessonId', 'e', 'num', 'ansText', 'a', 'stV']);
+
+/* ĐÁP ÁN mở thêm 26/09/2026 (chủ dự án duyệt) cho ba câu sai khoá thật — cùng
+   bộ số SO₂/O₂, ngân hàng tính hiệu suất theo chất DƯ nên ghi 40 % thay vì
+   60 %: học sinh làm đúng bị chấm sai. Đây là loại sửa nguy nhất, nên:
+     · phiếu phải ghi `doiDapAn: true` — không ai đổi đáp án "tiện tay";
+     · đúng kiểu dữ liệu (số / chữ / đúng-sai), xem KIEU;
+     · đổi `num` thì phải đổi `ansText` của cùng câu trong cùng phiếu (hai
+       trường cùng mang đáp số, lệch nhau là chấm theo một bên);
+     · `a` phải trỏ tới phương án có thật; in chữ của phương án cũ và mới;
+     · `stV` chỉ đổi `v` của ĐÚNG MỘT ý, mọi thứ khác trong `st` giữ nguyên.
+   `e` (lời giải) không phải đáp án nhưng học sinh đọc nó — mở cùng lúc để
+   lời giải khớp đáp án mới. `tol` vẫn khoá. */
+const DAP_AN = new Set(['num', 'ansText', 'a', 'stV']);
+const KIEU: Record<string, (v: unknown) => boolean> = {
+  num: v => typeof v === 'number' && Number.isFinite(v),
+  a: v => Number.isInteger(v) && (v as number) >= 0,
+  stV: v => typeof v === 'boolean',
+};
+const kieuDung = (truong: string, v: unknown) =>
+  (KIEU[truong] ?? ((x: unknown) => typeof x === 'string' && x.length > 0))(v);
 
 /* `lessonId` mở thêm cùng ngày (chủ dự án duyệt) cho 14 câu gắn nhầm bài. Nó
    quyết định câu hiện ở bài nào, không phải đáp án — nhưng chuyển SANG CHƯƠNG
@@ -80,18 +103,23 @@ function chuongCuaBai(): Map<string, unknown> {
 
 type Y = { s: string; v: boolean };
 
-/** Chữ hiện tại của trường mà phiếu nhắm tới (với `st` là `st[y].s`). */
+const laMangSt = (truong: string) => truong === 'st' || truong === 'stV';
+
+/** Giá trị hiện tại của thứ phiếu nhắm tới (`st` → `st[y].s`, `stV` → `st[y].v`). */
 function giaTri(d: Record<string, unknown> | undefined, m: MucSua): unknown {
-  if (m.truong !== 'st') return d?.[m.truong];
+  if (!laMangSt(m.truong)) return d?.[m.truong];
   const st = d?.st;
-  return Array.isArray(st) ? (st[m.y!] as Y | undefined)?.s : undefined;
+  const y = Array.isArray(st) ? (st[m.y!] as Y | undefined) : undefined;
+  return m.truong === 'st' ? y?.s : y?.v;
 }
 
-/** Mảng `st` mới: chỉ đổi `s` của ý `y`. Ném lỗi nếu có gì khác bị đổi theo. */
+/** Mảng `st` mới: chỉ đổi `s` (hoặc `v` với `stV`) của ý `y`. Ném lỗi nếu có gì khác bị đổi theo. */
 function mangMoiSt(cu: Y[], m: MucSua): Y[] {
-  const moi = cu.map((x, i) => (i === m.y ? { ...x, s: m.moi } : { ...x }));
-  const khacNgoaiY = moi.some((x, i) => x.v !== cu[i].v || (i !== m.y && x.s !== cu[i].s));
-  if (moi.length !== cu.length || khacNgoaiY) throw new Error('mảng st mới đổi nhiều hơn chữ của một ý');
+  const doiChu = m.truong === 'st';
+  const moi = cu.map((x, i) => (i !== m.y ? { ...x } : doiChu ? { ...x, s: m.moi as string } : { ...x, v: m.moi as boolean }));
+  const khac = moi.some((x, i) => (i !== m.y || !doiChu) && x.s !== cu[i].s)
+    || moi.some((x, i) => (i !== m.y || doiChu) && x.v !== cu[i].v);
+  if (moi.length !== cu.length || khac) throw new Error('mảng st mới đổi nhiều hơn một thứ của một ý');
   return moi;
 }
 
@@ -121,8 +149,7 @@ if (!Array.isArray(phieu) || !phieu.length) {
 /* Kiểm hình dạng phiếu TRƯỚC khi chạm mạng. Một phiếu thiếu `cuPhaiLa` mà lọt
    qua là mất luôn hàng rào số 3. */
 for (const [i, m] of phieu.entries()) {
-  const thieu = (['id', 'truong', 'cuPhaiLa', 'moi'] as const)
-    .filter(k => typeof m?.[k] !== 'string' || !m[k]);
+  const thieu = (['id', 'truong'] as const).filter(k => typeof m?.[k] !== 'string' || !m[k]);
   if (thieu.length) {
     console.error(`Mục ${i + 1} thiếu hoặc sai kiểu: ${thieu.join(', ')}`);
     process.exit(1);
@@ -132,11 +159,23 @@ for (const [i, m] of phieu.entries()) {
       + `trong danh sách được phép: ${[...DUOC_SUA].join(', ')}`);
     process.exit(1);
   }
-  if (m.truong === 'st' && !(Number.isInteger(m.y) && m.y! >= 0 && m.y! <= 3)) {
-    console.error(`Mục ${i + 1} (${m.id}) sửa \`st\` nhưng thiếu \`y\` hợp lệ (số thứ tự ý, 0–3)`);
+  if (!kieuDung(m.truong, m.cuPhaiLa) || !kieuDung(m.truong, m.moi)) {
+    console.error(`Mục ${i + 1} (${m.id}) có cuPhaiLa/moi sai kiểu cho trường \`${m.truong}\``);
     process.exit(1);
   }
-  if (m.truong === 'lessonId' && !(BAI_HOP_LE.test(m.cuPhaiLa) && BAI_HOP_LE.test(m.moi))) {
+  if (DAP_AN.has(m.truong) && m.doiDapAn !== true) {
+    console.error(`Mục ${i + 1} (${m.id}) sửa trường ĐÁP ÁN \`${m.truong}\` nhưng phiếu không ghi "doiDapAn": true`);
+    process.exit(1);
+  }
+  if (laMangSt(m.truong) && !(Number.isInteger(m.y) && m.y! >= 0 && m.y! <= 3)) {
+    console.error(`Mục ${i + 1} (${m.id}) sửa \`${m.truong}\` nhưng thiếu \`y\` hợp lệ (số thứ tự ý, 0–3)`);
+    process.exit(1);
+  }
+  if (m.truong === 'num' && !phieu.some(k => k.id === m.id && k.truong === 'ansText')) {
+    console.error(`Mục ${i + 1} (${m.id}) đổi \`num\` mà không đổi \`ansText\` của cùng câu — hai trường sẽ lệch nhau`);
+    process.exit(1);
+  }
+  if (m.truong === 'lessonId' && !(BAI_HOP_LE.test(m.cuPhaiLa as string) && BAI_HOP_LE.test(m.moi as string))) {
     console.error(`Mục ${i + 1} (${m.id}) sửa \`lessonId\` nhưng giá trị không có dạng bai-N`);
     process.exit(1);
   }
@@ -197,8 +236,17 @@ for (const muc of phieu) {
     continue;
   }
 
+  if (muc.truong === 'a') {
+    const o = duLieu.o as string[] | undefined;
+    if (!Array.isArray(o) || (muc.moi as number) >= o.length) {
+      console.log(`\n  DỪNG        ${muc.id} — đáp án mới ${String(muc.moi)} không trỏ tới phương án nào (có ${o?.length ?? 0} phương án)`);
+      boQua++;
+      continue;
+    }
+  }
+
   if (muc.truong === 'lessonId') {
-    const chuongMoi = chuongCuaBai().get(muc.moi);
+    const chuongMoi = chuongCuaBai().get(muc.moi as string);
     if (chuongMoi === undefined || chuongMoi !== duLieu.ch) {
       console.log(`\n  DỪNG        ${muc.id} — ${muc.moi} thuộc chương ${String(chuongMoi ?? '?')}, câu đang ở chương ${String(duLieu.ch)}; chỉ chuyển trong cùng chương`);
       boQua++;
@@ -207,7 +255,7 @@ for (const muc of phieu) {
   }
 
   let stCu: string | undefined;
-  if (muc.truong === 'st') {
+  if (laMangSt(muc.truong)) {
     const cu = duLieu.st as Y[];
     try { mangMoiSt(cu, muc); } catch (e) {
       console.log(`\n  DỪNG        ${muc.id} — ${(e as Error).message}`);
@@ -217,10 +265,15 @@ for (const muc of phieu) {
     stCu = JSON.stringify(cu);
   }
 
-  const noi = muc.truong === 'st' ? `\`st[${muc.y}].s\` (đáp án v = ${(duLieu.st as Y[])[muc.y!].v}, giữ nguyên)` : `\`${muc.truong}\``;
-  console.log(`\n  SẼ SỬA      ${muc.id}  ·  trường ${noi}`);
-  console.log(`    cũ  : ${muc.cuPhaiLa}`);
-  console.log(`    mới : ${muc.moi}`);
+  const y = laMangSt(muc.truong) ? (duLieu.st as Y[])[muc.y!] : undefined;
+  const noi = muc.truong === 'st' ? `\`st[${muc.y}].s\` (đáp án v = ${y!.v}, giữ nguyên)`
+    : muc.truong === 'stV' ? `\`st[${muc.y}].v\` — ý: "${y!.s.slice(0, 70)}"`
+    : `\`${muc.truong}\``;
+  const dapAn = DAP_AN.has(muc.truong);
+  console.log(`\n  SẼ SỬA      ${muc.id}  ·  trường ${noi}${dapAn ? '   *** ĐỔI ĐÁP ÁN ***' : ''}`);
+  const chuPA = (i: unknown) => (muc.truong === 'a' ? `  ("${(duLieu.o as string[])[i as number]}")` : '');
+  console.log(`    cũ  : ${String(muc.cuPhaiLa)}${chuPA(muc.cuPhaiLa)}`);
+  console.log(`    mới : ${String(muc.moi)}${chuPA(muc.moi)}`);
   sanSang.push({ muc, stCu });
 }
 
@@ -308,7 +361,7 @@ for (const { muc, stCu } of sanSang) {
        không nhắc tới sẽ biến mất. Đây đúng là kiểu "một lỗi trong script là
        hỏng hàng loạt" mà CLAUDE.md cảnh báo. */
     let giaTriGhi: unknown = muc.moi;
-    if (muc.truong === 'st') {
+    if (laMangSt(muc.truong)) {
       const stGio = (await getDoc(doc(db, COL, muc.id))).data()?.st as Y[];
       if (JSON.stringify(stGio) !== stCu) {
         console.log(`  BỎ QUA  ${muc.id} — mảng st đã đổi sau lúc đối chiếu`);
@@ -317,7 +370,7 @@ for (const { muc, stCu } of sanSang) {
       }
       giaTriGhi = mangMoiSt(stGio, muc);
     }
-    await updateDoc(doc(db, COL, muc.id), { [muc.truong]: giaTriGhi });
+    await updateDoc(doc(db, COL, muc.id), { [laMangSt(muc.truong) ? 'st' : muc.truong]: giaTriGhi });
     console.log(`  ĐÃ GHI  ${muc.id}`);
     xong++;
   } catch (e) {
@@ -337,8 +390,8 @@ for (const { muc, stCu } of sanSang) {
   const anh = await getDoc(doc(db, COL, muc.id));
   const duLieu = anh.data() as Record<string, unknown> | undefined;
   let dung = giaTri(duLieu, muc) === muc.moi;
-  /* Với `st` còn phải chắc mọi đáp án `v` và các ý khác y như trước. */
-  if (dung && muc.truong === 'st' && stCu) {
+  /* Với `st`/`stV` còn phải chắc mọi thứ khác trong mảng y như trước. */
+  if (dung && laMangSt(muc.truong) && stCu) {
     try { dung = JSON.stringify(mangMoiSt(JSON.parse(stCu), muc)) === JSON.stringify(duLieu?.st); }
     catch { dung = false; }
   }

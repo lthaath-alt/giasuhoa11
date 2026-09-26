@@ -175,6 +175,13 @@ Năm cái trói, **đừng nới cái nào mà không hỏi chủ dự án**:
    14 câu gắn nhầm bài: giá trị dạng `bai-N`, và **chỉ chuyển trong cùng
    chương** (chương của bài lấy từ bản chụp) — khác chương thì `ch`/`chapterId`
    lệch theo nên script dừng. Mẫu: `docs/soat-hoa-hoc/sua-14-cau-gan-nham-bai.json`.
+   Cũng ngày đó mở **trường ĐÁP ÁN** `num`, `ansText`, `a`, `stV` (đáp án `v`
+   của một ý) và `e` (lời giải) — cho ba câu sai khoá thật (bộ số SO₂/O₂, tính
+   hiệu suất theo chất dư: 40 % thay vì 60 %). Trói: phiếu phải ghi
+   `"doiDapAn": true`; đúng kiểu (số/chữ/đúng-sai); đổi `num` bắt buộc đổi
+   `ansText` cùng câu; `a` phải trỏ tới phương án có thật (in chữ phương án cũ
+   và mới); `stV` chỉ đổi `v` của một ý. `tol` vẫn khoá. Mẫu:
+   `docs/soat-hoa-hoc/sua-3-cau-dap-an-sai.json`.
 3. **Điều kiện tiên quyết khớp từng ký tự**: giá trị trên Firestore phải bằng
    đúng `cuPhaiLa`. Nhờ vậy chạy lại lần hai không làm gì, và phiếu soạn từ bản
    chụp cũ không đè mất thứ người khác vừa sửa.

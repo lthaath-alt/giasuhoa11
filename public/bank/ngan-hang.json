@@ -2852,7 +2852,7 @@
   "id": "bq_1788161089232_p4utb",
   "lessonId": "bai-8",
   "lv": "vd",
-  "q": "Khi dùng dung dịch NH₃ dư để nhận biết các dung dịch AlCl₃, FeCl₃, ZnCl₂, CuCl₂, KCl, các hiện tượng quan sát được là:",
+  "q": "[Nâng cao – ngoài SGK] Khi dùng dung dịch NH₃ dư để nhận biết các dung dịch AlCl₃, FeCl₃, ZnCl₂, CuCl₂, KCl, các hiện tượng quan sát được là:",
   "st": [
    {
     "s": "Dung dịch FeCl₃ tạo kết tủa màu nâu đỏ.",
@@ -2888,7 +2888,7 @@
    "Dung dịch AgNO₃",
    "Dung dịch BaCl₂"
   ],
-  "q": "Chỉ dùng một thuốc thử, bằng phương pháp hóa học hãy nhận biết 5 dung dịch: AlCl₃, FeCl₃, ZnCl₂, CuCl₂, KCl. Thuốc thử phù hợp nhất là:",
+  "q": "[Nâng cao – ngoài SGK] Chỉ dùng một thuốc thử, bằng phương pháp hóa học hãy nhận biết 5 dung dịch: AlCl₃, FeCl₃, ZnCl₂, CuCl₂, KCl. Thuốc thử phù hợp nhất là:",
   "t": "mc",
   "topic": "de-thi-hsg-hoa-hoc-11-nam-2023-2024-truong-thpt-luong-ngoc-q"
  },
@@ -5678,7 +5678,7 @@
   "id": "bq_1789371866324_dcszs",
   "lessonId": "bai-8",
   "lv": "vd",
-  "q": "Một muối X tác dụng với dung dịch HCl và dung dịch NaOH đều tạo khí; X không phản ứng với dung dịch BaCl₂ nhưng phản ứng với dung dịch Ba(OH)₂ vừa cho kết tủa, vừa tạo khí.",
+  "q": "Một muối X tác dụng với dung dịch HCl và dung dịch NaOH đều tạo khí; X không phản ứng với dung dịch BaCl₂ nhưng phản ứng với dung dịch Ba(OH)₂ vừa cho kết tủa, vừa tạo khí. Khí thoát ra khi X tác dụng với dung dịch HCl không làm mất màu nước bromine.",
   "st": [
    {
     "s": "X chứa ion NH₄⁺ vì tác dụng với NaOH tạo khí.",
@@ -6113,7 +6113,7 @@
   "lessonId": "bai-8",
   "lv": "vd",
   "num": 79,
-  "q": "Một muối X tác dụng với dung dịch HCl và dung dịch NaOH đều tạo khí; X không phản ứng với dung dịch BaCl₂ nhưng phản ứng với dung dịch Ba(OH)₂ vừa cho kết tủa, vừa tạo khí. Khối lượng phân tử của X là bao nhiêu?",
+  "q": "Một muối X tác dụng với dung dịch HCl và dung dịch NaOH đều tạo khí; X không phản ứng với dung dịch BaCl₂ nhưng phản ứng với dung dịch Ba(OH)₂ vừa cho kết tủa, vừa tạo khí. Khí thoát ra khi X tác dụng với dung dịch HCl không làm mất màu nước bromine. Khối lượng phân tử của X là bao nhiêu?",
   "t": "tn",
   "topic": "ĐỀ 1.docx"
  },
@@ -7222,12 +7222,12 @@
  {
   "ch": 2,
   "chapterId": "chuong-2",
-  "e": "BaCO₃ và BaSO₃ đều tan trong HNO₃ vì giải phóng CO₂, SO₂; chỉ BaSO₄ bền với acid nên X là (NH₄)₂SO₄.",
+  "e": "BaCO₃ và BaSO₃ đều tan trong dung dịch HCl vì giải phóng CO₂, SO₂; chỉ BaSO₄ không tan trong acid nên X là (NH₄)₂SO₄.",
   "g": 325,
   "id": "bq_1789371866325_023xx",
   "lessonId": "bai-8",
   "lv": "th",
-  "q": "Muối X tác dụng với dung dịch NaOH dư sinh khí mùi khai, tác dụng với dung dịch BaCl₂ sinh kết tủa trắng không tan trong HNO₃.",
+  "q": "Muối X tác dụng với dung dịch NaOH dư sinh khí mùi khai, tác dụng với dung dịch BaCl₂ sinh kết tủa trắng không tan trong dung dịch HCl.",
   "st": [
    {
     "s": "X chứa ion NH₄⁺.",
@@ -8178,7 +8178,7 @@
   "id": "bq_1789371866325_9jok9",
   "lessonId": "bai-5",
   "lv": "th",
-  "q": "Xét vai trò của NH₃ trong một số phản ứng hóa học.",
+  "q": "[Nâng cao – ngoài SGK] Xét vai trò của NH₃ trong một số phản ứng hóa học.",
   "st": [
    {
     "s": "Trong phản ứng 2NH₃ + 2Na → 2NaNH₂ + H₂, NH₃ là chất oxi hóa.",
@@ -8234,7 +8234,7 @@
    "4NH₃ + 5O₂ → 4NO + 6H₂O",
    "2NH₃ + 2Na → 2NaNH₂ + H₂"
   ],
-  "q": "Trong các phản ứng sau, phản ứng NH₃ đóng vai trò là chất oxi hóa là",
+  "q": "[Nâng cao – ngoài SGK] Trong các phản ứng sau, phản ứng NH₃ đóng vai trò là chất oxi hóa là",
   "t": "mc",
   "topic": "thuvienhoclieu.com-400-Cau-trac-nghiem-on-tap-Hoa-11-HK1-nam"
  },
@@ -10105,7 +10105,7 @@
    "Nguyên tử nitrogen ở đỉnh, đáy là một tam giác mà đỉnh là 3 nguyên tử hydrogen.",
    "Nguyên tử nitrogen ở đỉnh, đáy là một tam giác đều mà đỉnh là 3 nguyên tử hydrogen."
   ],
-  "q": "Nhận định nào sau đây đúng khi nói về cấu trúc của phân tử NH₃?",
+  "q": "Nhận định nào sau đây đúng và đầy đủ nhất khi nói về cấu trúc của phân tử NH₃?",
   "t": "mc",
   "topic": "thuvienhoclieu.com-400-Cau-trac-nghiem-on-tap-Hoa-11-HK1-nam"
  },
@@ -11649,7 +11649,7 @@
    "7,5",
    "5,5"
   ],
-  "q": "Muối ammonium dichromate bị nhiệt phân theo phương trình (NH₄)₂Cr₂O₇ → Cr₂O₃ + N₂ + 4H₂O. Khi nhiệt phân 48 gam muối này thấy còn 30 gam hỗn hợp chất rắn gồm sản phẩm rắn và tạp chất không bị biến đổi. Phần trăm tạp chất trong muối là",
+  "q": "[Nâng cao – ngoài SGK] Muối ammonium dichromate bị nhiệt phân theo phương trình (NH₄)₂Cr₂O₇ → Cr₂O₃ + N₂ + 4H₂O. Khi nhiệt phân 48 gam muối này thấy còn 30 gam hỗn hợp chất rắn gồm sản phẩm rắn và tạp chất không bị biến đổi. Phần trăm tạp chất trong muối là",
   "t": "mc",
   "topic": "thuvienhoclieu.com-400-Cau-trac-nghiem-on-tap-Hoa-11-HK1-nam"
  },
@@ -11766,7 +11766,7 @@
   "lessonId": "bai-5",
   "lv": "vdc",
   "num": 5.5,
-  "q": "Nhiệt phân 48 gam mẫu ammonium dichromate có lẫn tạp chất trơ, thu được 30 gam chất rắn. Phần trăm tạp chất trong mẫu là bao nhiêu %?",
+  "q": "[Nâng cao – ngoài SGK] Nhiệt phân 48 gam mẫu ammonium dichromate có lẫn tạp chất trơ, thu được 30 gam chất rắn. Phần trăm tạp chất trong mẫu là bao nhiêu %?",
   "t": "tn",
   "tol": 0.05,
   "topic": "thuvienhoclieu.com-400-Cau-trac-nghiem-on-tap-Hoa-11-HK1-nam",
@@ -33456,15 +33456,15 @@
   "topic": "thuvienhoclieu.com-De-cuong-on-tap-HK1-Hoa-11-KNTT.docx"
  },
  {
-  "ansText": "40",
+  "ansText": "60",
   "ch": 2,
   "chapterId": "chuong-2",
-  "e": "233x + 217(0,15 − x) = 33,51 cho x = 0,06 mol nên H = 0,06/0,15·100% = 40%.",
+  "e": "n(X) = 0,2 mol, M trung bình 56 nên SO₂ 0,15 mol, O₂ 0,05 mol. 233x + 217(0,15 − x) = 33,51 cho x = 0,06 mol SO₃, tức 0,03 mol O₂ đã phản ứng. O₂ là chất thiếu (oxi hóa hết 0,15 mol SO₂ cần 0,075 mol O₂ > 0,05 mol) nên hiệu suất tính theo O₂: H = 0,03/0,05·100% = 60%.",
   "g": 557,
   "id": "bq_1789373737083_fb6ic",
   "lessonId": "bai-8",
   "lv": "vdc",
-  "num": 40,
+  "num": 60,
   "q": "Hỗn hợp X gồm SO₂ và O₂ có tỉ khối so với H₂ bằng 28; lấy 4,958 lít X (đkc) cho qua V₂O₅ nung nóng rồi dẫn hỗn hợp sau phản ứng qua dung dịch Ba(OH)₂ dư thu được 33,51 gam kết tủa. Hiệu suất phản ứng oxi hóa SO₂ thành SO₃ là bao nhiêu %?",
   "t": "tn",
   "tol": 0.5,
@@ -34194,10 +34194,10 @@
   "topic": "thuvienhoclieu.com-De-cuong-on-tap-HK1-Hoa-11-KNTT.docx"
  },
  {
-  "a": 1,
+  "a": 3,
   "ch": 2,
   "chapterId": "chuong-2",
-  "e": "n(X) = 0,2 mol với M trung bình 56 cho SO₂ 0,15 mol và O₂ 0,05 mol; gọi SO₂ phản ứng là x thì 233x + 217(0,15 − x) = 33,51 nên x = 0,06 và H = 0,06/0,15 = 40%.",
+  "e": "n(X) = 0,2 mol với M trung bình 56 cho SO₂ 0,15 mol và O₂ 0,05 mol; gọi SO₃ tạo thành là x thì 233x + 217(0,15 − x) = 33,51 nên x = 0,06, tức 0,03 mol O₂ đã phản ứng. O₂ là chất thiếu (oxi hóa hết 0,15 mol SO₂ cần 0,075 mol O₂ > 0,05 mol) nên hiệu suất tính theo O₂: H = 0,03/0,05 = 60%.",
   "g": 557,
   "id": "bq_1789373737083_r59e7",
   "lessonId": "bai-8",
@@ -34413,7 +34413,7 @@
  {
   "ch": 2,
   "chapterId": "chuong-2",
-  "e": "SO₃ tạo BaSO₄ (M = 233) còn SO₂ dư tạo BaSO₃ (M = 217); từ khối lượng kết tủa tính được SO₂ phản ứng 0,06 mol, hiệu suất 40%.",
+  "e": "SO₃ tạo BaSO₄ (M = 233) còn SO₂ dư tạo BaSO₃ (M = 217); từ khối lượng kết tủa tính được 0,06 mol SO₃, tức 0,03 mol O₂ đã phản ứng. O₂ là chất thiếu (oxi hóa hết 0,15 mol SO₂ cần 0,075 mol O₂ > 0,05 mol) nên hiệu suất tính theo O₂: H = 0,03/0,05·100% = 60%.",
   "g": 557,
   "id": "bq_1789373737083_s8953",
   "lessonId": "bai-8",
@@ -34434,7 +34434,7 @@
    },
    {
     "s": "Hiệu suất phản ứng oxi hóa SO₂ là 60%.",
-    "v": false
+    "v": true
    }
   ],
   "t": "tf",

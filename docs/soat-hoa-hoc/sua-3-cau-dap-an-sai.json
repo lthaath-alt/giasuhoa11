@@ -1,0 +1,49 @@
+[
+ {
+  "id": "bq_1789373737083_fb6ic",
+  "truong": "num",
+  "doiDapAn": true,
+  "cuPhaiLa": 40,
+  "moi": 60
+ },
+ {
+  "id": "bq_1789373737083_fb6ic",
+  "truong": "ansText",
+  "doiDapAn": true,
+  "cuPhaiLa": "40",
+  "moi": "60"
+ },
+ {
+  "id": "bq_1789373737083_fb6ic",
+  "truong": "e",
+  "cuPhaiLa": "233x + 217(0,15 − x) = 33,51 cho x = 0,06 mol nên H = 0,06/0,15·100% = 40%.",
+  "moi": "n(X) = 0,2 mol, M trung bình 56 nên SO₂ 0,15 mol, O₂ 0,05 mol. 233x + 217(0,15 − x) = 33,51 cho x = 0,06 mol SO₃, tức 0,03 mol O₂ đã phản ứng. O₂ là chất thiếu (oxi hóa hết 0,15 mol SO₂ cần 0,075 mol O₂ > 0,05 mol) nên hiệu suất tính theo O₂: H = 0,03/0,05·100% = 60%."
+ },
+ {
+  "id": "bq_1789373737083_r59e7",
+  "truong": "a",
+  "doiDapAn": true,
+  "cuPhaiLa": 1,
+  "moi": 3
+ },
+ {
+  "id": "bq_1789373737083_r59e7",
+  "truong": "e",
+  "cuPhaiLa": "n(X) = 0,2 mol với M trung bình 56 cho SO₂ 0,15 mol và O₂ 0,05 mol; gọi SO₂ phản ứng là x thì 233x + 217(0,15 − x) = 33,51 nên x = 0,06 và H = 0,06/0,15 = 40%.",
+  "moi": "n(X) = 0,2 mol với M trung bình 56 cho SO₂ 0,15 mol và O₂ 0,05 mol; gọi SO₃ tạo thành là x thì 233x + 217(0,15 − x) = 33,51 nên x = 0,06, tức 0,03 mol O₂ đã phản ứng. O₂ là chất thiếu (oxi hóa hết 0,15 mol SO₂ cần 0,075 mol O₂ > 0,05 mol) nên hiệu suất tính theo O₂: H = 0,03/0,05 = 60%."
+ },
+ {
+  "id": "bq_1789373737083_s8953",
+  "truong": "stV",
+  "y": 3,
+  "doiDapAn": true,
+  "cuPhaiLa": false,
+  "moi": true
+ },
+ {
+  "id": "bq_1789373737083_s8953",
+  "truong": "e",
+  "cuPhaiLa": "SO₃ tạo BaSO₄ (M = 233) còn SO₂ dư tạo BaSO₃ (M = 217); từ khối lượng kết tủa tính được SO₂ phản ứng 0,06 mol, hiệu suất 40%.",
+  "moi": "SO₃ tạo BaSO₄ (M = 233) còn SO₂ dư tạo BaSO₃ (M = 217); từ khối lượng kết tủa tính được 0,06 mol SO₃, tức 0,03 mol O₂ đã phản ứng. O₂ là chất thiếu (oxi hóa hết 0,15 mol SO₂ cần 0,075 mol O₂ > 0,05 mol) nên hiệu suất tính theo O₂: H = 0,03/0,05·100% = 60%."
+ }
+]
