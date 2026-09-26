@@ -1,0 +1,69 @@
+[
+ {
+  "id": "bq_1788161296549_4c6r6",
+  "truong": "q",
+  "cuPhaiLa": "[Công thức cấu tạo: Propane có 2 liên kết C-C và 8 liên kết C-H; Butane có 3 liên kết C-C và 10 liên kết C-H] Dựa vào năng lượng liên kết, biến thiên enthalpy của phản ứng đốt cháy hoàn toàn 1 mol propane tạo thành CO₂ và hơi nước là:",
+  "moi": "[Công thức cấu tạo: Propane có 2 liên kết C-C và 8 liên kết C-H; Butane có 3 liên kết C-C và 10 liên kết C-H] Cho năng lượng liên kết (kJ/mol): C–C: 347; C–H: 413; O=O: 498; C=O (trong CO₂): 745; O–H: 467. Dựa vào năng lượng liên kết, biến thiên enthalpy của phản ứng đốt cháy hoàn toàn 1 mol propane tạo thành CO₂ và hơi nước là:"
+ },
+ {
+  "id": "bq_1788161296549_rwlqd",
+  "truong": "q",
+  "cuPhaiLa": "[Công thức cấu tạo: Propane có 2 liên kết C-C và 8 liên kết C-H; Butane có 3 liên kết C-C và 10 liên kết C-H] Bình gas hộ gia đình A chứa 10,76 kg khí hóa lỏng (LPG) gồm propane và butane với tỉ lệ mol tương ứng 3:7. Xét các phát biểu sau:",
+  "moi": "[Công thức cấu tạo: Propane có 2 liên kết C-C và 8 liên kết C-H; Butane có 3 liên kết C-C và 10 liên kết C-H] Cho năng lượng liên kết (kJ/mol): C–C: 347; C–H: 413; O=O: 498; C=O (trong CO₂): 745; O–H: 467. Bình gas hộ gia đình A chứa 10,76 kg khí hóa lỏng (LPG) gồm propane và butane với tỉ lệ mol tương ứng 3:7. Xét các phát biểu sau:"
+ },
+ {
+  "id": "bq_1788161296549_t00z1",
+  "truong": "q",
+  "cuPhaiLa": "Cho hỗn hợp khí X gồm 3 hydrocarbon A, B, C thuộc 3 dãy đồng đẳng alkane, alkene và alkyne và hỗn hợp khí Y gồm O₂, O₃ (tỉ khối Y đối với hydrogen bằng 19). Trộn X với Y theo tỉ lệ thể tích Vx : Vy = 1 : 2 rồi đốt cháy hoàn toàn hỗn hợp, thu được CO₂ và hơi nước với tỉ lệ thể tích tương ứng là 6 : 7. A và C là các chất nào sau đây?",
+  "moi": "Cho hỗn hợp khí X gồm 3 hydrocarbon A, B, C thuộc 3 dãy đồng đẳng alkane, alkene và alkyne và hỗn hợp khí Y gồm O₂, O₃ (tỉ khối Y đối với hydrogen bằng 19). Trộn X với Y theo tỉ lệ thể tích Vx : Vy = 1 : 2 rồi đốt cháy hoàn toàn hỗn hợp, sau phản ứng chỉ thu được CO₂ và hơi nước với tỉ lệ thể tích tương ứng là 6 : 7. A và C là các chất nào sau đây?"
+ },
+ {
+  "id": "bq_1788161296549_t00z1",
+  "truong": "e",
+  "cuPhaiLa": "Gọi công thức trung bình của X là CnHm, Y là Ox (x=2,375). Từ bảo toàn nguyên tố và tỉ lệ nCO2 : nH2O = 6:7, tính được số C trung bình là n = 1,5 và m = 3,5. Do số C trung bình nhỏ hơn 2 nên bắt buộc phải có CH₄, và do có alkyne nên alkyne ít C nhất là C₂H₂.",
+  "moi": "Y: M = 38 → n(O₂) : n(O₃) = 5 : 3, trung bình mỗi phân tử có 2,375 nguyên tử O. Lấy 1 mol X (CₙHₘ) và 2 mol Y (4,75 mol O). Sau phản ứng chỉ có CO₂ và H₂O nên 2n + m/2 = 4,75; và n : (m/2) = 6 : 7 → n = 1,5; m = 3,5. Số C trung bình 1,5 < 2 nên alkane A là CH₄. CH₄ và mọi alkene đều có ít nhất 4 nguyên tử H, mà số H trung bình 3,5 < 4, nên alkyne C phải có ít hơn 4 H, tức là C₂H₂ (loại C₃H₄)."
+ },
+ {
+  "id": "bq_1788161089233_rhjnk",
+  "truong": "q",
+  "cuPhaiLa": "[Sơ đồ phản ứng: CH₄ chuyển hóa thành C₂H₂ (1). Từ C₂H₂ rẽ 3 nhánh: nhánh 1 tạo C₂H₄ (2) rồi tạo C₂H₆O₂ (3); nhánh 2 tạo C₆H₆ (4) rồi tạo C₆H₆Cl₆ (5); nhánh 3 tạo C₄H₄ (6), chuyển thành C₄H₆ (7) rồi tạo C₄H₁₀O₄ (8).] Xét các nhận định sau về các phản ứng trong sơ đồ:",
+  "moi": "[Nâng cao – ngoài SGK] [Sơ đồ phản ứng: CH₄ chuyển hóa thành C₂H₂ (1). Từ C₂H₂ rẽ 3 nhánh: nhánh 1 tạo C₂H₄ (2) rồi tạo C₂H₆O₂ (3); nhánh 2 tạo C₆H₆ (4) rồi tạo C₆H₆Cl₆ (5); nhánh 3 tạo C₄H₄ (6), chuyển thành C₄H₆ (7) rồi tạo C₄H₁₀O₄ (8).] Xét các nhận định sau về các phản ứng trong sơ đồ:"
+ },
+ {
+  "id": "bq_1788161089233_rhjnk",
+  "truong": "e",
+  "cuPhaiLa": "Phản ứng (5) là cộng Cl₂ vào vòng benzene để tạo C₆H₆Cl₆ (thuốc trừ sâu 666), điều kiện là chiếu sáng nhiệt độ, không dùng xúc tác bột Fe (bột Fe dùng cho thế ở vòng).",
+  "moi": "Phản ứng (5) là cộng Cl₂ vào vòng benzene để tạo C₆H₆Cl₆ (thuốc trừ sâu 666), điều kiện là chiếu ánh sáng tử ngoại, không dùng xúc tác bột Fe (bột Fe dùng cho thế ở vòng)."
+ },
+ {
+  "id": "bq_1788161296549_h8hgt",
+  "truong": "q",
+  "cuPhaiLa": "Cho các phản ứng hóa học thuộc một dãy biến hóa sau: (A) + KMnO₄ → Khí (C) + KCl + (D) + H₂O(E); (C) + NaBr → (F) + (G); (F) + NaI → (H) + (I). Xét các nhận định:",
+  "moi": "[Kiến thức Hoá 10] Cho các phản ứng hóa học thuộc một dãy biến hóa sau: (A) + KMnO₄ → Khí (C) + KCl + (D) + H₂O; (C) + 2NaBr → 2NaCl + (F); (F) + 2NaI → 2NaBr + (H). Xét các nhận định:"
+ },
+ {
+  "id": "bq_1788161296549_h8hgt",
+  "truong": "st",
+  "y": 2,
+  "cuPhaiLa": "Phản ứng (C) + NaBr → (F) + (G) chứng minh tính oxi hóa của Br₂ mạnh hơn Cl₂.",
+  "moi": "Phản ứng giữa (C) và NaBr chứng minh tính oxi hóa của Br₂ mạnh hơn Cl₂."
+ },
+ {
+  "id": "bq_1788161296549_g647q",
+  "truong": "q",
+  "cuPhaiLa": "Cho sơ đồ phản ứng: (1) KCl (rắn) + H₂SO₄ (đặc) → Khí (A) + (B); (2) (A) + KMnO₄ → Khí (C) + KCl + (D) + (E). Khí (A) và (C) lần lượt là các khí nào sau đây?",
+  "moi": "[Kiến thức Hoá 10] Cho sơ đồ phản ứng: (1) KCl (rắn) + H₂SO₄ (đặc) → Khí (A) + (B); (2) (A) + KMnO₄ → Khí (C) + KCl + (D) + (E). Khí (A) và (C) lần lượt là các khí nào sau đây?"
+ },
+ {
+  "id": "bq_1788161296549_g647q",
+  "truong": "e",
+  "cuPhaiLa": "Đun nóng muối chloride với H₂SO₄ đặc sinh ra khí HCl (phương pháp sunfat). Cho dung dịch HCl đặc tác dụng với chất oxi hóa mạnh như KMnO₄ sinh ra khí Cl₂.",
+  "moi": "Đun nóng muối chloride với H₂SO₄ đặc sinh ra khí HCl (phương pháp sulfate). Cho dung dịch HCl đặc tác dụng với chất oxi hóa mạnh như KMnO₄ sinh ra khí Cl₂."
+ },
+ {
+  "id": "b:6:th:7",
+  "truong": "e",
+  "cuPhaiLa": "Phản ứng iodoform đặc trưng cho nhóm methyl ketone CH₃CO− và cả CH₃CH(OH)− vì bị oxi hóa thành methyl ketone.",
+  "moi": "Phản ứng iodoform đặc trưng cho hợp chất carbonyl có nhóm CH₃CO− gắn với nguyên tử H hoặc gốc hydrocarbon (methyl ketone, acetaldehyde). Carboxylic acid như CH₃COOH tuy có nhóm CH₃CO− nhưng không cho phản ứng này."
+ }
+]

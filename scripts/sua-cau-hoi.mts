@@ -41,6 +41,7 @@ import { getAuth, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { getFirestore, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { docEnv, cauHinh, thieuCauHinh, COL, docTepNganHang } from './ngan-hang-chung.mts';
 import { hoi, hoiKin } from './hoi-ban-phim.mts';
+import { CHEMISTRY_11_CURRICULUM } from '../src/features/lessons/constants.ts';
 
 interface MucSua {
   id: string;
@@ -93,7 +94,10 @@ const kieuDung = (truong: string, v: unknown) =>
 /* `lessonId` mở thêm cùng ngày (chủ dự án duyệt) cho 14 câu gắn nhầm bài. Nó
    quyết định câu hiện ở bài nào, không phải đáp án — nhưng chuyển SANG CHƯƠNG
    KHÁC thì `ch`/`chapterId` lệch theo, nên chỉ cho chuyển trong cùng chương.
-   Chương của từng bài lấy từ bản chụp: bài nào ứng với đúng một chương. */
+   Chương của từng bài lấy từ bản chụp: bài nào ứng với đúng một chương.
+   Bài CHƯA có câu nào trong bản chụp (bai-19, 27/09/2026) thì bản chụp không
+   biết — lấy từ chương trình KNTT trong `constants.ts`. Hai nguồn cùng biết
+   mà nói khác nhau thì coi như không biết, script dừng. */
 const BAI_HOP_LE = /^bai-\d+$/;
 function chuongCuaBai(): Map<string, unknown> {
   const dem = new Map<string, Set<unknown>>();
@@ -101,7 +105,16 @@ function chuongCuaBai(): Map<string, unknown> {
     const b = c.lessonId as string | undefined;
     if (b) dem.set(b, (dem.get(b) ?? new Set()).add(c.ch));
   }
-  return new Map([...dem].filter(([, s]) => s.size === 1).map(([b, s]) => [b, [...s][0]]));
+  const tuBanChup = new Map([...dem].filter(([, s]) => s.size === 1).map(([b, s]) => [b, [...s][0]]));
+  const kq = new Map<string, unknown>();
+  for (const chuong of CHEMISTRY_11_CURRICULUM) {
+    const so = Number(chuong.id.replace('chuong-', ''));
+    for (const bai of chuong.lessons) {
+      const chup = tuBanChup.get(bai.id);
+      if (chup === undefined || chup === so) kq.set(bai.id, so);
+    }
+  }
+  return kq;
 }
 
 type Y = { s: string; v: boolean };

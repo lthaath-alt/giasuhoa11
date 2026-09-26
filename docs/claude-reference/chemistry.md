@@ -175,6 +175,8 @@ Năm cái trói, **đừng nới cái nào mà không hỏi chủ dự án**:
    14 câu gắn nhầm bài: giá trị dạng `bai-N`, và **chỉ chuyển trong cùng
    chương** (chương của bài lấy từ bản chụp) — khác chương thì `ch`/`chapterId`
    lệch theo nên script dừng. Mẫu: `docs/soat-hoa-hoc/sua-14-cau-gan-nham-bai.json`.
+   Bài chưa có câu nào trong bản chụp (như `bai-19`) thì lấy chương từ
+   `src/features/lessons/constants.ts`; hai nguồn nói khác nhau thì dừng.
    Câu CHƯA gắn bài (không có `lessonId`) ghi `"cuPhaiLa": null` (27/09/2026).
    Một phiếu có nhiều mục `st`/`stV` cho CÙNG một câu thì được: trước 27/09/2026
    mục sau bị "BỎ QUA — mảng st đã đổi" vì so với ảnh chụp trước khi chính lượt
