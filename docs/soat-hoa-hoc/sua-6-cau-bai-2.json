@@ -1,0 +1,39 @@
+[
+ {
+  "id": "bq_1789371866325_1xtfx",
+  "truong": "q",
+  "cuPhaiLa": "Chỉ dùng quỳ tím, có thể nhận biết ba dung dịch riêng biệt nào sau đây?",
+  "moi": "Chỉ dùng quỳ tím (không dùng thêm thuốc thử nào khác, kể cả các chất đã nhận ra), có thể nhận biết ba dung dịch riêng biệt nào sau đây?"
+ },
+ {
+  "id": "bq_1789371866325_tzcf8",
+  "truong": "st",
+  "y": 0,
+  "cuPhaiLa": "Phương trình ion rút gọn của phản ứng giữa acid mạnh và base mạnh là H⁺ + OH⁻ → H₂O.",
+  "moi": "Phương trình ion rút gọn của phản ứng giữa HCl và NaOH là H⁺ + OH⁻ → H₂O."
+ },
+ {
+  "id": "bq_1788161089233_axxej",
+  "truong": "q",
+  "cuPhaiLa": "Trộn 150 ml dung dịch CH₃COOH 0,1M với 100 ml dung dịch NaOH 0,1M thu được dung dịch X. Biết Ka của CH₃COOH là 1,75.10⁻⁵. Giá trị pH của dung dịch X gần nhất với:",
+  "moi": "[Nâng cao – ngoài SGK] Trộn 150 ml dung dịch CH₃COOH 0,1M với 100 ml dung dịch NaOH 0,1M thu được dung dịch X. Biết Ka của CH₃COOH là 1,75.10⁻⁵. Giá trị pH của dung dịch X gần nhất với:"
+ },
+ {
+  "id": "bq_1788161296549_uzhen",
+  "truong": "q",
+  "cuPhaiLa": "[Hình ảnh: Bệnh gout ở bàn chân cho thấy tinh thể uric acid tích tụ ở khớp nối gây sưng viêm] Trong máu ở 37 °C có pH = 7,4; nồng độ Na⁺ là 130 mmol/L và tích số tan của sodium urate là 6,4.10⁻⁵ (pKa uric acid = 5,4). Xét các phát biểu sau:",
+  "moi": "[Nâng cao – ngoài SGK] [Hình ảnh: Bệnh gout ở bàn chân cho thấy tinh thể uric acid tích tụ ở khớp nối gây sưng viêm] Trong máu ở 37 °C có pH = 7,4; nồng độ Na⁺ là 130 mmol/L và tích số tan của sodium urate là 6,4.10⁻⁵ (pKa uric acid = 5,4). Xét các phát biểu sau:"
+ },
+ {
+  "id": "bq_1789371866324_kf8xd",
+  "truong": "lessonId",
+  "cuPhaiLa": "bai-2",
+  "moi": "bai-1"
+ },
+ {
+  "id": "bq_1789371866324_19ya7",
+  "truong": "lessonId",
+  "cuPhaiLa": "bai-2",
+  "moi": "bai-1"
+ }
+]

@@ -2940,7 +2940,7 @@
    "8,80",
    "5,30"
   ],
-  "q": "Trộn 150 ml dung dịch CH₃COOH 0,1M với 100 ml dung dịch NaOH 0,1M thu được dung dịch X. Biết Ka của CH₃COOH là 1,75.10⁻⁵. Giá trị pH của dung dịch X gần nhất với:",
+  "q": "[Nâng cao – ngoài SGK] Trộn 150 ml dung dịch CH₃COOH 0,1M với 100 ml dung dịch NaOH 0,1M thu được dung dịch X. Biết Ka của CH₃COOH là 1,75.10⁻⁵. Giá trị pH của dung dịch X gần nhất với:",
   "t": "mc",
   "topic": "de-thi-hsg-hoa-hoc-11-nam-2023-2024-truong-thpt-luong-ngoc-q"
  },
@@ -3748,7 +3748,7 @@
   "imgNote": "tệp de-hoc-sinh-gioi-hoa-hoc-11-nam-2024-2025-truong-thpt-binh-chieu-tp-hcm (1).pdf, trang 3, hình 3",
   "lessonId": "bai-2",
   "lv": "vd",
-  "q": "[Hình ảnh: Bệnh gout ở bàn chân cho thấy tinh thể uric acid tích tụ ở khớp nối gây sưng viêm] Trong máu ở 37 °C có pH = 7,4; nồng độ Na⁺ là 130 mmol/L và tích số tan của sodium urate là 6,4.10⁻⁵ (pKa uric acid = 5,4). Xét các phát biểu sau:",
+  "q": "[Nâng cao – ngoài SGK] [Hình ảnh: Bệnh gout ở bàn chân cho thấy tinh thể uric acid tích tụ ở khớp nối gây sưng viêm] Trong máu ở 37 °C có pH = 7,4; nồng độ Na⁺ là 130 mmol/L và tích số tan của sodium urate là 6,4.10⁻⁵ (pKa uric acid = 5,4). Xét các phát biểu sau:",
   "st": [
    {
     "s": "Nồng độ urate (Ur⁻) tối đa trong máu để không xuất hiện kết tủa sodium urate là 4,92.10⁻⁴ M.",
@@ -4929,7 +4929,7 @@
   "e": "Thêm một chất thì cân bằng chuyển theo chiều tiêu thụ bớt chất đó; nguyên lí chỉ áp dụng cho hệ cân bằng của phản ứng thuận nghịch.",
   "g": 243,
   "id": "bq_1789371866324_19ya7",
-  "lessonId": "bai-2",
+  "lessonId": "bai-1",
   "lv": "nb",
   "q": "Xét nguyên lí chuyển dịch cân bằng Le Chatelier.",
   "st": [
@@ -6061,7 +6061,7 @@
   "e": "Nguyên lí chuyển dịch cân bằng Le Chatelier cho biết cân bằng luôn chuyển dịch theo chiều chống lại tác động bên ngoài.",
   "g": 243,
   "id": "bq_1789371866324_kf8xd",
-  "lessonId": "bai-2",
+  "lessonId": "bai-1",
   "lv": "nb",
   "o": [
    "nguyên lí Le Chatelier.",
@@ -7478,7 +7478,7 @@
    "H₂SO₄, NaOH, KOH.",
    "Ba(OH)₂, NaOH, H₂SO₄."
   ],
-  "q": "Chỉ dùng quỳ tím, có thể nhận biết ba dung dịch riêng biệt nào sau đây?",
+  "q": "Chỉ dùng quỳ tím (không dùng thêm thuốc thử nào khác, kể cả các chất đã nhận ra), có thể nhận biết ba dung dịch riêng biệt nào sau đây?",
   "t": "mc",
   "topic": "thuvienhoclieu.com-400-Cau-trac-nghiem-on-tap-Hoa-11-HK1-nam"
  },
@@ -10690,7 +10690,7 @@
   "q": "Xét ý nghĩa của phương trình ion rút gọn.",
   "st": [
    {
-    "s": "Phương trình ion rút gọn của phản ứng giữa acid mạnh và base mạnh là H⁺ + OH⁻ → H₂O.",
+    "s": "Phương trình ion rút gọn của phản ứng giữa HCl và NaOH là H⁺ + OH⁻ → H₂O.",
     "v": true
    },
    {
