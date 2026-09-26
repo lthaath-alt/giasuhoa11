@@ -7615,7 +7615,7 @@
   "e": "Tổng hợp NH₃ theo quy trình Haber dùng xúc tác sắt (Fe) để tăng tốc độ phản ứng ở nhiệt độ vừa phải.",
   "g": 319,
   "id": "bq_1789371866325_351fi",
-  "lessonId": "bai-7",
+  "lessonId": "bai-5",
   "lv": "nb",
   "o": [
    "Fe",
@@ -7766,7 +7766,7 @@
   "e": "Ammonia có công thức NH₃, gồm 1 nguyên tử nitrogen liên kết với 3 nguyên tử hydrogen.",
   "g": 314,
   "id": "bq_1789371866325_4wvwl",
-  "lessonId": "bai-7",
+  "lessonId": "bai-5",
   "lv": "nb",
   "o": [
    "oxygen và nitrogen.",
@@ -8022,7 +8022,7 @@
   "e": "N₂ chiếm khoảng 78% thể tích không khí, O₂ khoảng 21%, các khí khác chỉ chiếm lượng nhỏ.",
   "g": 286,
   "id": "bq_1789371866325_7uxn3",
-  "lessonId": "bai-7",
+  "lessonId": "bai-4",
   "lv": "nb",
   "o": [
    "O₂",
@@ -8040,7 +8040,7 @@
   "e": "Xúc tác làm tăng tốc độ hai chiều như nhau nên không đổi hiệu suất cân bằng, chỉ giúp đạt cân bằng nhanh hơn.",
   "g": 319,
   "id": "bq_1789371866325_8eknv",
-  "lessonId": "bai-7",
+  "lessonId": "bai-5",
   "lv": "nb",
   "q": "Xét điều kiện tổng hợp ammonia trong công nghiệp.",
   "st": [
@@ -8557,7 +8557,7 @@
   "e": "Muối ammonium carbonate khi đun nóng phân hủy hoàn toàn thành NH₃, CO₂ và hơi nước làm bánh xốp mà không để lại cặn.",
   "g": 312,
   "id": "bq_1789371866325_cqo5w",
-  "lessonId": "bai-7",
+  "lessonId": "bai-5",
   "lv": "nb",
   "o": [
    "(NH₄)₂CO₃",
@@ -8884,7 +8884,7 @@
   "e": "Không khí khô gồm khoảng 78% N₂, 21% O₂ và khoảng 1% các khí khác (chủ yếu Ar); SO₂ chỉ là chất ô nhiễm với lượng vết.",
   "g": 286,
   "id": "bq_1789371866325_fv3ou",
-  "lessonId": "bai-7",
+  "lessonId": "bai-4",
   "lv": "nb",
   "q": "Xét thành phần của không khí.",
   "st": [
@@ -9401,7 +9401,7 @@
   "e": "(NH₄)₂CO₃ → 2NH₃ + CO₂ + H₂O, tất cả sản phẩm đều bay hơi; NH₄Cl phân hủy tạo HCl nên không dùng làm bột nở.",
   "g": 312,
   "id": "bq_1789371866325_l8ujx",
-  "lessonId": "bai-7",
+  "lessonId": "bai-5",
   "lv": "nb",
   "q": "Xét việc dùng muối ammonium carbonate làm bột nở.",
   "st": [
@@ -9851,7 +9851,7 @@
   "e": "NH₃ gồm N và H; H có số oxi hóa +1 nên N có số oxi hóa −3.",
   "g": 314,
   "id": "bq_1789371866325_oe6s2",
-  "lessonId": "bai-7",
+  "lessonId": "bai-5",
   "lv": "nb",
   "q": "Xét thành phần của ammonia.",
   "st": [
@@ -28870,7 +28870,7 @@
   "e": "m(CuSO₄) = 60·160/250 = 38,4 g; m dung dịch = 38,4/0,008 = 4800 g.",
   "g": 183,
   "id": "bq_1789372198152_2gd5x",
-  "lessonId": "bai-4",
+  "lessonId": "bai-8",
   "lv": "vd",
   "o": [
    "7500 gam",
@@ -28967,7 +28967,7 @@
   "e": "m(CuSO₄) = 38,4 g nên m dung dịch = 38,4/0,008 = 4800 g.",
   "g": 183,
   "id": "bq_1789372198152_57vti",
-  "lessonId": "bai-4",
+  "lessonId": "bai-8",
   "lv": "vd",
   "num": 4800,
   "q": "Để trừ nấm thực vật, người ta dùng dung dịch CuSO₄ 0,8%. Lượng dung dịch CuSO₄ 0,8% pha chế được từ 60 gam CuSO₄.5H₂O là bao nhiêu gam?",
@@ -29130,7 +29130,7 @@
   "e": "Fe⁺² trong FeCO₃, Fe(NO₃)₂ bị oxi hóa lên +3; +3 là số oxi hóa cao nhất thường gặp của Fe nên hợp chất Fe⁺³ không bị HNO₃ oxi hóa tiếp.",
   "g": 178,
   "id": "bq_1789372198152_7t9zg",
-  "lessonId": "bai-7",
+  "lessonId": "bai-6",
   "lv": "th",
   "q": "Cho từng chất: Fe, FeO, Fe(OH)₂, Fe(OH)₃, Fe₃O₄, Fe(NO₃)₂, Fe(NO₃)₃, FeSO₄, Fe₂(SO₄)₃, FeCO₃ lần lượt phản ứng với HNO₃ đặc, nóng.",
   "st": [
@@ -29210,7 +29210,7 @@
   "e": "Bảy chất chứa Fe⁰ hoặc Fe⁺²: Fe, FeO, Fe(OH)₂, Fe₃O₄, Fe(NO₃)₂, FeSO₄, FeCO₃.",
   "g": 178,
   "id": "bq_1789372198152_9pwgd",
-  "lessonId": "bai-7",
+  "lessonId": "bai-6",
   "lv": "th",
   "num": 7,
   "q": "Cho từng chất: Fe, FeO, Fe(OH)₂, Fe(OH)₃, Fe₃O₄, Fe(NO₃)₂, Fe(NO₃)₃, FeSO₄, Fe₂(SO₄)₃, FeCO₃ lần lượt phản ứng với HNO₃ đặc, nóng. Số phản ứng thuộc loại phản ứng oxi hóa – khử là bao nhiêu?",
@@ -30045,7 +30045,7 @@
   "e": "Các chất chứa Fe⁰ hoặc Fe⁺² bị HNO₃ oxi hóa lên Fe⁺³: Fe, FeO, Fe(OH)₂, Fe₃O₄, Fe(NO₃)₂, FeSO₄, FeCO₃ (7 chất); các chất chứa Fe⁺³ chỉ phản ứng trao đổi hoặc không phản ứng.",
   "g": 178,
   "id": "bq_1789372198152_uj53c",
-  "lessonId": "bai-7",
+  "lessonId": "bai-6",
   "lv": "th",
   "o": [
    "5",
@@ -30292,7 +30292,7 @@
   "e": "Nước kết tinh trở thành một phần dung môi nên chất tan chỉ là CuSO₄ (160/250 khối lượng tinh thể); 38,4/0,008 = 4800 g.",
   "g": 183,
   "id": "bq_1789372198152_zuq5w",
-  "lessonId": "bai-4",
+  "lessonId": "bai-8",
   "lv": "vd",
   "q": "Pha chế dung dịch CuSO₄ 0,8% (dùng trừ nấm thực vật) từ 60 gam CuSO₄.5H₂O.",
   "st": [

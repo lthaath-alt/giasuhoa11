@@ -39,7 +39,7 @@ import { readFileSync } from 'node:fs';
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { getFirestore, doc, getDoc, updateDoc } from 'firebase/firestore';
-import { docEnv, cauHinh, thieuCauHinh, COL } from './ngan-hang-chung.mts';
+import { docEnv, cauHinh, thieuCauHinh, COL, docTepNganHang } from './ngan-hang-chung.mts';
 import { hoi, hoiKin } from './hoi-ban-phim.mts';
 
 interface MucSua {
@@ -62,7 +62,21 @@ interface MucSua {
    cả chữ (`s`) lẫn ĐÁP ÁN (`v`) của từng ý, nên nó bị trói chặt hơn `q`: chỉ
    đổi chữ của ĐÚNG MỘT ý; số ý, mọi `v`, và chữ các ý khác phải giữ nguyên —
    `mangMoiSt` kiểm lại điều đó trước khi ghi, và phần đọc lại kiểm lần nữa. */
-const DUOC_SUA = new Set(['q', 'st']);
+const DUOC_SUA = new Set(['q', 'st', 'lessonId']);
+
+/* `lessonId` mở thêm cùng ngày (chủ dự án duyệt) cho 14 câu gắn nhầm bài. Nó
+   quyết định câu hiện ở bài nào, không phải đáp án — nhưng chuyển SANG CHƯƠNG
+   KHÁC thì `ch`/`chapterId` lệch theo, nên chỉ cho chuyển trong cùng chương.
+   Chương của từng bài lấy từ bản chụp: bài nào ứng với đúng một chương. */
+const BAI_HOP_LE = /^bai-\d+$/;
+function chuongCuaBai(): Map<string, unknown> {
+  const dem = new Map<string, Set<unknown>>();
+  for (const c of docTepNganHang() ?? []) {
+    const b = c.lessonId as string | undefined;
+    if (b) dem.set(b, (dem.get(b) ?? new Set()).add(c.ch));
+  }
+  return new Map([...dem].filter(([, s]) => s.size === 1).map(([b, s]) => [b, [...s][0]]));
+}
 
 type Y = { s: string; v: boolean };
 
@@ -122,6 +136,10 @@ for (const [i, m] of phieu.entries()) {
     console.error(`Mục ${i + 1} (${m.id}) sửa \`st\` nhưng thiếu \`y\` hợp lệ (số thứ tự ý, 0–3)`);
     process.exit(1);
   }
+  if (m.truong === 'lessonId' && !(BAI_HOP_LE.test(m.cuPhaiLa) && BAI_HOP_LE.test(m.moi))) {
+    console.error(`Mục ${i + 1} (${m.id}) sửa \`lessonId\` nhưng giá trị không có dạng bai-N`);
+    process.exit(1);
+  }
   if (m.cuPhaiLa === m.moi) {
     console.error(`Mục ${i + 1} (${m.id}) có giá trị mới TRÙNG giá trị cũ — phiếu soạn nhầm?`);
     process.exit(1);
@@ -177,6 +195,15 @@ for (const muc of phieu) {
     console.log('    Ai đó đã sửa câu này sau khi soạn phiếu. Soạn lại phiếu rồi chạy lại.');
     boQua++;
     continue;
+  }
+
+  if (muc.truong === 'lessonId') {
+    const chuongMoi = chuongCuaBai().get(muc.moi);
+    if (chuongMoi === undefined || chuongMoi !== duLieu.ch) {
+      console.log(`\n  DỪNG        ${muc.id} — ${muc.moi} thuộc chương ${String(chuongMoi ?? '?')}, câu đang ở chương ${String(duLieu.ch)}; chỉ chuyển trong cùng chương`);
+      boQua++;
+      continue;
+    }
   }
 
   let stCu: string | undefined;

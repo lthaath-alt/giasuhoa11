@@ -41,9 +41,17 @@ nhầm bài (subagent đếm, chưa kiểm từng câu).
     `5lv4x` (Ksp) — bốn câu lấy từ đề học sinh giỏi. `s430z` và `5lv4x` do
     giám khảo Hoá của hội đồng giả lập nêu.
   - `[Ngoài chương trình KNTT]`: `ivfj5`, `jd49p`, `uab7q` (phosphorus).
-- Các câu gắn nhầm bài: chưa xử lý.
+- 14 câu gắn nhầm bài **chuyển `lessonId`**, cùng chương 2, không đổi nội
+  dung hay đáp án. Phiếu `sua-14-cau-gan-nham-bai.json`. Danh sách lập lại
+  bằng tay từ cả 73 câu Bài 7 (subagent ước "khoảng 13" và nêu nhầm `ujxuu` —
+  câu đó về sulfur, giữ ở Bài 7):
+  - về Bài 4: `7uxn3`, `fv3ou` (không khí, N₂);
+  - về Bài 5: `351fi`, `4wvwl`, `8eknv`, `oe6s2`, `cqo5w`, `l8ujx` (ammonia,
+    bột nở);
+  - về Bài 6: `7t9zg`, `9pwgd`, `uj53c` (hợp chất Fe + HNO₃);
+  - Bài 4 → Bài 8: `2gd5x`, `57vti`, `zuq5w` (pha CuSO₄ — bài gần nhất).
 
-Cả hai phiếu đã ghi lên Firestore, đọc lại khớp; bản chụp xuất lại cùng ngày.
+Cả ba phiếu đã ghi lên Firestore, đọc lại khớp; bản chụp xuất lại cùng ngày.
 
 ## Đã loại
 
