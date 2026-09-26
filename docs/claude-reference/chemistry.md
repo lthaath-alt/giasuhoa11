@@ -83,6 +83,14 @@ HAI lần ra hai tệp, rồi `--nap a.json,b.json` (ngăn bằng dấu phẩy, 
 dấu cách). Báo cáo ghi `k/2 lượt cùng nêu` y như đường A. Tệp đề dẫn tự sinh
 ra sẵn hai tên tệp và cả dòng lệnh nạp.
 
+**`--nap` tính phạm vi từ cờ lọc gõ LÚC NẠP** (`--bai`, `--loai`…), không đọc
+từ đề dẫn. 26/09/2026 nạp 107 câu mc Bài 2 bằng lệnh thiếu cờ, báo cáo ra
+mang đuôi tên "tat-ca" và ghi "Soát 1554 câu" — vết kiểm định sai (đã xoá). Nay đề dẫn in lệnh nạp
+kèm đủ cờ, và `--nap` đối chiếu id với đề dẫn cùng tên: lệch (thiếu cờ, sai
+cờ, hay bản chụp đổi sau lúc xuất) thì dừng, không ghi báo cáo; tệp trả lời
+nêu id ngoài phạm vi cũng dừng. Đề dẫn xuất trước ngày đó vẫn in lệnh thiếu
+cờ: tự thêm cờ, ví dụ `--bai bai-2 --loai tf`.
+
 Ngày làm việc điển hình: hết 20 lượt miễn phí thì chuyển sang đường B, hôm sau
 lại có 20 lượt mới.
 

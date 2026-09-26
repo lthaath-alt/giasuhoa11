@@ -84,6 +84,31 @@ function tenPhamVi(): string {
     locLoai && `loai-${locLoai}`, soToiDa && `so-${soToiDa}`].filter(Boolean);
   return phan.length ? phan.join('-') : 'tat-ca';
 }
+
+/**
+ * Các cờ lọc đang bật, viết lại đúng dạng dòng lệnh.
+ *
+ * `--nap` tính phạm vi từ CHÍNH các cờ này chứ không đọc từ đề dẫn. Bản cũ in
+ * lệnh nạp trong đề dẫn mà không kèm chúng, nên làm đúng theo lệnh in sẵn là
+ * báo cáo coi như cả kho: 26/09/2026, nạp 107 câu mc Bài 2 ra báo cáo
+ * `tat-ca.md` ghi "Soát 1554 câu".
+ */
+function coLoc(): string {
+  return [locBai && `--bai ${locBai}`, locChuong && `--chuong ${locChuong}`,
+    locMuc && `--muc ${locMuc}`, locLoai && `--loai ${locLoai}`,
+    soToiDa && `--so ${soToiDa}`].filter(Boolean).join(' ');
+}
+
+/** Danh sách id trong phần "## Dữ liệu" của một tệp đề dẫn; null nếu đọc không ra. */
+function docIdDeDan(tep: string): string[] | null {
+  try {
+    const noi = readFileSync(tep, 'utf8');
+    const i = noi.indexOf('## Dữ liệu');
+    const khoi = i >= 0 ? noi.slice(i).match(/```json\s*([\s\S]*?)```/) : null;
+    if (!khoi) return null;
+    return (JSON.parse(khoi[1]) as { id: string }[]).map(c => c.id);
+  } catch { return null; }
+}
 const soToiDa = Number(lay('--so') || 0);
 const moiLo = Number(lay('--lo') || 25);
 /* Soát MẤY LƯỢT cho mỗi lô. Mặc định 2, không phải 1 — xem ghi chú ở vòng lặp:
@@ -326,6 +351,8 @@ async function chay() {
     const tenDeDan = join('docs/soat-hoa-hoc',
       `de-dan-${luc0.toISOString().slice(0, 10)}-${gio0}-${tenPhamVi()}.md`);
     const tenTraLoi = tenDeDan.replace(/^.*[\\/]/, '').replace(/^de-dan-/, 'tra-loi-').replace(/\.md$/, '.json');
+    const lenhNap = `npm run soat:hoa-hoc -- ${coLoc() ? `${coLoc()} ` : ''}--nap `
+      + `docs/soat-hoa-hoc/${tenTraLoi.replace('.json', '-1.json')},docs/soat-hoa-hoc/${tenTraLoi.replace('.json', '-2.json')}`;
     const noi = [
       `# Đề dẫn soát nội dung — ${ds.length} câu`, '',
       `Mở tệp này trong Antigravity rồi bảo nó: *"làm đúng yêu cầu trong tệp,`,
@@ -335,9 +362,8 @@ async function chay() {
       `KHÔNG đủ: đo 20/09/2026, cùng 16 câu chạy ba lượt cho ra 3, 3, rồi 0 câu`,
       `nghi ngờ — và ba câu bị bỏ sót ở lượt thứ ba là lỗi THẬT.`, '',
       'Xong thì nạp CẢ HAI, ngăn bằng dấu phẩy, KHÔNG có dấu cách:', '',
-      '```bash',
-      `npm run soat:hoa-hoc -- --nap docs/soat-hoa-hoc/${tenTraLoi.replace('.json', '-1.json')},docs/soat-hoa-hoc/${tenTraLoi.replace('.json', '-2.json')}`,
-      '```', '',
+      '```bash', lenhNap, '```', '',
+      'Giữ nguyên các cờ lọc trong lệnh trên: `--nap` tính phạm vi từ chúng.', '',
       'Báo cáo sẽ ghi `k/2 lượt cùng nêu` cho từng câu — câu nào cả hai lượt',
       'cùng chỉ ra thì đáng tin hơn hẳn. Chỉ có một tệp thì nạp một tệp cũng được,',
       'báo cáo sẽ ghi `1/1`.', '',
@@ -349,7 +375,7 @@ async function chay() {
     console.log(`\nĐã ghi đề dẫn ${ds.length} câu: ${tenDeDan}`);
     console.log('KHÔNG gọi mạng, không tốn lượt nào.');
     console.log('\nBước tiếp: mở tệp đó trong Antigravity, bảo nó soát HAI LẦN ra hai tệp,\nrồi nạp cả hai:\n'
-      + `  npm run soat:hoa-hoc -- --nap docs/soat-hoa-hoc/${tenTraLoi.replace('.json', '-1.json')},docs/soat-hoa-hoc/${tenTraLoi.replace('.json', '-2.json')}`);
+      + `  ${lenhNap}`);
     return;
   }
 
@@ -360,6 +386,33 @@ async function chay() {
        cùng nêu` y như khi gọi API. Nạp một tệp vẫn chạy, chỉ là N = 1. */
     const dsTep = napTep.split(',').map(t => t.trim()).filter(Boolean);
     let soHongNap = 0;
+
+    /* ĐỐI CHIẾU PHẠM VI với đề dẫn mà tệp trả lời sinh ra từ đó, TRƯỚC khi viết
+       báo cáo. Phạm vi ở đây tính từ cờ lọc gõ lúc nạp; gõ thiếu cờ thì báo cáo
+       ghi đã soát nhiều câu hơn thực tế — một vết kiểm định sai mà nhìn vào
+       không ai biết. Lệch cũng xảy ra khi bản chụp ngân hàng đổi sau lúc xuất
+       đề dẫn. Cả hai trường hợp đều phải dừng, không viết báo cáo. */
+    const idPhamVi = new Set(ds.map(c => c.id));
+    for (const t of dsTep) {
+      const m = t.replace(/^.*[\\/]/, '').match(/^tra-loi-(.+)-\d+\.json$/);
+      const tepDeDan = m ? join(dirname(duong(t)), `de-dan-${m[1]}.md`) : '';
+      const idDeDan = tepDeDan && existsSync(tepDeDan) ? docIdDeDan(tepDeDan) : null;
+      if (!idDeDan) {
+        console.warn(`  CẢNH BÁO: không tìm/đọc được đề dẫn của ${t}, nên KHÔNG đối chiếu được phạm vi.`
+          + (m ? '' : ' (tên tệp không theo mẫu tra-loi-…-N.json)'));
+        continue;
+      }
+      const ngoai = idDeDan.filter(id => !idPhamVi.has(id)).length;
+      const thua = ds.length - (idDeDan.length - ngoai);
+      if (ngoai || thua) {
+        console.error(`\nPHẠM VI KHÔNG KHỚP ĐỀ DẪN ${tepDeDan.replace(/^.*[\\/]/, '')}:`
+          + `\n  đề dẫn có ${idDeDan.length} câu, bộ lọc đang gõ (${coLoc() || 'không cờ nào = cả kho'}) ra ${ds.length} câu`
+          + `\n  ${ngoai} câu của đề dẫn nằm ngoài bộ lọc · ${thua} câu của bộ lọc không có trong đề dẫn.`
+          + '\nGõ lại đúng các cờ lọc đã dùng lúc --xuat-de-dan. Nếu cờ đã đúng thì bản chụp ngân hàng'
+          + '\nđã đổi sau lúc xuất đề dẫn — xuất đề dẫn mới rồi soát lại. Không ghi báo cáo.');
+        process.exit(1);
+      }
+    }
 
     for (const t of dsTep) {
       let tho: string;
@@ -378,6 +431,14 @@ async function chay() {
       }
       try {
         const mang = JSON.parse(khop[0]) as Nghi[];
+        /* Id không có trong phạm vi: phạm vi sai, hoặc mô hình chép sai/bịa id.
+           Cả hai đều cần người nhìn, nên dừng thay vì đưa câu ma vào báo cáo. */
+        const idLa = mang.map(n => n.id).filter(id => !idPhamVi.has(id));
+        if (idLa.length) {
+          console.error(`\n${t} nêu ${idLa.length} id KHÔNG có trong phạm vi: ${idLa.join(', ')}`
+            + '\nKiểm lại cờ lọc, hoặc id bị mô hình chép sai. Không ghi báo cáo.');
+          process.exit(1);
+        }
         nhan(mang);
         console.log(`  ${t}: ${mang.length} câu nghi ngờ`);
       } catch (e) {
