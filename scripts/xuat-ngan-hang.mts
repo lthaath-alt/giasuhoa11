@@ -35,7 +35,11 @@ if (thieu.length) {
 }
 
 console.log('Đang đọc bank_questions của dự án ' + cauHinh(env).projectId + ' …');
-const cau = await taiTuFirestore(env);
+/* Hạn 6 phút, không dùng 25 giây mặc định. Đo 26/09/2026 trên máy đi qua proxy
+   Zscaler: tải trọn 1.554 câu mất 173 giây — mạng CHẬM chứ không mất, mà hạn
+   25 giây báo "mất mạng" nên lệnh này không bao giờ chạy xong ở đó. Lệnh chạy
+   tay, chờ lâu được; `kiem-tra:dong-bo` vẫn giữ 25 giây để bộ kiểm không treo. */
+const cau = await taiTuFirestore(env, 360_000);
 
 if (!cau.length) {
   /* Ngân hàng rỗng gần như luôn là lỗi mạng hoặc sai cấu hình, chứ không phải
