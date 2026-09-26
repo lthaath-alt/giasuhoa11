@@ -12,7 +12,7 @@
  * Nếu báo chung một câu "thử lại sau ít phút" thì học sinh hết lượt của ngày sẽ
  * ngồi bấm lại cả buổi mà không bao giờ được trả lời.
  */
-import { thongBaoHetLuot } from '../src/features/tutor/services/geminiTutorService';
+import { thongBaoHetLuot, thongBaoLoiKetNoi } from '../src/features/tutor/services/geminiTutorService';
 import { loiThanhChuoi } from '../src/features/tutor/services/loiGemini';
 import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
@@ -146,6 +146,47 @@ console.log('\n== Trần lượt khách chỉ khai MỘT chỗ ==');
     const tinhCung = ma.match(/guestChatCount\s*(?:>=|>|<=|<|===|!==)\s*\d+|\b\d+\s*-\s*guestChatCount/g) || [];
     ok(tinhCung.length === 0, `${t}: không so sánh/trừ với số cứng${tinhCung.length ? ' — ' + tinhCung.join(' | ') : ''}`);
   }
+}
+
+/* App Check bị khoá 24 giờ thì phải bảo em TẢI LẠI TRANG, đừng bảo thử lại.
+   Đo trên bản đang chạy lúc 22:31 ngày 25/09/2026: một lượt đổi thẻ App Check
+   trả 403, `@firebase/app-check` coi đó là lỗi cấu hình nên tự khoá 24 giờ
+   (`appCheck/initial-throttle`) và không gửi thêm request nào. Trong suốt
+   phiên trang đó, mọi lượt hỏi đi kèm thẻ rỗng và máy chủ trả 401.
+
+   Khoá ấy chỉ sống trong MỘT phiên trang — đo lại: tab đang kẹt "còn 23 giờ"
+   sau khi F5 thì hỏi được ngay. Vì thế câu "Em thử lại sau ít phút nhé" là
+   lời khuyên SAI: bấm gửi lại trong cùng phiên thì hỏng vĩnh viễn, thứ cần
+   làm là tải lại trang. */
+console.log('\n== App Check bị khoá thì bảo TẢI LẠI TRANG ==');
+{
+  const LOI_APPCHECK = 'AI: Error fetching from https://firebasevertexai.googleapis.com/v1beta/projects/'
+    + 'giasuhoa11/models/gemini-3.6-flash:generateContent: [401 Unauthorized] '
+    + 'Firebase App Check token is invalid. (AI/fetch-error)';
+  const LOI_THROTTLE = 'FirebaseError: AppCheck: Requests throttled due to previous 403 error. '
+    + 'Attempts allowed again after 23h:59m:30s (appCheck/throttled).';
+
+  for (const [ten, loi] of [['401 thẻ App Check không hợp lệ', LOI_APPCHECK],
+                            ['bị khoá sau lỗi 403', LOI_THROTTLE]] as [string, string][]) {
+    const t = thongBaoLoiKetNoi(loi);
+    console.log('   ' + t);
+    ok(/tải lại trang/i.test(t), `${ten}: bảo em tải lại trang`);
+    ok(!/thử lại sau ít phút|gửi lại câu hỏi/i.test(t),
+       `${ten}: KHÔNG bảo em bấm gửi lại — trong cùng phiên trang thì vô ích`);
+  }
+
+  /* Hai nhánh cũ phải giữ nguyên ý, đừng để bản vá nuốt mất chúng. */
+  const tCho = thongBaoLoiKetNoi('AI: Error fetching from https://firebasevertexai.googleapis.com/…: '
+    + 'The operation was aborted. (AI/error)');
+  ok(/gửi lại/i.test(tCho) && !/tải lại trang/i.test(tCho),
+     'chờ quá hạn: vẫn bảo em gửi lại câu hỏi');
+
+  const t5xx = thongBaoLoiKetNoi('AI: Error fetching from https://firebasevertexai.googleapis.com/…: '
+    + '[503 Service Unavailable] The model is overloaded. (AI/fetch-error)');
+  ok(/máy chủ/i.test(t5xx), 'lỗi 5xx: nói rõ là lỗi phía máy chủ');
+
+  ok(thongBaoLoiKetNoi('TypeError: x is not a function') === '',
+     'lỗi lạ thì trả chuỗi rỗng để rơi về đường dự phòng như cũ');
 }
 
 console.log('\n' + (hong === 0 ? '>>> TẤT CẢ ĐẠT' : `>>> CÓ ${hong} MỤC HỎNG`) + '\n');

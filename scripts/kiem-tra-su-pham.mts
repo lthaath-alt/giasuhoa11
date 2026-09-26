@@ -31,7 +31,8 @@ import { dungPrompt, THAM_SO_SINH } from '../src/features/tutor/services/promptS
 import { buildProgramContext } from '../src/features/tutor/services/lessonContext';
 import { chuanHoaCongThuc } from '../src/core/components/chuanHoaCongThuc';
 import { LUOC_DO_LOC, TUY_CHON_KATEX, taoTheLink } from '../src/core/components/markdownCauHinh';
-import { tinhChiSo, xuatCsv } from '../src/features/tutor/services/telemetryService';
+import { tinhChiSo, xuatCsv, gopTheoHocSinh, csvHocSinh } from '../src/features/tutor/services/telemetryService';
+import { coDapSo, timDapAnChoTin } from '../src/features/tutor/services/chanRoDapSo';
 import type { ChatMessage } from '../src/features/auth/types';
 
 const GOC = fileURLToPath(new URL('..', import.meta.url));
@@ -264,6 +265,159 @@ console.log('\n== Telemetry và chỉ số Socratic ==');
   const csv = xuatCsv(mau);
   ok(!csv.includes('@') && !csv.includes('nội dung bí mật') && csv.split('\n')[0].startsWith('user_hash,'),
     'CSV không có email, không có nội dung tin nhắn');
+}
+
+console.log('\n== Gộp chỉ số theo từng học sinh (P0-5) ==');
+{
+  const t = (p: Partial<ChatMessage>): ChatMessage => ({
+    id: Math.random().toString(36), userEmail: 'hs01@truong.edu.vn', lessonId: 'bai-1',
+    sender: 'ai', content: 'nội dung bí mật', timestamp: '2026-09-20T08:00:00.000Z',
+    session_id: 's1', user_hash: 'h1', nhanh: 'socratic', ...p,
+  });
+  /* Mẫu dựng theo đúng những trường mã THẬT SỰ đang ghi xuống `chats` (xem
+     khối `aiMsg` trong AppContext): `chan_ro`, `nhan_hong`, `muc_goi_y`,
+     `be_tac`, `ngoai_mon`. Kế hoạch P0-5 còn nhắc `nghi_sao_chep` và
+     `gio_kiem_tra` — hai trường đó chưa có chỗ nào ghi, nên cố tình KHÔNG đo:
+     một cột luôn rỗng trong bản xuất nghiên cứu tệ hơn là không có cột. */
+  const mau = [
+    t({ sender: 'user', be_tac: true }),
+    t({ loai_luot: 'goi_mo', muc_goi_y: 1 }),
+    t({ sender: 'user', be_tac: true }),
+    t({ loai_luot: 'goi_mo', muc_goi_y: 3, chan_ro: true,
+        timestamp: '2026-09-20T08:10:00.000Z' }),
+    t({ sender: 'user', user_hash: 'h2', session_id: 's2' }),
+    t({ loai_luot: 'giai_thich', user_hash: 'h2', session_id: 's2',
+        nhan_hong: true, ngoai_mon: 'GIAN_LAN' }),
+    t({ user_hash: 'h2', session_id: 's2' }),   // lượt gia sư KHÔNG có nhãn loai_luot
+  ];
+
+  const dong = gopTheoHocSinh(mau);
+  ok(dong.length === 2, 'tách đúng hai học sinh', String(dong.length));
+
+  const h1 = dong.find(d => d.user_hash === 'h1')!;
+  ok(h1.soLuot === 4 && h1.soLuotHocSinh === 2 && h1.soPhien === 1,
+    'đếm đúng số lượt, số lượt của em, số phiên của h1');
+  ok(h1.mucCaoNhat === 3, 'nấc giàn giáo cao nhất của h1 = 3', String(h1.mucCaoNhat));
+  ok(h1.soPhienMuc3 === 1, 'đếm đúng số phiên chạm nấc trần', String(h1.soPhienMuc3));
+  ok(h1.tyLeGoiMo !== null && Math.abs(h1.tyLeGoiMo - 1) < 1e-9,
+    'tỉ lệ gợi mở của h1 = 1', String(h1.tyLeGoiMo));
+  ok(h1.tyLeBeTac !== null && Math.abs(h1.tyLeBeTac - 1) < 1e-9,
+    'tỉ lệ bế tắc của h1 = 1', String(h1.tyLeBeTac));
+  ok(h1.soLanChanRo === 1, 'đếm đúng số lượt bị bộ chặn rò can thiệp', String(h1.soLanChanRo));
+  ok(h1.tongThoiGianMs === 10 * 60 * 1000,
+    'thời gian cộng TRONG từng phiên, không lấy mốc đầu trừ mốc cuối', String(h1.tongThoiGianMs));
+
+  const h2 = dong.find(d => d.user_hash === 'h2')!;
+  ok(h2.soNhanThieu === 1, 'đếm đúng lượt gia sư thiếu nhãn loai_luot', String(h2.soNhanThieu));
+  ok(h2.soLanNhanHong === 1, 'đếm đúng lượt nhãn hỏng', String(h2.soLanNhanHong));
+  ok(h2.soLanGianLan === 1, 'đếm đúng lượt bị chặn vì gian lận phòng thi', String(h2.soLanGianLan));
+
+  ok(gopTheoHocSinh(mau, '2026-09-21', '2026-09-22').length === 0,
+    'lọc theo khoảng ngày loại hết tin ngoài khoảng');
+  ok(gopTheoHocSinh(mau, '2026-09-20', '2026-09-20').length === 2,
+    '`denNgay` tính TRỌN ngày đó, không cắt lúc 00:00');
+
+  /* Tệp CSV này mở bằng Excel trên Windows. Thiếu BOM là tiếng Việt ra ký tự
+     rác — đã ghi trong CLAUDE.md, và `liet-ke:tai-khoan` từng vấp đúng chỗ đó. */
+  const csv = csvHocSinh(dong, 'CHUA_LOC_DONG_Y');
+  ok(csv.startsWith('﻿'), 'CSV theo học sinh có BOM ở đầu');
+  ok(csv.slice(1).split('\n')[0].startsWith('canh_bao,user_hash,'),
+    'cột cảnh báo đứng ĐẦU, không nấp ở cuối bảng', csv.slice(1).split('\n')[0]);
+  ok(csv.split('\n').slice(1).every(d => !d || d.startsWith('CHUA_LOC_DONG_Y,')),
+    'MỌI dòng đều mang cảnh báo chưa lọc đồng ý tham gia nghiên cứu');
+  ok(!csv.includes('@') && !csv.includes('nội dung bí mật'),
+    'bảng theo học sinh không mang email và không mang nội dung hội thoại');
+}
+
+console.log('\n== Gỡ nhãn ẩn an toàn (P0-6) ==');
+{
+  /* Học sinh KHÔNG BAO GIỜ được thấy thẻ thô, kể cả khi mô hình viết sai định
+     dạng. Ba ca dưới đều là nhãn hỏng mà bốn regex cũ không khớp. */
+  const hong = [
+    'Em thử lại nhé. [BUOC: b3 ] [LUOT:goi_mo',      // thiếu ngoặc đóng
+    'Em thử lại nhé. [BUOC:Z9] [LUOT:khong_co_loai]', // nhãn bịa
+    'Em thử lại nhé. [ NGO_NHAN : xuc-tac-chuyen-dich ]',
+    'Em thử lại nhé. [LUOT]',                          // nhãn rỗng
+  ];
+  for (const t of hong) {
+    const r = tachNhanAn(t);
+    ok(!/\[\s*(BUOC|LUOT|NGO_NHAN)/i.test(r.noiDung),
+      `không còn thẻ thô: "${t.slice(-26)}"`, r.noiDung);
+  }
+  ok(tachNhanAn('Em thử lại nhé. [BUOC:Z9] [LUOT:goi_mo]').buoc === undefined,
+    'nhãn bịa vẫn không được ghi nhận');
+  ok(tachNhanAn('Không có nhãn gì cả.').thieuNhan === true,
+    'lượt thiếu nhãn bị đánh dấu để ghi log');
+  ok(tachNhanAn('Xong rồi em. [BUOC:A6] [LUOT:goi_mo]').thieuNhan === false,
+    'lượt đủ hai nhãn thì không bị đánh dấu thiếu');
+  ok(tachNhanAn('Em thử lại nhé. [BUOC: b3 ] [LUOT:goi_mo').nhanHong === true,
+    'nhãn sai định dạng bị đánh dấu để ghi log');
+
+  /* Nhãn RA ĐỀ phải còn nguyên — AppContext xử lý chúng sau tachNhanAn. */
+  const raDe = tachNhanAn('Giỏi lắm em. [SIGNAL:XONG_BAI:bai-3] [BUOC:A6] [LUOT:goi_mo]');
+  ok(raDe.noiDung.includes('[SIGNAL:XONG_BAI:bai-3]'), 'nhãn ra đề KHÔNG bị gỡ nhầm');
+}
+
+console.log('\n== Trần cho nấc câu hỏi có/không (P0-3) ==');
+{
+  const n4 = chiDanGianGiao(4), n5 = chiDanGianGiao(5), n6 = chiDanGianGiao(6);
+  const n7 = chiDanGianGiao(7), n9 = chiDanGianGiao(9);
+
+  ok([n4, n5, n6].every(s => /có\/không|một trong hai/i.test(s)),
+    'bế tắc lần 4–6 vẫn được hỏi câu có/không');
+  /* Nấc dừng VẪN nhắc chữ "có/không" — nó phải nói rõ là dừng loại câu hỏi đó.
+     Nên đừng kiểm bằng "không chứa chữ có/không" (phép kiểm đầu tiên viết vậy và
+     bắt nhầm chính câu đúng); kiểm bằng hai mệnh lệnh phải có. */
+  ok(/DỪNG chuỗi câu hỏi có\/không/i.test(n7) && /KHÔNG hỏi thêm câu có\/không/i.test(n7)
+    && /quay lại một câu hỏi mở|hỏi trực tiếp thầy|bài giảng cần đọc lại/i.test(n7),
+    'bế tắc lần 7 (lượt thứ 4 ở nấc có/không) thì DỪNG chuỗi có/không');
+  ok(/quay lại|câu hỏi mở|hỏi trực tiếp thầy|bài giảng/i.test(n9),
+    'bế tắc lần 9 vẫn ở trạng thái dừng, không quay lại hỏi có/không');
+  ok([n4, n5, n6, n7, n9].every(s => /đáp số có phải|kết quả có lớn hơn|có phải khoảng/i.test(s) === false
+      || /cấm mọi câu dạng/i.test(s)),
+    'không nấc nào cho phép hỏi dò giá trị đáp số');
+  ok([n4, n5, n6].every(s => /cấm mọi câu dạng "đáp số có phải/i.test(s)),
+    'nấc có/không nói rõ cấm hỏi dò giá trị đáp số');
+  ok([n4, n5, n6, n7, n9].every(s => /KHÔNG đưa đáp án/i.test(s)),
+    'mọi nấc vẫn cấm đưa đáp án');
+}
+
+console.log('\n== Bộ dò đáp số trong câu trả lời (P0-2, P0-4) ==');
+{
+  /* Mỗi ca là một lối viết số mà học sinh hoặc mô hình thật sự dùng. Ba lối
+     luỹ thừa cuối lấy từ chính lời giải trong ngân hàng (trường `e`). */
+  const ca: [string, number, boolean][] = [
+    ['Vậy pH của dung dịch là 1,70 em nhé.', 1.7, true],
+    ['pH = 1.70', 1.7, true],
+    ['nồng độ còn lại 1,45.10^-2 M', 0.0145, true],
+    ['nồng độ còn lại 1.45e-2 M', 0.0145, true],
+    ['giá trị 1,45×10⁻² mol/L', 0.0145, true],
+    ['Em thử tính lại xem [H+] bằng bao nhiêu nhé?', 1.7, false],
+    ['Theo phương trình, 1 mol H2 phản ứng tạo ra 2 mol HI.', 1.7, false],
+    ['Kết quả xấp xỉ 0,30 M', 0.3, true],
+    /* Lối viết LaTeX mà chính câu lệnh hệ thống dặn dùng: `24{,}79`. Đo
+       22/09/2026: 49/86 câu trả lời dùng lối này, mà bộ dò bản đầu mù hẳn. */
+    ['Vậy $pH = 1{,}70$ em nhé.', 1.7, true],
+    ['Khối lượng kết tủa là $66{,}2$ gam.', 66.2, true],
+    ['Nồng độ $x = 0{,}3$ M.', 0.3, true],
+    ['Theo đề, $V = 24{,}79$ L/mol là hằng số ở đkc.', 1.7, false],
+  ];
+  for (const [text, dap, mong] of ca) {
+    ok(coDapSo(text, dap, 0.05) === mong, `dò "${text.slice(0, 34)}…" → ${mong}`);
+  }
+
+  const kho = [{
+    q: 'Trộn 100 mL dung dịch HCl 0,1 M với 100 mL dung dịch NaOH 0,06 M. Tính pH của dung dịch sau phản ứng.',
+    num: 1.7, tol: 0.05,
+  }];
+  ok(timDapAnChoTin(
+    'tron 100 ml dung dich hcl 0,1 m voi 100 ml dung dich naoh 0,06 m tinh ph cua dung dich sau phan ung giup em voi a',
+    kho)?.num === 1.7,
+    'khớp được câu ngân hàng dù em gõ không dấu');
+  ok(timDapAnChoTin('em khong biet lam bai nay', kho) === undefined,
+    'tin ngắn hoặc khác đề thì không khớp bừa');
+  ok(timDapAnChoTin('Tính pH của dung dịch thu được khi trộn hai dung dịch acid mạnh có cùng nồng độ', kho) === undefined,
+    'bài cùng chủ đề nhưng khác đề thì không khớp');
 }
 
 console.log('\n' + (hong === 0 ? '>>> TẤT CẢ ĐẠT' : `>>> CÓ ${hong} MỤC KHÔNG ĐẠT`) + '\n');

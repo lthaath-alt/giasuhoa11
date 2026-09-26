@@ -45,6 +45,7 @@ chỉ hiện ra SAU KHI đăng nhập đều không ai canh. Hai thứ thêm hô
 |---|---|
 | `npm run kiem-tra:e2e` | Cả bộ. Cần tài khoản thử, xem bên dưới |
 | `npm run kiem-tra:e2e:khach` | Chỉ phần khách vãng lai — không cần tài khoản nào |
+| `npm run kiem-tra:e2e:giaovien` | Chỉ màn giáo viên. Cần `GIAO_VIEN_EMAIL` / `GIAO_VIEN_MATKHAU` |
 
 Đích mặc định là máy dev (`npm run dev` tự bật). Soi bản đã deploy thì đặt
 `E2E_URL=https://giasuhoa11.pages.dev` trước lệnh.
@@ -131,6 +132,45 @@ Và một cái bẫy khi viết phép thử cho vùng này: nhánh hỏng của 
 "Gia sư AI đang tạm mất kết nối với máy chủ" chứ không ném lỗi. Phép thử nào
 chỉ canh "AI không đưa đáp án" sẽ báo ĐẠT ngay cả khi AI không hề trả lời —
 đã dính đúng lần đầu. Canh AI THẬT SỰ TRẢ LỜI TRƯỚC, rồi mới canh nội dung.
+
+**Ba "lỗi" của bộ `giaovien` ghi ngày 22/09/2026 là MỘT lỗi của phép thử,
+che một lỗi thật của web** (đo lại 23/09/2026). Ba điều từng ghi ở đây —
+"gõ mật khẩu xong giáo viên vẫn bị hỏi Tiếp tục với ...", "màn giáo viên báo
+0 Lớp học kèm permission-denied", và "trong Playwright Firebase Auth không lưu
+phiên xuống đĩa" — đều SAI, và cùng một gốc: `dangNhapGiaoVien()` và
+`dang-nhap-vao-thang.spec.ts` **không bấm thẻ "Giáo viên"**. Thẻ mặc định là
+Học sinh, nên `LoginForm` thấy sai vai và đăng xuất ngay.
+
+Đối chứng, cùng tài khoản, cùng máy: bấm đúng thẻ thì vào thẳng `/teacher`
+sau khoảng 3 giây, không một lỗi quyền nào, IndexedDB có 1 bản ghi phiên, F5
+xong hiện "Tiếp tục với ..." đúng đặc tả. Bài học số 4 và số 9 cùng lúc: kết
+luận của lần trước đi từ triệu chứng thẳng tới một cơ chế nghe hợp lý (cuộc
+đua trong `LoginPage`, token về chậm), mà chưa lần nào đối chứng với một lượt
+chạy đúng.
+
+**Lỗi thật mà nó che, đã vá:** chọn nhầm thẻ thì `LoginForm` gọi `logout()`,
+nhưng lượt `onAuthStateChanged` của lần đăng nhập vẫn đang chờ đọc hồ sơ và
+tiến độ. Lượt đăng xuất đặt `currentUser = null` xong, lượt cũ chạy tiếp tới
+`persistSession` và **đặt lại người vừa bị đăng xuất**: màn "Tiếp tục với ..."
+hiện ra với một phiên đã chết, bấm vào là "0 Lớp học" kèm hàng loạt
+permission-denied. Đo: lỗi sai vai ở 2659 ms, `currentUser` bị đặt lại ở
+3108 ms. Người dùng thật gặp được, vì giáo viên quên đổi thẻ là chuyện thường.
+Vá bằng `conHieuLuc()` trong `AppContext`: sau MỖI nhịp `await` hỏi lại phiên
+Auth còn là người này không, không thì dừng. Phép thứ hai trong
+`dang-nhap-vao-thang.spec.ts` canh cho nó không quay lại.
+
+Phần đã làm hôm 23/09 vẫn giữ vì vẫn đúng khi mạng chập chờn:
+`getClassesHoacLoi()` trả kèm mã lỗi, `AppContext` thử lại một lần sau 800ms,
+và màn giáo viên phân biệt "chưa có lớp" với "không tải được danh sách lớp".
+
+Bộ `giaovien` vẫn để mỗi phép tự đăng nhập, không dùng `storageState` — lối
+đó chạy được nên không đổi. Nếu muốn nhanh hơn thì chuyển sang `storageState`
+như bộ `hocsinh`; lý do cũ để không làm vậy đã không còn.
+
+Phép `giao-de.spec.ts` **GHI DỮ LIỆU THẬT**: nó tạo một đề tên `[E2E] …` cho
+lớp thật rồi xoá ở cuối. Chết giữa chừng thì đề đó còn sót — xoá tay trong bảng
+"Đề đã giao"; bài đã nộp không mất theo.
+
 
 Sinh lại dữ liệu — đọc `scripts/README.md` trước khi dùng:
 `soan` (từ tệp .docx sang `constants.ts`), `xuat:ngan-hang` (Firestore sang repo),
