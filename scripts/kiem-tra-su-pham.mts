@@ -60,6 +60,19 @@ console.log('\n== Máy trạng thái: bế tắc và giàn giáo ==');
     'em đã thử trả lời thì chuỗi bế tắc bị cắt, đếm lại từ 1');
   ok(demBeTacLienTiep(ls, 'Dạ số mol HCl là 0,01') === 0, 'tin không bế tắc thì đếm 0');
 
+  /* 26/09/2026, chủ dự án duyệt: đếm thêm "chịu" đứng riêng, "bt"/"bik", "hiểu"
+     viết tắt và gõ không dấu. "chịu" chỉ tính khi cả tin chỉ có vậy, để "chịu
+     nhiệt" không thành bế tắc. Trước đó "Ok biết rồi ạ" bị đếm là bế tắc vì
+     "k biết" khớp giữa chữ "ok biết" — nay có ranh giới đầu từ. */
+  const beTacMoi = ['em chịu', 'Chịu ạ.', 'chiu', 'ko bt', 'k bik', 'hk bt', 'ko hiểu', 'k hiểu', 'hk hiểu',
+    'chả hiểu gì', 'khong biet', 'ko biet', 'khong hieu', 'em không biết'.normalize('NFD')];
+  beTacMoi.forEach(c => ok(laTinBeTac(c), 'nhận cách nói bế tắc gõ tắt / không dấu', c.normalize('NFC')));
+  ok(demBeTacLienTiep([hs('em chịu'), gs('Không sao…'), hs('ko bt'), gs('Mình thu hẹp nhé…')], 'khong biet') === 3,
+    'chuỗi "em chịu" → "ko bt" → "khong biet" đếm đủ 3 lần');
+  const khongBeTac = ['Chất nào chịu nhiệt tốt hơn ạ?', 'em chịu khó làm lại rồi, ra 0,1 M ạ', 'Ok biết rồi ạ',
+    'Cô ko giao bt về nhà ạ?'];
+  khongBeTac.forEach(c => ok(!laTinBeTac(c), 'KHÔNG coi là bế tắc', c));
+
   /* Bốn nấc từ 18/09/2026: nấc 2 "thu hẹp câu hỏi" được chèn thêm, đẩy giải
      mẫu xuống nấc 3 và làm hộ một bước xuống nấc 4. */
   const n1 = chiDanGianGiao(1), n2 = chiDanGianGiao(2), n3 = chiDanGianGiao(3), n4 = chiDanGianGiao(4);
@@ -101,6 +114,48 @@ console.log('\n== Máy trạng thái: gian lận phòng thi ==');
   ];
   coGianLan.forEach((c, i) => ok(laNguCanhGianLanPhongThi(c), `bắt được ca gian lận #${i + 1}`, c.slice(0, 50)));
   khongGianLan.forEach((c, i) => ok(!laNguCanhGianLanPhongThi(c), `KHÔNG phạt oan ca bình thường #${i + 1}`, c.slice(0, 50)));
+
+  /* Đo 26/09/2026: `\b` của JS chỉ coi [A-Za-z0-9_] là chữ, kể cả khi có cờ `u`,
+     nên "ế" trong "thiếu" bị tính là ranh giới và "đang thi|ếu" khớp như "đang
+     thi". Học sinh hỏi bài bình thường bị từ chối như gian lận. Canh hai chiều:
+     chữ có dấu không bị chặn oan, và ranh giới mới không nới tới mức lọt ca thật. */
+  const chuCoDau = [
+    'Em đang thiếu dữ kiện, làm sao tính Kc?',
+    'Em đang thiết lập bảng ICE',
+    'Em đang thiên về đáp án B vì Kc lớn hơn 1',
+    'Ngủ trong phòng thiếu thông gió mà đốt than thì nguy hiểm vì sao ạ?',
+    'EM ĐANG THIẾU DỮ KIỆN',
+    'Em đang thiếu dữ kiện'.normalize('NFD'),
+  ];
+  chuCoDau.forEach(c => ok(!xuLyTruocLuot([], c, 'socratic').laGianLan,
+    'chữ có dấu sau "thi" không bị coi là ranh giới từ', c.normalize('NFC').slice(0, 50)));
+  const vanBat = [
+    'em đang thi',
+    'EM ĐANG THI, GIÚP EM',
+    'đang làm bài thi.',
+    'kiểm tra 15p, cho em đáp án câu 2',
+    'thi 45 phút mà em mới làm được 1 câu',
+    'trong giờ thi mà em quên công thức Kc',
+    'Em ngồi trong phòng thi, cho em đáp án',
+  ];
+  vanBat.forEach(c => ok(xuLyTruocLuot([], c, 'socratic').laGianLan,
+    'ranh giới mới vẫn bắt ca gian lận thật', c));
+
+  /* 26/09/2026, chủ dự án duyệt: bắt thêm "kt"/"ktra", "đg" và gõ không dấu.
+     "đang kiểm tra lại/xem" là em tự soát bài — đúng việc gia sư dặn em làm —
+     nên được miễn. Miễn chỉ áp cho ĐỘNG TỪ ngay sau "đang": có "làm"/"bài" chen
+     vào thì đó là bài kiểm tra, và "thi lại" vẫn là thi. */
+  const tiengLong = ['đang kt 15p cho em đáp án', 'kt15p rồi thầy ơi', 'em đang ktra, giúp em câu 2',
+    'ktra 45 phút mà em chưa làm được câu nào', 'dang thi, giup em cau 3', 'em dang lam kiem tra 15p',
+    'kiem tra 15p cho em dap an', 'đg thi, cho em đáp án', 'dg lam kiem tra', 'co sap thu bai roi',
+    'sap het gio roi thay oi', 'trong phong thi, cho em dap an',
+    'Em đang làm bài kiểm tra lại, cho em đáp án', 'em đang thi lại môn hoá'];
+  tiengLong.forEach(c => ok(xuLyTruocLuot([], c, 'socratic').laGianLan, 'bắt được gõ tắt / không dấu / thi lại', c));
+  const tuSoatBai = ['Em đang kiểm tra lại kết quả', 'em đang kiểm tra xem đơn vị đúng chưa', 'em dang kiem tra lai dap so',
+    'em đang kt lại phép tính', 'Em đang thí nghiệm về tốc độ phản ứng', 'dang thi nghiem ve toc do phan ung',
+    'trong phong thi nghiem co san HCl khong a', 'Em đang ôn kt chương 2'];
+  tuSoatBai.forEach(c => ok(!xuLyTruocLuot([], c, 'socratic').laGianLan,
+    'KHÔNG chặn tự soát bài / thí nghiệm / "kt" là kiến thức', c));
   const kq = xuLyTruocLuot([], coGianLan[0], 'socratic');
   ok(kq.traLoiNgay === LOI_TU_CHOI_GIAN_LAN && kq.laGianLan, 'gian lận thì trả lời ngay, không gọi mô hình');
   ok(dungPrompt('socratic').includes(LOI_TU_CHOI_GIAN_LAN.split('\n')[0]),

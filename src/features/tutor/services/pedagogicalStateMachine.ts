@@ -17,20 +17,44 @@ export interface TinNhanToiThieu {
   content: string;
 }
 
+// ── 0. Ranh giới từ cho tiếng Việt ──────────────────────────────────────────
+//
+// KHÔNG dùng `\b`: `\b` của JS chỉ coi [A-Za-z0-9_] là chữ, kể cả khi có cờ `u`,
+// nên "ế" trong "thiếu" bị tính là ranh giới và "đang thi|ếu" khớp như "đang
+// thi" (đo 26/09/2026 — "Em đang thiếu dữ kiện" bị từ chối như gian lận).
+// Mẫu dùng hai mảnh này phải dựng bằng `mau()` để có cờ `u`.
+const DAU_TU = String.raw`(?<![\p{L}\p{M}\p{N}_])`;
+const CUOI_TU = String.raw`(?![\p{L}\p{M}\p{N}_])`;
+const mau = (nguon: string) => new RegExp(nguon, 'iu');
+
 // ── 1. Bế tắc và giàn giáo nhận thức ────────────────────────────────────────
 
+/** "không" và kiểu gõ tắt / không dấu: k, ko, hk, hông, khong. */
+const KHONG = String.raw`(?:kh[ôo]ng|h[ôo]ng|ko|hk|k)`;
+/** "biết", "biet", và viết tắt "bt", "bik". */
+const BIET = String.raw`(?:bi[ếe]t|bt${CUOI_TU}|bik${CUOI_TU})`;
+
 /**
- * Câu học sinh nói khi bế tắc. Bắt cả kiểu gõ tắt không dấu phổ biến.
+ * Câu học sinh nói khi bế tắc, có dấu, không dấu hoặc gõ tắt.
  * Chỉ tính là bế tắc khi CẢ TIN NHẮN ngắn (xem `laTinBeTac`) — "em không biết
  * vì sao Kc không đổi khi thêm xúc tác" là một câu hỏi thật, không phải bế tắc.
+ *
+ * "chịu" trần chỉ tính khi cả tin chỉ có vậy ("em chịu", "chịu ạ."): nằm giữa
+ * câu thì nó có thể là "chịu nhiệt". Các cách nói khác phải đứng ở đầu từ —
+ * thiếu ranh giới đó, "k biết" khớp giữa "Ok biết rồi ạ" (đo 26/09/2026).
+ * Danh sách gõ tắt / không dấu do chủ dự án duyệt ngày 26/09/2026.
  */
-export const BE_TAC = /không biết|chịu thôi|không hiểu|bí quá|chả biết|k biết|ko biết|chịu rồi|hông biết|không nghĩ ra|chịu luôn|bó tay/i;
+export const BE_TAC = mau(
+  String.raw`^\s*(?:em\s+)?ch[ịi]u(?:\s+[ạa])?[\s.!?…]*$|` +
+  DAU_TU + String.raw`(?:${KHONG}\s+(?:${BIET}|hi[ểe]u)|ch[ảa]\s+(?:${BIET}|hi[ểe]u)|kh[ôo]ng\s+ngh[ĩi]\s+ra` +
+  String.raw`|ch[ịi]u\s+(?:th[ôo]i|r[ồo]i|lu[ôo]n)|b[íi]\s+qu[áa]|b[óo]\s+tay)`,
+);
 
 /** Tin dài hơn mức này thì học sinh đang trình bày, không phải đang buông. */
 const TRAN_DO_DAI_BE_TAC = 90;
 
 export function laTinBeTac(noiDung: string): boolean {
-  const t = (noiDung ?? '').trim();
+  const t = (noiDung ?? '').normalize('NFC').trim();
   return t.length > 0 && t.length <= TRAN_DO_DAI_BE_TAC && BE_TAC.test(t);
 }
 
@@ -119,13 +143,29 @@ export function chiDanGianGiao(soLanBeTac: number): string {
  * CỐ Ý đòi ngữ cảnh "đang làm/thi" hoặc "sắp thu bài", KHÔNG bắt chữ "bài kiểm
  * tra" trần: "cho em làm bài kiểm tra chương" là em xin đề luyện tập — chặn
  * câu đó là phạt oan đúng hành vi hệ thống muốn khuyến khích.
+ *
+ * Nhận cả dạng không dấu, "kt"/"ktra", "đg" (chủ dự án duyệt 26/09/2026). So
+ * khớp trên chữ GỐC, không bỏ dấu trước: bỏ dấu thì "đang thí nghiệm" thành
+ * "dang thi nghiem" và bị chặn oan. Vì cùng lý do, "thi nghiem" gõ không dấu
+ * được loại riêng.
+ *
+ * "đang kiểm tra lại/xem" là em tự soát bài — đúng việc gia sư dặn em làm —
+ * nên được miễn, nhưng CHỈ khi "kiểm tra" là động từ ngay sau "đang". Có
+ * "làm"/"bài" chen vào thì đó là bài kiểm tra; "thi lại" vẫn là thi.
  */
+const DANG = String.raw`(?:[đd]ang|[đd]g)`;
+const KIEM_TRA = String.raw`(?:ki[ểe]m\s*tra|ktra|kt)`;
+const THI = String.raw`thi${CUOI_TU}(?!\s+nghi[ệe]m)`;
+const LAM = String.raw`l[àa]m`;
+const BAI = String.raw`b[àa]i`;
+
 const DAU_HIEU_PHONG_THI: RegExp[] = [
-  /đang\s+(?:làm\s+)?(?:bài\s+)?(?:kiểm\s*tra|thi)\b/i,
-  /(?:kiểm\s*tra|thi)\s+\d{1,3}\s*(?:phút|p)\b/i,
-  /(?:cô|thầy|giám\s*thị)\s+(?:sắp|chuẩn\s*bị|đang|sắp\s+sửa)\s+thu\s+bài/i,
-  /sắp\s+(?:hết\s+giờ|nộp\s+bài|thu\s+bài)/i,
-  /trong\s+(?:giờ|phòng)\s+(?:kiểm\s*tra|thi)/i,
+  mau(String.raw`${DAU_TU}${DANG}\s+(?:${LAM}\s+(?:${BAI}\s+)?|${BAI}\s+)(?:${KIEM_TRA}${CUOI_TU}|${THI})`),
+  mau(String.raw`${DAU_TU}${DANG}\s+(?:${KIEM_TRA}${CUOI_TU}(?!\s+(?:l[ạa]i|xem)${CUOI_TU})|${THI})`),
+  mau(String.raw`${DAU_TU}(?:${KIEM_TRA}|thi)\s*\d{1,3}\s*(?:ph[úu]t|p)${CUOI_TU}`),
+  mau(String.raw`${DAU_TU}(?:c[ôo]|th[ầa]y|gi[áa]m\s*th[ịi])\s+(?:s[ắa]p|chu[ẩa]n\s*b[ịi]|${DANG}|s[ắa]p\s+s[ửu]a)\s+thu\s+${BAI}`),
+  mau(String.raw`${DAU_TU}s[ắa]p\s+(?:h[ếe]t\s+gi[ờo]|n[ộo]p\s+${BAI}|thu\s+${BAI})`),
+  mau(String.raw`${DAU_TU}trong\s+(?:gi[ờo]|ph[òo]ng)\s+(?:${KIEM_TRA}${CUOI_TU}|${THI})`),
 ];
 
 export function laNguCanhGianLanPhongThi(noiDung: string): boolean {
