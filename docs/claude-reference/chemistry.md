@@ -165,8 +165,13 @@ Năm cái trói, **đừng nới cái nào mà không hỏi chủ dự án**:
 
 1. **Không tự biết phải sửa gì** — mọi thứ nằm trong một *phiếu sửa* JSON theo
    git, do người soạn sau khi đã kiểm tay.
-2. **Chỉ ghi trường trong danh sách trắng**, hiện chỉ có `q`. `a`/`num`/`tol`
-   là ĐÁP ÁN — sửa nhầm là cả lớp bị chấm sai mà điểm vẫn trông hợp lý.
+2. **Chỉ ghi trường trong danh sách trắng**: `q`, và từ 26/09/2026 `st` (chủ
+   dự án duyệt, cho câu `bdr93` có ý đúng/sai viết mơ hồ). `a`/`num`/`tol` là
+   ĐÁP ÁN — sửa nhầm là cả lớp bị chấm sai mà điểm vẫn trông hợp lý. `st` chứa
+   cả chữ lẫn đáp án `v` của từng ý nên bị trói chặt hơn: phiếu phải có `y`
+   (số thứ tự ý, 0–3), chỉ đổi chữ `s` của đúng ý đó; script tự kiểm số ý, mọi
+   `v` và chữ các ý khác giữ nguyên, trước khi ghi và lúc đọc lại. Mẫu:
+   `docs/soat-hoa-hoc/sua-1-cau-bdr93.json`.
 3. **Điều kiện tiên quyết khớp từng ký tự**: giá trị trên Firestore phải bằng
    đúng `cuPhaiLa`. Nhờ vậy chạy lại lần hai không làm gì, và phiếu soạn từ bản
    chụp cũ không đè mất thứ người khác vừa sửa.

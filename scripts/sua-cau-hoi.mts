@@ -44,17 +44,42 @@ import { hoi, hoiKin } from './hoi-ban-phim.mts';
 
 interface MucSua {
   id: string;
-  /** Tên trường được phép sửa. Hiện chỉ cho `q` — mở rộng thì sửa DUOC_SUA. */
+  /** Tên trường được phép sửa: `q`, hoặc `st` (xem `y`). Mở rộng thì sửa DUOC_SUA. */
   truong: string;
-  /** Giá trị hiện tại, phải khớp từng ký tự thì mới ghi. */
+  /** Chỉ với `st`: số thứ tự ý (tính từ 0) cần đổi CHỮ. */
+  y?: number;
+  /** Giá trị hiện tại, phải khớp từng ký tự thì mới ghi. Với `st` là chữ `s` của ý `y`. */
   cuPhaiLa: string;
   moi: string;
 }
 
 /* Danh sách trắng. Mở rộng thì phải tự hỏi: trường đó có phải thứ học sinh
    nhìn thấy không, và sửa sai nó thì ai phát hiện ra? `a`/`num`/`tol` là đáp
-   án — sửa nhầm là cả lớp bị chấm sai mà điểm vẫn trông hợp lý. */
-const DUOC_SUA = new Set(['q']);
+   án — sửa nhầm là cả lớp bị chấm sai mà điểm vẫn trông hợp lý.
+
+   `st` mở thêm ngày 26/09/2026 (chủ dự án duyệt) cho câu bdr93: một ý đúng/sai
+   viết mơ hồ, học sinh hiểu đúng hoá học vẫn bị chấm sai. `st` là MẢNG chứa
+   cả chữ (`s`) lẫn ĐÁP ÁN (`v`) của từng ý, nên nó bị trói chặt hơn `q`: chỉ
+   đổi chữ của ĐÚNG MỘT ý; số ý, mọi `v`, và chữ các ý khác phải giữ nguyên —
+   `mangMoiSt` kiểm lại điều đó trước khi ghi, và phần đọc lại kiểm lần nữa. */
+const DUOC_SUA = new Set(['q', 'st']);
+
+type Y = { s: string; v: boolean };
+
+/** Chữ hiện tại của trường mà phiếu nhắm tới (với `st` là `st[y].s`). */
+function giaTri(d: Record<string, unknown> | undefined, m: MucSua): unknown {
+  if (m.truong !== 'st') return d?.[m.truong];
+  const st = d?.st;
+  return Array.isArray(st) ? (st[m.y!] as Y | undefined)?.s : undefined;
+}
+
+/** Mảng `st` mới: chỉ đổi `s` của ý `y`. Ném lỗi nếu có gì khác bị đổi theo. */
+function mangMoiSt(cu: Y[], m: MucSua): Y[] {
+  const moi = cu.map((x, i) => (i === m.y ? { ...x, s: m.moi } : { ...x }));
+  const khacNgoaiY = moi.some((x, i) => x.v !== cu[i].v || (i !== m.y && x.s !== cu[i].s));
+  if (moi.length !== cu.length || khacNgoaiY) throw new Error('mảng st mới đổi nhiều hơn chữ của một ý');
+  return moi;
+}
 
 const cacCo = process.argv.slice(2);
 const tepPhieu = cacCo.find(t => !t.startsWith('--'));
@@ -93,6 +118,10 @@ for (const [i, m] of phieu.entries()) {
       + `trong danh sách được phép: ${[...DUOC_SUA].join(', ')}`);
     process.exit(1);
   }
+  if (m.truong === 'st' && !(Number.isInteger(m.y) && m.y! >= 0 && m.y! <= 3)) {
+    console.error(`Mục ${i + 1} (${m.id}) sửa \`st\` nhưng thiếu \`y\` hợp lệ (số thứ tự ý, 0–3)`);
+    process.exit(1);
+  }
   if (m.cuPhaiLa === m.moi) {
     console.error(`Mục ${i + 1} (${m.id}) có giá trị mới TRÙNG giá trị cũ — phiếu soạn nhầm?`);
     process.exit(1);
@@ -119,7 +148,9 @@ console.log(ghiThat ? '\n*** CHẾ ĐỘ GHI THẬT ***' : '\nChạy thử — K
 // workflow đồng bộ đêm). Nhờ vậy chạy thử không đòi mật khẩu, và người dùng
 // thấy TRƯỚC là sẽ đổi những gì rồi mới quyết định có gõ mật khẩu hay không.
 
-interface SanSang { muc: MucSua; }
+/* `stCu`: ảnh chụp nguyên mảng `st` lúc đối chiếu. Trước khi ghi đọc lại và so
+   nguyên mảng — ai sửa ý KHÁC trong lúc đó thì bỏ qua, không đè mất. */
+interface SanSang { muc: MucSua; stCu?: string; }
 const sanSang: SanSang[] = [];
 let boQua = 0;
 let khongThay = 0;
@@ -131,7 +162,8 @@ for (const muc of phieu) {
     khongThay++;
     continue;
   }
-  const hienTai = (anh.data() as Record<string, unknown>)[muc.truong];
+  const duLieu = anh.data() as Record<string, unknown>;
+  const hienTai = giaTri(duLieu, muc);
 
   if (hienTai === muc.moi) {
     console.log(`\n  ĐÃ SỬA RỒI  ${muc.id} — bỏ qua`);
@@ -147,10 +179,22 @@ for (const muc of phieu) {
     continue;
   }
 
-  console.log(`\n  SẼ SỬA      ${muc.id}  ·  trường \`${muc.truong}\``);
+  let stCu: string | undefined;
+  if (muc.truong === 'st') {
+    const cu = duLieu.st as Y[];
+    try { mangMoiSt(cu, muc); } catch (e) {
+      console.log(`\n  DỪNG        ${muc.id} — ${(e as Error).message}`);
+      boQua++;
+      continue;
+    }
+    stCu = JSON.stringify(cu);
+  }
+
+  const noi = muc.truong === 'st' ? `\`st[${muc.y}].s\` (đáp án v = ${(duLieu.st as Y[])[muc.y!].v}, giữ nguyên)` : `\`${muc.truong}\``;
+  console.log(`\n  SẼ SỬA      ${muc.id}  ·  trường ${noi}`);
   console.log(`    cũ  : ${muc.cuPhaiLa}`);
   console.log(`    mới : ${muc.moi}`);
-  sanSang.push({ muc });
+  sanSang.push({ muc, stCu });
 }
 
 console.log(`\n${'─'.repeat(70)}`);
@@ -231,12 +275,22 @@ console.log('');
 
 let xong = 0;
 let hong = 0;
-for (const { muc } of sanSang) {
+for (const { muc, stCu } of sanSang) {
   try {
     /* `updateDoc` chứ KHÔNG `setDoc`: setDoc thay cả tài liệu, tức mọi trường
        không nhắc tới sẽ biến mất. Đây đúng là kiểu "một lỗi trong script là
        hỏng hàng loạt" mà CLAUDE.md cảnh báo. */
-    await updateDoc(doc(db, COL, muc.id), { [muc.truong]: muc.moi });
+    let giaTriGhi: unknown = muc.moi;
+    if (muc.truong === 'st') {
+      const stGio = (await getDoc(doc(db, COL, muc.id))).data()?.st as Y[];
+      if (JSON.stringify(stGio) !== stCu) {
+        console.log(`  BỎ QUA  ${muc.id} — mảng st đã đổi sau lúc đối chiếu`);
+        hong++;
+        continue;
+      }
+      giaTriGhi = mangMoiSt(stGio, muc);
+    }
+    await updateDoc(doc(db, COL, muc.id), { [muc.truong]: giaTriGhi });
     console.log(`  ĐÃ GHI  ${muc.id}`);
     xong++;
   } catch (e) {
@@ -252,10 +306,15 @@ for (const { muc } of sanSang) {
 // chưa ghi được gì. Đọc lại là cách duy nhất biết chắc.
 console.log('\nĐọc lại từ Firestore để xác nhận:');
 let khop = 0;
-for (const { muc } of sanSang) {
+for (const { muc, stCu } of sanSang) {
   const anh = await getDoc(doc(db, COL, muc.id));
-  const gioLa = (anh.data() as Record<string, unknown> | undefined)?.[muc.truong];
-  const dung = gioLa === muc.moi;
+  const duLieu = anh.data() as Record<string, unknown> | undefined;
+  let dung = giaTri(duLieu, muc) === muc.moi;
+  /* Với `st` còn phải chắc mọi đáp án `v` và các ý khác y như trước. */
+  if (dung && muc.truong === 'st' && stCu) {
+    try { dung = JSON.stringify(mangMoiSt(JSON.parse(stCu), muc)) === JSON.stringify(duLieu?.st); }
+    catch { dung = false; }
+  }
   if (dung) khop++;
   console.log(`  ${dung ? 'ĐÚNG' : 'SAI '}  ${muc.id}`);
 }
