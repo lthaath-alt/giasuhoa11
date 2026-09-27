@@ -50,6 +50,13 @@ credentials/
 # và nội dung này ĐỔI THEO VIỆC ĐANG LÀM còn cấu hình hook thì không. Hook chỉ
 # `cat` tệp này ra; thiếu tệp thì hook im lặng, không làm chết phiên.
 !.claude/nhac-moi-luot.md
+#
+# ...và trừ agents: bốn subagent impeccable-* mà kỹ năng impeccable gọi tới
+# (asset-producer, documenter, finish-reviewer, manual-edit-applier). Thiếu chúng
+# thì máy khác pull về có kỹ năng mà không chạy được bước duyệt/ghi DESIGN.md.
+# Chủ dự án yêu cầu đưa lên 27/09/2026 (đổi sang tài khoản khác). Đã dò: không
+# có khoá hay mật khẩu trong các tệp này — thêm agent mới cũng phải dò lại.
+!.claude/agents/
 __pycache__/
 
 # So ghi tien do cua subagent-driven-development (nhap, khong len git)
