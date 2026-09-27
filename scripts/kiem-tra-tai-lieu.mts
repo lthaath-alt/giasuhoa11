@@ -43,6 +43,10 @@ const CO_Y_VANG = new Set([
   // `npm run kiem-tra:e2e` với tài khoản thử, và `.gitignore` chặn nó vì nó
   // mang token thật. Máy vừa clone về KHÔNG có thư mục này, và đó là đúng.
   'tests/.auth/',
+  // Bản dựng: chỉ có sau `npm run build`, và `.gitignore` chặn nó. Máy vừa
+  // clone hay worktree chưa build thì không có — đo ngày 27/09/2026, bốn tệp
+  // tài liệu đỏ oan trong worktree chỉ vì nhắc tới thư mục này.
+  'dist/',
 ]);
 /* Không phải đường dẫn: mẫu đặt tên, đường dẫn URL, đuôi tệp đứng một mình,
    và đường dẫn TÀI LIỆU FIRESTORE (`quan_tri/dong_quan_tri` là một document
@@ -68,6 +72,8 @@ function moiTep(thuMuc: string, ra: string[] = []): string[] {
   return ra;
 }
 const TEN_TEP = new Set(moiTep(GOC).map(p => basename(p)));
+const PKG = JSON.parse(readFileSync(join(GOC, 'package.json'), 'utf8'));
+const GOI_KHAI = new Set(Object.keys({ ...PKG.dependencies, ...PKG.devDependencies }));
 
 /* CLAUDE.md nay chỉ còn giữ quy tắc thường dùng; phần chi tiết tách sang
    `docs/claude-reference/`. Nếu danh sách này vẫn chỉ có hai tệp như trước thì
@@ -107,9 +113,13 @@ for (const tep of TAI_LIEU) {
   const thieu: string[] = [];
   for (const d of nhac) {
     const sach = d.replace(/^\.\//, '');
-    // Gói npm có phạm vi (@mui/material) thì tra trong node_modules.
+    /* Gói npm có phạm vi (@mui/material) thì tra trong package.json. Bản đầu tra
+       node_modules/ ở gốc repo, nên worktree (node_modules nằm ở repo cha, Node
+       tự tìm lên) và máy chưa `npm install` đều đỏ oan cả ba gói đang dùng thật.
+       package.json mới là nơi quyết định dự án dùng gói nào — và chặt hơn: gói
+       chỉ có mặt vì là phụ thuộc gián tiếp không còn được tính là "đã cài". */
     if (sach.startsWith('@')) {
-      if (!existsSync(join(GOC, 'node_modules', sach))) thieu.push(d);
+      if (!GOI_KHAI.has(sach)) thieu.push(d);
       continue;
     }
     // Thử từ gốc repo, rồi từ src/, rồi tra theo tên tệp trong toàn cây.
