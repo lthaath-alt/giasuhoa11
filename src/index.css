@@ -107,6 +107,10 @@
      dưới mức đọc được. Chữ nâu đậm trên vàng đạt hơn 8 mà vẫn giữ đúng
      màu nút. Giữ nguyên ở cả hai chế độ vì nút vàng cũng giữ nguyên. */
   --chu-tren-vang:#1A1400;
+  /* Màu hồng thật của phenolphthalein trong môi trường base (mô phỏng chuẩn
+     độ). Là màu vật lý của chất chỉ thị, không phải màu giao diện — giữ nguyên
+     ở cả hai chế độ. Chỉ dùng làm màu tô dung dịch, không làm chữ hay nền. */
+  --mau-phenolphthalein: #D6337F;
 }
 
 :root[data-theme="dark"] {
@@ -176,6 +180,7 @@
   --nen-ma:       #101010;
   --chu-ma:       #E8E7E1;
   --chu-tren-vang:#1A1400;
+  --mau-phenolphthalein: #D6337F;
 }
 
 body {

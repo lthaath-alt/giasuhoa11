@@ -160,7 +160,7 @@ footer{margin-top:30px;font-size:.81rem;color:var(--ink-2);max-width:68ch}
   </div>
 </div>
 
-<footer>Bản demo gồm 4 hiện vật. Trên web thật sẽ nối thêm benzen, ethanol và bộ chất chương nitrogen&nbsp;–&nbsp;sulfur, dùng chung khung này.</footer>
+<footer>Gồm 8 hiện vật: nước, methane, carbon dioxide, ammonia, ethylene, acetylene, ethanol và acetic acid. Độ dài và góc liên kết lấy theo giá trị đo thực nghiệm, làm tròn.</footer>
 </div>
 
 <script>
@@ -218,7 +218,43 @@ co2:{ft:'CO₂',ten:'Carbon dioxide',host:'c',shape:'Thẳng',angle:'180°',pol:
  about:'So CO₂ với nước thì thấy rõ một điều: cả hai đều có liên kết phân cực, nhưng chỉ nước là phân tử phân cực. Carbon ở đây không giữ cặp electron riêng nào, nên hai liên kết đôi nằm thẳng hàng, ngược chiều và triệt tiêu nhau.',
  atoms:{c:{e:'C',p:[0,0,0]},o1:{e:'O',p:[1.16,0,0]},o2:{e:'O',p:[-1.16,0,0]}},
  bonds:[['c','o1',2,'116 pm'],['c','o2',2,'116 pm']],
- lones:{},arc:['o1','c','o2','180°'],loneNote:''}
+ lones:{},arc:['o1','c','o2','180°'],loneNote:''},
+
+/* Bốn phân tử thêm ngày 27/09/2026 (Chương 4–6). Toạ độ tính bằng script từ độ
+   dài và góc liên kết chuẩn, 1 đơn vị = 100 pm như các phân tử trên; đã đo lại
+   từng độ dài liên kết từ toạ độ. */
+c2h4:{co:.9,ft:'C₂H₄',ten:'Ethylene',host:'c1',shape:'Phẳng',angle:'≈ 120°',pol:'Không phân cực',
+ about:'Sáu nguyên tử nằm trên cùng một mặt phẳng. Liên kết đôi C=C ngắn hơn liên kết đơn và không cho hai nửa phân tử xoay quanh nó — chính liên kết π trong C=C là chỗ phân tử cộng Br₂, H₂, HBr.',
+ atoms:{c1:{e:'C',p:[.665,0,0]},c2:{e:'C',p:[-.665,0,0]},h1:{e:'H',p:[1.23,.929,0]},h2:{e:'H',p:[1.23,-.929,0]},h3:{e:'H',p:[-1.23,.929,0]},h4:{e:'H',p:[-1.23,-.929,0]}},
+ bonds:[['c1','c2',2,'133 pm'],['c1','h1',1,'109 pm'],['c1','h2',1,'109 pm'],['c2','h3',1,'109 pm'],['c2','h4',1,'109 pm']],
+ lones:{},arc:['h1','c1','h2','117°'],loneNote:''},
+
+c2h2:{co:.85,ft:'C₂H₂',ten:'Acetylene',host:'c1',shape:'Thẳng',angle:'180°',pol:'Không phân cực',
+ about:'Bốn nguyên tử thẳng hàng. Liên kết ba C≡C (một σ, hai π) ngắn nhất trong các liên kết carbon – carbon. H gắn vào carbon nối ba linh động hơn H của alkane, nên acetylene tạo được kết tủa với AgNO₃ trong NH₃.',
+ atoms:{c1:{e:'C',p:[.6,0,0]},c2:{e:'C',p:[-.6,0,0]},h1:{e:'H',p:[1.66,0,0]},h2:{e:'H',p:[-1.66,0,0]}},
+ bonds:[['c1','c2',3,'120 pm'],['c1','h1',1,'106 pm'],['c2','h2',1,'106 pm']],
+ lones:{},arc:['h1','c1','c2','180°'],loneNote:''},
+
+c2h5oh:{co:.62,ft:'C₂H₅OH',ten:'Ethanol',host:'o',shape:'Gấp khúc ở O',angle:'108,5° (C–O–H)',pol:'Phân cực',
+ about:'Nhóm –OH gắn vào carbon no. Oxygen giữ hai cặp electron riêng nên góc C–O–H gấp khúc như trong nước. Nhờ –OH, ethanol tạo liên kết hydrogen với nước và tan vô hạn.',
+ atoms:{c2:{e:'C',p:[-.022,-.548,0]},o:{e:'O',p:[1.408,-.548,0]},c1:{e:'C',p:[-.495,.907,0]},h:{e:'H',p:[1.713,-1.458,0]},h4:{e:'H',p:[-.392,-1.057,.89]},h5:{e:'H',p:[-.392,-1.057,-.89]},h1:{e:'H',p:[-1.584,.936,0]},h2:{e:'H',p:[-.118,1.412,.89]},h3:{e:'H',p:[-.118,1.412,-.89]}},
+ bonds:[['c1','c2',1,'153 pm'],['c2','o',1,'143 pm'],['o','h',1,'96 pm'],['c1','h1',1,'109 pm'],['c1','h2',1,'109 pm'],['c1','h3',1,'109 pm'],['c2','h4',1,'109 pm'],['c2','h5',1,'109 pm']],
+ lones:{l1:[.337,.468,.817],l2:[.337,.468,-.817]},arc:['c2','o','h','108,5°'],
+ loneNote:'Hai cặp electron riêng của oxygen: chỗ tạo liên kết hydrogen với phân tử nước.'},
+
+ch3cooh:{co:.62,ft:'CH₃COOH',ten:'Acetic acid',host:'o2',shape:'Nhóm –COOH phẳng',angle:'123° (O=C–O)',pol:'Phân cực',
+ about:'Nhóm carboxyl –COOH gồm C=O và –OH trên cùng một carbon. C=O hút electron nên H của –OH dễ tách ra thành H⁺ hơn hẳn ở alcohol — acetic acid làm quỳ tím hoá đỏ. Bấm "Bớt H⁺" để xem.',
+ atoms:{c:{e:'C',p:[.564,.174,0]},cm:{e:'C',p:[-.956,.174,0]},o1:{e:'O',p:[1.258,1.165,0]},o2:{e:'O',p:[1.066,-1.068,0]},h:{e:'H',p:[2.03,-.967,0]},h1:{e:'H',p:[-1.32,1.202,0]},h2:{e:'H',p:[-1.32,-.34,-.89]},h3:{e:'H',p:[-1.32,-.34,.89]}},
+ bonds:[['c','cm',1,'152 pm'],['c','o1',2,'121 pm'],['c','o2',1,'134 pm'],['o2','h',1,'97 pm'],['cm','h1',1,'109 pm'],['cm','h2',1,'109 pm'],['cm','h3',1,'109 pm']],
+ lones:{l1:[-.297,-.495,.817],l2:[-.297,-.495,-.817]},arc:['o1','c','o2','123°'],
+ loneNote:'Hai cặp electron riêng trên oxygen của nhóm –OH.'},
+
+ch3coo:{co:.62,ft:'CH₃COO⁻',ten:'Ion acetate',host:'o2',shape:'Nhóm –COO⁻ phẳng',angle:'125° (O–C–O)',pol:'Mang điện âm',
+ about:'Mất H⁺, điện tích âm không nằm yên trên một oxygen mà trải đều cho cả hai: hai liên kết C–O dài bằng nhau (126 pm), trung gian giữa liên kết đơn (134 pm) và đôi (121 pm). Ion bền nên acetic acid nhường H⁺ được.',
+ atoms:{c:{e:'C',p:[.564,.174,0]},cm:{e:'C',p:[-.956,.174,0]},o1:{e:'O',p:[1.145,1.292,0]},o2:{e:'O',p:[1.145,-.944,0]},h1:{e:'H',p:[-1.32,1.202,0]},h2:{e:'H',p:[-1.32,-.34,-.89]},h3:{e:'H',p:[-1.32,-.34,.89]}},
+ bonds:[['c','cm',1,'152 pm'],['c','o1',1.5,'126 pm'],['c','o2',1.5,'126 pm'],['cm','h1',1,'109 pm'],['cm','h2',1,'109 pm'],['cm','h3',1,'109 pm']],
+ lones:{l1:[.153,-.294,.944],l2:[.153,-.294,-.944],l3:[.995,.105,0]},arc:['o1','c','o2','125°'],
+ loneNote:'Cặp electron này hiện ra đúng chỗ H⁺ vừa rời đi. Nó nhận lại H⁺ được — nên CH₃COO⁻ là base liên hợp của CH₃COOH. Hình chỉ vẽ cặp electron riêng trên một oxygen cho dễ nhìn; oxygen kia cũng có cặp electron riêng, và điện tích âm chia đều cho cả hai.'}
 };
 
 /* ================= hiện vật + tông màu ================= */
@@ -230,14 +266,26 @@ const ITEMS=[
  {id:'soda',ten:'Lon nước ngọt',sub:'khí trong bọt — CO₂',sp:'co2',art:'can',
   bg:[[70,22,36],[22,10,20]],acc:'#F2607A'},
  {id:'clean',ten:'Chai lau kính',sub:'ammonia — NH₃',sp:'nh3',art:'bottle',
-  bg:[[14,62,58],[8,22,26]],acc:'#3FD0B4'}
+  bg:[[14,62,58],[8,22,26]],acc:'#3FD0B4'},
+ {id:'banana',ten:'Nải chuối đang chín',sub:'khí làm quả chín — C₂H₄',sp:'c2h4',art:'banana',
+  bg:[[58,50,12],[20,18,8]],acc:'#E8C93A'},
+ {id:'torch',ten:'Đèn xì hàn cắt kim loại',sub:'khí đất đèn — C₂H₂',sp:'c2h2',art:'torch',
+  bg:[[20,30,62],[8,10,24]],acc:'#6FA8FF'},
+ {id:'spray',ten:'Chai cồn sát khuẩn',sub:'cồn — C₂H₅OH',sp:'c2h5oh',art:'spray',
+  bg:[[40,26,62],[14,10,26]],acc:'#B08CFF'},
+ {id:'vinegar',ten:'Chai giấm ăn',sub:'acetic acid — CH₃COOH',sp:'ch3cooh',art:'vinegar',
+  bg:[[62,40,14],[22,14,8]],acc:'#F2A93B'}
 ];
 
 const MORPH={
  h2o:{add:'h3o',rem:'oh'}, h3o:{rem:'h2o'}, oh:{add:'h2o'},
  nh3:{add:'nh4'}, nh4:{rem:'nh3'},
  ch4:{why:'Carbon trong CH₄ đã dùng hết bốn electron hóa trị để tạo liên kết, không còn cặp nào để giữ proton. Đó là lý do methane trơ với acid.'},
- co2:{why:'Carbon trong CO₂ cũng không còn cặp electron riêng. CO₂ chỉ thể hiện tính acid khi tan vào nước để tạo H₂CO₃.'}
+ co2:{why:'Carbon trong CO₂ cũng không còn cặp electron riêng. CO₂ chỉ thể hiện tính acid khi tan vào nước để tạo H₂CO₃.'},
+ c2h4:{why:'Không có cặp electron riêng nào để giữ H⁺, và cũng không nhường H⁺ cho nước. Ethylene phản ứng bằng liên kết đôi C=C: cộng Br₂, H₂, HBr.'},
+ c2h2:{why:'H gắn carbon nối ba linh động nên thay được bằng Ag (kết tủa với AgNO₃/NH₃), nhưng acetylene không phải acid trong nước — không nhường H⁺ làm đổi màu quỳ.'},
+ c2h5oh:{why:'H của –OH thay được bằng Na (tạo H₂), nhưng ethanol trung tính: trong nước nó hầu như không nhường H⁺, không làm đổi màu quỳ tím.'},
+ ch3cooh:{rem:'ch3coo'}, ch3coo:{add:'ch3cooh'}
 };
 
 /* ================= trạng thái ================= */
@@ -420,6 +468,91 @@ function drawArt(kind,k,alpha){
       ctx.fillStyle='#B8FFEF'; ctx.fill();
     }
   }
+  if(kind==='banana'){
+    for(let i=0;i<3;i++){
+      ctx.save(); ctx.translate(cx,cy+(i-1)*S*.22); ctx.rotate(-.3+i*.16);
+      ctx.beginPath(); ctx.moveTo(-S*.72,-S*.05);
+      ctx.quadraticCurveTo(0,S*.55,S*.72,-S*.12);
+      ctx.quadraticCurveTo(0,S*.28,-S*.72,-S*.05);
+      const g=ctx.createLinearGradient(0,-S*.1,0,S*.42);
+      g.addColorStop(0,'#FFE36B'); g.addColorStop(.6,'#E8C22E'); g.addColorStop(1,'#9DBF3A');
+      ctx.fillStyle=g; ctx.fill();
+      ctx.strokeStyle='#6E5A12'; ctx.lineWidth=Math.max(1,S*.012); ctx.stroke();
+      ctx.fillStyle='#5B4A14'; ctx.fillRect(-S*.8,-S*.09,S*.1,S*.06);
+      ctx.restore();
+    }
+    // khí ethylene quả chín toả ra
+    for(let i=0;i<9;i++){
+      const k2=(i*.11+t*.25)%1;
+      ctx.globalAlpha=alpha*(1-k2)*.6;
+      ctx.beginPath(); ctx.arc(cx+Math.sin(i*2.1)*S*.6,cy-S*.35-k2*S*.6,S*.022,0,7);
+      ctx.fillStyle='#FFF4B0'; ctx.fill();
+    }
+  }
+  if(kind==='torch'){
+    ctx.beginPath(); ctx.roundRect(cx-S*.8,cy-S*.02,S*.3,S*.7,S*.08);
+    const g=ctx.createLinearGradient(cx-S*.8,0,cx-S*.5,0);
+    g.addColorStop(0,'#5A2A1A'); g.addColorStop(.5,'#B5563A'); g.addColorStop(1,'#5A2A1A');
+    ctx.fillStyle=g; ctx.fill();
+    ctx.beginPath(); ctx.moveTo(cx-S*.65,cy-S*.02); ctx.quadraticCurveTo(cx-S*.62,cy-S*.4,cx-S*.3,cy-S*.2);
+    ctx.strokeStyle='#2E3742'; ctx.lineWidth=S*.04; ctx.stroke();
+    ctx.save(); ctx.translate(cx-S*.3,cy-S*.2); ctx.rotate(-.35);
+    ctx.fillStyle='#39465A'; ctx.fillRect(0,-S*.06,S*.55,S*.12);
+    ctx.fillStyle='#B8C2CE'; ctx.fillRect(S*.55,-S*.03,S*.28,S*.06);
+    const L=S*(.52+Math.sin(t*9)*.03);
+    ctx.beginPath(); ctx.moveTo(S*.83,-S*.045);
+    ctx.quadraticCurveTo(S*.83+L*.6,-S*.08,S*.83+L,0);
+    ctx.quadraticCurveTo(S*.83+L*.6,S*.08,S*.83,S*.045); ctx.closePath();
+    const fg=ctx.createLinearGradient(S*.83,0,S*.83+L,0);
+    fg.addColorStop(0,'#FFFFFF'); fg.addColorStop(.25,'#9FD0FF'); fg.addColorStop(1,'rgba(80,140,255,0)');
+    ctx.fillStyle=fg; ctx.fill();
+    for(let i=0;i<10;i++){
+      const k2=(i*.1+t*.9)%1;
+      ctx.globalAlpha=alpha*(1-k2);
+      ctx.beginPath(); ctx.arc(S*.83+L*.9+k2*S*.35,Math.sin(i*2.7)*S*.25*k2,S*.014,0,7);
+      ctx.fillStyle='#FFD27A'; ctx.fill();
+    }
+    ctx.restore();
+  }
+  if(kind==='spray'){
+    const w=S*.52,h=S*1.02;
+    ctx.beginPath(); ctx.roundRect(cx-w/2,cy-h/2+S*.24,w,h,S*.08);
+    const g=ctx.createLinearGradient(cx-w/2,0,cx+w/2,0);
+    g.addColorStop(0,'#C9CFE0'); g.addColorStop(.45,'#FFFFFF'); g.addColorStop(1,'#B7BDD0');
+    ctx.fillStyle=g; ctx.fill();
+    ctx.fillStyle='#6D4FD8'; ctx.fillRect(cx-w/2,cy-S*.02,w,S*.34);
+    ctx.fillStyle='#FFFFFF'; ctx.font=`700 ${Math.max(9,S*.1)}px Archivo,system-ui,sans-serif`;
+    ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('70°',cx,cy+S*.15);
+    ctx.fillStyle='#39465A';
+    ctx.fillRect(cx-S*.08,cy-h/2+S*.06,S*.16,S*.18);
+    ctx.beginPath(); ctx.roundRect(cx-S*.16,cy-h/2-S*.06,S*.32,S*.14,S*.03); ctx.fill();
+    ctx.fillRect(cx+S*.16,cy-h/2-S*.03,S*.12,S*.05);
+    for(let i=0;i<14;i++){
+      const k2=(i*.071+t*.4)%1;
+      ctx.globalAlpha=alpha*(1-k2)*.7;
+      ctx.beginPath(); ctx.arc(cx+S*.3+k2*S*.7,cy-h/2-S*.005+Math.sin(i*2.3)*S*.18*k2,S*.02,0,7);
+      ctx.fillStyle='#E4DCFF'; ctx.fill();
+    }
+  }
+  if(kind==='vinegar'){
+    const w=S*.5,h=S*1.0;
+    ctx.beginPath();
+    ctx.moveTo(cx-S*.09,cy-h/2-S*.1); ctx.lineTo(cx-S*.09,cy-h/2+S*.12);
+    ctx.quadraticCurveTo(cx-w/2,cy-h/2+S*.2,cx-w/2,cy-h/2+S*.36);
+    ctx.lineTo(cx-w/2,cy+h/2+S*.1); ctx.lineTo(cx+w/2,cy+h/2+S*.1); ctx.lineTo(cx+w/2,cy-h/2+S*.36);
+    ctx.quadraticCurveTo(cx+w/2,cy-h/2+S*.2,cx+S*.09,cy-h/2+S*.12);
+    ctx.lineTo(cx+S*.09,cy-h/2-S*.1); ctx.closePath();
+    ctx.save(); ctx.clip();
+    const g=ctx.createLinearGradient(0,cy-S*.2,0,cy+h/2);
+    g.addColorStop(0,'#F7C66A'); g.addColorStop(1,'#C9832A');
+    ctx.fillStyle=g; ctx.fillRect(cx-w,cy-S*.12,w*2,h);
+    ctx.restore();
+    ctx.strokeStyle='rgba(255,236,200,.85)'; ctx.lineWidth=Math.max(1.4,S*.025); ctx.stroke();
+    ctx.fillStyle='#8E2F1E'; ctx.fillRect(cx-S*.11,cy-h/2-S*.2,S*.22,S*.12);
+    ctx.fillStyle='#FFF6E3'; ctx.fillRect(cx-w/2+S*.04,cy+S*.1,w-S*.08,S*.26);
+    ctx.fillStyle='#8E2F1E'; ctx.font=`700 ${Math.max(9,S*.09)}px Archivo,system-ui,sans-serif`;
+    ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('GIẤM',cx,cy+S*.23);
+  }
   ctx.restore();
 }
 
@@ -483,19 +616,24 @@ function drawMolecule(alpha,S){
     const A=P[b.i],B=P[b.j]; if(!A||!B) return;
     const mx=(A.x+B.x)/2,my=(A.y+B.y)/2,ms=(A.s+B.s)/2;
     const dx=B.x-A.x,dy=B.y-A.y,L=Math.hypot(dx,dy)||1,nx=-dy/L,ny=dx/L;
-    const off=b.o===2?ms*.12:0;
+    /* Bậc liên kết: 1 đơn, 2 đôi, 3 ba (C₂H₂), 1.5 cộng hưởng (hai C–O của
+       ion acetate) — vạch thứ hai vẽ đứt để thấy nó chỉ "nửa" liên kết. */
+    const nhieu=b.o>1, vach=b.o===3?[-1,0,1]:nhieu?[-1,1]:[0];
+    const off=b.o===3?ms*.16:nhieu?ms*.12:0;
     if(b.a>.5) hit.push({kind:'bond',key:b.i+'-'+b.j,x:mx,y:my,r:Math.max(10,ms*.16),data:b});
     items.push({z:(A.z+B.z)/2,f:()=>{
       ctx.globalAlpha=alpha*b.a; ctx.lineCap='round';
       const on=sel&&sel.kind==='bond'&&sel.key===b.i+'-'+b.j;
       const ea=st.atoms.find(a=>a.k===b.i).e, eb=st.atoms.find(a=>a.k===b.j).e;
-      for(const k of (b.o===2?[-1,1]:[0])){
-        ctx.lineWidth=ms*(b.o===2?.095:.135)*(on?1.35:1);
+      for(const k of vach){
+        ctx.lineWidth=ms*(b.o===3?.075:nhieu?.095:.135)*(on?1.35:1);
+        ctx.setLineDash(b.o===1.5&&k===1?[ms*.12,ms*.1]:[]);
         ctx.beginPath(); ctx.moveTo(A.x+nx*off*k,A.y+ny*off*k); ctx.lineTo(mx+nx*off*k,my+ny*off*k);
         ctx.strokeStyle=on?'#FFF3B0':shade(EL[ea].c,-.15); ctx.stroke();
         ctx.beginPath(); ctx.moveTo(mx+nx*off*k,my+ny*off*k); ctx.lineTo(B.x+nx*off*k,B.y+ny*off*k);
         ctx.strokeStyle=on?'#FFF3B0':shade(EL[eb].c,-.15); ctx.stroke();
       }
+      ctx.setLineDash([]);
     }});
   });
 
@@ -567,7 +705,9 @@ function frame(){
   drawSwarm(Math.max(0,Math.sin(Math.min(1,Math.max(0,(t-.22)/.52))*Math.PI))*.95,
             Math.min(W,H)*(.18+t*.62));
   const ma=Math.max(0,Math.min(1,(t-.66)/.24));
-  drawMolecule(ma,Math.min(W,H)*.30*(.55+ma*.45));
+  /* `co`: hệ số thu nhỏ cho phân tử nhiều nguyên tử (ethanol, acetic acid…) —
+     không có thì xoay tới đâu cũng tràn khung (đo 27/09/2026: lệch tới 132 px). */
+  drawMolecule(ma,Math.min(W,H)*.30*(.55+ma*.45)*(SP[spKey].co||1));
 
   bigName.style.opacity=Math.max(0,1-t/.34);
   molTag.style.opacity=ma;
@@ -699,9 +839,12 @@ function renderNote(){
     ti.innerHTML=`<span class="chip" style="background:${d.c}"></span>${d.ten} <em>${e}</em>`;
     fa.innerHTML=`<div><dt>Bán kính</dt><dd>${d.bk}</dd></div>
       <div><dt>Độ âm điện</dt><dd>${d.am}</dd></div>`;
+    /* Phân tử chỉ có MỘT nguyên tử không phải H thì nó mới là "trung tâm"; C₂H₄,
+       ethanol, acetic acid… có cả khung nhiều nguyên tử. */
+    const motTam=st.atoms.filter(a=>a.e!=='H').length===1;
     bo.textContent=e==='H'
       ?'Nguyên tử nhỏ nhất, chỉ có một electron. Trong mọi phân tử ở đây nó luôn nằm ở rìa và tạo đúng một liên kết.'
-      :`Nguyên tử trung tâm của phân tử này. Độ âm điện ${d.am} — càng lớn thì nó càng kéo electron của liên kết về phía mình.`;
+      :`${motTam?'Nguyên tử trung tâm của phân tử này':`Một nguyên tử ${d.ten.toLowerCase()} trong khung phân tử`}. Độ âm điện ${d.am} — càng lớn thì nó càng kéo electron của liên kết về phía mình.`;
     return;
   }
   if(sel.kind==='bond'){
@@ -709,8 +852,9 @@ function renderNote(){
     const ea=st.atoms.find(a=>a.k===b.i).e, eb=st.atoms.find(a=>a.k===b.j).e;
     const na=parseFloat(EL[ea].am.replace(',','.')), nb=parseFloat(EL[eb].am.replace(',','.'));
     const dif=Math.abs(na-nb), keo=na>nb?ea:eb;
+    const KY={1:'–',1.5:'⋯',2:'=',3:'≡'}, TEN_LK={1:'liên kết đơn',1.5:'bậc một rưỡi — cộng hưởng',2:'liên kết đôi',3:'liên kết ba'};
     eye.textContent='Liên kết';
-    ti.innerHTML=`${ea}${b.o===2?'=':'–'}${eb} <em>${b.o===2?'liên kết đôi':'liên kết đơn'}</em>`;
+    ti.innerHTML=`${ea}${KY[b.o]}${eb} <em>${TEN_LK[b.o]}</em>`;
     fa.innerHTML=`<div><dt>Độ dài</dt><dd>${b.len}</dd></div>
       <div><dt>Hiệu độ âm điện</dt><dd>${dif.toFixed(2).replace('.',',')}</dd></div>`;
     bo.textContent=dif<.4
