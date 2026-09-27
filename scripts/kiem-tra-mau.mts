@@ -164,7 +164,11 @@ console.log('\n== Không còn mã màu viết cứng ==');
 {
   const con: string[] = [];
   for (const f of dsTep) {
-    const so = [...readFileSync(f, 'utf8').matchAll(/#[0-9a-fA-F]{6}\b/g)].length;
+    // Bỏ dòng có `mau-ok`, như các phép kiểm trên. Bản đầu đếm cả tệp nên lời
+    // hứa "ghi mau-ok là được bỏ qua" ở chú thích dưới chưa từng có hiệu lực.
+    const n = readFileSync(f, 'utf8')
+      .split(/\r?\n/).filter(d => !d.includes('mau-ok')).join('\n');
+    const so = [...n.matchAll(/#[0-9a-fA-F]{6}\b/g)].length;
     if (so) con.push(`${basename(f)} (${so})`);
   }
   const TONG = con.reduce((s, x) => s + Number(x.match(/\((\d+)\)/)![1]), 0);
