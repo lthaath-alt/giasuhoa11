@@ -226,7 +226,8 @@ export const DienLiNhieuNac3D: React.FC<{ acid: AcidNhieuNac; c: number; toanMan
         ref={ref}
         role="img"
         aria-label={`Cảnh 3D quá trình điện li nhiều nấc của ${acid.ct}. Kéo để xoay.`}
-        sx={{ width: '100%', height: toanManHinh ? '52vh' : 320, display: 'block', touchAction: 'none', cursor: 'grab',
+        /* Cao bằng khung của các thí nghiệm theo bài (28/09/2026). */
+        sx={{ width: '100%', height: toanManHinh ? '52vh' : { xs: 300, md: 400 }, display: 'block', touchAction: 'none', cursor: 'grab',
           bgcolor: 'var(--nen-rat-nhat)', border: '1px solid var(--vien)', '&:active': { cursor: 'grabbing' } }}
       />
       <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', flexWrap: 'wrap', mt: 0.75 }}>

@@ -6,9 +6,10 @@
  * nguồn khớp nhau trừ khi ghi khác) — URL trong báo cáo. `sgkTrang` = thí nghiệm
  * có trong SGK ở trang đó; không có `sgkTrang` = gợi ý thêm ngoài sách.
  *
- * Soạn ngày 27/09/2026 (AI soạn theo nội dung bài, chủ dự án yêu cầu), CHƯA qua
- * giáo viên duyệt: mọi mục `daDuyet: false` và giao diện hiện nhãn "Chờ giáo
- * viên duyệt". Thầy duyệt xong thì đổi đúng mục đó thành `true`.
+ * Soạn ngày 27/09/2026 (AI soạn theo nội dung bài, chủ dự án yêu cầu). Thầy Văn
+ * duyệt cả 41 mục ngày 27/09/2026 (chủ dự án chuyển lời) nên mọi mục để
+ * `daDuyet: true` và nhãn "Chờ giáo viên duyệt" không còn hiện. Thêm thí nghiệm
+ * mới thì để `false` cho tới khi thầy duyệt riêng mục đó.
  * Báo cáo soát: docs/soat-hoa-hoc/2026-09-27-thi-nghiem-theo-bai.md
  *
  * Số trang lấy theo các trang giải SGK, chưa đối chiếu sách giấy.
@@ -23,8 +24,31 @@
  *  (nitro hoá benzene, cộng Cl₂ vào benzene…) — không phải bài tự làm. */
 export type NoiLam = 'phong-thi-nghiem' | 'giao-vien-bieu-dien' | 'tai-nha' | 'sgk-mo-ta';
 
-/** Mô phỏng tương tác trong tab Thí nghiệm có thể mở thẳng từ thẻ. */
-export type MoPhong = 'den-dien-li' | 'chuan-do' | 'dien-li-nhieu-nac';
+/**
+ * Mô phỏng tương tác trong tab Thí nghiệm có thể mở thẳng từ thẻ.
+ *
+ * Ba mô phỏng đầu (Bài 2) là component React riêng. Những mô phỏng sau trùng id
+ * với thí nghiệm và chạy bằng kịch bản 3D trong
+ * `components/mo-phong/canh/` — thêm id ở đây thì phải thêm kịch bản cùng tên,
+ * nếu không nút "Mở mô phỏng" bấm vào sẽ không có gì.
+ */
+export type MoPhong =
+  | 'den-dien-li' | 'chuan-do' | 'dien-li-nhieu-nac'
+  | 'b1-no2-nhiet-do' | 'b1-ch3coona-nhiet-do' | 'b1-ch3coona-nong-do'
+  | 'b2-chat-chi-thi' | 'b2-thuy-phan-muoi'
+  | 'b5-nhan-biet-nh4' | 'b5-nh3-hcl'
+  | 'b6-cu-hno3'
+  | 'b7-s-fe' | 'b7-s-o2' | 'b7-so2-bromine'
+  | 'b8-cu-h2so4' | 'b8-hao-nuoc' | 'b8-nhan-biet-so4'
+  | 'b11-chung-cat' | 'b11-chiet' | 'b11-ket-tinh' | 'b11-sac-ki-giay'
+  | 'b15-hexane-bromine' | 'b15-oxi-hoa-hexane'
+  | 'b16-ethylene' | 'b16-acetylene' | 'b16-chuoi-chin'
+  | 'b17-nitro-hoa-benzene' | 'b17-cong-chlorine' | 'b17-toluene-kmno4'
+  | 'b19-thuy-phan'
+  | 'b20-chay' | 'b20-glycerol-cuoh2' | 'b20-ethanol-na'
+  | 'b21-phenol-naoh' | 'b21-phenol-bromine'
+  | 'b23-trang-bac' | 'b23-cuoh2' | 'b23-iodoform'
+  | 'b24-tinh-acid' | 'b24-ester-hoa' | 'b24-giam-baking-soda';
 
 export interface ThiNghiem {
   id: string;
@@ -63,7 +87,7 @@ export const THI_NGHIEM: ThiNghiem[] = [
     hienTuong: 'Ống ngâm nước đá nhạt màu hơn ống so sánh; ống ngâm nước nóng nâu đỏ đậm hơn.',
     giaiThich: '2NO₂ (nâu đỏ) ⇌ N₂O₄ (không màu), chiều thuận toả nhiệt. Hạ nhiệt độ: cân bằng chuyển dịch theo chiều toả nhiệt (tạo N₂O₄) nên nhạt màu; tăng nhiệt độ: chuyển dịch theo chiều thu nhiệt (tạo NO₂) nên đậm màu.',
     anToan: ['NO₂ rất độc: chỉ dùng ống đã nút kín, không mở ống.'],
-    noiLam: 'phong-thi-nghiem', daDuyet: false,
+    noiLam: 'phong-thi-nghiem', moPhong: 'b1-no2-nhiet-do', daDuyet: true,
   },
   {
     id: 'b1-ch3coona-nhiet-do', lessonId: 'bai-1', sgkTrang: 11,
@@ -75,7 +99,7 @@ export const THI_NGHIEM: ThiNghiem[] = [
     hienTuong: 'Ống ngâm nước nóng hồng đậm hơn; ống ngâm nước đá nhạt màu hơn ống so sánh.',
     giaiThich: 'CH₃COONa + H₂O ⇌ CH₃COOH + NaOH, chiều thuận thu nhiệt. Đun nóng: cân bằng chuyển dịch theo chiều thuận, tạo thêm OH⁻ nên hồng đậm hơn; làm lạnh thì ngược lại.',
     anToan: ['Dùng nước nóng vừa phải, cầm ống nghiệm bằng kẹp gỗ.'],
-    noiLam: 'phong-thi-nghiem', daDuyet: false,
+    noiLam: 'phong-thi-nghiem', moPhong: 'b1-ch3coona-nhiet-do', daDuyet: true,
   },
   {
     id: 'b1-ch3coona-nong-do', lessonId: 'bai-1', sgkTrang: 12,
@@ -87,7 +111,7 @@ export const THI_NGHIEM: ThiNghiem[] = [
     hienTuong: 'Ống 2 hồng đậm hơn; ống 3 nhạt màu hơn ống so sánh.',
     giaiThich: 'Tăng nồng độ CH₃COONa: cân bằng chuyển dịch theo chiều thuận, tạo thêm OH⁻. Thêm CH₃COOH (sản phẩm): cân bằng chuyển dịch theo chiều nghịch, OH⁻ giảm.',
     anToan: ['Hoá chất loãng, an toàn với găng và kính thông thường.'],
-    noiLam: 'phong-thi-nghiem', daDuyet: false,
+    noiLam: 'phong-thi-nghiem', moPhong: 'b1-ch3coona-nong-do', daDuyet: true,
   },
   {
     id: 'b2-dan-dien', lessonId: 'bai-2', sgkTrang: 16,
@@ -99,7 +123,7 @@ export const THI_NGHIEM: ThiNghiem[] = [
     hienTuong: 'Nước cất, muối ăn khan: đèn không sáng; dung dịch NaCl, HCl, NaOH: đèn sáng. Saccharose, ethanol: không sáng. Cùng 0,1 M, đèn ở cốc HCl sáng hơn cốc CH₃COOH.',
     giaiThich: 'Dung dịch dẫn điện nhờ ion chuyển động. NaCl rắn có ion nhưng bị giữ chặt trong tinh thể; tan trong nước (dung môi phân cực) thì ion tách ra và di chuyển được. HCl phân li hoàn toàn, CH₃COOH chỉ phân li một phần nên ít ion hơn.',
     anToan: ['Dùng nguồn điện an toàn của phòng thí nghiệm, không cắm điện lưới trực tiếp.', 'Không chạm điện cực khi đang đóng mạch.'],
-    noiLam: 'phong-thi-nghiem', moPhong: 'den-dien-li', daDuyet: false,
+    noiLam: 'phong-thi-nghiem', moPhong: 'den-dien-li', daDuyet: true,
   },
   {
     id: 'b2-chat-chi-thi', lessonId: 'bai-2', sgkTrang: 23,
@@ -111,7 +135,7 @@ export const THI_NGHIEM: ThiNghiem[] = [
     hienTuong: 'Môi trường acid (giấm, nước vitamin C) cho màu đỏ – hồng; trung tính giữ màu tím hoặc xanh ban đầu; môi trường base (nước rửa bát, soda) chuyển xanh – xanh lục.',
     giaiThich: 'Sắc tố anthocyanin đổi cấu tạo (và màu) theo pH, giống cách quỳ tím đổi màu.',
     anToan: ['Người lớn hỗ trợ khi dùng nước sôi.', 'Không nếm các mẫu đã pha.'],
-    noiLam: 'tai-nha', daDuyet: false,
+    noiLam: 'tai-nha', moPhong: 'b2-chat-chi-thi', daDuyet: true,
   },
   {
     id: 'b2-thuy-phan-muoi', lessonId: 'bai-2', sgkTrang: 24,
@@ -123,7 +147,7 @@ export const THI_NGHIEM: ThiNghiem[] = [
     hienTuong: 'Na₂CO₃ cho pH lớn hơn 7; AlCl₃ và FeCl₃ cho pH nhỏ hơn 7.',
     giaiThich: 'CO₃²⁻ + H₂O ⇌ HCO₃⁻ + OH⁻ nên Na₂CO₃ có môi trường base. Al³⁺ + H₂O ⇌ Al(OH)²⁺ + H⁺ (Fe³⁺ tương tự) nên AlCl₃, FeCl₃ có môi trường acid.',
     anToan: ['FeCl₃ làm ố da và quần áo; rửa tay sau thí nghiệm.'],
-    noiLam: 'phong-thi-nghiem', daDuyet: false,
+    noiLam: 'phong-thi-nghiem', moPhong: 'b2-thuy-phan-muoi', daDuyet: true,
   },
   {
     id: 'b2-chuan-do', lessonId: 'bai-2', sgkTrang: 25,
@@ -140,7 +164,7 @@ export const THI_NGHIEM: ThiNghiem[] = [
     hienTuong: 'Dung dịch không màu; tới điểm cuối, một giọt NaOH làm xuất hiện màu hồng nhạt bền.',
     giaiThich: 'HCl + NaOH → NaCl + H₂O. Tại điểm tương đương n(NaOH) = n(HCl) = 0,1 × 0,010 = 0,001 mol, nên C(NaOH) = 0,001 : V(NaOH, lít).',
     anToan: ['Đeo kính bảo hộ: NaOH gây bỏng mắt.', 'Không hút pipette bằng miệng — dùng quả bóp.'],
-    noiLam: 'phong-thi-nghiem', moPhong: 'chuan-do', daDuyet: false,
+    noiLam: 'phong-thi-nghiem', moPhong: 'chuan-do', daDuyet: true,
   },
   {
     id: 'b2-dien-li-nhieu-nac', lessonId: 'bai-2',
@@ -152,7 +176,7 @@ export const THI_NGHIEM: ThiNghiem[] = [
     hienTuong: 'Pha loãng thì độ điện li của các nấc chưa hoàn toàn tăng; [H⁺] thực tế nhỏ hơn số nấc × C.',
     giaiThich: 'SGK KNTT chỉ xếp H₂SO₄ vào nhóm acid mạnh, không học điện li nhiều nấc hay hằng số Ka. Khi làm bài tập theo SGK và đề thi, H₂SO₄ loãng được coi là điện li hoàn toàn ([H⁺] = 2C).',
     anToan: ['Mô phỏng — không dùng hoá chất.'],
-    noiLam: 'phong-thi-nghiem', moPhong: 'dien-li-nhieu-nac', daDuyet: false,
+    noiLam: 'phong-thi-nghiem', moPhong: 'dien-li-nhieu-nac', daDuyet: true,
   },
 
   /* ── Chương 2 ─────────────────────────────────────────────────────────── */
@@ -166,7 +190,7 @@ export const THI_NGHIEM: ThiNghiem[] = [
     hienTuong: 'Ống NH₄Cl có khí mùi khai, giấy pH chỉ môi trường base; ống KNO₃ không có hiện tượng đó.',
     giaiThich: 'NH₄Cl + NaOH → NaCl + NH₃↑ + H₂O (đun nóng). Chỉ muối ammonium mới giải phóng NH₃ khi đun với kiềm — đó là dấu hiệu nhận biết ion NH₄⁺.',
     anToan: ['Đeo kính bảo hộ: NaOH 20 % nóng bắn vào mắt rất nguy hiểm.', 'Hướng miệng ống ra xa người; không ngửi trực tiếp — phẩy nhẹ tay cho hơi bay tới mũi.'],
-    noiLam: 'phong-thi-nghiem', daDuyet: false,
+    noiLam: 'phong-thi-nghiem', moPhong: 'b5-nhan-biet-nh4', daDuyet: true,
   },
   {
     id: 'b5-nh3-hcl', lessonId: 'bai-5',
@@ -178,7 +202,7 @@ export const THI_NGHIEM: ThiNghiem[] = [
     hienTuong: 'Xuất hiện khói trắng giữa hai đầu đũa.',
     giaiThich: 'NH₃(g) + HCl(g) → NH₄Cl(s): các hạt NH₄Cl rắn rất nhỏ tạo thành "khói" trắng.',
     anToan: ['Khí NH₃ và HCl đều cay, độc — làm trong tủ hút, không ngửi trực tiếp.'],
-    noiLam: 'giao-vien-bieu-dien', daDuyet: false,
+    noiLam: 'giao-vien-bieu-dien', moPhong: 'b5-nh3-hcl', daDuyet: true,
   },
   {
     id: 'b6-cu-hno3', lessonId: 'bai-6',
@@ -190,7 +214,7 @@ export const THI_NGHIEM: ThiNghiem[] = [
     hienTuong: 'Khí màu nâu đỏ thoát ra; dung dịch chuyển xanh lục (pha loãng thì thành xanh lam).',
     giaiThich: 'Cu + 4HNO₃(đặc) → Cu(NO₃)₂ + 2NO₂↑ + 2H₂O. NO₂ màu nâu đỏ; ion Cu²⁺ màu xanh lam, lẫn NO₂ hoà tan nên dung dịch đặc trông xanh lục.',
     anToan: ['NO₂ rất độc, HNO₃ đặc gây bỏng nặng: CHỈ giáo viên làm trong tủ hút, hoặc xem video.'],
-    noiLam: 'giao-vien-bieu-dien', daDuyet: false,
+    noiLam: 'giao-vien-bieu-dien', moPhong: 'b6-cu-hno3', daDuyet: true,
   },
   {
     id: 'b7-s-fe', lessonId: 'bai-7', sgkTrang: 44,
@@ -202,7 +226,7 @@ export const THI_NGHIEM: ThiNghiem[] = [
     hienTuong: 'Sulfur nóng chảy, hỗn hợp cháy sáng, toả nhiều nhiệt, tạo chất rắn màu đen.',
     giaiThich: 'Fe + S → FeS (t°). Sulfur nhận electron (0 → −2) nên là chất oxi hoá; sắt là chất khử.',
     anToan: ['Phản ứng toả nhiệt mạnh; có thể sinh ít SO₂: làm nơi thoáng, hướng miệng ống ra xa người.'],
-    noiLam: 'phong-thi-nghiem', daDuyet: false,
+    noiLam: 'phong-thi-nghiem', moPhong: 'b7-s-fe', daDuyet: true,
   },
   {
     id: 'b7-s-o2', lessonId: 'bai-7', sgkTrang: 45,
@@ -214,7 +238,7 @@ export const THI_NGHIEM: ThiNghiem[] = [
     hienTuong: 'Trong không khí, sulfur cháy với ngọn lửa nhỏ màu xanh nhạt; trong oxygen cháy mãnh liệt hơn.',
     giaiThich: 'S + O₂ → SO₂ (t°). Sulfur nhường electron (0 → +4) nên là chất khử.',
     anToan: ['SO₂ sinh ra độc, gây ho: làm trong tủ hút hoặc nơi thật thoáng, có giáo viên hướng dẫn.'],
-    noiLam: 'phong-thi-nghiem', daDuyet: false,
+    noiLam: 'phong-thi-nghiem', moPhong: 'b7-s-o2', daDuyet: true,
   },
   {
     id: 'b7-so2-bromine', lessonId: 'bai-7',
@@ -226,7 +250,7 @@ export const THI_NGHIEM: ThiNghiem[] = [
     hienTuong: 'Nước bromine nhạt dần rồi mất màu.',
     giaiThich: 'SO₂ + Br₂ + 2H₂O → H₂SO₄ + 2HBr. Sulfur từ +4 lên +6: SO₂ là chất khử.',
     anToan: ['SO₂ và bromine đều độc: chỉ giáo viên làm trong tủ hút, hoặc xem video.'],
-    noiLam: 'giao-vien-bieu-dien', daDuyet: false,
+    noiLam: 'giao-vien-bieu-dien', moPhong: 'b7-so2-bromine', daDuyet: true,
   },
   {
     id: 'b8-cu-h2so4', lessonId: 'bai-8', sgkTrang: 51,
@@ -238,7 +262,7 @@ export const THI_NGHIEM: ThiNghiem[] = [
     hienTuong: 'Đồng tan dần, dung dịch chuyển xanh, có khí thoát ra.',
     giaiThich: 'Cu + 2H₂SO₄(đặc) → CuSO₄ + SO₂↑ + 2H₂O (t°). Bông tẩm NaOH giữ lại khí SO₂ độc: SO₂ + 2NaOH → Na₂SO₃ + H₂O.',
     anToan: ['H₂SO₄ đặc nóng gây bỏng rất nặng, SO₂ độc: làm dưới sự giám sát trực tiếp của giáo viên, đeo kính và găng.'],
-    noiLam: 'phong-thi-nghiem', daDuyet: false,
+    noiLam: 'phong-thi-nghiem', moPhong: 'b8-cu-h2so4', daDuyet: true,
   },
   {
     id: 'b8-hao-nuoc', lessonId: 'bai-8', sgkTrang: 51,
@@ -250,7 +274,7 @@ export const THI_NGHIEM: ThiNghiem[] = [
     hienTuong: 'Đường hoá đen, sủi bọt, khối than xốp dâng cao trào khỏi cốc; cốc nóng lên.',
     giaiThich: 'C₁₂H₂₂O₁₁ → 12C + 11H₂O (H₂SO₄ đặc hút nước). Một phần carbon bị H₂SO₄ đặc oxi hoá: C + 2H₂SO₄ → CO₂ + 2SO₂ + 2H₂O — khí sinh ra làm khối than phồng lên.',
     anToan: ['H₂SO₄ đặc gây bỏng rất nặng, SO₂ độc: làm trong tủ hút, có giáo viên hướng dẫn, đeo kính và găng.', 'Pha loãng H₂SO₄ đặc: rót từ từ ACID vào NƯỚC, không làm ngược lại.'],
-    noiLam: 'phong-thi-nghiem', daDuyet: false,
+    noiLam: 'phong-thi-nghiem', moPhong: 'b8-hao-nuoc', daDuyet: true,
   },
   {
     id: 'b8-nhan-biet-so4', lessonId: 'bai-8', sgkTrang: 53,
@@ -262,7 +286,7 @@ export const THI_NGHIEM: ThiNghiem[] = [
     hienTuong: 'Xuất hiện kết tủa trắng (cả với H₂SO₄ loãng).',
     giaiThich: 'Ba²⁺ + SO₄²⁻ → BaSO₄↓ trắng. BaSO₄ không tan cả trong acid — nhỏ thêm HCl loãng thấy kết tủa không tan, phân biệt được với BaCO₃, BaSO₃.',
     anToan: ['Hợp chất barium tan đều độc: không để dính tay, rửa tay sau thí nghiệm.'],
-    noiLam: 'phong-thi-nghiem', daDuyet: false,
+    noiLam: 'phong-thi-nghiem', moPhong: 'b8-nhan-biet-so4', daDuyet: true,
   },
 
   /* ── Chương 3 ─────────────────────────────────────────────────────────── */
@@ -276,7 +300,7 @@ export const THI_NGHIEM: ThiNghiem[] = [
     hienTuong: 'Nhiệt độ đứng yên một thời gian trong khi chất lỏng ngưng tụ chảy xuống bình hứng; sản phẩm có độ cồn cao hơn rượu ban đầu.',
     giaiThich: 'Ethanol sôi ở nhiệt độ thấp hơn nước nên bay hơi trước, ngưng tụ ở ống sinh hàn. Nhiệt độ sôi: ethanol < hỗn hợp < nước.',
     anToan: ['Ethanol dễ cháy: ưu tiên bếp điện, không để lửa gần đầu ra ống sinh hàn.', 'Luôn cho đá bọt để tránh sôi trào; không đun cạn bình.'],
-    noiLam: 'phong-thi-nghiem', daDuyet: false,
+    noiLam: 'phong-thi-nghiem', moPhong: 'b11-chung-cat', daDuyet: true,
   },
   {
     id: 'b11-chiet', lessonId: 'bai-11', sgkTrang: 66,
@@ -288,7 +312,7 @@ export const THI_NGHIEM: ThiNghiem[] = [
     hienTuong: 'Hỗn hợp tách hai lớp; lớp hexane ở trên chuyển từ không màu sang vàng cam.',
     giaiThich: 'β-carotene tan tốt trong hexane (không phân cực) hơn trong nước nên chuyển sang lớp hexane; hexane không tan trong nước và nhẹ hơn nên nằm trên.',
     anToan: ['Hexane rất dễ cháy: xa ngọn lửa, làm nơi thoáng.', 'Khi lắc, thỉnh thoảng dốc ngược phễu và mở khoá để xả hơi, tránh bật nút.'],
-    noiLam: 'phong-thi-nghiem', daDuyet: false,
+    noiLam: 'phong-thi-nghiem', moPhong: 'b11-chiet', daDuyet: true,
   },
   {
     id: 'b11-ket-tinh', lessonId: 'bai-11', sgkTrang: 68,
@@ -300,7 +324,7 @@ export const THI_NGHIEM: ThiNghiem[] = [
     hienTuong: 'Thu được tinh thể đường trắng.',
     giaiThich: 'Than hoạt tính hấp phụ chất màu. Độ tan của đường giảm khi nguội nên đường kết tinh, tạp chất còn lại trong nước.',
     anToan: ['Cẩn thận với nước đường nóng — dễ gây bỏng.'],
-    noiLam: 'sgk-mo-ta', daDuyet: false,
+    noiLam: 'sgk-mo-ta', moPhong: 'b11-ket-tinh', daDuyet: true,
   },
   {
     id: 'b11-sac-ki-giay', lessonId: 'bai-11',
@@ -312,7 +336,7 @@ export const THI_NGHIEM: ThiNghiem[] = [
     hienTuong: 'Chấm mực loang thành các dải màu khác nhau ở các độ cao khác nhau.',
     giaiThich: 'Mỗi chất màu bị giấy (pha tĩnh) giữ lại và bị nước (pha động) kéo đi ở mức khác nhau, nên đi được quãng đường khác nhau và tách ra.',
     anToan: ['An toàn — dùng đồ gia dụng.'],
-    noiLam: 'tai-nha', daDuyet: false,
+    noiLam: 'tai-nha', moPhong: 'b11-sac-ki-giay', daDuyet: true,
   },
 
   /* ── Chương 4 ─────────────────────────────────────────────────────────── */
@@ -326,7 +350,7 @@ export const THI_NGHIEM: ThiNghiem[] = [
     hienTuong: 'Ở nhiệt độ thường gần như không đổi; khi ngâm nước ấm, màu vàng của bromine nhạt dần rồi mất.',
     giaiThich: 'C₆H₁₄ + Br₂ → C₆H₁₃Br + HBr (phản ứng thế, giả thiết chỉ thế một nguyên tử H). Alkane chỉ thế halogen khi có nhiệt hoặc ánh sáng.',
     anToan: ['Hexane dễ cháy: tuyệt đối xa ngọn lửa, dùng nước ấm chứ không đun trực tiếp.', 'Bromine độc, ăn da: làm nơi thoáng hoặc tủ hút, đeo găng.'],
-    noiLam: 'phong-thi-nghiem', daDuyet: false,
+    noiLam: 'phong-thi-nghiem', moPhong: 'b15-hexane-bromine', daDuyet: true,
   },
   {
     id: 'b15-oxi-hoa-hexane', lessonId: 'bai-15', sgkTrang: 88,
@@ -338,7 +362,7 @@ export const THI_NGHIEM: ThiNghiem[] = [
     hienTuong: 'KMnO₄ giữ nguyên màu tím. Hexane trong bát sứ bốc cháy với ngọn lửa màu vàng.',
     giaiThich: 'Alkane không phản ứng với KMnO₄ ở điều kiện thường. Khi cháy hoàn toàn: 2C₆H₁₄ + 19O₂ → 12CO₂ + 14H₂O; thiếu oxygen thì tạo CO.',
     anToan: ['Đốt trong bát sứ, lượng nhỏ, không dùng cốc thuỷ tinh; để xa chai hexane.'],
-    noiLam: 'phong-thi-nghiem', daDuyet: false,
+    noiLam: 'phong-thi-nghiem', moPhong: 'b15-oxi-hoa-hexane', daDuyet: true,
   },
   {
     id: 'b16-ethylene', lessonId: 'bai-16', sgkTrang: 99,
@@ -350,7 +374,7 @@ export const THI_NGHIEM: ThiNghiem[] = [
     hienTuong: 'Nước bromine và KMnO₄ nhạt dần rồi mất màu; khí cháy với ngọn lửa sáng, toả nhiều nhiệt.',
     giaiThich: 'C₂H₅OH → CH₂=CH₂ + H₂O (H₂SO₄ đặc, khoảng 170 °C). CH₂=CH₂ + Br₂ → CH₂Br–CH₂Br. KMnO₄ oxi hoá liên kết đôi. C₂H₄ + 3O₂ → 2CO₂ + 2H₂O.',
     anToan: ['H₂SO₄ đặc gây bỏng nặng; ethylene dễ cháy nổ: làm dưới sự hướng dẫn trực tiếp của giáo viên, đeo kính và găng.', 'Luôn cho đá bọt để tránh sôi trào; tháo ống dẫn ra khỏi dung dịch trước khi tắt đèn để không bị hút ngược.'],
-    noiLam: 'phong-thi-nghiem', daDuyet: false,
+    noiLam: 'phong-thi-nghiem', moPhong: 'b16-ethylene', daDuyet: true,
   },
   {
     id: 'b16-acetylene', lessonId: 'bai-16', sgkTrang: 99,
@@ -365,7 +389,7 @@ export const THI_NGHIEM: ThiNghiem[] = [
       'C₂H₂ rất dễ cháy nổ; bromine độc: làm dưới sự hướng dẫn trực tiếp của giáo viên, xa mọi nguồn lửa trừ lúc đốt khí.',
       'CaC₂ kĩ thuật lẫn tạp chất nên khí sinh ra có PH₃, H₂S độc (mùi tỏi): làm trong tủ hút.',
     ],
-    noiLam: 'phong-thi-nghiem', daDuyet: false,
+    noiLam: 'phong-thi-nghiem', moPhong: 'b16-acetylene', daDuyet: true,
   },
   {
     id: 'b16-chuoi-chin', lessonId: 'bai-16',
@@ -377,7 +401,7 @@ export const THI_NGHIEM: ThiNghiem[] = [
     hienTuong: 'Chuối trong túi có quả chín vàng nhanh hơn rõ rệt.',
     giaiThich: 'Quả chín tiết ra khí ethylene (CH₂=CH₂) — hormone thực vật thúc quả chín; túi kín giữ khí lại.',
     anToan: ['An toàn — ăn được sau thí nghiệm.'],
-    noiLam: 'tai-nha', daDuyet: false,
+    noiLam: 'tai-nha', moPhong: 'b16-chuoi-chin', daDuyet: true,
   },
   {
     id: 'b17-nitro-hoa-benzene', lessonId: 'bai-17', sgkTrang: 105,
@@ -389,7 +413,7 @@ export const THI_NGHIEM: ThiNghiem[] = [
     hienTuong: 'Chất lỏng tách hai lớp; lớp nitrobenzene là chất lỏng màu vàng nhạt.',
     giaiThich: 'C₆H₆ + HNO₃ → C₆H₅NO₂ + H₂O (H₂SO₄ đặc, t°). Nhóm –NO₂ thế một nguyên tử H của vòng.',
     anToan: ['Benzene gây ung thư, hỗn hợp acid đặc rất nguy hiểm: học sinh chỉ đọc mô tả hoặc xem video.'],
-    noiLam: 'sgk-mo-ta', daDuyet: false,
+    noiLam: 'sgk-mo-ta', moPhong: 'b17-nitro-hoa-benzene', daDuyet: true,
   },
   {
     id: 'b17-cong-chlorine', lessonId: 'bai-17', sgkTrang: 106,
@@ -401,7 +425,7 @@ export const THI_NGHIEM: ThiNghiem[] = [
     hienTuong: 'Có khói trắng và lớp bột trắng bám vào thành bình.',
     giaiThich: 'C₆H₆ + 3Cl₂ → C₆H₆Cl₆ (ánh sáng). Sản phẩm hexachlorocyclohexane từng dùng làm thuốc trừ sâu "666", nay đã cấm.',
     anToan: ['Benzene và chlorine đều rất độc: chỉ đọc mô tả hoặc xem video.'],
-    noiLam: 'sgk-mo-ta', daDuyet: false,
+    noiLam: 'sgk-mo-ta', moPhong: 'b17-cong-chlorine', daDuyet: true,
   },
   {
     id: 'b17-toluene-kmno4', lessonId: 'bai-17', sgkTrang: 107,
@@ -413,7 +437,7 @@ export const THI_NGHIEM: ThiNghiem[] = [
     hienTuong: 'Ống benzene vẫn giữ màu tím; ống toluene nhạt màu rồi mất màu.',
     giaiThich: 'Vòng benzene bền với chất oxi hoá. Nhánh –CH₃ của toluene bị oxi hoá thành –COOH: 5C₆H₅CH₃ + 6KMnO₄ + 9H₂SO₄ → 5C₆H₅COOH + 3K₂SO₄ + 6MnSO₄ + 14H₂O (Mn²⁺ gần như không màu).',
     anToan: ['Benzene gây ung thư: làm trong tủ hút, lượng nhỏ, có giáo viên hướng dẫn, đeo găng.', 'Toluene dễ cháy — dùng nồi cách thuỷ, không đun trực tiếp.'],
-    noiLam: 'phong-thi-nghiem', daDuyet: false,
+    noiLam: 'phong-thi-nghiem', moPhong: 'b17-toluene-kmno4', daDuyet: true,
   },
 
   /* ── Chương 5 ─────────────────────────────────────────────────────────── */
@@ -431,7 +455,7 @@ export const THI_NGHIEM: ThiNghiem[] = [
     hienTuong: 'Xuất hiện kết tủa màu vàng nhạt.',
     giaiThich: 'C₂H₅Br + NaOH → C₂H₅OH + NaBr (t°). NaBr + AgNO₃ → AgBr↓ (vàng nhạt) + NaNO₃. Phải trung hoà NaOH trước, vì OH⁻ cũng tạo kết tủa với Ag⁺ (Ag₂O nâu đen) làm sai kết quả.',
     anToan: ['C₂H₅Br độc, dễ cháy, sôi ở khoảng 38 °C nên bay hơi mạnh khi đun: làm trong tủ hút, đun nhẹ.', 'Đeo kính khi đun kiềm.'],
-    noiLam: 'phong-thi-nghiem', daDuyet: false,
+    noiLam: 'phong-thi-nghiem', moPhong: 'b19-thuy-phan', daDuyet: true,
   },
   {
     id: 'b20-chay', lessonId: 'bai-20', sgkTrang: 124,
@@ -443,7 +467,7 @@ export const THI_NGHIEM: ThiNghiem[] = [
     hienTuong: 'Cồn cháy với ngọn lửa màu xanh nhạt, gần như không có khói.',
     giaiThich: 'C₂H₅OH + 3O₂ → 2CO₂ + 3H₂O. Phản ứng toả nhiều nhiệt.',
     anToan: ['Ngọn lửa cồn khó thấy dưới ánh sáng mạnh: không rót thêm cồn khi đang cháy, để xa chai cồn.'],
-    noiLam: 'phong-thi-nghiem', daDuyet: false,
+    noiLam: 'phong-thi-nghiem', moPhong: 'b20-chay', daDuyet: true,
   },
   {
     id: 'b20-glycerol-cuoh2', lessonId: 'bai-20', sgkTrang: 125,
@@ -455,7 +479,7 @@ export const THI_NGHIEM: ThiNghiem[] = [
     hienTuong: 'Ống ethanol: kết tủa xanh không tan. Ống glycerol: kết tủa tan, dung dịch xanh lam đậm.',
     giaiThich: 'CuSO₄ + 2NaOH → Cu(OH)₂↓ + Na₂SO₄. Glycerol có các nhóm –OH kề nhau tạo phức tan màu xanh lam với Cu(OH)₂; ethanol chỉ có một nhóm –OH nên không tạo được.',
     anToan: ['Đeo kính: NaOH gây bỏng mắt.'],
-    noiLam: 'phong-thi-nghiem', daDuyet: false,
+    noiLam: 'phong-thi-nghiem', moPhong: 'b20-glycerol-cuoh2', daDuyet: true,
   },
   {
     id: 'b20-ethanol-na', lessonId: 'bai-20',
@@ -467,7 +491,7 @@ export const THI_NGHIEM: ThiNghiem[] = [
     hienTuong: 'Mẩu Na tan dần, sủi bọt khí; khí cháy với tiếng nổ nhỏ.',
     giaiThich: '2C₂H₅OH + 2Na → 2C₂H₅ONa + H₂↑. Phản ứng êm hơn nhiều so với Na + nước.',
     anToan: ['Sodium phản ứng mãnh liệt với nước: chỉ giáo viên cắt và dùng mẩu rất nhỏ.', 'Ethanol dễ cháy — tránh xa ngọn lửa trần.', 'Mẩu Na dư: cho tan hết trong ethanol rồi mới đổ bỏ; không ném vào nước hay thùng rác.'],
-    noiLam: 'giao-vien-bieu-dien', daDuyet: false,
+    noiLam: 'giao-vien-bieu-dien', moPhong: 'b20-ethanol-na', daDuyet: true,
   },
   {
     id: 'b21-phenol-naoh', lessonId: 'bai-21', sgkTrang: 131,
@@ -479,7 +503,7 @@ export const THI_NGHIEM: ThiNghiem[] = [
     hienTuong: 'Cả hai ống chuyển từ vẩn đục sang trong suốt.',
     giaiThich: 'C₆H₅OH + NaOH → C₆H₅ONa + H₂O. C₆H₅OH + Na₂CO₃ ⇌ C₆H₅ONa + NaHCO₃. Sodium phenolate tan tốt nên dung dịch trong. Phenol yếu hơn H₂CO₃ nên không phản ứng với NaHCO₃ và không giải phóng CO₂.',
     anToan: ['Phenol độc, gây bỏng da: đeo găng, kính; rửa ngay bằng nhiều nước nếu dính da.'],
-    noiLam: 'phong-thi-nghiem', daDuyet: false,
+    noiLam: 'phong-thi-nghiem', moPhong: 'b21-phenol-naoh', daDuyet: true,
   },
   {
     id: 'b21-phenol-bromine', lessonId: 'bai-21', sgkTrang: 131,
@@ -491,7 +515,7 @@ export const THI_NGHIEM: ThiNghiem[] = [
     hienTuong: 'Nước bromine mất màu, xuất hiện kết tủa trắng.',
     giaiThich: 'C₆H₅OH + 3Br₂ → C₆H₂Br₃OH↓ (2,4,6-tribromophenol, trắng) + 3HBr. Benzene không phản ứng với nước bromine, còn phenol phản ứng ngay ở nhiệt độ thường.',
     anToan: ['Phenol gây bỏng da và độc, bromine độc: làm trong tủ hút, đeo găng.'],
-    noiLam: 'phong-thi-nghiem', daDuyet: false,
+    noiLam: 'phong-thi-nghiem', moPhong: 'b21-phenol-bromine', daDuyet: true,
   },
 
   /* ── Chương 6 ─────────────────────────────────────────────────────────── */
@@ -508,7 +532,7 @@ export const THI_NGHIEM: ThiNghiem[] = [
     hienTuong: 'Thành ống nghiệm phủ một lớp bạc sáng như gương.',
     giaiThich: 'CH₃CHO + 2[Ag(NH₃)₂]OH → CH₃COONH₄ + 2Ag↓ + 3NH₃ + H₂O. Aldehyde bị oxi hoá; ketone không có H gắn vào C=O nên không phản ứng.',
     anToan: ['Pha thuốc thử Tollens tới đâu dùng tới đó, đổ bỏ ngay sau thí nghiệm: để lâu có thể tạo hợp chất dễ nổ.', 'AgNO₃ làm đen da.'],
-    noiLam: 'phong-thi-nghiem', daDuyet: false,
+    noiLam: 'phong-thi-nghiem', moPhong: 'b23-trang-bac', daDuyet: true,
   },
   {
     id: 'b23-cuoh2', lessonId: 'bai-23', sgkTrang: 141,
@@ -520,7 +544,7 @@ export const THI_NGHIEM: ThiNghiem[] = [
     hienTuong: 'Kết tủa xanh lam chuyển dần sang đỏ gạch.',
     giaiThich: 'CH₃CHO + 2Cu(OH)₂ + NaOH → CH₃COONa + Cu₂O↓ (đỏ gạch) + 3H₂O (t°). Aldehyde khử Cu(II) thành Cu(I).',
     anToan: ['Đeo kính khi đun dung dịch kiềm; hướng miệng ống nghiệm ra xa người.'],
-    noiLam: 'phong-thi-nghiem', daDuyet: false,
+    noiLam: 'phong-thi-nghiem', moPhong: 'b23-cuoh2', daDuyet: true,
   },
   {
     id: 'b23-iodoform', lessonId: 'bai-23', sgkTrang: 142,
@@ -532,7 +556,7 @@ export const THI_NGHIEM: ThiNghiem[] = [
     hienTuong: 'Xuất hiện kết tủa màu vàng.',
     giaiThich: 'CH₃COCH₃ + 3I₂ + 4NaOH → CHI₃↓ (iodoform, vàng) + CH₃COONa + 3NaI + 3H₂O.',
     anToan: ['Acetone dễ cháy; đeo kính khi dùng NaOH.'],
-    noiLam: 'phong-thi-nghiem', daDuyet: false,
+    noiLam: 'phong-thi-nghiem', moPhong: 'b23-iodoform', daDuyet: true,
   },
   {
     id: 'b24-tinh-acid', lessonId: 'bai-24', sgkTrang: 149,
@@ -544,7 +568,7 @@ export const THI_NGHIEM: ThiNghiem[] = [
     hienTuong: 'Quỳ hoá đỏ; bột Mg tan dần, có khí không màu; ống Na₂CO₃ sủi bọt khí không màu.',
     giaiThich: '2CH₃COOH + Mg → (CH₃COO)₂Mg + H₂↑. 2CH₃COOH + Na₂CO₃ → 2CH₃COONa + CO₂↑ + H₂O.',
     anToan: ['Dùng dung dịch loãng; không để bột Mg gần lửa.'],
-    noiLam: 'phong-thi-nghiem', daDuyet: false,
+    noiLam: 'phong-thi-nghiem', moPhong: 'b24-tinh-acid', daDuyet: true,
   },
   {
     id: 'b24-ester-hoa', lessonId: 'bai-24', sgkTrang: 150,
@@ -556,7 +580,7 @@ export const THI_NGHIEM: ThiNghiem[] = [
     hienTuong: 'Chất lỏng tách hai lớp; lớp ester nổi lên trên, có mùi thơm.',
     giaiThich: 'CH₃COOH + C₂H₅OH ⇌ CH₃COOC₂H₅ + H₂O (H₂SO₄ đặc, t°). H₂SO₄ đặc vừa xúc tác vừa hút nước làm cân bằng chuyển dịch sang phải. Ester ít tan trong nước muối, nhẹ hơn nên nổi lên.',
     anToan: ['H₂SO₄ đặc và acetic acid tinh khiết gây bỏng; ethanol, ester dễ cháy: làm dưới sự hướng dẫn của giáo viên, dùng nồi cách thuỷ, đeo kính và găng.'],
-    noiLam: 'phong-thi-nghiem', daDuyet: false,
+    noiLam: 'phong-thi-nghiem', moPhong: 'b24-ester-hoa', daDuyet: true,
   },
   {
     id: 'b24-giam-baking-soda', lessonId: 'bai-24',
@@ -568,6 +592,6 @@ export const THI_NGHIEM: ThiNghiem[] = [
     hienTuong: 'Sủi bọt mạnh, bóng bay phồng lên.',
     giaiThich: 'CH₃COOH + NaHCO₃ → CH₃COONa + CO₂↑ + H₂O. Acid mạnh hơn đẩy acid yếu hơn (H₂CO₃ → CO₂ + H₂O) ra khỏi muối.',
     anToan: ['An toàn — đồ dùng trong bếp. Không nếm hỗn hợp.'],
-    noiLam: 'tai-nha', daDuyet: false,
+    noiLam: 'tai-nha', moPhong: 'b24-giam-baking-soda', daDuyet: true,
   },
 ];

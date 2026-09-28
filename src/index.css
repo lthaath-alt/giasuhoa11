@@ -111,6 +111,56 @@
      độ). Là màu vật lý của chất chỉ thị, không phải màu giao diện — giữ nguyên
      ở cả hai chế độ. Chỉ dùng làm màu tô dung dịch, không làm chữ hay nền. */
   --mau-phenolphthalein: #D6337F;
+  /* MÀU CHẤT THẬT cho mô phỏng thí nghiệm 3D (mo-phong/canh/). Cùng lý do với
+     phenolphthalein ở trên: đây là màu vật lý của hoá chất và ngọn lửa, không
+     phải màu giao diện — giữ nguyên ở cả hai chế độ, và chỉ dùng tô hình trong
+     canvas, không làm màu chữ hay màu nền. */
+  --mau-dd-trong:      #BCD4E6;  /* dung dịch không màu — chỉ đủ thấy mặt thoáng */
+  --mau-ket-tua:       #F4F2EC;  /* kết tủa trắng BaSO₄, bột muối khan */
+  --mau-khoi:          #E8E6E0;  /* khói NH₄Cl, hơi nước */
+  --mau-con:           #C4D3E2;  /* cồn trong bầu đèn */
+  --mau-lua:           #EE9A22;  /* ngọn lửa đèn cồn, phần ngoài */
+  --mau-lua-trong:     #FFDD80;  /* lõi ngọn lửa */
+  --mau-lua-sulfur:    #7FA6EE;  /* sulfur cháy cho ngọn lửa xanh lam */
+  --mau-nung-do:       #E4571C;  /* chỗ đang nung đỏ, hỗn hợp Fe + S cháy sáng */
+  --mau-no2:           #B4451E;  /* khí NO₂ nâu đỏ */
+  --mau-so2:           #D8E2EA;  /* khí SO₂ không màu — vẽ thành vệt mờ */
+  --mau-brom:          #D4861F;  /* nước bromine vàng cam */
+  --mau-cu-xanh-lam:   #1C74B8;  /* ion Cu²⁺ trong dung dịch loãng */
+  --mau-cu-xanh-luc:   #2F7F55;  /* Cu(NO₃)₂ đặc lẫn NO₂ hoà tan */
+  --mau-dong:          #B4632C;  /* kim loại copper */
+  --mau-sat:           #6E7276;  /* bột sắt */
+  --mau-luu-huynh:     #E0B416;  /* bột sulfur */
+  --mau-fes:           #241F1B;  /* FeS màu đen */
+  --mau-than:          #15120E;  /* than sinh ra từ đường */
+  --mau-nau-duong:     #8A5A22;  /* đường đang hoá nâu */
+  --mau-duong:         #F3EFE6;  /* đường mía */
+  --mau-giay-ph:       #D8D6A6;  /* giấy pH chưa đổi màu */
+  --mau-quy-xanh:      #2B69B4;  /* giấy pH gặp môi trường base */
+  --mau-quy-do:        #C0392B;  /* quỳ tím gặp acid */
+  --mau-cl2:           #C3D43B;  /* khí chlorine vàng lục */
+  --mau-kmno4:         #7B2D8E;  /* dung dịch KMnO₄ tím */
+  --mau-cu-oh2:        #3E9BD6;  /* kết tủa Cu(OH)₂ xanh lam */
+  --mau-cu2o:          #B5482A;  /* Cu₂O đỏ gạch */
+  --mau-bac:           #D3D7DB;  /* lớp bạc tráng gương, kim loại sodium */
+  --mau-ket-tua-vang:  #E8D35A;  /* AgBr nhạt, iodoform vàng */
+  --mau-i2:            #8A5A2B;  /* dung dịch I₂ trong KI */
+  --mau-carotene:      #E58A1F;  /* β-carotene tan trong hexane */
+  --mau-fecl3:         #C08A3E;  /* dung dịch FeCl₃ vàng nâu */
+  --mau-huu-co:        #DFE6CE;  /* lớp hữu cơ không màu: hexane, ester */
+  --mau-nitrobenzene:  #E0C766;  /* nitrobenzene vàng nhạt */
+  --mau-nuoc-da:       #CFE6F2;  /* cốc nước đá */
+  --mau-lua-xanh:      #6FA0E0;  /* cồn cháy: ngọn lửa xanh nhạt */
+  --mau-giay:          #F2EFE6;  /* giấy lọc, giấy sắc kí */
+  --mau-bong-bay:      #E05A7A;  /* bóng bay */
+  --mau-chuoi-xanh:    #7FA83C;  /* chuối còn xanh */
+  --mau-chuoi-chin:    #E8C13A;  /* chuối chín */
+  --mau-chi-thi-tim:   #7B4FA8;  /* nước bắp cải tím / đậu biếc, trung tính */
+  --mau-chi-thi-acid:  #C8306B;  /* chất chỉ thị tự nhiên trong acid */
+  --mau-chi-thi-base:  #3E8C6A;  /* chất chỉ thị tự nhiên trong base */
+  --mau-muc-1:         #2B6CB0;  /* dải mực khi chạy sắc kí giấy */
+  --mau-muc-2:         #C2306B;
+  --mau-muc-3:         #D9A017;
 }
 
 :root[data-theme="dark"] {
@@ -181,6 +231,56 @@
   --chu-ma:       #E8E7E1;
   --chu-tren-vang:#1A1400;
   --mau-phenolphthalein: #D6337F;
+  /* MÀU CHẤT THẬT cho mô phỏng thí nghiệm 3D (mo-phong/canh/). Cùng lý do với
+     phenolphthalein ở trên: đây là màu vật lý của hoá chất và ngọn lửa, không
+     phải màu giao diện — giữ nguyên ở cả hai chế độ, và chỉ dùng tô hình trong
+     canvas, không làm màu chữ hay màu nền. */
+  --mau-dd-trong:      #BCD4E6;  /* dung dịch không màu — chỉ đủ thấy mặt thoáng */
+  --mau-ket-tua:       #F4F2EC;  /* kết tủa trắng BaSO₄, bột muối khan */
+  --mau-khoi:          #E8E6E0;  /* khói NH₄Cl, hơi nước */
+  --mau-con:           #C4D3E2;  /* cồn trong bầu đèn */
+  --mau-lua:           #EE9A22;  /* ngọn lửa đèn cồn, phần ngoài */
+  --mau-lua-trong:     #FFDD80;  /* lõi ngọn lửa */
+  --mau-lua-sulfur:    #7FA6EE;  /* sulfur cháy cho ngọn lửa xanh lam */
+  --mau-nung-do:       #E4571C;  /* chỗ đang nung đỏ, hỗn hợp Fe + S cháy sáng */
+  --mau-no2:           #B4451E;  /* khí NO₂ nâu đỏ */
+  --mau-so2:           #D8E2EA;  /* khí SO₂ không màu — vẽ thành vệt mờ */
+  --mau-brom:          #D4861F;  /* nước bromine vàng cam */
+  --mau-cu-xanh-lam:   #1C74B8;  /* ion Cu²⁺ trong dung dịch loãng */
+  --mau-cu-xanh-luc:   #2F7F55;  /* Cu(NO₃)₂ đặc lẫn NO₂ hoà tan */
+  --mau-dong:          #B4632C;  /* kim loại copper */
+  --mau-sat:           #6E7276;  /* bột sắt */
+  --mau-luu-huynh:     #E0B416;  /* bột sulfur */
+  --mau-fes:           #241F1B;  /* FeS màu đen */
+  --mau-than:          #15120E;  /* than sinh ra từ đường */
+  --mau-nau-duong:     #8A5A22;  /* đường đang hoá nâu */
+  --mau-duong:         #F3EFE6;  /* đường mía */
+  --mau-giay-ph:       #D8D6A6;  /* giấy pH chưa đổi màu */
+  --mau-quy-xanh:      #2B69B4;  /* giấy pH gặp môi trường base */
+  --mau-quy-do:        #C0392B;  /* quỳ tím gặp acid */
+  --mau-cl2:           #C3D43B;  /* khí chlorine vàng lục */
+  --mau-kmno4:         #7B2D8E;  /* dung dịch KMnO₄ tím */
+  --mau-cu-oh2:        #3E9BD6;  /* kết tủa Cu(OH)₂ xanh lam */
+  --mau-cu2o:          #B5482A;  /* Cu₂O đỏ gạch */
+  --mau-bac:           #D3D7DB;  /* lớp bạc tráng gương, kim loại sodium */
+  --mau-ket-tua-vang:  #E8D35A;  /* AgBr nhạt, iodoform vàng */
+  --mau-i2:            #8A5A2B;  /* dung dịch I₂ trong KI */
+  --mau-carotene:      #E58A1F;  /* β-carotene tan trong hexane */
+  --mau-fecl3:         #C08A3E;  /* dung dịch FeCl₃ vàng nâu */
+  --mau-huu-co:        #DFE6CE;  /* lớp hữu cơ không màu: hexane, ester */
+  --mau-nitrobenzene:  #E0C766;  /* nitrobenzene vàng nhạt */
+  --mau-nuoc-da:       #CFE6F2;  /* cốc nước đá */
+  --mau-lua-xanh:      #6FA0E0;  /* cồn cháy: ngọn lửa xanh nhạt */
+  --mau-giay:          #F2EFE6;  /* giấy lọc, giấy sắc kí */
+  --mau-bong-bay:      #E05A7A;  /* bóng bay */
+  --mau-chuoi-xanh:    #7FA83C;  /* chuối còn xanh */
+  --mau-chuoi-chin:    #E8C13A;  /* chuối chín */
+  --mau-chi-thi-tim:   #7B4FA8;  /* nước bắp cải tím / đậu biếc, trung tính */
+  --mau-chi-thi-acid:  #C8306B;  /* chất chỉ thị tự nhiên trong acid */
+  --mau-chi-thi-base:  #3E8C6A;  /* chất chỉ thị tự nhiên trong base */
+  --mau-muc-1:         #2B6CB0;  /* dải mực khi chạy sắc kí giấy */
+  --mau-muc-2:         #C2306B;
+  --mau-muc-3:         #D9A017;
 }
 
 body {

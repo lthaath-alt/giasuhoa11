@@ -5,13 +5,16 @@ import { KhungToanManHinh } from './mo-phong/KhungToanManHinh';
 import { DenDienLi } from './mo-phong/DenDienLi';
 import { ChuanDo } from './mo-phong/ChuanDo';
 import { DienLiNhieuNac } from './mo-phong/DienLiNhieuNac';
+import { ThiNghiem3D } from './mo-phong/ThiNghiem3D';
+import { KICH_BAN, timKichBan } from './mo-phong/canh';
 import { ThiNghiemTheoBai } from './ThiNghiemTheoBai';
 import { MoPhong } from '../thiNghiemTheoBai';
 
 /**
  * TAB THÍ NGHIỆM — ba khung (27/09/2026):
- *   · Mô phỏng: bóng đèn dẫn điện, chuẩn độ tính C_M, điện li nhiều nấc (React).
- *   · Thí nghiệm theo bài: danh sách gợi ý (thiNghiemTheoBai.ts).
+ *   · Mô phỏng: bóng đèn dẫn điện, chuẩn độ tính C_M, điện li nhiều nấc (React)
+ *     và các thí nghiệm dựng bằng kịch bản 3D trong `mo-phong/canh/`.
+ *   · Thí nghiệm theo bài: danh sách 41 thí nghiệm (thiNghiemTheoBai.ts).
  *   · Mô hình phân tử 3D: PHÒNG TRƯNG BÀY VI MÔ.
  *
  * Phòng trưng bày là một trang tĩnh nằm ở public/thi-nghiem.html: HTML + canvas
@@ -35,11 +38,30 @@ const KHUNG: { id: Khung; nhan: string }[] = [
   { id: 'phan-tu', nhan: 'Mô hình phân tử 3D' },
 ];
 
-const MO_PHONG: { id: MoPhong; ten: string; nhan: string }[] = [
-  { id: 'den-dien-li', ten: 'Tính dẫn điện của dung dịch', nhan: 'Bài 2' },
-  { id: 'chuan-do', ten: 'Chuẩn độ acid – base tính nồng độ', nhan: 'Bài 2' },
-  { id: 'dien-li-nhieu-nac', ten: 'Điện li nhiều nấc', nhan: 'Bài 2 · mở rộng' },
+interface MucMoPhong { id: MoPhong; ten: string; nhan: string; baiId: string }
+
+/* Ba mô phỏng của Bài 2 là component React riêng (có ô nhập, bảng số liệu) nên
+   không đi qua danh sách kịch bản; phần còn lại lấy thẳng từ KICH_BAN để thêm
+   một thí nghiệm mới chỉ phải sửa đúng một chỗ. */
+const MO_PHONG_REACT: MucMoPhong[] = [
+  { id: 'den-dien-li', ten: 'Tính dẫn điện của dung dịch', nhan: 'Bài 2', baiId: 'bai-2' },
+  { id: 'chuan-do', ten: 'Chuẩn độ acid – base tính nồng độ', nhan: 'Bài 2', baiId: 'bai-2' },
+  { id: 'dien-li-nhieu-nac', ten: 'Điện li nhiều nấc', nhan: 'Bài 2 · mở rộng', baiId: 'bai-2' },
 ];
+
+const MO_PHONG: MucMoPhong[] = [
+  ...MO_PHONG_REACT,
+  ...KICH_BAN.map(k => ({ id: k.id, ten: k.ten, nhan: k.nhan, baiId: k.baiId })),
+];
+
+const soBai = (baiId: string) => Number(baiId.replace('bai-', ''));
+const tenBai = (baiId: string) => `Bài ${baiId.replace('bai-', '')}`;
+
+/* Sắp theo SỐ bài, không theo thứ tự trong MO_PHONG: ba mô phỏng React của Bài
+   2 đứng đầu danh sách nên để nguyên thì dải chọn bài ra "Bài 2, Bài 1, …". */
+const DS_BAI: string[] = MO_PHONG
+  .reduce<string[]>((ds, m) => (ds.includes(m.baiId) ? ds : [...ds, m.baiId]), [])
+  .sort((a, b) => soBai(a) - soBai(b));
 
 const nutChon = (dangChon: boolean) => ({
   borderRadius: 0,
@@ -50,6 +72,11 @@ const nutChon = (dangChon: boolean) => ({
   color: dangChon ? 'var(--chu-nguoc)' : 'var(--chu-dam)',
   '&:hover': { bgcolor: dangChon ? 'var(--tin-hieu-nen)' : 'var(--nen-nhat)' },
 });
+
+const nhanNhom = {
+  fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase' as const,
+  letterSpacing: '0.04em', color: 'var(--chu)', mr: 0.5,
+};
 
 export const PhongThiNghiem: React.FC = () => {
   const frameRef = useRef<HTMLIFrameElement>(null);
@@ -66,6 +93,8 @@ export const PhongThiNghiem: React.FC = () => {
     setKhung('mo-phong');
   };
   const dangMo = MO_PHONG.find(m => m.id === moPhong)!;
+  const dsCungBai = MO_PHONG.filter(m => m.baiId === dangMo.baiId);
+  const kichBan = timKichBan(moPhong);
 
   return (
     <Box sx={{ width: '100%', bgcolor: 'var(--nen-xam)', borderRadius: 0, p: { xs: 1.5, md: 3 } }}>
@@ -80,11 +109,24 @@ export const PhongThiNghiem: React.FC = () => {
 
       {khung === 'mo-phong' && (
         <Box>
+          {/* Hai tầng chọn: bài trước, rồi mô phỏng trong bài. Một dãy 12 nút
+              phẳng thì tới chương sau là tràn hết màn hình điện thoại. */}
+          <Box sx={{ display: 'flex', gap: 0.75, flexWrap: 'wrap', mb: 1, alignItems: 'center' }}>
+            <Typography sx={nhanNhom}>Chọn bài</Typography>
+            {DS_BAI.map(b => (
+              <Button
+                key={b}
+                aria-pressed={b === dangMo.baiId}
+                onClick={() => setMoPhong(MO_PHONG.find(m => m.baiId === b)!.id)}
+                sx={{ ...nutChon(b === dangMo.baiId), fontSize: '0.82rem', minWidth: 0 }}
+              >
+                {tenBai(b)}
+              </Button>
+            ))}
+          </Box>
           <Box sx={{ display: 'flex', gap: 0.75, flexWrap: 'wrap', mb: 1.5, alignItems: 'center' }}>
-            <Typography sx={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', color: 'var(--chu)', mr: 0.5 }}>
-              Chọn mô phỏng
-            </Typography>
-            {MO_PHONG.map(m => (
+            <Typography sx={nhanNhom}>Mô phỏng</Typography>
+            {dsCungBai.map(m => (
               <Button key={m.id} aria-pressed={moPhong === m.id} onClick={() => setMoPhong(m.id)}
                 sx={{ ...nutChon(moPhong === m.id), fontSize: '0.82rem' }}>
                 {m.ten}
@@ -94,9 +136,10 @@ export const PhongThiNghiem: React.FC = () => {
           {/* key: đổi mô phỏng là dựng khung mới (thoát toàn màn hình của khung cũ). */}
           <KhungToanManHinh key={moPhong} tieuDe={dangMo.ten} nhan={dangMo.nhan}>
             {toan => (
-              moPhong === 'den-dien-li' ? <DenDienLi toanManHinh={toan} />
-                : moPhong === 'chuan-do' ? <ChuanDo toanManHinh={toan} />
-                  : <DienLiNhieuNac toanManHinh={toan} />
+              kichBan ? <ThiNghiem3D canh={kichBan} toanManHinh={toan} />
+                : moPhong === 'den-dien-li' ? <DenDienLi toanManHinh={toan} />
+                  : moPhong === 'chuan-do' ? <ChuanDo toanManHinh={toan} />
+                    : <DienLiNhieuNac toanManHinh={toan} />
             )}
           </KhungToanManHinh>
         </Box>

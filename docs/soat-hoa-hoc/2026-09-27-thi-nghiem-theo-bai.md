@@ -1,4 +1,4 @@
-# Thí nghiệm & mô phỏng — 27/9/2026 — nội dung mới, chờ thầy Văn duyệt
+# Thí nghiệm & mô phỏng — 27/9/2026 — nội dung mới (mục 7: thầy Văn đã duyệt)
 
 Chủ dự án yêu cầu thêm khuyến nghị thí nghiệm vì tab "Thí nghiệm" chỉ có 4 hiện
 vật 3D. Nội dung do AI soạn, rồi **đối chiếu SGK KNTT theo yêu cầu thầy Văn** qua
@@ -98,8 +98,8 @@ Nguồn chính (mỗi trang con dạng `https://vietjack.com/hoa-hoc-11-kn/...`)
 
 ## 5. Còn chờ thầy Văn
 
-1. Duyệt từng thẻ trong 41 mục; mục nào duyệt thì đổi `daDuyet: true`. Số trang,
-   nồng độ, số mL nên được thầy so với sách in.
+1. ~~Duyệt từng thẻ trong 41 mục~~ — thầy đã duyệt cả 41 mục chiều 27/09/2026 (mục 7).
+   Số trang, nồng độ, số mL vẫn nên được thầy so lại với sách in.
 
 **Kiểm cảnh 3D (27/09):** trên trình duyệt, bóng đèn đủ ba mức, ion dồn đúng cực khi
 đóng mạch; nhiều nấc đọc dòng đếm theo thời gian — H₂SO₄ 0,1 M: nấc 1 hết H₂SO₄, nấc 2
@@ -113,3 +113,107 @@ khi máy bật giảm chuyển động (nhảy thẳng tới trạng thái cân 
 
 - `public/thi-nghiem.html` có sẵn từ trước: khung chú thích viền trái dày 4 px (trái luật `ui.md`), font Inter.
 - `scripts/kiem-tra-mau.mts`: bộ đếm mã màu cứng không bỏ qua dòng có `// mau-ok` dù chú thích nói có — đã tách thành việc riêng.
+
+## 7. Cập nhật chiều 27/09/2026 — thầy Văn duyệt, dựng mô phỏng 3D chương 2
+
+**Duyệt:** chủ dự án chuyển lời thầy Văn đã duyệt **cả 41 thí nghiệm**, nên
+`thiNghiemTheoBai.ts` để `daDuyet: true` toàn bộ và nhãn vàng "Chờ giáo viên duyệt"
+không còn hiện. Thí nghiệm thêm sau này vẫn để `false` cho tới khi thầy duyệt riêng
+mục đó.
+
+**Dựng mô phỏng:** chủ dự án yêu cầu làm mô phỏng 3D cho thí nghiệm theo bài, chọn
+cách **canvas tự viết như hiện tại, không thêm thư viện**, và làm trọn **chương 2**
+trước để xem thử.
+
+| Phần | Tệp | Nội dung |
+|---|---|---|
+| Bộ dụng cụ 3D dùng chung | `mo-phong/dungCu3d.ts` | Ống nghiệm (đáy tròn), cốc, bình khí có nắp, nút bông, ống dẫn khí, đũa thuỷ tinh, muôi sắt, kẹp gỗ, giấy pH, mảnh kim loại, đèn cồn, ngọn lửa, quầng sáng, mặt bàn; hệ hạt cho bọt khí, khói, kết tủa, đống bột; trộn màu và hàm `mauKhi` — khí không màu phải pha chút màu chữ mờ, không thì chìm hẳn vào nền sáng |
+| Kiểu kịch bản + khung chạy | `mo-phong/kichBan.ts`, `mo-phong/ThiNghiem3D.tsx` | Mỗi thí nghiệm là một kịch bản gồm các BƯỚC (đúng thứ tự thao tác SGK) và một hàm vẽ suy cảnh từ số bước + tiến độ trong bước, nên tua tới lui bước nào cũng ra đúng cảnh bước đó. Khung chạy: canvas kéo xoay, dải bước bấm được, nút Chạy / Bước trước / Bước sau / Làm lại, phần "Hiện tượng" và "Phương trình" của đúng bước đang xem |
+| 9 kịch bản chương 2 | `mo-phong/canh/b5.ts`, `b6.ts`, `b7.ts`, `b8.ts`, `canh/index.ts` | Nhận biết NH₄⁺ trong phân đạm (SGK tr. 36); NH₃ + HCl khói trắng; Cu + HNO₃ đặc; Fe + S (tr. 44); S + O₂ (tr. 45); SO₂ + nước bromine; Cu + H₂SO₄ đặc nóng (tr. 51); H₂SO₄ đặc háo nước (tr. 51); nhận biết SO₄²⁻ (tr. 53) |
+| Màu chất thật | `src/index.css` | 22 biến `--mau-*` mới (NO₂ nâu đỏ, Cu²⁺ xanh lam / xanh lục, nước bromine, bột sulfur, bột sắt, FeS, than, ngọn lửa đèn cồn, ngọn lửa sulfur…), giữ nguyên ở cả hai chế độ đúng như `--mau-phenolphthalein` |
+| Chọn mô phỏng hai tầng | `components/PhongThiNghiem.tsx` | Chọn bài (Bài 2, 5, 6, 7, 8) rồi chọn mô phỏng trong bài; một dãy 12 nút phẳng là tràn màn hình điện thoại |
+
+**Đã kiểm trên trình duyệt (dev, 1024 px):** mở đủ 9 mô phỏng, tua từng bước. Fe + S
+cháy rực rồi thành FeS đen; Cu + HNO₃ khí nâu đỏ đầy ống, dung dịch xanh lục rồi pha
+loãng thành xanh lam; S cháy trong bình O₂ sáng hơn hẳn ngoài không khí; nước bromine
+nhạt dần rồi mất màu; đường hoá đen và cột than trào khỏi cốc; BaSO₄ kết tủa rồi lắng,
+thêm HCl không tan; giấy pH chỉ hoá xanh ở ống NH₄Cl. Thử cả chế độ tối.
+`npm run lint` và `npm run kiem-tra:mau` đều đạt.
+
+**Ba chỗ sửa trong lúc kiểm:** (1) bấm thẳng vào một bước lúc đang tạm dừng thì bước
+đó phải DIỄN hết rồi mới dừng — không thì nhảy vào bước "Đun nhẹ" mà đèn chưa kịp
+cháy, coi như bước trống; (2) máy bật giảm chuyển động thì vẽ thẳng cảnh cuối bước,
+có hiện tượng để nhìn; (3) khí không màu, khói trắng và kết tủa trắng vẽ đúng màu
+thật thì không thấy gì trên nền sáng.
+
+**Còn lại:** 29 thí nghiệm của chương 1, 3, 4, 5, 6 chưa có mô phỏng (12/41 đã có).
+Thêm một cái chỉ phải viết kịch bản trong `mo-phong/canh/`, khai ở `canh/index.ts` và
+thêm id vào kiểu `MoPhong`.
+
+## 8. Cập nhật 27/09/2026 — dựng nốt mô phỏng 5 chương còn lại
+
+Chủ dự án xem chương 2 xong, yêu cầu làm tiếp. Nay **cả 41 thí nghiệm đều có
+mô phỏng**: 3 mô phỏng React của Bài 2 (đèn dẫn điện, chuẩn độ, điện li nhiều
+nấc) và 38 kịch bản 3D trong `mo-phong/canh/`.
+
+| Bài | Kịch bản thêm đợt này |
+|---|---|
+| 1 | Cân bằng 2NO₂ ⇌ N₂O₄ theo nhiệt độ; thuỷ phân CH₃COONa theo nhiệt độ; theo nồng độ (ba ống, ống giữa để so sánh) |
+| 2 | Chất chỉ thị từ hoa đậu biếc / bắp cải tím; đo pH dung dịch muối bằng giấy pH |
+| 11 | Chưng cất ethanol (bình cầu, nhiệt kế, sinh hàn, bình hứng); chiết β-carotene bằng phễu chiết; tinh chế đường đỏ; sắc kí giấy |
+| 15 | Bromine hoá hexane (phải đun ấm mới mất màu); oxi hoá hexane (KMnO₄ giữ nguyên tím, hexane cháy trong bát sứ) |
+| 16 | Điều chế + thử ethylene; điều chế + thử acetylene (có muội đen); ethylene làm quả chín |
+| 17 | Nitro hoá benzene; cộng chlorine dưới ánh nắng; oxi hoá toluene và benzene bằng KMnO₄ |
+| 19 | Thuỷ phân bromoethane (giữ nguyên bước rửa sạch halide trước khi thử AgNO₃) |
+| 20 | Cháy của alcohol; Cu(OH)₂ với ethanol và glycerol; ethanol tác dụng sodium |
+| 21 | Phenol với NaOH và Na₂CO₃; phenol với nước bromine |
+| 23 | Tráng bạc Tollens; Cu(OH)₂ → Cu₂O đỏ gạch; tạo iodoform |
+| 24 | Tính acid của acetic acid (quỳ, Mg, Na₂CO₃); ester hoá; giấm + baking soda thổi bóng |
+
+Dụng cụ thêm vào `dungCu3d.ts`: bình cầu, phễu chiết, phễu lọc, bình tam giác,
+bát sứ, ống sinh hàn, nhiệt kế, que đóm, chai + bóng bay, lớp tráng gương, lớp
+chất lỏng thứ hai (hệ hai lớp) và hàm dựng vật tròn xoay theo bán kính —
+bình cầu, phễu và bát chỉ khác nhau ở hàm bán kính nên dùng chung một chỗ vẽ.
+`src/index.css` thêm 20 biến `--mau-*` nữa (KMnO₄ tím, Cu(OH)₂, Cu₂O đỏ gạch,
+bạc, AgBr, iodine, β-carotene, chlorine, nitrobenzene, quỳ đỏ…).
+
+**Đã kiểm:** chụp cả 29 cảnh mới bằng Playwright (Chrome đã cài, không quay
+video, vào bằng khách vãng lai nên không ghi dữ liệu) rồi soát bằng mắt từng
+tấm; `npm run lint` và `npm run kiem-tra:mau` đạt; ở 375 px dải chọn bài xuống
+dòng, không cuộn ngang (đo được 0 px thừa).
+
+**Sửa sau khi soát ảnh:** kết tủa trắng của phenol + nước bromine, phenol vẩn
+đục, tinh thể đường và bột baking soda vẽ đúng màu trắng thì chìm vào nền sáng
+— phải pha thêm màu chữ mờ; lớp bạc tráng gương cũng vậy, tô đậm hơn và thêm
+vệt sáng dọc thân ống; cảnh kết tinh phóng to lên 1,15.
+
+**Giới hạn còn lại:** hai thẻ `sgk-mo-ta` của Bài 17 (nitro hoá, cộng chlorine)
+là thí nghiệm SGK chỉ mô tả — mô phỏng dựng theo lời mô tả trong sách, không
+phải bài tự làm, nhãn trong danh sách vẫn ghi rõ. Số liệu thời gian trong các
+bước là ước lượng cho vừa nhịp xem, không phải thời gian thật của thí nghiệm.
+
+## 9. Cập nhật 28/09/2026 — sửa bố cục khung mô phỏng
+
+Chủ dự án hỏi phần thí nghiệm có lỗi không, bố cục có dễ nhìn không. Soát lại:
+
+**Không có lỗi JS.** Cho Playwright mở lần lượt **41 mô phỏng, bấm qua 139
+bước**, bắt `console` và `pageerror`: 0 lỗi, 0 tài nguyên 404, 0 px cuộn ngang
+ở 375 px. (Lần đo đầu báo "canvas cao 24" là do phép đo bắt nhầm icon trong
+thanh tiêu đề, không phải lỗi của trang — đã sửa phép đo rồi đo lại.)
+
+**Ba chỗ bố cục đã sửa:**
+
+1. *Hình nhỏ so với khung.* Cỡ cảnh tính bằng `min(H/3,9 , W/4)` nên trên màn
+   hình rộng chiều CAO là cái chặn: khung 1308×360 mà cảnh chỉ chiếm ~370 px
+   giữa. Nay khung cao 440 px (điện thoại 330) và chặn ngang 900 px, đo lại ở
+   1440 px: khung 900×440, cảnh chiếm ~450 px — nửa bề ngang thay vì một phần
+   ba. Toàn màn hình nâng từ 58vh lên 68vh (1392×612). Hai mô phỏng React cũ
+   (đèn dẫn điện, điện li nhiều nấc) chỉnh theo cho khỏi nhảy cỡ khi đổi bài.
+2. *Chữ nhãn không to theo khung.* `veNhan` nay nhân cỡ chữ với `q.s / 78`
+   (chặn trong 0,9 – 2 lần), tức chữ co theo cỡ cảnh: chiếu toàn màn hình thì
+   chữ to theo hình, đọc được từ cuối lớp.
+3. *Nhãn đè lên dụng cụ.* Dời 6 nhãn: "bông tẩm NaOH" (Bài 6, Bài 8), "nút
+   bông" (Bài 7), "bình O₂" (Bài 7), "ống sinh hàn" và "rượu" (Bài 11).
+
+Đã kiểm: `tsc` sạch; chụp lại 4 cảnh ở khung mới, nhãn không còn đè; đo khung
+ở 1440 px, toàn màn hình và 375 px.

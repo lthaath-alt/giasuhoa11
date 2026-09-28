@@ -220,7 +220,10 @@ export const DenDienLi3D: React.FC<{ chat: ChatDen; dong: boolean; toanManHinh: 
       role="img"
       aria-label={`Cảnh 3D: cốc dung dịch, hai điện cực và bóng đèn ${dong ? (chat.sang >= 0.9 ? 'sáng rõ' : chat.sang > 0 ? 'sáng mờ' : 'không sáng') : 'tắt vì khoá K mở'}. Kéo để xoay.`}
       sx={{
-        width: '100%', height: toanManHinh ? '62vh' : 360, display: 'block', touchAction: 'none', cursor: 'grab',
+        /* Cao bằng khung của các thí nghiệm theo bài (28/09/2026): đổi mô phỏng
+           mà khung nhảy cỡ thì nhìn rất chói. */
+        width: '100%', height: toanManHinh ? '62vh' : { xs: 330, md: 440 },
+        display: 'block', touchAction: 'none', cursor: 'grab',
         bgcolor: 'var(--nen-rat-nhat)', border: '1px solid var(--vien)',
         '&:active': { cursor: 'grabbing' },
       }}
