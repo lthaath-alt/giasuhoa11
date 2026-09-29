@@ -39,6 +39,10 @@ const CO_Y_VANG = new Set([
   // Tệp cấu hình riêng từng máy: nhắc tới để nói rõ nó VẪN bị .gitignore chặn,
   // nên trên máy chưa sinh ra nó thì đường dẫn này không tồn tại là đúng.
   'settings.local.json',
+  // Cùng tệp ấy, ghi đủ đường dẫn (workflow.md, mục ngoại lệ `npx skills find`).
+  // Danh sách so khớp NGUYÊN CHUỖI, nên dạng đầy đủ phải khai riêng — thiếu nó
+  // là máy nào chưa sinh ra tệp này cũng đỏ oan (đo 29/09/2026).
+  '.claude/settings.local.json',
   // Phiên đăng nhập Playwright cất ra: chỉ sinh ra sau khi chạy
   // `npm run kiem-tra:e2e` với tài khoản thử, và `.gitignore` chặn nó vì nó
   // mang token thật. Máy vừa clone về KHÔNG có thư mục này, và đó là đúng.
