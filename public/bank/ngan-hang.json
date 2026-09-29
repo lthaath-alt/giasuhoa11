@@ -34984,5 +34984,340 @@
   ],
   "t": "tf",
   "topic": "thuvienhoclieu.com-De-cuong-on-tap-HK1-Hoa-11-KNTT.docx"
+ },
+ {
+  "ansText": "8",
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "CₙH₂ₙ với n = 4 → C₄H₈.",
+  "id": "bq_1790720757536_2vaiv",
+  "lessonId": "bai-16",
+  "lv": "nb",
+  "num": 8,
+  "q": "Phân tử alkene có 4 nguyên tử carbon chứa bao nhiêu nguyên tử hydrogen?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "2",
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "But-1-yne và but-2-yne.",
+  "id": "bq_1790720757536_3xqhs",
+  "lessonId": "bai-16",
+  "lv": "th",
+  "num": 2,
+  "q": "Có bao nhiêu alkyne mạch hở là đồng phân cấu tạo có công thức phân tử C₄H₆?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "2",
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Liên kết ba C≡C gồm 1 liên kết σ và 2 liên kết π.",
+  "id": "bq_1790720757536_5ijkg",
+  "lessonId": "bai-16",
+  "lv": "nb",
+  "num": 2,
+  "q": "Phân tử acetylene có bao nhiêu liên kết π?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Theo quy tắc Markovnikov, sản phẩm chính là 2-bromopropane. Chỉ alk-1-yne mới tạo kết tủa với AgNO₃/NH₃.",
+  "id": "bq_1790720757536_7aumf",
+  "lessonId": "bai-16",
+  "lv": "th",
+  "q": "Xét tính chất hoá học của propene.",
+  "st": [
+   {
+    "s": "Propene làm mất màu nước bromine.",
+    "v": true
+   },
+   {
+    "s": "Propene cộng HBr tạo sản phẩm chính là 1-bromopropane.",
+    "v": false
+   },
+   {
+    "s": "Propene tham gia phản ứng trùng hợp tạo polypropylene.",
+    "v": true
+   },
+   {
+    "s": "Propene tạo kết tủa với dung dịch AgNO₃ trong NH₃.",
+    "v": false
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Liên kết ba gồm 1 liên kết σ và 2 liên kết π.",
+  "id": "bq_1790720757536_gbiem",
+  "lessonId": "bai-16",
+  "lv": "nb",
+  "q": "Xét đặc điểm cấu tạo của ethylene và acetylene.",
+  "st": [
+   {
+    "s": "Các nguyên tử trong phân tử ethylene cùng nằm trên một mặt phẳng.",
+    "v": true
+   },
+   {
+    "s": "Liên kết đôi C=C gồm một liên kết σ và một liên kết π.",
+    "v": true
+   },
+   {
+    "s": "Phân tử acetylene có cấu tạo thẳng, góc liên kết HCC bằng 180°.",
+    "v": true
+   },
+   {
+    "s": "Liên kết ba C≡C gồm ba liên kết π.",
+    "v": false
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "40",
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "x + y = 0,1; 2x + y = 0,16 (C₂H₄ cho 2H₂O, C₂H₂ cho 1H₂O) → x = 0,06; y = 0,04 → %V(C₂H₂) = 40%.",
+  "id": "bq_1790720757536_jvbsz",
+  "lessonId": "bai-16",
+  "lv": "vdc",
+  "num": 40,
+  "q": "Đốt cháy hoàn toàn 0,1 mol hỗn hợp gồm ethylene và acetylene thu được 0,16 mol H₂O. Phần trăm thể tích của acetylene trong hỗn hợp là bao nhiêu?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "%"
+ },
+ {
+  "a": 3,
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Theo quy tắc Markovnikov, H cộng vào C mang nhiều H hơn, nhóm OH vào C bậc cao hơn: CH₃–CH(OH)–CH₃ (propan-2-ol).",
+  "id": "bq_1790720757536_kr76b",
+  "lessonId": "bai-16",
+  "lv": "th",
+  "o": [
+   "propan-1-ol",
+   "propane-1,2-diol",
+   "acetone",
+   "propan-2-ol"
+  ],
+  "q": "Cho propene tác dụng với H₂O (xúc tác acid, đun nóng). Sản phẩm chính là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "8",
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "n(X) = 0,15 mol; n(CH₃C≡CAg) = 14,7 : 147 = 0,1 mol = n(propyne) → n(C₂H₄) = 0,05 mol thoát ra, cộng 0,05 mol Br₂ = 8 gam.",
+  "id": "bq_1790720757536_kvph5",
+  "lessonId": "bai-16",
+  "lv": "vdc",
+  "num": 8,
+  "q": "Dẫn 3,7185 lít (đkc) hỗn hợp X gồm propyne và ethylene qua dung dịch AgNO₃/NH₃ dư thu được 14,7 gam kết tủa. Khí thoát ra làm mất màu tối đa bao nhiêu gam Br₂ trong dung dịch?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "gam"
+ },
+ {
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "CaC₂ + 2H₂O → Ca(OH)₂ + C₂H₂. Alkene CₙH₂ₙ cháy cho n(CO₂) = n(H₂O).",
+  "id": "bq_1790720757536_m2enc",
+  "lessonId": "bai-16",
+  "lv": "vd",
+  "q": "Xét tính chất và điều chế alkene, alkyne.",
+  "st": [
+   {
+    "s": "Trong phòng thí nghiệm, ethylene được điều chế bằng cách đun ethanol với H₂SO₄ đặc ở 170 °C.",
+    "v": true
+   },
+   {
+    "s": "Acetylene được điều chế từ calcium carbide và nước.",
+    "v": true
+   },
+   {
+    "s": "Trong công nghiệp, các alkene C₂–C₄ được điều chế chủ yếu bằng cracking alkane.",
+    "v": true
+   },
+   {
+    "s": "Đốt cháy hoàn toàn một alkene thu được số mol CO₂ lớn hơn số mol H₂O.",
+    "v": false
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 1,
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "But-2-ene CH₃–CH=CH–CH₃ có mỗi C mang liên kết đôi gắn hai nhóm khác nhau (H và CH₃) nên có đồng phân cis/trans.",
+  "id": "bq_1790720757536_tp0kj",
+  "lessonId": "bai-16",
+  "lv": "th",
+  "o": [
+   "But-1-ene",
+   "But-2-ene",
+   "2-Methylpropene",
+   "Propene"
+  ],
+  "q": "Chất nào sau đây có đồng phân hình học?",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "x + y = 0,2; x + 2y = 0,3 → x = y = 0,1. m = 0,1 × 28 + 0,1 × 40 = 6,8 g. Kết tủa CH₃C≡CAg: 0,1 × 147 = 14,7 g. %V(C₂H₄) = 50%.",
+  "id": "bq_1790720757536_umq4i",
+  "lessonId": "bai-16",
+  "lv": "vd",
+  "q": "Dẫn 0,2 mol hỗn hợp X gồm ethylene và propyne qua dung dịch bromine dư thấy có 0,3 mol Br₂ phản ứng.",
+  "st": [
+   {
+    "s": "Số mol mỗi chất trong X đều bằng 0,1 mol.",
+    "v": true
+   },
+   {
+    "s": "Khối lượng của X là 6,8 gam.",
+    "v": true
+   },
+   {
+    "s": "Cho 0,2 mol X qua dung dịch AgNO₃/NH₃ dư thu được 29,4 gam kết tủa.",
+    "v": false
+   },
+   {
+    "s": "Phần trăm thể tích ethylene trong X là 40%.",
+    "v": false
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "2",
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Chỉ alk-1-yne phản ứng: pent-1-yne và 3-methylbut-1-yne.",
+  "id": "bq_1790720757536_uqvqr",
+  "lessonId": "bai-16",
+  "lv": "th",
+  "num": 2,
+  "q": "Có bao nhiêu alkyne có công thức phân tử C₅H₈ tạo kết tủa với dung dịch AgNO₃ trong NH₃?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "4,958",
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Khối lượng bình tăng bằng khối lượng C₂H₄ bị hấp thụ: n = 5,6 : 28 = 0,2 mol → V = 0,2 × 24,79 = 4,958 lít.",
+  "id": "bq_1790720757536_v19bd",
+  "lessonId": "bai-16",
+  "lv": "vd",
+  "num": 4.958,
+  "q": "Dẫn V lít ethylene (đkc) vào dung dịch bromine dư, thấy khối lượng bình bromine tăng 5,6 gam. Giá trị của V là bao nhiêu?",
+  "t": "tn",
+  "tol": 0.01,
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "lít"
+ },
+ {
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "M(X) = 15 → n(H₂) : n(C₂H₄) = 1 : 1. Lấy 1 mol mỗi chất: m = 30 g; n(Y) = 30 : 25 = 1,2 mol → số mol giảm 0,8 = n(H₂) phản ứng → H = 80%. Y còn 0,2 mol C₂H₄ nên vẫn làm mất màu nước bromine.",
+  "id": "bq_1790720757536_vhfw2",
+  "lessonId": "bai-16",
+  "lv": "vdc",
+  "q": "Hỗn hợp X gồm H₂ và ethylene có tỉ khối so với H₂ là 7,5. Dẫn X qua Ni nung nóng thu được hỗn hợp Y có tỉ khối so với H₂ là 12,5 (chỉ xảy ra phản ứng cộng H₂).",
+  "st": [
+   {
+    "s": "Trong X, số mol H₂ bằng số mol ethylene.",
+    "v": true
+   },
+   {
+    "s": "Hiệu suất phản ứng cộng H₂ là 80%.",
+    "v": true
+   },
+   {
+    "s": "Khối lượng hỗn hợp Y bằng khối lượng hỗn hợp X.",
+    "v": true
+   },
+   {
+    "s": "Hỗn hợp Y không làm mất màu nước bromine.",
+    "v": false
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "5,04",
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Khối lượng được bảo toàn trong phản ứng trùng hợp: m(PE) = 5,6 × 0,9 = 5,04 tấn.",
+  "id": "bq_1790720757536_xcmt6",
+  "lessonId": "bai-16",
+  "lv": "vd",
+  "num": 5.04,
+  "q": "Trùng hợp 5,6 tấn ethylene với hiệu suất 90%. Khối lượng polyethylene thu được là bao nhiêu tấn?",
+  "t": "tn",
+  "tol": 0.005,
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "tấn"
+ },
+ {
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Nguyên tử H gắn vào C mang liên kết ba đầu mạch bị thay bằng Ag. But-2-yne không có H như vậy nên không phản ứng.",
+  "id": "bq_1790720757536_xn0fx",
+  "lessonId": "bai-16",
+  "lv": "th",
+  "q": "Xét phản ứng của alkyne với dung dịch AgNO₃ trong NH₃.",
+  "st": [
+   {
+    "s": "Acetylene tạo kết tủa màu vàng nhạt.",
+    "v": true
+   },
+   {
+    "s": "But-2-yne tạo kết tủa với thuốc thử này.",
+    "v": false
+   },
+   {
+    "s": "Chỉ các alkyne có liên kết ba ở đầu mạch mới phản ứng.",
+    "v": true
+   },
+   {
+    "s": "Có thể dùng phản ứng này để phân biệt but-1-yne và but-2-yne.",
+    "v": true
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "6,20",
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "n(CaC₂) = 16 : 64 = 0,25 mol → n(C₂H₂) = 0,25 mol → V = 0,25 × 24,79 = 6,1975 ≈ 6,20 lít.",
+  "id": "bq_1790720757536_zsnqq",
+  "lessonId": "bai-16",
+  "lv": "vd",
+  "num": 6.2,
+  "q": "Cho 16 gam calcium carbide (CaC₂) tác dụng hết với nước dư. Thể tích acetylene thu được là bao nhiêu lít (đkc)? (Làm tròn đến hàng phần trăm.)",
+  "t": "tn",
+  "tol": 0.01,
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "lít"
  }
 ]
