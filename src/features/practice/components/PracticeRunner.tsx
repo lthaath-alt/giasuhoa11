@@ -72,7 +72,9 @@ export const PracticeRunner: React.FC<Props> = ({
         Quay lại danh sách bài
       </Button>
 
-      <Paper sx={{ p: 2.5, mb: 3, borderLeft: '4px solid var(--xanh)' }}>
+      {/* Khung 1px mặc định của Paper (theme) là đủ; viền trái màu dày kiểu
+          callout bị DESIGN.md cấm ("The Straight-Rule Rule"). */}
+      <Paper sx={{ p: 2.5, mb: 3 }}>
         <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{tenBai}</Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
           {TEN_PHAN[phan]} — {cauHoi.length} câu · cần đạt {Math.round(NGUONG_DAT * 100)}%
