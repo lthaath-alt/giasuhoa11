@@ -316,7 +316,7 @@ export const TextbookViewer: React.FC<TextbookViewerProps> = ({ lesson, onOpenCh
                     onClick={onOpenChat}
                     sx={{ textTransform: 'none', fontWeight: 600, borderRadius: 0, fontSize: '0.8rem', borderColor: 'var(--tin-hieu)', color: 'var(--tin-hieu)', '&:hover': { bgcolor: 'var(--nen-tin-hieu-nhat)' } }}
                   >
-                    Hỏi Gia sư AI
+                    Hỏi Chemai
                   </Button>
                 </Box>
                 {revealedAnswers[q.id] && q.answer && (
@@ -345,7 +345,7 @@ export const TextbookViewer: React.FC<TextbookViewerProps> = ({ lesson, onOpenCh
       >
         <Box>
           <Typography variant="subtitle1" sx={{ fontWeight: 700, color: VAI.chu }}>Còn thắc mắc về bài học này?</Typography>
-          <Typography variant="body2" sx={{ color: 'var(--chu-2)', mt: 0.5 }}>Gia sư AI sẵn sàng giải đáp mọi câu hỏi của bạn ngay lập tức!</Typography>
+          <Typography variant="body2" sx={{ color: 'var(--chu-2)', mt: 0.5 }}>Chemai sẵn sàng giải đáp mọi câu hỏi của bạn ngay lập tức!</Typography>
         </Box>
         <Button
           variant="contained"
@@ -358,7 +358,7 @@ export const TextbookViewer: React.FC<TextbookViewerProps> = ({ lesson, onOpenCh
             '&:hover': { backgroundColor: VAI.nenDam },
           }}
         >
-          Hỏi Gia sư AI ngay
+          Hỏi Chemai ngay
         </Button>
       </Paper>
     </Box>

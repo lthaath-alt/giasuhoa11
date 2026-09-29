@@ -35,7 +35,7 @@ export const SuggestedQuestionsCard: React.FC<SuggestedQuestionsCardProps> = ({
           </Typography>
         </Box>
         <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
-          Click vào câu hỏi dưới đây để Gia sư AI dẫn dắt phương pháp giải và khơi gợi tư duy:
+          Click vào câu hỏi dưới đây để Chemai dẫn dắt phương pháp giải và khơi gợi tư duy:
         </Typography>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
           {lesson.commonQuestions.map((q, i) => (

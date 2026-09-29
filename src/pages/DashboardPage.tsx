@@ -148,9 +148,9 @@ export const DashboardPage: React.FC = () => {
       ma: 'AI',
       ten: 'Gia sư AI',
       trangThai: currentUser
-        ? 'Thầy Hùng gợi mở từng bước, không đưa đáp số'
+        ? 'Chemai gợi mở từng bước, không đưa đáp số'
         : `còn ${Math.max(0, TRAN_LUOT_KHACH - guestChatCount)}/${TRAN_LUOT_KHACH} câu hỏi thử`,
-      /* Thầy Hùng đứng ở mép phải ĐÚNG trường này, không phải giữa màn —
+      /* Chemai đứng ở mép phải ĐÚNG trường này, không phải giữa màn —
          hợp đồng hướng chỉ định vậy, và ở đây nhân vật nói đúng việc mình làm
          thay vì làm nền trang trí cho cả trang. */
       nhanVat: <MascotDauVai tab="gioithieu" rong={64} anBongBong />,
@@ -199,7 +199,7 @@ export const DashboardPage: React.FC = () => {
     try {
       await addMessage('global-advisor', text);
     } catch (err: any) {
-      setIchatError(err.message || 'Có lỗi xảy ra khi trò chuyện với Gia sư AI.');
+      setIchatError(err.message || 'Có lỗi xảy ra khi trò chuyện với Chemai.');
     } finally {
       setIsIchatSending(false);
     }
@@ -214,8 +214,8 @@ export const DashboardPage: React.FC = () => {
 
   // Các câu hỏi gợi ý cho iChat tư vấn học tập
   const SUGGESTED_ICHAT_PROMPTS = [
-    'Thầy ơi, hướng dẫn em cách tính pH của dung dịch Ba(OH)2 với ạ?',
-    'Làm sao để làm bài tập hiệu suất tổng hợp Ammonia vậy thầy?',
+    'Chemai ơi, hướng dẫn em cách tính pH của dung dịch Ba(OH)2 với ạ?',
+    'Làm sao để làm bài tập hiệu suất tổng hợp Ammonia vậy Chemai?',
     'Làm thế nào để xác định sản phẩm chính của phản ứng thế Alkane ạ?',
     'Phương pháp lập công thức phân tử hợp chất hữu cơ CxHyOz như thế nào ạ?',
   ];
@@ -474,7 +474,7 @@ export const DashboardPage: React.FC = () => {
                             Chơi Xong Rồi, Học Tiếp Thôi!
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
-                            Tạo tài khoản miễn phí để lưu tiến trình chơi, mở khóa đầy đủ 6 chương Hóa 11 và hỏi Thầy Gia sư AI bất cứ lúc nào.
+                            Tạo tài khoản miễn phí để lưu tiến trình chơi, mở khóa đầy đủ 6 chương Hóa 11 và hỏi Chemai bất cứ lúc nào.
                           </Typography>
                         </Box>
                         <Button
@@ -629,13 +629,13 @@ export const DashboardPage: React.FC = () => {
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                   <Card sx={{ p: 3, borderRadius: 0, border: '1px solid var(--vien)' }}>
                     <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)', mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Sparkles size={20} color="var(--chu-dam)" /> Thầy Hùng Trợ Giảng AI
+                      <Sparkles size={20} color="var(--chu-dam)" /> Chemai Trợ Giảng AI
                     </Typography>
                     <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.7 }}>
-                      Thầy là Trợ lý học tập cá nhân của em. Thầy sẵn sàng giải đáp mọi thắc mắc lý thuyết liên quan đến <strong>Hóa học lớp 11</strong>!
+                      Chemai là trợ lý học tập cá nhân của em, sẵn sàng giải đáp mọi thắc mắc lý thuyết liên quan đến <strong>Hóa học lớp 11</strong>!
                     </Typography>
                     <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.7 }}>
-                      Thầy chỉ dẫn từng bước khơi gợi tư duy giúp em tự học tốt nhất, không làm bài tập hộ đâu nhé!
+                      Chemai chỉ dẫn từng bước, khơi gợi tư duy giúp em tự học tốt nhất, không làm bài tập hộ đâu nhé!
                     </Typography>
                     
                     <Divider sx={{ my: 2 }} />
@@ -666,7 +666,7 @@ export const DashboardPage: React.FC = () => {
                         </Typography>
                         <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.68rem', display: 'block' }}>
                           <span style={{ color: 'var(--luc-tham)', fontWeight: 'bold' }}>Đã nạp sẵn trong web</span>
-                          {' '}— Thầy luôn có danh mục cả 25 bài; mở một bài cụ thể thì có thêm toàn văn bài đó.
+                          {' '}— Chemai luôn có danh mục cả 25 bài; mở một bài cụ thể thì có thêm toàn văn bài đó.
                         </Typography>
                       </Box>
                     </Box>
@@ -675,7 +675,7 @@ export const DashboardPage: React.FC = () => {
                   {/* Câu hỏi gợi ý nhanh */}
                   <Card sx={{ p: 3, borderRadius: 0, border: '1px solid var(--vien)' }}>
                     <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 2 }}>
-                      Các chủ đề gợi ý em có thể hỏi Thầy:
+                      Các chủ đề gợi ý em có thể hỏi Chemai:
                     </Typography>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                       {SUGGESTED_ICHAT_PROMPTS.map((prompt, idx) => (
@@ -728,7 +728,7 @@ export const DashboardPage: React.FC = () => {
                     </Avatar>
                     <Box>
                       <Typography variant="subtitle1" sx={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1 }}>
-                        Thầy Hùng — Gia sư tư vấn
+                        Chemai — Gia sư tư vấn
                         <Chip label="ONLINE" size="small" color="secondary" sx={{ height: 16, fontSize: '0.65rem', fontWeight: 'bold' }} />
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
@@ -752,7 +752,7 @@ export const DashboardPage: React.FC = () => {
                       ) : (
                         <span>Em đang dùng bản dùng thử. Còn lại: <strong>{guestRemainingCount}/{TRAN_LUOT_KHACH} lượt hỏi</strong>.</span>
                       )}
-                      {' Đăng ký tài khoản học sinh để hỏi Thầy không giới hạn!'}
+                      {' Đăng ký tài khoản học sinh để hỏi Chemai không giới hạn!'}
                     </Alert>
                   )}
 
@@ -763,9 +763,9 @@ export const DashboardPage: React.FC = () => {
                         <Avatar sx={{ width: 64, height: 64, bgcolor: 'var(--nen-xanh-nhat2)', color: 'var(--xanh)' }}>
                           <MessageSquare size={32} />
                         </Avatar>
-                        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Bắt đầu buổi tư vấn riêng cùng Thầy!</Typography>
+                        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Bắt đầu buổi tư vấn riêng cùng Chemai!</Typography>
                         <Typography variant="body2" color="text.secondary" sx={{ maxW: 420 }}>
-                          Em có thắc mắc gì về lý thuyết Hóa học 11, cách cân bằng phương trình, quy tắc Le Chatelier hay các chủ đề tự luận? Nhắn ngay cho thầy dưới đây nhé!
+                          Em có thắc mắc gì về lý thuyết Hóa học 11, cách cân bằng phương trình, quy tắc Le Chatelier hay các chủ đề tự luận? Nhắn ngay cho Chemai dưới đây nhé!
                         </Typography>
                       </Box>
                     ) : (
@@ -851,7 +851,7 @@ export const DashboardPage: React.FC = () => {
                     <TextField
                       fullWidth
                       size="small"
-                      placeholder={guestLimitReached ? 'Đã hết lượt chat thử miễn phí!' : 'Nhắn tin hỏi thầy (Ví dụ: Thầy hướng dẫn em bài tập tính pH)...'}
+                      placeholder={guestLimitReached ? 'Đã hết lượt chat thử miễn phí!' : 'Nhắn tin hỏi Chemai (Ví dụ: Hướng dẫn em bài tập tính pH)...'}
                       value={ichatInput}
                       onChange={(e) => setIchatInput(e.target.value)}
                       onKeyDown={handleKeyPressIchat}
@@ -864,7 +864,7 @@ export const DashboardPage: React.FC = () => {
                       disabled={guestLimitReached || isIchatSending || !ichatInput.trim()}
                       sx={{ borderRadius: 0, px: 3, fontWeight: 'bold' }}
                     >
-                      Gửi Thầy
+                      Gửi
                     </Button>
                   </Box>
 
@@ -938,7 +938,7 @@ export const DashboardPage: React.FC = () => {
                         <br />
                         - Khi em học lý thuyết, Gia sư tóm tắt các điểm then chốt nhất giúp em dễ nhớ dễ hiểu.
                         <br />
-                        - Khi em làm bài tập, Gia sư <strong>chỉ gợi mở phương pháp và dẫn dắt em tư duy qua từng bước</strong>, chứ thầy sẽ không giải hộ trực tiếp bài tập hay đưa ra đáp số ngay. Thầy muốn em tự động não và làm được bài tập để hình thành tư duy chủ động xuất sắc!
+                        - Khi em làm bài tập, Gia sư <strong>chỉ gợi mở phương pháp và dẫn dắt em tư duy qua từng bước</strong>, chứ Chemai sẽ không giải hộ trực tiếp bài tập hay đưa ra đáp số ngay. Chemai muốn em tự động não và làm được bài tập để hình thành tư duy chủ động xuất sắc!
                       </Typography>
                     </AccordionDetails>
                   </Accordion>

@@ -23,7 +23,7 @@ export function useGiayDaCho(dangCho: boolean): number {
 }
 
 /** Dòng chữ hiện trong lúc chờ — im lặng lúc đầu, nói rõ khi chờ lâu. */
-export function chuDangCho(giay: number, mac = 'Thầy đang viết câu trả lời...'): string {
+export function chuDangCho(giay: number, mac = 'Chemai đang viết câu trả lời...'): string {
   if (giay < 15) return mac;
   if (giay < 45) return `${mac} (${giay} giây — câu này thầy cần nghĩ lâu hơn chút)`;
   return `${mac} (${giay} giây — nếu quá lâu, em cứ gửi lại câu hỏi nhé)`;
