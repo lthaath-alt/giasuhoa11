@@ -33,6 +33,10 @@ export const PracticeRunner: React.FC<Props> = ({
 }) => {
   const [traLoi, setTraLoi] = useState<Record<string, TraLoi>>({});
   const [ketQua, setKetQua] = useState<KetQuaLuot | null>(null);
+  /* Tiến độ ĐÃ tính cả lượt vừa nộp. Đếm lượt còn lại theo nó, không theo prop
+     `tienDo`: cha cập nhật prop ngay khi nộp (ghi lạc quan), nên lấy prop trừ
+     thêm 1 là trừ hai lần — lượt thứ 3 sai đã báo "hết lượt" dù còn lượt 4. */
+  const [tienDoSau, setTienDoSau] = useState<TienDoPhan | null>(null);
 
   const daNop = ketQua !== null;
 
@@ -51,14 +55,16 @@ export const PracticeRunner: React.FC<Props> = ({
 
   const nop = () => {
     const kq = chamLuot(cauHoi, traLoi);
+    const sau = capNhatSauLuot(tienDo, cauHoi, kq);
     setKetQua(kq);
-    onNop(capNhatSauLuot(tienDo, cauHoi, kq), kq);
+    setTienDoSau(sau);
+    onNop(sau, kq);
   };
 
   const ketQuaCau = (cauId: string) =>
     ketQua?.chiTiet.find(r => r.cauId === cauId);
 
-  const conLaiSauLuotNay = soLuotConLai(tienDo) - 1;
+  const conLaiSauLuotNay = tienDoSau ? soLuotConLai(tienDoSau) : soLuotConLai(tienDo) - 1;
 
   return (
     <Box>
