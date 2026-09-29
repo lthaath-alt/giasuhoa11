@@ -87,13 +87,9 @@ export const PracticeList: React.FC<Props> = ({ curriculum, tienDo, onChon, onCh
               const xong = baiDaXong(tienDo[bai.id]);
 
               return (
-                <Paper
-                  key={bai.id}
-                  sx={{
-                    p: 2,
-                    borderLeft: `4px solid ${xong ? 'var(--luc)' : 'var(--vien)'}`,
-                  }}
-                >
+                /* Không viền trái màu dày (DESIGN.md cấm): bài xong đã có dấu
+                   ✓ màu lục ngay cạnh tên. */
+                <Paper key={bai.id} sx={{ p: 2 }}>
                   <Stack
                     direction={{ xs: 'column', md: 'row' }}
                     spacing={1.5}

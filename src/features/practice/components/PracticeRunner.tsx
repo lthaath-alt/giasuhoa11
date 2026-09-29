@@ -106,15 +106,8 @@ export const PracticeRunner: React.FC<Props> = ({
       {cauHoi.map((cau, idx) => {
         const kq = ketQuaCau(cau.id);
         return (
-          <Paper
-            key={cau.id}
-            sx={{
-              p: 2.5, mb: 2,
-              borderLeft: kq
-                ? `4px solid ${kq.dung ? 'var(--luc)' : 'var(--do)'}`
-                : '4px solid transparent',
-            }}
-          >
+          /* Đúng/sai đã có chip ngay đầu câu; không thêm viền trái màu dày. */
+          <Paper key={cau.id} sx={{ p: 2.5, mb: 2 }}>
             <Stack direction="row" spacing={1} sx={{ alignItems: 'flex-start', mb: 1.5 }}>
               <Chip label={`Câu ${idx + 1}`} size="small" color="primary" />
               {kq && (
