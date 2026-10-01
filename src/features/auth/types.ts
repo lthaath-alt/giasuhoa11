@@ -247,7 +247,11 @@ export interface ChatMessage {
   nhan_hong?: boolean;
   /** Nguồn đã trả lời (01/10/2026): 'gemini-firebase' | 'gemini-khoa-rieng'. Lượt không gọi mô hình thì trống */
   nha_cung_cap?: string;
-  /** Đường đã đi: 'chinh' | 'xoay-gemini' | 'khoa-rieng'. Lọc 'chinh' để phân tích riêng model gốc */
+  /** Đường đã đi: 'chinh' | 'xoay-gemini' | 'khoa-rieng'. Lọc 'chinh' để phân tích riêng model gốc.
+      Trống ở các dòng TRƯỚC 01/10/2026 (trường này chưa tồn tại — lượt đó chỉ có thể là model
+      chính hoặc khoá riêng của em) và ở lượt KHÔNG gọi model nào (gian lận phát hiện sớm, câu trả
+      lời dựng sẵn); phân tích "chỉ model chính" trên dữ liệu cũ phải xử trống đúng theo hai ca
+      trên, không coi trống là thiếu dữ liệu. */
   duong?: string;
 }
 

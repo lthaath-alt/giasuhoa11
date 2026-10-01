@@ -65,6 +65,12 @@ export async function goiTheoChuoi(cacBuoc: BuocGoi[], mt: MoiTruongChuoi): Prom
   const batDau = mt.bayGio();
   let loiCuoi: unknown = null;
   let loiPhut: unknown = null;
+  /* Lỗi 'may-chu' (503, quá tải, …) GẶP TRONG LƯỢT NÀY — không đánh dấu chết
+     trong kho vì chỉ là tạm thời, nhưng vẫn phải được NÉM RA thay vì lỗi của
+     bước cuối cùng: soát cuối nhánh A bắt ca model A trả 503 (còn sống) rồi
+     model B (đã chết hẳn) trả về hết lượt NGÀY — lỗi NGÀY đó là của riêng B,
+     không phải tình trạng chung, nói "máy chủ" mới đúng và vô hại hơn. */
+  let loiMayChu: unknown = null;
   /* Có BƯỚC NÀO (chung hay khoá riêng) bị bỏ qua hay hỏng vì đang nghỉ PHÚT
      không — quyết định câu lỗi cuối cùng khi không ai trả lời được. */
   let coNghiPhut = false;
@@ -116,7 +122,7 @@ export async function goiTheoChuoi(cacBuoc: BuocGoi[], mt: MoiTruongChuoi): Prom
         coNghiPhut = true;
         continue;
       }
-      if (loai === 'may-chu') continue;
+      if (loai === 'may-chu') { loiMayChu = loi; continue; }
       /* App Check, quá hạn, mạng, lỗi lạ: đổi model không cứu được. */
       throw loi;
     }
@@ -128,5 +134,16 @@ export async function goiTheoChuoi(cacBuoc: BuocGoi[], mt: MoiTruongChuoi): Prom
   /* Còn bước nào chỉ nghỉ phút thì nói đúng là "chờ một phút", đừng doạ
      "hết lượt cả ngày" — em sẽ bỏ đi trong khi một phút nữa là hỏi được. */
   if (coNghiPhut) throw loiPhut ?? new Error(LOI_HET_SACH_PHUT);
+  /* Lỗi cuối cùng phải mô tả đúng TÌNH TRẠNG CHUNG, không phải lỗi của riêng
+     bước gọi sau cùng (soát cuối nhánh A, 01/10/2026):
+       - mọi bước trong `cacBuoc` đều đã chết trong kho → đúng là hết sạch
+         ngày, dù bước cuối cùng ném ra lỗi gì (404 model hỏng, …).
+       - còn bước nào đó CÒN SỐNG mà cả lượt vẫn hỏng vì gặp 503 dọc đường →
+         nói "máy chủ", KHÔNG doạ "hết lượt cả ngày" trong khi model đó alive.
+       - còn lại (lỗi lạ không rơi vào hai ca trên) mới dùng lỗi của bước cuối. */
+  const locKiemTra = new Date(mt.bayGio());
+  const moiBuocDaChet = cacBuoc.every((b) => !mt.kho.conDung(b.vung, b.maMoHinh, locKiemTra));
+  if (moiBuocDaChet) throw new Error(LOI_HET_SACH_NGAY);
+  if (loiMayChu) throw loiMayChu;
   throw loiCuoi ?? new Error(LOI_HET_SACH_NGAY);
 }

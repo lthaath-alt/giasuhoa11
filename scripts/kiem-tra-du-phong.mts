@@ -36,6 +36,13 @@ const LOI_PHUT = LOI_NGAY.replace('PerDay', 'PerMinute');
 const LOI_404 = 'AI: Error fetching from https://firebasevertexai.googleapis.com/v1beta/projects/giasuhoa11/models/gemini-x:generateContent: [404 Not Found] models/gemini-x is not found (AI/fetch-error)';
 const LOI_503 = 'AI: Error fetching from https://firebasevertexai.googleapis.com/...: [503 Service Unavailable] The model is overloaded due to high demand (AI/fetch-error)';
 const LOI_APPCHECK = 'AppCheck: Requests throttled due to 403 error. Attempts allowed again after 23h:59m (appCheck/initial-throttle).';
+/* Soát cuối nhánh A: một số thông báo throttle của App Check tự mang chữ
+   "429" trong câu — phải vẫn là 'app-check', không rơi nhầm vào 'het-phut'. */
+const LOI_APPCHECK_429 = 'AppCheck: Requests throttled due to 429 error. Attempts allowed again after 00:01:00 (appCheck/throttled).';
+/* Regex y hệt UI dùng để bật hộp thoại "lấy khoá riêng" (TutorChat.tsx:68,
+   DashboardPage.tsx:188) — kiểm bằng đúng regex đó, không phải includes gần
+   đúng, để không lặp lại lỗi báo sai hộp thoại ở soát cuối nhánh A. */
+const RE_HET_NGAY_TOAN_HE_THONG = /hết lượt trả lời trong ngày của toàn hệ thống/;
 
 console.log('\n== Đọc loại lỗi ==');
 ok(phanLoaiLoiGemini(LOI_NGAY) === 'het-ngay', 'hết lượt NGÀY');
@@ -43,6 +50,8 @@ ok(phanLoaiLoiGemini(LOI_PHUT) === 'het-phut', 'hết lượt PHÚT');
 ok(phanLoaiLoiGemini(LOI_404) === 'mo-hinh-hong', 'model không tồn tại (404)');
 ok(phanLoaiLoiGemini(LOI_503) === 'may-chu', 'máy chủ quá tải (503)');
 ok(phanLoaiLoiGemini(LOI_APPCHECK) === 'app-check', 'App Check bị khoá');
+ok(phanLoaiLoiGemini(LOI_APPCHECK_429) === 'app-check',
+   'App Check mang chữ "429" trong câu throttle vẫn là app-check, không phải het-phut (soát cuối nhánh A)');
 ok(phanLoaiLoiGemini('AbortError: signal timed out') === 'qua-han', 'quá hạn chờ');
 ok(phanLoaiLoiGemini('TypeError: Failed to fetch') === 'mang', 'rớt mạng');
 ok(phanLoaiLoiGemini('API key not valid. Please pass a valid API key.') === 'khac', 'khoá sai không bị coi là hết lượt');
@@ -182,13 +191,46 @@ console.log('\n== Gọi theo chuỗi ==');
        'khoá riêng đứng ĐẦU mảng mà model chung còn sống: vẫn không được gọi trước nó', nhat.join());
   }
   {
+    /* Soát cuối nhánh A, ca (a): model chung A trả 503 (CÒN SỐNG, chỉ tạm
+       thời) rồi model chung B hết lượt NGÀY (CHẾT trong kho). Lỗi ném ra phải
+       là của 503 — "máy chủ", KHÔNG được doạ "hết lượt cả ngày" trong khi A
+       vẫn sống. Không có khoá riêng trong `cacBuoc` (giống học sinh chưa dán
+       khoá). */
+    const nhat: string[] = [];
+    const loi = await thu(() => goiTheoChuoi([
+      buoc('chinh', [LOI_503], nhat, { duong: 'chinh' }), buoc('a', [LOI_NGAY], nhat),
+    ], moiTruong()));
+    const chuoi = loiThanhChuoi(loi);
+    ok(loi !== null, 'lỗi vẫn phải được ném ra (không model nào trả lời được)');
+    const loiKetNoi = thongBaoLoiKetNoi(chuoi);
+    ok(loiKetNoi !== '' && loiKetNoi.includes('máy chủ'),
+       'thongBaoLoiKetNoi phải nói "máy chủ", vì model A còn sống, chỉ 503 tạm thời', chuoi);
+    ok(thongBaoHetLuot(chuoi) === '',
+       'thongBaoHetLuot phải RỖNG — đây không phải lỗi hết lượt, đừng bật hộp thoại khoá riêng', chuoi);
+    ok(!RE_HET_NGAY_TOAN_HE_THONG.test(loiKetNoi), 'câu báo không được khớp regex bật hộp thoại khoá riêng');
+  }
+  {
+    /* Soát cuối nhánh A, ca (b): mọi model chung đều CHẾT trong kho (chinh
+       hết NGÀY, a là bước gọi CUỐI nhưng chỉ 404 hỏng riêng model đó) — phải
+       báo đúng "hết lượt cả ngày", không phải để lọt lỗi 404 của bước cuối
+       lên (ca đó rơi về mock script ở đường khoá riêng, sai hẳn ý nghĩa). */
+    const nhat: string[] = [];
+    const loi = await thu(() => goiTheoChuoi([
+      buoc('chinh', [LOI_NGAY], nhat, { duong: 'chinh' }), buoc('a', [LOI_404], nhat),
+    ], moiTruong()));
+    ok(loi !== null, 'lỗi vẫn phải được ném ra');
+    ok(RE_HET_NGAY_TOAN_HE_THONG.test(thongBaoHetLuot(loiThanhChuoi(loi))),
+       'mọi model chung đã chết (kể cả bước cuối chỉ 404) thì phải đúng là hết lượt cả ngày', loiThanhChuoi(loi));
+  }
+  {
     const mt = moiTruong();
     mt.kho.danhDau('firebase', 'chinh', new Date(gio));
     mt.kho.danhDau('firebase', 'a', new Date(gio));
     const nhat: string[] = [];
     const loi = await thu(() => goiTheoChuoi([buoc('chinh', ['ok'], nhat, { duong: 'chinh' }), buoc('a', ['ok'], nhat)], mt));
     ok(loi !== null && nhat.length === 0, 'mọi model đã chết từ trước: không gọi ai cả');
-    ok(thongBaoHetLuot(loiThanhChuoi(loi)).includes('toàn hệ thống'), 'và học sinh nhận đúng câu hết lượt trong ngày');
+    ok(RE_HET_NGAY_TOAN_HE_THONG.test(thongBaoHetLuot(loiThanhChuoi(loi))),
+       'và học sinh nhận đúng câu hết lượt trong ngày (đúng regex UI dùng để bật hộp thoại khoá riêng)');
   }
   {
     const nhat: string[] = [];
@@ -237,7 +279,7 @@ console.log('\n== Gọi theo chuỗi ==');
        hệ thống), không được treo hay trả `undefined`. */
     const loi = await thu(() => goiTheoChuoi([], moiTruong()));
     ok(loi !== null, 'mảng bước rỗng: vẫn phải báo lỗi, không treo');
-    ok(thongBaoHetLuot(loiThanhChuoi(loi)).includes('toàn hệ thống'), 'và đúng câu hết lượt toàn hệ thống');
+    ok(RE_HET_NGAY_TOAN_HE_THONG.test(thongBaoHetLuot(loiThanhChuoi(loi))), 'và đúng câu hết lượt toàn hệ thống');
   }
 }
 
@@ -247,6 +289,16 @@ console.log('\n== Gia sư dùng chuỗi, ghi đúng model ==');
   ok(ma.includes('goiTheoChuoi(') && ma.includes('GEMINI_XOAY'), 'geminiTutorService gọi qua chuỗi có xoay vòng');
   ok(!/modelName:\s*GEMINI_MODEL_NAME/.test(ma), 'KHÔNG còn ghi cứng modelName = model chính');
   ok(ma.includes('ket.goiLai('), 'lượt sinh lại đi qua goiLai (đúng model vừa trả lời)');
+  /* Soát cuối nhánh A (Việc 2): sinhLai gọi thêm một lượt model — hỏng giữa
+     chừng (hết lượt đúng lúc đó) không được để lỗi hạn mức văng lên nuốt mất
+     cả lượt. Kiểm TĨNH đơn giản: có `catch` đứng gần `ket.goiLai(`, không chạy
+     lại máy trạng thái đầy đủ ở đây (đã có `kiem-tra:su-pham` lo phần đó). */
+  {
+    const idx = ma.indexOf('ket.goiLai(');
+    const quanh = idx === -1 ? '' : ma.slice(Math.max(0, idx - 150), idx + 150);
+    ok(idx !== -1 && quanh.includes('catch'),
+       'lượt sinh lại của bộ chặn rò có try/catch quanh ket.goiLai (hỏng giữa lượt thì trả rỗng, không ném lỗi hạn mức lên)');
+  }
   const ctx = readFileSync(new URL('../src/core/contexts/AppContext.tsx', import.meta.url), 'utf8');
   ok(/nha_cung_cap:\s*ketQua\.nhaCungCap/.test(ctx) && /duong:\s*ketQua\.duong/.test(ctx),
      'AppContext ghi nguồn trả lời và đường đi xuống chats');

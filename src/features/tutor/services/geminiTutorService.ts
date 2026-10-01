@@ -192,8 +192,20 @@ async function layCauCoDapSo(lessonId: string): Promise<CauCoDapSo[]> {
 /* Model đang nghỉ vì hết lượt PHÚT — sống theo phiên trang, không cần lưu. */
 const NGHI_PHUT = new Map<string, number>();
 
+/** `typeof localStorage` không bắt hết: ở một số trình duyệt chặn lưu trữ
+    (chế độ riêng tư nghiêm ngặt, …), chính việc ĐỌC thuộc tính `localStorage`
+    đã ném `SecurityError`, xảy ra trước khi `typeof` kịp gán giá trị — phải
+    bọc try/catch mới an toàn thật (soát cuối nhánh A). */
+const localStorageAnToan = (): Pick<Storage, 'getItem' | 'setItem'> | null => {
+  try {
+    return typeof localStorage === 'undefined' ? null : localStorage;
+  } catch {
+    return null;
+  }
+};
+
 const moiTruongChuoi = (): MoiTruongChuoi => ({
-  kho: taoKhoHet(typeof localStorage === 'undefined' ? null : localStorage),
+  kho: taoKhoHet(localStorageAnToan()),
   bayGio: () => Date.now(),
   nghiPhut: NGHI_PHUT,
   tongHanMs: HAN_CHO_MS,
@@ -280,7 +292,18 @@ export const generateAIResponseChiTiet = async (
       const loc = await locTraLoi({
         traLoi: tachNhanAn(traLoi).noiDung,
         dapAn,
-        sinhLai: async (chiThi) => tachNhanAn(await ket.goiLai(chiThi)).noiDung,
+        /* Lượt sinh lại gọi THÊM một lượt model — hỏng giữa chừng (vd hết lượt
+           đúng lúc này) thì KHÔNG được để lỗi hạn mức đó văng lên nuốt mất cả
+           lượt: trả '' để `locTraLoi` coi là không rò (coDapSo('') luôn false)
+           và nhánh `if (traLoi)` ở dưới tự rơi về câu "sự cố kỹ thuật" — còn
+           hơn để nguyên đáp số (bản chưa lọc) lọt ra khi ném lỗi lên trên. */
+        sinhLai: async (chiThi) => {
+          try {
+            return tachNhanAn(await ket.goiLai(chiThi)).noiDung;
+          } catch {
+            return '';
+          }
+        },
       });
       if (loc.daChan) {
         daChanRo = true;

@@ -15,19 +15,23 @@ export type LoaiLoiGemini =
 
 /**
  * Đọc loại lỗi từ chuỗi `loiThanhChuoi(loi)`. Thứ tự các phép thử là cố ý:
- * hết lượt xét trước (chuỗi lỗi 429 có thể chứa chữ khác), App Check xét
- * trước mạng (lỗi App Check có khi mang chữ "fetch").
+ * App Check xét TRƯỚC CẢ hết lượt — soát cuối nhánh A (01/10/2026) chỉ ra một
+ * số thông báo throttle của App Check tự mang chữ "429" trong câu (vd
+ * "Requests throttled due to 429 error … appCheck/throttled"); xét 429 trước
+ * sẽ bắt nhầm thành hết lượt Gemini, trong khi đổi model không cứu được lỗi
+ * App Check — mọi model đi chung một thẻ, phải dừng đúng chỗ. App Check cũng
+ * xét trước mạng (lỗi App Check có khi mang chữ "fetch").
  */
 export function phanLoaiLoiGemini(chuoiLoi: string): LoaiLoiGemini {
   const goc = chuoiLoi || '';
   const s = goc.toLowerCase();
+  /* App Check hỏng thì đổi model cũng hỏng y vậy: mọi model đi chung một thẻ. */
+  if (s.includes('app check') || s.includes('appcheck') || s.includes('initial-throttle')
+      || s.includes('attempts allowed again')) return 'app-check';
   if (s.includes('429') || s.includes('quota') || s.includes('rate limit')
       || s.includes('resource_exhausted')) {
     return s.includes('perday') ? 'het-ngay' : 'het-phut';
   }
-  /* App Check hỏng thì đổi model cũng hỏng y vậy: mọi model đi chung một thẻ. */
-  if (s.includes('app check') || s.includes('appcheck') || s.includes('initial-throttle')
-      || s.includes('attempts allowed again')) return 'app-check';
   if (s.includes('abort') || s.includes('timeout') || s.includes('timed out')) return 'qua-han';
   if (s.includes('network') || s.includes('failed to fetch')) return 'mang';
   /* Model bị gỡ — chỉ chết với RIÊNG model này. CHỈ 404: một lỗi 400 (tham

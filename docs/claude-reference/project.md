@@ -18,7 +18,7 @@ Các đường dẫn code trong nội dung gốc tính từ gốc repo. Cụm �
 | Icons / Animation | `lucide-react`, `@mui/icons-material` / `motion` |
 | Backend | Firebase Firestore |
 | Auth | **Firebase Auth** (email + mật khẩu). Hồ sơ ở `users/{uid}` — xem "Vài điểm dễ vấp" |
-| AI | Gemini qua **Firebase AI Logic** (gói firebase/ai + App Check reCAPTCHA Enterprise) ở bản build — xem `src/features/tutor/services/giaSuFirebaseAI.ts`. Trước khi gọi, `pedagogicalStateMachine.ts` đếm bế tắc / chặn gian lận phòng thi. `@google/genai` chỉ còn dùng trong script `scripts/` (đường "key riêng người dùng tự nhập" đã bỏ ngày 14/09/2026) Hết lượt thì xoay sang các model Gemini khác cùng dự án (`src/features/tutor/services/danhSachMoHinh.ts`, `src/features/tutor/services/chuoiDuPhong.ts`), học sinh không thấy; `chats` ghi `model_name`/`nha_cung_cap`/`duong` (01/10/2026). |
+| AI | Gemini qua **Firebase AI Logic** (gói firebase/ai + App Check reCAPTCHA Enterprise) ở bản build — xem `src/features/tutor/services/giaSuFirebaseAI.ts`. Trước khi gọi, `pedagogicalStateMachine.ts` đếm bế tắc / chặn gian lận phòng thi. `@google/genai` chỉ còn dùng trong script `scripts/` (đường "key riêng người dùng tự nhập" đã bỏ ngày 14/09/2026). Hết lượt thì xoay sang các model Gemini khác cùng dự án (`src/features/tutor/services/danhSachMoHinh.ts`, `src/features/tutor/services/chuoiDuPhong.ts`), học sinh không thấy; `chats` ghi `model_name`/`nha_cung_cap`/`duong` (01/10/2026). |
 | Hiển thị chat | `MathMarkdownRenderer.tsx` (react-markdown + remark-math + rehype-sanitize + rehype-katex + mhchem), thay cho RichText/mathText đã xoá |
 | Routing | `react-router-dom` v7 |
 | Form | Không có thư viện form — viết tay bằng state |
