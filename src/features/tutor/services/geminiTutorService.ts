@@ -1,8 +1,8 @@
 import { ChatMessage } from '../../auth/types';
 import { ErrorLogService } from '../../../core/services/errorLog';
 import { GEMINI_MODEL_NAME } from '../../../core/constants';
-import { buildLessonContext, buildLessonCatalog, buildProgramContext } from './lessonContext';
-import { dungPrompt, THAM_SO_SINH } from './promptSuPham';
+import { THAM_SO_SINH } from './promptSuPham';
+import { dungHuongDanHeThong } from './dungCauLenh';
 import { nhanhCuaHocSinh } from '../../research/thucNghiem';
 import { RECAPTCHA_ENTERPRISE_SITE_KEY } from '../../../core/services/firebaseCongKhai';
 import { loiThanhChuoi } from './loiGemini';
@@ -211,28 +211,12 @@ export const generateAIResponseChiTiet = async (
     const formattedHistory = buildGeminiHistory(history, userQuestion);
     const latestMessage = formattedHistory.pop()?.parts[0].text || '';
 
-    /* Nội dung bài đang mở; không mở bài nào (khung iChat chung) thì rỗng. */
-    const nguCanhBai = buildLessonContext(lessonId);
-    /* Danh mục mã bài LUÔN đính kèm, để nhãn ra đề mang đúng mã bài. */
-    const danhMucBai = buildLessonCatalog();
-    /* Không mở bài nào thì đưa dàn bài cả chương trình vào chỗ trống. */
-    const danBaiChung = nguCanhBai ? '' : buildProgramContext();
-
     const dungYeuCau = (chiThiChan?: string) => ({
       model: GEMINI_MODEL_NAME,
       contents: formattedHistory.concat({ role: 'user' as const, parts: [{ text: latestMessage }] }),
-      systemInstruction: [
-        dungPrompt(nhanh),
-        '='.repeat(60),
-        danhMucBai,
-        ...(nguCanhBai ? ['='.repeat(60), nguCanhBai] : []),
-        ...(danBaiChung ? ['='.repeat(60), danBaiChung] : []),
-        /* Chỉ dẫn của máy trạng thái đặt CUỐI CÙNG: gần lượt hỏi nhất, và câu
-           lệnh đã dặn mục "TRẠNG THÁI" được ưu tiên hơn quy tắc bước. */
-        ...(truoc.chiDanThem ? ['='.repeat(60), truoc.chiDanThem] : []),
-        /* Chỉ thị của bộ chặn rò đứng sau cùng, chỉ có ở lượt sinh lại. */
-        ...(chiThiChan ? ['='.repeat(60), chiThiChan] : []),
-      ].join('\n\n'),
+      systemInstruction: dungHuongDanHeThong({
+        nhanh, lessonId, chiDanThem: truoc.chiDanThem, chiThiChan,
+      }),
       temperature: THAM_SO_SINH.temperature,
       topP: THAM_SO_SINH.topP,
     });

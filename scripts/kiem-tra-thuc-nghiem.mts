@@ -20,6 +20,11 @@ import { dirname, join } from 'node:path';
 import { dungPrompt } from '../src/features/tutor/services/promptSuPham';
 import { nhanhCuaHocSinh, maAnDanh, DANG_CHAY_NGHIEN_CUU } from '../src/features/research/thucNghiem';
 import { pHaiPhia, tWelch, cohenD, tb, doLech } from './thong-ke.mjs';
+import { dungHuongDanHeThong } from '../src/features/tutor/services/dungCauLenh';
+import { buildLessonCatalog, buildLessonContext, buildProgramContext } from '../src/features/tutor/services/lessonContext';
+import { chiDanGianGiao } from '../src/features/tutor/services/pedagogicalStateMachine';
+import { CHI_THI_SINH_LAI } from '../src/features/tutor/services/chanRoDapSo';
+import { CHEMISTRY_11_CURRICULUM } from '../src/features/lessons/constants';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 
@@ -48,6 +53,49 @@ console.log('\n== Nhánh Socratic phải giống NGUYÊN VĂN bản chụp đã 
     .replace(/\r\n/g, '\n');
   ok(soc === chup, 'ghép lại khớp từng ký tự với bản chụp',
      soc === chup ? `${soc.length} ký tự` : `lệch: bản ghép ${soc.length}, bản chụp ${chup.length}`);
+}
+
+console.log('\n== Chỗ ghép câu lệnh dùng chung ra ĐÚNG như bản ghép cũ ==');
+{
+  /* Bản ghép của geminiTutorService.dungYeuCau trước ngày 01/10/2026, chép
+     nguyên văn rồi ĐÓNG BĂNG ở đây. dungCauLenh.ts lệch một ký tự là đỏ — tức
+     nhóm thực nghiệm đang được dạy bằng câu lệnh khác câu lệnh đã duyệt. */
+  const banCu = (nhanh: 'socratic' | 'truc-tiep', lessonId: string, chiDanThem: string, chiThiChan?: string) => {
+    const nguCanhBai = buildLessonContext(lessonId);
+    const danhMucBai = buildLessonCatalog();
+    const danBaiChung = nguCanhBai ? '' : buildProgramContext();
+    return [
+      dungPrompt(nhanh),
+      '='.repeat(60),
+      danhMucBai,
+      ...(nguCanhBai ? ['='.repeat(60), nguCanhBai] : []),
+      ...(danBaiChung ? ['='.repeat(60), danBaiChung] : []),
+      ...(chiDanThem ? ['='.repeat(60), chiDanThem] : []),
+      ...(chiThiChan ? ['='.repeat(60), chiThiChan] : []),
+    ].join('\n\n');
+  };
+  const cacBai = [...CHEMISTRY_11_CURRICULUM.flatMap(c => c.lessons.map(l => l.id)), 'global-advisor'];
+  let soCa = 0;
+  let lech = '';
+  for (const nhanh of ['socratic', 'truc-tiep'] as const) {
+    for (const lessonId of cacBai) {
+      for (const muc of [0, 1, 2, 3, 4]) {
+        for (const chiThiChan of [undefined, CHI_THI_SINH_LAI]) {
+          const chiDanThem = nhanh === 'socratic' ? chiDanGianGiao(muc) : '';
+          soCa++;
+          const moi = dungHuongDanHeThong({ nhanh, lessonId, chiDanThem, chiThiChan });
+          if (!lech && moi !== banCu(nhanh, lessonId, chiDanThem, chiThiChan)) {
+            lech = `${nhanh} ${lessonId} nấc ${muc}${chiThiChan ? ' sinh lại' : ''}`;
+          }
+        }
+      }
+    }
+  }
+  ok(!lech, 'khớp từng ký tự ở mọi tổ hợp bài × nhánh × nấc × sinh lại',
+     lech ? `lệch đầu tiên: ${lech}` : `${soCa} tổ hợp`);
+  const maGiaSu = readFileSync(join(HERE, '..', 'src/features/tutor/services/geminiTutorService.ts'), 'utf8');
+  ok(maGiaSu.includes('dungHuongDanHeThong(') && !maGiaSu.includes('buildProgramContext'),
+     'geminiTutorService dùng chỗ ghép chung, không tự ghép lại');
 }
 
 console.log('\n== Hai nhánh chỉ khác nhau ở CÁCH DẠY ==');
