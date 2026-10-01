@@ -131,6 +131,12 @@ Mở Claude Code ở thư mục dự án thì các kỹ năng này tự nạp, g
   cài; quyền nằm ở `.claude/settings.local.json` (máy riêng, không theo git).
   `npx skills add`/`update` vẫn phải hỏi. Đừng lẫn nó với việc dùng kỹ
   năng đã có — việc đó nằm ở mục "Cách làm việc" bên trên.
+- **`wrangler`, `workers-best-practices`, `cloudflare`** — làm việc với Cloudflare
+  (Pages Functions, D1, Workers AI, deploy bằng Wrangler). Cài ngày 01/10/2026 bằng
+  `npx skills add` (user đồng ý) từ `github.com/cloudflare/skills` (Apache-2.0); mã băm
+  trong `skills-lock.json`. Chúng dặn tra tài liệu Cloudflare lúc chạy — ngoại lệ có lý
+  do so với tiền lệ loại kỹ năng Vercel; dùng `curl` vì WebFetch bị chặn. Chi tiết:
+  `.claude/skills/CLOUDFLARE-SKILLS-LICENSE.md`.
 
 ### Ba chỗ superpowers nói khác dự án này — theo dự án
 

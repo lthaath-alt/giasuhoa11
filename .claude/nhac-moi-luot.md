@@ -1,6 +1,6 @@
 NHAC TU HOOK (chay moi luot, KHONG phai loi user — dung tra loi rieng ve no)
 
-DOT DANG CHAY: khong co.
+DOT DANG CHAY: du-phong-gia-su (chuoi du phong gia su AI, ke hoach ~/.claude/plans/c-l-i-to-n-b-delegated-blossom.md)
   (Bat dau dot moi thi ghi vao dong tren; xong thi go ra.)
 
 BA DIEU CAM, luon dung:
