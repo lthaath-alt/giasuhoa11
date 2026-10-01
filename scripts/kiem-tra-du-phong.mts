@@ -12,6 +12,9 @@
 import { phanLoaiLoiGemini, ngayTheoMuiGio, taoKhoHet, KHOA_KHO_HET } from '../src/features/tutor/services/hetLuotMoHinh';
 import { GEMINI_XOAY } from '../src/features/tutor/services/danhSachMoHinh';
 import { GEMINI_MODEL_NAME } from '../src/core/constants';
+import { goiTheoChuoi, type BuocGoi, type MoiTruongChuoi } from '../src/features/tutor/services/chuoiDuPhong';
+import { thongBaoHetLuot } from '../src/features/tutor/services/geminiTutorService';
+import { loiThanhChuoi } from '../src/features/tutor/services/loiGemini';
 
 let hong = 0;
 const ok = (dieu: boolean, ten: string, chiTiet = '') => {
@@ -72,6 +75,120 @@ ok(GEMINI_XOAY.length >= 4, `có ít nhất 4 model dự phòng (đang có ${GEM
 ok(!GEMINI_XOAY.includes(GEMINI_MODEL_NAME), 'model chính không nằm lại trong danh sách xoay');
 ok(GEMINI_XOAY.every(m => /^gemini-3/.test(m)), 'chỉ đời 3.x (nhận thinkingLevel như model chính)');
 ok(new Set(GEMINI_XOAY).size === GEMINI_XOAY.length, 'không trùng tên');
+
+console.log('\n== Gọi theo chuỗi ==');
+{
+  let gio = Date.parse('2026-10-01T16:00:00Z');            // 09:00 Pacific
+  const moiTruong = (): MoiTruongChuoi => ({
+    kho: taoKhoHet(luuTruGia()), bayGio: () => gio, nghiPhut: new Map(), tongHanMs: 90_000,
+  });
+  /** Bước giả: lần gọi thứ i làm theo hanhVi[i] (hết mảng thì lặp phần tử cuối). */
+  const buoc = (ten: string, hanhVi: ('ok' | string)[], nhat: string[], them: Partial<BuocGoi> = {}): BuocGoi => {
+    let lan = 0;
+    return {
+      duong: 'xoay-gemini', nhaCungCap: 'gemini-firebase', maMoHinh: ten, vung: 'firebase', ...them,
+      goi: async (chiThi) => {
+        nhat.push(ten + (chiThi ? '+chiThi' : ''));
+        const h = hanhVi[Math.min(lan++, hanhVi.length - 1)];
+        if (h === 'ok') return `trả lời của ${ten}`;
+        throw new Error(h);
+      },
+    };
+  };
+  const thu = async (f: () => Promise<unknown>) => { try { await f(); return null; } catch (e) { return e; } };
+
+  {
+    const nhat: string[] = [];
+    const kq = await goiTheoChuoi([buoc('chinh', ['ok'], nhat, { duong: 'chinh' }), buoc('a', ['ok'], nhat)], moiTruong());
+    ok(kq.duong === 'chinh' && kq.maMoHinh === 'chinh' && nhat.join() === 'chinh',
+       'ngày thường: chỉ gọi model chính, một lần');
+  }
+  {
+    const mt = moiTruong();
+    const nhat: string[] = [];
+    const cacBuoc = [buoc('chinh', [LOI_NGAY], nhat, { duong: 'chinh' }), buoc('a', ['ok'], nhat)];
+    const kq = await goiTheoChuoi(cacBuoc, mt);
+    ok(kq.maMoHinh === 'a' && kq.duong === 'xoay-gemini' && nhat.join() === 'chinh,a',
+       'model chính hết lượt NGÀY thì lặng lẽ sang model kế');
+    nhat.length = 0;
+    await goiTheoChuoi(cacBuoc, mt);
+    ok(nhat.join() === 'a', 'lượt sau cùng ngày: KHÔNG gõ cửa model đã chết nữa', nhat.join());
+    gio = Date.parse('2026-10-02T07:00:00Z');               // nửa đêm Pacific
+    nhat.length = 0;
+    await goiTheoChuoi(cacBuoc, mt);
+    ok(nhat[0] === 'chinh', 'qua nửa đêm Pacific: thử lại model chính', nhat.join());
+    gio = Date.parse('2026-10-01T16:00:00Z');
+  }
+  {
+    const nhat: string[] = [];
+    const kq = await goiTheoChuoi([buoc('chinh', [LOI_503], nhat, { duong: 'chinh' }), buoc('a', ['ok'], nhat)], moiTruong());
+    ok(kq.maMoHinh === 'a', 'máy chủ quá tải (503) thì sang model kế');
+  }
+  {
+    const nhat: string[] = [];
+    const kq = await goiTheoChuoi([buoc('chinh', [LOI_404], nhat, { duong: 'chinh' }), buoc('a', ['ok'], nhat)], moiTruong());
+    ok(kq.maMoHinh === 'a', 'model không tồn tại (404) thì sang model kế');
+  }
+  {
+    const nhat: string[] = [];
+    const loi = await thu(() => goiTheoChuoi([
+      buoc('chinh', [LOI_APPCHECK], nhat, { duong: 'chinh' }), buoc('a', ['ok'], nhat),
+    ], moiTruong()));
+    ok(loi !== null && nhat.join() === 'chinh', 'App Check hỏng thì DỪNG, không gõ cửa model nào nữa');
+  }
+  {
+    const nhat: string[] = [];
+    const khoa = { duong: 'khoa-rieng' as const, nhaCungCap: 'gemini-khoa-rieng' as const, vung: 'khoa' as const, chiKhiChungHetNgay: true };
+    const loi = await thu(() => goiTheoChuoi([
+      buoc('chinh', [LOI_PHUT], nhat, { duong: 'chinh' }), buoc('a', [LOI_NGAY], nhat), buoc('k', ['ok'], nhat, khoa),
+    ], moiTruong()));
+    ok(loi !== null && !nhat.includes('k'), 'chỉ hết lượt PHÚT thì KHÔNG tiêu khoá riêng của em', nhat.join());
+    ok(thongBaoHetLuot(loiThanhChuoi(loi)).includes('mỗi phút'), 'và học sinh được bảo chờ một phút');
+  }
+  {
+    const nhat: string[] = [];
+    const khoa = { duong: 'khoa-rieng' as const, nhaCungCap: 'gemini-khoa-rieng' as const, vung: 'khoa' as const, chiKhiChungHetNgay: true };
+    const kq = await goiTheoChuoi([
+      buoc('chinh', [LOI_NGAY], nhat, { duong: 'chinh' }), buoc('a', [LOI_NGAY], nhat), buoc('k', ['ok'], nhat, khoa),
+    ], moiTruong());
+    ok(kq.duong === 'khoa-rieng' && kq.nhaCungCap === 'gemini-khoa-rieng',
+       'mọi model chung hết lượt NGÀY thì mới dùng khoá riêng của em');
+  }
+  {
+    const mt = moiTruong();
+    mt.kho.danhDau('firebase', 'chinh', new Date(gio));
+    mt.kho.danhDau('firebase', 'a', new Date(gio));
+    const nhat: string[] = [];
+    const loi = await thu(() => goiTheoChuoi([buoc('chinh', ['ok'], nhat, { duong: 'chinh' }), buoc('a', ['ok'], nhat)], mt));
+    ok(loi !== null && nhat.length === 0, 'mọi model đã chết từ trước: không gọi ai cả');
+    ok(thongBaoHetLuot(loiThanhChuoi(loi)).includes('toàn hệ thống'), 'và học sinh nhận đúng câu hết lượt trong ngày');
+  }
+  {
+    const nhat: string[] = [];
+    const kq = await goiTheoChuoi([buoc('chinh', [LOI_NGAY], nhat, { duong: 'chinh' }), buoc('a', ['ok'], nhat)], moiTruong());
+    await kq.goiLai('đừng nêu đáp số');
+    ok(nhat.at(-1) === 'a+chiThi', 'lượt sinh lại của bộ chặn rò đi thẳng vào ĐÚNG model vừa trả lời', nhat.join());
+  }
+  {
+    const nhat: string[] = [];
+    const cham: BuocGoi = {
+      duong: 'chinh', nhaCungCap: 'gemini-firebase', maMoHinh: 'chinh', vung: 'firebase',
+      goi: async () => { nhat.push('chinh'); gio += 85_000; throw new Error(LOI_NGAY); },
+    };
+    const loi = await thu(() => goiTheoChuoi([cham, buoc('a', ['ok'], nhat)], moiTruong()));
+    ok(loi !== null && nhat.join() === 'chinh', 'model chính ngốn 85 s rồi mới hỏng: không gọi thêm lượt chắc chắn quá hạn');
+    gio = Date.parse('2026-10-01T16:00:00Z');
+  }
+  {
+    let hanNhan = 0;
+    const b: BuocGoi = {
+      duong: 'chinh', nhaCungCap: 'gemini-firebase', maMoHinh: 'chinh', vung: 'firebase',
+      goi: async (_c, han) => { hanNhan = han; return 'x'; },
+    };
+    await goiTheoChuoi([b], moiTruong());
+    ok(hanNhan === 90_000, 'model chính vẫn được chờ đủ 90 giây như trước', String(hanNhan));
+  }
+}
 
 console.log('\n' + (hong === 0 ? '>>> TẤT CẢ ĐẠT' : `>>> CÓ ${hong} MỤC KHÔNG ĐẠT`) + '\n');
 process.exit(hong === 0 ? 0 : 1);
