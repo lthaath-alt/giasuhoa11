@@ -9,6 +9,12 @@ import re
 import sys
 import unicodedata
 
+# Windows: Python không tự dùng UTF-8 cho console (kể cả khi chcp 65001), in chữ
+# Việt là văng UnicodeEncodeError trước khi kịp báo kết quả. Ép UTF-8 ngay khi nạp.
+for _luong in (sys.stdout, sys.stderr):
+    if hasattr(_luong, 'reconfigure'):
+        _luong.reconfigure(encoding='utf-8', errors='replace')
+
 PHIEN_BAN_CHUAN_HOA = 1
 
 # Sáu nhãn — thứ tự cố định, dùng cho báo cáo và ma trận nhầm lẫn.
