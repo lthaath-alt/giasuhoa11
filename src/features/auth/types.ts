@@ -239,12 +239,16 @@ export interface ChatMessage {
   /** Loại ngoài môn: hai loại đầu do mô hình gắn nhãn, hai loại sau do mã phát hiện */
   ngoai_mon?: 'CAM_XUC_TIEU_CUC' | 'LAC_DE' | 'SPAM_ATTACK' | 'GIAN_LAN';
   model_name?: string;
-  /** Thời gian gọi mô hình thật (ms), KHÔNG gồm độ trễ giả lập */
+  /** Thời gian học sinh chờ (ms), gồm cả lúc gõ cửa model đã hết lượt (từ 01/10/2026); KHÔNG gồm độ trễ giả lập */
   latency_ms?: number;
   /** Bộ chặn rò đáp số (P0-2) đã can thiệp vào lượt này */
   chan_ro?: boolean;
   /** Mô hình quên nhãn ẩn hoặc viết sai định dạng (P0-6) — đếm để biết nhãn hụt bao nhiêu */
   nhan_hong?: boolean;
+  /** Nguồn đã trả lời (01/10/2026): 'gemini-firebase' | 'gemini-khoa-rieng'. Lượt không gọi mô hình thì trống */
+  nha_cung_cap?: string;
+  /** Đường đã đi: 'chinh' | 'xoay-gemini' | 'khoa-rieng'. Lọc 'chinh' để phân tích riêng model gốc */
+  duong?: string;
 }
 
 export interface QuizAttempt {

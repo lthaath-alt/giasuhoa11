@@ -15,6 +15,7 @@ import { GEMINI_MODEL_NAME } from '../src/core/constants';
 import { goiTheoChuoi, type BuocGoi, type MoiTruongChuoi } from '../src/features/tutor/services/chuoiDuPhong';
 import { thongBaoHetLuot, thongBaoLoiKetNoi } from '../src/features/tutor/services/geminiTutorService';
 import { loiThanhChuoi } from '../src/features/tutor/services/loiGemini';
+import { readFileSync } from 'node:fs';
 
 let hong = 0;
 const ok = (dieu: boolean, ten: string, chiTiet = '') => {
@@ -238,6 +239,17 @@ console.log('\n== Gọi theo chuỗi ==');
     ok(loi !== null, 'mảng bước rỗng: vẫn phải báo lỗi, không treo');
     ok(thongBaoHetLuot(loiThanhChuoi(loi)).includes('toàn hệ thống'), 'và đúng câu hết lượt toàn hệ thống');
   }
+}
+
+console.log('\n== Gia sư dùng chuỗi, ghi đúng model ==');
+{
+  const ma = readFileSync(new URL('../src/features/tutor/services/geminiTutorService.ts', import.meta.url), 'utf8');
+  ok(ma.includes('goiTheoChuoi(') && ma.includes('GEMINI_XOAY'), 'geminiTutorService gọi qua chuỗi có xoay vòng');
+  ok(!/modelName:\s*GEMINI_MODEL_NAME/.test(ma), 'KHÔNG còn ghi cứng modelName = model chính');
+  ok(ma.includes('ket.goiLai('), 'lượt sinh lại đi qua goiLai (đúng model vừa trả lời)');
+  const ctx = readFileSync(new URL('../src/core/contexts/AppContext.tsx', import.meta.url), 'utf8');
+  ok(/nha_cung_cap:\s*ketQua\.nhaCungCap/.test(ctx) && /duong:\s*ketQua\.duong/.test(ctx),
+     'AppContext ghi nguồn trả lời và đường đi xuống chats');
 }
 
 console.log('\n' + (hong === 0 ? '>>> TẤT CẢ ĐẠT' : `>>> CÓ ${hong} MỤC KHÔNG ĐẠT`) + '\n');

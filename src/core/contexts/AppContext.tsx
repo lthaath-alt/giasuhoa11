@@ -1408,6 +1408,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       ngoai_mon: ketQua.gianLan ? 'GIAN_LAN' : nhan.ngoaiMon,
       model_name: ketQua.modelName,
       latency_ms: ketQua.latencyMs,
+      nha_cung_cap: ketQua.nhaCungCap,
+      duong: ketQua.duong,
       /* Hai cờ cho bản xuất dữ liệu nghiên cứu (P0-5). Firestore từ chối cả
          tài liệu nếu gặp một giá trị `undefined`, nên `|| undefined` ở đây là
          cố ý: false phải biến mất hẳn chứ không được ghi xuống. */
