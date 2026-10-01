@@ -30,9 +30,12 @@ export function phanLoaiLoiGemini(chuoiLoi: string): LoaiLoiGemini {
       || s.includes('attempts allowed again')) return 'app-check';
   if (s.includes('abort') || s.includes('timeout') || s.includes('timed out')) return 'qua-han';
   if (s.includes('network') || s.includes('failed to fetch')) return 'mang';
-  /* Model bị gỡ hoặc không nhận cấu hình — chỉ chết với RIÊNG model này. */
-  if (/\[404\s/.test(goc) || /\[400\s/.test(goc) || s.includes('is not found')
-      || s.includes('not supported')) return 'mo-hinh-hong';
+  /* Model bị gỡ — chỉ chết với RIÊNG model này. CHỈ 404: một lỗi 400 (tham
+     số sai, nội dung bị chặn, …) là do chính YÊU CẦU, sẽ lặp lại giống vậy
+     ở MỌI model — xếp vào đây thì đánh dấu chết oan cả model lành, trong khi
+     đường chạy không thử model nào khác được cứu. Để 400 rơi về 'khac' (dừng
+     hẳn, không đánh dấu ai) — quyết định của người kiểm, lệch khỏi kế hoạch gốc. */
+  if (/\[404\s/.test(goc) || s.includes('is not found')) return 'mo-hinh-hong';
   if (/\[5\d\d\s/.test(goc) || /"?status"?:\s*5\d\d/.test(goc) || s.includes('internal server error')
       || s.includes('service unavailable') || s.includes('overloaded')
       || s.includes('high demand')) return 'may-chu';

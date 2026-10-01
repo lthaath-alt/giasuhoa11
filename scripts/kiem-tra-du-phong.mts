@@ -13,7 +13,7 @@ import { phanLoaiLoiGemini, ngayTheoMuiGio, taoKhoHet, KHOA_KHO_HET } from '../s
 import { GEMINI_XOAY } from '../src/features/tutor/services/danhSachMoHinh';
 import { GEMINI_MODEL_NAME } from '../src/core/constants';
 import { goiTheoChuoi, type BuocGoi, type MoiTruongChuoi } from '../src/features/tutor/services/chuoiDuPhong';
-import { thongBaoHetLuot } from '../src/features/tutor/services/geminiTutorService';
+import { thongBaoHetLuot, thongBaoLoiKetNoi } from '../src/features/tutor/services/geminiTutorService';
 import { loiThanhChuoi } from '../src/features/tutor/services/loiGemini';
 
 let hong = 0;
@@ -45,6 +45,8 @@ ok(phanLoaiLoiGemini(LOI_APPCHECK) === 'app-check', 'App Check bị khoá');
 ok(phanLoaiLoiGemini('AbortError: signal timed out') === 'qua-han', 'quá hạn chờ');
 ok(phanLoaiLoiGemini('TypeError: Failed to fetch') === 'mang', 'rớt mạng');
 ok(phanLoaiLoiGemini('API key not valid. Please pass a valid API key.') === 'khac', 'khoá sai không bị coi là hết lượt');
+ok(phanLoaiLoiGemini('[400 Bad Request] Request contains an invalid argument.') === 'khac',
+   '400 do chính yêu cầu (không riêng model nào): KHÔNG xếp vào mo-hinh-hong — sửa theo soát Việc 3');
 
 console.log('\n== Ngày theo giờ Thái Bình Dương (hạn mức hồi lại lúc nửa đêm ở đó) ==');
 ok(ngayTheoMuiGio(new Date('2026-10-02T06:59:59Z')) === '2026-10-01', 'mùa hè: 13:59:59 giờ VN vẫn là ngày cũ');
@@ -155,6 +157,30 @@ console.log('\n== Gọi theo chuỗi ==');
        'mọi model chung hết lượt NGÀY thì mới dùng khoá riêng của em');
   }
   {
+    /* Soát Việc 3: cổng khoá riêng rò ở 503/400 — "chỉ nghỉ phút" cũ không
+       bắt được ca này vì 503/400 không hề đụng tới nghỉ phút. Gate đúng phải
+       xét MỌI model chung còn sống trong kho (`conDung`), không chỉ xét
+       "có đang nghỉ phút không". */
+    const nhat: string[] = [];
+    const khoa = { duong: 'khoa-rieng' as const, nhaCungCap: 'gemini-khoa-rieng' as const, vung: 'khoa' as const, chiKhiChungHetNgay: true };
+    const loi = await thu(() => goiTheoChuoi([
+      buoc('chinh', [LOI_503], nhat, { duong: 'chinh' }), buoc('a', [LOI_503], nhat), buoc('k', ['ok'], nhat, khoa),
+    ], moiTruong()));
+    ok(loi !== null && !nhat.includes('k'),
+       'máy chủ quá tải (503) ở mọi model chung: KHÔNG tiêu khoá riêng (chưa model nào chết trong kho)', nhat.join());
+  }
+  {
+    /* Thứ tự trong `cacBuoc` không được quyết định gate: khoá riêng đứng
+       NGAY ĐẦU mảng, trước cả model chung còn sống, vẫn phải bị chặn. */
+    const nhat: string[] = [];
+    const khoa = { duong: 'khoa-rieng' as const, nhaCungCap: 'gemini-khoa-rieng' as const, vung: 'khoa' as const, chiKhiChungHetNgay: true };
+    const kq = await goiTheoChuoi([
+      buoc('k', ['ok'], nhat, khoa), buoc('chinh', ['ok'], nhat, { duong: 'chinh' }),
+    ], moiTruong());
+    ok(kq.duong === 'chinh' && !nhat.includes('k'),
+       'khoá riêng đứng ĐẦU mảng mà model chung còn sống: vẫn không được gọi trước nó', nhat.join());
+  }
+  {
     const mt = moiTruong();
     mt.kho.danhDau('firebase', 'chinh', new Date(gio));
     mt.kho.danhDau('firebase', 'a', new Date(gio));
@@ -177,6 +203,11 @@ console.log('\n== Gọi theo chuỗi ==');
     };
     const loi = await thu(() => goiTheoChuoi([cham, buoc('a', ['ok'], nhat)], moiTruong()));
     ok(loi !== null && nhat.join() === 'chinh', 'model chính ngốn 85 s rồi mới hỏng: không gọi thêm lượt chắc chắn quá hạn');
+    /* Soát Việc 3: dừng vì HẾT HẠN phải nói đúng là quá hạn (chữ "timeout"),
+       không phải lặp lại lỗi (có khi đã cũ) của bước trước — để
+       `thongBaoLoiKetNoi` bảo em GỬI LẠI, không doạ hết lượt trong ngày. */
+    ok(thongBaoLoiKetNoi(loiThanhChuoi(loi)).includes('gửi lại'),
+       'và học sinh được bảo gửi lại câu hỏi, không phải bị doạ hết lượt', loiThanhChuoi(loi));
     gio = Date.parse('2026-10-01T16:00:00Z');
   }
   {
@@ -187,6 +218,25 @@ console.log('\n== Gọi theo chuỗi ==');
     };
     await goiTheoChuoi([b], moiTruong());
     ok(hanNhan === 90_000, 'model chính vẫn được chờ đủ 90 giây như trước', String(hanNhan));
+  }
+  {
+    /* Soát Việc 3: mọi bước đang nghỉ PHÚT (chưa ai hỏng hẳn, chỉ đang chờ)
+       thì không gọi ai, và câu báo phải là "chờ một phút", không phải
+       "hết lượt cả ngày" — khác hẳn trường hợp bị đánh dấu chết trong kho. */
+    const mt = moiTruong();
+    mt.nghiPhut.set('firebase:chinh', gio + 30_000);
+    mt.nghiPhut.set('firebase:a', gio + 30_000);
+    const nhat: string[] = [];
+    const loi = await thu(() => goiTheoChuoi([buoc('chinh', ['ok'], nhat, { duong: 'chinh' }), buoc('a', ['ok'], nhat)], mt));
+    ok(loi !== null && nhat.length === 0, 'mọi bước đang nghỉ phút từ trước: không gọi ai cả', nhat.join());
+    ok(thongBaoHetLuot(loiThanhChuoi(loi)).includes('mỗi phút'), 'và học sinh được bảo chờ một phút, không phải hết lượt cả ngày');
+  }
+  {
+    /* Mảng rỗng: không có bước nào để thử cũng phải báo lỗi (hết lượt toàn
+       hệ thống), không được treo hay trả `undefined`. */
+    const loi = await thu(() => goiTheoChuoi([], moiTruong()));
+    ok(loi !== null, 'mảng bước rỗng: vẫn phải báo lỗi, không treo');
+    ok(thongBaoHetLuot(loiThanhChuoi(loi)).includes('toàn hệ thống'), 'và đúng câu hết lượt toàn hệ thống');
   }
 }
 

@@ -31,9 +31,12 @@ export interface BuocGoi {
   nhaCungCap: NhaCungCap;
   maMoHinh: string;
   vung: VungHet;
-  /** Khoá riêng của em: chỉ dùng khi MỌI model chung đã hết lượt NGÀY. Chỉ
-      hết lượt PHÚT thì chờ một phút là xong, tiêu lượt của em làm gì
-      (quy tắc 20/09/2026). */
+  /** Khoá riêng của em: chỉ được GỌI khi MỌI bước KHÔNG mang cờ này trong
+      `cacBuoc` đã chết hôm nay trong kho (`!kho.conDung(...)` đúng cho tất
+      cả) — xét trên CẢ MẢNG, không phụ thuộc thứ tự đứng trước hay sau trong
+      `cacBuoc`. Chỉ hết lượt PHÚT (máy chủ quá tải 503, …) thì KHÔNG tính
+      — còn sống trong kho, nên gate vẫn chặn; chờ một phút là xong, tiêu
+      lượt của em làm gì (quy tắc 20/09/2026, bản sửa theo soát Việc 3). */
   chiKhiChungHetNgay?: boolean;
   goi: (chiThi: string | undefined, hanChoMs: number) => Promise<string>;
 }
@@ -43,7 +46,10 @@ export interface KetQuaGoi {
   maMoHinh: string;
   nhaCungCap: NhaCungCap;
   duong: Duong;
-  /** Gọi lại ĐÚNG model vừa trả lời — cho lượt sinh lại của bộ chặn rò. */
+  /** Gọi lại ĐÚNG model vừa trả lời — cho lượt sinh lại của bộ chặn rò.
+      Cố ý nhận đủ `tongHanMs`, không phải phần hạn còn lại của lượt đầu:
+      khớp đúng hành vi sinh lại cũ (một hạn chờ mới, không trừ vào lượt
+      trước). */
   goiLai: (chiThi: string) => Promise<string>;
 }
 
@@ -59,22 +65,37 @@ export async function goiTheoChuoi(cacBuoc: BuocGoi[], mt: MoiTruongChuoi): Prom
   const batDau = mt.bayGio();
   let loiCuoi: unknown = null;
   let loiPhut: unknown = null;
-  /* Có model chung nào đang chỉ nghỉ phút (chưa chết hẳn trong ngày) không. */
-  let chungChiNghiPhut = false;
+  /* Có BƯỚC NÀO (chung hay khoá riêng) bị bỏ qua hay hỏng vì đang nghỉ PHÚT
+     không — quyết định câu lỗi cuối cùng khi không ai trả lời được. */
+  let coNghiPhut = false;
+  /* Vòng lặp DỪNG vì hết hạn tổng (`CON_LAI_TOI_THIEU_MS`), không phải vì
+     hết bước để thử — lỗi cuối phải nói đúng là quá hạn, không phải lỗi
+     (có thể đã cũ) của bước trước đó. */
+  let dungDoHetHan = false;
   let daGoi = false;
+
+  /* Soát riêng của người kiểm Việc 3 (lệch kế hoạch gốc): bước mang
+     `chiKhiChungHetNgay` chỉ được GỌI khi TẤT CẢ bước KHÔNG mang cờ này
+     trong `cacBuoc` đã chết hôm nay trong kho — xét trên cả mảng, không
+     theo thứ tự đứng trước/sau. Không dùng `chungChiNghiPhut` nữa: hết lượt
+     PHÚT (hay máy chủ 503 tạm continue) không đánh dấu chết trong kho, nên
+     hàm dưới tự trả false, khoá riêng không bị tiêu oan. */
+  const moiModelChungDaChetHomNay = (luc: number): boolean =>
+    cacBuoc.filter((x) => !x.chiKhiChungHetNgay)
+      .every((x) => !mt.kho.conDung(x.vung, x.maMoHinh, new Date(luc)));
 
   for (const b of cacBuoc) {
     const ma = `${b.vung}:${b.maMoHinh}`;
     const bayGio = mt.bayGio();
-    if (b.chiKhiChungHetNgay && chungChiNghiPhut) continue;
+    if (b.chiKhiChungHetNgay && !moiModelChungDaChetHomNay(bayGio)) continue;
     if (!mt.kho.conDung(b.vung, b.maMoHinh, new Date(bayGio))) continue;
     if ((mt.nghiPhut.get(ma) ?? 0) > bayGio) {
-      if (!b.chiKhiChungHetNgay) chungChiNghiPhut = true;
+      coNghiPhut = true;
       continue;
     }
 
     const conLai = batDau + mt.tongHanMs - bayGio;
-    if (daGoi && conLai < CON_LAI_TOI_THIEU_MS) break;
+    if (daGoi && conLai < CON_LAI_TOI_THIEU_MS) { dungDoHetHan = true; break; }
     daGoi = true;
     try {
       const text = await b.goi(undefined, Math.min(mt.tongHanMs, conLai));
@@ -92,7 +113,7 @@ export async function goiTheoChuoi(cacBuoc: BuocGoi[], mt: MoiTruongChuoi): Prom
       if (loai === 'het-phut') {
         mt.nghiPhut.set(ma, mt.bayGio() + NGHI_HET_PHUT_MS);
         loiPhut = loi;
-        if (!b.chiKhiChungHetNgay) chungChiNghiPhut = true;
+        coNghiPhut = true;
         continue;
       }
       if (loai === 'may-chu') continue;
@@ -100,8 +121,12 @@ export async function goiTheoChuoi(cacBuoc: BuocGoi[], mt: MoiTruongChuoi): Prom
       throw loi;
     }
   }
-  /* Còn model chỉ nghỉ phút thì nói đúng là "chờ một phút", đừng doạ
+  /* Dừng vì hết hạn tổng: lỗi thật là "chờ quá lâu", không phải lỗi (có khi
+     đã cũ) của bước trước — nói đúng để `thongBaoLoiKetNoi` bảo em gửi lại,
+     đừng doạ hết lượt trong khi model kế có khi còn sống. */
+  if (dungDoHetHan) throw new Error('timeout: hết thời gian chờ của lượt này');
+  /* Còn bước nào chỉ nghỉ phút thì nói đúng là "chờ một phút", đừng doạ
      "hết lượt cả ngày" — em sẽ bỏ đi trong khi một phút nữa là hỏi được. */
-  if (chungChiNghiPhut) throw loiPhut ?? new Error(LOI_HET_SACH_PHUT);
+  if (coNghiPhut) throw loiPhut ?? new Error(LOI_HET_SACH_PHUT);
   throw loiCuoi ?? new Error(LOI_HET_SACH_NGAY);
 }
