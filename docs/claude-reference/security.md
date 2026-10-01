@@ -245,6 +245,10 @@ Hai điều phải giữ:
 - **Chỉ AI Logic bật App Check.** Đừng bấm Enforce cho Firestore/Auth/Storage
   trong Firebase Console khi app chưa khởi tạo App Check ở mọi màn — học sinh sẽ
   không đăng nhập được. (Từ 02/11/2026 Firebase bắt buộc App Check cho AI Logic.)
+- **Xoay vòng model (01/10/2026).** Mọi model trong chuỗi đi CÙNG đường AI Logic,
+  cùng thẻ App Check — không thêm khoá, không thêm tên miền CSP. `localStorage`
+  khoá `h11_mo_hinh_het` chỉ chứa tên model và ngày, không có gì của học sinh.
+  Khoá riêng của em vẫn chỉ dùng khi mọi model chung đã hết lượt NGÀY.
 - **CSP phải cho phép reCAPTCHA** (`https://www.google.com/recaptcha/`,
   `https://www.gstatic.com/recaptcha/`, `https://recaptcha.google.com/recaptcha/`) — thiếu thì
   gia sư chết trên web thật mà máy dev vẫn chạy.

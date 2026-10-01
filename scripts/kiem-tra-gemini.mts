@@ -28,6 +28,7 @@ import { homedir } from 'node:os';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { GEMINI_MODEL_NAME } from '../src/core/constants';
+import { GEMINI_XOAY } from '../src/features/tutor/services/danhSachMoHinh';
 
 const GOC = join(dirname(fileURLToPath(import.meta.url)), '..');
 let hong = 0;
@@ -161,6 +162,14 @@ if (!key) {
        co ? `Google đang cấp ${ten.length} model` :
        `Google KHÔNG còn cấp model này. Web gọi nó qua Firebase AI Logic, nên gia sư `
        + `sẽ chết. Đổi GEMINI_MODEL_NAME trong src/core/constants.ts.`);
+
+    /* Model xoay vòng bị Google gỡ thì gia sư không chết (chuỗi đánh dấu nó
+       hỏng rồi đi tiếp), nhưng mỗi ngày phí một lượt gõ cửa và mất một tầng
+       dự phòng mà không ai biết. */
+    for (const m of GEMINI_XOAY) {
+      ok(ten.includes(m), `model xoay vòng \`${m}\` còn được cấp`,
+         ten.includes(m) ? '' : 'Gỡ tên này khỏi GEMINI_XOAY trong src/features/tutor/services/danhSachMoHinh.ts.');
+    }
   } catch (e) {
     console.log(`  BỎ QUA  không hỏi được danh sách model: ${(e as Error).message}`);
   }
