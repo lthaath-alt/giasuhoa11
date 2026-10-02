@@ -73,8 +73,9 @@ export function vectoTfidf(m: MoHinhYDinh, s: string): Map<number, number> {
   for (let i = 0; i + 1 < tu.length; i++) cum.push(`${tu[i]} ${tu[i + 1]}`);
   const v = new Map<number, number>();
   for (const c of cum) {
-    /* Object.hasOwn: "constructor", "__proto__" là từ em gõ được, không phải chỉ số. */
-    if (!Object.hasOwn(m.tu_vung, c)) continue;
+    /* hasOwnProperty.call (không dùng Object.hasOwn — Safari < 15.4 chưa có):
+       "constructor", "__proto__" là từ em gõ được, không phải chỉ số. */
+    if (!Object.prototype.hasOwnProperty.call(m.tu_vung, c)) continue;
     const i = m.tu_vung[c];
     v.set(i, (v.get(i) ?? 0) + 1);
   }

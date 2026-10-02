@@ -135,6 +135,42 @@ console.log('\n== Hành vi doanYDinhNen: nạp mô hình, chỉ chờ 1 lần m�
   ok(raD2 === undefined, 'lần gọi SAU khi mô hình vẫn treo: vẫn trả undefined');
   ok(msLanSau < 100, 'lần gọi SAU KHÔNG chờ lại 1,5 s — đọc thẳng trạng thái đã biết', `${msLanSau} ms`);
 
+  /* (e) Mạng chậm: mô hình về SAU 1,5 s (phép kiểm hồi quy cho sửa vòng 2,
+     điểm QUAN TRỌNG của lần sửa này) — lần gọi ĐẦU vẫn hết hạn chờ như cũ,
+     nhưng khi mô hình thật về rồi, các tin SAU đó phải có y_dinh. Trước sửa,
+     `moHinhSan` chỉ được gán trong `race` nên mãi mãi là null dù mô hình đã
+     về — cả phiên trang mất `y_dinh`. */
+  datLaiYDinhNenChoKiemTra();
+  dungFetch(() => new Promise<Response>((resolve) => {
+    setTimeout(() => resolve(new Response(JSON.stringify(mauMoHinh), { status: 200, headers: { 'content-type': 'application/json' } })), 1700);
+  }));
+  const t2 = Date.now();
+  const raE1 = await doanYDinhNen('em khong hieu bai nay a');
+  const msE1 = Date.now() - t2;
+  ok(raE1 === undefined, 'mạng chậm: lần gọi ĐẦU (mô hình chưa về trong 1,5 s) vẫn trả undefined', `${msE1} ms`);
+  await new Promise((r) => setTimeout(r, 400));
+  const t3 = Date.now();
+  const raE2 = await doanYDinhNen('em khong hieu bai nay a');
+  const msE2 = Date.now() - t3;
+  ok(!!raE2 && mauMoHinh.nhan.includes(raE2.y_dinh),
+     'mạng chậm: mô hình về sau 1,5 s vẫn được dùng cho tin nhắn SAU, không mất cả phiên', raE2 ? raE2.y_dinh : 'undefined');
+  ok(msE2 < 100, 'lần gọi SAU khi mô hình đã về: trả ngay, không chờ lại 1,5 s', `${msE2} ms`);
+
+  /* (f) Mô hình hình dạng đúng (qua `laMoHinhHopLe`, vì hàm đó chỉ kiểm hình
+     dạng) nhưng hệ số là NaN (ví dụ JSON ghi dở giữa đường) — softmax của NaN
+     ra NaN, không throw. Mock trực tiếp đối tượng `Response`-giống (không
+     JSON.stringify) vì NaN qua JSON sẽ hoá thành null, che mất lỗi cần kiểm. */
+  datLaiYDinhNenChoKiemTra();
+  const moHinhNaN: MoHinhYDinh = JSON.parse(JSON.stringify(mauMoHinh));
+  moHinhNaN.he_so = moHinhNaN.he_so.map((hang) => hang.map(() => NaN));
+  dungFetch(() => Promise.resolve({
+    ok: true,
+    headers: { get: () => 'application/json' },
+    json: async () => moHinhNaN,
+  } as unknown as Response));
+  const raF = await doanYDinhNen('em khong hieu bai nay a');
+  ok(raF === undefined, 'mô hình hệ số NaN (hình dạng vẫn đúng) → không ghi nhãn bịa đặt, trả undefined');
+
   globalThis.fetch = fetchGoc;
   datLaiYDinhNenChoKiemTra();
 }

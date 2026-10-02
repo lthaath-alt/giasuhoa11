@@ -31,7 +31,7 @@ from sklearn.pipeline import Pipeline
 THU_MUC = Path(__file__).resolve().parent
 GOC = THU_MUC.parents[1]
 sys.path.insert(0, str(THU_MUC))
-from chung import NHAN, PHIEN_BAN_CHUAN_HOA, doc_csv_nhan, tach_tu  # noqa: E402
+from chung import NHAN, PHIEN_BAN_CHUAN_HOA, doc_csv_nhan, gop_trung, tach_tu  # noqa: E402
 
 # Câu DÒ nối thêm vào tệp khớp: tập kiểm thật hiếm khi lặp từ, nên nếu chỉ có tập
 # kiểm thì một bản TypeScript đếm "có/không" thay vì đếm thô vẫn khớp. Có lặp từ,
@@ -63,6 +63,12 @@ def main():
     vao = Path(a.vao)   # đường dẫn tương đối tính từ thư mục đang đứng (chạy từ gốc repo)
 
     X, y = doc_csv_nhan(vao)
+    # Gộp câu trùng SAU chuẩn hoá trước khi chia train/test — nếu không, "Em
+    # chịu" (train) và "em chiu" (test) là CÙNG một vectơ TF-IDF, mô hình coi
+    # như được xem bài trước; luật regex không có lợi thế này nên số đo lệch
+    # về phía mô hình một cách giả tạo.
+    X, y, so_gop = gop_trung(X, y)
+    print(f'Gộp {so_gop} câu trùng sau chuẩn hoá — ghi số này vào báo cáo.')
     dem = Counter(y)
     thieu = [n for n in NHAN if dem[n] < 5]
     if thieu:

@@ -12,9 +12,13 @@
 // mạng/tệp mô hình bị treo (không bao giờ resolve, không timeout riêng của
 // nó), `dangNap` không bao giờ settle — thì MỌI tin nhắn của em, suốt cả
 // phiên, đều phải chờ thêm 1,5 s mới hiện bong bóng chat. Không được làm chậm
-// tin nhắn của em: nay chỉ LẦN GỌI ĐẦU của trang mới chờ race; mạng chậm thì
-// vài tin đầu của phiên thiếu `y_dinh` — chấp nhận được, đây là phép đo chạy
-// bóng cho đề tài, không phải tính năng quyết định hành vi gia sư.
+// tin nhắn của em: nay chỉ LẦN GỌI ĐẦU của trang mới chờ race; các lượt gọi
+// sau đọc thẳng `moHinhSan`, KHÔNG chờ lại — nhưng `napMoHinh()` vẫn tiếp tục
+// chạy phía sau, nên nếu mạng chậm và mô hình nạp xong SAU 1,5 s, `moHinhSan`
+// vẫn được gán khi nó đến (xem `.then` trong `napMoHinh`): chỉ (các) tin nhắn
+// rơi đúng vào khoảng mạng còn chậm đó thiếu `y_dinh`, không phải cả phiên —
+// chấp nhận được, đây là phép đo chạy bóng cho đề tài, không phải tính năng
+// quyết định hành vi gia sư.
 import { duDoanYDinh, laMoHinhHopLe, type MoHinhYDinh } from './phanLoaiYDinh';
 
 const DUONG_MO_HINH = '/mo-hinh/phan-loai-y-dinh.json';
@@ -36,7 +40,12 @@ function napMoHinh(): Promise<MoHinhYDinh | null> {
       const m: unknown = await r.json();
       return laMoHinhHopLe(m) ? m : null;
     })
-    .catch(() => null);
+    .catch(() => null)
+    /* Nạp xong SAU khi lần gọi đầu đã hết hạn chờ (mạng chậm) vẫn phải cập
+       nhật `moHinhSan` — không thì cả phiên trang mất `y_dinh`, chỉ vì
+       `race` ở `doanYDinhNen` đã bỏ qua kết quả này. Không chờ lại gì cả,
+       chỉ gán khi Promise này tự đến. */
+    .then((m) => { if (m) moHinhSan = m; return m; });
   return dangNap;
 }
 
@@ -67,6 +76,11 @@ export async function doanYDinhNen(noiDung: string): Promise<NhanYDinhGhi | unde
   }
   if (!moHinhSan) return undefined;
   const kq = duDoanYDinh(moHinhSan, noiDung);
+  /* Mô hình hỏng kiểu tinh vi (hệ số NaN, ví dụ JSON ghi lỗi giữa đường) vẫn
+     qua được `laMoHinhHopLe` (chỉ kiểm hình dạng, không kiểm giá trị) —
+     softmax của NaN vẫn ra NaN, không throw. Thà bỏ ghi `y_dinh` còn hơn ghi
+     một nhãn bịa đặt từ một mô hình hỏng. */
+  if (!Number.isFinite(kq.xacSuat)) return undefined;
   return { y_dinh: kq.nhan, y_dinh_xs: Math.round(kq.xacSuat * 1000) / 1000, y_dinh_phien_ban: moHinhSan.phien_ban };
 }
 
