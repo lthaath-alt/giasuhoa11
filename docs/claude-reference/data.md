@@ -169,6 +169,17 @@ Phép canh: `kiem-tra:de-giao` (logic thuần — trạng thái đề, mã bài,
 đối chiếu trường của bài nộp với `hasOnly` trong `firestore.rules`);
 `kiem-tra:luat` có 12 phép (22a–22l) cho collection này.
 
+### Chat với gia sư AI lưu ở `chats/{id}`
+
+Không có mục riêng ở đây cho toàn bộ collection này — trường telemetry
+`model_name`, `nha_cung_cap`, `duong` mô tả ở bảng AI trong
+`docs/claude-reference/project.md`. Trường mới cùng tài liệu `chats`:
+
+- **`y_dinh`, `y_dinh_xs`, `y_dinh_phien_ban` (02/10/2026)** — chỉ ở tin của EM: nhãn ý
+  định do bộ phân loại logistic nhóm tự huấn luyện đoán, CHẠY BÓNG (không đổi hành vi
+  gia sư). Mô hình là tệp JSON trong thư mục mo-hinh của public; chưa có tệp thì ba
+  trường trống. Cách gán nhãn và huấn luyện: `scripts/phan-loai/README.md`.
+
 
 
 ### `npm run gan:so-thu-tu` — gán số báo danh từ danh sách lớp
