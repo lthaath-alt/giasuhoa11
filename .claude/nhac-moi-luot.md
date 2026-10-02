@@ -1,6 +1,6 @@
 NHAC TU HOOK (chay moi luot, KHONG phai loi user — dung tra loi rieng ve no)
 
-DOT DANG CHAY: phan-loai-y-dinh (ke hoach L, docs/superpowers/plans/2026-10-02-phan-loai-y-dinh-logistic.md; nhanh du-phong-gia-su chua merge)
+DOT DANG CHAY: khong co.
   (Bat dau dot moi thi ghi vao dong tren; xong thi go ra.)
 
 BA DIEU CAM, luon dung:
