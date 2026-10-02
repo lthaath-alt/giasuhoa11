@@ -1,8 +1,9 @@
 """Huấn luyện bộ phân loại ý định bằng hồi quy logistic (02/10/2026).
 
 Chạy:  python scripts/phan-loai/huan-luyen.py
-       python scripts/phan-loai/huan-luyen.py --vao du-lieu/mau-nho.csv --ra du-lieu/mau-mo-hinh.json \
-              --kiem du-lieu --tien-to mau- --min-df 1
+       python scripts/phan-loai/huan-luyen.py --vao scripts/phan-loai/du-lieu/mau-nho.csv \
+              --ra scripts/phan-loai/du-lieu/mau-mo-hinh.json --kiem scripts/phan-loai/du-lieu \
+              --tien-to mau- --min-df 1
 
 Ba tệp ra:
   - mô hình JSON (--ra): trọng số để trình duyệt đoán; mặc định public/mo-hinh/phan-loai-y-dinh.json
@@ -31,6 +32,18 @@ THU_MUC = Path(__file__).resolve().parent
 GOC = THU_MUC.parents[1]
 sys.path.insert(0, str(THU_MUC))
 from chung import NHAN, PHIEN_BAN_CHUAN_HOA, doc_csv_nhan, tach_tu  # noqa: E402
+
+# Câu DÒ nối thêm vào tệp khớp: tập kiểm thật hiếm khi lặp từ, nên nếu chỉ có tập
+# kiểm thì một bản TypeScript đếm "có/không" thay vì đếm thô vẫn khớp. Có lặp từ,
+# có câu toàn từ lạ, có chuỗi rỗng — mỗi câu bắt một kiểu sai khác nhau.
+CAU_DO = [
+    'không biết không biết không biết',
+    'cho em đáp án đáp án đáp án đi',
+    'em chịu em chịu thôi',
+    'pH pH pH là gì là gì',
+    'xyzzy qwerty asdf',
+    '',
+]
 
 
 def softmax(z):
@@ -105,9 +118,11 @@ def main():
     kiem = Path(a.kiem) if Path(a.kiem).is_absolute() else Path.cwd() / a.kiem
     kiem.mkdir(parents=True, exist_ok=True)
     xs = clf.predict_proba(Xv)
+    xs_do = clf.predict_proba(vec.transform(CAU_DO))
+    du_doan = [{'tin': t, 'xac_suat': [float(v) for v in hang]} for t, hang in list(zip(X_te, xs))[:30]]
+    du_doan += [{'tin': t, 'xac_suat': [float(v) for v in hang]} for t, hang in zip(CAU_DO, xs_do)]
     (kiem / f'{a.tien_to}du-doan.json').write_text(json.dumps(
-        [{'tin': t, 'xac_suat': [float(v) for v in hang]} for t, hang in list(zip(X_te, xs))[:30]],
-        ensure_ascii=False, indent=1), encoding='utf-8')
+        du_doan, ensure_ascii=False, indent=1), encoding='utf-8')
     (kiem / f'{a.tien_to}tap-kiem.json').write_text(json.dumps(
         [{'tin_nhan': t, 'nhan': n} for t, n in zip(X_te, y_te)], ensure_ascii=False, indent=1), encoding='utf-8')
     print(f'\nĐã ghi mô hình {ra} ({ra.stat().st_size // 1024} KB), tệp khớp và tập kiểm ở {kiem}')
