@@ -253,6 +253,12 @@ export interface ChatMessage {
       lời dựng sẵn); phân tích "chỉ model chính" trên dữ liệu cũ phải xử trống đúng theo hai ca
       trên, không coi trống là thiếu dữ liệu. */
   duong?: string;
+  /** Ý định tin của EM do bộ phân loại logistic nhóm tự huấn luyện đoán (chạy bóng, 02/10/2026) — không đổi hành vi gia sư */
+  y_dinh?: string;
+  /** Xác suất của nhãn đoán (0–1, 3 chữ số) */
+  y_dinh_xs?: number;
+  /** Phiên bản tệp mô hình đã đoán — huấn luyện lại thì so theo phiên bản */
+  y_dinh_phien_ban?: string;
 }
 
 export interface QuizAttempt {

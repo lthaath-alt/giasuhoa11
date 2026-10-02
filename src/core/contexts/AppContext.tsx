@@ -7,6 +7,7 @@ import { generateAIResponseChiTiet } from '../../features/tutor/services/geminiT
 import { kiemTraVaGhiNhanLuotGui, layTrangThaiGioiHan, thongBaoBiChan } from '../../features/tutor/services/gioiHanChatService';
 import { tachNhanAn, laTinBeTac } from '../../features/tutor/services/pedagogicalStateMachine';
 import { laySessionId, ketThucPhien, userHash } from '../../features/tutor/services/telemetryService';
+import { doanYDinhNen } from '../../features/tutor/services/yDinhNen';
 import { GoogleUserInfo } from '../services/googleAuth';
 import { QuizService } from '../../features/quiz/quizService';
 import { BankFirestore } from '../../features/bank/bankStore';
@@ -1237,6 +1238,12 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     /* Bước 0: giới hạn — lượt thử của khách và khoá tạm khi spam, kiểm ở
        Firestore (xem gioiHanChatService.ts). Kiểm TRƯỚC khi gọi AI: chính kẻ
        spam đang đốt hạn mức gọi AI chung của cả web. */
+    /* Chạy BÓNG bộ phân loại ý định do nhóm tự huấn luyện (02/10/2026): chỉ GHI
+       nhãn đoán để so với regex; mọi quyết định vẫn do máy trạng thái. Bắt đầu
+       từ đây để chạy song song với bước giới hạn bên dưới. Hỏng hay chậm quá
+       1,5 s thì bỏ qua — xem yDinhNen.ts. */
+    const huaYDinh = doanYDinhNen(content).catch(() => undefined);
+
     const gioiHan = await kiemTraVaGhiNhanLuotGui(laKhach, content);
     if (laKhach) setGuestChatCount(gioiHan.luotKhach);
     if (!gioiHan.choPhep && gioiHan.lyDo === 'het-luot-khach') {
@@ -1244,6 +1251,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     }
 
     const nhanDo = { session_id: laySessionId(userEmail, lessonId), user_hash: userHash(userEmail) };
+
+    const yDinh = await huaYDinh;
 
     const userMsg: ChatMessage = {
       id: `m-user-${Date.now()}`,
@@ -1255,6 +1264,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       ...nhanDo,
       be_tac: laTinBeTac(content) || undefined,
       ngoai_mon: gioiHan.lyDo === 'spam' ? 'SPAM_ATTACK' : undefined,
+      ...yDinh,
     };
 
     // Cập nhật state ngay (optimistic)

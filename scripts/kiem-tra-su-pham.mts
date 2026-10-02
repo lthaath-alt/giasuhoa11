@@ -265,8 +265,8 @@ console.log('\n== Telemetry và chỉ số Socratic ==');
   const csv = xuatCsv(mau);
   ok(!csv.includes('@') && !csv.includes('nội dung bí mật') && csv.split('\n')[0].startsWith('user_hash,'),
     'CSV không có email, không có nội dung tin nhắn');
-  ok(csv.split('\n')[0].endsWith(',do_dai_noi_dung,nha_cung_cap,duong'),
-    'CSV có cột nguồn trả lời và đường đi, thêm ở CUỐI để không xô lệch cột cũ');
+  ok(csv.split('\n')[0].endsWith(',do_dai_noi_dung,nha_cung_cap,duong,y_dinh,y_dinh_xs,y_dinh_phien_ban'),
+    'CSV có cột nguồn trả lời, đường đi và ý định — thêm ở CUỐI để không xô lệch cột cũ');
 }
 
 console.log('\n== Gộp chỉ số theo từng học sinh (P0-5) ==');

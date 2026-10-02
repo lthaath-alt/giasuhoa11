@@ -73,5 +73,20 @@ console.log('\n== Tệp mô hình hỏng thì từ chối, không đoán bừa =
   ok(Math.abs(duDoanYDinh(m, '').phanBo.reduce((a, b) => a + b, 0) - 1) < 1e-9, 'tin rỗng vẫn ra phân bố tổng bằng 1');
 }
 
+console.log('\n== CHẠY BÓNG: bộ phân loại không được đổi hành vi gia sư ==');
+{
+  for (const t of ['geminiTutorService.ts', 'pedagogicalStateMachine.ts', 'chuoiDuPhong.ts', 'promptSuPham.ts', 'dungCauLenh.ts']) {
+    const ma = readFileSync(join(GOC, 'src/features/tutor/services', t), 'utf8');
+    ok(!/phanLoaiYDinh|yDinhNen/.test(ma), `${t} không dùng bộ phân loại`);
+  }
+  const ctx = readFileSync(join(GOC, 'src/core/contexts/AppContext.tsx'), 'utf8');
+  ok((ctx.match(/doanYDinhNen\(/g) ?? []).length === 1, 'AppContext gọi bộ phân loại đúng một chỗ');
+  ok(/\.\.\.yDinh\b/.test(ctx), 'kết quả chỉ được trải vào tin nhắn để GHI lại');
+  const DUONG_YDINH_NEN = join(GOC, 'src/features/tutor/services/yDinhNen.ts');
+  const nen = existsSync(DUONG_YDINH_NEN) ? readFileSync(DUONG_YDINH_NEN, 'utf8') : '';
+  ok(nen.includes("'/mo-hinh/phan-loai-y-dinh.json'") && /content-type/i.test(nen),
+     'nạp mô hình cùng nguồn và kiểm kiểu nội dung (luật SPA trả index.html kèm 200)');
+}
+
 console.log('\n' + (hong === 0 ? '>>> TẤT CẢ ĐẠT' : `>>> CÓ ${hong} MỤC KHÔNG ĐẠT`) + '\n');
 process.exit(hong === 0 ? 0 : 1);
