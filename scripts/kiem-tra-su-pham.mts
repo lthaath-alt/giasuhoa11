@@ -267,6 +267,12 @@ console.log('\n== Telemetry và chỉ số Socratic ==');
     'CSV không có email, không có nội dung tin nhắn');
   ok(csv.split('\n')[0].endsWith(',do_dai_noi_dung,nha_cung_cap,duong,y_dinh,y_dinh_xs,y_dinh_phien_ban'),
     'CSV có cột nguồn trả lời, đường đi và ý định — thêm ở CUỐI để không xô lệch cột cũ');
+
+  /* Sửa vòng 1, MINOR 2: kiểm GIÁ TRỊ thật của ba cột mới trên một dòng, không
+     chỉ kiểm tên cột ở header. */
+  const csvYDinh = xuatCsv([m({ sender: 'user', y_dinh: 'be_tac', y_dinh_xs: 0.9, y_dinh_phien_ban: 'v1' })]);
+  ok(csvYDinh.split('\n')[1].endsWith(',be_tac,0.9,v1'),
+    'dòng CSV mang đúng giá trị y_dinh/y_dinh_xs/y_dinh_phien_ban ở ba cột cuối', csvYDinh.split('\n')[1]);
 }
 
 console.log('\n== Gộp chỉ số theo từng học sinh (P0-5) ==');

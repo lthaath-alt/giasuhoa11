@@ -12,6 +12,10 @@ import { readFileSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chuanHoaYDinh, tachTuYDinh, duDoanYDinh, laMoHinhHopLe, type MoHinhYDinh } from '../src/features/tutor/services/phanLoaiYDinh';
+/* `yDinhNen.ts` chỉ import tệp thuần `phanLoaiYDinh` ở trên, nên Node nạp được
+   bình thường — không cần mô phỏng DOM/trình duyệt gì thêm, chỉ cần tự thay
+   `globalThis.fetch` cho từng ca. */
+import { doanYDinhNen, datLaiYDinhNenChoKiemTra } from '../src/features/tutor/services/yDinhNen';
 
 const GOC = join(dirname(fileURLToPath(import.meta.url)), '..');
 const docJson = (p: string): unknown => JSON.parse(readFileSync(join(GOC, p), 'utf8'));
@@ -86,6 +90,53 @@ console.log('\n== CHẠY BÓNG: bộ phân loại không được đổi hành v
   const nen = existsSync(DUONG_YDINH_NEN) ? readFileSync(DUONG_YDINH_NEN, 'utf8') : '';
   ok(nen.includes("'/mo-hinh/phan-loai-y-dinh.json'") && /content-type/i.test(nen),
      'nạp mô hình cùng nguồn và kiểm kiểu nội dung (luật SPA trả index.html kèm 200)');
+}
+
+console.log('\n== Hành vi doanYDinhNen: nạp mô hình, chỉ chờ 1 lần mỗi phiên trang ==');
+{
+  const fetchGoc = globalThis.fetch;
+  const dungFetch = (dung: () => Promise<Response>) => { globalThis.fetch = dung as typeof fetch; };
+
+  // (a) Luật SPA trả index.html kèm 200 khi chưa có tệp — không phải JSON.
+  datLaiYDinhNenChoKiemTra();
+  dungFetch(() => Promise.resolve(new Response('<html></html>', { status: 200, headers: { 'content-type': 'text/html' } })));
+  const raA = await doanYDinhNen('em khong hieu bai nay a');
+  ok(raA === undefined, 'HTML 200 (luật SPA trả index.html) → không đoán, trả undefined');
+
+  // (b) JSON hợp lệ — đúng mô hình mẫu đã dùng ở các phép kiểm trên.
+  datLaiYDinhNenChoKiemTra();
+  const mauMoHinh = docJson('scripts/phan-loai/du-lieu/mau-mo-hinh.json') as MoHinhYDinh;
+  dungFetch(() => Promise.resolve(new Response(JSON.stringify(mauMoHinh), { status: 200, headers: { 'content-type': 'application/json' } })));
+  const raB = await doanYDinhNen('em khong hieu bai nay a');
+  ok(!!raB && mauMoHinh.nhan.includes(raB.y_dinh), 'JSON mô hình hợp lệ → y_dinh là một nhãn có thật của mô hình', raB ? raB.y_dinh : 'undefined');
+  ok(!!raB && Number.isInteger(raB.y_dinh_xs * 1000), 'y_dinh_xs làm tròn tối đa 3 chữ số', raB ? String(raB.y_dinh_xs) : '');
+  ok(!!raB && raB.y_dinh_phien_ban === mauMoHinh.phien_ban, 'y_dinh_phien_ban đúng theo mô hình đã nạp', raB?.y_dinh_phien_ban);
+
+  // (c) JSON nhưng hình dạng sai (ví dụ tệp hỏng giữa đường) — laMoHinhHopLe từ chối.
+  datLaiYDinhNenChoKiemTra();
+  dungFetch(() => Promise.resolve(new Response('{}', { status: 200, headers: { 'content-type': 'application/json' } })));
+  const raC = await doanYDinhNen('em khong hieu bai nay a');
+  ok(raC === undefined, 'JSON đúng kiểu nội dung nhưng sai hình dạng mô hình → trả undefined');
+
+  /* (d) Tệp mô hình TREO (fetch không bao giờ resolve/reject) — phép kiểm hồi
+     quy cho điểm QUAN TRỌNG của vòng sửa 1: lần gọi đầu phải chờ ~1,5 s rồi
+     thôi, nhưng lần gọi SAU (trong khi mạng vẫn còn treo) KHÔNG được chờ lại —
+     nếu không, mọi tin nhắn của em trong cả phiên sẽ chậm thêm 1,5 s. */
+  datLaiYDinhNenChoKiemTra();
+  dungFetch(() => new Promise<Response>(() => { /* không bao giờ settle */ }));
+  const t0 = Date.now();
+  const raD1 = await doanYDinhNen('em khong hieu bai nay a');
+  const msLanDau = Date.now() - t0;
+  ok(raD1 === undefined, 'tệp mô hình treo: lần gọi ĐẦU vẫn trả undefined sau khi hết hạn chờ');
+  ok(msLanDau >= 1400, 'lần gọi ĐẦU chờ đủ khoảng 1,5 s, không trả non ngay', `${msLanDau} ms`);
+  const t1 = Date.now();
+  const raD2 = await doanYDinhNen('em khong hieu bai nay a');
+  const msLanSau = Date.now() - t1;
+  ok(raD2 === undefined, 'lần gọi SAU khi mô hình vẫn treo: vẫn trả undefined');
+  ok(msLanSau < 100, 'lần gọi SAU KHÔNG chờ lại 1,5 s — đọc thẳng trạng thái đã biết', `${msLanSau} ms`);
+
+  globalThis.fetch = fetchGoc;
+  datLaiYDinhNenChoKiemTra();
 }
 
 console.log('\n' + (hong === 0 ? '>>> TẤT CẢ ĐẠT' : `>>> CÓ ${hong} MỤC KHÔNG ĐẠT`) + '\n');

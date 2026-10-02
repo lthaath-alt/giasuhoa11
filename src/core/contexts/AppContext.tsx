@@ -1235,15 +1235,15 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     const userEmail = currentUser ? currentUser.email : 'guest';
     const laKhach = !currentUser;
 
-    /* Bước 0: giới hạn — lượt thử của khách và khoá tạm khi spam, kiểm ở
-       Firestore (xem gioiHanChatService.ts). Kiểm TRƯỚC khi gọi AI: chính kẻ
-       spam đang đốt hạn mức gọi AI chung của cả web. */
     /* Chạy BÓNG bộ phân loại ý định do nhóm tự huấn luyện (02/10/2026): chỉ GHI
        nhãn đoán để so với regex; mọi quyết định vẫn do máy trạng thái. Bắt đầu
        từ đây để chạy song song với bước giới hạn bên dưới. Hỏng hay chậm quá
        1,5 s thì bỏ qua — xem yDinhNen.ts. */
     const huaYDinh = doanYDinhNen(content).catch(() => undefined);
 
+    /* Bước 0: giới hạn — lượt thử của khách và khoá tạm khi spam, kiểm ở
+       Firestore (xem gioiHanChatService.ts). Kiểm TRƯỚC khi gọi AI: chính kẻ
+       spam đang đốt hạn mức gọi AI chung của cả web. */
     const gioiHan = await kiemTraVaGhiNhanLuotGui(laKhach, content);
     if (laKhach) setGuestChatCount(gioiHan.luotKhach);
     if (!gioiHan.choPhep && gioiHan.lyDo === 'het-luot-khach') {
