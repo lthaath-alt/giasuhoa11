@@ -8,6 +8,12 @@ import csv
 import re
 import sys
 import unicodedata
+from collections import Counter
+
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import GridSearchCV, StratifiedKFold, train_test_split
+from sklearn.pipeline import Pipeline
 
 # Windows: Python không tự dùng UTF-8 cho console (kể cả khi chcp 65001), in chữ
 # Việt là văng UnicodeEncodeError trước khi kịp báo kết quả. Ép UTF-8 ngay khi nạp.
@@ -95,3 +101,34 @@ def gop_trung(X, y):
         X2.append(tin)
         y2.append(nhan)
     return X2, y2, so_gop
+
+
+# ─── Ống học: TF-IDF + hồi quy logistic ──────────────────────────────────────
+# huan-luyen.py và ve-bieu-do.py cùng gọi ba hàm dưới đây, để biểu đồ vẽ đúng mô
+# hình đang chạy trên web. Đổi tham số ở đây là đổi cả hai.
+
+CAC_C = [0.25, 1.0, 4.0, 16.0]  # các mức C thử khi kiểm chéo; C nhỏ = phạt trọng số lớn mạnh hơn
+
+
+def chia_tap(X, y):
+    """80 % để học, 20 % để kiểm, giữ tỉ lệ nhãn, hạt giống 42. Trả X_hoc, X_kiem, y_hoc, y_kiem."""
+    return train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
+
+
+def tao_ong(min_df=2):
+    """TF-IDF 1–2 từ trên chữ đã chuẩn hoá, rồi hồi quy logistic đa thức cân bằng nhãn."""
+    return Pipeline([
+        ('vec', TfidfVectorizer(tokenizer=tach_tu, preprocessor=None, lowercase=False, token_pattern=None,
+                                ngram_range=(1, 2), min_df=min_df, smooth_idf=True, norm='l2')),
+        ('clf', LogisticRegression(max_iter=3000, class_weight='balanced')),
+    ])
+
+
+def chon_C(X_hoc, y_hoc, min_df=2):
+    """Kiểm chéo trên phần học để chọn C. Trả GridSearchCV đã học xong: `best_estimator_`
+    là ống học lại trên cả phần học với C tốt nhất, `n_splits_` là số gấp."""
+    so_gap = min(5, min(Counter(y_hoc).values()))
+    luoi = GridSearchCV(tao_ong(min_df), {'clf__C': CAC_C}, scoring='f1_macro',
+                        cv=StratifiedKFold(n_splits=so_gap, shuffle=True, random_state=42))
+    luoi.fit(X_hoc, y_hoc)
+    return luoi

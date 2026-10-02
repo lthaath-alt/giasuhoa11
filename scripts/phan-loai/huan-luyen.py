@@ -22,16 +22,12 @@ from collections import Counter
 from pathlib import Path
 
 import numpy as np
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, f1_score
-from sklearn.model_selection import GridSearchCV, StratifiedKFold, train_test_split
-from sklearn.pipeline import Pipeline
 
 THU_MUC = Path(__file__).resolve().parent
 GOC = THU_MUC.parents[1]
 sys.path.insert(0, str(THU_MUC))
-from chung import NHAN, PHIEN_BAN_CHUAN_HOA, doc_csv_nhan, gop_trung, tach_tu  # noqa: E402
+from chung import NHAN, PHIEN_BAN_CHUAN_HOA, chia_tap, chon_C, doc_csv_nhan, gop_trung  # noqa: E402
 
 # Câu DÒ nối thêm vào tệp khớp: tập kiểm thật hiếm khi lặp từ, nên nếu chỉ có tập
 # kiểm thì một bản TypeScript đếm "có/không" thay vì đếm thô vẫn khớp. Có lặp từ,
@@ -75,19 +71,12 @@ def main():
         sys.exit(f'Mỗi nhãn cần ít nhất 5 câu. Đang thiếu: {", ".join(f"{n} ({dem[n]})" for n in thieu)}')
     print(f'Đọc {len(X)} câu từ {vao}: ' + ', '.join(f'{n}={dem[n]}' for n in NHAN))
 
-    X_tr, X_te, y_tr, y_te = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
-    ong = Pipeline([
-        ('vec', TfidfVectorizer(tokenizer=tach_tu, preprocessor=None, lowercase=False, token_pattern=None,
-                                ngram_range=(1, 2), min_df=a.min_df, smooth_idf=True, norm='l2')),
-        ('clf', LogisticRegression(max_iter=3000, class_weight='balanced')),
-    ])
-    so_gap = min(5, min(Counter(y_tr).values()))
-    luoi = GridSearchCV(ong, {'clf__C': [0.25, 1.0, 4.0, 16.0]}, scoring='f1_macro',
-                        cv=StratifiedKFold(n_splits=so_gap, shuffle=True, random_state=42))
-    luoi.fit(X_tr, y_tr)
+    # Cách chia, ống học và lưới C nằm ở chung.py — ve-bieu-do.py dùng đúng các hàm này.
+    X_tr, X_te, y_tr, y_te = chia_tap(X, y)
+    luoi = chon_C(X_tr, y_tr, a.min_df)
     tot = luoi.best_estimator_
     vec, clf = tot.named_steps['vec'], tot.named_steps['clf']
-    print(f'C tốt nhất (kiểm chéo {so_gap} gấp trên 80 %): {luoi.best_params_["clf__C"]}')
+    print(f'C tốt nhất (kiểm chéo {luoi.n_splits_} gấp trên 80 %): {luoi.best_params_["clf__C"]}')
 
     Xv = vec.transform(X_te)
     # Trình duyệt tính softmax(decision_function); phải trùng predict_proba, không thì dừng.

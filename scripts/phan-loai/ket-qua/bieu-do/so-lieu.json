@@ -1,0 +1,677 @@
+{
+ "ve_ngay": "2026-10-02",
+ "du_lieu": {
+  "tep": "nhan.csv",
+  "so_cau": 438,
+  "so_gop": 0,
+  "so_cau_ai_viet": 360,
+  "so_cau_ai_gan_nhan": 438,
+  "theo_nhan": {
+   "hoi_khai_niem": 63,
+   "be_tac": 78,
+   "xin_dap_an": 103,
+   "nop_bai_lam": 71,
+   "gian_lan_phong_thi": 62,
+   "ngoai_mon": 61
+  },
+  "so_cau_hoc": 350,
+  "so_cau_kiem": 88
+ },
+ "mo_hinh": {
+  "C": 16.0,
+  "so_gap_kiem_cheo": 5,
+  "f1_kiem_cheo": 0.8863,
+  "so_vong_lap": 33,
+  "phien_ban_tren_web": "2026-10-02-1154",
+  "trung_ban_tren_web": true
+ },
+ "tap_kiem": {
+  "so_cau": 88,
+  "so_cau_dung": 81,
+  "do_chinh_xac": 0.9205,
+  "f1_trung_binh": 0.9231
+ },
+ "duong_cong_huan_luyen": [
+  {
+   "vong": 0,
+   "mat_mat_hoc": 1.7918,
+   "mat_mat_kiem": 1.7918,
+   "chinh_xac_hoc": null,
+   "chinh_xac_kiem": null
+  },
+  {
+   "vong": 1,
+   "mat_mat_hoc": 1.3785,
+   "mat_mat_kiem": 1.4367,
+   "chinh_xac_hoc": 0.9571,
+   "chinh_xac_kiem": 0.9091
+  },
+  {
+   "vong": 2,
+   "mat_mat_hoc": 1.2511,
+   "mat_mat_kiem": 1.3603,
+   "chinh_xac_hoc": 0.4429,
+   "chinh_xac_kiem": 0.4091
+  },
+  {
+   "vong": 3,
+   "mat_mat_hoc": 0.2726,
+   "mat_mat_kiem": 0.4547,
+   "chinh_xac_hoc": 0.9629,
+   "chinh_xac_kiem": 0.875
+  },
+  {
+   "vong": 4,
+   "mat_mat_hoc": 0.2362,
+   "mat_mat_kiem": 0.4167,
+   "chinh_xac_hoc": 0.9657,
+   "chinh_xac_kiem": 0.8977
+  },
+  {
+   "vong": 5,
+   "mat_mat_hoc": 0.2,
+   "mat_mat_kiem": 0.3855,
+   "chinh_xac_hoc": 0.9714,
+   "chinh_xac_kiem": 0.8977
+  },
+  {
+   "vong": 6,
+   "mat_mat_hoc": 0.169,
+   "mat_mat_kiem": 0.3758,
+   "chinh_xac_hoc": 0.9743,
+   "chinh_xac_kiem": 0.8977
+  },
+  {
+   "vong": 7,
+   "mat_mat_hoc": 0.137,
+   "mat_mat_kiem": 0.3437,
+   "chinh_xac_hoc": 0.9914,
+   "chinh_xac_kiem": 0.8977
+  },
+  {
+   "vong": 8,
+   "mat_mat_hoc": 0.1298,
+   "mat_mat_kiem": 0.3454,
+   "chinh_xac_hoc": 0.9971,
+   "chinh_xac_kiem": 0.9091
+  },
+  {
+   "vong": 9,
+   "mat_mat_hoc": 0.1216,
+   "mat_mat_kiem": 0.3554,
+   "chinh_xac_hoc": 1.0,
+   "chinh_xac_kiem": 0.9091
+  },
+  {
+   "vong": 10,
+   "mat_mat_hoc": 0.1138,
+   "mat_mat_kiem": 0.3607,
+   "chinh_xac_hoc": 1.0,
+   "chinh_xac_kiem": 0.9205
+  },
+  {
+   "vong": 11,
+   "mat_mat_hoc": 0.1133,
+   "mat_mat_kiem": 0.3706,
+   "chinh_xac_hoc": 1.0,
+   "chinh_xac_kiem": 0.9091
+  },
+  {
+   "vong": 12,
+   "mat_mat_hoc": 0.1109,
+   "mat_mat_kiem": 0.373,
+   "chinh_xac_hoc": 1.0,
+   "chinh_xac_kiem": 0.9091
+  },
+  {
+   "vong": 13,
+   "mat_mat_hoc": 0.1075,
+   "mat_mat_kiem": 0.3675,
+   "chinh_xac_hoc": 1.0,
+   "chinh_xac_kiem": 0.9205
+  },
+  {
+   "vong": 14,
+   "mat_mat_hoc": 0.105,
+   "mat_mat_kiem": 0.3658,
+   "chinh_xac_hoc": 1.0,
+   "chinh_xac_kiem": 0.9205
+  },
+  {
+   "vong": 15,
+   "mat_mat_hoc": 0.104,
+   "mat_mat_kiem": 0.3632,
+   "chinh_xac_hoc": 1.0,
+   "chinh_xac_kiem": 0.9205
+  },
+  {
+   "vong": 16,
+   "mat_mat_hoc": 0.1023,
+   "mat_mat_kiem": 0.3629,
+   "chinh_xac_hoc": 1.0,
+   "chinh_xac_kiem": 0.9205
+  },
+  {
+   "vong": 17,
+   "mat_mat_hoc": 0.1013,
+   "mat_mat_kiem": 0.364,
+   "chinh_xac_hoc": 1.0,
+   "chinh_xac_kiem": 0.9205
+  },
+  {
+   "vong": 18,
+   "mat_mat_hoc": 0.1,
+   "mat_mat_kiem": 0.3654,
+   "chinh_xac_hoc": 1.0,
+   "chinh_xac_kiem": 0.9205
+  },
+  {
+   "vong": 19,
+   "mat_mat_hoc": 0.1006,
+   "mat_mat_kiem": 0.3653,
+   "chinh_xac_hoc": 1.0,
+   "chinh_xac_kiem": 0.9205
+  },
+  {
+   "vong": 20,
+   "mat_mat_hoc": 0.1003,
+   "mat_mat_kiem": 0.3676,
+   "chinh_xac_hoc": 1.0,
+   "chinh_xac_kiem": 0.9205
+  },
+  {
+   "vong": 21,
+   "mat_mat_hoc": 0.1003,
+   "mat_mat_kiem": 0.3665,
+   "chinh_xac_hoc": 1.0,
+   "chinh_xac_kiem": 0.9205
+  },
+  {
+   "vong": 22,
+   "mat_mat_hoc": 0.1003,
+   "mat_mat_kiem": 0.3644,
+   "chinh_xac_hoc": 1.0,
+   "chinh_xac_kiem": 0.9205
+  },
+  {
+   "vong": 23,
+   "mat_mat_hoc": 0.0999,
+   "mat_mat_kiem": 0.3637,
+   "chinh_xac_hoc": 1.0,
+   "chinh_xac_kiem": 0.9205
+  },
+  {
+   "vong": 24,
+   "mat_mat_hoc": 0.0994,
+   "mat_mat_kiem": 0.3639,
+   "chinh_xac_hoc": 1.0,
+   "chinh_xac_kiem": 0.9205
+  },
+  {
+   "vong": 25,
+   "mat_mat_hoc": 0.099,
+   "mat_mat_kiem": 0.3641,
+   "chinh_xac_hoc": 1.0,
+   "chinh_xac_kiem": 0.9205
+  },
+  {
+   "vong": 26,
+   "mat_mat_hoc": 0.0988,
+   "mat_mat_kiem": 0.3645,
+   "chinh_xac_hoc": 1.0,
+   "chinh_xac_kiem": 0.9205
+  },
+  {
+   "vong": 27,
+   "mat_mat_hoc": 0.0989,
+   "mat_mat_kiem": 0.3644,
+   "chinh_xac_hoc": 1.0,
+   "chinh_xac_kiem": 0.9205
+  },
+  {
+   "vong": 28,
+   "mat_mat_hoc": 0.0989,
+   "mat_mat_kiem": 0.3643,
+   "chinh_xac_hoc": 1.0,
+   "chinh_xac_kiem": 0.9205
+  },
+  {
+   "vong": 29,
+   "mat_mat_hoc": 0.099,
+   "mat_mat_kiem": 0.3643,
+   "chinh_xac_hoc": 1.0,
+   "chinh_xac_kiem": 0.9205
+  },
+  {
+   "vong": 30,
+   "mat_mat_hoc": 0.099,
+   "mat_mat_kiem": 0.3643,
+   "chinh_xac_hoc": 1.0,
+   "chinh_xac_kiem": 0.9205
+  },
+  {
+   "vong": 31,
+   "mat_mat_hoc": 0.0991,
+   "mat_mat_kiem": 0.3646,
+   "chinh_xac_hoc": 1.0,
+   "chinh_xac_kiem": 0.9205
+  },
+  {
+   "vong": 32,
+   "mat_mat_hoc": 0.0991,
+   "mat_mat_kiem": 0.3646,
+   "chinh_xac_hoc": 1.0,
+   "chinh_xac_kiem": 0.9205
+  },
+  {
+   "vong": 33,
+   "mat_mat_hoc": 0.0991,
+   "mat_mat_kiem": 0.3646,
+   "chinh_xac_hoc": 1.0,
+   "chinh_xac_kiem": 0.9205
+  }
+ ],
+ "duong_cong_hoc": [
+  {
+   "ti_le": 0.2,
+   "so_cau_hoc": 56.0,
+   "f1_hoc": 1.0,
+   "f1_hoc_lech": 0.0,
+   "f1_kiem": 0.6456,
+   "f1_kiem_lech": 0.0289
+  },
+  {
+   "ti_le": 0.35,
+   "so_cau_hoc": 98.0,
+   "f1_hoc": 1.0,
+   "f1_hoc_lech": 0.0,
+   "f1_kiem": 0.7666,
+   "f1_kiem_lech": 0.011
+  },
+  {
+   "ti_le": 0.5,
+   "so_cau_hoc": 140.0,
+   "f1_hoc": 1.0,
+   "f1_hoc_lech": 0.0,
+   "f1_kiem": 0.8016,
+   "f1_kiem_lech": 0.038
+  },
+  {
+   "ti_le": 0.65,
+   "so_cau_hoc": 182.0,
+   "f1_hoc": 1.0,
+   "f1_hoc_lech": 0.0,
+   "f1_kiem": 0.8452,
+   "f1_kiem_lech": 0.0129
+  },
+  {
+   "ti_le": 0.8,
+   "so_cau_hoc": 224.0,
+   "f1_hoc": 1.0,
+   "f1_hoc_lech": 0.0,
+   "f1_kiem": 0.8657,
+   "f1_kiem_lech": 0.0157
+  },
+  {
+   "ti_le": 1.0,
+   "so_cau_hoc": 280.0,
+   "f1_hoc": 1.0,
+   "f1_hoc_lech": 0.0,
+   "f1_kiem": 0.8863,
+   "f1_kiem_lech": 0.0174
+  }
+ ],
+ "chon_C": [
+  {
+   "C": 0.015625,
+   "f1_hoc": 0.960139,
+   "f1_kiem": 0.831766,
+   "f1_kiem_lech": 0.063812
+  },
+  {
+   "C": 0.0625,
+   "f1_hoc": 0.962306,
+   "f1_kiem": 0.834571,
+   "f1_kiem_lech": 0.06748
+  },
+  {
+   "C": 0.25,
+   "f1_hoc": 0.973186,
+   "f1_kiem": 0.845129,
+   "f1_kiem_lech": 0.047789
+  },
+  {
+   "C": 1.0,
+   "f1_hoc": 0.99243,
+   "f1_kiem": 0.856481,
+   "f1_kiem_lech": 0.036546
+  },
+  {
+   "C": 4.0,
+   "f1_hoc": 1.0,
+   "f1_kiem": 0.875826,
+   "f1_kiem_lech": 0.020305
+  },
+  {
+   "C": 16.0,
+   "f1_hoc": 1.0,
+   "f1_kiem": 0.886287,
+   "f1_kiem_lech": 0.017368
+  },
+  {
+   "C": 64.0,
+   "f1_hoc": 1.0,
+   "f1_kiem": 0.884537,
+   "f1_kiem_lech": 0.02336
+  },
+  {
+   "C": 256.0,
+   "f1_hoc": 1.0,
+   "f1_kiem": 0.889498,
+   "f1_kiem_lech": 0.018267
+  },
+  {
+   "C": 1024.0,
+   "f1_hoc": 1.0,
+   "f1_kiem": 0.889157,
+   "f1_kiem_lech": 0.02341
+  }
+ ],
+ "so_lan_chua_hoi_tu_khi_chon_C": 0,
+ "ma_tran_nham_lan": {
+  "thu_tu": [
+   "hoi_khai_niem",
+   "be_tac",
+   "xin_dap_an",
+   "nop_bai_lam",
+   "gian_lan_phong_thi",
+   "ngoai_mon"
+  ],
+  "hang_la_nhan_that": [
+   [
+    12,
+    0,
+    0,
+    0,
+    0,
+    1
+   ],
+   [
+    0,
+    15,
+    1,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    20,
+    0,
+    0,
+    1
+   ],
+   [
+    0,
+    0,
+    1,
+    13,
+    0,
+    0
+   ],
+   [
+    0,
+    1,
+    1,
+    0,
+    10,
+    0
+   ],
+   [
+    0,
+    0,
+    1,
+    0,
+    0,
+    11
+   ]
+  ]
+ },
+ "cum_tu_dac_trung": {
+  "hoi_khai_niem": [
+   [
+    "sao",
+    5.12
+   ],
+   [
+    "gi",
+    2.8777
+   ],
+   [
+    "the nao",
+    2.8686
+   ],
+   [
+    "vi sao",
+    2.6223
+   ],
+   [
+    "vi",
+    2.2028
+   ],
+   [
+    "nao",
+    2.1634
+   ],
+   [
+    "tai sao",
+    2.0701
+   ],
+   [
+    "tai",
+    2.0701
+   ]
+  ],
+  "be_tac": [
+   [
+    "chiu",
+    4.136
+   ],
+   [
+    "biet",
+    2.9033
+   ],
+   [
+    "luon",
+    2.746
+   ],
+   [
+    "nhin",
+    2.488
+   ],
+   [
+    "luon a",
+    2.0226
+   ],
+   [
+    "bo",
+    1.9437
+   ],
+   [
+    "em nhin",
+    1.9203
+   ],
+   [
+    "nghi ra",
+    1.8907
+   ]
+  ],
+  "xin_dap_an": [
+   [
+    "dap",
+    4.0073
+   ],
+   [
+    "dap an",
+    3.0012
+   ],
+   [
+    "an",
+    2.8236
+   ],
+   [
+    "ket qua",
+    2.5602
+   ],
+   [
+    "ket",
+    2.5508
+   ],
+   [
+    "giai",
+    2.5497
+   ],
+   [
+    "di",
+    2.1166
+   ],
+   [
+    "cho",
+    2.102
+   ]
+  ],
+  "nop_bai_lam": [
+   [
+    "em nghi",
+    3.9632
+   ],
+   [
+    "0",
+    3.0988
+   ],
+   [
+    "em tinh",
+    3.0411
+   ],
+   [
+    "em",
+    2.9291
+   ],
+   [
+    "chon",
+    2.8312
+   ],
+   [
+    "ra",
+    2.7359
+   ],
+   [
+    "em chon",
+    2.5338
+   ],
+   [
+    "em ra",
+    2.3599
+   ]
+  ],
+  "gian_lan_phong_thi": [
+   [
+    "thi",
+    4.5216
+   ],
+   [
+    "dang",
+    4.2156
+   ],
+   [
+    "phut",
+    2.9799
+   ],
+   [
+    "kiem tra",
+    2.8787
+   ],
+   [
+    "tra",
+    2.8142
+   ],
+   [
+    "dang thi",
+    2.777
+   ],
+   [
+    "cau",
+    2.7304
+   ],
+   [
+    "sap",
+    2.7241
+   ]
+  ],
+  "ngoai_mon": [
+   [
+    "thay",
+    5.6198
+   ],
+   [
+    "thay co",
+    3.442
+   ],
+   [
+    "hoc",
+    3.1799
+   ],
+   [
+    "vay",
+    2.6493
+   ],
+   [
+    "buon",
+    2.3688
+   ],
+   [
+    "ai",
+    2.2752
+   ],
+   [
+    "duoc khong",
+    2.0832
+   ],
+   [
+    "thich",
+    2.0686
+   ]
+  ]
+ },
+ "so_voi_regex": [
+  {
+   "nhan": "be_tac",
+   "cach": "regex",
+   "f1": 0.571
+  },
+  {
+   "nhan": "be_tac",
+   "cach": "mô hình",
+   "f1": 0.938
+  },
+  {
+   "nhan": "gian_lan_phong_thi",
+   "cach": "regex",
+   "f1": 0.737
+  },
+  {
+   "nhan": "gian_lan_phong_thi",
+   "cach": "mô hình",
+   "f1": 0.909
+  }
+ ],
+ "anh": [
+  "1-duong-cong-huan-luyen.png",
+  "2-duong-cong-hoc.png",
+  "3-chon-C.png",
+  "4-ma-tran-nham-lan.png",
+  "5-cum-tu-dac-trung.png",
+  "6-so-voi-regex.png"
+ ]
+}
