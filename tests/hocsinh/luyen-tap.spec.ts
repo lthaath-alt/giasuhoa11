@@ -89,6 +89,47 @@ test.describe('Luyện tập (đã đăng nhập)', () => {
     console.log(`  [đo] mở tab: ${sauKhiMo} request Firestore · sau khi bấm bài: ${sauKhiBam}`);
   });
 
+  /**
+   * Lỗi 29/09/2026: làm sai rồi bấm "Làm lại với đề khác" thì đề mới hiện ra
+   * ở trạng thái ĐÃ NỘP — lộ đáp án (✓, lời giải), khóa ô chọn, mất nút Nộp
+   * bài. Nguyên nhân: lượt mới giữ nguyên màn 'lam-bai' nên React giữ lại
+   * PracticeRunner cũ cùng `ketQua` của lượt trước. Sửa bằng `key` theo lượt
+   * trong PracticeSection.tsx.
+   *
+   * Chỉ trả lời ĐÚNG MỘT câu rồi nộp: tối đa 1/N số điểm, chắc chắn dưới
+   * ngưỡng 70% mà không cần biết đáp án. Phép này tiêu một lượt thật của tài
+   * khoản thử; hết lượt thì phần đó khóa 10 phút và phép tự BỎ QUA.
+   */
+  test('làm sai rồi "Làm lại với đề khác" thì ra đề mới CHƯA nộp', async ({ page }) => {
+    await page.locator('button:has-text("Nhiều lựa chọn")').first().click();
+
+    const nutNop = page.getByRole('button', { name: /^Nộp bài/ });
+    const vaoDuoc = await nutNop.waitFor({ state: 'visible', timeout: 30_000 })
+      .then(() => true).catch(() => false);
+    test.skip(!vaoDuoc, 'Phần đầu tiên đang khóa hoặc cần ôn lại — không có đề để làm.');
+
+    // Trả lời đúng một câu (chọn phương án A của câu 1), rồi nộp
+    await page.getByRole('radio').first().check();
+    await nutNop.click();
+
+    await expect(page.getByText('Chưa đạt', { exact: true })).toBeVisible();
+    const nutLamLai = page.getByRole('button', { name: 'Làm lại với đề khác' });
+    test.skip(!(await nutLamLai.isVisible()), 'Tài khoản thử đã hết lượt ở phần này.');
+
+    await nutLamLai.click();
+
+    // Đề mới phải là một lượt TRỐNG: có nút Nộp bài, chưa chọn câu nào
+    await expect(nutNop).toBeVisible();
+    await expect(nutNop).toContainText('(0/');
+    await expect(page.getByText('Chưa đạt', { exact: true })).toBeHidden();
+    // Không lộ đáp án của lượt mới
+    await expect(page.getByText('Giải thích', { exact: true })).toHaveCount(0);
+    await expect(page.locator('text=✓')).toHaveCount(0);
+    // Ô chọn phải bấm được
+    await expect(page.getByRole('radio').first()).toBeEnabled();
+    await expect(page.getByRole('radio', { checked: true })).toHaveCount(0);
+  });
+
   test('bấm "Chơi để ôn" thì mở khu Trò chơi, KHÔNG mở tab mới', async ({ page, context }) => {
     const soTabTruoc = context.pages().length;
     await NUT_CHOI(page).first().click();

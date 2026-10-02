@@ -165,7 +165,7 @@ const LESSON_CHAPTER_MAP: Record<string, string> = {
 // ============================================================
 
 const STEP_PROMPTS = {
-  classify: `Chào em! 👋 Thầy/Cô là Gia sư Hóa học 11 Thông minh — sẽ dẫn dắt em tự tìm ra câu trả lời theo từng bước nhé!
+  classify: `Chào em! 👋 Thầy/Cô là Chemai, gia sư Hóa học 11 — sẽ dẫn dắt em tự tìm ra câu trả lời theo từng bước nhé!
 
 Để bắt đầu, em hãy cho thầy/cô biết:
 

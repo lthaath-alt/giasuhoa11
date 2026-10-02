@@ -116,7 +116,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
     try {
       await addMessage(lesson.id, text);
     } catch (err: any) {
-      setErrorMsg(err.message || 'Có lỗi xảy ra khi kết nối với Gia sư AI.');
+      setErrorMsg(err.message || 'Có lỗi xảy ra khi kết nối với Chemai.');
     } finally {
       setIsSending(false);
     }
@@ -214,7 +214,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
               setInputMessage(q);
               handleSend(q);
             } else {
-              setErrorMsg(`Bạn đã dùng hết ${TRAN_LUOT_KHACH} lượt chat thử. Hãy đăng ký tài khoản để hỏi Gia sư câu này nhé!`);
+              setErrorMsg(`Bạn đã dùng hết ${TRAN_LUOT_KHACH} lượt chat thử. Hãy đăng ký tài khoản để hỏi Chemai câu này nhé!`);
             }
           }}
         />
@@ -253,7 +253,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
             </Avatar>
             <Box>
               <Typography variant="subtitle1" color="text.primary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, fontWeight: 'bold' }}>
-                Gia sư AI Hóa học 11
+                Chemai
                 <Chip label="ONLINE" size="small" color="secondary" sx={{ height: 16, fontSize: '0.65rem', fontWeight: 'bold' }} />
               </Typography>
               <Typography variant="caption" color="text.secondary">
@@ -339,7 +339,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
                 <Sparkles size={32} />
               </Avatar>
               <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                Trò chuyện với Gia sư AI của bài học này
+                Trò chuyện với Chemai về bài học này
               </Typography>
               <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 450, mb: 1 }}>
                 Nhập câu hỏi của em ở phía dưới, hoặc nhấp vào một trong các{' '}
@@ -435,7 +435,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
               >
                 <CircularProgress size={16} thickness={5} color="primary" />
                 <Typography variant="caption" color="text.secondary">
-                  {chuDangCho(giayDaCho, 'Gia sư AI đang chuẩn bị gợi ý...')}
+                  {chuDangCho(giayDaCho, 'Chemai đang chuẩn bị gợi ý...')}
                 </Typography>
               </Paper>
             </Box>
@@ -493,7 +493,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
                 ? 'Đã hết lượt chat thử! Đăng ký tài khoản học sinh ngay.'
                 : remainingCooldown > 0
                 ? `Đang tạm dừng (${Math.ceil(remainingCooldown / 60000)} phút)`
-                : 'Hỏi Gia sư AI về phương pháp giải bài...'
+                : 'Hỏi Chemai về phương pháp giải bài...'
             }
             variant="outlined"
             size="small"

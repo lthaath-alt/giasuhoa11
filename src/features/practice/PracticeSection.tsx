@@ -63,6 +63,11 @@ export const PracticeSection: React.FC<Props> = ({ onDangNhap, onMoTroChoi }) =>
   const [cauLamSai, setCauLamSai] = useState<BankQuestion[]>([]);
   const [dangLuu, setDangLuu] = useState(false);
   const [loiLuu, setLoiLuu] = useState<string | null>(null);
+  /* Mỗi lượt một số mới, làm `key` của PracticeRunner. "Làm lại với đề khác"
+     giữ nguyên màn 'lam-bai' nên thiếu key thì React giữ runner cũ, kèm luôn
+     `ketQua` của lượt trước: đề mới hiện ra ở trạng thái ĐÃ NỘP — lộ đáp án,
+     khóa ô chọn, mất nút Nộp bài. */
+  const [maLuot, setMaLuot] = useState(0);
 
   const email = currentUser?.email || '';
 
@@ -109,6 +114,7 @@ export const PracticeSection: React.FC<Props> = ({ onDangNhap, onMoTroChoi }) =>
       return;
     }
     setCauHoi(cau);
+    setMaLuot(n => n + 1);
     setBai(b);
     setPhan(p);
     setMan('lam-bai');
@@ -248,6 +254,7 @@ export const PracticeSection: React.FC<Props> = ({ onDangNhap, onMoTroChoi }) =>
 
       {man === 'lam-bai' && bai && (
         <PracticeRunner
+          key={maLuot}
           tenBai={bai.title}
           phan={phan}
           cauHoi={cauHoi}

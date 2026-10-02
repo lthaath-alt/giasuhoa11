@@ -33,6 +33,10 @@ export const PracticeRunner: React.FC<Props> = ({
 }) => {
   const [traLoi, setTraLoi] = useState<Record<string, TraLoi>>({});
   const [ketQua, setKetQua] = useState<KetQuaLuot | null>(null);
+  /* Tiến độ ĐÃ tính cả lượt vừa nộp. Đếm lượt còn lại theo nó, không theo prop
+     `tienDo`: cha cập nhật prop ngay khi nộp (ghi lạc quan), nên lấy prop trừ
+     thêm 1 là trừ hai lần — lượt thứ 3 sai đã báo "hết lượt" dù còn lượt 4. */
+  const [tienDoSau, setTienDoSau] = useState<TienDoPhan | null>(null);
 
   const daNop = ketQua !== null;
 
@@ -51,14 +55,16 @@ export const PracticeRunner: React.FC<Props> = ({
 
   const nop = () => {
     const kq = chamLuot(cauHoi, traLoi);
+    const sau = capNhatSauLuot(tienDo, cauHoi, kq);
     setKetQua(kq);
-    onNop(capNhatSauLuot(tienDo, cauHoi, kq), kq);
+    setTienDoSau(sau);
+    onNop(sau, kq);
   };
 
   const ketQuaCau = (cauId: string) =>
     ketQua?.chiTiet.find(r => r.cauId === cauId);
 
-  const conLaiSauLuotNay = soLuotConLai(tienDo) - 1;
+  const conLaiSauLuotNay = tienDoSau ? soLuotConLai(tienDoSau) : soLuotConLai(tienDo) - 1;
 
   return (
     <Box>
@@ -66,7 +72,9 @@ export const PracticeRunner: React.FC<Props> = ({
         Quay lại danh sách bài
       </Button>
 
-      <Paper sx={{ p: 2.5, mb: 3, borderLeft: '4px solid var(--xanh)' }}>
+      {/* Khung 1px mặc định của Paper (theme) là đủ; viền trái màu dày kiểu
+          callout bị DESIGN.md cấm ("The Straight-Rule Rule"). */}
+      <Paper sx={{ p: 2.5, mb: 3 }}>
         <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{tenBai}</Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
           {TEN_PHAN[phan]} — {cauHoi.length} câu · cần đạt {Math.round(NGUONG_DAT * 100)}%
@@ -98,15 +106,8 @@ export const PracticeRunner: React.FC<Props> = ({
       {cauHoi.map((cau, idx) => {
         const kq = ketQuaCau(cau.id);
         return (
-          <Paper
-            key={cau.id}
-            sx={{
-              p: 2.5, mb: 2,
-              borderLeft: kq
-                ? `4px solid ${kq.dung ? 'var(--luc)' : 'var(--do)'}`
-                : '4px solid transparent',
-            }}
-          >
+          /* Đúng/sai đã có chip ngay đầu câu; không thêm viền trái màu dày. */
+          <Paper key={cau.id} sx={{ p: 2.5, mb: 2 }}>
             <Stack direction="row" spacing={1} sx={{ alignItems: 'flex-start', mb: 1.5 }}>
               <Chip label={`Câu ${idx + 1}`} size="small" color="primary" />
               {kq && (

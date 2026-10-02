@@ -148,7 +148,7 @@ export const StudentArea: React.FC = () => {
           >
             <Tab icon={<ClipboardCheck size={18} />} iconPosition="start" label="Bài tập GV giao" />
             <Tab icon={<BookOpen size={18} />} iconPosition="start" label="Luyện tập tự do" />
-            <Tab icon={<Sparkles size={18} />} iconPosition="start" label="Gia sư Hóa học AI" />
+            <Tab icon={<Sparkles size={18} />} iconPosition="start" label="Chemai" />
             <Tab icon={<Award size={18} />} iconPosition="start" label="Học bạ thông minh" />
           </Tabs>
         </Box>
@@ -303,13 +303,13 @@ export const StudentArea: React.FC = () => {
             )}
           </TabPanel>
 
-          {/* TAB 3: Gia sư Hóa học AI */}
+          {/* TAB 3: Chemai */}
           <TabPanel value={tabValue} index={2}>
             <Box sx={{ height: '70vh', borderRadius: 0, overflow: 'hidden', border: '1px solid var(--vien)' }}>
               <TutorChat 
                 lesson={{
                   id: 'student-free-chat',
-                  title: 'Gia sư Hóa học AI',
+                  title: 'Chemai',
                   summary: 'Trợ lý học tập riêng cho từng em',
                   formulae: [],
                   commonQuestions: []

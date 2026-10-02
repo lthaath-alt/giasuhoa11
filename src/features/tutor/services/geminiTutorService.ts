@@ -59,7 +59,7 @@ export const thongBaoHetLuot = (loi: string, coKeyRieng = false): string => {
   if (!(m.includes('429') || m.includes('quota') || m.includes('rate limit'))) return '';
 
   if (m.includes('perday')) {
-    const chung = 'Gia sư AI đã dùng hết lượt trả lời trong ngày của toàn hệ thống, '
+    const chung = 'Chemai đã dùng hết lượt trả lời trong ngày của toàn hệ thống, '
       + 'nên tạm thời chưa trả lời được. Lượt mới được cấp lại vào đầu ngày mai. '
       + 'Trong lúc chờ, em xem lại bài giảng hoặc làm phần luyện tập của bài này nhé.';
     /* Em đã có khoá riêng mà vẫn ra lỗi này thì chính khoá của em cũng hết
@@ -104,7 +104,7 @@ export const thongBaoLoiKetNoi = (chuoiLoi: string): string => {
      Phải nói đúng việc cần làm. */
   if (msg.includes('app check token is invalid') || msg.includes('appcheck/throttled')
       || msg.includes('initial-throttle') || msg.includes('attempts allowed again')) {
-    return 'Thầy đang không xác thực được với máy chủ nên chưa trả lời được. '
+    return 'Chemai đang không xác thực được với máy chủ nên chưa trả lời được. '
       + 'Em TẢI LẠI TRANG (phím F5) rồi hỏi lại giúp thầy nhé — lỗi này không tự hết '
       + 'nếu em chỉ bấm gửi lại.';
   }
@@ -122,12 +122,12 @@ export const thongBaoLoiKetNoi = (chuoiLoi: string): string => {
      và cũng không phải hết lượt. Đo ngày 21/09/2026 trên bản đang chạy. */
   if (/\[5\d\d\s/.test(chuoiLoi) || /"?status"?:\s*5\d\d/.test(chuoiLoi)
       || msg.includes('internal server error') || msg.includes('service unavailable')) {
-    return 'Máy chủ của gia sư AI đang trục trặc (lỗi phía máy chủ, không phải do em). '
+    return 'Máy chủ của Chemai đang trục trặc (lỗi phía máy chủ, không phải do em). '
       + 'Em thử gửi lại sau một phút nhé; trong lúc chờ, em xem lại bài giảng hoặc làm phần luyện tập.';
   }
 
   if (msg.includes('firebasevertexai') || msg.includes('app check') || msg.includes('appcheck')) {
-    return 'Gia sư AI đang tạm mất kết nối với máy chủ. Em thử lại sau ít phút nhé!';
+    return 'Chemai đang tạm mất kết nối với máy chủ. Em thử lại sau ít phút nhé!';
   }
 
   return '';
