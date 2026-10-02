@@ -14,6 +14,7 @@
     "kiem-tra:het-luot": "tsx scripts/kiem-tra-het-luot.mts",
     "kiem-tra:du-phong": "tsx scripts/kiem-tra-du-phong.mts",
     "kiem-tra:phan-loai": "tsx scripts/kiem-tra-phan-loai.mts",
+    "danh-gia:phan-loai": "tsx scripts/danh-gia-phan-loai.mts",
     "thu:ai": "tsx scripts/thu-gia-su-ai.mts",
     "soan": "npm run soan:trich && npm run soan:sinh && npm run kiem-tra:chuong-trinh",
     "soan:trich": "python scripts/soan-noi-dung/1-trich-docx.py",

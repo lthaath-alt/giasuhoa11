@@ -1,0 +1,68 @@
+/**
+ * So bộ phân loại tự huấn luyện với luật regex đang chạy, trên TẬP KIỂM —
+ * 20 % câu mà mô hình không thấy lúc học.
+ *
+ * Chạy:  npm run danh-gia:phan-loai                (mô hình thật, sau khi huấn luyện)
+ *        npm run danh-gia:phan-loai -- --mau       (mô hình mẫu, để thử đường ống)
+ *
+ * In bảng Markdown để dán vào báo cáo, và ghi ra scripts/phan-loai/ket-qua/so-sanh.md
+ * (hoặc du-lieu/mau-so-sanh.md với --mau).
+ *
+ * Regex chỉ có ý kiến về HAI nhãn (bế tắc, gian lận phòng thi), nên so từng nhãn
+ * theo kiểu có/không. Bốn nhãn kia chỉ mô hình làm được — báo riêng.
+ */
+import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { duDoanYDinh, laMoHinhHopLe } from '../src/features/tutor/services/phanLoaiYDinh';
+import { laTinBeTac, laNguCanhGianLanPhongThi } from '../src/features/tutor/services/pedagogicalStateMachine';
+
+const GOC = join(dirname(fileURLToPath(import.meta.url)), '..');
+const mau = process.argv.includes('--mau');
+const tepMoHinh = mau ? 'scripts/phan-loai/du-lieu/mau-mo-hinh.json' : 'public/mo-hinh/phan-loai-y-dinh.json';
+const tepKiem = mau ? 'scripts/phan-loai/du-lieu/mau-tap-kiem.json' : 'scripts/phan-loai/ket-qua/tap-kiem.json';
+const tepRa = mau ? 'scripts/phan-loai/du-lieu/mau-so-sanh.md' : 'scripts/phan-loai/ket-qua/so-sanh.md';
+
+const m: unknown = JSON.parse(readFileSync(join(GOC, tepMoHinh), 'utf8'));
+if (!laMoHinhHopLe(m)) { console.error(`${tepMoHinh} không đúng hình dạng mô hình.`); process.exit(1); }
+const cau = JSON.parse(readFileSync(join(GOC, tepKiem), 'utf8')) as { tin_nhan: string; nhan: string }[];
+const doan = cau.map(c => duDoanYDinh(m, c.tin_nhan).nhan);
+
+const pct = (x: number) => (x * 100).toFixed(1).replace('.', ',') + ' %';
+/** precision, recall, F1 cho bài toán có/không. */
+const prf = (that: boolean[], du: boolean[]) => {
+  let tp = 0, fp = 0, fn = 0;
+  that.forEach((t, i) => { if (t && du[i]) tp++; else if (!t && du[i]) fp++; else if (t && !du[i]) fn++; });
+  const p = tp + fp ? tp / (tp + fp) : 0;
+  const r = tp + fn ? tp / (tp + fn) : 0;
+  return { p, r, f1: p + r ? 2 * p * r / (p + r) : 0, tp, fp, fn };
+};
+
+const dong: string[] = [];
+const dung = doan.filter((d, i) => d === cau[i].nhan).length;
+dong.push(`# So sánh bộ phân loại tự huấn luyện với luật regex`, '',
+  `Mô hình \`${m.phien_ban}\`, tập kiểm ${cau.length} câu (máy không thấy lúc học).`, '',
+  `Độ chính xác 6 nhãn của mô hình: **${pct(dung / cau.length)}** (${dung}/${cau.length}).`, '',
+  '| Nhãn | Cách | Precision | Recall | F1 | Bắt đúng | Báo nhầm | Bỏ sót |',
+  '|---|---|---|---|---|---|---|---|');
+const so = (nhan: string, luat: (s: string) => boolean) => {
+  const that = cau.map(c => c.nhan === nhan);
+  for (const [cach, du] of [['regex', cau.map(c => luat(c.tin_nhan))], ['mô hình', doan.map(d => d === nhan)]] as const) {
+    const k = prf(that, du as boolean[]);
+    dong.push(`| ${nhan} | ${cach} | ${pct(k.p)} | ${pct(k.r)} | ${pct(k.f1)} | ${k.tp} | ${k.fp} | ${k.fn} |`);
+  }
+};
+so('be_tac', laTinBeTac);
+so('gian_lan_phong_thi', laNguCanhGianLanPhongThi);
+dong.push('', '## Bốn nhãn chỉ mô hình làm được', '', '| Nhãn | Precision | Recall | F1 |', '|---|---|---|---|');
+for (const nhan of ['hoi_khai_niem', 'xin_dap_an', 'nop_bai_lam', 'ngoai_mon']) {
+  const k = prf(cau.map(c => c.nhan === nhan), doan.map(d => d === nhan));
+  dong.push(`| ${nhan} | ${pct(k.p)} | ${pct(k.r)} | ${pct(k.f1)} |`);
+}
+dong.push('', `_Tập kiểm nhỏ thì mỗi câu đổi vài điểm phần trăm — ghi kèm số câu khi trích._`);
+
+const ra = dong.join('\n') + '\n';
+mkdirSync(dirname(join(GOC, tepRa)), { recursive: true });
+writeFileSync(join(GOC, tepRa), ra, 'utf8');
+console.log(ra);
+console.log(`Đã ghi ${tepRa}`);
