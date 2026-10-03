@@ -11,6 +11,9 @@ from chung import (  # noqa: E402
     bat_buoc_trong, chia_tap, chia_theo_tuy_chon, chuan_hoa, co_cau_that, do_ten_trong_tu_vung, doc_csv_nhan,
     doc_ten_hoc_sinh, gop_trung, tach_tu,
 )
+from nap_dot import (  # noqa: E402
+    Dung, chenh, cong_don, doc_lich_su, dung_tep_hoc, ghi_dong, kiem_cung_danh_sach, kiem_tep_gan, them_lich_su,
+)
 
 hong = 0
 
@@ -137,6 +140,53 @@ ok(lot == ['bao an', 'nguyen hoang', 'thanh an'], f'dò ra cụm hai chữ của
 ok('an' not in lot and 'dap an' not in lot, 'chữ đơn "an" và cụm thường "dap an" không bị bắt')
 ok(do_ten_trong_tu_vung(tu_vung, ['nguyen hoang thanh an']) == ['nguyen hoang', 'thanh an'], 'tên gõ không dấu cũng dò được')
 ok(do_ten_trong_tu_vung(tu_vung, ['Trần Bảo Ân'], cho_phep=['bảo an']) == [], '--cho-phep-cum bỏ qua cụm đã xem tay')
+
+print('\n== Quy trình nạp đợt (nap_dot.py): các bước kiểm, cộng dồn, lịch sử ==')
+with tempfile.TemporaryDirectory() as tmp:
+    tm = Path(tmp)
+
+    def dung_ra(ham, *ts):
+        try:
+            ham(*ts)
+            return ''
+        except Dung as e:
+            return str(e)
+
+    ghi_dong(tm / 'a.csv', [{'tin_nhan': 'em chiu', 'nhan': 'be_tac', 'nguoi_gan': 'An'},
+                            {'tin_nhan': 'cho dap an', 'nhan': '', 'nguoi_gan': 'An'}], ['tin_nhan', 'nhan', 'nguoi_gan'])
+    ok('chưa gán nhãn' in dung_ra(kiem_tep_gan, tm / 'a.csv'), 'còn ô nhãn trống → dừng, nói dòng nào')
+    ghi_dong(tm / 'a.csv', [{'tin_nhan': 'em chiu', 'nhan': 'be-tac', 'nguoi_gan': 'An'}], ['tin_nhan', 'nhan', 'nguoi_gan'])
+    ok('nhãn lạ' in dung_ra(kiem_tep_gan, tm / 'a.csv'), 'nhãn gõ sai → dừng')
+    ghi_dong(tm / 'a.csv', [{'tin_nhan': 'em chiu', 'nhan': 'be_tac', 'nguoi_gan': ''}], ['tin_nhan', 'nhan', 'nguoi_gan'])
+    ok('nguoi_gan' in dung_ra(kiem_tep_gan, tm / 'a.csv'), 'thiếu tên người gán → dừng')
+    ok('Không thấy' in dung_ra(kiem_tep_gan, tm / 'khong-co.csv'), 'thiếu tệp → dừng')
+    ok('lệch' in dung_ra(kiem_cung_danh_sach, [{'tin_nhan': 'a'}], [{'tin_nhan': 'b'}]), 'a.csv và b.csv khác câu → dừng')
+
+    d1 = [{'tin_nhan': 'Em chịu', 'nhan': 'be_tac', 'nguoi_gan': 'An+Binh'},
+          {'tin_nhan': 'cho em dap an', 'nhan': 'xin_dap_an', 'nguoi_gan': 'An+Binh'}]
+    tl, them = cong_don([], d1, 'dot-1')
+    ok(them == 2 and all(d['nguon'] == 'that:dot-1' for d in tl), 'đợt đầu: thêm 2 câu, nguồn ghi tên đợt')
+    tl2, them2 = cong_don(tl, d1, 'dot-1')
+    ok(them2 == 0 and len(tl2) == 2, 'chạy lại cùng đợt không cộng hai lần')
+    tl3, them3 = cong_don(tl, [{'tin_nhan': 'em chiu!!', 'nhan': 'be_tac'}, {'tin_nhan': 'Kc là gì', 'nhan': 'hoi_khai_niem'}], 'dot-2')
+    ok(them3 == 1 and len(tl3) == 3, 'đợt sau: câu trùng (sau chuẩn hoá) bỏ qua, câu mới thêm')
+    ok('đợt trước' in dung_ra(cong_don, tl, [{'tin_nhan': 'em chiu', 'nhan': 'ngoai_mon'}], 'dot-3'),
+       'cùng câu mà đợt sau gán khác nhãn → dừng, không tự chọn')
+
+    cu = [{'tin_nhan': 'em chịu', 'nhan': 'ngoai_mon', 'nguon': 'ai-sinh'}, {'tin_nhan': 'chao thay', 'nhan': 'ngoai_mon', 'nguon': 'ai-sinh'}]
+    hoc, bo = dung_tep_hoc(tl, cu, False)
+    ok(len(hoc) == 3 and bo == 1, 'bộ học = câu thật + bộ cũ, bỏ câu cũ trùng câu thật')
+    ok([d['nhan'] for d in hoc if chuan_hoa(d['tin_nhan']) == 'em chiu'] == ['be_tac'], 'trùng câu thì giữ nhãn câu THẬT')
+    ok(dung_tep_hoc(tl, cu, True) == (tl, 0), '--chi-cau-that: chỉ câu thật')
+
+    ls = tm / 'lich-su.csv'
+    them_lich_su({'ngay': '2026-10-03', 'dot': 'dot-1', 'do_chinh_xac': 0.8}, ls)
+    them_lich_su({'ngay': '2026-10-10', 'dot': 'dot-2', 'do_chinh_xac': 0.85}, ls)
+    ok([d['dot'] for d in doc_lich_su(ls)] == ['dot-1', 'dot-2'], 'lịch sử ghi thêm từng đợt, không ghi đè')
+    them_lich_su({'ngay': '2026-10-10', 'dot': 'dot-2', 'do_chinh_xac': 0.86}, ls)
+    ok([(d['dot'], d['do_chinh_xac']) for d in doc_lich_su(ls)] == [('dot-1', '0.8'), ('dot-2', '0.86')],
+       'chạy lại cùng đợt thì thay dòng của đợt đó, không thêm dòng trùng')
+    ok(chenh(0.85, '0.8') == ' (+5,0 điểm %)', f'so với đợt trước ra điểm phần trăm ({chenh(0.85, "0.8")})')
 
 print('>>> TẤT CẢ ĐẠT' if hong == 0 else f'>>> CÓ {hong} MỤC KHÔNG ĐẠT')
 sys.exit(0 if hong == 0 else 1)

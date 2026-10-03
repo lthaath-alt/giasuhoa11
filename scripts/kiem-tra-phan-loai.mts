@@ -8,7 +8,8 @@
  * Lệch chuẩn hoá một ký tự thì mô hình vẫn chạy, vẫn ra nhãn — chỉ là nhãn sai,
  * và không ai thấy.
  */
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chuanHoaYDinh, tachTuYDinh, duDoanYDinh, laMoHinhHopLe, type MoHinhYDinh } from '../src/features/tutor/services/phanLoaiYDinh';
@@ -18,6 +19,7 @@ import { chuanHoaYDinh, tachTuYDinh, duDoanYDinh, laMoHinhHopLe, type MoHinhYDin
 import { doanYDinhNen, datLaiYDinhNenChoKiemTra } from '../src/features/tutor/services/yDinhNen';
 import {
   cheThongTin, cumTenCanChe, chonCauHoi, xao, docCsv, docDanhSachDongY, cotTinNhan, csvChuaGan, danhSachTen,
+  csvChoNguoiGan, ghiDot, cauDaCo,
   CHE_EMAIL, CHE_SDT, CHE_TEN,
 } from './phan-loai/loc-cau-that.mts';
 
@@ -236,6 +238,23 @@ console.log('\n== Xuất câu hỏi thật: che thông tin, lọc lớp, bỏ tr
   ok(/email/.test(loi), 'tệp đồng ý thiếu cột email thì báo lỗi rõ');
   ok(JSON.stringify(danhSachTen(['  Trần  Bảo Ân ', '', 'An Nguyễn', 'Trần Bảo Ân'])) === '["An Nguyễn","Trần Bảo Ân"]',
     'danh sách tên để dò từ vựng: gọn khoảng trắng, bỏ rỗng, bỏ trùng, không có email');
+  ok(csvChoNguoiGan(['em chịu']) === '﻿tin_nhan,nhan,nguoi_gan\r\nem chịu,,\r\n',
+    'tệp cho người gán KHÔNG có cột nguon (không lộ gợi ý)');
+  {
+    const tam = mkdtempSync(join(tmpdir(), 'dot-'));
+    const that = join(tam, 'that');
+    mkdirSync(that);
+    writeFileSync(join(tam, 'nhan.csv'), 'tin_nhan,nhan\ncau cu,be_tac\n');
+    const d1 = ghiDot(that, '2026-10-03', ['cau a', 'cau b'], ['Nguồn: giả'], ['Trần Bảo Ân']);
+    const d2 = ghiDot(that, '2026-10-03', ['cau c'], ['Nguồn: giả'], ['Trần Bảo Ân']);
+    ok(d1.endsWith('dot-2026-10-03') && d2.endsWith('dot-2026-10-03-2'), 'đợt cùng ngày không ghi đè đợt trước (thêm -2)');
+    ok(['chua-gan.csv', 'chua-gan.meta.txt', 'a.csv', 'b.csv'].every(t => existsSync(join(d1, t))), 'đợt có chua-gan.csv, .meta.txt, a.csv, b.csv');
+    ok(readFileSync(join(d1, 'a.csv'), 'utf8') === readFileSync(join(d1, 'b.csv'), 'utf8'), 'a.csv và b.csv cùng danh sách, cùng thứ tự');
+    ok(readFileSync(join(that, 'ten-hoc-sinh.txt'), 'utf8') === 'Trần Bảo Ân\r\n', 'ghi danh sách tên (chỉ tên) vào that/');
+    ok(cauDaCo(tam).sort().join() === ['cau a', 'cau a', 'cau a', 'cau b', 'cau b', 'cau b', 'cau c', 'cau c', 'cau c', 'cau cu'].join(),
+      'câu đã có đọc cả du-lieu/ lẫn mọi đợt trong that/ (đợt sau không xuất lại)');
+    rmSync(tam, { recursive: true, force: true });
+  }
   const csv = csvChuaGan(['a, "b"', 'em chịu']);
   ok(csv.startsWith('﻿tin_nhan,nhan,nguoi_gan,nguon\r\n"a, ""b""",,,that\r\n'), 'CSV ra đúng 4 cột như nhan.csv, nguồn "that", có BOM cho Excel');
 }

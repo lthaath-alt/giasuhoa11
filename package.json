@@ -40,6 +40,8 @@
     "sao-luu": "tsx scripts/sao-luu-firestore.mts",
     "xuat:nghien-cuu": "tsx scripts/xuat-du-lieu-nghien-cuu.mts",
     "xuat:cau-hoi": "tsx scripts/phan-loai/xuat-cau-hoi.mts",
+    "phan-loai:xuat": "tsx scripts/phan-loai/xuat-cau-hoi.mts --lop 11A3 --that",
+    "phan-loai:huan-luyen": "python scripts/phan-loai/nap_dot.py",
     "chuyen:users": "tsx scripts/chuyen-users-sang-uid.mts",
     "xoa:password": "tsx scripts/xoa-cot-password.mts",
     "kiem-tra:dong-bo": "tsx scripts/kiem-tra-dong-bo-ngan-hang.mts",

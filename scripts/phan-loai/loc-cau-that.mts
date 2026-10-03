@@ -17,6 +17,8 @@
  * danh sách, tên trường, địa chỉ đều KHÔNG che được bằng máy. Người gán nhãn vẫn
  * phải đọc và che tay trước khi đưa câu nào vào báo cáo.
  */
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { chuanHoaYDinh } from '../../src/features/tutor/services/phanLoaiYDinh';
 
 export interface TinTho {
@@ -239,4 +241,47 @@ const bocO = (s: string) => /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : 
 /** CSV cho người gán: cùng bốn cột với nhan.csv, nhãn để trống, nguồn "that". */
 export function csvChuaGan(cau: readonly string[]): string {
   return '﻿' + ['tin_nhan,nhan,nguoi_gan,nguon', ...cau.map(c => `${bocO(c)},,,that`)].join('\r\n') + '\r\n';
+}
+
+/** Tệp cho MỘT người gán: tin_nhan, nhan, nguoi_gan. Cố ý KHÔNG có cột nguon (lộ gợi ý). */
+export function csvChoNguoiGan(cau: readonly string[]): string {
+  return '﻿' + ['tin_nhan,nhan,nguoi_gan', ...cau.map(c => `${bocO(c)},,`)].join('\r\n') + '\r\n';
+}
+
+// ── Đợt xuất: một thư mục that/dot-<ngày>/ cho mỗi lần chạy ────────────────
+
+/** Mọi câu (cột tin_nhan) trong các CSV của du-lieu/ và MỌI thư mục con của du-lieu/that/. */
+export function cauDaCo(thuMucDuLieu: string): string[] {
+  const ra: string[] = [];
+  const doc = (tm: string, deQuy: boolean) => {
+    if (!existsSync(tm)) return;
+    for (const e of readdirSync(tm, { withFileTypes: true })) {
+      const p = join(tm, e.name);
+      if (e.isDirectory() && deQuy) doc(p, true);
+      else if (e.isFile() && e.name.endsWith('.csv')) ra.push(...cotTinNhan(readFileSync(p, 'utf8')));
+    }
+  };
+  doc(thuMucDuLieu, false);
+  doc(join(thuMucDuLieu, 'that'), true);
+  return ra;
+}
+
+/**
+ * Ghi một đợt vào `<thuMucThat>/dot-<ngày>/` (thêm -2, -3... nếu đã có, không ghi đè):
+ *   chua-gan.csv   bản gốc, có cột nguon "that" — nap_dot.py lấy nguồn từ đây
+ *   chua-gan.meta.txt
+ *   a.csv, b.csv   hai bản cho hai người gán ĐỘC LẬP, không cột nguon
+ * và `<thuMucThat>/ten-hoc-sinh.txt` (chỉ tên) để dò từ vựng. Trả đường dẫn thư mục đợt.
+ */
+export function ghiDot(thuMucThat: string, ngay: string, cau: readonly string[],
+  meta: readonly string[], dsTen: readonly string[]): string {
+  let dot = join(thuMucThat, `dot-${ngay}`);
+  for (let i = 2; existsSync(dot); i++) dot = join(thuMucThat, `dot-${ngay}-${i}`);
+  mkdirSync(dot, { recursive: true });
+  writeFileSync(join(dot, 'chua-gan.csv'), csvChuaGan(cau), 'utf8');
+  writeFileSync(join(dot, 'chua-gan.meta.txt'), [...meta, ''].join('\r\n'), 'utf8');
+  writeFileSync(join(dot, 'a.csv'), csvChoNguoiGan(cau), 'utf8');
+  writeFileSync(join(dot, 'b.csv'), csvChoNguoiGan(cau), 'utf8');
+  writeFileSync(join(thuMucThat, 'ten-hoc-sinh.txt'), dsTen.join('\r\n') + '\r\n', 'utf8');
+  return dot;
 }

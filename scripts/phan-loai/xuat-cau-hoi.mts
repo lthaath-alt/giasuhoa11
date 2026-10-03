@@ -15,9 +15,10 @@
  * giấy đồng ý (xem quy tắc 1, HUONG-DAN-GAN-NHAN.md).
  *
  * ─── Ra gì ──────────────────────────────────────────────────────────────────
- * `scripts/phan-loai/du-lieu/that/chua-gan-<ngày>.csv`, cột tin_nhan,nhan,nguoi_gan,nguon
- * như nhan.csv, nhãn trống, nguồn "that", kèm `.meta.txt` ghi nguồn và sự đồng ý
- * để trích vào báo cáo. Chỉ có nội dung câu đã che (xem loc-cau-that.mts): không
+ * Một đợt `scripts/phan-loai/du-lieu/that/dot-<ngày>/` (xem ghiDot): chua-gan.csv (cột
+ * như nhan.csv, nhãn trống, nguồn "that") kèm .meta.txt ghi nguồn và sự đồng ý để trích
+ * vào báo cáo, và a.csv, b.csv cho hai người gán. Bước sau: `npm run phan-loai:huan-luyen
+ * -- <thư mục đợt>` (nap_dot.py). Chỉ có nội dung câu đã che (xem loc-cau-that.mts): không
  * email, không mã học sinh, không bài, không giờ gửi, thứ tự đã xáo. `.gitignore`
  * chặn thư mục `that/`: bước che tên bằng máy không bắt hết, nên tệp này vẫn là
  * dữ liệu riêng tư.
@@ -29,14 +30,14 @@
  * chữ nào lên Firestore; `kiem-tra:an-ninh` quét cả chú thích, nên đừng viết tên
  * hàm ghi nào vào tệp này.
  */
-import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { getFirestore, collection, getDocs, doc, getDoc } from 'firebase/firestore';
 import { GOC, docEnv, cauHinh, thieuCauHinh } from '../ngan-hang-chung.mts';
 import { hoi, hoiKin } from '../hoi-ban-phim.mts';
-import { chonCauHoi, cotTinNhan, csvChuaGan, danhSachTen, docDanhSachDongY, laThanhVienLop, type TinTho } from './loc-cau-that.mts';
+import { cauDaCo, chonCauHoi, danhSachTen, docDanhSachDongY, ghiDot, laThanhVienLop, type TinTho } from './loc-cau-that.mts';
 import type { SchoolClass, User } from '../../src/features/auth/types';
 
 /** Lớp được phép xuất → ghi chú đồng ý đi vào tệp .meta.txt. */
@@ -87,16 +88,10 @@ if (tepDongY) {
   }
 }
 
-/* Câu đã có trong các tệp gán nhãn và các lần xuất trước, để đợt sau không xuất lại. */
+/* Câu đã có trong các tệp gán nhãn và các đợt xuất trước, để đợt sau không xuất lại. */
 const THU_MUC = join(GOC, 'scripts/phan-loai/du-lieu');
 const RA = join(THU_MUC, 'that');
-const daCo: string[] = [];
-for (const tm of [THU_MUC, RA]) {
-  if (!existsSync(tm)) continue;
-  for (const ten of readdirSync(tm).filter(t => t.endsWith('.csv'))) {
-    daCo.push(...cotTinNhan(readFileSync(join(tm, ten), 'utf8')));
-  }
-}
+const daCo = cauDaCo(THU_MUC);
 
 // ── Đăng nhập ───────────────────────────────────────────────────────────────
 
@@ -188,12 +183,13 @@ if (!ghiThat) {
   await thoat(0);
 }
 
-mkdirSync(RA, { recursive: true });
+if (!cau.length) {
+  console.log('\nKhông có câu mới, không tạo đợt.');
+  await thoat(0);
+}
 const ngay = new Date().toISOString().slice(0, 10);
-let goc = join(RA, `chua-gan-${ngay}`);
-if (existsSync(`${goc}.csv`)) goc = `${goc}-${Date.now()}`;   // không ghi đè đợt cũ
-writeFileSync(`${goc}.csv`, csvChuaGan(cau), 'utf8');
-writeFileSync(`${goc}.meta.txt`, [
+const dsTen = danhSachTen(hocSinh.map(u => u.name ?? ''));
+const dot = ghiDot(RA, ngay, cau, [
   `Nguồn   : collection chats, tin học sinh gửi gia sư, lớp ${tenLop}`,
   `Đồng ý  : ${ghiChuDongY}`,
   `Lọc thêm: ${emailTrongTep ? `tệp --dong-y, ${emailDuocLay.length} em` : 'không'}`,
@@ -203,14 +199,14 @@ writeFileSync(`${goc}.meta.txt`, [
   'Ẩn danh : bỏ email, mã học sinh, bài, giờ gửi; xáo thứ tự; che email, số điện thoại,',
   '          họ tên học sinh có trong hồ sơ. Tên một chữ, biệt danh, tên trường KHÔNG che được:',
   '          người gán nhãn đọc lại và che tay.',
-  '',
-].join('\r\n'), 'utf8');
-/* Danh sách TÊN (không email) để huan-luyen.py dò trong từ vựng mô hình web trước khi
-   ghi. Ghi lại mỗi lần cho khớp hồ sơ mới nhất. */
-const tepTen = join(RA, 'ten-hoc-sinh.txt');
-const dsTen = danhSachTen(hocSinh.map(u => u.name ?? ''));
-writeFileSync(tepTen, dsTen.join('\r\n') + '\r\n', 'utf8');
-console.log(`\nĐã ghi ${cau.length} câu: ${relative(GOC, goc)}.csv (kèm .meta.txt)`);
-console.log(`Danh sách ${dsTen.length} tên học sinh để dò từ vựng: ${relative(GOC, tepTen)}`);
-console.log('Trước khi gán nhãn: đọc lại từng câu, che tay tên, biệt danh, tên trường mà máy còn sót.');
+], dsTen);
+const dotRel = relative(GOC, dot).replace(/\\/g, '/');
+console.log(`\nĐã tạo đợt ${cau.length} câu: ${dotRel}/`);
+console.log(`  a.csv, b.csv  hai bản cho hai người gán (không có cột nguồn)`);
+console.log(`  chua-gan.csv  bản gốc; chua-gan.meta.txt chép vào báo cáo`);
+console.log(`Danh sách ${dsTen.length} tên học sinh (chỉ tên) để dò từ vựng: scripts/phan-loai/du-lieu/that/ten-hoc-sinh.txt`);
+console.log('\nBước tiếp:');
+console.log('  1. Đọc lại a.csv, che tay tên, biệt danh, tên trường máy còn sót; sửa y hệt trong b.csv và chua-gan.csv.');
+console.log('  2. Hai bạn gán ĐỘC LẬP: một bạn điền cột nhan + nguoi_gan trong a.csv, bạn kia trong b.csv.');
+console.log(`  3. npm run phan-loai:huan-luyen -- ${dotRel}`);
 await thoat(0);
