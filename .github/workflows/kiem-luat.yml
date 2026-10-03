@@ -1,9 +1,10 @@
 ﻿# Chạy bộ kiểm luật Firestore trên emulator.
 #
-# VÌ SAO CHẠY Ở ĐÂY MÀ KHÔNG CHẠY Ở MÁY. Emulator đòi JDK 11+; máy chủ dự án
-# chỉ có Java 8 (Zulu 8 JRE của công ty) và không cài được bản mới. Máy chạy
-# của GitHub có sẵn Java. Ở máy chủ dự án, `npm run kiem-tra` tự BỎ QUA phép
-# luật, nên không ai bị chặn việc.
+# VÌ SAO CÓ JOB NÀY. Emulator của firebase-tools 15 đòi JDK 21+. Máy cũ của dự
+# án chỉ có Java 8 (Zulu 8 JRE của công ty) nên phép luật chỉ chạy được ở đây;
+# máy mới (03/10/2026) có Temurin 21 nên chạy được cả tại chỗ. Máy nào thiếu
+# Java 21, `npm run kiem-tra` tự BỎ QUA phép luật, nên không ai bị chặn việc,
+# và job này vẫn là chốt chặn cuối.
 #
 # Job này KHÔNG chạm tới Firebase thật: emulator chạy cục bộ với projectId
 # `demo-giasuhoa11`, và tiền tố `demo-` là quy ước Firebase cho dự án không bao
@@ -38,7 +39,7 @@ jobs:
           cache: npm
 
       # Khai rõ bản Java thay vì trông vào bản có sẵn của máy chạy: bản có sẵn
-      # đổi theo thời gian, mà emulator đòi tối thiểu 11.
+      # đổi theo thời gian, mà emulator đòi tối thiểu 21.
       - uses: actions/setup-java@v4
         with:
           distribution: temurin

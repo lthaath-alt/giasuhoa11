@@ -10,8 +10,9 @@
  * cách. Và Playground KHÔNG mô phỏng được `list`, nên hai đường quan trọng
  * nhất của khối `users` chưa từng được đo lần nào.
  *
- * THIẾU JAVA 11+ THÌ BỎ QUA, không báo hỏng. Máy chủ dự án chỉ có Java 8 và
- * không cài được bản mới; phép này chạy thật trên GitHub Actions.
+ * THIẾU JAVA 21+ THÌ BỎ QUA, không báo hỏng; phép này vẫn chạy thật trên
+ * GitHub Actions. Máy cũ của dự án chỉ có Java 8. Máy mới (03/10/2026) có
+ * Temurin 21 nên chạy được tại chỗ.
  *
  * Script tự gọi lại chính mình: lần đầu chạy ngoài emulator thì kiểm điều kiện
  * rồi spawn `firebase emulators:exec`, lần sau (có cờ H11_TRONG_EMULATOR) thì
@@ -50,6 +51,12 @@ const GOC = join(dirname(fileURLToPath(import.meta.url)), '..');
 const DU_AN = 'demo-giasuhoa11';   // tiền tố `demo-` = không bao giờ chạm hạ tầng thật
 const CONG = 8080;
 
+/* firebase-tools 15 từ chối chạy emulator dưới Java 21
+   (`MIN_SUPPORTED_JAVA_MAJOR_VERSION = 21` trong lib/emulator/commandUtils.js,
+   đo 03/10/2026). Trước đây kiểm 11+: Java 11 lọt qua bước này rồi mới hỏng
+   ở firebase. Nâng firebase-tools thì xem lại số này. */
+const JAVA_TOI_THIEU = 21;
+
 /** Đọc số hiệu chính của Java. `1.8.0_502` -> 8; `21.0.12` -> 21. Không gọi
  *  được `java` thì trả 0. */
 function soHieuJava(): number {
@@ -74,8 +81,8 @@ async function main() {
 
   if (process.env.H11_TRONG_EMULATOR !== '1') {
     const java = soHieuJava();
-    if (java < 11) {
-      console.log(`  BỎ QUA  emulator cần Java 11+, máy này có ${java || 'không có Java'}`);
+    if (java < JAVA_TOI_THIEU) {
+      console.log(`  BỎ QUA  emulator cần Java ${JAVA_TOI_THIEU}+, máy này có ${java || 'không có Java'}`);
       console.log('          (phép này chạy thật trên GitHub Actions)');
       process.exit(0);
     }
@@ -84,9 +91,15 @@ async function main() {
       process.exit(0);
     }
 
+    /* Windows cần `shell: true` mới gọi được `npx`, mà khi đó Node nối các
+       đối số bằng dấu cách, KHÔNG đặt trong nháy: lệnh con bị tách thành ba
+       đối số và firebase báo "Too many arguments" (đo 03/10/2026, lần đầu
+       chạy được tới đây trên Windows). Bọc nháy kép để shell giữ nguyên một
+       đối số. Linux không qua shell nên giữ nguyên. */
+    const lenhCon = 'npx tsx scripts/kiem-tra-luat.mts';
     const con = spawnSync('npx', [
       'firebase', 'emulators:exec', '--only', 'firestore', '--project', DU_AN,
-      'npx tsx scripts/kiem-tra-luat.mts',
+      process.platform === 'win32' ? `"${lenhCon}"` : lenhCon,
     ], {
       cwd: GOC,
       stdio: 'inherit',
