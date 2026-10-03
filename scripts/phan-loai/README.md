@@ -5,7 +5,11 @@
    tấn công: `python scripts/phan-loai/lay-cau-red-team.py`.
    - Mở CSV bằng Excel thì khi lưu lại PHẢI chọn "CSV UTF-8 (Comma delimited)" — lưu
      bằng bảng mã khác, script đọc sẽ dừng ngay với thông báo rõ nguyên nhân.
-2. Đo đồng thuận: `python scripts/phan-loai/do-dong-thuan.py a.csv b.csv`; thống nhất, ghi `du-lieu/nhan.csv`.
+2. Đo đồng thuận: `python scripts/phan-loai/do-dong-thuan.py a.csv b.csv` (in kappa, đồng thuận
+   từng nhãn, ma trận nhầm lẫn giữa hai người; ghi `du-lieu/bat-dong.csv`). Nhóm điền cột
+   `nhan_chot` cho từng câu bất đồng, rồi dựng `du-lieu/nhan.csv`:
+   `python scripts/phan-loai/gop-nhan.py a.csv b.csv scripts/phan-loai/du-lieu/bat-dong.csv --ghi-de`.
+   Chi tiết và cách đọc số ở mục "Đo đồng thuận và xử lý câu bất đồng" của `HUONG-DAN-GAN-NHAN.md`.
 3. Huấn luyện: `python scripts/phan-loai/huan-luyen.py` → ghi `public/mo-hinh/phan-loai-y-dinh.json`
    và `scripts/phan-loai/ket-qua/`.
    - **Chốt tập kiểm sau lần huấn luyện THẬT đầu tiên**: `train_test_split` chia theo
