@@ -13,8 +13,14 @@ chọn theo thứ tự ưu tiên ở cột cuối (số nhỏ thắng), và ghi 
 | `ngoai_mon` | Chào hỏi, cảm ơn, tâm sự, hỏi môn khác, hỏi về gia sư | "chào thầy", "giải giúp bài Toán" | 6 |
 
 ## Quy tắc
-1. **KHÔNG chép tin nhắn thật của học sinh** (chưa có giấy đồng ý). Tự viết theo cách
-   học sinh lớp 11 gõ thật: không dấu, viết tắt (k, ko, e, dc), teencode, sai chính tả.
+1. **Tin nhắn thật của học sinh chỉ dùng được qua `npm run xuat:cau-hoi`**, và chỉ của lớp
+   đã đồng ý. Từ 03/10/2026: lớp **11A3** (chủ nhiệm đề tài cho phép, phụ huynh đồng ý; theo
+   lời chủ dự án ngày 03/10/2026). Nhóm giữ giấy hoặc tin nhắn đồng ý và ghi chỗ lưu vào
+   đây: ............................................ Câu thật đã qua script ẩn danh nhưng vẫn
+   có thể sót tên, nên tệp chỉ nằm trong `du-lieu/that/` và KHÔNG commit. Không tự chép tay
+   tin nhắn từ màn giáo viên hay Firebase Console. Lớp khác hoặc em rút lại đồng ý: xem
+   README bước 2b. Câu tự viết thì viết theo cách học sinh lớp 11 gõ thật: không dấu, viết
+   tắt (k, ko, e, dc), teencode, sai chính tả.
 2. Mỗi nhãn ít nhất 50 câu; tổng 300–600 câu. Viết đa dạng, đừng chỉ đổi một chữ.
 3. Hai người gán nhãn ĐỘC LẬP trên cùng danh sách câu (mỗi người một tệp), rồi chạy
    `python scripts/phan-loai/do-dong-thuan.py a.csv b.csv` để đo kappa. Câu bất đồng thì

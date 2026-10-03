@@ -83,5 +83,10 @@ sao-luu/
 # cả tài khoản chưa đồng ý.
 xuat-nghien-cuu/
 
+# Câu hỏi THẬT của học sinh do `npm run xuat:cau-hoi` xuất ra để gán nhãn. Đã che
+# email, số điện thoại, họ tên có trong hồ sơ, nhưng tên một chữ, biệt danh, tên
+# trường vẫn có thể sót — coi như dữ liệu riêng tư, không bao giờ commit.
+scripts/phan-loai/du-lieu/that/
+
 # Ket qua chay Playwright (anh chup, trace). `playwright-report/` da chan o tren.
 test-results/

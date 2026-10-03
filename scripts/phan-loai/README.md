@@ -10,6 +10,39 @@
    `nhan_chot` cho từng câu bất đồng, rồi dựng `du-lieu/nhan.csv`:
    `python scripts/phan-loai/gop-nhan.py a.csv b.csv scripts/phan-loai/du-lieu/bat-dong.csv --ghi-de`.
    Chi tiết và cách đọc số ở mục "Đo đồng thuận và xử lý câu bất đồng" của `HUONG-DAN-GAN-NHAN.md`.
+2b. **Câu hỏi thật của lớp 11A3** (từ 03/10/2026, xem quy tắc 1 của `HUONG-DAN-GAN-NHAN.md`):
+   - Xuất: `npm run xuat:cau-hoi -- --lop 11A3` (chạy thử: in số câu và 3 câu đã che), rồi
+     `npm run xuat:cau-hoi -- --lop 11A3 --that` → `du-lieu/that/chua-gan-<ngày>.csv` kèm
+     `.meta.txt` (nguồn, sự đồng ý, số câu — chép vào báo cáo). Cần tài khoản giáo viên; tự
+     nhập mật khẩu. Thêm `--tu`/`--den` để chỉ lấy câu mới; câu đã có trong các tệp `du-lieu/`
+     và `du-lieu/that/` tự bị bỏ, nên chạy lại mỗi tuần không xuất trùng.
+   - Script chỉ giữ NỘI DUNG câu, bỏ email, mã học sinh, bài, giờ gửi, xáo thứ tự, che email,
+     số điện thoại, họ tên học sinh có trong hồ sơ. Tên một chữ, biệt danh, tên trường KHÔNG che
+     được: người gán đọc lại và che tay trước khi gán.
+   - Gán nhãn như bước 2 (hai người, `do-dong-thuan.py`, `gop-nhan.py`). Gán trên Google Sheets
+     thì để chế độ chia sẻ **Bị hạn chế** (chỉ thêm email từng bạn trong nhóm), KHÔNG để "Bất kỳ ai
+     có đường liên kết"; xong thì tải CSV về `du-lieu/that/` và xoá bảng tính.
+   - Câu thật không rời `du-lieu/that/` (bị `.gitignore` chặn). Tệp nào nằm trong đó, hoặc có dòng
+     nguồn `that`, là các script tự coi là câu thật: `do-dong-thuan.py` ghi `that/bat-dong.csv`,
+     `gop-nhan.py` ghi `that/nhan-that.csv`, `huan-luyen.py` ghi tệp khớp và tập kiểm vào
+     `that/ket-qua/`, `ve-bieu-do.py` ghi ảnh vào `that/bieu-do/` (xem ảnh trước khi chép vào báo
+     cáo). Trỏ `--ra`/`--kiem`/`--tap-kiem` ra ngoài thư mục đó thì script dừng.
+   - Mô hình web (`public/mo-hinh/`) vẫn ghi như cũ, nhưng TRƯỚC khi ghi, `huan-luyen.py` dò từ vựng
+     với `that/ten-hoc-sinh.txt` (danh sách TÊN, không email, do `xuat:cau-hoi --that` ghi). Một cụm
+     hai chữ của tên nằm trong từ vựng (so không dấu, vd. "thanh an") là dừng, in cụm đó: che tay
+     trong CSV rồi chạy lại; cụm đã xem tay là lời thường thì thêm `--cho-phep-cum "<cụm>"`. Không
+     dò chữ đơn ("an", "minh" là chữ thường), nên tên một chữ vẫn phải che tay từ đầu.
+   - Khi học trên câu thật mà ghi vào mô hình web, `ket-qua/du-doan.json` (lên git, để
+     `kiem-tra:phan-loai` so TypeScript với Python) được dựng từ câu GIẢ `mau-nho.csv`, không từ câu
+     thật. So với regex: `npm run danh-gia:phan-loai -- --tap-kiem <đường dẫn huan-luyen.py in ra>`;
+     quên `--tap-kiem` thì script dừng vì tập kiểm không khớp mô hình.
+   - Huấn luyện với tập kiểm CỐ ĐỊNH: lần đầu
+     `python scripts/phan-loai/huan-luyen.py --vao scripts/phan-loai/du-lieu/that/nhan-that.csv --tap-kiem scripts/phan-loai/du-lieu/that/tap-kiem-co-dinh.csv --tao-tap-kiem`
+     (chọn 20 % câu nguồn `that` làm tập kiểm, ghi ra tệp); các đợt sau bỏ `--tao-tap-kiem`.
+     Câu mới chỉ vào phần học, số đo các đợt so được với nhau. Xoá câu khỏi tập kiểm thì script
+     dừng. `ve-bieu-do.py` nhận cùng `--tap-kiem`.
+   - Giới hạn còn lại: phép dò tên chỉ biết tên có trong hồ sơ. Biệt danh, tên bạn ngoài trường lặp
+     lại từ 2 câu trở lên vẫn có thể vào từ vựng web; đọc kỹ CSV trước khi gán là chốt cuối.
 3. Huấn luyện: `python scripts/phan-loai/huan-luyen.py` → ghi `public/mo-hinh/phan-loai-y-dinh.json`
    và `scripts/phan-loai/ket-qua/`.
    - **Chốt tập kiểm sau lần huấn luyện THẬT đầu tiên**: `train_test_split` chia theo

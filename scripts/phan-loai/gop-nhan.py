@@ -17,7 +17,7 @@ from pathlib import Path
 
 THU_MUC = Path(__file__).resolve().parent
 sys.path.insert(0, str(THU_MUC))
-from chung import NHAN, doc_csv_nhan  # noqa: E402
+from chung import NHAN, THU_MUC_THAT, bat_buoc_trong, co_cau_that, doc_csv_nhan  # noqa: E402
 
 
 def doc_dong(tep):
@@ -45,11 +45,15 @@ def main():
     ap.add_argument('nguoi1')
     ap.add_argument('nguoi2')
     ap.add_argument('bat_dong', help='bat-dong.csv đã điền cột nhan_chot')
-    ap.add_argument('--ra', default=str(THU_MUC / 'du-lieu' / 'nhan.csv'))
+    ap.add_argument('--ra', help='mặc định du-lieu/nhan.csv, hoặc du-lieu/that/nhan-that.csv khi có câu thật')
     ap.add_argument('--ghi-de', action='store_true', help='cho phép ghi đè tệp ra đã có')
     a = ap.parse_args()
 
-    ra = Path(a.ra)
+    # du-lieu/nhan.csv lên git: câu thật không được gộp vào đó.
+    if co_cau_that(a.nguoi1, a.nguoi2, a.bat_dong):
+        ra = bat_buoc_trong(a.ra or THU_MUC_THAT / 'nhan-that.csv', THU_MUC_THAT, '--ra')
+    else:
+        ra = Path(a.ra) if a.ra else THU_MUC / 'du-lieu' / 'nhan.csv'
     if ra.exists() and not a.ghi_de:
         sys.exit(f'{ra} đã có. Sao lưu tệp cũ rồi chạy lại với --ghi-de nếu đúng là muốn thay.')
 

@@ -14,7 +14,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from chung import NHAN, doc_csv_nhan  # noqa: E402
+from chung import NHAN, THU_MUC_THAT, bat_buoc_trong, co_cau_that, doc_csv_nhan  # noqa: E402
 from sklearn.metrics import cohen_kappa_score, confusion_matrix  # noqa: E402
 
 
@@ -33,9 +33,14 @@ def main():
     ap = argparse.ArgumentParser(description='Đo đồng thuận giữa hai người gán nhãn.')
     ap.add_argument('nguoi1')
     ap.add_argument('nguoi2')
-    ap.add_argument('--ra', default=str(Path(__file__).parent / 'du-lieu' / 'bat-dong.csv'),
-                    help='nơi ghi các câu bất đồng')
+    ap.add_argument('--ra', help='nơi ghi các câu bất đồng; mặc định du-lieu/bat-dong.csv, '
+                                 'hoặc du-lieu/that/bat-dong.csv khi có câu thật')
     a = ap.parse_args()
+    # bat-dong.csv mang nguyên văn câu: câu thật thì chỉ được nằm trong du-lieu/that/.
+    if co_cau_that(a.nguoi1, a.nguoi2):
+        ra = bat_buoc_trong(a.ra or THU_MUC_THAT / 'bat-dong.csv', THU_MUC_THAT, '--ra')
+    else:
+        ra = Path(a.ra) if a.ra else Path(__file__).parent / 'du-lieu' / 'bat-dong.csv'
 
     ta, tb = doc_theo_cau(a.nguoi1), doc_theo_cau(a.nguoi2)
     chung = [t for t in ta if t in tb]
@@ -64,7 +69,6 @@ def main():
         print(f'  {n:<20}' + ''.join(f'{int(v):>8}' for v in hang))
     print('  (cột viết tắt 6 chữ đầu của nhãn, cùng thứ tự với hàng)')
 
-    ra = Path(a.ra)
     ra.parent.mkdir(parents=True, exist_ok=True)
     with open(ra, 'w', encoding='utf-8-sig', newline='') as f:
         w = csv.writer(f)

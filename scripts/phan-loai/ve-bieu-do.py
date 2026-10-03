@@ -43,7 +43,10 @@ from sklearn.model_selection import StratifiedKFold, train_test_split, validatio
 THU_MUC = Path(__file__).resolve().parent
 GOC = THU_MUC.parents[1]
 sys.path.insert(0, str(THU_MUC))
-from chung import CAC_C, NHAN, chia_tap, chon_C, doc_csv_nhan, gop_trung, tao_ong  # noqa: E402
+from chung import (  # noqa: E402
+    CAC_C, NHAN, THU_MUC_THAT, bat_buoc_trong, chia_theo_tuy_chon, chon_C, co_cau_that, doc_csv_nhan,
+    gop_trung, tao_ong,
+)
 
 TEN_NHAN = {
     'hoi_khai_niem': 'Hỏi khái niệm',
@@ -355,14 +358,23 @@ def ve_regex(dong, n_kiem):
 def main():
     ap = argparse.ArgumentParser(description='Vẽ biểu đồ cho bộ phân loại ý định.')
     ap.add_argument('--vao', default=str(THU_MUC / 'du-lieu' / 'nhan.csv'), help='CSV đã gán nhãn')
-    ap.add_argument('--ra', default=str(THU_MUC / 'ket-qua' / 'bieu-do'), help='thư mục ghi ảnh')
+    ap.add_argument('--ra', help='thư mục ghi ảnh; mặc định ket-qua/bieu-do/, hoặc du-lieu/that/bieu-do/ khi có câu thật')
     ap.add_argument('--mo-hinh', default=str(GOC / 'public' / 'mo-hinh' / 'phan-loai-y-dinh.json'),
                     help='mô hình đang chạy trên web, để so')
     ap.add_argument('--so-sanh', default=str(THU_MUC / 'ket-qua' / 'so-sanh.md'),
                     help='tệp npm run danh-gia:phan-loai ghi ra, để vẽ cột so với regex')
     ap.add_argument('--min-df', type=int, default=2)
+    ap.add_argument('--tap-kiem', help='tệp tập kiểm cố định, PHẢI giống lệnh huan-luyen.py đã chạy')
     a = ap.parse_args()
-    vao, ra = Path(a.vao), Path(a.ra)
+    vao = Path(a.vao)
+    # Câu thật: ảnh cụm từ đặc trưng và so-lieu.json mang chữ lấy từ câu của học sinh,
+    # nên chỉ được ghi trong du-lieu/that/ (bị .gitignore). Xem lại rồi mới chép ảnh ra.
+    if co_cau_that(vao):
+        ra = bat_buoc_trong(a.ra or THU_MUC_THAT / 'bieu-do', THU_MUC_THAT, '--ra')
+        if a.tap_kiem:
+            bat_buoc_trong(a.tap_kiem, THU_MUC_THAT, '--tap-kiem')
+    else:
+        ra = Path(a.ra) if a.ra else THU_MUC / 'ket-qua' / 'bieu-do'
     plt.rcParams.update({'font.size': 10.5, 'axes.titleweight': 'bold'})
 
     X, y = doc_csv_nhan(vao)
@@ -373,7 +385,7 @@ def main():
     thieu = [n for n in NHAN if dem[n] < 5]
     if thieu:
         sys.exit(f'Mỗi nhãn cần ít nhất 5 câu. Đang thiếu: {", ".join(f"{n} ({dem[n]})" for n in thieu)}')
-    X_hoc, X_kiem, y_hoc, y_kiem = chia_tap(X, y)
+    X_hoc, X_kiem, y_hoc, y_kiem = chia_theo_tuy_chon(X, y, vao, a.tap_kiem)
     luoi = chon_C(X_hoc, y_hoc, a.min_df)
     tot = luoi.best_estimator_
     vec, clf = tot.named_steps['vec'], tot.named_steps['clf']

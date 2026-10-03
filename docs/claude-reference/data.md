@@ -179,6 +179,19 @@ Không có mục riêng ở đây cho toàn bộ collection này — trường t
   định do bộ phân loại logistic nhóm tự huấn luyện đoán, CHẠY BÓNG (không đổi hành vi
   gia sư). Mô hình là tệp JSON trong thư mục mo-hinh của public; chưa có tệp thì ba
   trường trống. Cách gán nhãn và huấn luyện: `scripts/phan-loai/README.md`.
+- **"Ẩn khỏi màn hình" thay cho "Xóa lịch sử chat" (03/10/2026)** — nút cũ trong
+  TutorChat gọi `clearLessonChats`, xóa thật tài liệu `chats`, tức xóa cả số liệu đề
+  tài. Nay giao diện học sinh không còn đường nào gọi hàm đó: nút mới chỉ ghi một mốc
+  thời gian vào localStorage (khoá `h11_an_chat:<uid>:<lessonId>`, không chứa email),
+  tin tới mốc không hiện và không gửi làm ngữ cảnh cho gia sư; "Hiện lại" xóa mốc. Mốc
+  chỉ ở máy đó. Xem `src/features/tutor/services/anTinCu.ts`.
+- **Tin nhắn thật làm dữ liệu huấn luyện (03/10/2026)** — chủ dự án báo chủ nhiệm đề tài
+  cho phép và phụ huynh lớp 11A3 đồng ý. Đường duy nhất: `npm run xuat:cau-hoi -- --lop 11A3`
+  (`scripts/phan-loai/xuat-cau-hoi.mts`, CHỈ ĐỌC, vai giáo viên). Ra câu đã che, không
+  email/mã/giờ, vào thư mục con "that" của `scripts/phan-loai/du-lieu/` (bị `.gitignore`
+  chặn, chỉ có sau lần xuất đầu tiên). Lớp khác phải
+  thêm vào hằng `DONG_Y` trong script sau khi có đồng ý. `y_dinh` vẫn KHÔNG dùng làm nhãn
+  hay để đánh giá học sinh; nhãn do hai người gán. Quy trình: `scripts/phan-loai/README.md` bước 2b.
 
 
 

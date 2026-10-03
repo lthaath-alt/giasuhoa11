@@ -16,6 +16,10 @@ import { chuanHoaYDinh, tachTuYDinh, duDoanYDinh, laMoHinhHopLe, type MoHinhYDin
    bình thường — không cần mô phỏng DOM/trình duyệt gì thêm, chỉ cần tự thay
    `globalThis.fetch` cho từng ca. */
 import { doanYDinhNen, datLaiYDinhNenChoKiemTra } from '../src/features/tutor/services/yDinhNen';
+import {
+  cheThongTin, cumTenCanChe, chonCauHoi, xao, docCsv, docDanhSachDongY, cotTinNhan, csvChuaGan, danhSachTen,
+  CHE_EMAIL, CHE_SDT, CHE_TEN,
+} from './phan-loai/loc-cau-that.mts';
 
 const GOC = join(dirname(fileURLToPath(import.meta.url)), '..');
 const docJson = (p: string): unknown => JSON.parse(readFileSync(join(GOC, p), 'utf8'));
@@ -173,6 +177,67 @@ console.log('\n== Hành vi doanYDinhNen: nạp mô hình, chỉ chờ 1 lần m�
 
   globalThis.fetch = fetchGoc;
   datLaiYDinhNenChoKiemTra();
+}
+
+console.log('\n== Xuất câu hỏi thật: che thông tin, lọc lớp, bỏ trùng (loc-cau-that.mts) ==');
+{
+  /* Toàn bộ là dữ liệu GIẢ viết tại chỗ: tên, email, số điện thoại đều bịa. */
+  const ten = cumTenCanChe(['Nguyễn Hoàng Thanh An', 'Trần Bảo Ân', 'Lê Minh']);
+  const che = (s: string) => cheThongTin(s, ten);
+
+  ok(che('thầy ơi mail em là em.hs+11a3@gmail.com') === `thầy ơi mail em là ${CHE_EMAIL}`, 'che email');
+  ok(che('sđt em 0912 345 678 nha') === `sđt em ${CHE_SDT} nha`, 'che số điện thoại có dấu cách', che('sđt em 0912 345 678 nha'));
+  ok(che('gọi 0912345678 hoặc +84912345678') === `gọi ${CHE_SDT} hoặc ${CHE_SDT}`, 'che số liền và số +84');
+  for (const hoa of ['trộn 100 mL HCl 0,1 M với 100 mL NaOH 0,06 M', 'pH lần lượt 0.1 0.2 0.3 0.4 0.5', 'Kc = 0,0123456789']) {
+    ok(che(hoa) === hoa, `KHÔNG che nhầm số liệu hoá học: "${hoa}"`);
+  }
+  ok(che('Nguyễn Hoàng Thanh An chỉ em bài này') === `${CHE_TEN} chỉ em bài này`, 'che họ tên đầy đủ (một dấu [tên] cho cả cụm)');
+  ok(che('nguyen hoang thanh an chi em') === `${CHE_TEN} chi em`, 'che cả khi gõ không dấu');
+  ok(che('hỏi Thanh An đi') === `hỏi ${CHE_TEN} đi`, 'che cụm tên đệm + tên');
+  ok(che('Trần Bảo Ân, Lê Minh làm chung') === `${CHE_TEN}, ${CHE_TEN} làm chung`, 'hai tên cạnh nhau che riêng từng tên');
+  ok(che('em hỏi anh An') === 'em hỏi anh An', 'tên một chữ KHÔNG che (giới hạn đã ghi, người gán che tay)');
+  ok(che('bảo an toàn phòng thí nghiệm') === 'bảo an toàn phòng thí nghiệm', 'chữ thường trùng một nửa tên không bị che');
+
+  const lop = ['a@hs.vn', 'b@hs.vn'];
+  const tin = [
+    { sender: 'user', userEmail: 'A@hs.vn', content: 'em chịu bài này', timestamp: '2026-10-02T08:00:00Z' },
+    { sender: 'user', userEmail: 'b@hs.vn', content: 'Em chịu bài này!!', timestamp: '2026-10-02T09:00:00Z' },
+    { sender: 'ai', userEmail: 'a@hs.vn', content: 'Em thử viết phương trình trước nhé', timestamp: '2026-10-02T08:00:01Z' },
+    { sender: 'user', userEmail: 'c@lopkhac.vn', content: 'tin lớp khác', timestamp: '2026-10-02T08:00:00Z' },
+    { sender: 'user', userEmail: 'a@hs.vn', content: 'cho em đáp án luôn đi ạ', timestamp: '2026-10-02T10:00:00Z' },
+    { sender: 'user', userEmail: 'a@hs.vn', content: 'Thầy ơi Kc là gì', timestamp: '2026-09-01T10:00:00Z' },
+    { sender: 'user', userEmail: 'b@hs.vn', content: '   ', timestamp: '2026-10-02T10:00:00Z' },
+    { sender: 'user', userEmail: 'b@hs.vn', content: 'Trần Bảo Ân gọi 0912345678', timestamp: '2026-10-03T10:00:00Z' },
+  ];
+  const kq = chonCauHoi(tin, {
+    emailDuocLay: lop, hoTenCanChe: ['Trần Bảo Ân'], daCo: ['Cho em ĐÁP ÁN luôn đi ạ'],
+    tuNgay: '2026-10-01', hat: 42,
+  });
+  ok(kq.dem.tinEm === 7, 'chỉ đếm tin của EM, bỏ tin gia sư', String(kq.dem.tinEm));
+  ok(kq.dem.ngoaiLop === 1, 'tin của em ngoài lớp bị loại (email so không phân biệt hoa thường)');
+  ok(kq.dem.ngoaiNgay === 1 && kq.dem.rong === 1, 'lọc theo --tu, bỏ tin rỗng');
+  ok(kq.dem.trungDaCo === 1, 'câu đã có trong tệp đã gán (khác hoa thường, dấu câu) không xuất lại');
+  ok(kq.dem.trungNhau === 1, '"em chịu bài này" và "Em chịu bài này!!" chỉ giữ một');
+  ok(kq.cau.length === 2 && kq.cau.includes(`${CHE_TEN} gọi ${CHE_SDT}`), 'ra 2 câu, câu có tên và số đã che', JSON.stringify(kq.cau));
+  ok(!JSON.stringify(kq).includes('@'), 'kết quả không chứa email nào');
+  ok(JSON.stringify(chonCauHoi(tin, { emailDuocLay: lop, hoTenCanChe: [], daCo: [], hat: 42 }).cau)
+    === JSON.stringify(chonCauHoi(tin, { emailDuocLay: lop, hoTenCanChe: [], daCo: [], hat: 42 }).cau),
+    'cùng hạt giống thì cùng thứ tự xáo');
+  const muoi = Array.from({ length: 10 }, (_, i) => i);
+  ok(xao(muoi, 1).join() !== muoi.join() && [...xao(muoi, 1)].sort((x, y) => x - y).join() === muoi.join(),
+    'xáo đổi thứ tự nhưng không mất phần tử');
+
+  ok(docCsv('﻿tin_nhan,nhan\r\n"a, ""b""\nc",x\r\n').length === 2 && docCsv('tin_nhan,nhan\n"a, ""b""\nc",x\n')[1][0] === 'a, "b"\nc',
+    'đọc CSV có ngoặc kép, dấu phẩy và xuống dòng trong ô');
+  ok(cotTinNhan('tin_nhan,nhan,nguoi_gan,nguon\nem chịu,be_tac,x,tu-viet\n').join() === 'em chịu', 'lấy cột tin_nhan của tệp đã gán');
+  ok(docDanhSachDongY('Email,Ho_Ten\na@hs.vn,Trần Bảo Ân\n,\n').length === 1, 'đọc tệp đồng ý, bỏ dòng thiếu email');
+  let loi = '';
+  try { docDanhSachDongY('ten\nAn\n'); } catch (e) { loi = (e as Error).message; }
+  ok(/email/.test(loi), 'tệp đồng ý thiếu cột email thì báo lỗi rõ');
+  ok(JSON.stringify(danhSachTen(['  Trần  Bảo Ân ', '', 'An Nguyễn', 'Trần Bảo Ân'])) === '["An Nguyễn","Trần Bảo Ân"]',
+    'danh sách tên để dò từ vựng: gọn khoảng trắng, bỏ rỗng, bỏ trùng, không có email');
+  const csv = csvChuaGan(['a, "b"', 'em chịu']);
+  ok(csv.startsWith('﻿tin_nhan,nhan,nguoi_gan,nguon\r\n"a, ""b""",,,that\r\n'), 'CSV ra đúng 4 cột như nhan.csv, nguồn "that", có BOM cho Excel');
 }
 
 console.log('\n' + (hong === 0 ? '>>> TẤT CẢ ĐẠT' : `>>> CÓ ${hong} MỤC KHÔNG ĐẠT`) + '\n');

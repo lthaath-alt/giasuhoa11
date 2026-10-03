@@ -12,20 +12,33 @@
  * theo kiểu có/không. Bốn nhãn kia chỉ mô hình làm được — báo riêng.
  */
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
-import { join, dirname } from 'node:path';
+import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { duDoanYDinh, laMoHinhHopLe } from '../src/features/tutor/services/phanLoaiYDinh';
 import { laTinBeTac, laNguCanhGianLanPhongThi } from '../src/features/tutor/services/pedagogicalStateMachine';
 
 const GOC = join(dirname(fileURLToPath(import.meta.url)), '..');
 const mau = process.argv.includes('--mau');
+/* Học trên câu thật thì tập kiểm nằm trong du-lieu/that/ (bị .gitignore chặn):
+   huan-luyen.py in sẵn lệnh có --tap-kiem đúng đường dẫn. so-sanh.md chỉ mang số. */
+const iTapKiem = process.argv.indexOf('--tap-kiem');
+const tapKiemRieng = iTapKiem >= 0 ? process.argv[iTapKiem + 1] : undefined;
 const tepMoHinh = mau ? 'scripts/phan-loai/du-lieu/mau-mo-hinh.json' : 'public/mo-hinh/phan-loai-y-dinh.json';
-const tepKiem = mau ? 'scripts/phan-loai/du-lieu/mau-tap-kiem.json' : 'scripts/phan-loai/ket-qua/tap-kiem.json';
+const tepKiem = tapKiemRieng ? resolve(tapKiemRieng)
+  : join(GOC, mau ? 'scripts/phan-loai/du-lieu/mau-tap-kiem.json' : 'scripts/phan-loai/ket-qua/tap-kiem.json');
 const tepRa = mau ? 'scripts/phan-loai/du-lieu/mau-so-sanh.md' : 'scripts/phan-loai/ket-qua/so-sanh.md';
 
 const m: unknown = JSON.parse(readFileSync(join(GOC, tepMoHinh), 'utf8'));
 if (!laMoHinhHopLe(m)) { console.error(`${tepMoHinh} không đúng hình dạng mô hình.`); process.exit(1); }
-const cau = JSON.parse(readFileSync(join(GOC, tepKiem), 'utf8')) as { tin_nhan: string; nhan: string }[];
+const cau = JSON.parse(readFileSync(tepKiem, 'utf8')) as { tin_nhan: string; nhan: string }[];
+/* Mô hình ghi số câu kiểm lúc học. Lệch số là đang chấm mô hình trên tập kiểm của LẦN
+   HỌC KHÁC (vd. mô hình học trên câu thật mà quên --tap-kiem): số đo sẽ sai, dừng. */
+const soCauKiem = (m as { so_do?: { so_cau_kiem?: number } }).so_do?.so_cau_kiem;
+if (soCauKiem !== undefined && soCauKiem !== cau.length) {
+  console.error(`Tập kiểm ${tepKiem} có ${cau.length} câu, mà mô hình học với ${soCauKiem} câu kiểm — không cùng một lần học.`);
+  console.error('Học trên câu thật thì chạy lại với --tap-kiem <đường dẫn huan-luyen.py in ra>.');
+  process.exit(1);
+}
 const doan = cau.map(c => duDoanYDinh(m, c.tin_nhan).nhan);
 
 const pct = (x: number) => (x * 100).toFixed(1).replace('.', ',') + ' %';

@@ -9,6 +9,7 @@ import re
 import sys
 import unicodedata
 from collections import Counter
+from pathlib import Path
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
@@ -113,6 +114,139 @@ CAC_C = [0.25, 1.0, 4.0, 16.0]  # các mức C thử khi kiểm chéo; C nhỏ =
 def chia_tap(X, y):
     """80 % để học, 20 % để kiểm, giữ tỉ lệ nhãn, hạt giống 42. Trả X_hoc, X_kiem, y_hoc, y_kiem."""
     return train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
+
+
+# ─── Câu THẬT của học sinh không được rời thư mục du-lieu/that/ (03/10/2026) ──
+# Thư mục đó bị .gitignore chặn. Mọi tệp ra CÓ CHỨA CÂU (bất đồng, nhãn gộp, tập
+# kiểm, dự đoán, biểu đồ cụm từ) khi dữ liệu vào có câu nguồn "that" phải nằm ở
+# đó; trỏ ra ngoài thì dừng. Mô hình web chỉ mang từ vựng, nhưng từ vựng vẫn có
+# thể chứa tên chưa che, nên phải qua do_ten_trong_tu_vung trước khi ghi.
+
+THU_MUC_THAT = Path(__file__).resolve().parent / 'du-lieu' / 'that'
+TEP_TEN_HOC_SINH = THU_MUC_THAT / 'ten-hoc-sinh.txt'   # do `npm run xuat:cau-hoi -- --that` ghi
+
+
+def co_cau_that(*cac_tep, goc_that=THU_MUC_THAT):
+    """Có tệp nào mang câu thật không: nằm trong du-lieu/that/, HOẶC có dòng nguồn bắt đầu
+    bằng "that". Xét cả vị trí tệp vì người gán có thể xoá cột nguon khi làm trên Sheets."""
+    g = Path(goc_that).resolve()
+    for tep in cac_tep:
+        p = Path(tep).resolve()
+        if g in p.parents or any(v.startswith('that') for v in nguon_theo_khoa(p).values()):
+            return True
+    return False
+
+
+def bat_buoc_trong(duong, goc, ten_tham_so):
+    """Dừng nếu `duong` không nằm trong thư mục `goc`. Trả Path đã chuẩn hoá."""
+    p, g = Path(duong).resolve(), Path(goc).resolve()
+    if p != g and g not in p.parents:
+        sys.exit(f'Dữ liệu có câu THẬT (nguồn "that") nên {ten_tham_so} phải nằm trong {g} '
+                 f'(thư mục bị .gitignore chặn), đang là {p}.')
+    return p
+
+
+def doc_ten_hoc_sinh(tep=TEP_TEN_HOC_SINH):
+    tep = Path(tep)
+    if not tep.exists():
+        sys.exit(f'Chưa có {tep}. Chạy `npm run xuat:cau-hoi -- --lop 11A3 --that` (nó ghi danh sách tên '
+                 f'học sinh, chỉ tên) trước khi huấn luyện trên câu thật.')
+    return [d.strip() for d in tep.read_text(encoding='utf-8-sig').splitlines() if d.strip()]
+
+
+def do_ten_trong_tu_vung(tu_vung, ds_ten, cho_phep=()):
+    """Các mục từ vựng trùng một cặp chữ liền nhau trong họ tên học sinh.
+
+    Từ vựng mô hình là chữ đã chuan_hoa (không dấu), nên chuẩn hoá tên y như vậy: tên
+    gõ có dấu hay không dấu đều khớp. Chỉ dò CỤM HAI CHỮ ("thanh an", "nguyen hoang"),
+    không dò chữ đơn: "an", "anh", "minh" là chữ thường gặp, dò chữ đơn thì mô hình
+    nào cũng bị chặn. Cụm đã xem tay là lời thường thì đưa vào cho_phep."""
+    cum = set()
+    for ten in ds_ten:
+        chu = chuan_hoa(ten).split()
+        cum.update(f'{chu[i]} {chu[i + 1]}' for i in range(len(chu) - 1))
+    cum -= {chuan_hoa(c) for c in cho_phep}
+    return sorted(t for t in tu_vung if t in cum)
+
+
+# ─── Tập kiểm CỐ ĐỊNH cho dữ liệu thật (03/10/2026) ──────────────────────────
+# chia_tap chia lại theo toàn bộ nhan.csv, nên mỗi đợt thêm câu thật là tập kiểm
+# đổi và số đo các đợt không so được với nhau. Với câu thật, tập kiểm được chọn
+# MỘT lần (20 % câu nguồn "that"), ghi ra tệp, các đợt sau chỉ thêm vào phần học.
+
+def nguon_theo_khoa(tep):
+    """{khoá chuẩn hoá: cột nguon} của lần xuất hiện đầu tiên, để biết câu nào là câu thật."""
+    ket = {}
+    with open(tep, encoding='utf-8-sig', newline='') as f:
+        for r in csv.DictReader(f):
+            tin = (r.get('tin_nhan') or '').strip()
+            if tin:
+                ket.setdefault(chuan_hoa(tin), (r.get('nguon') or '').strip())
+    return ket
+
+
+def tao_tap_kiem(y, nguon, ti_le=0.2, hat=42):
+    """Chỉ số các câu nguồn "that" được chọn làm tập kiểm cố định (giữ tỉ lệ nhãn khi được)."""
+    idx = [i for i, n in enumerate(nguon) if n.startswith('that')]
+    if len(idx) < 10:
+        sys.exit(f'Mới có {len(idx)} câu nguồn "that" — cần ít nhất 10 câu thật đã gán nhãn mới tạo tập kiểm cố định.')
+    yy = [y[i] for i in idx]
+    dem = Counter(yy)
+    tang = yy if len(dem) > 1 and min(dem.values()) >= 2 else None
+    _, kiem = train_test_split(idx, test_size=ti_le, stratify=tang, random_state=hat)
+    return sorted(kiem)
+
+
+def ghi_tap_kiem(tep, X, y):
+    tep.parent.mkdir(parents=True, exist_ok=True)
+    with open(tep, 'w', encoding='utf-8-sig', newline='') as f:
+        w = csv.writer(f)
+        w.writerow(['tin_nhan', 'nhan'])
+        w.writerows(zip(X, y))
+
+
+def doc_tap_kiem(tep):
+    """Khoá chuẩn hoá của các câu trong tệp tập kiểm cố định."""
+    X, _ = doc_csv_nhan(tep)
+    return [chuan_hoa(t) for t in X]
+
+
+def chia_theo_tap_kiem(X, y, khoa_kiem):
+    """Câu có khoá trong khoa_kiem vào tập kiểm, còn lại vào phần học. Câu nào của tập
+    kiểm đã biến khỏi dữ liệu thì DỪNG: tập kiểm đã đổi, số đo không còn so được."""
+    co = {chuan_hoa(t) for t in X}
+    thieu = [k for k in khoa_kiem if k not in co]
+    if thieu:
+        sys.exit(f'{len(thieu)} câu của tập kiểm cố định không còn trong dữ liệu học (vd. "{thieu[0]}"). '
+                 f'Không được bỏ câu khỏi tập kiểm; khôi phục câu đó trong nhan.csv.')
+    kk = set(khoa_kiem)
+    X_tr, X_te, y_tr, y_te = [], [], [], []
+    for t, n in zip(X, y):
+        if chuan_hoa(t) in kk:
+            X_te.append(t)
+            y_te.append(n)
+        else:
+            X_tr.append(t)
+            y_tr.append(n)
+    return X_tr, X_te, y_tr, y_te
+
+
+def chia_theo_tuy_chon(X, y, vao, tap_kiem=None, tao=False):
+    """Không có tap_kiem: chia 80/20 như cũ. Có: dùng tệp đó; chưa có tệp mà tao=True thì
+    tạo từ 20 % câu nguồn "that" của `vao` rồi dùng. Trả X_hoc, X_kiem, y_hoc, y_kiem."""
+    if not tap_kiem:
+        return chia_tap(X, y)
+    tk = Path(tap_kiem)
+    if not tk.exists():
+        if not tao:
+            sys.exit(f'Chưa có tệp tập kiểm {tk}. Lần đầu huấn luyện với câu thật thì thêm --tao-tap-kiem.')
+        theo_khoa = nguon_theo_khoa(vao)
+        chon = tao_tap_kiem(y, [theo_khoa.get(chuan_hoa(t), '') for t in X])
+        ghi_tap_kiem(tk, [X[i] for i in chon], [y[i] for i in chon])
+        print(f'Đã TẠO tập kiểm cố định {len(chon)} câu: {tk}. Từ nay giữ nguyên tệp này, đừng sửa hay xoá.')
+    elif tao:
+        sys.exit(f'{tk} đã có. Không tạo lại tập kiểm (số đo cũ sẽ không so được nữa); bỏ --tao-tap-kiem.')
+    return chia_theo_tap_kiem(X, y, doc_tap_kiem(tk))
 
 
 def tao_ong(min_df=2):
