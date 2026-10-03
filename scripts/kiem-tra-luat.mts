@@ -220,6 +220,17 @@ async function chayCacPhep(): Promise<number> {
   await chan(updateDoc(doc(dong, 'users', NGUOI.admin2.uid), { role: 'teacher' }),
     '13. đồng quản trị hạ vai một quản trị');
 
+  // Phép 9 và 11 vừa nâng `hs2` và `hs` lên teacher. Trước 03/10/2026 không
+  // ai trả lại, nên mọi phép "học sinh …" phía sau chạy bằng vai giáo viên:
+  // 21e, 21g, 21l, 22g báo SAI từ 22/09 vì luật cho giáo viên làm đúng những
+  // việc đó (đo: ngay trước nhóm 21, hs.role = hs2.role = 'teacher'). Trả cả
+  // hai về học sinh như lúc gieo, để các phép sau đo luật của HỌC SINH.
+  await moi.withSecurityRulesDisabled(async ctx => {
+    for (const n of [NGUOI.hs, NGUOI.hs2]) {
+      await updateDoc(doc(ctx.firestore(), 'users', n.uid), { role: 'student' });
+    }
+  });
+
   // 14: xoá hồ sơ
   await chan(deleteDoc(doc(gv, 'users', NGUOI.hs.uid)), '14. giáo viên xoá hồ sơ');
 
@@ -242,8 +253,9 @@ async function chayCacPhep(): Promise<number> {
   // 18: cái bẫy affectedKeys — `deleteClass` ghi role: 'student' đè lên hồ sơ
   //     vốn đã là student. Giá trị không đổi nên `role` KHÔNG nằm trong
   //     affectedKeys(), và giáo viên vẫn phải xoá được lớp.
-  //     Nhắm vào `hs3` chứ KHÔNG phải `hs`: phép 11 đã đổi `hs` thành teacher,
-  //     nên với `hs` thì role đổi giá trị thật và phép này sẽ đo ngược chiều.
+  //     Nhắm vào `hs3`: hồ sơ này chưa từng đổi vai, nên chắc chắn là ghi đè
+  //     cùng giá trị. (`hs` từng bị phép 11 đổi thành teacher; nay đã được trả
+  //     về student ngay sau phép 13, nhưng giữ `hs3` cho khỏi phụ thuộc thứ tự.)
   await duoc(updateDoc(doc(gv, 'users', NGUOI.hs3.uid), { role: 'student', classId: null }),
     '18. giáo viên ghi `role: student` đè lên hồ sơ vốn đã student');
 
@@ -323,6 +335,52 @@ async function chayCacPhep(): Promise<number> {
     '22k. giáo viên đóng đề của mình');
   await chan(deleteDoc(doc(nhu(moi, NGUOI.dong), 'de_giao', 'de_1')),
     '22l. giáo viên khác xoá đề không phải của mình');
+
+  // 23: những luật trước 03/10/2026 chưa có phép nào đo. Kẻ thử là `hs3` —
+  //     học sinh chưa từng đổi vai. Mỗi chỗ chặn có phép đối chứng ĐƯỢC, để
+  //     phép chặn không đạt vì một lý do khác.
+  const hs3 = nhu(moi, NGUOI.hs3);
+  // 23a-d: danh sách đồng quản trị. Ghi được vào đây là tự phong quản trị.
+  await chan(setDoc(doc(hs3, 'quan_tri', 'dong_quan_tri'), { emails: [NGUOI.hs3.email] }),
+    '23a. học sinh tự ghi mình vào danh sách đồng quản trị');
+  await chan(getDoc(doc(hs3, 'quan_tri', 'dong_quan_tri')),
+    '23b. học sinh đọc danh sách đồng quản trị');
+  await chan(setDoc(doc(dong, 'quan_tri', 'dong_quan_tri'), { emails: [NGUOI.dong.email, NGUOI.gv.email] }),
+    '23c. đồng quản trị tự thêm người vào danh sách');
+  await duoc(setDoc(doc(chu, 'quan_tri', 'dong_quan_tri'), { emails: [NGUOI.dong.email] }),
+    '23d. chủ dự án ghi danh sách đồng quản trị (giữ nguyên nội dung)');
+  // 23e-f: lớp học
+  await chan(setDoc(doc(hs3, 'classes', 'lop_hs'), { name: 'Lớp tự lập', inviteCode: 'HS000' }),
+    '23e. học sinh tự tạo lớp');
+  await chan(updateDoc(doc(hs3, 'classes', 'lop_1'), { inviteCode: 'HACK1' }),
+    '23f. học sinh sửa mã mời của lớp');
+  await duoc(getDoc(doc(hs3, 'classes', 'lop_1')), '23g. học sinh đọc lớp (đối chứng)');
+  // 23h-j: kho nội dung chỉ giáo viên ghi. Câu sạch, để chỉ còn vai quyết định.
+  await chan(setDoc(doc(hs3, 'bank_questions', 'cau_hs'), { q: 'Câu học sinh tự thêm?' }),
+    '23h. học sinh thêm câu sạch vào bank_questions');
+  await chan(deleteDoc(doc(hs3, 'bank_questions', 'cau_1')), '23i. học sinh xoá câu hỏi');
+  for (const ten of ['questions', 'curriculum_chapters', 'exams', 'equations', 'matrix_resources']) {
+    await chan(setDoc(doc(hs3, ten, 'x_hs'), { q: 'sạch' }), `23j. học sinh ghi \`${ten}\``);
+  }
+  // 23k-m: cấu hình hệ thống chỉ quản trị ghi
+  await chan(setDoc(doc(gv, 'system_settings', 'chung'), { batAI: false }),
+    '23k. giáo viên thường ghi `system_settings`');
+  await chan(setDoc(doc(hs3, 'schools', 'truong_hs'), { ten: 'Trường giả' }),
+    '23l. học sinh ghi `schools`');
+  await duoc(setDoc(doc(chu, 'system_settings', 'chung'), { batAI: true }),
+    '23m. quản trị ghi `system_settings` (đối chứng)');
+  // 23n-p: tiến độ của từng em
+  await duoc(getDoc(doc(hs, 'progress', NGUOI.hs.email)), '23n. học sinh đọc tiến độ của mình (đối chứng)');
+  await chan(getDoc(doc(hs3, 'progress', NGUOI.hs.email)), '23o. học sinh đọc tiến độ của bạn');
+  await chan(setDoc(doc(hs3, 'progress', NGUOI.hs.email), { diem: 0 }), '23p. học sinh ghi đè tiến độ của bạn');
+  // 23q-t: lịch sử chat
+  await duoc(getDoc(doc(hs, 'chats', 'chat_1')), '23q. học sinh đọc chat của mình (đối chứng)');
+  await chan(getDoc(doc(hs3, 'chats', 'chat_1')), '23r. học sinh đọc chat của bạn');
+  await chan(setDoc(doc(hs3, 'chats', 'chat_gia'), { userEmail: NGUOI.hs.email, noiDung: 'giả' }),
+    '23s. học sinh tạo chat đứng tên bạn');
+  await chan(deleteDoc(doc(hs3, 'chats', 'chat_1')), '23t. học sinh xoá chat của bạn');
+  // 23u: collection không có trong luật thì chặn hết, kể cả quản trị
+  await chan(setDoc(doc(chu, 'la_lung', 'x'), { a: 1 }), '23u. ghi vào collection không có trong luật');
 
   /* PHÉP TỰ PHÁ. Một bộ kiểm luôn xanh mà chưa bao giờ bắt được gì thì đáng
      ngờ hơn đáng mừng — bài học đã trả giá một lần, xem "Rút kinh nghiệm"
