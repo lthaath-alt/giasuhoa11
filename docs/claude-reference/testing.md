@@ -28,7 +28,7 @@ hoá + dựng công thức KaTeX, telemetry), `kiem-tra:chuong-trinh` (dữ li�
 (mọi đường dẫn và lệnh npm mà CLAUDE.md / hiến chương nhắc tới đều phải có thật),
 `kiem-tra:an-ninh` (những hàng rào an ninh không được phép biến mất — xem mục
 "An ninh dự án" bên dưới),
-`kiem-tra:luat` (19 phép thử luật Firestore trên emulator; cần Java 21+ vì
+`kiem-tra:luat` (83 phép thử luật Firestore trên emulator, nhóm 1–23; cần Java 21+ vì
 firebase-tools 15 đòi vậy, nên máy nào thiếu thì tự bỏ qua — phép này chạy thật
 trên GitHub Actions, xem `.github/workflows/kiem-luat.yml`. Lần chạy đầu trên
 một máy, firebase tải emulator Firestore về thư mục .cache/firebase/emulators

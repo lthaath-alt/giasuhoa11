@@ -47,5 +47,5 @@ jobs:
 
       - run: npm ci
 
-      - name: Chạy 19 phép thử luật
+      - name: Chạy các phép thử luật (83 phép, nhóm 1–23)
         run: npm run kiem-tra:luat
