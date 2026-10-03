@@ -125,14 +125,16 @@ nó đã publish chưa (CHỈ ĐỌC, cần `.env.local`). Tệp `firestore.rule
 chỉ là bản thảo, nên `kiem-tra:luat` xanh **không** có nghĩa là luật đang chạy đã
 đúng — hai việc khác nhau. Xem `do-luat-dang-chay.mts`.
 
-Máy chủ dự án KHÔNG chạy được bộ kiểm đó, và đã đo kỹ ngày 16/09/2026 — đừng
-đi dò lại. Máy có đúng hai bản Java, cả hai đều là 8: Zulu 8 JRE 32-bit (chỗ
-`JAVA_HOME` đang trỏ tới) và AdoptOpenJDK 8 64-bit. `winget install` bản JDK
-mới không chạy được. Antigravity chạy ngay trên chính máy Windows này, không
-container không WSL, nên bên đó cũng in BỎ QUA y hệt. Cổng 8080 trống, không
-cần `firebase login` — hai thứ đó không phải vấn đề. Vấn đề chỉ là Java.
-Đường chưa thử, nếu sau này thấy phiền: tải JDK dạng `.zip` giải nén vào thư
-mục người dùng (không cần quyền quản trị) rồi đặt `JAVA_HOME` cho riêng phiên.
+Máy mới của chủ dự án (từ 03/10/2026) CHẠY ĐƯỢC bộ kiểm đó tại chỗ: có Temurin
+21 ở `C:\Program Files\Eclipse Adoptium\jdk-21.0.12.101-hotspot\bin`. Đo
+03/10/2026: `npm run kiem-tra:luat` ra 83/83 OK, mã thoát 0. firebase-tools 15
+đòi Java 21+ (không phải 11+ như kế hoạch ban đầu); shell mở từ trước khi cài
+Java thì nối thư mục `bin` trên vào đầu PATH của riêng shell đó. Không cần
+`firebase login`, emulator chạy với projectId `demo-giasuhoa11`.
+
+Máy cũ (đo 16/09/2026) KHÔNG chạy được: chỉ có hai bản Java 8 (Zulu 8 JRE
+32-bit và AdoptOpenJDK 8 64-bit), `winget install` JDK mới không chạy được, nên
+ở đó bộ luật in BỎ QUA. Máy nào thiếu Java 21 cũng vậy; CI vẫn là chốt chặn.
 
 Một cái bẫy của Playground, đã mất nửa buổi vì nó: ô "Build document" ghi thừa
 một dấu cách vào tên trường (`role␣`) là tạo ra một trường KHÁC, và luật đọc

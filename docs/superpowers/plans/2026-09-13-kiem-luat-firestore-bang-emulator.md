@@ -53,13 +53,13 @@ Java nên nó sẽ đi đúng vào nhánh bỏ qua.
   emulator". KHÔNG dựa vào `FIRESTORE_EMULATOR_HOST` do `emulators:exec` tự đặt
   — đặt cờ của mình thì không phụ thuộc hành vi không được ghi trong tài liệu.
 
-- [ ] **Bước 1: Cài hai gói**
+- [x] **Bước 1: Cài hai gói**
 
 ```bash
 npm i -D @firebase/rules-unit-testing@^5.0.2 firebase-tools@^15.30.0
 ```
 
-- [ ] **Bước 2: Thêm khối `emulators` vào `firebase.json`**
+- [x] **Bước 2: Thêm khối `emulators` vào `firebase.json`**
 
 Tệp sau khi sửa phải đúng như thế này:
 
@@ -83,7 +83,7 @@ Tệp sau khi sửa phải đúng như thế này:
 
 `ui.enabled: false` vì CI không ai mở giao diện, mà bật thì tốn thêm một cổng.
 
-- [ ] **Bước 3: Viết khung `scripts/kiem-tra-luat.mts`**
+- [x] **Bước 3: Viết khung `scripts/kiem-tra-luat.mts`**
 
 ```ts
 /**
@@ -185,7 +185,7 @@ export const CAU_HINH = { DU_AN, CONG };
 main();
 ```
 
-- [ ] **Bước 4: Thêm hai dòng vào `package.json`**
+- [x] **Bước 4: Thêm hai dòng vào `package.json`**
 
 Trong `scripts`, thêm:
 
@@ -199,7 +199,7 @@ và nối vào cuối chuỗi `kiem-tra` (sau `kiem-tra:an-ninh`):
 && npm run kiem-tra:luat
 ```
 
-- [ ] **Bước 5: Chạy để xác nhận đường BỎ QUA sạch**
+- [x] **Bước 5: Chạy để xác nhận đường BỎ QUA sạch**
 
 ```bash
 npm run kiem-tra:luat
@@ -221,7 +221,7 @@ npm run kiem-tra:luat; echo "ma thoat = $?"
 
 Phải thấy `ma thoat = 0`.
 
-- [ ] **Bước 6: Chạy cả bộ, xác nhận không làm đỏ gì**
+- [x] **Bước 6: Chạy cả bộ, xác nhận không làm đỏ gì**
 
 ```bash
 npm run kiem-tra
@@ -229,7 +229,7 @@ npm run kiem-tra
 
 Phải vẫn `TẤT CẢ ĐẠT` như trước, cộng thêm dòng BỎ QUA mới.
 
-- [ ] **Bước 7: Commit**
+- [x] **Bước 7: Commit**
 
 ```bash
 git add package.json package-lock.json firebase.json scripts/kiem-tra-luat.mts
@@ -250,7 +250,7 @@ git commit -m "Viec 1: khung bo kiem luat va duong BO QUA khi thieu Java"
 **KHÔNG chạy được trên máy chủ dự án.** Viết xong thì đi tiếp; Việc 3 nghiệm thu
 trên CI.
 
-- [ ] **Bước 1: Thêm phần nhập khẩu vào đầu tệp**
+- [x] **Bước 1: Thêm phần nhập khẩu vào đầu tệp**
 
 ```ts
 import {
@@ -262,7 +262,7 @@ import {
 } from 'firebase/firestore';
 ```
 
-- [ ] **Bước 2: Viết hàm gieo dữ liệu nền**
+- [x] **Bước 2: Viết hàm gieo dữ liệu nền**
 
 Đặt ngay trên `chayCacPhep()`:
 
@@ -304,7 +304,7 @@ const nhu = (moi: RulesTestEnvironment, n: { uid: string; email: string }) =>
   moi.authenticatedContext(n.uid, { email: n.email }).firestore();
 ```
 
-- [ ] **Bước 3: Viết thân `chayCacPhep()`**
+- [x] **Bước 3: Viết thân `chayCacPhep()`**
 
 Thay toàn bộ hàm tạm của Việc 1 bằng:
 
@@ -403,7 +403,7 @@ async function chayCacPhep(): Promise<number> {
 }
 ```
 
-- [ ] **Bước 4: Kiểm kiểu**
+- [x] **Bước 4: Kiểm kiểu**
 
 ```bash
 npm run lint
@@ -411,7 +411,7 @@ npm run lint
 
 Phải xanh. Đây là thứ DUY NHẤT kiểm được ở máy cho việc này.
 
-- [ ] **Bước 5: Commit**
+- [x] **Bước 5: Commit**
 
 ```bash
 git add scripts/kiem-tra-luat.mts
@@ -430,7 +430,7 @@ git commit -m "Viec 2: 18 phep thu luat, gom ca hai duong `list` chua tung do du
 
 **Giao diện:** không sinh ra gì cho việc sau.
 
-- [ ] **Bước 1: Thêm phép tự phá vào cuối `chayCacPhep()`**
+- [x] **Bước 1: Thêm phép tự phá vào cuối `chayCacPhep()`**
 
 Đặt ngay trước `await moi.cleanup();`:
 
@@ -464,7 +464,7 @@ git commit -m "Viec 2: 18 phep thu luat, gom ca hai duong `list` chua tung do du
   }
 ```
 
-- [ ] **Bước 2: Tạo `.github/workflows/kiem-luat.yml`**
+- [x] **Bước 2: Tạo `.github/workflows/kiem-luat.yml`**
 
 ```yaml
 # Chạy bộ kiểm luật Firestore trên emulator.
@@ -519,7 +519,7 @@ jobs:
         run: npm run kiem-tra:luat
 ```
 
-- [ ] **Bước 3: Ghi vào `CLAUDE.md`, mục "Lệnh"**
+- [x] **Bước 3: Ghi vào `CLAUDE.md`, mục "Lệnh"**
 
 Trong bảng các bộ kiểm chạy riêng, thêm `kiem-tra:luat` vào danh sách, với mô tả:
 
@@ -531,7 +531,7 @@ máy nào thiếu thì tự bỏ qua — phép này chạy thật trên GitHub A
 
 Và sửa con số: `npm run kiem-tra` nay chạy **12** bộ kiểm, không phải 11.
 
-- [ ] **Bước 4: Ghi vào `CLAUDE.md`, mục "An ninh"**
+- [x] **Bước 4: Ghi vào `CLAUDE.md`, mục "An ninh"**
 
 Thêm ngay dưới đoạn "Sửa luật xong là CHƯA có tác dụng gì":
 
@@ -543,7 +543,7 @@ chạy trên Firebase thì vẫn phải đo bằng REST sau khi publish. Hai vi�
 nhau.
 ```
 
-- [ ] **Bước 5: Thêm một dòng vào `.claude/nhac-moi-luot.md`**
+- [x] **Bước 5: Thêm một dòng vào `.claude/nhac-moi-luot.md`**
 
 Trong khối "LICH SU CAC DOT...", thêm:
 
@@ -552,7 +552,7 @@ Trong khối "LICH SU CAC DOT...", thêm:
   vi thieu Java — xem ket qua that o tab Actions sau khi push).
 ```
 
-- [ ] **Bước 6: Kiểm ở máy**
+- [x] **Bước 6: Kiểm ở máy**
 
 ```bash
 npm run lint && npm run kiem-tra
@@ -560,14 +560,14 @@ npm run lint && npm run kiem-tra
 
 Cả hai phải xanh, và phép luật phải in `BỎ QUA`.
 
-- [ ] **Bước 7: Commit**
+- [x] **Bước 7: Commit**
 
 ```bash
 git add scripts/kiem-tra-luat.mts .github/workflows/kiem-luat.yml CLAUDE.md .claude/nhac-moi-luot.md
 git commit -m "Viec 3: phep tu pha, workflow CI, va tai lieu"
 ```
 
-- [ ] **Bước 8: Chủ dự án push và xem CI**
+- [x] **Bước 8: Chủ dự án push và xem CI**
 
 Đây là phép nghiệm thu THẬT. Người thi công KHÔNG push — chủ dự án push.
 
