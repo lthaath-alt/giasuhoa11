@@ -10,6 +10,7 @@
  *   3. Bộ chuẩn hoá + dựng công thức: đúng từng ca đã hỏng ở bộ regex cũ, và
  *      không mở lại lỗ hổng XSS / link độc.
  *   4. Chỉ số telemetry tính đúng và bản xuất CSV không lộ email hay nội dung.
+ *   5. Khung chat gom tin theo phiên (nhomPhien.ts) đúng ranh giới phiên và ngày.
  */
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
@@ -34,6 +35,8 @@ import { LUOC_DO_LOC, TUY_CHON_KATEX, taoTheLink } from '../src/core/components/
 import { tinhChiSo, xuatCsv, gopTheoHocSinh, csvHocSinh } from '../src/features/tutor/services/telemetryService';
 import { coDapSo, timDapAnChoTin } from '../src/features/tutor/services/chanRoDapSo';
 import type { ChatMessage } from '../src/features/auth/types';
+import { nhomTheoPhien, nhanNhom } from '../src/features/tutor/services/nhomPhien';
+import { khoaAnTin, docMocAn, ghiMocAn, mocAnTatCa, locTheoMoc } from '../src/features/tutor/services/anTinCu';
 
 const GOC = fileURLToPath(new URL('..', import.meta.url));
 
@@ -481,6 +484,90 @@ console.log('\n== Bộ dò đáp số trong câu trả lời (P0-2, P0-4) ==');
     'tin ngắn hoặc khác đề thì không khớp bừa');
   ok(timDapAnChoTin('Tính pH của dung dịch thu được khi trộn hai dung dịch acid mạnh có cùng nồng độ', kho) === undefined,
     'bài cùng chủ đề nhưng khác đề thì không khớp');
+}
+
+console.log('\n== Khung chat: gom tin theo phiên (nhomPhien.ts) ==');
+{
+  /* Giờ địa phương dựng bằng new Date(năm, tháng, ...) để phép kiểm đúng ở mọi
+     múi giờ máy chạy. Tháng tính từ 0: 9 là tháng 10. */
+  const luc = (ngay: number, gio: number, phut = 0) => new Date(2026, 9, ngay, gio, phut).toISOString();
+  let so = 0;
+  const tin = (t: string, phien?: string) => ({ id: `t${so++}`, timestamp: t, session_id: phien });
+
+  ok(nhomTheoPhien([]).length === 0, 'không có tin thì không có nhóm');
+
+  const haiPhien = [
+    tin(luc(3, 13, 5), 'a'), tin(luc(3, 13, 6), 'a'), tin(luc(3, 13, 9), 'a'),
+    tin(luc(3, 15, 0), 'b'), tin(luc(3, 15, 1), 'b'),
+  ];
+  const n1 = nhomTheoPhien(haiPhien);
+  ok(n1.length === 2 && n1[0].tin.length === 3 && n1[1].tin.length === 2,
+    'hai session_id liền nhau → hai nhóm 3 + 2 tin', n1.map(n => n.tin.length).join(' + '));
+  ok(n1.flatMap(n => n.tin).map(m => m.id).join() === haiPhien.map(m => m.id).join(),
+    'giữ nguyên thứ tự và không mất tin nào');
+  ok(nhanNhom(n1[0]) === 'Thứ Bảy 03/10 · 13:05 · 3 tin',
+    'nhãn phiên có thứ, ngày, giờ bắt đầu, số tin', nhanNhom(n1[0]));
+
+  const n2 = nhomTheoPhien([tin(luc(1, 8)), tin(luc(1, 9)), tin(luc(2, 8))]);
+  ok(n2.length === 2 && n2.every(n => !n.theoPhien), 'tin cũ không có session_id → gom theo ngày');
+  ok(nhanNhom(n2[1]) === 'Thứ Sáu 02/10 · 1 tin', 'nhóm theo ngày không ghi giờ', nhanNhom(n2[1]));
+
+  ok(nhomTheoPhien([tin(luc(3, 23, 50)), tin(luc(4, 0, 10))]).length === 2,
+    'tin cũ lúc 23:50 và 00:10 hôm sau là hai ngày theo giờ máy');
+  ok(nhomTheoPhien([tin(luc(3, 23, 50), 'c'), tin(luc(4, 0, 10), 'c')]).length === 1,
+    'một phiên kéo qua nửa đêm vẫn là MỘT nhóm');
+
+  const xenKe = nhomTheoPhien([tin(luc(3, 9), 'a'), tin(luc(3, 9, 1), 'b'), tin(luc(3, 9, 2), 'a')]);
+  ok(xenKe.length === 3 && new Set(xenKe.map(n => n.khoa)).size === 3,
+    'phiên quay lại sau phiên khác → nhóm riêng, khoá không trùng (key React)');
+
+  ok(nhomTheoPhien([tin(luc(3, 8)), tin(luc(3, 9), 'a')]).length === 2,
+    'tin không phiên và tin có phiên cùng ngày không bị trộn');
+
+  ok(nhanNhom(nhomTheoPhien([tin('khong-phai-ngay')])[0]) === 'Không rõ ngày · 1 tin',
+    'timestamp hỏng không làm sập, ghi "Không rõ ngày"');
+}
+
+console.log('\n== Khung chat: "Ẩn khỏi màn hình" thay cho xóa (anTinCu.ts) ==');
+{
+  const t = (phut: number) => ({ timestamp: new Date(2026, 9, 3, 13, phut).toISOString() });
+  const ds = [t(1), t(2), t(3)];
+
+  ok(mocAnTatCa(ds) === Date.parse(t(3).timestamp), 'mốc = thời điểm tin MỚI NHẤT, không phải giờ máy');
+  ok(mocAnTatCa([]) === null && mocAnTatCa([{ timestamp: 'hong' }]) === null, 'không có tin hợp lệ thì không có mốc');
+
+  const an = locTheoMoc(ds, mocAnTatCa(ds));
+  ok(an.hien.length === 0 && an.soAn === 3, 'ẩn tới mốc thì cả 3 tin cũ biến khỏi màn hình');
+  const sau = locTheoMoc([...ds, t(10)], mocAnTatCa(ds));
+  ok(sau.hien.length === 1 && sau.soAn === 3, 'tin tới SAU khi ẩn vẫn hiện');
+  ok(locTheoMoc(ds, null).hien.length === 3, 'chưa ẩn (mốc null) thì hiện đủ');
+  ok(locTheoMoc([{ timestamp: 'hong' }], 0).hien.length === 1, 'timestamp hỏng thì cứ hiện, không làm mất tin');
+
+  const khoa = khoaAnTin('Uid123', 'bai-11');
+  ok(khoa === 'h11_an_chat:Uid123:bai-11', 'khoá localStorage gồm uid và mã bài', khoa);
+  ok(!/@/.test(khoa) && khoaAnTin(undefined, 'bai-11') === 'h11_an_chat:khach:bai-11',
+    'khoá không chứa email; khách vãng lai dùng chữ "khach"');
+
+  /* localStorage giả: Node không có sẵn. Thử cả bản chạy được lẫn bản ném lỗi
+     (Safari chế độ riêng tư, trình duyệt chặn lưu trữ). */
+  const g = globalThis as { localStorage?: unknown };
+  const cu = g.localStorage;
+  const kho = new Map<string, string>();
+  g.localStorage = {
+    getItem: (k: string) => kho.get(k) ?? null,
+    setItem: (k: string, v: string) => { kho.set(k, v); },
+    removeItem: (k: string) => { kho.delete(k); },
+  };
+  ok(docMocAn(khoa) === null, 'chưa ghi thì đọc ra null');
+  ok(ghiMocAn(khoa, 1234) && docMocAn(khoa) === 1234, 'ghi rồi đọc lại đúng mốc (giữ qua tải lại trang)');
+  ok(ghiMocAn(khoa, null) && docMocAn(khoa) === null && !kho.has(khoa), '"Hiện lại" xóa hẳn mốc');
+  kho.set(khoa, 'rac');
+  ok(docMocAn(khoa) === null, 'giá trị rác trong localStorage coi như chưa ẩn');
+  const nem = () => { throw new Error('bị chặn'); };
+  g.localStorage = { getItem: nem, setItem: nem, removeItem: nem };
+  ok(docMocAn(khoa) === null && ghiMocAn(khoa, 1) === false,
+    'localStorage ném lỗi: đọc ra null, ghi trả false, không làm sập khung chat');
+  g.localStorage = cu;
 }
 
 console.log('\n' + (hong === 0 ? '>>> TẤT CẢ ĐẠT' : `>>> CÓ ${hong} MỤC KHÔNG ĐẠT`) + '\n');

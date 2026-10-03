@@ -8,6 +8,7 @@ import { kiemTraVaGhiNhanLuotGui, layTrangThaiGioiHan, thongBaoBiChan } from '..
 import { tachNhanAn, laTinBeTac } from '../../features/tutor/services/pedagogicalStateMachine';
 import { laySessionId, ketThucPhien, userHash } from '../../features/tutor/services/telemetryService';
 import { doanYDinhNen } from '../../features/tutor/services/yDinhNen';
+import { khoaAnTin, docMocAn, locTheoMoc } from '../../features/tutor/services/anTinCu';
 import { GoogleUserInfo } from '../services/googleAuth';
 import { QuizService } from '../../features/quiz/quizService';
 import { BankFirestore } from '../../features/bank/bankStore';
@@ -1292,9 +1293,13 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     }
 
     // Lấy lịch sử chat hiện tại cho bài học này từ state
-    const currentHistory = chats.filter(
-      c => c.userEmail === userEmail && c.lessonId === lessonId
-    );
+    /* Bỏ các tin em đã "Ẩn khỏi màn hình" (anTinCu.ts, 03/10/2026). Nút cũ xóa
+       hẳn tin nên gia sư bắt đầu lại từ đầu; giữ đúng hành vi đó, chỉ khác là
+       tin vẫn còn trên Firestore cho đề tài. */
+    const currentHistory = locTheoMoc(
+      chats.filter(c => c.userEmail === userEmail && c.lessonId === lessonId),
+      docMocAn(khoaAnTin(currentUser?.id, lessonId)),
+    ).hien;
 
     /* Gỡ khoảng chờ giả 5–10 giây (16/09/2026).
        Bản trước cố ý chờ thêm `Math.random() * 5000 + 5000` ms cho "giống người

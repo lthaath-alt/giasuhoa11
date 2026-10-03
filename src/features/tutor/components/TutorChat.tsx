@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Paper,
@@ -11,7 +11,7 @@ import {
   Alert,
   CircularProgress,
 } from '@mui/material';
-import { Send, Trash2, Sparkles, CheckCircle, Award, Lightbulb, HelpCircle, Clock, KeyRound } from 'lucide-react';
+import { Send, EyeOff, Sparkles, CheckCircle, Award, Lightbulb, HelpCircle, Clock, KeyRound } from 'lucide-react';
 import { coKeyRieng } from '../services/keyRieng';
 import { KeyRiengDialog } from './KeyRiengDialog';
 import { useApp } from '../../../core/hooks/useApp';
@@ -21,6 +21,10 @@ import { SuggestedQuestionsCard } from './SuggestedQuestionsCard';
 import { layTrangThaiGioiHan, TRAN_LUOT_KHACH } from '../services/gioiHanChatService';
 import { useGiayDaCho, chuDangCho } from './useGiayDaCho';
 import { MathMarkdownRenderer } from '../../../core/components/MathMarkdownRenderer';
+import { useCuonDay } from './useCuonDay';
+import { khoaAnTin, docMocAn, ghiMocAn, mocAnTatCa, locTheoMoc } from '../services/anTinCu';
+import { DanhSachTinTheoPhien, NutTinMoiNhat } from './DanhSachTinTheoPhien';
+import type { ChatMessage } from '../../auth/types';
 
 interface TutorChatProps {
   lesson: Lesson;
@@ -32,7 +36,6 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
     chats,
     guestChatCount,
     addMessage,
-    clearLessonHistory,
     isLessonCompleted,
     toggleLessonCompletion,
     loadLessonChats,
@@ -41,7 +44,6 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
   const [inputMessage, setInputMessage] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
   
   const [remainingCooldown, setRemainingCooldown] = useState(0);
   /* Số giây đã chờ lượt này — để dòng "đang chuẩn bị gợi ý" không đứng im. */
@@ -61,21 +63,22 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
 
   // Lọc tin nhắn của bài học hiện tại và user hiện tại
   const email = currentUser ? currentUser.email : 'guest';
-  const lessonChats = chats.filter((c) => c.userEmail === email && c.lessonId === lesson.id);
+  const tatCaTin = chats.filter((c) => c.userEmail === email && c.lessonId === lesson.id);
+
+  /* Tin em đã bấm "Ẩn khỏi màn hình" (xem anTinCu.ts). Mốc nằm ở localStorage
+     nên đọc lại mỗi lần vẽ; `lamMoi` chỉ để vẽ lại sau khi ghi mốc. */
+  const khoaAn = khoaAnTin(currentUser?.id, lesson.id);
+  const [, lamMoi] = useState(0);
+  const { hien: lessonChats, soAn } = locTheoMoc(tatCaTin, docMocAn(khoaAn));
 
   /* Câu trả lời cuối có phải thông báo hết hạn mức THEO NGÀY không. Bám vào
      đúng cụm chữ mà `thongBaoHetLuot` sinh ra cho trường hợp đó. */
   const vuaHetHanMuc = /hết lượt trả lời trong ngày của toàn hệ thống/
     .test(lessonChats[lessonChats.length - 1]?.content || '');
 
-  // Cuộn xuống đáy khi có tin nhắn mới
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [lessonChats, isSending]);
+  /* Cuộn xuống tin mới nhất — chỉ khi có tin mới và em đang ở gần đáy.
+     Xem useCuonDay.ts vì sao không còn cuộn theo mảng `lessonChats`. */
+  const { khungRef, khiCuon, xaDay, cuonXuong } = useCuonDay(lessonChats.length, isSending, lesson.id);
 
   /* Thời gian khoá (khi bị phát hiện spam) nay nằm ở Firestore — đọc một lần
      sau mỗi lượt gửi, rồi đếm lùi tại chỗ. Lạc đề và cảm xúc tiêu cực KHÔNG còn
@@ -129,10 +132,27 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
     }
   };
 
-  const handleClearHistory = () => {
-    if (window.confirm('Bạn có chắc chắn muốn xóa toàn bộ lịch sử trò chuyện của bài học này?')) {
-      clearLessonHistory(lesson.id);
+  /* Thay cho nút "Xóa lịch sử chat" (03/10/2026): nút cũ xóa thật tin trên
+     Firestore, tức xóa luôn số liệu đề tài. Giờ chỉ ẩn trên máy này. */
+  const handleAnTin = () => {
+    /* Khách vãng lai không có tin nào trên Firestore (addMessage chỉ lưu khi
+       đã đăng nhập), nên đừng hứa "thầy cô vẫn xem được" với khách. */
+    if (!window.confirm(
+      'Ẩn các tin hiện có của bài này khỏi màn hình trên máy này?\n\n'
+      + (currentUser ? 'Tin vẫn được lưu, thầy cô vẫn xem được. ' : '')
+      + 'Em bấm "Hiện lại" để xem lại bất cứ lúc nào. '
+      + 'Chemai sẽ bắt đầu lại như cuộc trò chuyện mới.',
+    )) return;
+    if (!ghiMocAn(khoaAn, mocAnTatCa(tatCaTin))) {
+      setErrorMsg('Trình duyệt này không cho lưu cài đặt nên chưa ẩn được tin.');
+      return;
     }
+    lamMoi((n) => n + 1);
+  };
+
+  const handleHienLai = () => {
+    ghiMocAn(khoaAn, null);
+    lamMoi((n) => n + 1);
   };
 
   /* Tính số lượt dùng thử còn lại — ĐỌC HẰNG SỐ, đừng chép cứng con số.
@@ -276,19 +296,45 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
 
             {lessonChats.length > 0 && (
               <Button
-                id="clear-history-btn"
+                id="hide-history-btn"
                 size="small"
-                color="error"
-                startIcon={<Trash2 size={14} />}
-                onClick={handleClearHistory}
-                sx={{ textTransform: 'none' }}
+                startIcon={<EyeOff size={14} />}
+                onClick={handleAnTin}
+                sx={{ textTransform: 'none', color: 'var(--chu-dam)', borderRadius: 0 }}
               >
-                Xóa lịch sử chat
+                Ẩn khỏi màn hình
               </Button>
             )}
 
           </Box>
         </Box>
+
+        {soAn > 0 && (
+          <Box
+            id="hidden-chats-bar"
+            sx={{
+              px: 2,
+              py: 0.5,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              borderBottom: '1px solid var(--vien)',
+              backgroundColor: 'var(--nen-trang)',
+            }}
+          >
+            <Typography variant="caption" color="text.secondary">
+              Đã ẩn {soAn} tin cũ trên máy này ·
+            </Typography>
+            <Button
+              id="show-hidden-btn"
+              size="small"
+              onClick={handleHienLai}
+              sx={{ textTransform: 'none', color: 'var(--chu-dam)', fontWeight: 'bold', minWidth: 0, p: 0, borderRadius: 0, textDecoration: 'underline' }}
+            >
+              Hiện lại
+            </Button>
+          </Box>
+        )}
 
         {/* Cảnh báo khách vãng lai hoặc tài khoản */}
         {!currentUser && (
@@ -312,6 +358,8 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
         {/* Khung chứa các tin nhắn */}
         <Box
           id="chat-messages-box"
+          ref={khungRef}
+          onScroll={khiCuon}
           sx={{
             flex: 1,
             p: 3,
@@ -352,60 +400,65 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
               </Box>
             </Box>
           ) : (
-            lessonChats.map((msg) => {
-              const isAi = msg.sender === 'ai';
-              return (
-                <Box
-                  key={msg.id}
-                  sx={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    gap: 1.5,
-                    alignSelf: isAi ? 'flex-start' : 'flex-end',
-                    maxWidth: { xs: '90%', sm: '80%' },
-                    textAlign: 'left',
-                  }}
-                >
-                  {isAi && (
-                    <Avatar
-                      sx={{
-                        width: 32,
-                        height: 32,
-                        bgcolor: 'var(--nen-tin-hieu-nhat2)',
-                        color: 'var(--tin-hieu)',
-                        border: '1px solid var(--nen-tin-hieu-nhat2)',
-                      }}
-                    >
-                      <Sparkles size={16} />
-                    </Avatar>
-                  )}
+            <DanhSachTinTheoPhien
+              tin={lessonChats}
+              khungRef={khungRef}
+              khoa={lesson.id}
+              veTin={(msg: ChatMessage) => {
+                const isAi = msg.sender === 'ai';
+                return (
+                  <Box
+                    key={msg.id}
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      gap: 1.5,
+                      alignSelf: isAi ? 'flex-start' : 'flex-end',
+                      maxWidth: { xs: '90%', sm: '80%' },
+                      textAlign: 'left',
+                    }}
+                  >
+                    {isAi && (
+                      <Avatar
+                        sx={{
+                          width: 32,
+                          height: 32,
+                          bgcolor: 'var(--nen-tin-hieu-nhat2)',
+                          color: 'var(--tin-hieu)',
+                          border: '1px solid var(--nen-tin-hieu-nhat2)',
+                        }}
+                      >
+                        <Sparkles size={16} />
+                      </Avatar>
+                    )}
 
-                  <Box>
-                    <Paper
-                      sx={{
-                        p: 2,
-                        borderRadius: 0,
-                        backgroundColor: isAi ? 'var(--nen-nhat)' : 'var(--luc-tham-nen)',
-                        color: isAi ? 'text.primary' : 'var(--chu-nguoc)',
-                        border: isAi ? '1px solid var(--vien)' : 'none',
-                        boxShadow: 'none',
-                      }}
-                    >
-                      <Typography component="div" variant="body2" sx={{ lineHeight: 1.6, fontSize: '0.9rem' }}>
-                        <MathMarkdownRenderer text={msg.content} linkColor={isAi ? 'var(--xanh)' : 'var(--chu-nguoc)'} />
+                    <Box>
+                      <Paper
+                        sx={{
+                          p: 2,
+                          borderRadius: 0,
+                          backgroundColor: isAi ? 'var(--nen-nhat)' : 'var(--luc-tham-nen)',
+                          color: isAi ? 'text.primary' : 'var(--chu-nguoc)',
+                          border: isAi ? '1px solid var(--vien)' : 'none',
+                          boxShadow: 'none',
+                        }}
+                      >
+                        <Typography component="div" variant="body2" sx={{ lineHeight: 1.6, fontSize: '0.9rem' }}>
+                          <MathMarkdownRenderer text={msg.content} linkColor={isAi ? 'var(--xanh)' : 'var(--chu-nguoc)'} />
+                        </Typography>
+                      </Paper>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ display: 'block', mt: 0.5, ml: 1, mr: 1, textAlign: isAi ? 'left' : 'right' }}
+                      >
+                        {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </Typography>
-                    </Paper>
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      sx={{ display: 'block', mt: 0.5, ml: 1, mr: 1, textAlign: isAi ? 'left' : 'right' }}
-                    >
-                      {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </Typography>
+                    </Box>
                   </Box>
-                </Box>
-              );
-            })
+                );
+              }}
+            />
           )}
 
           {/* Hiệu ứng đang gửi / AI phản hồi */}
@@ -441,7 +494,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
             </Box>
           )}
 
-          <div ref={messagesEndRef} />
+          {xaDay && <NutTinMoiNhat onClick={() => cuonXuong()} />}
         </Box>
 
         {/* Hiển thị lỗi nếu có */}

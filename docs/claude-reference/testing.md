@@ -20,7 +20,7 @@ Hằng ngày:
 | `npm run build` | **Chỉ khi user yêu cầu** |
 
 Bộ kiểm chạy riêng khi cần: `kiem-tra:su-pham` (máy trạng thái sư phạm, chuẩn
-hoá + dựng công thức KaTeX, telemetry), `kiem-tra:chuong-trinh` (dữ liệu 25 bài),
+hoá + dựng công thức KaTeX, telemetry, gom tin chat theo phiên), `kiem-tra:chuong-trinh` (dữ liệu 25 bài),
 `kiem-tra:ngan-hang`, `kiem-tra:de-chuong`, `kiem-tra:het-luot`, `kiem-tra:mau`
 (biến màu + tương phản), `kiem-tra:thuc-nghiem`, `kiem-tra:ran-thang`,
 `kiem-tra:dong-bo` (cần mạng, mất mạng thì tự bỏ qua), `kiem-tra:luyen-tap`,
