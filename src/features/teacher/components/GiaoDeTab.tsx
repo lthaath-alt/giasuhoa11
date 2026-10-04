@@ -141,6 +141,8 @@ export const GiaoDeTab: React.FC<{ students: User[] }> = ({ students }) => {
   const [deDangXem, setDeDangXem] = useState<string | null>(null);
   const [hoiXoa, setHoiXoa] = useState<DeGiao | null>(null);
   const [daChep, setDaChep] = useState<string | null>(null);
+  /** Lần chép gần nhất bị trình duyệt từ chối — hộp thoại hiện lời dặn chép tay */
+  const [chepHong, setChepHong] = useState(false);
 
   const chuong = curriculum.find(c => c.id === maChuong);
   const emails = useMemo(() => students.map(s => s.email.toLowerCase()), [students]);
@@ -271,11 +273,26 @@ export const GiaoDeTab: React.FC<{ students: User[] }> = ({ students }) => {
     }
   };
 
-  const chep = (chu: string, dau: string) => {
-    void navigator.clipboard.writeText(chu);
-    setDaChep(dau);
-    setTimeout(() => setDaChep(null), 2000);
+  /* CHỈ báo "Đã chép" khi trình duyệt chép được thật (04/10/2026). Bản trước gọi
+     `writeText` rồi đặt cờ luôn, không chờ kết quả: trình duyệt từ chối quyền
+     ghi bộ nhớ tạm (đo được `NotAllowedError`), hay trang không chạy trên https
+     nên `navigator.clipboard` không tồn tại, thì cô vẫn thấy "Đã chép!" rồi dán
+     vào nhóm lớp một thứ khác hẳn.
+     Không chép được thì mở hộp có sẵn đoạn thông báo để cô bôi đen chép tay —
+     `de` là đề của hàng vừa bấm; bấm từ chính hộp đó thì hộp đang mở sẵn. */
+  const chep = async (chu: string, dau: string, de?: DeGiao) => {
+    try {
+      await navigator.clipboard.writeText(chu);
+      setChepHong(false);
+      setDaChep(dau);
+      setTimeout(() => setDaChep(null), 2000);
+    } catch {
+      setDaChep(null);
+      setChepHong(true);
+      if (de) setDeVuaGiao(de);
+    }
   };
+  const dongHopThongBao = () => { setDeVuaGiao(null); setChepHong(false); };
 
   const doiDong = async (de: DeGiao) => {
     try {
@@ -554,7 +571,7 @@ export const GiaoDeTab: React.FC<{ students: User[] }> = ({ students }) => {
                       báo lỗi gì. */}
                   <TableCell align="right" onClick={e => e.stopPropagation()} sx={{ whiteSpace: 'nowrap' }}>
                     <Tooltip disableInteractive title={daChep === de.id ? 'Đã chép!' : 'Chép link thông báo'}>
-                      <IconButton size="small" onClick={() => chep(loiThongBao(de), de.id)}>
+                      <IconButton size="small" onClick={() => void chep(loiThongBao(de), de.id, de)}>
                         {daChep === de.id ? <Copy size={15} color="var(--luc-tham)" /> : <Link2 size={15} />}
                       </IconButton>
                     </Tooltip>
@@ -661,12 +678,21 @@ export const GiaoDeTab: React.FC<{ students: User[] }> = ({ students }) => {
       )}
 
       {/* ── HỘP THOẠI: LINK THÔNG BÁO ────────────────────────────────────── */}
-      <Dialog open={Boolean(deVuaGiao)} onClose={() => setDeVuaGiao(null)} maxWidth="sm" fullWidth>
-        <DialogTitle id="giao-de-xong" sx={{ fontWeight: 'bold' }}>Đã giao đề cho lớp {deVuaGiao?.tenLop}</DialogTitle>
+      <Dialog open={Boolean(deVuaGiao)} onClose={dongHopThongBao} maxWidth="sm" fullWidth>
+        <DialogTitle id="giao-de-xong" sx={{ fontWeight: 'bold' }}>
+          {/* Hộp này cũng mở lại cho một đề CŨ khi chép tự động không được. */}
+          {chepHong ? `Thông báo của đề cho lớp ${deVuaGiao?.tenLop ?? ''}` : `Đã giao đề cho lớp ${deVuaGiao?.tenLop ?? ''}`}
+        </DialogTitle>
         <DialogContent>
-          <Alert severity="success" sx={{ mb: 2, borderRadius: 0 }}>
-            Gửi đoạn dưới đây vào nhóm lớp. Học sinh đăng nhập rồi mở link là vào làm bài.
-          </Alert>
+          {chepHong ? (
+            <Alert id="giao-de-chep-hong" severity="warning" sx={{ mb: 2, borderRadius: 0 }}>
+              Trình duyệt không cho chép tự động. Thầy cô bôi đen đoạn dưới đây rồi bấm Ctrl+C để chép.
+            </Alert>
+          ) : (
+            <Alert severity="success" sx={{ mb: 2, borderRadius: 0 }}>
+              Gửi đoạn dưới đây vào nhóm lớp. Học sinh đăng nhập rồi mở link là vào làm bài.
+            </Alert>
+          )}
           {deVuaGiao && (
             <TextField
               value={loiThongBao(deVuaGiao)}
@@ -678,11 +704,11 @@ export const GiaoDeTab: React.FC<{ students: User[] }> = ({ students }) => {
         <DialogActions sx={{ px: 3, pb: 2.5, gap: 1 }}>
           <Button
             variant="outlined" startIcon={<Copy size={16} />}
-            onClick={() => deVuaGiao && chep(loiThongBao(deVuaGiao), 'moi')}
+            onClick={() => deVuaGiao && void chep(loiThongBao(deVuaGiao), 'moi')}
           >
             {daChep === 'moi' ? '✓ Đã chép' : 'Chép thông báo'}
           </Button>
-          <Button variant="contained" onClick={() => setDeVuaGiao(null)}>Đóng</Button>
+          <Button variant="contained" onClick={dongHopThongBao}>Đóng</Button>
         </DialogActions>
       </Dialog>
 

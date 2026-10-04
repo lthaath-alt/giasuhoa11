@@ -213,15 +213,24 @@ const moiTruongChuoi = (): MoiTruongChuoi => ({
 
 /**
  * Gọi gia sư cho một lượt: chạy máy trạng thái sư phạm trước, rồi mới gọi mô hình.
+ *
+ * @param chiDanBoSung Lời dặn theo TÌNH TRẠNG của em do nơi gọi dựng sẵn — hiện
+ *   chỉ có lời dặn khoá bài (`chiDanKhoaChoGiaSu` ở features/lessons/khoaBai.ts).
+ *   Nối SAU chỉ dẫn của máy trạng thái, cùng một khối cuối câu lệnh. Bỏ trống
+ *   thì câu lệnh hệ thống giữ nguyên từng ký tự như trước — điều
+ *   `kiem-tra:thuc-nghiem` đang canh. Tệp này cố ý KHÔNG tự tính lời dặn: nó
+ *   không biết tiến độ của em, và hai nhánh thực nghiệm phải nhận cùng một lời.
  */
 export const generateAIResponseChiTiet = async (
   lessonId: string,
   userQuestion: string,
   history: ChatMessage[],
-  userEmail: string = 'guest'
+  userEmail: string = 'guest',
+  chiDanBoSung?: string,
 ): Promise<KetQuaGiaSu> => {
   const nhanh = nhanhCuaHocSinh(userEmail);
   const truoc = xuLyTruocLuot(history, userQuestion, nhanh);
+  const chiDanThem = [truoc.chiDanThem, chiDanBoSung].filter(Boolean).join('\n\n') || undefined;
   const mucGoiY = Math.min(truoc.soLanBeTac, 3) as 0 | 1 | 2 | 3;
   const coBan = { nhanh, mucGoiY, beTac: truoc.soLanBeTac > 0, gianLan: truoc.laGianLan };
 
@@ -240,7 +249,7 @@ export const generateAIResponseChiTiet = async (
       model: moHinh,
       contents: noiDung,
       systemInstruction: dungHuongDanHeThong({
-        nhanh, lessonId, chiDanThem: truoc.chiDanThem, chiThiChan,
+        nhanh, lessonId, chiDanThem, chiThiChan,
       }),
       temperature: THAM_SO_SINH.temperature,
       topP: THAM_SO_SINH.topP,

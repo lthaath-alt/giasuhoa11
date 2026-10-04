@@ -11,7 +11,7 @@ import { dirname, join } from 'path';
 
 import { CHEMISTRY_11_CURRICULUM } from '../src/features/lessons/constants';
 import { buildLessonContext, buildProgramContext } from '../src/features/tutor/services/lessonContext';
-import { xetKhoaBai, baiLamDuocNgay, laBaiOnTap, DIEM_MO_BAI_SAU } from '../src/features/lessons/khoaBai';
+import { xetKhoaBai, baiLamDuocNgay, chiDanKhoaChoGiaSu, laBaiOnTap, DIEM_MO_BAI_SAU } from '../src/features/lessons/khoaBai';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 
@@ -257,6 +257,29 @@ console.log('\n== Khoá bài tuần tự ==');
   ok(baiLamDuocNgay(ds, 'bai-2', datLanDau, 'student') === undefined
     && baiLamDuocNgay(ds, 'bai-5', trong, 'teacher') === undefined,
     'bài không khoá (hoặc không phải học sinh) thì không có gì phải làm trước');
+
+  /* Lời dặn KHOÁ BÀI gửi kèm cho gia sư (04/10/2026). Đề tính điểm thì web đã
+     chặn; lời dặn này để Chemai không tự ra bộ câu luyện trong khung chat cho
+     bài em chưa mở. Không có gì để dặn (khách, thầy cô, em đã mở hết) thì phải
+     trả `undefined`, để câu lệnh hệ thống giữ nguyên từng ký tự như trước. */
+  ok(chiDanKhoaChoGiaSu(ds, trong, null) === undefined
+    && chiDanKhoaChoGiaSu(ds, trong, 'teacher') === undefined
+    && chiDanKhoaChoGiaSu(ds, trong, 'admin') === undefined,
+    'khách và thầy cô: không có lời dặn khoá bài');
+  const datHet = tienDo(Object.fromEntries(ds.map(b => [b.id, { bestScore: 10 }])));
+  ok(chiDanKhoaChoGiaSu(ds, datHet, 'student') === undefined, 'học sinh đã mở hết mọi bài: không có lời dặn');
+  {
+    const dan = chiDanKhoaChoGiaSu(ds, datLanDau, 'student') || '';
+    ok(dan.includes('bai-3') && dan.includes('bai-4') && dan.includes('bai-25'),
+      'mới đạt bài 1: lời dặn kê các bài đang khoá (bai-3, bai-4 … bai-25)');
+    ok(!/\bbai-1\b/.test(dan.split('ĐANG KHOÁ')[1]?.split('\n')[0] ?? '') && !/\bbai-2\b/.test(dan.split('ĐANG KHOÁ')[1]?.split('\n')[0] ?? ''),
+      'bài 1 và bài 2 (đang mở) KHÔNG nằm trong danh sách khoá');
+    ok(dan.includes(ds[1].title), 'lời dặn gọi đúng tên bài em làm được ngay (bài 2)');
+    ok(dan.includes('[SIGNAL:YEU_CAU_DE') && dan.includes('[SIGNAL:XONG_BAI'),
+      'lời dặn cấm phát nhãn ra đề cho bài đang khoá');
+    ok(/vẫn hướng dẫn/.test(dan), 'lời dặn KHÔNG cấm giải thích lý thuyết hay bài tập em tự mang tới');
+    ok(dan.startsWith('TRẠNG THÁI'), 'lời dặn mở đầu bằng "TRẠNG THÁI" — mục mà câu lệnh gốc dặn ưu tiên');
+  }
 
   /* Chiều ngược lại, đo trên DỮ LIỆU: bài nào đứng ra chặn bài khác thì ngân
      hàng phải đủ câu để ra đề (`createQuiz` cần ít nhất 5 câu cho một đề đủ),

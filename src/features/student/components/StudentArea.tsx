@@ -27,6 +27,8 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { useApp } from '../../../core/hooks/useApp';
+/* Link `driveLink` do người dùng gõ vào — chỉ mở khi là https tới Google. */
+import { linkGoogleHopLe } from '../../../core/services/linkGoogle';
 import { TutorChat } from '../../tutor/components/TutorChat';
 /* Ô chọn lớp. Import chéo sang feature `auth` — cùng lối với dòng
    `TutorChat` ngay trên. Xem chú thích ở khối "chưa tham gia lớp" bên dưới để
@@ -59,20 +61,6 @@ function TabPanel(props: TabPanelProps) {
       )}
     </div>
   );
-}
-
-/** Đường dẫn tài liệu thầy cô chia sẻ, đã kiểm: chỉ nhận `https` tới Google Drive
- *  hoặc Google Docs — đúng hai nơi màn nhập của giáo viên yêu cầu. Trường
- *  `driveLink` do người dùng gõ vào, nên không đem mở thẳng. */
-function linkTaiLieu(raw?: string): string | null {
-  try {
-    const u = new URL((raw || '').trim());
-    const duoc = u.protocol === 'https:'
-      && (u.hostname === 'drive.google.com' || u.hostname === 'docs.google.com');
-    return duoc ? u.href : null;
-  } catch {
-    return null;
-  }
 }
 
 export const StudentArea: React.FC = () => {
@@ -222,7 +210,7 @@ export const StudentArea: React.FC = () => {
                 </Typography>
                 <Grid container spacing={3}>
                   {assignedExams.map((exam) => {
-                    const link = linkTaiLieu(exam.driveLink);
+                    const link = linkGoogleHopLe(exam.driveLink);
                     return (
                       <Grid size={{ xs: 12, md: 6 }} key={exam.id}>
                         <Card sx={{ borderRadius: 0, border: '1px solid var(--vien)', boxShadow: 'none', height: '100%' }}>

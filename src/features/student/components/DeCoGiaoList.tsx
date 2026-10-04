@@ -7,7 +7,7 @@ import { CalendarClock, ClipboardList, Clock } from 'lucide-react';
 import { docBaiNop } from '../../quiz/baiNopService';
 import { docDeCuaLop } from '../../quiz/deGiaoService';
 import { QuizStorage } from '../../quiz/quizStorage';
-import { maBaiLam, trangThaiDe } from '../../quiz/taoDeGiao';
+import { dongSom, maBaiLam, trangThaiDe } from '../../quiz/taoDeGiao';
 import type { DeGiao } from '../../quiz/types';
 
 /*
@@ -123,7 +123,12 @@ export const DeCoGiaoList: React.FC<{
                   disabled={!vaoDuoc}
                   onClick={() => navigate(`/de/${de.id}`)}
                 >
-                  {nop ? 'Xem lại bài' : tt === 'chua-mo' ? 'Chưa mở' : tt === 'da-dong' ? 'Đã hết hạn' : 'Vào làm bài'}
+                  {/* Cô đóng SỚM thì không ghi "Đã hết hạn": ngay dòng trên là một
+                      hạn nộp còn ở tương lai. */}
+                  {nop ? 'Xem lại bài'
+                    : tt === 'chua-mo' ? 'Chưa mở'
+                    : tt === 'da-dong' ? (dongSom(de) ? 'Giáo viên đã đóng' : 'Đã hết hạn')
+                    : 'Vào làm bài'}
                 </Button>
               </CardContent>
             </Card>

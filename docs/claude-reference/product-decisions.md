@@ -29,7 +29,7 @@ vì nó gửi tiến độ về bằng `postMessage` tới cửa sổ cha.
 
 
 **Khoá bài tuần tự theo đề kiểm tra; bỏ "Nâng cao" và "Mật khẩu cấp"**
-(04/10/2026, chủ dự án chốt sau khi bàn lại). Bốn quyết định đi cùng nhau:
+(04/10/2026, chủ dự án chốt sau khi bàn lại). Năm quyết định đi cùng nhau:
 
 1. Học sinh phải đạt từ 7/10 đề kiểm tra của bài trước thì bài sau mới mở. Xem
    slide không tính. Luyện tập, bài giảng slide, thí nghiệm, trò chơi không bị
@@ -40,6 +40,10 @@ vì nó gửi tiến độ về bằng `postMessage` tới cửa sổ cha.
 4. Bỏ việc chia "Mật khẩu Cấp 1 / Cấp 2". Trang "Quản lý Mật khẩu" chỉ còn hướng
    dẫn đặt lại qua thư và danh sách tài khoản không có email; danh sách "yêu cầu
    cấp lại mật khẩu" trước đó là dữ liệu giả, đã gỡ.
+
+5. Chemai cũng theo khoá: không tự ra bộ câu luyện hay đề cho bài em chưa mở.
+   Hỏi lý thuyết, hoặc mang bài tập của chính mình tới hỏi, thì vẫn được hướng
+   dẫn dù bài đó đang khoá — lớp có thể học trước tiến độ của em trên web.
 
 Chi tiết kỹ thuật và số đo: mục "Đề kiểm tra chấm Đúng/Sai…" trong
 [data.md](data.md). Đừng gỡ khoá hay dựng lại "Nâng cao" mà không hỏi chủ dự án.

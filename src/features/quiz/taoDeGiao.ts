@@ -38,6 +38,17 @@ export function trangThaiDe(de: DeGiao, luc: number = Date.now()): TrangThaiDe {
 }
 
 /**
+ * Đề đang đóng vì GIÁO VIÊN ĐÓNG SỚM, chứ chưa hề tới hạn nộp.
+ *
+ * Tách riêng để lời báo cho học sinh nói đúng lý do. Trước 04/10/2026 cả hai
+ * trường hợp đều ra "Đề đã đóng. Hạn nộp là 11/10…" — em đọc thấy một hạn còn
+ * ở tương lai mà đề thì không vào được, không hiểu vì sao.
+ */
+export function dongSom(de: DeGiao, luc: number = Date.now()): boolean {
+  return Boolean(de.dong) && luc <= new Date(de.dongLuc).getTime();
+}
+
+/**
  * Mã bài làm của MỘT em cho MỘT đề — phải suy ra được, không được sinh ngẫu nhiên.
  *
  * Mã này cũng là id tài liệu `bai_nop/{id}`, nên nó quyết định hai việc:

@@ -5,6 +5,7 @@ import {
 } from '@mui/material';
 import { BookOpen, FileText, Plus, ExternalLink, Trash2 } from 'lucide-react';
 import { useApp } from '../hooks/useApp';
+import { linkGoogleHopLe } from '../services/linkGoogle';
 
 export const LibraryManagement: React.FC = () => {
   const { exams, addExam, deleteExam, currentUser } = useApp();
@@ -25,18 +26,17 @@ export const LibraryManagement: React.FC = () => {
     setIsDialogOpen(true);
   };
 
-  const validateDriveLink = (link: string) => {
-    const valid = link.includes('drive.google.com/') || link.includes('docs.google.com/');
-    return valid;
-  };
 
   const handleSubmit = () => {
     if (!form.title.trim() || !form.topic.trim()) {
       setError('Vui lòng nhập đủ Tiêu đề và Chủ đề.');
       return;
     }
-    if (form.driveLink && !validateDriveLink(form.driveLink)) {
-      setError('Vui lòng nhập đường dẫn Google Drive hợp lệ (chứa drive.google.com hoặc docs.google.com).');
+    /* Link để trống thì được; đã gõ thì phải là https tới Google Drive/Docs —
+       xem core/services/linkGoogle.ts vì sao không còn kiểm bằng `includes`. */
+    const link = form.driveLink.trim() ? linkGoogleHopLe(form.driveLink) : '';
+    if (link === null) {
+      setError('Đường dẫn phải bắt đầu bằng https://drive.google.com/ hoặc https://docs.google.com/.');
       return;
     }
 
@@ -44,7 +44,7 @@ export const LibraryManagement: React.FC = () => {
       title: form.title.trim(),
       description: form.description.trim(),
       topic: form.topic.trim(),
-      driveLink: form.driveLink.trim(),
+      driveLink: link,
       type: currentUser?.role === 'admin' ? 'Kho chung' : 'Do GV tự tải',
       createdBy: currentUser?.email,
       questionCount: 0 // Mock value since we are using drive links
@@ -106,7 +106,7 @@ export const LibraryManagement: React.FC = () => {
                   {exam.description || 'Chưa có mô tả.'}
                 </Typography>
                 
-                {exam.driveLink ? (
+                {linkGoogleHopLe(exam.driveLink) ? (
                   <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'var(--luc-tham)', mb: 3 }}>
                     <ExternalLink size={16} /> Tệp đính kèm (Google Drive)
                   </Typography>
@@ -120,9 +120,12 @@ export const LibraryManagement: React.FC = () => {
                   <Button
                     variant="outlined"
                     size="small"
-                    href={exam.driveLink || '#'}
+                    /* Link trong Firestore có thể được nhập từ thời kiểm lỏng: chỉ mở
+                       khi nó thật sự là https tới Google, không thì tắt nút. */
+                    href={linkGoogleHopLe(exam.driveLink) ?? undefined}
                     target="_blank"
-                    disabled={!exam.driveLink}
+                    rel="noopener noreferrer"
+                    disabled={!linkGoogleHopLe(exam.driveLink)}
                     sx={{ textTransform: 'none', borderRadius: 0 }}
                   >
                     Xem chi tiết

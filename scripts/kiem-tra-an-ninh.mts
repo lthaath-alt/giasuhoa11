@@ -22,6 +22,7 @@
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { join, basename, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { linkGoogleHopLe } from '../src/core/services/linkGoogle';
 
 /* fileURLToPath, không phải .pathname: .pathname còn nguyên mã hoá URL, nên
  * đường dẫn có dấu cách hoặc chữ tiếng Việt (NCKH%202026, gia-s%C6%B0…) thành
@@ -553,6 +554,54 @@ console.log('\n== Script sao lưu Firestore chỉ được ĐỌC ==');
   if (!/^\s*sao-luu\/\s*$/m.test(gi)) {
     truot('.gitignore chặn thư mục sao-luu/', 'bản sao chứa email và hội thoại của học sinh — không được lên git');
   } else dat('.gitignore chặn thư mục sao-luu/');
+}
+
+console.log('\n== Link tài liệu do người dùng gõ phải là https tới Google ==');
+{
+  /* `driveLink` của "Kho bài tập chung" và phần ma trận do giáo viên gõ vào, rồi
+     thành `href` trên máy người khác. Trước 04/10/2026 chỉ cần chuỗi CHỨA
+     "drive.google.com/" là qua, nên `javascript:…drive.google.com/…` hay một
+     trang lạ mang đoạn đó trong đường dẫn đều lọt. Nay MỘT hàm quyết:
+     `src/core/services/linkGoogle.ts`. */
+  const nhan = [
+    'https://drive.google.com/file/d/abc/view',
+    'https://docs.google.com/document/d/x/edit',
+    '  https://drive.google.com/drive/folders/1  ',
+  ];
+  const tuChoi = [
+    "javascript:alert('drive.google.com/')",
+    'http://drive.google.com/file/d/abc',
+    'https://evil.example/drive.google.com/abc',
+    'https://drive.google.com.evil.example/abc',
+    'https://evil.example/?u=https://docs.google.com/',
+    'drive.google.com/abc',
+    'data:text/html,drive.google.com/',
+    '',
+  ];
+  const lot = tuChoi.filter(l => linkGoogleHopLe(l) !== null);
+  const chanNham = nhan.filter(l => linkGoogleHopLe(l) === null);
+  if (lot.length) truot('linkGoogleHopLe từ chối link không phải https tới Google', 'lọt: ' + lot.join(' | '));
+  else dat(`linkGoogleHopLe từ chối cả ${tuChoi.length} link giả dạng`);
+  if (chanNham.length) truot('linkGoogleHopLe nhận link Google Drive/Docs thật', 'chặn nhầm: ' + chanNham.join(' | '));
+  else dat('linkGoogleHopLe nhận link Google Drive/Docs thật');
+
+  /* Không tệp nào khác được tự kiểm bằng `includes('drive.google.com…')`, và mọi
+     `href` lấy từ `driveLink` phải đi qua hàm trên. */
+  const tuKiem: string[] = [];
+  const hrefTho: string[] = [];
+  for (const f of tepNguon) {
+    if (basename(f) === 'linkGoogle.ts') continue;
+    doc(f).split(/\r?\n/).forEach((d, i) => {
+      const t = d.trimStart();
+      if (t.startsWith('*') || t.startsWith('//') || t.startsWith('/*')) return;
+      if (/includes\(\s*['"](drive|docs)\.google\.com/.test(d)) tuKiem.push(`${ten(f)}:${i + 1}`);
+      if (/href=\{[^}]*driveLink/.test(d) && !d.includes('linkGoogleHopLe(')) hrefTho.push(`${ten(f)}:${i + 1}`);
+    });
+  }
+  if (tuKiem.length) truot('không chỗ nào tự kiểm link bằng includes()', tuKiem.join(', '));
+  else dat('không chỗ nào tự kiểm link bằng includes()');
+  if (hrefTho.length) truot('mọi href lấy từ driveLink đều qua linkGoogleHopLe', hrefTho.join(', '));
+  else dat('mọi href lấy từ driveLink đều qua linkGoogleHopLe');
 }
 
 console.log(soLoi === 0 ? '\n>>> TẤT CẢ ĐẠT\n' : `\n>>> CÓ ${soLoi} MỤC KHÔNG ĐẠT\n`);

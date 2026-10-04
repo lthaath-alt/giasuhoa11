@@ -101,3 +101,40 @@ export function baiLamDuocNgay(
   }
   return xet.baiTruoc;
 }
+
+/**
+ * Lời dặn KHOÁ BÀI gửi kèm cho gia sư ở mỗi lượt, hoặc `undefined` nếu không có
+ * gì để dặn (khách, thầy cô, hay học sinh đã mở hết mọi bài).
+ *
+ * Vì sao cần (đo 04/10/2026 với tài khoản thử): em mới đạt Bài 1 xin "đề luyện
+ * tập Bài 5". Web từ chối đúng cái đề tính điểm, nhưng Chemai thì vẫn soạn luôn
+ * hai câu luyện Bài 5 ngay trong khung chat — khoá thành ra chỉ khoá một nửa.
+ *
+ * CHỈ cấm việc gia sư tự RA bài luyện / phát nhãn ra đề cho bài đang khoá. Em
+ * mang bài tập của chính em tới hỏi, hay hỏi để hiểu lý thuyết, thì vẫn được
+ * hướng dẫn: lớp có thể đang học Bài 5 trong khi em chưa kịp làm đề Bài 2 trên
+ * web, và chặn luôn cả việc hỏi bài là bỏ rơi em đúng lúc cần.
+ *
+ * Trả `undefined` khi không có gì để dặn là điều BẮT BUỘC: lời dặn được nối vào
+ * `chiDanThem` của câu lệnh hệ thống, mà `kiem-tra:thuc-nghiem` so câu lệnh đó
+ * từng ký tự với bản đóng băng. Lời dặn giống hệt nhau cho cả hai nhánh thực
+ * nghiệm, nên không làm lệch biến đề tài đang đo.
+ */
+export function chiDanKhoaChoGiaSu(
+  dsBai: Lesson[],
+  layTienDo: (maBai: string) => { bestScore?: number } | null | undefined,
+  vai: UserRole | null | undefined,
+): string | undefined {
+  if (vai !== 'student') return undefined;
+  const dangKhoa = dsBai.filter(b => xetKhoaBai(dsBai, b.id, layTienDo, vai).khoa);
+  if (dangKhoa.length === 0) return undefined;
+  /* Chuỗi khoá chỉ có MỘT bài "làm được ngay" cho mọi bài đang khoá: bài học
+     đầu tiên (không kể ôn tập) em chưa đạt đề. */
+  const tenBaiNgay = baiLamDuocNgay(dsBai, dangKhoa[0].id, layTienDo, vai)?.title ?? 'bài trước';
+  return [
+    'TRẠNG THÁI KHOÁ BÀI (do web quyết định theo điểm đề kiểm tra của em, không thương lượng được):',
+    `- Các bài ĐANG KHOÁ với em này: ${dangKhoa.map(b => b.id).join(', ')}.`,
+    `- Em XIN ĐỀ hoặc xin bộ câu hỏi luyện tập của một bài đang khoá: KHÔNG ra câu hỏi luyện nào cho bài đó, và KHÔNG phát nhãn [SIGNAL:YEU_CAU_DE:…] hay [SIGNAL:XONG_BAI:…] mang mã bài đó. Nói ngắn gọn rằng bài đó chưa mở, em cần đạt từ ${DIEM_MO_BAI_SAU}/10 đề kiểm tra của "${tenBaiNgay}" trước; rồi mời em xin đề của "${tenBaiNgay}" để làm.`,
+    '- Em mang bài tập của chính em tới hỏi, hoặc hỏi để hiểu lý thuyết, thì vẫn hướng dẫn như thường dù thuộc bài nào.',
+  ].join('\n');
+}

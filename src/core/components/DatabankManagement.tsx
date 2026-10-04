@@ -7,6 +7,7 @@ import {
 } from '@mui/material';
 import { Database, Plus, Search, Trash2, Edit, ExternalLink, Link2, FileText, FlaskConical } from 'lucide-react';
 import { useApp } from '../hooks/useApp';
+import { linkGoogleHopLe } from '../services/linkGoogle';
 import { BankManager } from '../../features/bank/components/BankManager';
 import { BankFirestore } from '../../features/bank/bankStore';
 import { Question, Equation, MatrixResource } from '../../features/library/types';
@@ -154,13 +155,15 @@ export const DatabankManagement: React.FC = () => {
   const [matrixError, setMatrixError] = useState('');
 
   const handleMatrixSubmit = () => {
-    const valid = matrixForm.driveLink.includes('drive.google.com/') || matrixForm.driveLink.includes('docs.google.com/');
-    if (!valid) {
-      setMatrixError('Vui lòng nhập link Google Drive hợp lệ.');
+    /* https tới Google Drive/Docs mới nhận — xem core/services/linkGoogle.ts. */
+    const link = linkGoogleHopLe(matrixForm.driveLink);
+    if (!link) {
+      setMatrixError('Link phải bắt đầu bằng https://drive.google.com/ hoặc https://docs.google.com/.');
       return;
     }
     addMatrixResource({
       ...matrixForm,
+      driveLink: link,
       createdBy: currentUser?.email
     });
     setIsMatrixDialogOpen(false);
@@ -294,7 +297,7 @@ export const DatabankManagement: React.FC = () => {
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>{res.description}</Typography>
                   <Typography variant="body2" sx={{ mb: 2 }}>Số câu: <strong>{res.questionCount}</strong> câu</Typography>
                   <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                    <Button variant="outlined" size="small" startIcon={<ExternalLink size={16} />} href={res.driveLink} target="_blank" sx={{ textTransform: 'none' }}>
+                    <Button variant="outlined" size="small" startIcon={<ExternalLink size={16} />} href={linkGoogleHopLe(res.driveLink) ?? undefined} target="_blank" rel="noopener noreferrer" disabled={!linkGoogleHopLe(res.driveLink)} sx={{ textTransform: 'none' }}>
                       Xem thử & Tải về
                     </Button>
                     {canEditOrDelete(res.createdBy) && (

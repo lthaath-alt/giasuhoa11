@@ -238,6 +238,24 @@ Bổ sung sau đợt rà soát 02/10/2026; kế hoạch và số đo ở
   trường `advancedUnlocked` / `advancedCompleted` / `skippedAdvanced` CÒN trong
   kiểu `LessonProgress` và trong hồ sơ cũ, nhưng không nơi nào đọc hay ghi nữa.
   Chưa đạt 70% thì trang kết quả có nút "Làm lại đề khác" (`createRetryQuiz`).
+- **Gia sư cũng nhận lời dặn khoá bài** (04/10/2026). `chiDanKhoaChoGiaSu` trong
+  `khoaBai.ts` dựng một khối "TRẠNG THÁI KHOÁ BÀI" kê các bài đang khoá;
+  `addMessage` truyền nó qua tham số thứ năm `chiDanBoSung` của
+  `generateAIResponseChiTiet`, nối SAU chỉ dẫn của máy trạng thái. Lý do đo
+  được: web đã chặn đề tính điểm của bài khoá, nhưng Chemai vẫn tự soạn câu luyện
+  bài đó ngay trong khung chat. Lời dặn CHỈ cấm gia sư tự ra bài luyện / phát
+  nhãn ra đề cho bài khoá; em mang bài tập của mình tới hỏi hay hỏi lý thuyết thì
+  vẫn được hướng dẫn. Hai điều phải giữ: không có gì để dặn thì hàm trả
+  `undefined` (câu lệnh hệ thống không đổi một ký tự — `kiem-tra:thuc-nghiem`
+  canh), và lời dặn giống nhau cho cả hai nhánh thực nghiệm.
+- **Đề đóng sớm khác đề hết hạn**: `dongSom(de)` trong `taoDeGiao.ts`. Trang đề
+  và danh sách đề của học sinh dùng nó để nói "Giáo viên đã đóng đề này trước
+  hạn" thay vì "Đề đã đóng. Hạn nộp là…" kèm một hạn còn ở tương lai.
+- **Link tài liệu người dùng gõ** (`driveLink` ở "Kho bài tập chung" và ma trận)
+  chỉ qua một cửa: `linkGoogleHopLe` trong `src/core/services/linkGoogle.ts` —
+  https tới `drive.google.com` / `docs.google.com`. Dùng ở cả chỗ NHẬP lẫn chỗ
+  HIỆN (`href`), vì dữ liệu cũ nhập dưới phép kiểm lỏng `includes(...)`.
+  `kiem-tra:an-ninh` canh cả hai đầu.
 - Khách không được phát link đề; dòng link đề do mô hình tự chép lại bị bỏ
   (`src/features/quiz/linkDe.ts`).
 

@@ -14,7 +14,7 @@ import { QuizService } from '../../features/quiz/quizService';
 import { BankFirestore } from '../../features/bank/bankStore';
 import { toLegacy, toChapter } from '../../features/bank/convert';
 import { boDongLinkDe } from '../../features/quiz/linkDe';
-import { xetKhoaBai, baiLamDuocNgay, DIEM_MO_BAI_SAU } from '../../features/lessons/khoaBai';
+import { xetKhoaBai, baiLamDuocNgay, chiDanKhoaChoGiaSu, DIEM_MO_BAI_SAU } from '../../features/lessons/khoaBai';
 import { dayBaiCuLen, docBaiNop, ghiDiemChamLai } from '../../features/quiz/baiNopService';
 import { loginWithFirestore, createAccountWithFirestore, resetPasswordWithFirestore } from '../services/firestoreAuth';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
@@ -1313,7 +1313,13 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
        14/09/2026) phần lớn là khoảng chờ này chứ không phải thời gian gọi mô
        hình — tức là số liệu của đề tài bị chính mình làm nhiễu. Thời gian gọi
        thật nằm ở trường `latency_ms`, xem telemetryService.ts. */
-    const ketQua = await generateAIResponseChiTiet(lessonId, content, currentHistory, userEmail);
+    /* Lời dặn khoá bài (04/10/2026): bài nào em chưa mở thì gia sư không tự ra
+       bộ câu luyện cho bài đó trong khung chat. Khách, thầy cô và em đã mở hết
+       thì hàm trả `undefined` — câu lệnh hệ thống không đổi một ký tự. */
+    const chiDanKhoa = chiDanKhoaChoGiaSu(
+      curriculum.flatMap(c => c.lessons), getLessonProgress, currentUser?.role,
+    );
+    const ketQua = await generateAIResponseChiTiet(lessonId, content, currentHistory, userEmail, chiDanKhoa);
 
     /* Bước 2: gỡ nhãn ẩn (bước, loại lượt, ngộ nhận, ngoài môn). Hai nhãn ngoài
        môn KHÔNG còn tính lượt phạt — chỉ spam do mã phát hiện mới bị khoá.

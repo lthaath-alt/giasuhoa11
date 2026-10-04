@@ -11,7 +11,7 @@ import { useApp } from '../core/hooks/useApp';
 import { docBaiNop } from '../features/quiz/baiNopService';
 import { docDeGiao } from '../features/quiz/deGiaoService';
 import { QuizStorage } from '../features/quiz/quizStorage';
-import { maBaiLam, taoBaiLam, trangThaiDe } from '../features/quiz/taoDeGiao';
+import { dongSom, maBaiLam, taoBaiLam, trangThaiDe } from '../features/quiz/taoDeGiao';
 import { xaoPhuongAnWeb } from '../features/bank/xaoDapAn';
 import type { DeGiao, Quiz } from '../features/quiz/types';
 
@@ -205,7 +205,11 @@ export const DeGiaoPage: React.FC = () => {
             </Alert>
           ) : trangThai === 'da-dong' ? (
             <Alert severity="error" sx={{ borderRadius: 0 }}>
-              Đề đã đóng. Hạn nộp là <strong>{gioDep(de.dongLuc)}</strong> — liên hệ giáo viên nếu em có lý do chính đáng.
+              {/* Cô đóng SỚM thì nói đúng vậy: ghi "Hạn nộp là …" với một hạn
+                  còn ở tương lai làm em không hiểu vì sao đề không vào được. */}
+              {dongSom(de)
+                ? <>Giáo viên đã đóng đề này trước hạn (hạn nộp ban đầu là <strong>{gioDep(de.dongLuc)}</strong>) — liên hệ giáo viên nếu em có lý do chính đáng.</>
+                : <>Đề đã đóng. Hạn nộp là <strong>{gioDep(de.dongLuc)}</strong> — liên hệ giáo viên nếu em có lý do chính đáng.</>}
             </Alert>
           ) : (
             <>

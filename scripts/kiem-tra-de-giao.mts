@@ -24,7 +24,7 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
 import {
-  TIEN_TO_DE_GIAO, hetGioLuc, maBaiLam, taoBaiLam, thongKeDeGiao, tomTatDeGiao, tongDiem, trangThaiDe,
+  TIEN_TO_DE_GIAO, hetGioLuc, maBaiLam, taoBaiLam, thongKeDeGiao, tomTatDeGiao, tongDiem, trangThaiDe, dongSom,
 } from '../src/features/quiz/taoDeGiao';
 import { chuoiDapAnDungSai, coPhuongAnNeo, xaoPhuongAnWeb } from '../src/features/bank/xaoDapAn';
 import {
@@ -101,6 +101,11 @@ console.log('\n== Đề mở lúc nào, đóng lúc nào ==');
   /* Cô bấm "Đóng đề sớm" thì phải đóng NGAY, kể cả khi hạn ghi trên đề còn xa
      — nếu không, cô kết thúc tiết kiểm tra rồi mà em vẫn vào làm tiếp được. */
   ok(trangThaiDe(deMau({ dong: true }), MO + 1000) === 'da-dong', 'cô đóng sớm thì đóng ngay, bất kể hạn');
+  /* Lời báo cho học sinh phải phân biệt "cô đóng sớm" với "hết hạn": trước
+     04/10/2026 cả hai đều ra "Đề đã đóng. Hạn nộp là …" kèm một hạn còn ở tương lai. */
+  ok(dongSom(deMau({ dong: true }), MO + 1000) === true, 'cô đóng khi chưa tới hạn → là đóng SỚM');
+  ok(dongSom(deMau({ dong: true }), DONG + 1) === false, 'cô đóng nhưng hạn cũng đã qua → không còn là đóng sớm');
+  ok(dongSom(deMau(), MO + 1000) === false && dongSom(deMau(), DONG + 1) === false, 'đề không bị đóng tay thì không bao giờ là đóng sớm');
 }
 
 // ─── Mã bài làm ──────────────────────────────────────────────────────────────
