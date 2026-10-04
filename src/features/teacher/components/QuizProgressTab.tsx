@@ -152,7 +152,10 @@ export const QuizProgressTab: React.FC<QuizProgressTabProps> = ({ students, isAd
       const chapter = CHEMISTRY_11_CURRICULUM.find(c => c.id === q.chapterId);
       const lesson = chapter?.lessons.find(l => l.id === q.lessonId);
 
-      const chapterName = chapter ? chapter.title.replace(/,/g, '-') : q.chapterId;
+      /* Đề giáo viên giao không thuộc chương nào; `chapterId` của nó là mã nội
+         bộ `de-giao:de_…`, không phải thứ để in ra bảng điểm. */
+      const chapterName = chapter ? chapter.title.replace(/,/g, '-')
+        : q.deGiaoId ? 'Đề giáo viên giao' : q.chapterId;
       /* Đề giáo viên giao không thuộc bài nào trong chương trình — lấy tên đề
          đã chép sẵn trong bài nộp, nếu không cột này chỉ ra `de-giao:de_1758…`. */
       const lessonName = q.tenDe ? q.tenDe.replace(/,/g, '-') : lesson ? lesson.title.replace(/,/g, '-') : q.lessonId;
@@ -577,6 +580,17 @@ export const QuizProgressTab: React.FC<QuizProgressTabProps> = ({ students, isAd
                                     <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
                                       <ChemicalText html={q.content} />
                                     </Typography>
+
+                                    {/* Câu Đúng/Sai nhiều ý: `content` chỉ là đề dẫn, các ý
+                                        nằm riêng. Thiếu khối này cô chỉ thấy "a) Đúng · b) Sai"
+                                        mà không biết a, b là ý nào. */}
+                                    {q.type === 'Đúng/Sai' && q.yDungSai && q.yDungSai.length > 1 && (
+                                      <Box component="ol" type="a" sx={{ m: 0, mb: 1, pl: 2.5, fontSize: '0.85rem', color: 'var(--chu-dam-2)' }}>
+                                        {q.yDungSai.map((y, i) => (
+                                          <li key={i}><ChemicalText html={y.s} /></li>
+                                        ))}
+                                      </Box>
+                                    )}
 
                                     <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
                                       Học sinh làm: <strong>{res?.studentAnswer || '(Trống)'}</strong>

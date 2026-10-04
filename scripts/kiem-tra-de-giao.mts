@@ -24,9 +24,13 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
 import {
-  TIEN_TO_DE_GIAO, hetGioLuc, maBaiLam, taoBaiLam, thongKeDeGiao, tomTatDeGiao, tongDiem, trangThaiDe,
+  TIEN_TO_DE_GIAO, hetGioLuc, maBaiLam, taoBaiLam, thongKeDeGiao, tomTatDeGiao, tongDiem, trangThaiDe, dongSom,
 } from '../src/features/quiz/taoDeGiao';
-import { coPhuongAnNeo, xaoPhuongAnWeb } from '../src/features/bank/xaoDapAn';
+import { chuoiDapAnDungSai, coPhuongAnNeo, xaoPhuongAnWeb } from '../src/features/bank/xaoDapAn';
+import {
+  chamDapSo, chamDungSaiNhieuY, dapSoCua, giaiMaDungSai, maHoaDungSai,
+} from '../src/features/quiz/chamDiem';
+import { boDongLinkDe } from '../src/features/quiz/linkDe';
 import { fromLegacy, toLegacy } from '../src/features/bank/convert';
 import { chuanHoaCau } from '../src/features/bank/types';
 import type { BankQuestion } from '../src/features/bank/types';
@@ -97,6 +101,11 @@ console.log('\n== Đề mở lúc nào, đóng lúc nào ==');
   /* Cô bấm "Đóng đề sớm" thì phải đóng NGAY, kể cả khi hạn ghi trên đề còn xa
      — nếu không, cô kết thúc tiết kiểm tra rồi mà em vẫn vào làm tiếp được. */
   ok(trangThaiDe(deMau({ dong: true }), MO + 1000) === 'da-dong', 'cô đóng sớm thì đóng ngay, bất kể hạn');
+  /* Lời báo cho học sinh phải phân biệt "cô đóng sớm" với "hết hạn": trước
+     04/10/2026 cả hai đều ra "Đề đã đóng. Hạn nộp là …" kèm một hạn còn ở tương lai. */
+  ok(dongSom(deMau({ dong: true }), MO + 1000) === true, 'cô đóng khi chưa tới hạn → là đóng SỚM');
+  ok(dongSom(deMau({ dong: true }), DONG + 1) === false, 'cô đóng nhưng hạn cũng đã qua → không còn là đóng sớm');
+  ok(dongSom(deMau(), MO + 1000) === false && dongSom(deMau(), DONG + 1) === false, 'đề không bị đóng tay thì không bao giờ là đóng sớm');
 }
 
 // ─── Mã bài làm ──────────────────────────────────────────────────────────────
@@ -501,6 +510,115 @@ console.log('\n== Không xáo câu có phương án neo ==');
   ok(coPhuongAnNeo(['x', 'y', 'z', 'cả A, B, C.']), 'nhận ra "cả A, B, C."');
   ok(!coPhuongAnNeo(['Giảm áp suất', 'Tăng nồng độ', 'Giảm nhiệt độ', '0,1M']),
     'KHÔNG bắt nhầm phương án bình thường');
+}
+
+// ─── Chấm Đề kiểm tra: câu Đúng/Sai nhiều ý và câu trả lời ngắn ──────────────
+//
+// Đo 02/10/2026 trên web thật: trả lời ĐÚNG cả 8 câu của một đề Chemai phát mà
+// chỉ được 5,5/8. Hai gốc, đều ở chỗ đổi mô hình `toLegacy`:
+//   - câu trả lời ngắn thành "Tự luận" một ý, rồi bộ chấm dò từ khoá cộng cứng
+//     0,25 cho mỗi ý — đáp số đúng cũng chỉ được 0,25/1, gõ "3.57" thay "3,57"
+//     thì 0;
+//   - câu Đúng/Sai 4 ý gộp thành MỘT mệnh đề, mất luôn đề dẫn, và đáp án gần
+//     như luôn là "Sai" (đề làm lại hôm đó: 5/5 câu).
+// Các phép dưới đây canh cho hai chỗ đó không quay lại.
+
+console.log('\n== Chấm Đề kiểm tra: Đúng/Sai nhiều ý ==');
+{
+  const tf: BankQuestion = {
+    id: 'tf1', ch: 1, lv: 'th', t: 'tf', q: 'Cho phương trình: NH₃ + H₂O ⇌ NH₄⁺ + OH⁻.',
+    st: [
+      { s: 'H₂O là acid.', v: true }, { s: 'NH₄⁺ là base.', v: false },
+      { s: 'NH₃ là base.', v: true }, { s: 'OH⁻ là acid.', v: false },
+    ],
+  };
+  const web = toLegacy(tf);
+  ok(web.type === 'Đúng/Sai' && web.content === tf.q, 'toLegacy giữ ĐỀ DẪN của câu Đúng/Sai nhiều ý',
+    JSON.stringify(web.content).slice(0, 50));
+  ok((web.yDungSai || []).length === 4 && web.yDungSai!.every((y, i) => y.s === tf.st![i].s && y.v === tf.st![i].v),
+    'toLegacy mang đủ 4 ý kèm đúng/sai');
+  ok(web.correctAnswer === 'a) Đúng · b) Sai · c) Đúng · d) Sai', 'đáp án ghi theo từng ý', String(web.correctAnswer));
+  ok(JSON.stringify(fromLegacy(web).st) === JSON.stringify(tf.st) && fromLegacy(web).q === tf.q,
+    'fromLegacy trả các ý và đề dẫn về nguyên chỗ');
+  /* Chỉ soi phần MỚI thêm: các trường cũ (vd `createdBy`) vốn có thể undefined
+     và đã được `chuanBiBaiNop` lọc bằng một vòng JSON trước khi ghi Firestore.
+     Vòng JSON đó phải giữ nguyên các ý. */
+  ok(web.yDungSai!.every(y => typeof y.s === 'string' && typeof y.v === 'boolean')
+    && JSON.stringify(JSON.parse(JSON.stringify(web)).yDungSai) === JSON.stringify(web.yDungSai),
+    'các ý không mang giá trị undefined và sống sót qua vòng JSON của bài nộp');
+
+  const mh = maHoaDungSai([true, false, null, true]);
+  ok(mh === 'DS-D', 'mã hoá câu trả lời từng ý', mh);
+  ok(JSON.stringify(giaiMaDungSai('DS-D', 4)) === JSON.stringify([true, false, null, true]), 'giải mã ngược lại đúng');
+  ok(JSON.stringify(giaiMaDungSai('', 4)) === JSON.stringify([null, null, null, null]), 'chuỗi rỗng là bốn ý bỏ trống');
+
+  const c4 = chamDungSaiNhieuY(web, 'DSDS');
+  ok(c4.diem === 1 && c4.dung, 'đúng 4/4 ý được trọn điểm', `${c4.diem}`);
+  const c3 = chamDungSaiNhieuY(web, 'DSDD');
+  ok(c3.diem === 0.5 && !c3.dung, 'đúng 3/4 ý được 0,5 (thang của Bộ, như Luyện tập)', `${c3.diem}`);
+  const c2 = chamDungSaiNhieuY(web, 'DDDD');
+  ok(c2.diem === 0.25, 'đúng 2/4 ý được 0,25', `${c2.diem}`);
+  const c0 = chamDungSaiNhieuY(web, '');
+  ok(c0.diem === 0 && !c0.dung, 'bỏ trống cả câu được 0', `${c0.diem}`);
+  ok(/c\) \(bỏ trống\)/.test(chamDungSaiNhieuY(web, 'DS-S').traLoiHienThi), 'ý bỏ trống hiện rõ là bỏ trống');
+  const d2 = chamDungSaiNhieuY({ ...web, points: 2 }, 'DSDS');
+  ok(d2.diem === 2, 'câu 2 điểm thì đúng hết được 2', `${d2.diem}`);
+
+  /* Xáo ý: chuỗi đáp án phải đi theo thứ tự mới, nếu không màn giáo viên hiện
+     đáp án của thứ tự cũ. */
+  const lech = Array.from({ length: 40 }, () => xaoPhuongAnWeb(web))
+    .filter(x => x.correctAnswer !== chuoiDapAnDungSai(x.yDungSai!));
+  ok(lech.length === 0, 'xáo ý xong chuỗi đáp án đi theo', lech.length ? `lệch ${lech.length}/40` : '40/40 lượt khớp');
+  const doiCho = Array.from({ length: 40 }, () => xaoPhuongAnWeb(web))
+    .filter(x => x.yDungSai!.map(y => y.s).join('|') !== web.yDungSai!.map(y => y.s).join('|'));
+  ok(doiCho.length > 0, 'các ý Đúng/Sai được xáo', `đổi ${doiCho.length}/40 lượt`);
+
+  /* Câu Đúng/Sai MỘT mệnh đề của kho cũ phải giữ nguyên lối cũ. */
+  const mot = toLegacy({ id: 'tf2', ch: 1, lv: 'nb', t: 'tf', q: 'Kc phụ thuộc nhiệt độ.', st: [{ s: 'Kc phụ thuộc nhiệt độ.', v: true }] });
+  ok(!mot.yDungSai && mot.correctAnswer === 'Đúng', 'câu một mệnh đề vẫn là Đúng/Sai đơn như cũ');
+}
+
+console.log('\n== Chấm Đề kiểm tra: câu trả lời ngắn ==');
+{
+  const tn: BankQuestion = { id: 'tn1', ch: 1, lv: 'vd', t: 'tn', q: 'Tính Kc.', ansText: '3,57', num: 3.57 };
+  const web = toLegacy(tn);
+  ok(web.type === 'Tự luận' && dapSoCua(web)?.text === '3,57', 'toLegacy mang đáp số sang đề', JSON.stringify(web.dapSo));
+  ok(Object.values(web.dapSo || {}).every(v => v !== undefined), 'đáp số không mang giá trị undefined');
+
+  const dung = ['3,57', '3.57', ' 3,57 ', 'Kc = 3,57'];
+  const saiCham = dung.filter(t => !(chamDapSo(web, t).dung && chamDapSo(web, t).diem === 1));
+  ok(saiCham.length === 0, 'đáp số đúng được TRỌN điểm dù gõ phẩy, chấm hay kèm chữ',
+    saiCham.length ? 'chấm sai: ' + JSON.stringify(saiCham) : dung.join(' | '));
+  ok(chamDapSo(web, '3,6').diem === 0 && !chamDapSo(web, '3,6').dung, 'đáp số sai được 0');
+  ok(chamDapSo(web, '').diem === 0, 'bỏ trống được 0');
+
+  const coSaiSo = toLegacy({ ...tn, id: 'tn2', ansText: '100', num: 100, tol: 0.5, unit: 'atm' });
+  ok(chamDapSo(coSaiSo, '100,4').dung && !chamDapSo(coSaiSo, '101').dung, 'có sai số cho phép thì nhận trong sai số');
+  ok(chamDapSo(coSaiSo, '100 atm').dung, 'gõ kèm đơn vị vẫn nhận');
+
+  /* Bài đã tạo TRƯỚC khi vá (kể cả bài đang làm dở trong máy học sinh) không
+     có `dapSo`, chỉ có một ý nhãn "Đáp án". Phải chấm được theo số. */
+  const cu: Question = {
+    id: 'cu1', type: 'Tự luận', difficulty: 'Cao', points: 1, content: 'Tính Kc.', images: [],
+    essayPoints: [{ label: 'Đáp án', content: '0,074' }], createdAt: '2026-09-18T00:00:00.000Z',
+  };
+  ok(dapSoCua(cu)?.text === '0,074', 'câu cũ một ý nhãn "Đáp án" được nhận là câu trả lời ngắn');
+  ok(chamDapSo(cu, 'Kc = 0,074').diem === 1 && chamDapSo(cu, '2').diem === 0, 'câu cũ chấm theo số: đúng trọn điểm, sai 0');
+
+  const tuLuan: Question = { ...cu, id: 'tl1', essayPoints: [{ label: 'Ý 1', content: 'acid cho proton' }, { label: 'Ý 2', content: 'base nhận proton' }] };
+  ok(dapSoCua(tuLuan) === null, 'câu tự luận nhiều ý KHÔNG bị coi là câu trả lời ngắn');
+  const tuLuan1 = { ...cu, id: 'tl2', essayPoints: [{ label: 'Đáp án tham khảo', content: 'acid cho proton' }] };
+  ok(dapSoCua(tuLuan1) === null, 'câu tự luận một ý nhãn "Đáp án tham khảo" vẫn là tự luận');
+}
+
+console.log('\n== Link đề do Chemai tự chép lại ==');
+{
+  const tra = 'Chào em!\n\nEm thử nghĩ xem?\n\n👉 **Đề luyện tập về Bài 1** (8 câu): [Làm bài kiểm tra ngay](http://localhost:3000/#/quiz/quiz_1789723767818_81)';
+  const sach = boDongLinkDe(tra);
+  ok(!sach.includes('#/quiz/') && sach.includes('Em thử nghĩ xem?'), 'bỏ đúng dòng mang link đề, giữ phần còn lại',
+    JSON.stringify(sach).slice(0, 60));
+  ok(!boDongLinkDe('Xem https://x.pages.dev/#/de/de_1_2 nhé').includes('#/de/'), 'bỏ cả dòng mang link đề giáo viên giao');
+  ok(boDongLinkDe('Kc = [NH₃]² / ([N₂][H₂]³)') === 'Kc = [NH₃]² / ([N₂][H₂]³)', 'không đụng câu bình thường');
 }
 
 console.log('\n' + (hong === 0 ? '>>> TẤT CẢ ĐẠT' : `>>> CÓ ${hong} MỤC HỎNG`) + '\n');

@@ -8,6 +8,7 @@
 
 import { Question, QuestionType, DifficultyLevel } from '../library/types';
 import { BankQuestion, Chapter, Level, QType } from './types';
+import { chuoiDapAnDungSai } from './xaoDapAn';
 
 // ─── Bảng ánh xạ ─────────────────────────────────────────────────────────────
 
@@ -99,7 +100,9 @@ export function fromLegacy(
     // Đúng/Sai bên web là MỘT mệnh đề; bên game là NHIỀU ý chấm từng phần.
     // Chuyển thành một ý duy nhất — đúng về nghĩa, nhưng form thêm câu của
     // game đòi tối thiểu 2 ý nên câu loại này cần bổ sung ý khi sửa trong game.
-    out.st = [{ s: q.content, v: q.correctAnswer !== 'Sai' }];
+    out.st = q.yDungSai && q.yDungSai.length > 1
+      ? q.yDungSai.map(y => ({ s: y.s, v: !!y.v }))   // câu nhiều ý đi vòng về nguyên vẹn
+      : [{ s: q.content, v: q.correctAnswer !== 'Sai' }];
   } else {
     out.ans = (q.essayPoints || []).map(p => `${p.label}: ${p.content}`).join('\n');
     if (q.essayPoints && q.essayPoints.length) out.essayPoints = q.essayPoints;
@@ -152,14 +155,30 @@ export function toLegacy(b: BankQuestion): Question {
     out.options = (b.o || []).slice(0, 4).map((text, i) => ({ key: KEYS[i], text }));
     out.correctAnswer = KEYS[typeof b.a === 'number' ? b.a : 0];
   } else if (t === 'tf') {
-    // Nhiều ý gộp lại thành một mệnh đề; đúng khi mọi ý đều đúng.
     const st = b.st || [];
-    out.content = st.length > 1 ? st.map(s => `• ${s.s}`).join('\n') : (st[0]?.s ?? b.q);
-    out.correctAnswer = st.every(s => s.v) ? 'Đúng' : 'Sai';
+    if (st.length > 1) {
+      /* Nhiều ý: GIỮ đề dẫn và từng ý (02/10/2026). Bản trước gộp cả 4 ý thành
+         một mệnh đề "đúng khi mọi ý đều đúng" — đề dẫn mất, học sinh chỉ thấy
+         bốn gạch đầu dòng với MỘT cặp nút Đúng/Sai, và đáp án gần như luôn là
+         "Sai". Đề kiểm tra nay chấm từng ý như Luyện tập. */
+      out.yDungSai = st.map(y => ({ s: y.s, v: !!y.v }));
+      out.correctAnswer = chuoiDapAnDungSai(out.yDungSai);
+    } else {
+      // Một ý duy nhất thì chính nó là mệnh đề Đúng/Sai kiểu cũ.
+      out.content = st[0]?.s ?? b.q;
+      out.correctAnswer = st.every(s => s.v) ? 'Đúng' : 'Sai';
+    }
   } else if (t === 'tn') {
-    out.essayPoints = [
-      { label: 'Đáp án', content: b.ansText ?? String(b.num ?? '') + (b.unit ? ' ' + b.unit : '') },
-    ];
+    const dapAn = b.ansText ?? String(b.num ?? '') + (b.unit ? ' ' + b.unit : '');
+    out.essayPoints = [{ label: 'Đáp án', content: dapAn }];
+    /* Mang đáp số sang để Đề kiểm tra chấm bằng SO SỐ. Thiếu khối này thì câu
+       rơi vào bộ chấm tự luận dò từ khoá: đáp số đúng chỉ được 0,25/1, và gõ
+       "3.57" thay "3,57" thì 0. Chỉ gán trường CÓ giá trị — Firestore từ chối
+       cả bài nộp nếu gặp một `undefined`. */
+    out.dapSo = { text: dapAn };
+    if (typeof b.num === 'number') out.dapSo.num = b.num;
+    if (typeof b.tol === 'number') out.dapSo.tol = b.tol;
+    if (b.unit) out.dapSo.unit = b.unit;
   } else {
     out.essayPoints =
       b.essayPoints && b.essayPoints.length

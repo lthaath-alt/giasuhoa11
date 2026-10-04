@@ -3,6 +3,7 @@ import { chonCauChoDeChuong } from './deChuong';
 import { xaoPhuongAnWeb } from '../bank/xaoDapAn';
 import { QuizStorage } from './quizStorage';
 import { luuBaiNop } from './baiNopService';
+import { chamDapSo, chamDungSaiNhieuY, dapSoCua } from './chamDiem';
 import { Question, QuestionType, DifficultyLevel } from '../library/types';
 import {
   layCauHoiCuaBai,
@@ -352,7 +353,7 @@ export const QuizService = {
     let totalScore = 0;
 
     for (const question of quiz.questions) {
-      const studentAns = (answers[question.id] || '').trim();
+      let studentAns = (answers[question.id] || '').trim();
       let isCorrect = false;
       let pointsAwarded = 0;
       let feedback = '';
@@ -363,6 +364,21 @@ export const QuizService = {
         isCorrect = studentAns.toUpperCase() === (question.correctAnswer || '').toUpperCase();
         pointsAwarded = isCorrect ? question.points : 0;
         feedback = isCorrect ? 'Đáp án hoàn toàn chính xác!' : `Sai rồi. Đáp án đúng là: ${question.correctAnswer}`;
+      } else if (question.type === 'Đúng/Sai' && question.yDungSai && question.yDungSai.length > 1) {
+        /* Câu nhiều ý: chấm từng ý theo thang của Bộ — xem chamDiem.ts. Đáp án
+           lưu dạng mã ("DS-D"); đổi ra chữ để màn kết quả và màn giáo viên đọc được. */
+        const kq = chamDungSaiNhieuY(question, studentAns);
+        isCorrect = kq.dung;
+        pointsAwarded = kq.diem;
+        feedback = kq.nhanXet;
+        studentAns = kq.traLoiHienThi;
+      } else if (question.type === 'Tự luận' && dapSoCua(question)) {
+        /* Câu trả lời ngắn: so SỐ, đúng thì trọn điểm. Độ tin cậy 'high' để câu
+           này không rơi vào danh sách "cần chấm lại" của giáo viên. */
+        const kq = chamDapSo(question, studentAns);
+        isCorrect = kq.dung;
+        pointsAwarded = kq.diem;
+        feedback = kq.nhanXet;
       } else if (question.type === 'Đúng/Sai') {
         const standardAns = studentAns.toLowerCase() === 'đúng' ? 'Đúng' : studentAns.toLowerCase() === 'sai' ? 'Sai' : '';
         isCorrect = standardAns === question.correctAnswer;

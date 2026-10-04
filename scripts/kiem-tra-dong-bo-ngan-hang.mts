@@ -44,6 +44,20 @@ try {
   process.exit(0);
 }
 
+/* Firestore trả về 0 câu trong khi git đang có câu: đó là KHÔNG ĐỌC ĐƯỢC, không
+   phải lệch thật. Mạng rớt giữa chừng thì SDK trả ngay một danh sách rỗng —
+   không ném lỗi, không chờ hết hạn — nên nhánh `catch` ở trên không bắt được.
+   Đo 04/10/2026: mạng rớt vài chục giây (trình duyệt báo ERR_INTERNET_DISCONNECTED
+   cùng lúc), bộ này ra "lệch — trên Firestore 0 câu" và chặn cả `npm run
+   kiem-tra`; chạy lại ngay sau đó thì khớp 1780 câu. Cùng lý lẽ với
+   `xuat-ngan-hang.mts`, vốn từ chối ghi đè khi nhận 0 câu: ngân hàng rỗng gần
+   như luôn là lỗi mạng, chứ không phải ai vừa xoá sạch mấy trăm câu. */
+if (tren.length === 0 && tep.length > 0) {
+  console.log('  BỎ QUA  Firestore trả về 0 câu — coi như không đọc được (mất mạng?), không phải lệch thật.');
+  console.log(`          tệp trong git đang có ${tep.length} câu. Có mạng lại thì chạy lại lệnh này.`);
+  process.exit(0);
+}
+
 const vtTep = vanTay(tep);
 const vtTren = vanTay(tren);
 

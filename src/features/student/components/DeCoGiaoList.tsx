@@ -7,7 +7,7 @@ import { CalendarClock, ClipboardList, Clock } from 'lucide-react';
 import { docBaiNop } from '../../quiz/baiNopService';
 import { docDeCuaLop } from '../../quiz/deGiaoService';
 import { QuizStorage } from '../../quiz/quizStorage';
-import { maBaiLam, trangThaiDe } from '../../quiz/taoDeGiao';
+import { dongSom, maBaiLam, trangThaiDe } from '../../quiz/taoDeGiao';
 import type { DeGiao } from '../../quiz/types';
 
 /*
@@ -28,7 +28,12 @@ const gioDep = (iso: string) => {
   return `${hai(d.getDate())}/${hai(d.getMonth() + 1)}/${d.getFullYear()} ${hai(d.getHours())}:${hai(d.getMinutes())}`;
 };
 
-export const DeCoGiaoList: React.FC<{ classId: string; email: string }> = ({ classId, email }) => {
+export const DeCoGiaoList: React.FC<{
+  classId: string;
+  email: string;
+  /** Báo số đề của lớp cho màn cha, để nó không ghi "chưa có bài tập" bên dưới */
+  onSoDe?: (soDe: number) => void;
+}> = ({ classId, email, onSoDe }) => {
   const navigate = useNavigate();
   const [ds, setDs] = useState<DeGiao[]>([]);
   const [daNop, setDaNop] = useState<Set<string>>(new Set());
@@ -43,6 +48,7 @@ export const DeCoGiaoList: React.FC<{ classId: string; email: string }> = ({ cla
       .then(async de => {
         if (huy) return;
         setDs(de);
+        onSoDe?.(de.length);
         /* Hỏi máy này trước rồi mới hỏi Firestore: em làm ở máy khác thì
            localStorage trống, còn em làm ở chính máy này thì khỏi tốn lượt đọc. */
         const xong = new Set<string>();
@@ -117,7 +123,12 @@ export const DeCoGiaoList: React.FC<{ classId: string; email: string }> = ({ cla
                   disabled={!vaoDuoc}
                   onClick={() => navigate(`/de/${de.id}`)}
                 >
-                  {nop ? 'Xem lại bài' : tt === 'chua-mo' ? 'Chưa mở' : tt === 'da-dong' ? 'Đã hết hạn' : 'Vào làm bài'}
+                  {/* Cô đóng SỚM thì không ghi "Đã hết hạn": ngay dòng trên là một
+                      hạn nộp còn ở tương lai. */}
+                  {nop ? 'Xem lại bài'
+                    : tt === 'chua-mo' ? 'Chưa mở'
+                    : tt === 'da-dong' ? (dongSom(de) ? 'Giáo viên đã đóng' : 'Đã hết hạn')
+                    : 'Vào làm bài'}
                 </Button>
               </CardContent>
             </Card>

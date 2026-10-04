@@ -13,6 +13,8 @@ import { GoogleUserInfo } from '../services/googleAuth';
 import { QuizService } from '../../features/quiz/quizService';
 import { BankFirestore } from '../../features/bank/bankStore';
 import { toLegacy, toChapter } from '../../features/bank/convert';
+import { boDongLinkDe } from '../../features/quiz/linkDe';
+import { xetKhoaBai, baiLamDuocNgay, chiDanKhoaChoGiaSu, daNoiBaiChuaMo, DIEM_MO_BAI_SAU } from '../../features/lessons/khoaBai';
 import { dayBaiCuLen, docBaiNop, ghiDiemChamLai } from '../../features/quiz/baiNopService';
 import { loginWithFirestore, createAccountWithFirestore, resetPasswordWithFirestore } from '../services/firestoreAuth';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
@@ -229,7 +231,6 @@ export interface AppContextType {
                       tienDoPhan: unknown) => Promise<void>;
   getLessonProgress: (lessonId: string) => import('../../features/auth/types').LessonProgress | null;
   isLessonCompleted: (lessonId: string) => boolean;
-  hasAdvancedStudentTitle: (email: string) => boolean;
   resetGuestChats: () => void;
 
   // ── Chương trình học ──────────────────────────────────────────────────────────
@@ -1295,11 +1296,15 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     // Lấy lịch sử chat hiện tại cho bài học này từ state
     /* Bỏ các tin em đã "Ẩn khỏi màn hình" (anTinCu.ts, 03/10/2026). Nút cũ xóa
        hẳn tin nên gia sư bắt đầu lại từ đầu; giữ đúng hành vi đó, chỉ khác là
-       tin vẫn còn trên Firestore cho đề tài. */
+       tin vẫn còn trên Firestore cho đề tài.
+       Rồi gỡ các dòng link đề cũ khỏi lịch sử gửi cho mô hình (02/10/2026). Mô
+       hình thấy dòng "👉 … [Làm bài kiểm tra ngay](…)" trong lịch sử là chép lại
+       y nguyên vào câu trả lời mới, trỏ về một bài đã nộp từ đời nào — xem
+       features/quiz/linkDe.ts. */
     const currentHistory = locTheoMoc(
       chats.filter(c => c.userEmail === userEmail && c.lessonId === lessonId),
       docMocAn(khoaAnTin(currentUser?.id, lessonId)),
-    ).hien;
+    ).hien.map(c => (c.sender === 'ai' ? { ...c, content: boDongLinkDe(c.content) } : c));
 
     /* Gỡ khoảng chờ giả 5–10 giây (16/09/2026).
        Bản trước cố ý chờ thêm `Math.random() * 5000 + 5000` ms cho "giống người
@@ -1308,7 +1313,13 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
        14/09/2026) phần lớn là khoảng chờ này chứ không phải thời gian gọi mô
        hình — tức là số liệu của đề tài bị chính mình làm nhiễu. Thời gian gọi
        thật nằm ở trường `latency_ms`, xem telemetryService.ts. */
-    const ketQua = await generateAIResponseChiTiet(lessonId, content, currentHistory, userEmail);
+    /* Lời dặn khoá bài (04/10/2026): bài nào em chưa mở thì gia sư không tự ra
+       bộ câu luyện cho bài đó trong khung chat. Khách, thầy cô và em đã mở hết
+       thì hàm trả `undefined` — câu lệnh hệ thống không đổi một ký tự. */
+    const chiDanKhoa = chiDanKhoaChoGiaSu(
+      curriculum.flatMap(c => c.lessons), getLessonProgress, currentUser?.role,
+    );
+    const ketQua = await generateAIResponseChiTiet(lessonId, content, currentHistory, userEmail, chiDanKhoa);
 
     /* Bước 2: gỡ nhãn ẩn (bước, loại lượt, ngộ nhận, ngoài môn). Hai nhãn ngoài
        môn KHÔNG còn tính lượt phạt — chỉ spam do mã phát hiện mới bị khoá.
@@ -1316,7 +1327,17 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     const nhan = tachNhanAn(ketQua.text);
     const aiResponseText = nhan.noiDung;
 
-    let finalAiResponse = aiResponseText;
+    /* Link đề chỉ được do WEB nối vào bên dưới, sau khi đã thật sự tạo đề. Dòng
+       link nào mô hình tự viết ra đều là chép từ lịch sử — bỏ. Việc dò nhãn
+       [SIGNAL:…] vẫn làm trên `aiResponseText` nguyên bản. */
+    let finalAiResponse = boDongLinkDe(aiResponseText);
+
+    /* KHÁCH không được phát đề (02/10/2026). `QuizPage` đòi đăng nhập, mà đề lại
+       đứng tên 'guest' nên đăng nhập xong cũng bị từ chối: link phát ra là ngõ
+       cụt. Nói thẳng lý do thay vì đưa một link không dùng được. */
+    const MOI_DANG_KY_LAM_DE = '\n\n_(Đề kiểm tra cần tài khoản học sinh để lưu bài làm và điểm. '
+      + 'Em đăng ký miễn phí rồi xin lại đề nhé.)_';
+    let daMoiDangKy = false;
 
     /* Link bài kiểm tra CHỈ mở khi gia sư đã rà xong cả chương và phát nhãn
        [SIGNAL:XONG_CHUONG].
@@ -1342,7 +1363,10 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
          (mã đúng là 'chuong-1'). Giữ nó thì `toChapter('c1')` vẫn ra số 1,
          nên mọi lessonId lạc (ví dụ 'global-advisor' của khung tư vấn chung)
          đều lặng lẽ nhận đề của Chương 1. */
-      if (!chapter) {
+      if (laKhach) {
+        finalAiResponse += MOI_DANG_KY_LAM_DE;
+        daMoiDangKy = true;
+      } else if (!chapter) {
         console.warn(
           `[Quiz] lessonId "${lessonId}" không thuộc chương nào — bỏ qua bài kiểm tra tổng hợp.`,
         );
@@ -1387,9 +1411,33 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
       const chuongCuaBai = curriculum.find(c => c.lessons.some(l => l.id === maBai));
 
-      if (!chuongCuaBai) {
+      if (laKhach) {
+        if (!daMoiDangKy) finalAiResponse += MOI_DANG_KY_LAM_DE;
+      } else if (!chuongCuaBai) {
         // Gia sư bịa mã bài: bỏ qua, KHÔNG giao nhầm đề của bài khác
         console.warn(`[Quiz] Gia sư phát mã bài không có thật: "${maBai}" — bỏ qua.`);
+      } else if (xetKhoaBai(curriculum.flatMap(c => c.lessons), maBai, getLessonProgress, currentUser?.role).khoa) {
+        /* Bài đang KHOÁ (04/10/2026): không tạo đề. `QuizPage` sẽ chặn đề đó
+           bằng màn "Bài học đang bị khóa", nên phát link ra là dắt em vào ngõ
+           cụt — đúng lỗi đã đo ngày 02/10/2026 với bản khoá cũ. Nói thẳng em
+           cần làm gì trước. Luật khoá: `features/lessons/khoaBai.ts`. */
+        const dsBai = curriculum.flatMap(c => c.lessons);
+        const tenBai = dsBai.find(l => l.id === maBai)?.title ?? maBai;
+        const baiChan = xetKhoaBai(dsBai, maBai, getLessonProgress, currentUser?.role).baiTruoc;
+        /* Bài chặn có thể cũng đang khoá (xin Bài 5 khi mới đạt Bài 1: bài chặn
+           là Bài 4, mà Bài 4 lại chờ Bài 2). Khi đó chỉ thẳng tới bài em làm
+           được NGAY, kẻo em xin Bài 4 rồi lại bị từ chối lần nữa. */
+        const baiNgay = baiLamDuocNgay(dsBai, maBai, getLessonProgress, currentUser?.role);
+        const viecCanLam = baiChan && baiNgay && baiNgay.id !== baiChan.id
+          ? `${baiChan.title}, mà bài đó cũng chưa mở. Bài em làm được ngay là ${baiNgay.title} — em xin đề của bài đó trước nhé`
+          : `${baiChan?.title ?? 'bài trước'} đã. Em xin đề của bài đó để làm trước nhé`;
+        /* Gia sư đã tự nói bài chưa mở (nhờ lời dặn khoá bài) thì KHÔNG nối thêm:
+           đo 04/10/2026, câu trả lời ra hai đoạn liền nhau nói cùng một ý. Dòng
+           dưới chỉ còn đỡ cho lúc mô hình quên giải thích. */
+        if (!daNoiBaiChuaMo(finalAiResponse)) {
+          finalAiResponse += `\n\n_(Đề của ${tenBai} chưa mở: em cần đạt từ ${DIEM_MO_BAI_SAU}/10 điểm ở đề kiểm tra `
+            + `${viecCanLam}.)_`;
+        }
       } else {
         const deBai = await QuizService.createQuiz(
           chuongCuaBai.id, maBai, userEmail, libraryQuestions,
@@ -1648,11 +1696,10 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     return lp ? lp.basicCompleted : false;
   };
 
-  const hasAdvancedStudentTitle = (email: string): boolean => {
-    const progress = progressCache[email];
-    if (!progress || !progress.details) return false;
-    return Object.values(progress.details).some(lp => lp.advancedUnlocked);
-  };
+  /* `hasAdvancedStudentTitle` (danh hiệu "HS Nâng cao") đã gỡ ngày 04/10/2026
+     cùng cả phần Nâng cao. Ba cờ `advancedUnlocked` / `advancedCompleted` /
+     `skippedAdvanced` còn trong kiểu `LessonProgress` chỉ để đọc được hồ sơ
+     cũ; không chỗ nào còn dựa vào chúng. */
 
   /* Bộ đếm khách nay nằm ở Firestore và luật CẤM đếm lùi, nên hàm này chỉ còn
      xoá tin chat của khách trong bộ nhớ. Không chỗ nào gọi nó (kiểm 14/09/2026). */
@@ -2133,7 +2180,6 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     getUserProgress,
         getLessonProgress,
         isLessonCompleted,
-        hasAdvancedStudentTitle,
         resetGuestChats,
         deleteChapter,
         deleteLesson,

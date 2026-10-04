@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Box, Paper, Typography, Button, Divider, CircularProgress, Alert } from '@mui/material';
 import { BookOpen, Sparkles, UserCheck, Play } from 'lucide-react';
 import { useApp } from '../core/hooks/useApp';
@@ -127,8 +127,14 @@ const duongTheoVai = (role?: string) => {
 
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { currentUser, logout } = useApp();
-  const [view, setView] = useState<LoginView>('login');
+  /* Nút "Đăng Ký" ở trang học gửi kèm `moDangKy` để mở THẲNG màn tạo tài khoản.
+     Trước đó nút ấy chỉ đưa tới form đăng nhập, người bấm phải tự tìm dòng
+     "Đăng ký ngay" bên dưới. */
+  const [view, setView] = useState<LoginView>(
+    () => ((location.state as { moDangKy?: boolean } | null)?.moDangKy ? 'register' : 'login'),
+  );
   const [pendingGoogleInfo, setPendingGoogleInfo] = useState<GoogleUserInfo | null>(null);
 
   /* Cờ "người dùng đã bấm vào". Vì sao phải chờ bằng useEffect chứ không điều

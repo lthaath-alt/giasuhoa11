@@ -181,6 +181,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                         edge="end"
                         size="small"
                         tabIndex={-1}
+                        aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
                       >
                         {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                       </IconButton>

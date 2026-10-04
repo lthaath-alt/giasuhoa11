@@ -37,9 +37,15 @@ export const SystemSettingsManagement: React.FC = () => (
         dự án trong Firebase Console, trang này không đổi được.
       </Typography>
 
+      {/* Viết lại 02/10/2026. Câu cũ ("ô nhập API key riêng đã gỡ ngày 16/09/2026")
+          sai từ 20/09/2026, khi khoá riêng CÓ LẠI dưới dạng hộp thoại chỉ mời lúc
+          cả web hết hạn mức ngày — xem docs/claude-reference/security.md. Công
+          tắc bật/tắt ở trang này thì vẫn không có, như chú thích đầu tệp. */}
       <Alert severity="info" sx={{ borderRadius: 0 }}>
-        Ô nhập API key riêng của người dùng đã gỡ ngày 16/09/2026. Điều khoản Gemini API không cho
-        phép ứng dụng dành cho người dưới 18 tuổi, nên học sinh không tự tạo key được.
+        Khi cả web hết hạn mức trong ngày, học sinh được mời dùng "Khoá riêng": một khoá Gemini do
+        bố mẹ hoặc thầy cô tạo giúp, vì Google yêu cầu người tạo khoá từ 18 tuổi. Khoá chỉ lưu
+        trong trình duyệt trên máy của em, không lưu vào cơ sở dữ liệu của web. Trang này không có
+        công tắc bật/tắt tính năng đó.
       </Alert>
     </Paper>
   </Box>

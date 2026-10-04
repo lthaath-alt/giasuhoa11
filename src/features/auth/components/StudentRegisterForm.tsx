@@ -142,7 +142,7 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
           {/* Họ tên */}
           <TextField
             id="student-register-name"
-            label="Họ và tên *"
+            label="Họ và tên"
             variant="outlined"
             fullWidth
             required
@@ -165,7 +165,7 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
           {/* Email */}
           <TextField
             id="student-register-email"
-            label="Email *"
+            label="Email"
             type="email"
             variant="outlined"
             fullWidth
@@ -189,7 +189,7 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
           {/* Mật khẩu */}
           <TextField
             id="student-register-password"
-            label="Mật khẩu *"
+            label="Mật khẩu"
             type={showPassword ? 'text' : 'password'}
             variant="outlined"
             fullWidth
@@ -220,7 +220,7 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
           {/* Xác nhận mật khẩu */}
           <TextField
             id="student-register-confirm-password"
-            label="Xác nhận mật khẩu *"
+            label="Xác nhận mật khẩu"
             type={showConfirmPw ? 'text' : 'password'}
             variant="outlined"
             fullWidth
@@ -281,7 +281,7 @@ export const StudentRegisterForm: React.FC<StudentRegisterFormProps> = ({ onBack
           onClick={onBackToLogin}
           sx={{ textTransform: 'none', color: 'var(--chu-2)', fontWeight: 600 }}
         >
-          Quay lại đăng nhập
+          Quay lại
         </Button>
       </Box>
     </Box>

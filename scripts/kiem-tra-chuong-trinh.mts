@@ -11,6 +11,7 @@ import { dirname, join } from 'path';
 
 import { CHEMISTRY_11_CURRICULUM } from '../src/features/lessons/constants';
 import { buildLessonContext, buildProgramContext } from '../src/features/tutor/services/lessonContext';
+import { xetKhoaBai, baiLamDuocNgay, chiDanKhoaChoGiaSu, daNoiBaiChuaMo, laBaiOnTap, DIEM_MO_BAI_SAU } from '../src/features/lessons/khoaBai';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 
@@ -183,6 +184,130 @@ console.log('\n== Dàn bài cả chương trình (khung iChat tư vấn chung) =
      biên bản thẩm định bắt được. Nay gia sư tự nói bài/chương, không bắt đoán. */
   ok(dan.includes('KHÔNG bắt học sinh đoán chương') && !dan.includes('VẪN hỏi học sinh'),
      'còn nguyên lời dặn bước xác định chương, và không bắt học sinh đoán chương');
+}
+
+/* ── Khoá bài tuần tự (04/10/2026) ───────────────────────────────────────────
+   Luật do chủ dự án chốt: bài N chỉ mở khi bài N−1 ĐẠT TỪ 7/10 ĐỀ KIỂM TRA.
+   Xem slide không tính. Bản khoá trước đó đòi thêm cờ "Nâng cao" không nơi nào
+   đặt được, nên em đạt 70% ngay lần đầu vẫn bị chặn bài sau — phép kiểm dưới
+   canh đúng trường hợp đó. Hàm thuần, không đọc Firebase. */
+console.log('\n== Khoá bài tuần tự ==');
+{
+  const ds = bais as any[];
+  const tienDo = (bang: Record<string, any>) => (ma: string) => bang[ma] ?? null;
+  const trong = tienDo({});
+
+  ok(DIEM_MO_BAI_SAU === 7, 'ngưỡng mở bài sau là 7 điểm thang 10', String(DIEM_MO_BAI_SAU));
+
+  ok(!xetKhoaBai(ds, 'bai-5', trong, null).khoa, 'khách (chưa đăng nhập) không bị khoá bài nào');
+  ok(!xetKhoaBai(ds, 'bai-5', trong, 'teacher').khoa, 'giáo viên không bị khoá');
+  ok(!xetKhoaBai(ds, 'bai-5', trong, 'school_admin').khoa && !xetKhoaBai(ds, 'bai-5', trong, 'admin').khoa,
+    'quản trị trường và quản trị web không bị khoá');
+
+  ok(!xetKhoaBai(ds, 'bai-1', trong, 'student').khoa, 'học sinh: bài 1 luôn mở');
+  ok(xetKhoaBai(ds, 'bai-2', trong, 'student').khoa, 'học sinh chưa có tiến độ: bài 2 khoá');
+
+  const chiXemSlide = tienDo({ 'bai-1': { basicCompleted: true, bestScore: 0 } });
+  ok(xetKhoaBai(ds, 'bai-2', chiXemSlide, 'student').khoa,
+    'bài 1 mới chỉ xem hết slide (chưa đạt đề) thì bài 2 VẪN khoá');
+
+  ok(xetKhoaBai(ds, 'bai-2', tienDo({ 'bai-1': { bestScore: 6.9 } }), 'student').khoa, 'bài 1 được 6,9 thì bài 2 khoá');
+  ok(!xetKhoaBai(ds, 'bai-2', tienDo({ 'bai-1': { bestScore: 7 } }), 'student').khoa, 'bài 1 được đúng 7 thì bài 2 mở');
+
+  /* Chính lỗi của bản khoá cũ: đạt ngay lần đầu, không cờ Nâng cao nào. */
+  const datLanDau = tienDo({ 'bai-1': {
+    basicCompleted: true, bestScore: 9.4,
+    advancedUnlocked: true, advancedCompleted: false, skippedAdvanced: false,
+  } });
+  ok(!xetKhoaBai(ds, 'bai-2', datLanDau, 'student').khoa,
+    'đạt 9,4 ngay lần đầu, không cờ Nâng cao nào: bài 2 PHẢI mở');
+  ok(xetKhoaBai(ds, 'bai-3', datLanDau, 'student').khoa, 'chỉ bài 1 đạt thì bài 3 vẫn khoá (bài chặn của nó là bài 2)');
+
+  ok(xetKhoaBai(ds, 'bai-2', trong, 'student').baiTruoc?.id === 'bai-1'
+    && xetKhoaBai(ds, 'bai-25', trong, 'student').baiTruoc?.id === 'bai-24',
+    'trả về đúng bài chặn để màn khoá gọi tên');
+
+  /* Bài ôn tập KHÔNG chặn bài sau (chủ dự án chốt 04/10/2026): chúng không có
+     câu hỏi riêng nên không ai "đạt đề" của chúng được. */
+  const onTap = ds.filter(laBaiOnTap).map(b => b.id);
+  ok(JSON.stringify(onTap) === JSON.stringify(['bai-3', 'bai-9', 'bai-14', 'bai-18', 'bai-22', 'bai-25']),
+    'nhận đúng 6 bài ôn tập / hệ thống hoá theo tên bài', onTap.join(', '));
+
+  const dat8 = tienDo({ 'bai-8': { bestScore: 8 } });
+  ok(xetKhoaBai(ds, 'bai-10', trong, 'student').baiTruoc?.id === 'bai-8',
+    'bài 10 đứng sau bài ôn tập 9: bài chặn là bài 8');
+  ok(!xetKhoaBai(ds, 'bai-10', dat8, 'student').khoa && !xetKhoaBai(ds, 'bai-9', dat8, 'student').khoa,
+    'bài 8 đạt thì cả bài 9 (ôn tập) lẫn bài 10 đều mở');
+  ok(xetKhoaBai(ds, 'bai-10', tienDo({ 'bai-9': { bestScore: 10 } }), 'student').khoa,
+    'chỉ bài 9 có điểm mà bài 8 chưa đạt thì bài 10 vẫn khoá');
+  ok(xetKhoaBai(ds, 'bai-4', trong, 'student').baiTruoc?.id === 'bai-2'
+    && xetKhoaBai(ds, 'bai-15', trong, 'student').baiTruoc?.id === 'bai-13'
+    && xetKhoaBai(ds, 'bai-19', trong, 'student').baiTruoc?.id === 'bai-17'
+    && xetKhoaBai(ds, 'bai-23', trong, 'student').baiTruoc?.id === 'bai-21',
+    'bài đầu mỗi chương nhảy qua bài ôn tập của chương trước');
+
+  /* Bài LÀM ĐƯỢC NGAY: lời nhắn cho em phải chỉ tới bài em mở được, không phải
+     tới một bài chặn cũng đang khoá. */
+  ok(baiLamDuocNgay(ds, 'bai-5', datLanDau, 'student')?.id === 'bai-2',
+    'mới đạt bài 1 mà xin bài 5: bài làm được ngay là bài 2 (không phải bài 4 đang khoá)');
+  ok(baiLamDuocNgay(ds, 'bai-5', trong, 'student')?.id === 'bai-1', 'chưa đạt bài nào: bài làm được ngay là bài 1');
+  const datToi7 = tienDo(Object.fromEntries([1, 2, 4, 5, 6, 7].map(i => ['bai-' + i, { bestScore: 8 }])));
+  ok(baiLamDuocNgay(ds, 'bai-12', datToi7, 'student')?.id === 'bai-8',
+    'đạt tới bài 7 mà xin bài 12: bài làm được ngay là bài 8 (bài 9 ôn tập không tính)');
+  ok(baiLamDuocNgay(ds, 'bai-2', datLanDau, 'student') === undefined
+    && baiLamDuocNgay(ds, 'bai-5', trong, 'teacher') === undefined,
+    'bài không khoá (hoặc không phải học sinh) thì không có gì phải làm trước');
+
+  /* Lời dặn KHOÁ BÀI gửi kèm cho gia sư (04/10/2026). Đề tính điểm thì web đã
+     chặn; lời dặn này để Chemai không tự ra bộ câu luyện trong khung chat cho
+     bài em chưa mở. Không có gì để dặn (khách, thầy cô, em đã mở hết) thì phải
+     trả `undefined`, để câu lệnh hệ thống giữ nguyên từng ký tự như trước. */
+  ok(chiDanKhoaChoGiaSu(ds, trong, null) === undefined
+    && chiDanKhoaChoGiaSu(ds, trong, 'teacher') === undefined
+    && chiDanKhoaChoGiaSu(ds, trong, 'admin') === undefined,
+    'khách và thầy cô: không có lời dặn khoá bài');
+  const datHet = tienDo(Object.fromEntries(ds.map(b => [b.id, { bestScore: 10 }])));
+  ok(chiDanKhoaChoGiaSu(ds, datHet, 'student') === undefined, 'học sinh đã mở hết mọi bài: không có lời dặn');
+  {
+    const dan = chiDanKhoaChoGiaSu(ds, datLanDau, 'student') || '';
+    ok(dan.includes('bai-3') && dan.includes('bai-4') && dan.includes('bai-25'),
+      'mới đạt bài 1: lời dặn kê các bài đang khoá (bai-3, bai-4 … bai-25)');
+    ok(!/\bbai-1\b/.test(dan.split('ĐANG KHOÁ')[1]?.split('\n')[0] ?? '') && !/\bbai-2\b/.test(dan.split('ĐANG KHOÁ')[1]?.split('\n')[0] ?? ''),
+      'bài 1 và bài 2 (đang mở) KHÔNG nằm trong danh sách khoá');
+    ok(dan.includes(ds[1].title), 'lời dặn gọi đúng tên bài em làm được ngay (bài 2)');
+    ok(dan.includes('[SIGNAL:YEU_CAU_DE') && dan.includes('[SIGNAL:XONG_BAI'),
+      'lời dặn cấm phát nhãn ra đề cho bài đang khoá');
+    ok(/vẫn hướng dẫn/.test(dan), 'lời dặn KHÔNG cấm giải thích lý thuyết hay bài tập em tự mang tới');
+    ok(dan.startsWith('TRẠNG THÁI'), 'lời dặn mở đầu bằng "TRẠNG THÁI" — mục mà câu lệnh gốc dặn ưu tiên');
+  }
+
+  /* Web chỉ nối dòng "(Đề của Bài N chưa mở…)" khi gia sư CHƯA tự nói điều đó.
+     Câu đầu là nguyên văn Chemai trả lời tài khoản thử ngày 04/10/2026. */
+  ok(daNoiBaiChuaMo('Bài Bài 5: Ammonia và muối ammonium hiện tại chưa mở với em. Để mở khóa bài này, em cần đạt từ 7/10 điểm ở đề kiểm tra của Bài 2 trước nhé!'),
+    'gia sư đã nói "chưa mở" → web không nối thêm đoạn lặp');
+  ok(daNoiBaiChuaMo('Bài này đang bị khoá em nhé') && daNoiBaiChuaMo('Em cần mở khoá bài trước đã'),
+    'nhận cả hai cách đặt dấu "khoá" / "khóa"');
+  ok(!daNoiBaiChuaMo('Thầy gửi em đề luyện tập ngắn gồm 2 câu hỏi về Bài 5: Ammonia và muối ammonium nhé: Câu 1 (Lý thuyết)…'),
+    'gia sư quên giải thích (cứ thế ra câu luyện) → web VẪN nối dòng báo bài chưa mở');
+
+  /* Chiều ngược lại, đo trên DỮ LIỆU: bài nào đứng ra chặn bài khác thì ngân
+     hàng phải đủ câu để ra đề (`createQuiz` cần ít nhất 5 câu cho một đề đủ),
+     nếu không chuỗi khoá kẹt ngay tại đó. Đọc bản chụp trong repo — bản này
+     đồng bộ từ Firestore, xem `kiem-tra:dong-bo`. */
+  const nganHang = JSON.parse(readFileSync(join(HERE, '..', 'public', 'bank', 'ngan-hang.json'), 'utf8')) as any[];
+  const soCau: Record<string, number> = {};
+  for (const q of nganHang) if (q.lessonId) soCau[q.lessonId] = (soCau[q.lessonId] || 0) + 1;
+  const baiChan = new Set(ds.map(b => xetKhoaBai(ds, b.id, trong, 'student').baiTruoc?.id).filter(Boolean) as string[]);
+  const chanMaThieuCau = [...baiChan].filter(ma => (soCau[ma] || 0) < 5);
+  ok(chanMaThieuCau.length === 0,
+    `cả ${baiChan.size} bài đứng ra chặn bài khác đều có từ 5 câu trong ngân hàng`,
+    chanMaThieuCau.map(ma => `${ma}: ${soCau[ma] || 0} câu`).join(', ') || 'ít nhất '
+      + Math.min(...[...baiChan].map(ma => soCau[ma] || 0)) + ' câu/bài');
+
+  /* Đề cả chương mang mã chương, đề giáo viên giao mang tiền tố `de-giao:` —
+     cả hai không phải bài nào, không được khoá. */
+  ok(!xetKhoaBai(ds, 'chuong-2', trong, 'student').khoa, 'mã chương (đề cả chương) không bị khoá');
+  ok(!xetKhoaBai(ds, 'de-giao:abc123', trong, 'student').khoa, 'đề giáo viên giao không bị khoá');
 }
 
 console.log('\n' + (hong === 0 ? '>>> TẤT CẢ ĐẠT' : `>>> CÓ ${hong} MỤC HỎNG`) + '\n');
