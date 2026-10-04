@@ -86,6 +86,21 @@ export const KeyRiengDialog: React.FC<Props> = ({ mo, onDong, onDoi }) => {
           placeholder="AIza..."
           autoComplete="off"
           spellCheck={false}
+          /* Tên riêng, không dính chữ "password"/"email", kèm cờ bảo trình quản
+             lý mật khẩu (1Password, LastPass, Dashlane/Bitwarden) bỏ qua ô này:
+             mật khẩu đăng nhập của em không được tự điền vào chỗ dán khoá. */
+          id="h11-o-khoa-gemini"
+          name="h11-khoa-gemini"
+          slotProps={{
+            htmlInput: {
+              'data-1p-ignore': 'true',
+              'data-lpignore': 'true',
+              'data-form-type': 'other',
+              'data-bwignore': 'true',
+              autoCapitalize: 'off',
+              autoCorrect: 'off',
+            },
+          }}
         />
         {loi && <Alert severity="warning" sx={{ mt: 1.5, borderRadius: 0 }}>{loi}</Alert>}
 

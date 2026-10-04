@@ -15,6 +15,7 @@ import { GEMINI_MODEL_NAME } from '../src/core/constants';
 import { goiTheoChuoi, type BuocGoi, type MoiTruongChuoi } from '../src/features/tutor/services/chuoiDuPhong';
 import { thongBaoHetLuot, thongBaoLoiKetNoi } from '../src/features/tutor/services/geminiTutorService';
 import { loiThanhChuoi } from '../src/features/tutor/services/loiGemini';
+import { keyHopLe, luuKey, docKey } from '../src/features/tutor/services/keyRieng';
 import { readFileSync } from 'node:fs';
 
 let hong = 0;
@@ -302,6 +303,40 @@ console.log('\n== Gia sư dùng chuỗi, ghi đúng model ==');
   const ctx = readFileSync(new URL('../src/core/contexts/AppContext.tsx', import.meta.url), 'utf8');
   ok(/nha_cung_cap:\s*ketQua\.nhaCungCap/.test(ctx) && /duong:\s*ketQua\.duong/.test(ctx),
      'AppContext ghi nguồn trả lời và đường đi xuống chats');
+}
+
+console.log('\n== Ô dán khoá riêng: kiểm dạng và chặn tự điền ==');
+{
+  /* Khoá giả ghép lúc chạy, không viết liền trong mã: `kiem-tra:an-ninh` quét
+     mọi chuỗi trông giống khoá thật. */
+  const GIA_AIZA = 'AIza' + 'x'.repeat(35);
+  const GIA_AQ = 'AQ.' + 'x'.repeat(40);
+  ok(keyHopLe(GIA_AIZA), 'nhận khoá dạng AIza');
+  ok(keyHopLe(GIA_AQ), 'nhận khoá dạng AQ. (cấp từ 2026)');
+  ok(keyHopLe(`  ${GIA_AIZA}\n`), 'khoảng trắng hai đầu được cắt trước khi kiểm');
+  ok(!keyHopLe(''), 'ô trống: từ chối');
+  ok(!keyHopLe('MatKhau@2026'), 'mật khẩu đăng nhập bị tự điền vào: từ chối');
+  ok(!keyHopLe('hocsinh01@gmail.com'), 'email bị tự điền vào: từ chối');
+  ok(!keyHopLe('AIza' + 'x'.repeat(10)), 'khoá AIza cụt: từ chối');
+  ok(!keyHopLe(GIA_AIZA.slice(0, 20) + ' ' + GIA_AIZA.slice(20)), 'khoá có dấu cách ở giữa: từ chối');
+  ok(!keyHopLe(GIA_AIZA + '!'), 'khoá lẫn ký tự lạ: từ chối');
+
+  const kho = luuTruGia();
+  const g = globalThis as { localStorage?: unknown };
+  const cu = g.localStorage;
+  g.localStorage = { ...kho, removeItem: (k: string) => { kho.m.delete(k); } };
+  try {
+    ok(!luuKey('MatKhau@2026') && kho.m.size === 0, 'sai dạng thì KHÔNG ghi gì vào localStorage');
+    ok(luuKey(`  ${GIA_AQ} `) && docKey() === GIA_AQ, 'đúng dạng thì lưu bản đã cắt khoảng trắng');
+  } finally {
+    g.localStorage = cu;
+  }
+
+  const hop = readFileSync(new URL('../src/features/tutor/components/KeyRiengDialog.tsx', import.meta.url), 'utf8');
+  ok(!/type=["']password["']/.test(hop), 'ô dán khoá KHÔNG là type="password" (trình duyệt sẽ điền mật khẩu đăng nhập vào)');
+  ok(/autoComplete="off"/.test(hop), 'ô dán khoá tắt autoComplete');
+  ok(['data-1p-ignore', 'data-lpignore', 'data-form-type'].every(c => hop.includes(c)),
+     'ô dán khoá mang cờ bảo trình quản lý mật khẩu bỏ qua');
 }
 
 console.log('\n' + (hong === 0 ? '>>> TẤT CẢ ĐẠT' : `>>> CÓ ${hong} MỤC KHÔNG ĐẠT`) + '\n');
