@@ -75,6 +75,23 @@ export interface Question {
   essayPoints?: EssayPoint[];
 
   /**
+   * Các ý của một câu Đúng/Sai NHIỀU Ý (02/10/2026). Có mặt thì `content` là
+   * đề dẫn, mỗi ý được trả lời và chấm riêng theo thang của Bộ — xem
+   * `features/quiz/chamDiem.ts`. Vắng mặt là câu Đúng/Sai một mệnh đề kiểu cũ.
+   *
+   * Trước đó `toLegacy` gộp cả 4 ý thành một mệnh đề "đúng khi mọi ý đúng":
+   * mất đề dẫn, và đáp án gần như luôn là "Sai".
+   */
+  yDungSai?: { s: string; v: boolean }[];
+
+  /**
+   * Đáp số của câu TRẢ LỜI NGẮN (02/10/2026). Mô hình cũ không có dạng này nên
+   * `type` vẫn là 'Tự luận', nhưng có `dapSo` thì chấm bằng so số như Luyện
+   * tập, không dò từ khoá. Không được mang giá trị `undefined`.
+   */
+  dapSo?: { text: string; num?: number; tol?: number; unit?: string };
+
+  /**
    * Lời giải, hiện cho học sinh SAU KHI nộp bài (22/09/2026).
    *
    * Tương ứng trường `e` của `BankQuestion`. Thêm vào vì `toLegacy` trước đây

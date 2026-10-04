@@ -545,18 +545,25 @@ export const GiaoDeTab: React.FC<{ students: User[] }> = ({ students }) => {
                   {/* Bấm nút trong ô này KHÔNG được coi là chọn đề để xem kết
                       quả — cô bấm "xoá" mà bảng dưới nhảy sang đề khác thì
                       nhìn nhầm ngay. */}
-                  <TableCell align="right" onClick={e => e.stopPropagation()}>
-                    <Tooltip title={daChep === de.id ? 'Đã chép!' : 'Chép link thông báo'}>
+                  {/* Ba nút PHẢI nằm một hàng, và chú giải KHÔNG được hứng cú bấm
+                      (04/10/2026). Ở bề ngang hẹp ô này bóp lại, ba nút xếp dọc,
+                      và chú giải của nút trên — mặc định bấm vào được — phủ đúng
+                      tâm hai nút dưới. Đo ở 539 px: vừa bấm "Chép link" xong thì
+                      nhãn "Đã chép!" (73×47 px) nằm đè lên "Đóng đề sớm" và "Xoá
+                      đề"; cú bấm kế tiếp rơi vào nhãn, đề không đóng mà cũng không
+                      báo lỗi gì. */}
+                  <TableCell align="right" onClick={e => e.stopPropagation()} sx={{ whiteSpace: 'nowrap' }}>
+                    <Tooltip disableInteractive title={daChep === de.id ? 'Đã chép!' : 'Chép link thông báo'}>
                       <IconButton size="small" onClick={() => chep(loiThongBao(de), de.id)}>
                         {daChep === de.id ? <Copy size={15} color="var(--luc-tham)" /> : <Link2 size={15} />}
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title={de.dong ? 'Mở lại đề' : 'Đóng đề sớm'}>
+                    <Tooltip disableInteractive title={de.dong ? 'Mở lại đề' : 'Đóng đề sớm'}>
                       <IconButton size="small" onClick={() => void doiDong(de)}>
                         {de.dong ? <Unlock size={15} /> : <Lock size={15} />}
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="Xoá đề">
+                    <Tooltip disableInteractive title="Xoá đề">
                       <IconButton size="small" data-xoa onClick={() => setHoiXoa(de)}><Trash2 size={15} /></IconButton>
                     </Tooltip>
                   </TableCell>

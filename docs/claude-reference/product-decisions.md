@@ -28,6 +28,23 @@ chơi xong mà khoá không mở); và trò chơi phải mở TRONG tab Trò ch�
 vì nó gửi tiến độ về bằng `postMessage` tới cửa sổ cha.
 
 
+**Khoá bài tuần tự theo đề kiểm tra; bỏ "Nâng cao" và "Mật khẩu cấp"**
+(04/10/2026, chủ dự án chốt sau khi bàn lại). Bốn quyết định đi cùng nhau:
+
+1. Học sinh phải đạt từ 7/10 đề kiểm tra của bài trước thì bài sau mới mở. Xem
+   slide không tính. Luyện tập, bài giảng slide, thí nghiệm, trò chơi không bị
+   khoá theo bài.
+2. Bài ôn tập không chặn bài sau, vì ngân hàng không có câu hỏi riêng cho chúng.
+3. Bỏ hẳn phần "Nâng cao" (hộp thoại, nhãn, danh hiệu "HS Nâng cao"): nó chưa
+   bao giờ có nội dung nào phía sau.
+4. Bỏ việc chia "Mật khẩu Cấp 1 / Cấp 2". Trang "Quản lý Mật khẩu" chỉ còn hướng
+   dẫn đặt lại qua thư và danh sách tài khoản không có email; danh sách "yêu cầu
+   cấp lại mật khẩu" trước đó là dữ liệu giả, đã gỡ.
+
+Chi tiết kỹ thuật và số đo: mục "Đề kiểm tra chấm Đúng/Sai…" trong
+[data.md](data.md). Đừng gỡ khoá hay dựng lại "Nâng cao" mà không hỏi chủ dự án.
+
+
 ## KHÔNG biến app thành PWA / service worker
 - Dự án này KHÔNG phải PWA và phải giữ nguyên như vậy. ĐỪNG thêm `vite-plugin-pwa`, `workbox`, `manifest.webmanifest`, hay bất kỳ đoạn `navigator.serviceWorker.register(...)` nào.
 - Lý do: service worker cache lại trang cũ → học viên sửa code, build lại, deploy mà trình duyệt vẫn hiện bản cũ, tưởng "sửa không ăn". Người mới rất dễ nản vì lỗi khó hiểu này.

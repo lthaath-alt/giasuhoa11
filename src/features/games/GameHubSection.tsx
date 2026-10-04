@@ -289,6 +289,10 @@ export const GameHubSection: React.FC = () => {
         {GAMES.map((game) => (
           <Card
             key={game.id}
+            /* Thẻ mang con trỏ bàn tay và nhấc lên khi rê chuột, nên bấm vào đâu
+               trên thẻ cũng phải mở trò chơi. Trước đây chỉ riêng nút "Chơi
+               ngay" mới mở; bấm vào hình hay tên trò thì không có gì xảy ra. */
+            onClick={() => handleOpenGame(game)}
             sx={{
               position: 'relative',
               borderRadius: 0,
@@ -384,7 +388,9 @@ export const GameHubSection: React.FC = () => {
 
               <Button
                 variant="contained"
-                onClick={() => handleOpenGame(game)}
+                /* Chặn nổi bọt: thẻ cha cũng mở trò chơi, để nguyên thì một cú
+                   bấm gọi mở hai lần. */
+                onClick={e => { e.stopPropagation(); handleOpenGame(game); }}
                 startIcon={<Play size={18} />}
                 sx={{
                   mt: 2,

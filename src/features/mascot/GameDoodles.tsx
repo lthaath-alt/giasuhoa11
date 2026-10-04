@@ -70,9 +70,15 @@ const DS: Mon[] = [
   /* Hai món này trước đây đặt lấn ra ngoài mép (left:-1%, bottom:-6) nên bị
      `overflow:hidden` của lớp xén mất một góc, nhìn như cắt thiếu. Kéo vào
      trong hẳn. */
-  { tep: 'tay-cam.png', ten: 'Tay cầm chơi game', rong: 106, bottom: 18, left: 'max(10px, 0.5%)', xoay: -8, tuKho: 'sm' },
+  /* Hàng dưới chỉ được đứng ở Ô TRỐNG của lưới thẻ (04/10/2026). Lưới ba cột
+     đang có 4 trò, nên hàng hai còn trống cột giữa và cột phải — ba món này
+     nằm cả ở đó. Tay cầm trước đây neo góc dưới-trái, đúng chỗ thẻ thứ tư: đo
+     ở 900, 1366 và 1920 px nó phủ 3.025 px² lên nút "Chơi ngay" của thẻ "Vòng
+     Quanh Hóa 11". Dưới `md` lưới còn hai cột, bốn thẻ lấp kín, không còn ô
+     trống nào nên cả ba món đều ẩn. Thêm trò thứ năm thì phải đo lại chỗ này. */
+  { tep: 'tay-cam.png', ten: 'Tay cầm chơi game', rong: 106, bottom: 18, left: '38%', xoay: -8, tuKho: 'md' },
   { tep: 'nam.png', ten: 'Nấm 1-up', rong: 84, bottom: 8, left: '57%', tuKho: 'md' },
-  { tep: 'may-cam-tay.png', ten: 'Máy chơi game cầm tay', rong: 74, bottom: 12, right: '2%', xoay: 6, tuKho: 'sm' },
+  { tep: 'may-cam-tay.png', ten: 'Máy chơi game cầm tay', rong: 74, bottom: 12, right: '2%', xoay: 6, tuKho: 'md' },
 ];
 
 /* ---- Mấy món vẽ thêm cho dải trống bên dưới lưới thẻ ----

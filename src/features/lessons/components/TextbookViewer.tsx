@@ -89,14 +89,21 @@ export const TextbookViewer: React.FC<TextbookViewerProps> = ({ lesson, onOpenCh
           <Typography variant="h5" sx={{ fontWeight: 800, lineHeight: 1.3, mb: 1 }}>
             {lesson.title}
           </Typography>
-          <Chip
-            label={`📄 ${tb.pageRange}`}
-            size="small"
-            sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'var(--chu-nguoc)', fontWeight: 600, fontSize: '0.8rem' }}
-          />
+          {/* 19/25 bài chưa có số trang và chưa có mục tiêu (đo 04/10/2026; nội
+              dung do máy sinh từ tài liệu nguồn, chưa soạn đủ). Thiếu thì ẨN ô
+              đó đi: trước đây trang hiện một nhãn "📄" trơ trọi và một khung
+              "Mục tiêu bài học" không có dòng nào bên dưới. */}
+          {tb.pageRange?.trim() && (
+            <Chip
+              label={`📄 ${tb.pageRange}`}
+              size="small"
+              sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'var(--chu-nguoc)', fontWeight: 600, fontSize: '0.8rem' }}
+            />
+          )}
         </Box>
 
         {/* Mục tiêu bài học */}
+        {tb.objectives?.length > 0 && (
         <Box sx={{ p: 3, bgcolor: VAI.truong }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
             <Target size={18} color={VAI.chu} />
@@ -113,6 +120,7 @@ export const TextbookViewer: React.FC<TextbookViewerProps> = ({ lesson, onOpenCh
             ))}
           </Box>
         </Box>
+        )}
       </Paper>
 
       {/* ===== NỘI DUNG BÀI HỌC ===== */}

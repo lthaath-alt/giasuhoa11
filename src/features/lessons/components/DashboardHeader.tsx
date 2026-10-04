@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -38,12 +38,16 @@ import {
   Target,
   Moon,
   Sun,
+  Lock,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { useCheDoMau } from '../../../core/hooks/useCheDoMau';
 import { LINK_ZALO } from '../../../core/constants';
 import { User } from '../../auth/types';
 import { useApp } from '../../../core/hooks/useApp';
 import { Lesson } from '../types';
+import { xetKhoaBai, DIEM_MO_BAI_SAU } from '../khoaBai';
 
 /**
  * Bật/tắt mục "Các khóa học (Hóa 11)" trên thanh menu.
@@ -76,7 +80,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   setActiveTab,
   onSelectLesson,
 }) => {
-  const { curriculum, hasAdvancedStudentTitle } = useApp();
+  const { curriculum, getLessonProgress } = useApp();
   const { laToi, doiCheDo } = useCheDoMau();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
@@ -89,7 +93,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
 
   const handleRegisterRedirect = () => {
     logout();
-    navigate('/login');
+    navigate('/login', { state: { moDangKy: true } });   // mở thẳng màn tạo tài khoản
   };
 
   // Lọc bài học khi tìm kiếm
@@ -103,12 +107,67 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
     setSearchAnchorEl(e.currentTarget);
   };
 
+  /* Bài đang khoá (xem `khoaBai.ts`) thì ô tìm kiếm cũng không mở: nếu không,
+     tìm kiếm là đường vòng qua chính cái khoá ở danh mục bài. */
+  const xetKhoa = (lesson: Lesson) =>
+    xetKhoaBai(allLessons, lesson.id, getLessonProgress, currentUser?.role);
+
   const handleSearchSelect = (lesson: Lesson) => {
+    if (xetKhoa(lesson).khoa) return;
     onSelectLesson(lesson);
     setActiveTab('hocmai');
     setSearchQuery('');
     setSearchAnchorEl(null);
   };
+
+  /* Thanh menu cuộn ngang khi không đủ chỗ, mà thanh cuộn thì bị ẩn — nên phải
+     có thứ khác báo "còn mục ở phía bên kia". Đo 04/10/2026 ở 375 px: thanh
+     rộng 341 px chứa 917 px nội dung, năm mục (Thí nghiệm bị cắt nửa, Luyện
+     tập, Trò chơi, iChat, Hỗ trợ) nằm khuất mà không có dấu hiệu nào; ở
+     900 px mục "Hỗ trợ" bị cắt. Hai nút mũi tên dưới đây chỉ hiện ở phía còn
+     mục khuất, bấm thì cuộn. Không dùng dải mờ chuyển sắc — thế giới nhãn dựng
+     bằng nét kẻ (docs/claude-reference/ui.md). */
+  const menuRef = useRef<HTMLDivElement>(null);
+  const [conKhuat, setConKhuat] = useState({ trai: false, phai: false });
+  const vai = currentUser?.role;
+  useEffect(() => {
+    const hop = menuRef.current;
+    if (!hop) return;
+    const do_ = () => {
+      const trai = hop.scrollLeft > 4;
+      const phai = hop.scrollLeft + hop.clientWidth < hop.scrollWidth - 4;
+      setConKhuat(cu => (cu.trai === trai && cu.phai === phai ? cu : { trai, phai }));
+    };
+    do_();
+    hop.addEventListener('scroll', do_, { passive: true });
+    window.addEventListener('resize', do_);
+    /* Phông chữ nạp xong hay số mục đổi theo vai đều làm bề rộng nội dung đổi
+       mà không có sự kiện resize nào của cửa sổ. */
+    const quanSat = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(do_) : null;
+    quanSat?.observe(hop);
+    return () => {
+      hop.removeEventListener('scroll', do_);
+      window.removeEventListener('resize', do_);
+      quanSat?.disconnect();
+    };
+  }, [vai]);
+  const cuonMenu = (huong: 1 | -1) => {
+    const hop = menuRef.current;
+    if (hop) hop.scrollBy({ left: huong * Math.round(hop.clientWidth * 0.7), behavior: 'smooth' });
+  };
+  const nutCuon = (phia: 'trai' | 'phai') => ({
+    position: 'absolute' as const,
+    top: 0,
+    bottom: 0,
+    [phia === 'trai' ? 'left' : 'right']: 0,
+    zIndex: 1,
+    width: 32,
+    borderRadius: 0,
+    color: 'var(--chu-dam)',
+    backgroundColor: 'var(--nen-the)',
+    [phia === 'trai' ? 'borderRight' : 'borderLeft']: '1px solid var(--chu-dam)',
+    '&:hover': { backgroundColor: 'var(--nen-nhat)' },
+  });
 
   return (
     <AppBar
@@ -260,10 +319,14 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 }}
               >
                 {filteredLessons.length > 0 ? (
-                  filteredLessons.map((l) => (
+                  filteredLessons.map((l) => {
+                    const xet = xetKhoa(l);
+                    const khoa = xet.khoa;
+                    return (
                     <Box
                       key={l.id}
                       onClick={() => handleSearchSelect(l)}
+                      aria-disabled={khoa || undefined}
                       sx={{
                         py: 1.2,
                         px: 2,
@@ -271,20 +334,27 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'flex-start',
-                        cursor: 'pointer',
+                        cursor: khoa ? 'not-allowed' : 'pointer',
                         '&:hover': {
-                          backgroundColor: 'var(--nen-nhat)',
+                          backgroundColor: khoa ? 'transparent' : 'var(--nen-nhat)',
                         },
                       }}
                     >
-                      <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--xanh)' }}>
+                      <Typography
+                        variant="subtitle2"
+                        sx={{ fontWeight: 'bold', color: khoa ? 'var(--chu-2)' : 'var(--xanh)', display: 'flex', alignItems: 'center', gap: 0.75 }}
+                      >
+                        {khoa && <Lock size={13} style={{ flexShrink: 0 }} />}
                         {l.title}
                       </Typography>
                       <Typography variant="caption" color="text.secondary" noWrap sx={{ width: '100%' }}>
-                        {l.summary}
+                        {khoa
+                          ? `Đang khóa — đạt từ ${DIEM_MO_BAI_SAU} điểm đề kiểm tra ${xet.baiTruoc?.title.split(':')[0] ?? 'bài trước'} để mở`
+                          : l.summary}
                       </Typography>
                     </Box>
-                  ))
+                    );
+                  })
                 ) : (
                   <Box sx={{ p: 2, textAlign: 'center' }}>
                     <Typography variant="body2" color="text.secondary">
@@ -382,21 +452,6 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                       color: 'var(--chu-nguoc)',
                     }}
                   />
-                  {currentUser.role === 'student' && hasAdvancedStudentTitle(currentUser.email) && (
-                    <Chip
-                      size="small"
-                      label="HS Nâng cao"
-                      sx={{
-                        height: 18,
-                        fontSize: '0.6rem',
-                        fontWeight: 'bold',
-                        bgcolor: 'var(--vang-nen)',
-                        color: 'var(--chu-tren-vang)',
-                        ml: 0.5,
-                        boxShadow: 'none',
-                      }}
-                    />
-                  )}
                 </Box>
                 <Button
                   id="header-logout-btn"
@@ -457,7 +512,11 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                   variant="contained"
                   color="secondary"
                   size="small"
-                  onClick={() => navigate('/dashboard')}
+                  /* Thanh này chỉ dựng ở /dashboard, nên `navigate('/dashboard')`
+                     cũ là bấm mà không có gì xảy ra. Khách đang ở sẵn chế độ dùng
+                     thử; đưa em tới chỗ bắt đầu học — cùng đích với nút "Bắt đầu
+                     học ngay hôm nay" ở trang Giới thiệu. */
+                  onClick={() => { onLogoClick(); setActiveTab('baigiang'); window.scrollTo({ top: 0 }); }}
                   sx={{
                     textTransform: 'none',
                     borderRadius: 0,
@@ -486,7 +545,19 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
       {/* Hàng menu nay là GIẤY: dải mực đã về đúng chỗ của nó ở trên. */}
       <Box sx={{ backgroundColor: 'var(--nen-the)', color: 'var(--chu-dam)' }}>
         <Container maxWidth="xl">
+          <Box sx={{ position: 'relative' }}>
+          {conKhuat.trai && (
+            <IconButton id="nav-scroll-left-btn" size="small" aria-label="Xem các mục phía trước" onClick={() => cuonMenu(-1)} sx={nutCuon('trai')}>
+              <ChevronLeft size={18} />
+            </IconButton>
+          )}
+          {conKhuat.phai && (
+            <IconButton id="nav-scroll-right-btn" size="small" aria-label="Xem thêm mục" onClick={() => cuonMenu(1)} sx={nutCuon('phai')}>
+              <ChevronRight size={18} />
+            </IconButton>
+          )}
           <Box
+            ref={menuRef}
             sx={{
               display: 'flex',
               alignItems: 'center',
@@ -494,6 +565,12 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               py: 0.5,
               gap: 1,
               '&::-webkit-scrollbar': { display: 'none' },
+              /* Dòng trên một mình KHÔNG còn đủ: `index.css` đặt `scrollbar-color`
+                 cho cả trang, mà Chrome từ bản 121 hễ thấy thuộc tính chuẩn đó
+                 là bỏ qua mọi `::-webkit-scrollbar`. Đo 04/10/2026 trên Chrome
+                 152 ở cửa sổ 539 px: thanh cuộn 15 px hiện ngay dưới hàng menu.
+                 Hai nút mũi tên đã lo việc báo "còn mục khuất". */
+              scrollbarWidth: 'none',
               /* Không có hai dòng này thì trên điện thoại flex bóp các nút lại
                  cho vừa bề ngang: chữ vỡ dòng, icon đè lên chữ mục kế bên.
                  Ép nút giữ nguyên bề ngang để `overflowX: auto` ở trên làm
@@ -774,6 +851,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 Quản trị Website
               </Button>
             )}
+          </Box>
           </Box>
         </Container>
       </Box>

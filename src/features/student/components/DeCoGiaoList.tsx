@@ -28,7 +28,12 @@ const gioDep = (iso: string) => {
   return `${hai(d.getDate())}/${hai(d.getMonth() + 1)}/${d.getFullYear()} ${hai(d.getHours())}:${hai(d.getMinutes())}`;
 };
 
-export const DeCoGiaoList: React.FC<{ classId: string; email: string }> = ({ classId, email }) => {
+export const DeCoGiaoList: React.FC<{
+  classId: string;
+  email: string;
+  /** Báo số đề của lớp cho màn cha, để nó không ghi "chưa có bài tập" bên dưới */
+  onSoDe?: (soDe: number) => void;
+}> = ({ classId, email, onSoDe }) => {
   const navigate = useNavigate();
   const [ds, setDs] = useState<DeGiao[]>([]);
   const [daNop, setDaNop] = useState<Set<string>>(new Set());
@@ -43,6 +48,7 @@ export const DeCoGiaoList: React.FC<{ classId: string; email: string }> = ({ cla
       .then(async de => {
         if (huy) return;
         setDs(de);
+        onSoDe?.(de.length);
         /* Hỏi máy này trước rồi mới hỏi Firestore: em làm ở máy khác thì
            localStorage trống, còn em làm ở chính máy này thì khỏi tốn lượt đọc. */
         const xong = new Set<string>();

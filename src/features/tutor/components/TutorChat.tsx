@@ -41,7 +41,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
   const [inputMessage, setInputMessage] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const hopTinRef = useRef<HTMLDivElement>(null);
   
   const [remainingCooldown, setRemainingCooldown] = useState(0);
   /* Số giây đã chờ lượt này — để dòng "đang chuẩn bị gợi ý" không đứng im. */
@@ -68,9 +68,14 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
   const vuaHetHanMuc = /hết lượt trả lời trong ngày của toàn hệ thống/
     .test(lessonChats[lessonChats.length - 1]?.content || '');
 
-  // Cuộn xuống đáy khi có tin nhắn mới
+  /* Cuộn xuống đáy khi có tin nhắn mới — cuộn CHÍNH HỘP TIN, không cuộn trang.
+     Bản trước gọi `scrollIntoView` lên một thẻ đánh dấu cuối hộp: lệnh đó cuộn
+     mọi tầng chứa nó, kể cả cửa sổ, và kéo thẻ đó lên sát mép trên màn hình. Đo
+     02/10/2026 ở 1024×768: gửi một câu là trang trượt xuống ~700 px, khung chat
+     trôi khỏi màn hình (mép trên ở −490 px), câu trả lời nằm ngoài tầm nhìn. */
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const hop = hopTinRef.current;
+    if (hop) hop.scrollTo({ top: hop.scrollHeight, behavior: 'smooth' });
   };
 
   useEffect(() => {
@@ -148,8 +153,12 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
         display: 'flex',
         flexDirection: { xs: 'column', md: 'row' },
         gap: 3,
-        height: 'calc(100vh - 180px)',
-        minHeight: 500,
+        /* Chiều cao cố định chỉ hợp với bố cục HAI CỘT. Ở điện thoại hai khối
+           xếp chồng, mà khối nào cũng đòi cao 100% của một khung cố định: đo
+           02/10/2026 ở 375 px, cột trái chiếm hết 632 px và khung chat còn đúng
+           2 px — không thấy ô nhập. Xếp chồng thì để từng khối cao tự nhiên. */
+        height: { xs: 'auto', md: 'calc(100vh - 180px)' },
+        minHeight: { md: 500 },
       }}
     >
       {/* CỘT TRÁI: KIẾN THỨC BÀI HỌC VÀ CÂU HỎI MẪU */}
@@ -159,9 +168,17 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
           display: 'flex',
           flexDirection: 'column',
           gap: 2,
-          height: '100%',
-          overflowY: 'auto',
+          height: { xs: 'auto', md: '100%' },
+          overflowY: { xs: 'visible', md: 'auto' },
           pr: { md: 1 },
+          /* Xếp chồng (điện thoại) thì khung chat lên TRƯỚC: em vừa bấm "Hỏi AI",
+             để hai thẻ này ở trên là ô nhập nằm cách hơn 1.100 px bên dưới. */
+          order: { xs: 2, md: 0 },
+          /* Thẻ MUI mang `overflow: hidden`, nên trong một cột flex nó được
+             phép co nhỏ hơn nội dung và CẮT phần thừa thay vì để cột cuộn. Đo
+             02/10/2026: thẻ câu hỏi mẫu cao 164 px trên 434 px nội dung, hai nút
+             câu hỏi nằm ngoài vùng nhìn thấy và không bấm được. */
+          '& > *': { flexShrink: 0 },
         }}
       >
         {/* Thẻ Lý thuyết tóm tắt */}
@@ -224,10 +241,11 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
       <Paper
         id="chat-frame-paper"
         sx={{
-          flex: 1,
+          flex: { md: 1 },
           display: 'flex',
           flexDirection: 'column',
-          height: '100%',
+          height: { xs: '70vh', md: '100%' },
+          minHeight: { xs: 460 },
           borderRadius: 0,
           overflow: 'hidden',
           boxShadow: 'none',
@@ -312,6 +330,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
         {/* Khung chứa các tin nhắn */}
         <Box
           id="chat-messages-box"
+          ref={hopTinRef}
           sx={{
             flex: 1,
             p: 3,
@@ -343,7 +362,8 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
               </Typography>
               <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 450, mb: 1 }}>
                 Nhập câu hỏi của em ở phía dưới, hoặc nhấp vào một trong các{' '}
-                <strong>Câu hỏi tự luyện mẫu</strong> ở cột trái để bắt đầu buổi thảo luận nhé!
+                {/* Không nói "ở cột trái": trên điện thoại thẻ đó nằm bên dưới. */}
+                <strong>Câu hỏi tự luyện mẫu</strong> để bắt đầu buổi thảo luận nhé!
               </Typography>
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'center' }}>
                 <Chip icon={<Award size={14} color="var(--chu-dam)" />} label="Hỗ trợ lý thuyết" variant="outlined" size="small" />
@@ -440,8 +460,6 @@ export const TutorChat: React.FC<TutorChatProps> = ({ lesson }) => {
               </Paper>
             </Box>
           )}
-
-          <div ref={messagesEndRef} />
         </Box>
 
         {/* Hiển thị lỗi nếu có */}

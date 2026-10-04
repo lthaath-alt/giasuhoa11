@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { LINK_ZALO } from '../core/constants';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -88,6 +88,8 @@ export const DashboardPage: React.FC = () => {
   // Tab mặc định khi vào web: Giới thiệu, để khách mới đọc trước khi vào học.
   // Đổi sang 'baigiang' nếu muốn mở thẳng vào lưới bài giảng.
   const [activeTab, setActiveTab] = useState<string>('gioithieu');
+  /** Tab đang đứng lúc mở một bài từ ô tìm kiếm — nơi nút "Quay lại" trả về */
+  const [tabTruocKhiMoBai, setTabTruocKhiMoBai] = useState<string>('gioithieu');
   const [searchQuery, setSearchQuery] = useState<string>('');
   // 'sgk' = xem trang sách, 'chat' = hỏi gia sư AI
   const [studyMode, setStudyMode] = useState<'sgk' | 'chat'>('sgk');
@@ -188,6 +190,15 @@ export const DashboardPage: React.FC = () => {
   const ichatVuaHetHanMuc = /hết lượt trả lời trong ngày của toàn hệ thống/
     .test(globalChats[globalChats.length - 1]?.content || '');
 
+  /* iChat tự cuộn tới tin mới — cuộn chính hộp tin, không cuộn trang (cùng lối
+     với TutorChat). Trước đó hộp đứng yên ở đầu: câu trả lời và link đề nằm dưới
+     mép hộp, em phải tự kéo xuống mới thấy. */
+  const hopIchatRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const hop = hopIchatRef.current;
+    if (hop) hop.scrollTo({ top: hop.scrollHeight, behavior: 'smooth' });
+  }, [globalChats.length, isIchatSending, activeTab]);
+
   const handleSendGlobalIchat = async (textToSend?: string) => {
     const text = (textToSend || ichatInput).trim();
     if (!text) return;
@@ -248,6 +259,9 @@ export const DashboardPage: React.FC = () => {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         onSelectLesson={(lesson) => {
+          /* Nhớ tab đang đứng để "Quay lại" trả về đúng đó. Tab 'hocmai' không
+             có nút nào trên menu, nên quay về nó là rơi vào một trang lạc lõng. */
+          if (activeTab !== 'hocmai') setTabTruocKhiMoBai(activeTab);
           setSelectedLesson(lesson);
           setActiveTab('hocmai');
         }}
@@ -402,7 +416,7 @@ export const DashboardPage: React.FC = () => {
                         variant="outlined"
                         size="small"
                         startIcon={<ArrowRight size={15} />}
-                        onClick={() => { setSelectedLesson(null); setStudyMode('sgk'); }}
+                        onClick={() => { setSelectedLesson(null); setStudyMode('sgk'); setActiveTab(tabTruocKhiMoBai); }}
                         sx={{ textTransform: 'none', fontWeight: 'bold', borderRadius: 0, fontSize: '0.82rem', borderColor: 'var(--vien)', color: 'var(--chu-2)', '&:hover': { borderColor: 'var(--tin-hieu)', color: 'var(--chu-dam)', bgcolor: 'var(--nen-tin-hieu-nhat)' } }}
                       >
                         Quay lại
@@ -414,7 +428,12 @@ export const DashboardPage: React.FC = () => {
                   <Box
                     sx={{
                       display: 'grid',
-                      gridTemplateColumns: { xs: '1fr', md: '260px 1fr' },
+                      /* Cột danh mục rộng theo chính nó (260 px khi mở, một ô
+                         biểu tượng khi thu gọn). Ghim cứng 260 px thì bấm "Thu
+                         gọn" xong cột vẫn chiếm nguyên chỗ, nội dung không rộng
+                         thêm chút nào. `minmax(0, 1fr)` để nội dung dài không
+                         đẩy lưới tràn ngang. */
+                      gridTemplateColumns: { xs: 'minmax(0, 1fr)', md: 'auto minmax(0, 1fr)' },
                       gap: 3,
                       alignItems: 'start',
                     }}
@@ -481,7 +500,7 @@ export const DashboardPage: React.FC = () => {
                           variant="contained"
                           color="warning"
                           size="large"
-                          onClick={() => navigate('/login')}
+                          onClick={() => navigate('/login', { state: { moDangKy: true } })}
                           sx={{ px: 3, py: 1.2, borderRadius: 0, fontWeight: 'bold', fontSize: '0.9rem', flexShrink: 0 }}
                         >
                           ĐĂNG KÝ HỌC THỬ MIỄN PHÍ NGAY
@@ -520,7 +539,10 @@ export const DashboardPage: React.FC = () => {
                 <MascotDauVai tab="luyentap" />
               </Box>
               <PracticeSection
-                onDangNhap={() => setActiveTab('hocsinh')}
+                /* Nút này chỉ hiện với KHÁCH. Trước đây nó chuyển sang tab
+                   'hocsinh', mà `StudentArea` trả về rỗng khi chưa đăng nhập —
+                   khách bấm xong chỉ thấy một trang trắng. */
+                onDangNhap={() => navigate('/login')}
                 onMoTroChoi={() => setActiveTab('trochoi')}
               />
             </Box>
@@ -757,14 +779,14 @@ export const DashboardPage: React.FC = () => {
                   )}
 
                   {/* Vùng Tin Nhắn */}
-                  <Box sx={{ flex: 1, p: 3, overflowY: 'auto', bgcolor: 'var(--nen-the)', display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  <Box ref={hopIchatRef} sx={{ flex: 1, p: 3, overflowY: 'auto', bgcolor: 'var(--nen-the)', display: 'flex', flexDirection: 'column', gap: 2 }}>
                     {globalChats.length === 0 ? (
                       <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', textAlign: 'center', gap: 2, p: 4 }}>
                         <Avatar sx={{ width: 64, height: 64, bgcolor: 'var(--nen-xanh-nhat2)', color: 'var(--xanh)' }}>
                           <MessageSquare size={32} />
                         </Avatar>
                         <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Bắt đầu buổi tư vấn riêng cùng Chemai!</Typography>
-                        <Typography variant="body2" color="text.secondary" sx={{ maxW: 420 }}>
+                        <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 420 }}>
                           Em có thắc mắc gì về lý thuyết Hóa học 11, cách cân bằng phương trình, quy tắc Le Chatelier hay các chủ đề tự luận? Nhắn ngay cho Chemai dưới đây nhé!
                         </Typography>
                       </Box>
@@ -903,8 +925,12 @@ export const DashboardPage: React.FC = () => {
                     </AccordionSummary>
                     <AccordionDetails>
                       <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.7 }}>
-                        Rất đơn giản! Em hãy nhìn lên góc trên bên phải màn hình và nhấn vào nút <strong>Đăng Ký</strong> (màu cam). Hãy nhập họ tên, địa chỉ email và mật khẩu của em để gửi yêu cầu phê duyệt tài khoản tới Admin. Sau khi đăng ký xong, tài khoản sẽ chuyển sang trạng thái <em>Chờ duyệt</em>. Admin (Giáo viên bộ môn) sẽ phê duyệt kích hoạt tài khoản của em trong vòng 5-10 phút. 
-                        Sau khi được kích hoạt, em có thể sử dụng nút <strong>Đăng Nhập</strong> để bắt đầu học tập và lưu trữ lịch sử học tập.
+                        {/* Viết lại 02/10/2026 cho khớp luồng đang chạy: học sinh tự
+                            đăng ký là dùng được ngay, không có bước chờ quản trị
+                            duyệt (chỉ đơn làm GIÁO VIÊN mới chờ duyệt), và nút
+                            Đăng Ký không còn màu cam. */}
+                        Em nhìn lên góc trên bên phải màn hình và nhấn nút <strong>Đăng Ký</strong>, chọn <strong>Học sinh đăng ký bằng Email</strong>, rồi nhập họ tên, địa chỉ email và mật khẩu. Tạo xong là em đăng nhập được ngay bằng nút <strong>Đăng Nhập</strong>, không phải chờ ai duyệt.
+                        Sau khi đăng nhập, em vào mục <strong>Học sinh</strong> để chọn lớp của mình; thầy cô duyệt đơn là em vào lớp. Nếu nhà trường đã cấp sẵn tài khoản thì em dùng luôn tài khoản đó.
                       </Typography>
                     </AccordionDetails>
                   </Accordion>

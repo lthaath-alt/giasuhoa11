@@ -1,21 +1,42 @@
 import { locHtml } from '../core/services/locHtml';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Box, Container, Typography, Paper, Button, Radio, RadioGroup,
   FormControlLabel, FormControl, TextField, Divider, Alert, AlertTitle,
   Grid, Chip, Card, CardContent, CircularProgress, Dialog, DialogTitle,
-  DialogContent, DialogActions, Link, Tooltip, DialogContentText
+  DialogContent, DialogActions, Link, Tooltip
 } from '@mui/material';
 import {
   Award, HelpCircle, CheckCircle, XCircle, AlertTriangle, Clock,
-  ArrowLeft, BookOpen, Send, GraduationCap, Eye, ChevronRight, Lock
+  ArrowLeft, BookOpen, Send, GraduationCap, Eye, ChevronRight, Lock, RotateCcw
 } from 'lucide-react';
 import { useApp } from '../core/hooks/useApp';
+import { xetKhoaBai, baiLamDuocNgay, DIEM_MO_BAI_SAU } from '../features/lessons/khoaBai';
 import { QuizStorage } from '../features/quiz/quizStorage';
 import { QuizService } from '../features/quiz/quizService';
 import { docBaiNop } from '../features/quiz/baiNopService';
+import { dapSoCua, giaiMaDungSai, maHoaDungSai } from '../features/quiz/chamDiem';
 import type { Quiz, QuizQuestionResult } from '../features/quiz/types';
+import type { Question } from '../features/library/types';
+
+/** Câu Đúng/Sai nhiều ý (chấm từng ý) hay câu một mệnh đề kiểu cũ */
+const laDungSaiNhieuY = (q: Question) =>
+  q.type === 'Đúng/Sai' && Array.isArray(q.yDungSai) && q.yDungSai.length > 1;
+
+/** Tên dạng câu hiện cho học sinh. Mô hình cũ gọi câu trả lời ngắn là "Tự luận". */
+const tenDangCau = (q: Question) => (dapSoCua(q) ? 'Trả lời ngắn' : q.type);
+
+const chuY = (i: number) => String.fromCharCode(97 + i);
+
+/** Nội dung phương án ứng với chữ cái của một câu TRẮC NGHIỆM; dạng câu khác trả `null`.
+ *  Trang kết quả hiện đề dẫn nhưng KHÔNG hiện bốn phương án, nên trước đây em
+ *  chỉ đọc được "B" và "C" mà không biết mình đã chọn gì, đáp án đúng nói gì. */
+const noiDungPhuongAn = (q: Question, chu: string | undefined): string | null => {
+  if (q.type !== 'Trắc nghiệm' || !chu) return null;
+  const khoa = chu.trim().toUpperCase();
+  return q.options?.find(o => o.key === khoa)?.text ?? null;
+};
 
 // Helper render Hóa học (giữ sub/sup)
 // Nội dung tới từ `bank_questions`, collection ai cũng ghi được — PHẢI lọc.
@@ -35,10 +56,6 @@ export const QuizPage: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const [submitConfirmOpen, setSubmitConfirmOpen] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  
-  // States for progression flow
-  const [showRetryDialog, setShowRetryDialog] = useState(false);
-  const [showUnlockDialog, setShowUnlockDialog] = useState(false);
 
   // 1. Tải thông tin bài kiểm tra
   useEffect(() => {
@@ -62,9 +79,29 @@ export const QuizPage: React.FC = () => {
     return () => { huy = true; };
   }, [quizId]);
 
+  /* Đáp án mới nhất, đọc được từ trong bộ đếm giờ. Bộ đếm sống suốt lúc làm bài
+     nên biến `answers` nó khép lại là bản của lúc MỞ trang — tự nộp bằng bản đó
+     là nộp một bài trống. */
+  const answersRef = useRef(answers);
+  answersRef.current = answers;
+  const daTuNop = useRef(false);
+
   // 2. Tính thời gian còn lại của link
   useEffect(() => {
     if (!quiz || quiz.status === 'submitted') return;
+
+    /* Đề GIÁO VIÊN GIAO hết giờ thì TỰ NỘP phần em đã làm (02/10/2026). Trước đó
+       hết giờ là cả trang đổi sang "đã quá hạn 24 giờ, hỏi Gia sư AI": bài không
+       được nộp, đáp án đã chọn mất, cô thấy em "chưa nộp", và em không có đường
+       nào làm lại. Đo bằng một đề 1 phút: 4 đáp án đã chọn, hết giờ còn 0.
+       Chỉ chủ bài mới tự nộp; đề tự ôn giữ nguyên lối cũ (hết 24 giờ thì xin đề mới). */
+    const laChuBai = !!currentUser
+      && currentUser.email.toLowerCase() === quiz.userEmail.toLowerCase();
+    const tuNop = () => {
+      if (daTuNop.current) return;
+      daTuNop.current = true;
+      nopBai(answersRef.current);
+    };
 
     const timer = setInterval(() => {
       const now = new Date().getTime();
@@ -74,6 +111,7 @@ export const QuizPage: React.FC = () => {
       if (diff <= 0) {
         setTimeLeftStr('Đã hết hạn');
         clearInterval(timer);
+        if (quiz.deGiaoId && laChuBai) tuNop();
       } else {
         const hours = Math.floor(diff / (1000 * 60 * 60));
         const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
@@ -87,7 +125,8 @@ export const QuizPage: React.FC = () => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [quiz]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [quiz, currentUser?.email]);
 
   if (!quiz) {
     return (
@@ -99,38 +138,6 @@ export const QuizPage: React.FC = () => {
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
             Đường dẫn bài kiểm tra không tồn tại hoặc đã bị xóa khỏi hệ thống.
-          </Typography>
-          <Button variant="contained" onClick={() => navigate('/dashboard')} sx={{ textTransform: 'none', borderRadius: 0 }}>
-            Quay lại trang học tập
-          </Button>
-        </Paper>
-      </Container>
-    );
-  }
-
-  // 2b. Bảo vệ: Nếu bài học chưa mở khóa thì không cho vào
-  const allLessons = curriculum.flatMap(c => c.lessons);
-  const lessonIndex = allLessons.findIndex(l => l.id === quiz.lessonId);
-  
-  let isLocked = false;
-  if (currentUser && currentUser.role === 'student' && lessonIndex > 0) {
-    const prevLesson = allLessons[lessonIndex - 1];
-    const prevProgress = getLessonProgress(prevLesson.id);
-    if (!prevProgress || !prevProgress.basicCompleted || (!prevProgress.advancedCompleted && !prevProgress.skippedAdvanced)) {
-      isLocked = true;
-    }
-  }
-
-  if (isLocked) {
-    return (
-      <Container maxWidth="sm" sx={{ py: 8, textAlign: 'center' }}>
-        <Paper variant="outlined" sx={{ p: 5, borderRadius: 0 }}>
-          <Lock size={48} color="var(--chu-mo)" style={{ margin: '0 auto 16px' }} />
-          <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 1, color: 'var(--do)' }}>
-            Bài học đang bị khóa
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-            Hoàn thành bài {lessonIndex} (Bài học trước đó) để mở khóa bài kiểm tra này.
           </Typography>
           <Button variant="contained" onClick={() => navigate('/dashboard')} sx={{ textTransform: 'none', borderRadius: 0 }}>
             Quay lại trang học tập
@@ -185,8 +192,66 @@ export const QuizPage: React.FC = () => {
     );
   }
 
+  /* Khoá bài tuần tự (04/10/2026, chủ dự án chốt): đề của bài N chỉ làm được khi
+     em đã đạt từ 7/10 đề kiểm tra của bài N−1 — luật nằm ở
+     `features/lessons/khoaBai.ts`, dùng chung với danh mục bài, ô tìm kiếm và
+     chỗ Chemai phát đề.
+     Bản khoá trước đòi thêm cờ phần "Nâng cao" không nơi nào đặt được, nên em
+     đạt 70% ngay lần đầu vẫn bị chặn bài sau (đo 02/10/2026).
+     Chỉ chặn đề ĐANG LÀM: bài đã nộp thì em vẫn mở lại xem điểm và lời giải.
+     Đề cả chương và đề giáo viên giao mang mã không phải bài nào nên không bị
+     chặn — xem điều 3 mục "Đề giáo viên GIAO" trong docs/claude-reference/data.md. */
+  const dsBai = curriculum.flatMap(c => c.lessons);
+  const xetKhoa = xetKhoaBai(dsBai, quiz.lessonId, getLessonProgress, currentUser.role);
+  if (xetKhoa.khoa && quiz.status !== 'submitted') {
+    /* Bài chặn có thể cũng đang khoá; khi đó nói luôn bài em làm được ngay. */
+    const baiNgay = baiLamDuocNgay(dsBai, quiz.lessonId, getLessonProgress, currentUser.role);
+    return (
+      <Container maxWidth="sm" sx={{ py: 8, textAlign: 'center' }}>
+        <Paper variant="outlined" sx={{ p: 5, borderRadius: 0 }}>
+          <Lock size={48} color="var(--chu-mo)" style={{ margin: '0 auto 16px' }} />
+          <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 1 }}>
+            Bài học đang bị khóa
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+            Em cần đạt từ {DIEM_MO_BAI_SAU}/10 điểm ở đề kiểm tra của{' '}
+            <strong>{xetKhoa.baiTruoc?.title}</strong> thì đề này mới mở.
+            {baiNgay && baiNgay.id !== xetKhoa.baiTruoc?.id
+              ? <> Bài đó cũng chưa mở; bài em làm được ngay là <strong>{baiNgay.title}</strong>. Em xin Chemai đề của bài đó để làm trước nhé.</>
+              : <> Em xin Chemai đề của bài đó để làm trước nhé.</>}
+          </Typography>
+          <Button variant="contained" onClick={() => navigate('/dashboard')} sx={{ textTransform: 'none', borderRadius: 0 }}>
+            Quay lại trang học tập
+          </Button>
+        </Paper>
+      </Container>
+    );
+  }
+
   // Kiểm tra bài thi hết hạn mà chưa nộp
-  const isExpired = quiz.status === 'pending' && new Date().getTime() > new Date(quiz.expiresAt).getTime();
+  const daQuaGio =quiz.status === 'pending' && new Date().getTime() > new Date(quiz.expiresAt).getTime();
+
+  /* Đề giáo viên giao hết giờ: bộ đếm ở trên đang tự nộp (chậm nhất một giây
+     nữa). Hiện màn chờ thay cho các ô chọn, để em không bấm thêm vào một bài
+     sắp được chốt. */
+  if (daQuaGio && quiz.deGiaoId) {
+    return (
+      <Container maxWidth="sm" sx={{ py: 8, textAlign: 'center' }}>
+        <Paper variant="outlined" sx={{ p: 5, borderRadius: 0 }}>
+          <Clock size={48} color="var(--chu-mo)" style={{ margin: '0 auto 16px' }} />
+          <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 1 }}>
+            Đã hết giờ làm bài
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+            {errorMsg || 'Hệ thống đang nộp phần em đã làm…'}
+          </Typography>
+          {!errorMsg && <CircularProgress size={28} />}
+        </Paper>
+      </Container>
+    );
+  }
+
+  const isExpired = daQuaGio;
   if (isExpired) {
     return (
       <Container maxWidth="sm" sx={{ py: 8, textAlign: 'center' }}>
@@ -209,11 +274,25 @@ export const QuizPage: React.FC = () => {
   // ── XỬ LÝ LÀM BÀI / THAY ĐỔI ĐÁP ÁN ──────────────────────────────────────
 
   const handleAnswerChange = (qId: string, val: string) => {
-    setAnswers(prev => ({ ...prev, [qId]: val }));
+    const moi = { ...answersRef.current, [qId]: val };
+    answersRef.current = moi;
+    setAnswers(moi);
+    /* Lưu tạm xuống máy sau MỖI lần chọn (02/10/2026). Trước đó đáp án chỉ nằm
+       trong state: tải lại trang giữa chừng là mất sạch trong khi đồng hồ vẫn
+       chạy — đo được 3 câu đã chọn còn 0. `Quiz.answers` vốn sinh ra để chứa
+       đúng thứ này, và trang đã đọc nó lại lúc mở. */
+    if (quiz.status === 'pending') QuizStorage.updateQuiz(quiz.id, { answers: moi });
+  };
+
+  /** Câu còn bỏ trống. Câu Đúng/Sai nhiều ý thiếu một ý cũng tính là chưa xong. */
+  const chuaLam = (q: Question) => {
+    const tl = (answers[q.id] || '').trim();
+    if (laDungSaiNhieuY(q)) return tl.length < q.yDungSai!.length || tl.includes('-');
+    return !tl;
   };
 
   const handleOpenConfirm = () => {
-    const unansCount = quiz.questions.filter(q => !answers[q.id]?.trim()).length;
+    const unansCount = quiz.questions.filter(chuaLam).length;
     if (unansCount > 0) {
       if (!window.confirm(`Bạn còn ${unansCount} câu hỏi chưa làm. Bạn vẫn muốn nộp bài?`)) {
         return;
@@ -225,8 +304,15 @@ export const QuizPage: React.FC = () => {
   const handleSubmit = () => {
     setSubmitConfirmOpen(false);
     setSubmitting(true);
-    setTimeout(() => {
-      const updated = QuizService.submitQuiz(quiz!.id, answers);
+    setTimeout(() => nopBai(answers), 1200);
+  };
+
+  /* Chấm và nộp. Khai bằng `function` (được đưa lên đầu hàm) vì bộ đếm giờ ở
+     trên gọi nó khi hết giờ, kể cả ở lượt vẽ đã `return` sớm trước dòng này. */
+  function nopBai(dapAn: Record<string, string>) {
+    if (!quiz) return;
+    {
+      const updated = QuizService.submitQuiz(quiz.id, dapAn);
       if (updated) {
         setQuiz(updated);
 
@@ -258,19 +344,17 @@ export const QuizPage: React.FC = () => {
           bestScore: newBestScore,
         };
 
-        if (percent >= 70) {
-          updates.advancedUnlocked = true;
-          /* Đạt 7/10 thì tính bài học là HOÀN THÀNH (18/09/2026). Trước đây chỉ
-             nút "Đánh dấu Xong" ở mục Các khóa học mới đặt được, mà mục đó bị
-             ẩn khỏi menu — nên "Bài học đã hoàn thành" luôn 0 với mọi em.
-             Đề cả chương mang `lessonId` = mã CHƯƠNG, không phải bài: bỏ qua,
-             kẻo đếm một chương thành một bài. */
-          if (curriculum.some(c => c.lessons.some(l => l.id === updated.lessonId))) {
-            updates.basicCompleted = true;
-          }
-          setShowUnlockDialog(true);
-        } else {
-          setShowRetryDialog(true);
+        /* Đạt 7/10 thì tính bài học là HOÀN THÀNH (18/09/2026). Trước đây chỉ
+           nút "Đánh dấu Xong" ở mục Các khóa học mới đặt được, mà mục đó bị
+           ẩn khỏi menu — nên "Bài học đã hoàn thành" luôn 0 với mọi em.
+           Đề cả chương mang `lessonId` = mã CHƯƠNG, không phải bài: bỏ qua,
+           kẻo đếm một chương thành một bài.
+           Hai hộp thoại "Nâng cao" từng bật ở đây đã gỡ ngày 04/10/2026 (chủ dự
+           án chốt bỏ phần Nâng cao): hộp "chưa đạt" không đóng được nên em không
+           xem được bài vừa chấm, hộp "đạt" mời vào một phần không tồn tại. Việc
+           mở bài sau nay đọc thẳng `bestScore` ghi ngay bên trên. */
+        if (percent >= 70 && curriculum.some(c => c.lessons.some(l => l.id === updated.lessonId))) {
+          updates.basicCompleted = true;
         }
 
         updateLessonProgress(updated.lessonId, updates);
@@ -279,11 +363,14 @@ export const QuizPage: React.FC = () => {
         setErrorMsg('Nộp bài thất bại. Vui lòng thử lại.');
       }
       setSubmitting(false);
-    }, 1200);
-  };
+    }
+  }
 
+  /* Làm lại bằng một đề KHÁC của cùng bài (không lặp câu của đề vừa nộp). Gọi từ
+     nút trên trang kết quả khi chưa đạt 70%. */
   const handleRetry = async () => {
     if (!quiz) return;
+    setErrorMsg(null);
     const retryQuiz = await QuizService.createRetryQuiz(
       quiz.chapterId,
       quiz.lessonId,
@@ -293,20 +380,11 @@ export const QuizPage: React.FC = () => {
     );
     if (!retryQuiz) {
       setErrorMsg('Không đủ câu hỏi mới trong ngân hàng để tạo đề làm lại. Vui lòng quay lại màn hình học tập và liên hệ giáo viên.');
-      setShowRetryDialog(false);
       return;
     }
-    setShowRetryDialog(false);
     setQuiz(retryQuiz);
     setAnswers({});
     navigate(`/quiz/${retryQuiz.id}`, { replace: true });
-  };
-
-  const handleSkip = () => {
-    if (!quiz) return;
-    updateLessonProgress(quiz.lessonId, { skippedAdvanced: true });
-    setShowRetryDialog(false);
-    navigate('/dashboard'); // Trở về dashboard để vào bài tiếp theo
   };
 
   // ── RENDER 1: GIAO DIỆN KẾT QUẢ (SAU KHI NỘP BÀI) ──────────────────────────
@@ -314,6 +392,23 @@ export const QuizPage: React.FC = () => {
   if (quiz.status === 'submitted' && quiz.results) {
     const percent = Math.round((quiz.score / quiz.maxScore) * 100);
     const correctCount = Object.values(quiz.results).filter(r => r.correct).length;
+
+    /* Đề tự ôn của MỘT BÀI (không phải đề cả chương, không phải đề giáo viên
+       giao): mới có "làm lại đề khác" và mới liên quan tới việc mở bài sau. */
+    const viTriBai = quiz.deGiaoId ? -1 : dsBai.findIndex(b => b.id === quiz.lessonId);
+    const laChuBai = currentUser.email.toLowerCase() === quiz.userEmail.toLowerCase();
+    const duocLamLai = viTriBai >= 0 && percent < 70 && laChuBai;
+    /* Bài kế tiếp và nó đã mở chưa — đọc tiến độ THẬT, không suy từ điểm của
+       riêng đề này: em có thể đã đạt bài này ở một lần làm khác. */
+    const baiKeTiep = viTriBai >= 0 && currentUser.role === 'student' ? dsBai[viTriBai + 1] : undefined;
+    const xetBaiKeTiep = baiKeTiep
+      ? xetKhoaBai(dsBai, baiKeTiep.id, getLessonProgress, currentUser.role)
+      : null;
+    /* Chỉ nói về bài kế tiếp khi CHÍNH BÀI NÀY là bài chặn của nó. Bài ôn tập
+       không chặn bài nào (xem khoaBai.ts): làm đề ôn tập dưới 70% thì bài sau
+       vẫn mở hay khoá là do một bài khác, nói "cần đạt bài này" là nói sai. */
+    const baiNayChanBaiKe = !!xetBaiKeTiep && xetBaiKeTiep.baiTruoc?.id === quiz.lessonId;
+    const baiKeTiepConKhoa = baiNayChanBaiKe && xetBaiKeTiep!.khoa;
 
     return (
       <Box id="quiz-result-view" sx={{ minHeight: '100vh', py: 6, bgcolor: 'var(--nen-trang)' }}>
@@ -379,15 +474,24 @@ export const QuizPage: React.FC = () => {
               </Grid>
             </Grid>
 
-            {percent >= 70 ? (
+            {/* Hai lời nhận xét dưới đây viết cho đề tự ôn sau buổi trao đổi với
+                gia sư ("kiến thức Socratic vừa trao đổi"). Đề giáo viên giao đã
+                có khung "Bài đã gửi cho giáo viên" ở trên, không nhắc gia sư AI. */}
+            {quiz.deGiaoId ? null : percent >= 70 ? (
               <Alert severity="success" sx={{ borderRadius: 0, textAlign: 'left', mt: 3 }}>
                 <AlertTitle sx={{ fontWeight: 'bold' }}>Chúc mừng! Bạn đã hoàn thành tốt bài học</AlertTitle>
                 Điểm số đạt trên 70% chứng tỏ bạn đã nắm vững kiến thức Socratic vừa trao đổi với Gia sư AI.
+                {baiKeTiep && baiNayChanBaiKe && !baiKeTiepConKhoa && (
+                  <> Bài tiếp theo — <strong>{baiKeTiep.title}</strong> — đã mở.</>
+                )}
               </Alert>
             ) : (
               <Alert severity="warning" sx={{ borderRadius: 0, textAlign: 'left', mt: 3 }}>
                 <AlertTitle sx={{ fontWeight: 'bold' }}>Cần tiếp tục ôn luyện thêm</AlertTitle>
                 Điểm số của bạn dưới 70%. Bạn nên xem kỹ lại phần giải thích chi tiết từng câu sai bên dưới và trao đổi thêm với Gia sư AI.
+                {baiKeTiep && baiNayChanBaiKe && baiKeTiepConKhoa && (
+                  <> Cần đạt từ 70% đề của bài này thì <strong>{baiKeTiep.title}</strong> mới mở.</>
+                )}
               </Alert>
             )}
           </Paper>
@@ -404,12 +508,15 @@ export const QuizPage: React.FC = () => {
               const weightColor = q.difficulty === 'Thấp' ? 'var(--luc)' : q.difficulty === 'Trung bình' ? 'var(--vang)' : 'var(--do)';
 
               return (
-                <Paper key={q.id} variant="outlined" sx={{ p: 3, borderRadius: 0, borderLeft: `5px solid ${isCorrect ? 'var(--luc)' : 'var(--do)'}` }}>
+                /* Không kẻ viền trái dày xanh/đỏ (ui.md cấm kiểu viền đó): đúng
+                   hay sai đã có chip "Câu N", dòng "Điểm đạt" và biểu tượng ở
+                   ô câu trả lời nói rồi. */
+                <Paper key={q.id} variant="outlined" sx={{ p: 3, borderRadius: 0 }}>
                   {/* Câu header */}
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5, flexWrap: 'wrap', gap: 1 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                       <Chip label={`Câu ${idx + 1}`} color={isCorrect ? 'success' : 'error'} size="small" sx={{ fontWeight: 'bold' }} />
-                      <Chip label={q.type} size="small" variant="outlined" />
+                      <Chip label={tenDangCau(q)} size="small" variant="outlined" />
                       <Chip label={q.difficulty} size="small" sx={{ bgcolor: weightColor, color: 'var(--chu-nguoc)', fontSize: '0.7rem', height: 20 }} />
                     </Box>
                     <Typography variant="caption" sx={{ fontWeight: 'bold', color: isCorrect ? 'var(--luc)' : 'var(--do)' }}>
@@ -422,18 +529,52 @@ export const QuizPage: React.FC = () => {
                     <ChemicalText html={q.content} />
                   </Typography>
 
+                  {/* Câu Đúng/Sai nhiều ý: từng ý kèm lựa chọn của em và đáp án.
+                      Thiếu khối này thì em chỉ thấy "a) Đúng · b) Sai" mà không
+                      biết a, b là ý nào. */}
+                  {laDungSaiNhieuY(q) && (
+                    <Box sx={{ mb: 2, border: '1px solid var(--vien)' }}>
+                      {giaiMaDungSai(quiz.answers?.[q.id] || '', q.yDungSai!.length).map((chon, i) => {
+                        const y = q.yDungSai![i];
+                        const dungY = chon === y.v;
+                        return (
+                          <Box key={i} sx={{ display: 'flex', gap: 1.5, alignItems: 'flex-start', flexWrap: 'wrap', p: 1.5, borderTop: i ? '1px solid var(--vien)' : 'none' }}>
+                            <Box sx={{ color: dungY ? 'var(--luc-tham)' : 'var(--do-dam)', display: 'flex', mt: 0.3 }}>
+                              {dungY ? <CheckCircle size={16} /> : <XCircle size={16} />}
+                            </Box>
+                            <Typography variant="body2" sx={{ flex: 1, minWidth: 200, color: 'var(--chu-dam-2)' }}>
+                              <strong>{chuY(i)})</strong> <ChemicalText html={y.s} />
+                            </Typography>
+                            <Typography variant="caption" sx={{ color: 'var(--chu-2)', whiteSpace: 'nowrap' }}>
+                              Em chọn: <strong>{chon === null ? 'bỏ trống' : chon ? 'Đúng' : 'Sai'}</strong>
+                              {' · '}Đáp án: <strong>{y.v ? 'Đúng' : 'Sai'}</strong>
+                            </Typography>
+                          </Box>
+                        );
+                      })}
+                    </Box>
+                  )}
+
                   {/* Hiển thị câu trả lời */}
-                  <Box sx={{ p: 2, bgcolor: 'var(--nen-trang)', borderRadius: 0, mb: 2 }}>
+                  <Box sx={{ p: 2, bgcolor: 'var(--nen-trang)', borderRadius: 0, mb: 2, display: laDungSaiNhieuY(q) ? 'none' : 'block' }}>
                     <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5, fontWeight: 'bold' }}>
                       CÂU TRẢ LỜI CỦA BẠN:
                     </Typography>
                     <Typography variant="body2" sx={{
                       fontWeight: 600,
                       color: isCorrect ? 'var(--luc-tham)' : 'var(--do-dam)',
-                      display: 'flex', alignItems: 'center', gap: 0.5
+                      /* Căn theo dòng ĐẦU: nội dung phương án có thể dài vài dòng */
+                      display: 'flex', alignItems: 'flex-start', gap: 0.5
                     }}>
-                      {isCorrect ? <CheckCircle size={16} /> : <XCircle size={16} />}
-                      {res?.studentAnswer || '(Không có câu trả lời)'}
+                      {isCorrect
+                        ? <CheckCircle size={16} style={{ flexShrink: 0, marginTop: 2 }} />
+                        : <XCircle size={16} style={{ flexShrink: 0, marginTop: 2 }} />}
+                      <span>
+                        {res?.studentAnswer || '(Không có câu trả lời)'}
+                        {noiDungPhuongAn(q, res?.studentAnswer) && (
+                          <>. <ChemicalText html={noiDungPhuongAn(q, res?.studentAnswer)!} /></>
+                        )}
+                      </span>
                     </Typography>
                   </Box>
 
@@ -441,12 +582,13 @@ export const QuizPage: React.FC = () => {
                   {res?.feedback && (
                     <Box sx={{ p: 2, bgcolor: 'var(--nen-luc-nhat2)', borderRadius: 0, mb: 2, border: '1px solid var(--luc-tham-nen)' }}>
                       <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5, fontWeight: 'bold', color: 'var(--luc-tham)' }}>
-                        NHẬN XÉT CỦA GIA SƯ AI:
+                        {/* Câu chấm bằng so đáp án thì không có AI nào nhận xét cả. */}
+                        {q.type === 'Tự luận' && !dapSoCua(q) ? 'NHẬN XÉT CỦA GIA SƯ AI:' : 'KẾT QUẢ CHẤM:'}
                       </Typography>
                       <Typography variant="body2" sx={{ whiteSpace: 'pre-line', color: 'var(--chu-dam-3)' }}>
                         {res.feedback}
                       </Typography>
-                      {q.type === 'Tự luận' && (
+                      {q.type === 'Tự luận' && !dapSoCua(q) && (
                         <Box sx={{ mt: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
                           <Chip label={`Độ tin cậy: ${res.confidence}`} size="small" variant="outlined" color={res.confidence === 'high' ? 'success' : res.confidence === 'medium' ? 'warning' : 'default'} />
                           {res.confidence !== 'high' && (
@@ -459,8 +601,8 @@ export const QuizPage: React.FC = () => {
                     </Box>
                   )}
 
-                  {/* Đáp án đúng mẫu */}
-                  {!isCorrect && (
+                  {/* Đáp án đúng mẫu (câu Đúng/Sai nhiều ý đã ghi đáp án ở từng ý) */}
+                  {!isCorrect && !laDungSaiNhieuY(q) && (
                     <Box sx={{ p: 2, bgcolor: 'var(--nen-nhat)', borderRadius: 0 }}>
                       <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5, fontWeight: 'bold' }}>
                         ĐÁP ÁN MẪU CHUẨN:
@@ -470,6 +612,9 @@ export const QuizPage: React.FC = () => {
                           ? q.essayPoints?.map(p => `${p.label}: ${p.content}`).join('\n')
                           : q.correctAnswer
                         }
+                        {noiDungPhuongAn(q, q.correctAnswer) && (
+                          <>. <ChemicalText html={noiDungPhuongAn(q, q.correctAnswer)!} /></>
+                        )}
                       </Typography>
                     </Box>
                   )}
@@ -479,7 +624,7 @@ export const QuizPage: React.FC = () => {
                       chỗ này trước nay bỏ trống dù ngân hàng có sẵn lời giải
                       cho cả 1.554 câu — xem `giaiThich` trong library/types.ts. */}
                   {q.giaiThich && (
-                    <Box sx={{ mt: 2, p: 2, bgcolor: 'var(--nen-nhat)', borderRadius: 0, borderLeft: '3px solid var(--vien-2)' }}>
+                    <Box sx={{ mt: 2, p: 2, bgcolor: 'var(--nen-nhat)', borderRadius: 0, border: '1px solid var(--vien)' }}>
                       <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5, fontWeight: 'bold' }}>
                         LỜI GIẢI:
                       </Typography>
@@ -493,10 +638,26 @@ export const QuizPage: React.FC = () => {
             })}
           </Box>
 
-          {/* Nút quay lại */}
-          <Box sx={{ mt: 4, textAlign: 'center' }}>
+          {/* Chưa đạt 70% đề của một bài: cho làm lại bằng đề khác NGAY TẠI ĐÂY.
+              Trước 04/10/2026 lời mời này nằm trong một hộp thoại không đóng
+              được, che luôn bài vừa chấm. Lỗi tạo đề hiện ngay trên hàng nút. */}
+          {errorMsg && (
+            <Alert severity="error" sx={{ mt: 3, borderRadius: 0 }}>{errorMsg}</Alert>
+          )}
+          <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center', gap: 2, flexWrap: 'wrap' }}>
+            {duocLamLai && (
+              <Button
+                id="quiz-retry-btn"
+                variant="contained"
+                startIcon={<RotateCcw size={16} />}
+                onClick={handleRetry}
+                sx={{ textTransform: 'none', px: 4, py: 1.2, borderRadius: 0, boxShadow: 'none' }}
+              >
+                Làm lại đề khác
+              </Button>
+            )}
             <Button
-              variant="contained"
+              variant={duocLamLai ? 'outlined' : 'contained'}
               startIcon={<ArrowLeft size={16} />}
               onClick={() => navigate('/dashboard')}
               sx={{ textTransform: 'none', px: 4, py: 1.2, borderRadius: 0 }}
@@ -505,45 +666,6 @@ export const QuizPage: React.FC = () => {
             </Button>
           </Box>
         </Container>
-
-        {/* Dialog báo chưa đạt (dưới 7 điểm) */}
-        <Dialog open={showRetryDialog} onClose={() => {}} maxWidth="sm" fullWidth>
-          <DialogTitle sx={{ fontWeight: 'bold', color: 'var(--chu-dam)' }}>
-            Chưa đạt yêu cầu phần Cơ bản
-          </DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              Điểm số của bạn dưới 7 điểm. Phần <strong>Nâng cao</strong> của bài này vẫn bị khóa.
-              Bạn muốn làm lại đề kiểm tra khác (cùng chủ đề) để cải thiện điểm số và mở khóa phần Nâng cao, hay bỏ qua để chuyển sang bài học tiếp theo?
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions sx={{ px: 3, pb: 3, justifyContent: 'space-between' }}>
-            <Button onClick={handleSkip} color="inherit" sx={{ textTransform: 'none', borderRadius: 0 }}>
-              Bỏ qua, học tiếp Bài sau
-            </Button>
-            <Button onClick={handleRetry} color="primary" variant="contained" sx={{ textTransform: 'none', borderRadius: 0, boxShadow: 'none' }}>
-              Làm lại bài kiểm tra
-            </Button>
-          </DialogActions>
-        </Dialog>
-
-        {/* Dialog báo đạt (>= 7 điểm) */}
-        <Dialog open={showUnlockDialog} onClose={() => setShowUnlockDialog(false)} maxWidth="sm" fullWidth>
-          <DialogTitle sx={{ fontWeight: 'bold', color: 'var(--luc)' }}>
-            Chúc mừng! Mở khoá thành công
-          </DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              Tuyệt vời! Bạn đã vượt qua bài kiểm tra với điểm số xuất sắc. 
-              Phần <strong>Nâng cao</strong> của bài học này đã được mở khóa dành riêng cho bạn!
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions sx={{ px: 3, pb: 3, justifyContent: 'center' }}>
-            <Button onClick={() => { setShowUnlockDialog(false); navigate('/dashboard'); }} color="primary" variant="contained" sx={{ textTransform: 'none', borderRadius: 0, boxShadow: 'none' }}>
-              Vào phần Nâng cao ngay
-            </Button>
-          </DialogActions>
-        </Dialog>
       </Box>
     );
   }
@@ -576,7 +698,9 @@ export const QuizPage: React.FC = () => {
                 Thời gian nộp bài còn lại
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                Link bài thi hết hạn sau 24h kể từ khi tạo.
+                {quiz.deGiaoId
+                  ? 'Hết giờ, hệ thống tự nộp phần em đã làm.'
+                  : 'Link bài thi hết hạn sau 24h kể từ khi tạo.'}
               </Typography>
             </Box>
           </Box>
@@ -597,10 +721,13 @@ export const QuizPage: React.FC = () => {
         <Paper variant="outlined" sx={{ p: 4, mb: 4, borderRadius: 0 }}>
           <Typography variant="h5" sx={{ fontWeight: 900, color: 'var(--luc-tham)', mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
             <GraduationCap size={24} />
-            BÀI KIỂM TRA TỰ HỌC PHẢN XẠ HÓA 11
+            {/* Đề giáo viên giao mang tên cô đặt; tiêu đề cũ chỉ đúng với đề tự ôn. */}
+            {quiz.deGiaoId ? (quiz.tenDe || 'Bài kiểm tra giáo viên giao') : 'BÀI KIỂM TRA TỰ HỌC PHẢN XẠ HÓA 11'}
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            Bài kiểm tra bám sát nội dung thảo luận Socratic vừa qua. Hãy suy nghĩ kỹ và trả lời đầy đủ.
+            {quiz.deGiaoId
+              ? 'Đề do giáo viên giao, mỗi em nộp một lần. Đáp án em chọn được lưu tạm trên máy này.'
+              : 'Bài kiểm tra bám sát nội dung thảo luận Socratic vừa qua. Hãy suy nghĩ kỹ và trả lời đầy đủ.'}
           </Typography>
           <Divider sx={{ mb: 2 }} />
           <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
@@ -621,7 +748,7 @@ export const QuizPage: React.FC = () => {
                 {/* Câu header */}
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
                   <Chip label={`Câu ${idx + 1}`} color="primary" size="small" sx={{ fontWeight: 'bold' }} />
-                  <Chip label={q.type} size="small" variant="outlined" />
+                  <Chip label={tenDangCau(q)} size="small" variant="outlined" />
                   <Chip label={q.difficulty} size="small" sx={{ bgcolor: weightColor, color: 'var(--chu-nguoc)', fontSize: '0.7rem', height: 20 }} />
                   <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'bold', ml: 'auto' }}>
                     {q.points} điểm
@@ -680,7 +807,56 @@ export const QuizPage: React.FC = () => {
                   </FormControl>
                 )}
 
-                {q.type === 'Đúng/Sai' && (
+                {/* Đúng/Sai NHIỀU Ý: mỗi ý một cặp nút, chấm từng ý (02/10/2026).
+                    Đáp án lưu thành một chuỗi mã ("DS-D") — xem chamDiem.ts. */}
+                {laDungSaiNhieuY(q) && (() => {
+                  const dap = giaiMaDungSai(value, q.yDungSai!.length);
+                  const chon = (i: number, v: boolean) => {
+                    const moi = [...dap];
+                    moi[i] = v;
+                    handleAnswerChange(q.id, maHoaDungSai(moi));
+                  };
+                  return (
+                    <Box>
+                      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
+                        Chọn Đúng hoặc Sai cho từng ý. Đúng hết được trọn điểm; sai 1 ý còn 0,5; sai 2 ý 0,25; sai 3 ý 0,1.
+                      </Typography>
+                      <Box sx={{ border: '1px solid var(--vien)' }}>
+                        {q.yDungSai!.map((y, i) => (
+                          <Box
+                            key={i}
+                            sx={{
+                              display: 'flex', gap: 1.5, alignItems: 'center', flexWrap: 'wrap',
+                              p: 1.5, borderTop: i ? '1px solid var(--vien)' : 'none',
+                            }}
+                          >
+                            <Typography variant="body2" sx={{ flex: 1, minWidth: 200, color: 'var(--chu-dam-2)' }}>
+                              <strong>{chuY(i)})</strong> <ChemicalText html={y.s} />
+                            </Typography>
+                            <Box sx={{ display: 'flex', gap: 1 }}>
+                              {[true, false].map(v => (
+                                <Button
+                                  key={String(v)}
+                                  size="small"
+                                  variant={dap[i] === v ? 'contained' : 'outlined'}
+                                  color={v ? 'primary' : 'secondary'}
+                                  aria-pressed={dap[i] === v}
+                                  aria-label={`Ý ${chuY(i)}: ${v ? 'Đúng' : 'Sai'}`}
+                                  onClick={() => chon(i, v)}
+                                  sx={{ minWidth: 72, borderRadius: 0, fontWeight: 'bold', boxShadow: 'none' }}
+                                >
+                                  {v ? 'Đúng' : 'Sai'}
+                                </Button>
+                              ))}
+                            </Box>
+                          </Box>
+                        ))}
+                      </Box>
+                    </Box>
+                  );
+                })()}
+
+                {q.type === 'Đúng/Sai' && !laDungSaiNhieuY(q) && (
                   <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
                     {['Đúng', 'Sai'].map(opt => {
                       const isSelected = value === opt;
@@ -706,7 +882,21 @@ export const QuizPage: React.FC = () => {
                   </Box>
                 )}
 
-                {q.type === 'Tự luận' && (
+                {/* Trả lời ngắn: một ô nhập đáp số, chấm bằng so số. Ô nhiều dòng
+                    bên dưới chỉ còn dành cho câu tự luận thật. */}
+                {q.type === 'Tự luận' && dapSoCua(q) && (
+                  <TextField
+                    size="small"
+                    placeholder="Đáp số"
+                    value={value}
+                    onChange={e => handleAnswerChange(q.id, e.target.value)}
+                    helperText={`Chỉ gõ con số${dapSoCua(q)!.unit ? ` (đơn vị: ${dapSoCua(q)!.unit})` : ''}. Dấu phẩy hay dấu chấm thập phân đều được.`}
+                    slotProps={{ htmlInput: { 'aria-label': `Đáp số câu ${idx + 1}`, inputMode: 'decimal' } }}
+                    sx={{ width: { xs: '100%', sm: 320 }, '& .MuiOutlinedInput-root': { borderRadius: 0 } }}
+                  />
+                )}
+
+                {q.type === 'Tự luận' && !dapSoCua(q) && (
                   <TextField
                     fullWidth
                     multiline

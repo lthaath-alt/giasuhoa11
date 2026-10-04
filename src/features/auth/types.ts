@@ -255,9 +255,15 @@ export interface QuizAttempt {
 
 export interface LessonProgress {
   lessonId: string;
+  /** Bài đã học: đạt 70% đề của bài HOẶC xem hết slide. KHÔNG phải điều kiện mở
+   *  bài sau — cái đó là `bestScore`, xem `features/lessons/khoaBai.ts`. */
   basicCompleted: boolean;
   quizAttempts: QuizAttempt[];
+  /** Điểm cao nhất ở đề kiểm tra của bài, thang 10. Bài sau mở khi số này ≥ 7. */
   bestScore: number;
+  /* Ba trường dưới thuộc phần "Nâng cao" đã bỏ ngày 04/10/2026. GIỮ trong kiểu vì
+     hồ sơ cũ trên Firestore còn mang chúng và các chỗ dựng hồ sơ mặc định vẫn
+     điền; không nơi nào còn đọc để quyết định điều gì. Đừng dựa vào chúng. */
   advancedUnlocked: boolean;
   advancedCompleted: boolean;
   skippedAdvanced: boolean;

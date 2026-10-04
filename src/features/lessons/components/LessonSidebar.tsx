@@ -4,6 +4,7 @@ import { BookOpen, ChevronLeft, Trash2, Lock } from 'lucide-react';
 import { Lesson } from '../types';
 import { User, LearningProgress } from '../../auth/types';
 import { useApp } from '../../../core/hooks/useApp';
+import { xetKhoaBai, DIEM_MO_BAI_SAU } from '../khoaBai';
 
 interface LessonSidebarProps {
   selectedLesson: Lesson | null;
@@ -19,12 +20,17 @@ export const LessonSidebar: React.FC<LessonSidebarProps> = ({
   getUserProgress,
 }) => {
   const { curriculum, deleteChapter, deleteLesson, getLessonProgress } = useApp();
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  /* Ở điện thoại danh mục xếp TRÊN nội dung bài (lưới một cột) và cao hơn 2.500
+     px, nên mở sẵn là em phải cuộn qua cả 25 bài mới tới bài vừa chọn. Mặc định
+     thu gọn ở bề ngang đó; từ `md` (900 px) trở lên nó là cột bên, mở sẵn. */
+  const [isCollapsed, setIsCollapsed] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(max-width: 899.95px)').matches,
+  );
 
   // Fallback nếu curriculum chưa được tải hoặc rỗng
   const displayCurriculum = curriculum && curriculum.length > 0 ? curriculum : [];
-  
-  // Dàn phẳng danh sách bài học để kiểm tra thứ tự
+
+  // Dàn phẳng danh sách bài học để xét bài liền trước
   const allLessons = displayCurriculum.flatMap(c => c.lessons);
 
   if (isCollapsed) {
@@ -49,12 +55,18 @@ export const LessonSidebar: React.FC<LessonSidebarProps> = ({
               borderColor: 'var(--tin-hieu)',
               color: 'var(--chu-dam)',
             },
-            position: 'sticky',
+            position: { xs: 'static', md: 'sticky' },
             top: 20,
             transition: 'all 0.2s',
+            gap: 1,
           }}
         >
           <BookOpen size={24} />
+          {/* Ở điện thoại ô này trải hết bề ngang; một biểu tượng trơ trọi thì
+              không ai biết bấm vào để làm gì. */}
+          <Typography variant="body2" sx={{ display: { xs: 'inline', md: 'none' }, fontWeight: 'bold' }}>
+            Danh mục bài học
+          </Typography>
         </Paper>
       </Tooltip>
     );
@@ -68,8 +80,13 @@ export const LessonSidebar: React.FC<LessonSidebarProps> = ({
         borderRadius: 0,
         border: '1px solid var(--vien)',
         backgroundColor: 'var(--nen-the)',
-        position: 'sticky',
+        /* `sticky` CHỈ khi là cột bên. Ở lưới một cột (điện thoại) danh mục cao
+           2.516 px dính vào mép trên rồi trượt ĐÈ lên nội dung bài nằm ngay dưới
+           nó — đo 02/10/2026 ở 375 px: chữ bài học và danh mục chồng lên nhau,
+           chỉ còn mấy cái nút lọt ra. */
+        position: { xs: 'static', md: 'sticky' },
         top: 20,
+        width: { md: 260 },
         boxShadow: 'none',
       }}
     >
@@ -141,29 +158,38 @@ export const LessonSidebar: React.FC<LessonSidebarProps> = ({
               <List sx={{ p: 0, display: 'flex', flexDirection: 'column', gap: 0.5 }}>
                 {chapter.lessons.map((les) => {
                   const isSelected = selectedLesson?.id === les.id;
-                  const lessonIndex = allLessons.findIndex(l => l.id === les.id);
-                  
-                  let isLocked = false;
-                  if (currentUser && currentUser.role === 'student') {
-                    if (lessonIndex > 0) {
-                      const prevLesson = allLessons[lessonIndex - 1];
-                      const prevProgress = getLessonProgress(prevLesson.id);
-                      if (!prevProgress || !prevProgress.basicCompleted || (!prevProgress.advancedCompleted && !prevProgress.skippedAdvanced)) {
-                        isLocked = true;
-                      }
-                    }
-                  }
 
-                  const progress = getLessonProgress(les.id);
-                  const isBasicDone = progress?.basicCompleted;
-                  const isAdvUnlocked = progress?.advancedUnlocked;
-                  const isAdvDone = progress?.advancedCompleted;
+                  /* Khoá bài tuần tự (04/10/2026): bài sau chỉ mở khi bài liền
+                     trước đã đạt từ 7/10 đề kiểm tra. Luật nằm ở `khoaBai.ts`,
+                     dùng chung với QuizPage, ô tìm kiếm và chỗ Chemai phát đề.
+                     Chỉ học sinh bị khoá; khách và thầy cô xem tự do. */
+                  const xetKhoa = xetKhoaBai(allLessons, les.id, getLessonProgress, currentUser?.role);
+                  const isLocked = xetKhoa.khoa;
+                  /* Gọi tên BÀI CHẶN ("Bài 8"), không ghi chung chung "bài trước":
+                     bài ôn tập không chặn, nên bài chặn của Bài 10 là Bài 8. */
+                  const tenBaiChan = xetKhoa.baiTruoc?.title.split(':')[0] ?? 'bài trước';
+
+                  /* Nhãn "Đạt" bám ĐÚNG điều kiện mở bài sau. Trước đây là cặp
+                     "CB" / "NC" (cơ bản / nâng cao); phần Nâng cao đã bỏ nên
+                     "CB" đứng một mình không còn nghĩa. */
+                  const daDat = (getLessonProgress(les.id)?.bestScore ?? 0) >= DIEM_MO_BAI_SAU;
 
                   return (
-                    <Tooltip key={les.id} title={isLocked ? `Hoàn thành bài trước đó để mở khóa` : ''} placement="right">
+                    <Tooltip
+                      key={les.id}
+                      title={isLocked ? `Đạt từ ${DIEM_MO_BAI_SAU} điểm đề kiểm tra ${tenBaiChan} để mở khóa` : ''}
+                      placement="right"
+                    >
                       <ListItem
                         id={`lesson-item-${les.id}`}
-                        onClick={() => !isLocked && setSelectedLesson(les)}
+                        aria-disabled={isLocked || undefined}
+                        onClick={() => {
+                          if (isLocked) return;
+                          setSelectedLesson(les);
+                          /* Điện thoại: chọn xong thì gập danh mục lại, để bài
+                             vừa chọn hiện ngay bên dưới thay vì cách 2.500 px. */
+                          if (window.matchMedia('(max-width: 899.95px)').matches) setIsCollapsed(true);
+                        }}
                         sx={{
                           borderRadius: 0,
                           cursor: isLocked ? 'not-allowed' : 'pointer',
@@ -199,36 +225,14 @@ export const LessonSidebar: React.FC<LessonSidebarProps> = ({
                                 <Box sx={{ p: 0.5, bgcolor: 'var(--nen-nhat)', borderRadius: 0, display: 'flex' }}>
                                   <Lock size={14} color="var(--chu-2)" />
                                 </Box>
-                              ) : (
-                                <>
-                                  {isBasicDone && (
-                                    <Chip
-                                      label="CB"
-                                      size="small"
-                                      color="success"
-                                      variant="filled"
-                                      sx={{ height: 16, fontSize: '0.6rem', fontWeight: 'bold', minWidth: 'auto', px: 0.5 }}
-                                    />
-                                  )}
-                                  {isAdvDone && (
-                                    <Chip
-                                      label="NC"
-                                      size="small"
-                                      color="secondary"
-                                      variant="filled"
-                                      sx={{ height: 16, fontSize: '0.6rem', fontWeight: 'bold', minWidth: 'auto', px: 0.5 }}
-                                    />
-                                  )}
-                                  {isAdvUnlocked && !isAdvDone && (
-                                    <Chip
-                                      label="NC 🔓"
-                                      size="small"
-                                      variant="outlined"
-                                      color="secondary"
-                                      sx={{ height: 16, fontSize: '0.6rem', fontWeight: 'bold', minWidth: 'auto', px: 0.5 }}
-                                    />
-                                  )}
-                                </>
+                              ) : daDat && (
+                                <Chip
+                                  label="Đạt"
+                                  size="small"
+                                  color="success"
+                                  variant="filled"
+                                  sx={{ height: 16, fontSize: '0.6rem', fontWeight: 'bold', minWidth: 'auto', px: 0.5 }}
+                                />
                               )}
                               {(currentUser?.role === 'admin' || currentUser?.role === 'school_admin') && (
                                 <IconButton
@@ -258,7 +262,7 @@ export const LessonSidebar: React.FC<LessonSidebarProps> = ({
                           </Typography>
                         }
                         />
-                    </ListItem>
+                      </ListItem>
                     </Tooltip>
                   );
                 })}

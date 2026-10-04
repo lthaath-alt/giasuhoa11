@@ -1,276 +1,114 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
-  Box, Typography, Button, Paper, Table, TableBody, TableCell,
-  TableContainer, TableHead, TableRow, Chip, IconButton, Tooltip,
-  Dialog, DialogTitle, DialogContent, DialogActions,
-  Divider, Alert, Grid
+  Box, Typography, Paper, Table, TableBody, TableCell,
+  TableContainer, TableHead, TableRow, Alert, Grid,
 } from '@mui/material';
-import { Copy, Eye, EyeOff, Trash2, Shield, ShieldAlert, ShieldCheck, KeyRound } from 'lucide-react';
+import { KeyRound, Mail, UserX } from 'lucide-react';
 import { User as UserType } from '../../features/auth/types';
-import { useApp } from '../hooks/useApp';
 
-// ─── CredentialDialog (shared inline) ─────────────────────────────────────────
+/* Trang này trước 04/10/2026 gồm ba thứ, và cả ba đều không thật:
+     - Hai ô "Mật khẩu Cấp 1" / "Mật khẩu Cấp 2" chỉ ghi "Tính năng đang được
+       hoàn thiện". Chủ dự án chốt bỏ việc chia mật khẩu theo cấp.
+     - "Danh sách yêu cầu cấp lại mật khẩu" là dữ liệu GIẢ: một `useEffect` lấy
+       hai học sinh đầu danh sách làm "yêu cầu hôm nay". Hệ thống không hề có
+       hàng đợi yêu cầu nào — học sinh tự bấm "Quên mật khẩu?" ở màn đăng nhập.
+     - Nút "Cấp lại mật khẩu" bên cạnh lại gửi THƯ ĐẶT LẠI THẬT cho đúng em đó,
+       tức một em không yêu cầu gì vẫn nhận thư.
+   Nay trang chỉ nói điều đúng: mật khẩu đặt lại bằng cách nào, và tài khoản
+   nào trong phạm vi quản lý KHÔNG tự đặt lại được. */
 
-interface CredentialDialogProps {
-  open: boolean;
-  onClose: () => void;
-  credentials: { identifier: string; password: string; name: string } | null;
-}
-
-const CredentialDialog: React.FC<CredentialDialogProps> = ({ open, onClose, credentials }) => {
-  const [showPassword, setShowPassword] = useState(false);
-  const [copied, setCopied] = useState(false);
-
-  useEffect(() => {
-    if (!open) setShowPassword(false);
-  }, [open]);
-
-  const copyAll = () => {
-    if (!credentials) return;
-    const text = `Thông tin đăng nhập:\nHọ tên: ${credentials.name}\nTài khoản: ${credentials.identifier}\nMật khẩu: ${credentials.password}`;
-    navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle sx={{ bgcolor: 'var(--luc-tham-nen)', color: 'var(--chu-nguoc)', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1 }}>
-        <ShieldCheck size={24} />
-        Mật khẩu đã được cấp lại!
-      </DialogTitle>
-      <DialogContent sx={{ pt: 3 }}>
-        <Alert severity="warning" sx={{ mb: 2, borderRadius: 0 }}>
-          Sao chép và cấp thông tin này cho người dùng ngay bây giờ. Mật khẩu sẽ không hiển thị lại ở bất kỳ đâu trong hệ thống!
-        </Alert>
-
-        {credentials && (
-          <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 0, bgcolor: 'var(--nen-trang)' }}>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-              <Box>
-                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'bold' }}>HỌ TÊN</Typography>
-                <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{credentials.name}</Typography>
-              </Box>
-              <Divider />
-              <Box>
-                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'bold' }}>TÀI KHOẢN ĐĂNG NHẬP</Typography>
-                <Typography variant="body1" sx={{ fontWeight: 'bold', fontFamily: 'monospace', color: 'var(--luc-tham)' }}>
-                  {credentials.identifier}
-                </Typography>
-              </Box>
-              <Divider />
-              <Box>
-                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'bold' }}>MẬT KHẨU MỚI</Typography>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Typography variant="body1" sx={{ fontWeight: 'bold', fontFamily: 'monospace', color: 'var(--chu-dam)', letterSpacing: showPassword ? 0 : 4 }}>
-                    {showPassword ? credentials.password : '••••••••••'}
-                  </Typography>
-                  <IconButton size="small" onClick={() => setShowPassword(v => !v)}>
-                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </IconButton>
-                </Box>
-              </Box>
-            </Box>
-          </Paper>
-        )}
-      </DialogContent>
-      <DialogActions sx={{ px: 3, pb: 2.5, gap: 1 }}>
-        <Button
-          variant="outlined"
-          startIcon={<Copy size={16} />}
-          onClick={copyAll}
-          sx={{ borderRadius: 0, textTransform: 'none' }}
-        >
-          {copied ? '✓ Đã sao chép!' : 'Sao chép tất cả'}
-        </Button>
-        <Button variant="contained" color="primary" onClick={onClose} sx={{ borderRadius: 0, textTransform: 'none' }}>
-          Đóng
-        </Button>
-      </DialogActions>
-    </Dialog>
-  );
-};
-
+/** Đuôi địa chỉ của tài khoản tạo bằng tên đăng nhập, không có email thật.
+ *  Ghép ở `createStudent` trong AppContext; xem docs/claude-reference/auth.md. */
+const DUOI_KHONG_EMAIL = '@internal.local';
 
 interface Props {
   users: UserType[];
 }
 
+const BUOC_DAT_LAI = [
+  'Ở màn đăng nhập, bấm "Quên mật khẩu?".',
+  'Nhập email tài khoản rồi bấm "Gửi thư đặt lại mật khẩu".',
+  'Mở thư, bấm đường dẫn trong đó để tự đặt mật khẩu mới. Không thấy thư thì xem hộp thư rác.',
+];
+
 export const PasswordManagement: React.FC<Props> = ({ users }) => {
-  const { forgotPassword } = useApp();
-  
-  const [resetRequests, setResetRequests] = useState<UserType[]>([]);
-  const [credentialDialog, setCredentialDialog] = useState<{ identifier: string; password: string; name: string } | null>(null);
-
-  useEffect(() => {
-    const students = users.filter(u => u.role === 'student');
-    if (students.length > 0 && resetRequests.length === 0) {
-      setResetRequests(students.slice(0, Math.min(2, students.length)));
-    }
-  }, [users]);
-
-  /* Từ 10/09/2026 `forgotPassword` GỬI THƯ đặt lại chứ không sinh mật khẩu mới
-     nữa, nên nó không còn trả về `newPassword`. Bản cũ ở đây đọc
-     `res.newPassword` rồi mở hộp thoại khoe mật khẩu — nay điều kiện đó không
-     bao giờ đúng, hộp thoại không bao giờ hiện, và người dùng chỉ thấy một
-     `alert` báo lỗi dù thư đã gửi đi rồi.
-     Nay hiện thẳng câu trả lời của hệ thống. Hộp thoại `credentialDialog` vẫn
-     còn để phục vụ luồng TẠO tài khoản mới — chỗ đó admin tự đặt mật khẩu ban
-     đầu nên vẫn có gì để hiện. */
-  const handleResetPassword = async (user: UserType) => {
-    const identifier = user.email || user.username!;
-    const res = await forgotPassword(identifier);
-    alert(res.message);
-    if (res.success) {
-      setResetRequests(prev => prev.filter(req => req.id !== user.id));
-    }
-  };
-
-  const removeRequest = (userId: string) => {
-    setResetRequests(prev => prev.filter(req => req.id !== userId));
-  };
-
-  const getRoleChip = (role: string) => {
-    switch (role) {
-      case 'admin': return <Chip size="small" label="Quản trị Website" sx={{ bgcolor: 'var(--nen-vang-nhat)', color: 'var(--vang-dam)', fontWeight: 'bold' }} />;
-      case 'school_admin': return <Chip size="small" label="Quản trị Trường học" sx={{ bgcolor: 'var(--nen-tim-nhat)', color: 'var(--tim)', fontWeight: 'bold' }} />;
-      case 'teacher': return <Chip size="small" label="Giáo viên" sx={{ bgcolor: 'var(--nen-luc-nhat)', color: 'var(--luc-tham)', fontWeight: 'bold' }} />;
-      case 'student': return <Chip size="small" label="Học sinh" sx={{ bgcolor: 'var(--nen-xanh-nhat)', color: 'var(--xanh-troi)', fontWeight: 'bold' }} />;
-      default: return <Chip size="small" label={role} />;
-    }
-  };
+  const khongEmail = users
+    .filter(u => (u.email || '').toLowerCase().endsWith(DUOI_KHONG_EMAIL))
+    .sort((a, b) => a.name.localeCompare(b.name, 'vi'));
 
   return (
     <Box>
-      <Box sx={{ mb: 4, display: 'flex', flexDirection: 'column', gap: 3 }}>
-        
-        {/* Phân cấp mật khẩu 3 hộp ngang */}
-        <Grid container spacing={3}>
-          {/* Hộp 1 */}
-          <Grid size={{ xs: 12, md: 4 }}>
-            <Paper elevation={0} sx={{ p: 3, borderRadius: 0, border: '1px solid var(--vien)', height: '100%', display: 'flex', flexDirection: 'column' }}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Typography variant="h6" sx={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Shield size={20} color="var(--xanh)" /> Mật khẩu Cấp 1
-                </Typography>
-                <Chip label="Bảo mật mặc định" size="small" sx={{ bgcolor: 'var(--nen-xanh-nhat)', color: 'var(--xanh)', fontWeight: 'bold' }} />
-              </Box>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 3, flexGrow: 1 }}>
-                Dành cho học sinh thường. Quy tắc: tối thiểu 8 ký tự, gồm chữ, số và ký tự đặc biệt.
-              </Typography>
-              <Alert severity="info" sx={{ borderRadius: 0 }}>
-                Tính năng đang được hoàn thiện
-              </Alert>
-            </Paper>
-          </Grid>
-          
-          {/* Hộp 2 */}
-          <Grid size={{ xs: 12, md: 4 }}>
-            <Paper elevation={0} sx={{ p: 3, borderRadius: 0, border: '1px solid var(--vien)', height: '100%', display: 'flex', flexDirection: 'column' }}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Typography variant="h6" sx={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <ShieldCheck size={20} color="var(--tim)" /> Mật khẩu Cấp 2
-                </Typography>
-                <Chip label="Độ nâng cao" size="small" sx={{ bgcolor: 'var(--nen-tim-nhat)', color: 'var(--tim)', fontWeight: 'bold' }} />
-              </Box>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 3, flexGrow: 1 }}>
-                Dành cho học sinh đạt trên 8 điểm ở bài kiểm tra do AI chấm, được mở khoá nội dung nâng cao.
-              </Typography>
-              <Alert severity="info" sx={{ borderRadius: 0 }}>
-                Tính năng đang được hoàn thiện
-              </Alert>
-            </Paper>
-          </Grid>
-          
-          {/* Hộp 3 */}
-          <Grid size={{ xs: 12, md: 4 }}>
-            <Paper elevation={0} sx={{ p: 3, borderRadius: 0, border: '1px solid var(--tin-hieu-vien)', bgcolor: 'var(--nen-tin-hieu-nhat)', height: '100%', display: 'flex', flexDirection: 'column' }}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Typography variant="h6" sx={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1, color: 'var(--tin-hieu-dam)' }}>
-                  <ShieldAlert size={20} color="var(--chu-dam)" /> Khôi phục mật khẩu
-                </Typography>
-                <Chip label="Khẩn cấp" size="small" sx={{ bgcolor: 'var(--nen-tin-hieu-nhat2)', color: 'var(--tin-hieu-dam)', fontWeight: 'bold' }} />
-              </Box>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 3, flexGrow: 1 }}>
-                Xử lý yêu cầu khôi phục mật khẩu từ học sinh.
-              </Typography>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)' }}>
-                  Đang có {resetRequests.length} yêu cầu
-                </Typography>
-              </Box>
-            </Paper>
-          </Grid>
+      <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)', mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+        <KeyRound size={20} color="var(--chu-dam)" />
+        Đặt lại mật khẩu
+      </Typography>
+
+      <Alert severity="info" sx={{ mb: 3, borderRadius: 0 }}>
+        Không ai xem hay đặt hộ được mật khẩu của người khác, kể cả quản trị. Chỉ chủ
+        tài khoản tự đặt lại được, qua thư gửi về email của chính mình.
+      </Alert>
+
+      <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Grid size={{ xs: 12, md: 6 }}>
+          <Paper elevation={0} sx={{ p: 3, borderRadius: 0, border: '1px solid var(--vien)', height: '100%' }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)', mb: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Mail size={18} color="var(--chu-dam)" /> Tài khoản có email
+            </Typography>
+            <Box component="ol" sx={{ m: 0, pl: 2.5, color: 'var(--chu)', '& li': { mb: 0.75, lineHeight: 1.6 } }}>
+              {BUOC_DAT_LAI.map((buoc, i) => (
+                <Typography key={i} component="li" variant="body2">{buoc}</Typography>
+              ))}
+            </Box>
+          </Paper>
         </Grid>
-      </Box>
 
-      {/* ─── DANH SÁCH YÊU CẦU KHÔI PHỤC (Box 3 Expand) ──────────────────── */}
-      <Box sx={{ mt: 4 }}>
-        <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)', mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-          <KeyRound size={20} color="var(--chu-dam)" />
-          Danh sách yêu cầu cấp lại mật khẩu
-        </Typography>
+        <Grid size={{ xs: 12, md: 6 }}>
+          <Paper elevation={0} sx={{ p: 3, borderRadius: 0, border: '1px solid var(--vien)', height: '100%' }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)', mb: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}>
+              <UserX size={18} color="var(--chu-dam)" /> Tài khoản không có email
+            </Typography>
+            <Typography variant="body2" sx={{ color: 'var(--chu)', lineHeight: 1.6 }}>
+              Học sinh được tạo bằng tên đăng nhập (không khai email) không nhận được thư
+              đặt lại. Em nào quên mật khẩu thì thầy cô tạo lại tài khoản cho em bằng nút
+              "Thêm tài khoản Học sinh" ở mục "Quản lý Tài khoản".
+            </Typography>
+          </Paper>
+        </Grid>
+      </Grid>
 
+      <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: 'var(--chu-dam)', mb: 0.5 }}>
+        Tài khoản không tự đặt lại được
+      </Typography>
+      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+        {users.length === 0
+          ? 'Chưa có tài khoản nào trong phạm vi quản lý.'
+          : khongEmail.length === 0
+            ? `Cả ${users.length} tài khoản trong phạm vi quản lý đều có email, tự đặt lại được.`
+            : `${khongEmail.length}/${users.length} tài khoản trong phạm vi quản lý không có email.`}
+      </Typography>
+
+      {khongEmail.length > 0 && (
         <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid var(--vien)', borderRadius: 0 }}>
-          <Table>
+          <Table size="small">
             <TableHead>
               <TableRow sx={{ bgcolor: 'var(--nen-trang)' }}>
-                <TableCell sx={{ fontWeight: 'bold', color: 'var(--chu)' }}>Họ Tên & Tài khoản</TableCell>
-                <TableCell sx={{ fontWeight: 'bold', color: 'var(--chu)' }}>Vai Trò</TableCell>
-                <TableCell sx={{ fontWeight: 'bold', color: 'var(--chu)' }}>Ngày Yêu Cầu</TableCell>
-                <TableCell sx={{ fontWeight: 'bold', color: 'var(--chu)' }}>Thao Tác</TableCell>
-                <TableCell sx={{ fontWeight: 'bold', color: 'var(--chu)', align: 'right' }}>Bỏ Qua</TableCell>
+                <TableCell sx={{ fontWeight: 'bold', color: 'var(--chu)' }}>Họ tên</TableCell>
+                <TableCell sx={{ fontWeight: 'bold', color: 'var(--chu)' }}>Tên đăng nhập</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {resetRequests.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={5} align="center" sx={{ py: 6, color: 'text.secondary' }}>
-                    Không có yêu cầu khôi phục mật khẩu nào.
+              {khongEmail.map(u => (
+                <TableRow key={u.id}>
+                  <TableCell>{u.name}</TableCell>
+                  <TableCell sx={{ fontFamily: 'monospace' }}>
+                    {u.username || u.email.slice(0, -DUOI_KHONG_EMAIL.length)}
                   </TableCell>
                 </TableRow>
-              ) : (
-                resetRequests.map(req => (
-                  <TableRow key={req.id}>
-                    <TableCell>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>{req.name}</Typography>
-                      <Typography variant="caption" sx={{ fontFamily: 'monospace', color: 'var(--luc-tham)' }}>{req.username || req.email}</Typography>
-                    </TableCell>
-                    <TableCell>{getRoleChip(req.role)}</TableCell>
-                    <TableCell>
-                      <Typography variant="body2" color="text.secondary">Hôm nay</Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        variant="outlined"
-                        size="small"
-                        startIcon={<KeyRound size={14} />}
-                        onClick={() => handleResetPassword(req)}
-                        sx={{ textTransform: 'none', borderRadius: 0, borderColor: 'var(--tin-hieu)', color: 'var(--chu-dam)', fontWeight: 'bold' }}
-                      >
-                        Cấp lại mật khẩu
-                      </Button>
-                    </TableCell>
-                    <TableCell align="right">
-                      <Tooltip title="Bỏ qua yêu cầu này">
-                        <IconButton size="small" onClick={() => removeRequest(req.id)} sx={{ color: 'var(--do)' }}>
-                          <Trash2 size={16} />
-                        </IconButton>
-                      </Tooltip>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
+              ))}
             </TableBody>
           </Table>
         </TableContainer>
-      </Box>
-
-      <CredentialDialog
-        open={Boolean(credentialDialog)}
-        onClose={() => setCredentialDialog(null)}
-        credentials={credentialDialog}
-      />
+      )}
     </Box>
   );
 };

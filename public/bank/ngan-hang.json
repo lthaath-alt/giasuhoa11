@@ -34984,5 +34984,4315 @@
   ],
   "t": "tf",
   "topic": "thuvienhoclieu.com-De-cuong-on-tap-HK1-Hoa-11-KNTT.docx"
+ },
+ {
+  "ansText": "8",
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "CₙH₂ₙ với n = 4 → C₄H₈.",
+  "id": "bq_1790720757536_2vaiv",
+  "lessonId": "bai-16",
+  "lv": "nb",
+  "num": 8,
+  "q": "Phân tử alkene có 4 nguyên tử carbon chứa bao nhiêu nguyên tử hydrogen?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "2",
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "But-1-yne và but-2-yne.",
+  "id": "bq_1790720757536_3xqhs",
+  "lessonId": "bai-16",
+  "lv": "th",
+  "num": 2,
+  "q": "Có bao nhiêu alkyne mạch hở là đồng phân cấu tạo có công thức phân tử C₄H₆?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "2",
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Liên kết ba C≡C gồm 1 liên kết σ và 2 liên kết π.",
+  "id": "bq_1790720757536_5ijkg",
+  "lessonId": "bai-16",
+  "lv": "nb",
+  "num": 2,
+  "q": "Phân tử acetylene có bao nhiêu liên kết π?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Theo quy tắc Markovnikov, sản phẩm chính là 2-bromopropane. Chỉ alk-1-yne mới tạo kết tủa với AgNO₃/NH₃.",
+  "id": "bq_1790720757536_7aumf",
+  "lessonId": "bai-16",
+  "lv": "th",
+  "q": "Xét tính chất hoá học của propene.",
+  "st": [
+   {
+    "s": "Propene làm mất màu nước bromine.",
+    "v": true
+   },
+   {
+    "s": "Propene cộng HBr tạo sản phẩm chính là 1-bromopropane.",
+    "v": false
+   },
+   {
+    "s": "Propene tham gia phản ứng trùng hợp tạo polypropylene.",
+    "v": true
+   },
+   {
+    "s": "Propene tạo kết tủa với dung dịch AgNO₃ trong NH₃.",
+    "v": false
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Liên kết ba gồm 1 liên kết σ và 2 liên kết π.",
+  "id": "bq_1790720757536_gbiem",
+  "lessonId": "bai-16",
+  "lv": "nb",
+  "q": "Xét đặc điểm cấu tạo của ethylene và acetylene.",
+  "st": [
+   {
+    "s": "Các nguyên tử trong phân tử ethylene cùng nằm trên một mặt phẳng.",
+    "v": true
+   },
+   {
+    "s": "Liên kết đôi C=C gồm một liên kết σ và một liên kết π.",
+    "v": true
+   },
+   {
+    "s": "Phân tử acetylene có cấu tạo thẳng, góc liên kết HCC bằng 180°.",
+    "v": true
+   },
+   {
+    "s": "Liên kết ba C≡C gồm ba liên kết π.",
+    "v": false
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "40",
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "x + y = 0,1; 2x + y = 0,16 (C₂H₄ cho 2H₂O, C₂H₂ cho 1H₂O) → x = 0,06; y = 0,04 → %V(C₂H₂) = 40%.",
+  "id": "bq_1790720757536_jvbsz",
+  "lessonId": "bai-16",
+  "lv": "vdc",
+  "num": 40,
+  "q": "Đốt cháy hoàn toàn 0,1 mol hỗn hợp gồm ethylene và acetylene thu được 0,16 mol H₂O. Phần trăm thể tích của acetylene trong hỗn hợp là bao nhiêu?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "%"
+ },
+ {
+  "a": 3,
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Theo quy tắc Markovnikov, H cộng vào C mang nhiều H hơn, nhóm OH vào C bậc cao hơn: CH₃–CH(OH)–CH₃ (propan-2-ol).",
+  "id": "bq_1790720757536_kr76b",
+  "lessonId": "bai-16",
+  "lv": "th",
+  "o": [
+   "propan-1-ol",
+   "propane-1,2-diol",
+   "acetone",
+   "propan-2-ol"
+  ],
+  "q": "Cho propene tác dụng với H₂O (xúc tác acid, đun nóng). Sản phẩm chính là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "8",
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "n(X) = 0,15 mol; n(CH₃C≡CAg) = 14,7 : 147 = 0,1 mol = n(propyne) → n(C₂H₄) = 0,05 mol thoát ra, cộng 0,05 mol Br₂ = 8 gam.",
+  "id": "bq_1790720757536_kvph5",
+  "lessonId": "bai-16",
+  "lv": "vdc",
+  "num": 8,
+  "q": "Dẫn 3,7185 lít (đkc) hỗn hợp X gồm propyne và ethylene qua dung dịch AgNO₃/NH₃ dư thu được 14,7 gam kết tủa. Khí thoát ra làm mất màu tối đa bao nhiêu gam Br₂ trong dung dịch?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "gam"
+ },
+ {
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "CaC₂ + 2H₂O → Ca(OH)₂ + C₂H₂. Alkene CₙH₂ₙ cháy cho n(CO₂) = n(H₂O).",
+  "id": "bq_1790720757536_m2enc",
+  "lessonId": "bai-16",
+  "lv": "vd",
+  "q": "Xét tính chất và điều chế alkene, alkyne.",
+  "st": [
+   {
+    "s": "Trong phòng thí nghiệm, ethylene được điều chế bằng cách đun ethanol với H₂SO₄ đặc ở 170 °C.",
+    "v": true
+   },
+   {
+    "s": "Acetylene được điều chế từ calcium carbide và nước.",
+    "v": true
+   },
+   {
+    "s": "Trong công nghiệp, các alkene C₂–C₄ được điều chế chủ yếu bằng cracking alkane.",
+    "v": true
+   },
+   {
+    "s": "Đốt cháy hoàn toàn một alkene thu được số mol CO₂ lớn hơn số mol H₂O.",
+    "v": false
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 1,
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "But-2-ene CH₃–CH=CH–CH₃ có mỗi C mang liên kết đôi gắn hai nhóm khác nhau (H và CH₃) nên có đồng phân cis/trans.",
+  "id": "bq_1790720757536_tp0kj",
+  "lessonId": "bai-16",
+  "lv": "th",
+  "o": [
+   "But-1-ene",
+   "But-2-ene",
+   "2-Methylpropene",
+   "Propene"
+  ],
+  "q": "Chất nào sau đây có đồng phân hình học?",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "x + y = 0,2; x + 2y = 0,3 → x = y = 0,1. m = 0,1 × 28 + 0,1 × 40 = 6,8 g. Kết tủa CH₃C≡CAg: 0,1 × 147 = 14,7 g. %V(C₂H₄) = 50%.",
+  "id": "bq_1790720757536_umq4i",
+  "lessonId": "bai-16",
+  "lv": "vd",
+  "q": "Dẫn 0,2 mol hỗn hợp X gồm ethylene và propyne qua dung dịch bromine dư thấy có 0,3 mol Br₂ phản ứng.",
+  "st": [
+   {
+    "s": "Số mol mỗi chất trong X đều bằng 0,1 mol.",
+    "v": true
+   },
+   {
+    "s": "Khối lượng của X là 6,8 gam.",
+    "v": true
+   },
+   {
+    "s": "Cho 0,2 mol X qua dung dịch AgNO₃/NH₃ dư thu được 29,4 gam kết tủa.",
+    "v": false
+   },
+   {
+    "s": "Phần trăm thể tích ethylene trong X là 40%.",
+    "v": false
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "2",
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Chỉ alk-1-yne phản ứng: pent-1-yne và 3-methylbut-1-yne.",
+  "id": "bq_1790720757536_uqvqr",
+  "lessonId": "bai-16",
+  "lv": "th",
+  "num": 2,
+  "q": "Có bao nhiêu alkyne có công thức phân tử C₅H₈ tạo kết tủa với dung dịch AgNO₃ trong NH₃?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "4,958",
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Khối lượng bình tăng bằng khối lượng C₂H₄ bị hấp thụ: n = 5,6 : 28 = 0,2 mol → V = 0,2 × 24,79 = 4,958 lít.",
+  "id": "bq_1790720757536_v19bd",
+  "lessonId": "bai-16",
+  "lv": "vd",
+  "num": 4.958,
+  "q": "Dẫn V lít ethylene (đkc) vào dung dịch bromine dư, thấy khối lượng bình bromine tăng 5,6 gam. Giá trị của V là bao nhiêu?",
+  "t": "tn",
+  "tol": 0.01,
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "lít"
+ },
+ {
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "M(X) = 15 → n(H₂) : n(C₂H₄) = 1 : 1. Lấy 1 mol mỗi chất: m = 30 g; n(Y) = 30 : 25 = 1,2 mol → số mol giảm 0,8 = n(H₂) phản ứng → H = 80%. Y còn 0,2 mol C₂H₄ nên vẫn làm mất màu nước bromine.",
+  "id": "bq_1790720757536_vhfw2",
+  "lessonId": "bai-16",
+  "lv": "vdc",
+  "q": "Hỗn hợp X gồm H₂ và ethylene có tỉ khối so với H₂ là 7,5. Dẫn X qua Ni nung nóng thu được hỗn hợp Y có tỉ khối so với H₂ là 12,5 (chỉ xảy ra phản ứng cộng H₂).",
+  "st": [
+   {
+    "s": "Trong X, số mol H₂ bằng số mol ethylene.",
+    "v": true
+   },
+   {
+    "s": "Hiệu suất phản ứng cộng H₂ là 80%.",
+    "v": true
+   },
+   {
+    "s": "Khối lượng hỗn hợp Y bằng khối lượng hỗn hợp X.",
+    "v": true
+   },
+   {
+    "s": "Hỗn hợp Y không làm mất màu nước bromine.",
+    "v": false
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "5,04",
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Khối lượng được bảo toàn trong phản ứng trùng hợp: m(PE) = 5,6 × 0,9 = 5,04 tấn.",
+  "id": "bq_1790720757536_xcmt6",
+  "lessonId": "bai-16",
+  "lv": "vd",
+  "num": 5.04,
+  "q": "Trùng hợp 5,6 tấn ethylene với hiệu suất 90%. Khối lượng polyethylene thu được là bao nhiêu tấn?",
+  "t": "tn",
+  "tol": 0.005,
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "tấn"
+ },
+ {
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Nguyên tử H gắn vào C mang liên kết ba đầu mạch bị thay bằng Ag. But-2-yne không có H như vậy nên không phản ứng.",
+  "id": "bq_1790720757536_xn0fx",
+  "lessonId": "bai-16",
+  "lv": "th",
+  "q": "Xét phản ứng của alkyne với dung dịch AgNO₃ trong NH₃.",
+  "st": [
+   {
+    "s": "Acetylene tạo kết tủa màu vàng nhạt.",
+    "v": true
+   },
+   {
+    "s": "But-2-yne tạo kết tủa với thuốc thử này.",
+    "v": false
+   },
+   {
+    "s": "Chỉ các alkyne có liên kết ba ở đầu mạch mới phản ứng.",
+    "v": true
+   },
+   {
+    "s": "Có thể dùng phản ứng này để phân biệt but-1-yne và but-2-yne.",
+    "v": true
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "6,20",
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "n(CaC₂) = 16 : 64 = 0,25 mol → n(C₂H₂) = 0,25 mol → V = 0,25 × 24,79 = 6,1975 ≈ 6,20 lít.",
+  "id": "bq_1790720757536_zsnqq",
+  "lessonId": "bai-16",
+  "lv": "vd",
+  "num": 6.2,
+  "q": "Cho 16 gam calcium carbide (CaC₂) tác dụng hết với nước dư. Thể tích acetylene thu được là bao nhiêu lít (đkc)? (Làm tròn đến hàng phần trăm.)",
+  "t": "tn",
+  "tol": 0.01,
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "lít"
+ },
+ {
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Alkane chỉ có liên kết σ, không phân cực nên không tan trong nước; C₁–C₄ là chất khí.",
+  "id": "bq_1790722046329_0ekn7",
+  "lessonId": "bai-15",
+  "lv": "nb",
+  "q": "Xét dãy đồng đẳng của alkane.",
+  "st": [
+   {
+    "s": "Công thức chung của alkane là CₙH₂ₙ₊₂ (n ≥ 1).",
+    "v": true
+   },
+   {
+    "s": "Các alkane từ C₁ đến C₄ ở điều kiện thường là chất khí.",
+    "v": true
+   },
+   {
+    "s": "Trong phân tử alkane có một liên kết π.",
+    "v": false
+   },
+   {
+    "s": "Alkane tan tốt trong nước.",
+    "v": false
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Ba đồng phân: pentane, 2-methylbutane, 2,2-dimethylpropane. Mạch càng phân nhánh, nhiệt độ sôi càng thấp nên pentane sôi cao hơn 2,2-dimethylpropane. C2 của 2-methylbutane liên kết với 3 C nên là bậc III.",
+  "id": "bq_1790722046329_0h425",
+  "lessonId": "bai-15",
+  "lv": "vd",
+  "q": "Xét các alkane có công thức phân tử C₅H₁₂.",
+  "st": [
+   {
+    "s": "C₅H₁₂ có 3 đồng phân cấu tạo.",
+    "v": true
+   },
+   {
+    "s": "2,2-Dimethylpropane chỉ tạo một dẫn xuất monochloro duy nhất.",
+    "v": true
+   },
+   {
+    "s": "Pentane có nhiệt độ sôi thấp hơn 2,2-dimethylpropane.",
+    "v": false
+   },
+   {
+    "s": "Phân tử 2-methylbutane có một nguyên tử carbon bậc III.",
+    "v": true
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "4,958",
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "CH₄ + 2O₂ → CO₂ + 2H₂O. Cùng điều kiện, tỉ lệ thể tích bằng tỉ lệ mol: V(O₂) = 2 × 2,479 = 4,958 lít.",
+  "id": "bq_1790722046329_0i2jm",
+  "lessonId": "bai-15",
+  "lv": "vd",
+  "num": 4.958,
+  "q": "Cần bao nhiêu lít O₂ (đkc) để đốt cháy hoàn toàn 2,479 lít methane (đkc)?",
+  "t": "tn",
+  "tol": 0.01,
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "lít"
+ },
+ {
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Cl ưu tiên thế H ở C bậc II nên sản phẩm chính là 2-chloropropane, sản phẩm phụ là 1-chloropropane; mỗi phản ứng thế tạo thêm HCl.",
+  "id": "bq_1790722046329_3cy33",
+  "lessonId": "bai-15",
+  "lv": "th",
+  "q": "Xét phản ứng của propane với Cl₂ (tỉ lệ mol 1 : 1, chiếu sáng).",
+  "st": [
+   {
+    "s": "Đây là phản ứng thế.",
+    "v": true
+   },
+   {
+    "s": "Sản phẩm chính là 1-chloropropane.",
+    "v": false
+   },
+   {
+    "s": "Phản ứng tạo ra hai dẫn xuất monochloro là đồng phân của nhau.",
+    "v": true
+   },
+   {
+    "s": "Ngoài dẫn xuất chloro, phản ứng còn tạo ra HCl.",
+    "v": true
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 1,
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Alkane có công thức CₙH₂ₙ₊₂; C₃H₈ ứng với n = 3.",
+  "id": "bq_1790722046329_420hn",
+  "lessonId": "bai-15",
+  "lv": "nb",
+  "o": [
+   "C₂H₄",
+   "C₃H₈",
+   "C₂H₂",
+   "C₆H₆"
+  ],
+  "q": "Chất nào sau đây thuộc dãy đồng đẳng alkane?",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 2,
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Các alkane C₁–C₄ là chất khí ở điều kiện thường; butane (C₄H₁₀) là khí, còn pentane, hexane, octane là chất lỏng.",
+  "id": "bq_1790722046329_9h3hl",
+  "lessonId": "bai-15",
+  "lv": "nb",
+  "o": [
+   "Hexane",
+   "Pentane",
+   "Butane",
+   "Octane"
+  ],
+  "q": "Ở điều kiện thường, alkane nào sau đây ở trạng thái khí?",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "12,6",
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "C₆H₁₄ → 7H₂O: n(H₂O) = 0,7 mol → m = 0,7 × 18 = 12,6 gam.",
+  "id": "bq_1790722046329_a855e",
+  "lessonId": "bai-15",
+  "lv": "vd",
+  "num": 12.6,
+  "q": "Đốt cháy hoàn toàn 0,1 mol hexane. Khối lượng H₂O thu được là bao nhiêu gam?",
+  "t": "tn",
+  "tol": 0.05,
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "gam"
+ },
+ {
+  "a": 2,
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Mạch chính 4 C, đánh số từ đầu gần nhánh: hai nhánh methyl cùng ở C2, tên là 2,2-dimethylbutane.",
+  "id": "bq_1790722046329_cnad7",
+  "lessonId": "bai-15",
+  "lv": "th",
+  "o": [
+   "3,3-dimethylbutane",
+   "2-methylpentane",
+   "2,2-dimethylbutane",
+   "2-ethyl-2-methylpropane"
+  ],
+  "q": "Tên theo danh pháp IUPAC của alkane (CH₃)₃C–CH₂–CH₃ là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "5",
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "12n : (14n + 2) = 0,8333 → n = 5 (C₅H₁₂: 60 : 72 = 83,33%).",
+  "id": "bq_1790722046329_cw8ro",
+  "lessonId": "bai-15",
+  "lv": "vd",
+  "num": 5,
+  "q": "Một alkane có phần trăm khối lượng carbon là 83,33%. Phân tử alkane đó có bao nhiêu nguyên tử carbon?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "14",
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "CₙH₂ₙ₊₂ với n = 6 → C₆H₁₄.",
+  "id": "bq_1790722046329_d89w4",
+  "lessonId": "bai-15",
+  "lv": "nb",
+  "num": 14,
+  "q": "Phân tử alkane có 6 nguyên tử carbon chứa bao nhiêu nguyên tử hydrogen?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 2,
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Trong C(CH₃)₄ cả 12 nguyên tử H tương đương nhau nên chỉ tạo một sản phẩm thế monochloro. Butane tạo 2, pentane tạo 3, 2-methylbutane tạo 4.",
+  "id": "bq_1790722046329_fl7ll",
+  "lessonId": "bai-15",
+  "lv": "th",
+  "o": [
+   "Butane",
+   "2-Methylbutane",
+   "2,2-Dimethylpropane",
+   "Pentane"
+  ],
+  "q": "Alkane nào sau đây khi tác dụng với Cl₂ (tỉ lệ mol 1 : 1, chiếu sáng) chỉ tạo một dẫn xuất monochloro duy nhất?",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "44",
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "C₃H₈: 3 × 12 + 8 × 1 = 44.",
+  "id": "bq_1790722046329_jlh0o",
+  "lessonId": "bai-15",
+  "lv": "nb",
+  "num": 44,
+  "q": "Phân tử khối của propane là bao nhiêu?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "CₙH₂ₙ₊₂ + (3n+1)/2 O₂ → nCO₂ + (n+1)H₂O, tỏa nhiệt mạnh. Với n = 3 cần 5 mol O₂; n(H₂O) − n(CO₂) = n(alkane).",
+  "id": "bq_1790722046329_jz17l",
+  "lessonId": "bai-15",
+  "lv": "th",
+  "q": "Xét phản ứng đốt cháy hoàn toàn alkane.",
+  "st": [
+   {
+    "s": "Số mol H₂O thu được luôn lớn hơn số mol CO₂.",
+    "v": true
+   },
+   {
+    "s": "Số mol alkane bằng hiệu số mol H₂O và số mol CO₂.",
+    "v": true
+   },
+   {
+    "s": "Phản ứng đốt cháy alkane là phản ứng thu nhiệt.",
+    "v": false
+   },
+   {
+    "s": "Đốt cháy hoàn toàn 1 mol propane cần 5 mol O₂.",
+    "v": true
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 2,
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Alkane không phân cực nên không tan trong nước, khối lượng riêng nhỏ hơn nước; nhiệt độ sôi tăng theo phân tử khối.",
+  "id": "bq_1790722046329_kxdq5",
+  "lessonId": "bai-15",
+  "lv": "th",
+  "o": [
+   "Alkane tan tốt trong nước",
+   "Alkane nặng hơn nước",
+   "Alkane không tan trong nước và nhẹ hơn nước",
+   "Nhiệt độ sôi của alkane giảm khi phân tử khối tăng"
+  ],
+  "q": "Nhận xét nào sau đây về tính chất vật lí của alkane là đúng?",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "C₄H₁₀ → CH₄ + C₃H₆ là một hướng cracking. Reforming tạo alkane mạch nhánh và arene nên làm tăng chỉ số octane của xăng.",
+  "id": "bq_1790722046329_mpj1m",
+  "lessonId": "bai-15",
+  "lv": "vd",
+  "q": "Xét quá trình cracking và reforming alkane trong công nghiệp lọc dầu.",
+  "st": [
+   {
+    "s": "Cracking chuyển alkane mạch dài thành các hydrocarbon mạch ngắn hơn.",
+    "v": true
+   },
+   {
+    "s": "Cracking butane có thể tạo ra CH₄ và C₃H₆.",
+    "v": true
+   },
+   {
+    "s": "Reforming chuyển alkane mạch không phân nhánh thành alkane mạch nhánh và hydrocarbon mạch vòng mà không làm thay đổi số nguyên tử carbon.",
+    "v": true
+   },
+   {
+    "s": "Reforming làm giảm chỉ số octane của xăng.",
+    "v": false
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "4",
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "CH₃–CH(CH₃)–CH₂–CH₃ có 4 loại H khác nhau (hai nhóm CH₃ gắn C2 tương đương; C2; C3; C4) nên tạo 4 dẫn xuất monochloro.",
+  "id": "bq_1790722046329_o0yuq",
+  "lessonId": "bai-15",
+  "lv": "th",
+  "num": 4,
+  "q": "Cho 2-methylbutane tác dụng với Cl₂ (tỉ lệ mol 1 : 1, chiếu sáng). Có thể thu được tối đa bao nhiêu dẫn xuất monochloro là đồng phân cấu tạo của nhau?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 1,
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Chlorine ưu tiên thế H ở carbon bậc cao hơn. Trong (CH₃)₃CH, C trung tâm là bậc III nên sản phẩm chính là (CH₃)₃CCl: 2-chloro-2-methylpropane.",
+  "id": "bq_1790722046329_pd3mk",
+  "lessonId": "bai-15",
+  "lv": "th",
+  "o": [
+   "1-chloro-2-methylpropane",
+   "2-chloro-2-methylpropane",
+   "1-chlorobutane",
+   "2-chlorobutane"
+  ],
+  "q": "Cho 2-methylpropane tác dụng với Cl₂ (tỉ lệ mol 1 : 1, chiếu sáng). Sản phẩm chính là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 1,
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Hỗn hợp chỉ gồm C và H: m = m(C) + m(H) = 0,5 × 12 + 0,7 × 2 × 1 = 6 + 1,4 = 7,4 gam.",
+  "id": "bq_1790722046329_trztz",
+  "lessonId": "bai-15",
+  "lv": "vdc",
+  "o": [
+   "6,8",
+   "7,4",
+   "8,2",
+   "14,4"
+  ],
+  "q": "Đốt cháy hoàn toàn m gam hỗn hợp X gồm methane, ethane và propane thu được 0,5 mol CO₂ và 0,7 mol H₂O. Giá trị của m là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 1,
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "n(X) = n(H₂O) − n(CO₂) = 0,1 mol; số C = 0,4 : 0,1 = 4 → C₄H₁₀.",
+  "id": "bq_1790722046329_uoot6",
+  "lessonId": "bai-15",
+  "lv": "vd",
+  "o": [
+   "C₃H₈",
+   "C₄H₁₀",
+   "C₅H₁₂",
+   "C₂H₆"
+  ],
+  "q": "Đốt cháy hoàn toàn một alkane X thu được 0,4 mol CO₂ và 0,5 mol H₂O. Công thức phân tử của X là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 1,
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Alkane là hydrocarbon no, chỉ chứa liên kết đơn C–C và C–H, đều là liên kết σ.",
+  "id": "bq_1790722046329_vifkb",
+  "lessonId": "bai-15",
+  "lv": "nb",
+  "o": [
+   "các liên kết σ và một liên kết π",
+   "chỉ các liên kết σ",
+   "các liên kết σ và hai liên kết π",
+   "chỉ các liên kết π"
+  ],
+  "q": "Liên kết trong phân tử alkane gồm",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "5",
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Hexane, 2-methylpentane, 3-methylpentane, 2,2-dimethylbutane, 2,3-dimethylbutane: 5 đồng phân.",
+  "id": "bq_1790722046329_vuz5e",
+  "lessonId": "bai-15",
+  "lv": "th",
+  "num": 5,
+  "q": "Có bao nhiêu alkane là đồng phân cấu tạo có công thức phân tử C₆H₁₄?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 3,
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "n(C₄H₁₀) = 2,9 : 58 = 0,05 mol → n(CO₂) = 4 × 0,05 = 0,2 mol → V = 0,2 × 24,79 = 4,958 lít.",
+  "id": "bq_1790722046329_wgmil",
+  "lessonId": "bai-15",
+  "lv": "vd",
+  "o": [
+   "2,479 lít",
+   "3,7185 lít",
+   "6,1975 lít",
+   "4,958 lít"
+  ],
+  "q": "Đốt cháy hoàn toàn 2,9 gam butane. Thể tích khí CO₂ thu được (đkc, 24,79 L/mol) là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Số C trung bình = 0,4 : 0,15 ≈ 2,67 → C₂H₆ (x mol) và C₃H₈ (y mol): x + y = 0,15; 2x + 3y = 0,4 → x = 0,05; y = 0,1. n(H₂O) = 0,4 + 0,15 = 0,55 mol; n(O₂) = 0,4 + 0,55 : 2 = 0,675 mol.",
+  "id": "bq_1790722046329_wqb1e",
+  "lessonId": "bai-15",
+  "lv": "vdc",
+  "q": "Đốt cháy hoàn toàn 0,15 mol hỗn hợp X gồm hai alkane kế tiếp nhau trong dãy đồng đẳng, thu được 0,4 mol CO₂.",
+  "st": [
+   {
+    "s": "Hai alkane trong X là C₂H₆ và C₃H₈.",
+    "v": true
+   },
+   {
+    "s": "Số mol H₂O thu được là 0,55 mol.",
+    "v": true
+   },
+   {
+    "s": "Số mol C₂H₆ trong X là 0,1 mol.",
+    "v": false
+   },
+   {
+    "s": "Số mol O₂ đã phản ứng là 0,675 mol.",
+    "v": true
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "13",
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "3 liên kết C–C và 10 liên kết C–H, tất cả là liên kết σ: 13.",
+  "id": "bq_1790722046329_y406h",
+  "lessonId": "bai-15",
+  "lv": "th",
+  "num": 13,
+  "q": "Phân tử butane (C₄H₁₀) có tổng cộng bao nhiêu liên kết σ?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 3,
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Mạch chính dài nhất có 4 C (butane), đánh số từ đầu gần nhánh nên nhánh methyl ở C2: 2-methylbutane.",
+  "id": "bq_1790722046329_ztcd7",
+  "lessonId": "bai-15",
+  "lv": "nb",
+  "o": [
+   "3-methylbutane",
+   "pentane",
+   "2-ethylpropane",
+   "2-methylbutane"
+  ],
+  "q": "Tên theo danh pháp IUPAC của CH₃–CH(CH₃)–CH₂–CH₃ là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "3",
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "M(X) = 72 → 14n + 2 = 72 → n = 5 (C₅H₁₂), có 3 đồng phân cấu tạo.",
+  "id": "bq_1790722046330_bsnfz",
+  "lessonId": "bai-15",
+  "lv": "vd",
+  "num": 3,
+  "q": "Alkane X có tỉ khối hơi so với H₂ bằng 36. X có bao nhiêu đồng phân cấu tạo?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "100",
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Nhiệt cần tỏa ra = 4 450 : 0,8 = 5 562,5 kJ → n(CH₄) = 5 562,5 : 890 = 6,25 mol → m = 6,25 × 16 = 100 gam.",
+  "id": "bq_1790722046330_bzn78",
+  "lessonId": "bai-15",
+  "lv": "vdc",
+  "num": 100,
+  "q": "Đốt cháy hoàn toàn 1 mol methane tỏa ra 890 kJ nhiệt. Nếu hiệu suất sử dụng nhiệt là 80%, cần đốt bao nhiêu gam methane để thu được 4 450 kJ nhiệt có ích?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "gam"
+ },
+ {
+  "ansText": "60",
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Mỗi phân tử butane bị cracking tạo 2 phân tử (1 alkane + 1 alkene) nên số mol tăng đúng bằng số mol butane phản ứng: 0,32 − 0,2 = 0,12 mol → H = 0,12 : 0,2 × 100% = 60%.",
+  "id": "bq_1790722046330_gg0xs",
+  "lessonId": "bai-15",
+  "lv": "vdc",
+  "num": 60,
+  "q": "Cracking 0,2 mol butane thu được hỗn hợp X gồm CH₄, C₃H₆, C₂H₆, C₂H₄ và butane dư, có tổng số mol là 0,32 mol. Hiệu suất phản ứng cracking là bao nhiêu phần trăm?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "%"
+ },
+ {
+  "ansText": "22,3",
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Gọi n(C₃H₈) = 2x, n(C₄H₁₀) = 3x: 88x + 174x = 13,1 → x = 0,05 → 0,1 mol C₃H₈ và 0,15 mol C₄H₁₀. n(CO₂) = 0,3 + 0,6 = 0,9 mol → V = 0,9 × 24,79 = 22,311 ≈ 22,3 lít.",
+  "id": "bq_1790722046330_slzrk",
+  "lessonId": "bai-15",
+  "lv": "vdc",
+  "num": 22.3,
+  "q": "Đốt cháy hoàn toàn 13,1 gam hỗn hợp propane và butane có tỉ lệ mol tương ứng 2 : 3. Thể tích CO₂ thu được là bao nhiêu lít (đkc)? (Làm tròn đến hàng phần mười.)",
+  "t": "tn",
+  "tol": 0.05,
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "lít"
+ },
+ {
+  "ansText": "78",
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "C₆H₆: 6 × 12 + 6 × 1 = 78.",
+  "id": "bq_1790722118206_0la8o",
+  "lessonId": "bai-17",
+  "lv": "nb",
+  "num": 78,
+  "q": "Phân tử khối của benzene là bao nhiêu?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 1,
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "n(C₆H₆) = 0,2 mol → n(C₆H₅NO₂) = 0,2 × 0,8 = 0,16 mol → m = 0,16 × 123 = 19,68 gam.",
+  "id": "bq_1790722118206_0w7re",
+  "lessonId": "bai-17",
+  "lv": "vd",
+  "o": [
+   "24,6 gam",
+   "19,68 gam",
+   "15,6 gam",
+   "12,3 gam"
+  ],
+  "q": "Nitro hoá 15,6 gam benzene với hiệu suất 80%. Khối lượng nitrobenzene thu được là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "50,5",
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Chỉ styrene cộng Br₂: n = 0,1 mol → 10,4 gam; m(ethylbenzene) = 10,6 gam → 10,6 : 21,0 = 50,48% ≈ 50,5%.",
+  "id": "bq_1790722118206_18kr2",
+  "lessonId": "bai-17",
+  "lv": "vdc",
+  "num": 50.5,
+  "q": "Hỗn hợp X gồm styrene và ethylbenzene có khối lượng 21,0 gam, làm mất màu vừa đủ 200 mL dung dịch Br₂ 0,5 M. Phần trăm khối lượng ethylbenzene trong X là bao nhiêu? (Làm tròn đến hàng phần mười.)",
+  "t": "tn",
+  "tol": 0.05,
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "%"
+ },
+ {
+  "ansText": "12,3",
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "n(C₆H₆) = 0,1 mol → n(C₆H₅NO₂) = 0,1 mol → m = 0,1 × 123 = 12,3 gam.",
+  "id": "bq_1790722118206_190h7",
+  "lessonId": "bai-17",
+  "lv": "vd",
+  "num": 12.3,
+  "q": "Nitro hoá hoàn toàn 7,8 gam benzene thành nitrobenzene (hiệu suất 100%). Khối lượng nitrobenzene thu được là bao nhiêu gam?",
+  "t": "tn",
+  "tol": 0.05,
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "gam"
+ },
+ {
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Arene không phân cực hoặc kém phân cực nên không tan trong nước; benzene nhẹ hơn nước.",
+  "id": "bq_1790722118206_1y5tn",
+  "lessonId": "bai-17",
+  "lv": "th",
+  "q": "Xét tính chất vật lí và độc tính của arene.",
+  "st": [
+   {
+    "s": "Benzene và toluene ở điều kiện thường là chất lỏng.",
+    "v": true
+   },
+   {
+    "s": "Arene tan tốt trong nước.",
+    "v": false
+   },
+   {
+    "s": "Benzene là chất độc, tiếp xúc lâu dài có thể gây ung thư.",
+    "v": true
+   },
+   {
+    "s": "Benzene nặng hơn nước.",
+    "v": false
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 1,
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Khi chiếu sáng, benzene cộng 3 phân tử Cl₂ tạo C₆H₆Cl₆ (1,2,3,4,5,6-hexachlorocyclohexane). Có xúc tác Fe/FeCl₃ thì mới xảy ra phản ứng thế tạo chlorobenzene.",
+  "id": "bq_1790722118206_1yjc8",
+  "lessonId": "bai-17",
+  "lv": "th",
+  "o": [
+   "chlorobenzene",
+   "1,2,3,4,5,6-hexachlorocyclohexane",
+   "1,4-dichlorobenzene",
+   "hexachlorobenzene"
+  ],
+  "q": "Chiếu sáng hỗn hợp benzene và chlorine (không có xúc tác Fe/FeCl₃), thu được sản phẩm là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "4",
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Ethylbenzene, o-xylene, m-xylene, p-xylene.",
+  "id": "bq_1790722118206_241jq",
+  "lessonId": "bai-17",
+  "lv": "th",
+  "num": 4,
+  "q": "Có bao nhiêu arene là đồng phân cấu tạo có công thức phân tử C₈H₁₀?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Naphthalene có công thức C₁₀H₈. TNT là 2,4,6-trinitrotoluene, điều chế từ toluene.",
+  "id": "bq_1790722118206_38h0k",
+  "lessonId": "bai-17",
+  "lv": "vd",
+  "q": "Xét ứng dụng và điều chế arene.",
+  "st": [
+   {
+    "s": "Trong công nghiệp, benzene và toluene được điều chế từ quá trình reforming.",
+    "v": true
+   },
+   {
+    "s": "Ethylbenzene được điều chế từ benzene và ethylene.",
+    "v": true
+   },
+   {
+    "s": "Naphthalene có công thức phân tử C₁₀H₁₀.",
+    "v": false
+   },
+   {
+    "s": "Toluene được dùng để sản xuất thuốc nổ TNT.",
+    "v": true
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 2,
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Ethylbenzene và p-xylene (1,4-dimethylbenzene) cùng có công thức C₈H₁₀.",
+  "id": "bq_1790722118206_3shrd",
+  "lessonId": "bai-17",
+  "lv": "th",
+  "o": [
+   "Toluene",
+   "Styrene",
+   "p-Xylene",
+   "Cumene"
+  ],
+  "q": "Chất nào sau đây là đồng phân của ethylbenzene?",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Liên kết đôi ở nhánh vinyl phản ứng như alkene. Cộng H₂ hoàn toàn: 1 mol vào nhánh + 3 mol vào vòng = 4 mol.",
+  "id": "bq_1790722118206_4bwk2",
+  "lessonId": "bai-17",
+  "lv": "vd",
+  "q": "Xét tính chất hoá học của styrene C₆H₅CH=CH₂.",
+  "st": [
+   {
+    "s": "Styrene làm mất màu nước bromine ở điều kiện thường.",
+    "v": true
+   },
+   {
+    "s": "Styrene trùng hợp tạo polystyrene (PS).",
+    "v": true
+   },
+   {
+    "s": "Styrene không làm mất màu dung dịch KMnO₄ ở nhiệt độ thường.",
+    "v": false
+   },
+   {
+    "s": "1 mol styrene cộng tối đa 4 mol H₂ (xúc tác Ni, đun nóng).",
+    "v": true
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 2,
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Naphthalene là chất rắn màu trắng, có mùi đặc trưng; benzene, toluene, xylene, styrene là chất lỏng.",
+  "id": "bq_1790722118206_52wgp",
+  "lessonId": "bai-17",
+  "lv": "nb",
+  "o": [
+   "chất khí không màu",
+   "chất lỏng không màu",
+   "chất rắn màu trắng, có mùi đặc trưng",
+   "chất lỏng màu vàng"
+  ],
+  "q": "Ở điều kiện thường, naphthalene là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 0,
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "n(toluene) = 0,1 mol → n(C₆H₅COOH) = 0,1 mol → m = 0,1 × 122 = 12,2 gam.",
+  "id": "bq_1790722118206_53p8p",
+  "lessonId": "bai-17",
+  "lv": "vd",
+  "o": [
+   "12,2 gam",
+   "9,2 gam",
+   "16,0 gam",
+   "14,4 gam"
+  ],
+  "q": "Oxi hoá hoàn toàn 9,2 gam toluene bằng dung dịch KMnO₄ đun nóng, rồi acid hoá bằng HCl dư. Khối lượng benzoic acid thu được là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 1,
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Nhánh –CH₃ của toluene bị KMnO₄ oxi hoá khi đun nóng. Styrene và ethylene làm mất màu ngay ở nhiệt độ thường; benzene không phản ứng.",
+  "id": "bq_1790722118206_5drw0",
+  "lessonId": "bai-17",
+  "lv": "th",
+  "o": [
+   "Benzene",
+   "Toluene",
+   "Styrene",
+   "Ethylene"
+  ],
+  "q": "Chất nào sau đây làm mất màu dung dịch KMnO₄ khi đun nóng nhưng không làm mất màu ở nhiệt độ thường?",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "4",
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Vòng benzene có 3 liên kết π, nhánh vinyl CH=CH₂ có 1 liên kết π.",
+  "id": "bq_1790722118206_bo8ss",
+  "lessonId": "bai-17",
+  "lv": "th",
+  "num": 4,
+  "q": "Theo công thức Kekulé, phân tử styrene có bao nhiêu liên kết π?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 3,
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "KMnO₄: styrene mất màu ngay ở nhiệt độ thường, toluene mất màu khi đun nóng, benzene không đổi. Nước bromine chỉ nhận ra styrene.",
+  "id": "bq_1790722118206_c2i8k",
+  "lessonId": "bai-17",
+  "lv": "th",
+  "o": [
+   "Nước bromine",
+   "Quỳ tím",
+   "Dung dịch AgNO₃/NH₃",
+   "Dung dịch KMnO₄"
+  ],
+  "q": "Thuốc thử nào sau đây phân biệt được ba chất lỏng benzene, toluene và styrene?",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 3,
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Phản ứng nitro hoá: C₆H₆ + HNO₃ → C₆H₅NO₂ + H₂O (xúc tác H₂SO₄ đặc).",
+  "id": "bq_1790722118206_cnns1",
+  "lessonId": "bai-17",
+  "lv": "th",
+  "o": [
+   "phenol",
+   "chlorobenzene",
+   "benzoic acid",
+   "nitrobenzene"
+  ],
+  "q": "Đun nóng benzene với hỗn hợp HNO₃ đặc và H₂SO₄ đặc, sản phẩm hữu cơ chính là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Các liên kết C–C trong benzene dài bằng nhau (139 pm), không phải xen kẽ đơn–đôi thật sự.",
+  "id": "bq_1790722118206_ddww0",
+  "lessonId": "bai-17",
+  "lv": "nb",
+  "q": "Xét cấu tạo của phân tử benzene.",
+  "st": [
+   {
+    "s": "Sáu nguyên tử C và sáu nguyên tử H cùng nằm trên một mặt phẳng.",
+    "v": true
+   },
+   {
+    "s": "Sáu nguyên tử carbon tạo thành hình lục giác đều.",
+    "v": true
+   },
+   {
+    "s": "Độ dài các liên kết carbon–carbon luân phiên dài, ngắn khác nhau.",
+    "v": false
+   },
+   {
+    "s": "Công thức phân tử của benzene là C₆H₆.",
+    "v": true
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "7",
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Toluene C₆H₅CH₃ = C₇H₈.",
+  "id": "bq_1790722118206_fggl7",
+  "lessonId": "bai-17",
+  "lv": "nb",
+  "num": 7,
+  "q": "Phân tử toluene có bao nhiêu nguyên tử carbon?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 0,
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Styrene (vinylbenzene) là C₆H₅CH=CH₂.",
+  "id": "bq_1790722118206_g41on",
+  "lessonId": "bai-17",
+  "lv": "nb",
+  "o": [
+   "C₆H₅CH=CH₂",
+   "C₆H₅CH₃",
+   "C₆H₅CH₂CH₃",
+   "C₆H₅CH(CH₃)₂"
+  ],
+  "q": "Công thức cấu tạo thu gọn của styrene là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 3,
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Benzene C₆H₆ và các đồng đẳng hợp thành dãy CₙH₂ₙ₋₆ (n ≥ 6).",
+  "id": "bq_1790722118206_he3sq",
+  "lessonId": "bai-17",
+  "lv": "nb",
+  "o": [
+   "CₙH₂ₙ₊₂ (n ≥ 1)",
+   "CₙH₂ₙ (n ≥ 2)",
+   "CₙH₂ₙ₋₂ (n ≥ 2)",
+   "CₙH₂ₙ₋₆ (n ≥ 6)"
+  ],
+  "q": "Công thức chung của dãy đồng đẳng benzene là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "8",
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Naphthalene có công thức C₁₀H₈.",
+  "id": "bq_1790722118206_hj7ud",
+  "lessonId": "bai-17",
+  "lv": "nb",
+  "num": 8,
+  "q": "Phân tử naphthalene có bao nhiêu nguyên tử hydrogen?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 0,
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Chỉ styrene cộng Br₂: n(styrene) = n(Br₂) = 0,1 mol → 10,4 gam; m(benzene) = 7,8 gam → 7,8 : 18,2 = 42,86%.",
+  "id": "bq_1790722118206_idjrt",
+  "lessonId": "bai-17",
+  "lv": "vdc",
+  "o": [
+   "42,86%",
+   "57,14%",
+   "50,00%",
+   "33,33%"
+  ],
+  "q": "Hỗn hợp X gồm benzene và styrene có khối lượng 18,2 gam, làm mất màu vừa đủ 16 gam Br₂ trong dung dịch. Phần trăm khối lượng của benzene trong X là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "8,5",
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "m = m(C) + m(H) = 0,65 × 12 + 0,35 × 2 = 7,8 + 0,7 = 8,5 gam (ứng với 0,05 mol mỗi chất).",
+  "id": "bq_1790722118206_iqf99",
+  "lessonId": "bai-17",
+  "lv": "vdc",
+  "num": 8.5,
+  "q": "Đốt cháy hoàn toàn m gam hỗn hợp benzene và toluene thu được 0,65 mol CO₂ và 0,35 mol H₂O. Giá trị của m là bao nhiêu?",
+  "t": "tn",
+  "tol": 0.05,
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "gam"
+ },
+ {
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Nhóm alkyl làm phản ứng thế ở vòng dễ hơn benzene và ưu tiên vị trí 2, 4 (ortho, para), nên sản phẩm chính là 2- và 4-nitrotoluene.",
+  "id": "bq_1790722118206_kti7v",
+  "lessonId": "bai-17",
+  "lv": "th",
+  "q": "Xét phản ứng thế nguyên tử hydrogen ở vòng benzene.",
+  "st": [
+   {
+    "s": "Benzene phản ứng với Br₂ khan (xúc tác FeBr₃) tạo bromobenzene.",
+    "v": true
+   },
+   {
+    "s": "Toluene tham gia phản ứng thế ở vòng khó hơn benzene.",
+    "v": false
+   },
+   {
+    "s": "Nhóm –CH₃ định hướng phản ứng thế ưu tiên vào vị trí ortho và para.",
+    "v": true
+   },
+   {
+    "s": "Nitro hoá toluene thu được sản phẩm chính là 3-nitrotoluene.",
+    "v": false
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 1,
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "C₆H₅CH₃ là methylbenzene, tên thông thường là toluene.",
+  "id": "bq_1790722118206_n6a6r",
+  "lessonId": "bai-17",
+  "lv": "nb",
+  "o": [
+   "xylene",
+   "toluene",
+   "styrene",
+   "cumene"
+  ],
+  "q": "Chất có công thức C₆H₅CH₃ có tên là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 2,
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "C₆H₆ + 3H₂ → C₆H₁₂ (cyclohexane), vòng 6 cạnh vẫn giữ nguyên.",
+  "id": "bq_1790722118206_o3z6q",
+  "lessonId": "bai-17",
+  "lv": "th",
+  "o": [
+   "cyclohexene",
+   "hexane",
+   "cyclohexane",
+   "hex-1-ene"
+  ],
+  "q": "Cho benzene cộng H₂ dư (xúc tác Ni, đun nóng), sản phẩm thu được là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 3,
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Số C = 0,7 : 0,1 = 7 → C₇H₈ (toluene).",
+  "id": "bq_1790722118206_oodwd",
+  "lessonId": "bai-17",
+  "lv": "vd",
+  "o": [
+   "styrene",
+   "xylene",
+   "benzene",
+   "toluene"
+  ],
+  "q": "Đốt cháy hoàn toàn 0,1 mol một arene X thuộc dãy đồng đẳng benzene thu được 0,7 mol CO₂. X là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "29,1",
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "n(C₆H₆) = 0,1 mol → n(C₆H₆Cl₆) = 0,1 mol; M = 72 + 6 + 213 = 291 → m = 29,1 gam.",
+  "id": "bq_1790722118206_ozipp",
+  "lessonId": "bai-17",
+  "lv": "vd",
+  "num": 29.1,
+  "q": "Chiếu sáng hỗn hợp 7,8 gam benzene với chlorine dư (không có xúc tác Fe) để phản ứng cộng xảy ra hoàn toàn. Khối lượng hexachlorocyclohexane (C₆H₆Cl₆) thu được là bao nhiêu gam?",
+  "t": "tn",
+  "tol": 0.05,
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "gam"
+ },
+ {
+  "a": 2,
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "12n : (14n − 6) = 0,9057 → n = 8 → C₈H₁₀ (96 : 106 = 90,57%).",
+  "id": "bq_1790722118206_qdee7",
+  "lessonId": "bai-17",
+  "lv": "vd",
+  "o": [
+   "C₆H₆",
+   "C₇H₈",
+   "C₈H₁₀",
+   "C₉H₁₂"
+  ],
+  "q": "Arene X thuộc dãy đồng đẳng benzene có phần trăm khối lượng carbon là 90,57%. Công thức phân tử của X là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "7,44",
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "C₆H₆ + 3H₂ → C₆H₁₂: n(H₂) = 0,3 mol → V = 0,3 × 24,79 = 7,437 ≈ 7,44 lít.",
+  "id": "bq_1790722118206_ql0mv",
+  "lessonId": "bai-17",
+  "lv": "vd",
+  "num": 7.44,
+  "q": "Cần bao nhiêu lít H₂ (đkc) để chuyển hoàn toàn 0,1 mol benzene thành cyclohexane? (Làm tròn đến hàng phần trăm.)",
+  "t": "tn",
+  "tol": 0.01,
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "lít"
+ },
+ {
+  "a": 1,
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "Benzene là lục giác đều phẳng, các góc liên kết đều bằng 120°.",
+  "id": "bq_1790722118206_qwcld",
+  "lessonId": "bai-17",
+  "lv": "nb",
+  "o": [
+   "109,5°",
+   "120°",
+   "180°",
+   "90°"
+  ],
+  "q": "Trong phân tử benzene, các góc liên kết đều bằng",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "1,97",
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "M(C₇H₈) = 92, M(TNT) = 227. m(TNT) = 1 × 227 : 92 × 0,8 = 1,974 ≈ 1,97 tấn.",
+  "id": "bq_1790722118206_s8hy7",
+  "lessonId": "bai-17",
+  "lv": "vdc",
+  "num": 1.97,
+  "q": "Từ 1 tấn toluene sản xuất TNT (2,4,6-trinitrotoluene, C₇H₅N₃O₆) với hiệu suất 80%. Khối lượng TNT thu được là bao nhiêu tấn? (Làm tròn đến hàng phần trăm.)",
+  "t": "tn",
+  "tol": 0.01,
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "tấn"
+ },
+ {
+  "ansText": "3",
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "2-bromotoluene, 3-bromotoluene, 4-bromotoluene (ortho, meta, para).",
+  "id": "bq_1790722118206_uualg",
+  "lessonId": "bai-17",
+  "lv": "th",
+  "num": 3,
+  "q": "Có bao nhiêu đồng phân cấu tạo có công thức C₇H₇Br chứa vòng benzene mà nguyên tử Br gắn trực tiếp vào vòng?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ch": 4,
+  "chapterId": "chuong-4",
+  "e": "n(toluene) = 0,15 mol → 0,15 × 122 = 18,3 g C₆H₅COOH. Chỉ nhánh –CH₃ bị oxi hoá, vòng giữ nguyên. Benzoic acid là C₇H₆O₂.",
+  "id": "bq_1790722118206_v8kg9",
+  "lessonId": "bai-17",
+  "lv": "vdc",
+  "q": "Oxi hoá 13,8 gam toluene bằng dung dịch KMnO₄ đun nóng (hiệu suất 100%), sau đó acid hoá bằng HCl dư thu được benzoic acid.",
+  "st": [
+   {
+    "s": "Khối lượng benzoic acid thu được là 18,3 gam.",
+    "v": true
+   },
+   {
+    "s": "Trước khi acid hoá, sản phẩm hữu cơ trong dung dịch là C₆H₅COOK.",
+    "v": true
+   },
+   {
+    "s": "Vòng benzene bị oxi hoá trong phản ứng này.",
+    "v": false
+   },
+   {
+    "s": "Benzoic acid có công thức phân tử C₇H₈O₂.",
+    "v": false
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 3,
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "Mạch chính 3 C (propane), Cl ở C2: 2-chloropropane.",
+  "id": "bq_1790722199329_07hcn",
+  "lessonId": "bai-19",
+  "lv": "th",
+  "o": [
+   "2-chloropropene",
+   "1-chloropropane",
+   "3-chloropropane",
+   "2-chloropropane"
+  ],
+  "q": "Tên theo danh pháp thay thế của CH₃–CHCl–CH₃ là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 3,
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "Tên thay thế = vị trí + halogeno + tên hydrocarbon; Br chỉ có một vị trí nên không cần số: bromoethane.",
+  "id": "bq_1790722199329_3pwqm",
+  "lessonId": "bai-19",
+  "lv": "nb",
+  "o": [
+   "bromomethane",
+   "ethyl bromine",
+   "1-bromopropane",
+   "bromoethane"
+  ],
+  "q": "Tên theo danh pháp thay thế của CH₃CH₂Br là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "9,2",
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "n(C₂H₅Cl) = 12,9 : 64,5 = 0,2 mol → n(C₂H₅OH) = 0,2 mol → m = 9,2 gam.",
+  "id": "bq_1790722199329_4e02y",
+  "lessonId": "bai-19",
+  "lv": "vd",
+  "num": 9.2,
+  "q": "Đun nóng 12,9 gam chloroethane với dung dịch NaOH loãng dư (hiệu suất 100%). Khối lượng ethanol thu được là bao nhiêu gam?",
+  "t": "tn",
+  "tol": 0.05,
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "gam"
+ },
+ {
+  "ansText": "43,9",
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "n(NaCl) = 0,2 mol: x + y = 0,2; 50,5x + 64,5y = 11,5 → x = 0,1 → m(CH₃Cl) = 5,05 g → 5,05 : 11,5 = 43,91% ≈ 43,9%.",
+  "id": "bq_1790722199329_546je",
+  "lessonId": "bai-19",
+  "lv": "vdc",
+  "num": 43.9,
+  "q": "Thuỷ phân hoàn toàn 11,5 gam hỗn hợp X gồm CH₃Cl và C₂H₅Cl bằng dung dịch NaOH dư, thu được 11,7 gam NaCl. Phần trăm khối lượng CH₃Cl trong X là bao nhiêu? (Làm tròn đến hàng phần mười.)",
+  "t": "tn",
+  "tol": 0.05,
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "%"
+ },
+ {
+  "a": 0,
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "n(C₄H₉Br) = 13,7 : 137 = 0,1 mol → tổng n(alkene) = 0,1 mol → V = 2,479 lít (gồm cả but-2-ene và but-1-ene).",
+  "id": "bq_1790722199329_6wu7h",
+  "lessonId": "bai-19",
+  "lv": "vd",
+  "o": [
+   "2,479 lít",
+   "4,958 lít",
+   "1,2395 lít",
+   "3,7185 lít"
+  ],
+  "q": "Đun 13,7 gam 2-bromobutane với dung dịch KOH trong ethanol (dư), hiệu suất 100%. Tổng thể tích alkene thu được (đkc) là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "Bốn đồng phân: 1-bromobutane, 2-bromobutane, 1-bromo-2-methylpropane, 2-bromo-2-methylpropane. Bậc I: 1-bromobutane, 1-bromo-2-methylpropane. 1-Bromobutane chỉ có H ở C2 để tách nên chỉ tạo but-1-ene.",
+  "id": "bq_1790722199329_7s4j4",
+  "lessonId": "bai-19",
+  "lv": "vd",
+  "q": "Xét các dẫn xuất halogen có công thức phân tử C₄H₉Br.",
+  "st": [
+   {
+    "s": "Có 4 đồng phân cấu tạo.",
+    "v": true
+   },
+   {
+    "s": "Có 2 đồng phân là dẫn xuất bậc I.",
+    "v": true
+   },
+   {
+    "s": "2-Bromo-2-methylpropane là dẫn xuất bậc III.",
+    "v": true
+   },
+   {
+    "s": "Tách HBr từ 1-bromobutane thu được sản phẩm chính là but-2-ene.",
+    "v": false
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "C₆H₅Br (bromobenzene) là dẫn xuất halogen của arene (benzene).",
+  "id": "bq_1790722199329_8n2sa",
+  "lessonId": "bai-19",
+  "lv": "nb",
+  "q": "Xét khái niệm và danh pháp dẫn xuất halogen.",
+  "st": [
+   {
+    "s": "Thay nguyên tử hydrogen trong hydrocarbon bằng nguyên tử halogen được dẫn xuất halogen.",
+    "v": true
+   },
+   {
+    "s": "CH₂Cl₂ có tên thay thế là dichloromethane.",
+    "v": true
+   },
+   {
+    "s": "CHI₃ có tên thông thường là iodoform.",
+    "v": true
+   },
+   {
+    "s": "C₆H₅Br là dẫn xuất halogen của alkane.",
+    "v": false
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 1,
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "Dẫn xuất halogen thu được khi thay nguyên tử H trong hydrocarbon bằng nguyên tử halogen: CH₄ → CH₃Cl.",
+  "id": "bq_1790722199329_8nkfy",
+  "lessonId": "bai-19",
+  "lv": "nb",
+  "o": [
+   "CH₃OH",
+   "CH₃Cl",
+   "CH₃COOH",
+   "CH₃CHO"
+  ],
+  "q": "Chất nào sau đây là dẫn xuất halogen của hydrocarbon?",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 3,
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "Cùng gốc ethyl, phân tử khối tăng từ F đến I nên nhiệt độ sôi tăng; C₂H₅I cao nhất.",
+  "id": "bq_1790722199329_agm19",
+  "lessonId": "bai-19",
+  "lv": "th",
+  "o": [
+   "C₂H₅F",
+   "C₂H₅Cl",
+   "C₂H₅Br",
+   "C₂H₅I"
+  ],
+  "q": "Chất nào sau đây có nhiệt độ sôi cao nhất?",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "2,2",
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "C₂H₄Cl₂ (M = 99) → C₂H₃Cl (M = 62,5) → PVC. m = 1 × 99 : 62,5 : (0,8 × 0,9) = 1,584 : 0,72 = 2,2 tấn.",
+  "id": "bq_1790722199329_bdett",
+  "lessonId": "bai-19",
+  "lv": "vdc",
+  "num": 2.2,
+  "q": "Tách HCl từ 1,2-dichloroethane thu được vinyl chloride (hiệu suất 80%), rồi trùng hợp vinyl chloride thành PVC (hiệu suất 90%). Để sản xuất 1 tấn PVC cần bao nhiêu tấn 1,2-dichloroethane?",
+  "t": "tn",
+  "tol": 0.01,
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "tấn"
+ },
+ {
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "Nhiều hợp chất chlorine dùng trong nông nghiệp khó phân huỷ, tồn dư lâu nên bị hạn chế hoặc cấm.",
+  "id": "bq_1790722199329_c68az",
+  "lessonId": "bai-19",
+  "lv": "vd",
+  "q": "Xét ứng dụng và tác hại của dẫn xuất halogen.",
+  "st": [
+   {
+    "s": "CFC từng được dùng làm chất làm lạnh trong tủ lạnh, máy điều hoà.",
+    "v": true
+   },
+   {
+    "s": "CFC phá huỷ tầng ozone nên bị hạn chế và cấm sử dụng.",
+    "v": true
+   },
+   {
+    "s": "HFC và HFO được dùng để thay thế CFC.",
+    "v": true
+   },
+   {
+    "s": "Các thuốc bảo vệ thực vật chứa chlorine dễ phân huỷ nên không tồn dư trong môi trường.",
+    "v": false
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "n(C₃H₇Br) = 12,3 : 123 = 0,1 mol → 0,1 mol propene (2,479 lít), cộng 0,1 mol Br₂ = 16 g; n(NaBr) = 0,1 mol = 10,3 g.",
+  "id": "bq_1790722199329_d92ij",
+  "lessonId": "bai-19",
+  "lv": "vdc",
+  "q": "Đun nóng 12,3 gam 2-bromopropane với NaOH trong ethanol (dư), hiệu suất 100%, chỉ xảy ra phản ứng tách.",
+  "st": [
+   {
+    "s": "Sản phẩm hữu cơ là propene.",
+    "v": true
+   },
+   {
+    "s": "Thể tích khí thu được là 4,958 lít (đkc).",
+    "v": false
+   },
+   {
+    "s": "Lượng khí thu được làm mất màu tối đa 16 gam Br₂ trong dung dịch.",
+    "v": true
+   },
+   {
+    "s": "Khối lượng NaBr tạo thành là 8,0 gam.",
+    "v": false
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "4",
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "1-chlorobutane, 2-chlorobutane, 1-chloro-2-methylpropane, 2-chloro-2-methylpropane.",
+  "id": "bq_1790722199329_e1cn3",
+  "lessonId": "bai-19",
+  "lv": "th",
+  "num": 4,
+  "q": "Có bao nhiêu đồng phân cấu tạo có công thức phân tử C₄H₉Cl?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 1,
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "Liên kết C–X phân cực nên phản ứng đặc trưng là thế nguyên tử halogen; ngoài ra còn có phản ứng tách HX.",
+  "id": "bq_1790722199329_hdbmq",
+  "lessonId": "bai-19",
+  "lv": "nb",
+  "o": [
+   "phản ứng cộng",
+   "phản ứng thế nguyên tử halogen",
+   "phản ứng trùng hợp",
+   "phản ứng tráng bạc"
+  ],
+  "q": "Phản ứng đặc trưng của dẫn xuất halogen là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "3",
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "But-1-ene, cis-but-2-ene và trans-but-2-ene.",
+  "id": "bq_1790722199329_i0sji",
+  "lessonId": "bai-19",
+  "lv": "vd",
+  "num": 3,
+  "q": "Đun 2-bromobutane với KOH trong ethanol. Có thể thu được tối đa bao nhiêu alkene (kể cả đồng phân hình học)?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "3",
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "CHCl₃ có 3 nguyên tử Cl.",
+  "id": "bq_1790722199329_j1anf",
+  "lessonId": "bai-19",
+  "lv": "nb",
+  "num": 3,
+  "q": "Phân tử chloroform (CHCl₃) có bao nhiêu nguyên tử halogen?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 1,
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "M(C₃H₇Cl) = 78,5 → n = 0,2 mol → n(C₃H₇OH) = 0,2 mol → m = 0,2 × 60 = 12,0 gam.",
+  "id": "bq_1790722199329_jzy17",
+  "lessonId": "bai-19",
+  "lv": "vd",
+  "o": [
+   "6,0 gam",
+   "12,0 gam",
+   "9,2 gam",
+   "15,7 gam"
+  ],
+  "q": "Đun nóng 15,7 gam 1-chloropropane với dung dịch NaOH loãng dư (hiệu suất 100%). Khối lượng alcohol thu được là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 2,
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "35,5 : (14n + 36,5) = 0,4522 → 14n + 36,5 = 78,5 → n = 3 → C₃H₇Cl.",
+  "id": "bq_1790722199329_m6odd",
+  "lessonId": "bai-19",
+  "lv": "vd",
+  "o": [
+   "CH₃Cl",
+   "C₂H₅Cl",
+   "C₃H₇Cl",
+   "C₄H₉Cl"
+  ],
+  "q": "Dẫn xuất monochloro X của alkane có phần trăm khối lượng chlorine là 45,22%. Công thức phân tử của X là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 1,
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "Phản ứng tách HBr theo quy tắc Zaitsev: Br tách cùng H ở carbon bên cạnh có bậc cao hơn → CH₃–CH=CH–CH₃.",
+  "id": "bq_1790722199329_n8v0b",
+  "lessonId": "bai-19",
+  "lv": "th",
+  "o": [
+   "but-1-ene",
+   "but-2-ene",
+   "butan-2-ol",
+   "butane"
+  ],
+  "q": "Đun 2-bromobutane với KOH trong ethanol, sản phẩm chính là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "109",
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "M = 80 : 0,7339 = 109 → C₂H₅Br.",
+  "id": "bq_1790722199329_oh23g",
+  "lessonId": "bai-19",
+  "lv": "vd",
+  "num": 109,
+  "q": "Dẫn xuất monobromo X của alkane có phần trăm khối lượng bromine là 73,39%. Phân tử khối của X là bao nhiêu?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "37,6",
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "n(C₂H₅Br) = 21,8 : 109 = 0,2 mol → 0,2 mol NaBr → 0,2 mol AgBr × 188 = 37,6 gam.",
+  "id": "bq_1790722199329_ran4d",
+  "lessonId": "bai-19",
+  "lv": "vdc",
+  "num": 37.6,
+  "q": "Đun nóng 21,8 gam bromoethane với dung dịch NaOH loãng dư (hiệu suất 100%). Acid hoá dung dịch bằng HNO₃ rồi thêm AgNO₃ dư. Khối lượng kết tủa thu được là bao nhiêu gam?",
+  "t": "tn",
+  "tol": 0.05,
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "gam"
+ },
+ {
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "CH₃CH₂CH₂Br + NaOH → CH₃CH₂CH₂OH + NaBr. Tạo alkene cần base mạnh trong dung môi alcohol.",
+  "id": "bq_1790722199329_rrk9p",
+  "lessonId": "bai-19",
+  "lv": "th",
+  "q": "Xét phản ứng của CH₃CH₂CH₂Br với dung dịch NaOH loãng, đun nóng.",
+  "st": [
+   {
+    "s": "Đây là phản ứng thế nguyên tử Br bởi nhóm OH.",
+    "v": true
+   },
+   {
+    "s": "Sản phẩm hữu cơ là propan-1-ol.",
+    "v": true
+   },
+   {
+    "s": "Sản phẩm hữu cơ chính là propene.",
+    "v": false
+   },
+   {
+    "s": "Sau phản ứng, dung dịch có chứa NaBr.",
+    "v": true
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 2,
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "Trong dung dịch kiềm loãng, Cl bị thế bởi nhóm OH: CH₃CH₂Cl + NaOH → CH₃CH₂OH + NaCl.",
+  "id": "bq_1790722199329_rtde7",
+  "lessonId": "bai-19",
+  "lv": "th",
+  "o": [
+   "ethylene",
+   "ethane",
+   "ethanol",
+   "diethyl ether"
+  ],
+  "q": "Đun nóng CH₃CH₂Cl với dung dịch NaOH loãng, sản phẩm hữu cơ thu được là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "50,5",
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "12 + 3 × 1 + 35,5 = 50,5.",
+  "id": "bq_1790722199329_t1sve",
+  "lessonId": "bai-19",
+  "lv": "nb",
+  "num": 50.5,
+  "q": "Phân tử khối của chloromethane (CH₃Cl) là bao nhiêu?",
+  "t": "tn",
+  "tol": 0.05,
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 2,
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "Trùng hợp vinyl chloride thu được PVC, dùng làm ống nước, vỏ dây điện…",
+  "id": "bq_1790722199329_tpdlp",
+  "lessonId": "bai-19",
+  "lv": "th",
+  "o": [
+   "polyethylene (PE)",
+   "polystyrene (PS)",
+   "poly(vinyl chloride) (PVC)",
+   "cao su buna"
+  ],
+  "q": "Vinyl chloride (CH₂=CHCl) được dùng chủ yếu để sản xuất",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 1,
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "1-chloropropane và 2-chloropropane.",
+  "id": "bq_1790722199329_tv7xr",
+  "lessonId": "bai-19",
+  "lv": "vd",
+  "o": [
+   "1",
+   "2",
+   "3",
+   "4"
+  ],
+  "q": "Số đồng phân cấu tạo có công thức phân tử C₃H₇Cl là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "Phản ứng tách HX tuân theo quy tắc Zaitsev; quy tắc Markovnikov áp dụng cho phản ứng cộng.",
+  "id": "bq_1790722199329_ukaxj",
+  "lessonId": "bai-19",
+  "lv": "th",
+  "q": "Xét phản ứng tách HBr khi đun 2-bromobutane với KOH trong ethanol.",
+  "st": [
+   {
+    "s": "Sản phẩm chính là but-2-ene.",
+    "v": true
+   },
+   {
+    "s": "Sản phẩm phụ là but-1-ene.",
+    "v": true
+   },
+   {
+    "s": "Phản ứng tuân theo quy tắc Markovnikov.",
+    "v": false
+   },
+   {
+    "s": "Nguyên tử Br bị tách ưu tiên cùng nguyên tử H ở carbon bên cạnh có bậc cao hơn.",
+    "v": true
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 3,
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "Bậc của dẫn xuất halogen là bậc của C gắn halogen. Trong CH₃CHBrCH₃, C gắn Br liên kết với 2 C nên là bậc II.",
+  "id": "bq_1790722199329_v4e2o",
+  "lessonId": "bai-19",
+  "lv": "th",
+  "o": [
+   "(CH₃)₃CBr",
+   "CH₃CH₂Br",
+   "CH₃Br",
+   "CH₃CHBrCH₃"
+  ],
+  "q": "Chất nào sau đây là dẫn xuất halogen bậc II?",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "3,97",
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "n(C₃H₇Cl) = 15,7 : 78,5 = 0,2 mol → n(propene) = 0,2 × 0,8 = 0,16 mol → V = 0,16 × 24,79 = 3,966 ≈ 3,97 lít.",
+  "id": "bq_1790722199329_w93hq",
+  "lessonId": "bai-19",
+  "lv": "vd",
+  "num": 3.97,
+  "q": "Đun 15,7 gam 2-chloropropane với KOH trong ethanol, hiệu suất 80%. Thể tích propene thu được là bao nhiêu lít (đkc)? (Làm tròn đến hàng phần trăm.)",
+  "t": "tn",
+  "tol": 0.01,
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "lít"
+ },
+ {
+  "a": 3,
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "Các dẫn xuất có phân tử khối nhỏ như CH₃Cl, CH₃F là chất khí; CH₂Cl₂, CHCl₃, CCl₄ là chất lỏng.",
+  "id": "bq_1790722199329_wdprq",
+  "lessonId": "bai-19",
+  "lv": "nb",
+  "o": [
+   "CH₂Cl₂",
+   "CHCl₃",
+   "CCl₄",
+   "CH₃Cl"
+  ],
+  "q": "Ở điều kiện thường, chất nào sau đây là chất khí?",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "2",
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "1,1-dichloroethane (CH₃CHCl₂) và 1,2-dichloroethane (ClCH₂CH₂Cl).",
+  "id": "bq_1790722199329_weyl9",
+  "lessonId": "bai-19",
+  "lv": "th",
+  "num": 2,
+  "q": "Có bao nhiêu đồng phân cấu tạo có công thức phân tử C₂H₄Cl₂?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 1,
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "Halogen có độ âm điện lớn hơn carbon nên mang một phần điện tích âm, carbon mang một phần điện tích dương.",
+  "id": "bq_1790722199329_wxoll",
+  "lessonId": "bai-19",
+  "lv": "th",
+  "o": [
+   "nguyên tử carbon",
+   "nguyên tử halogen",
+   "nguyên tử hydrogen",
+   "không phân cực về phía nào"
+  ],
+  "q": "Trong phân tử dẫn xuất halogen, liên kết C–X phân cực về phía",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "M = 35,5 : 0,3838 = 92,5 → C₄H₉Cl. Dẫn xuất bậc III (CH₃)₃CCl có ba nhóm CH₃ tương đương nên chỉ tạo một alkene là 2-methylpropene.",
+  "id": "bq_1790722199329_ychbh",
+  "lessonId": "bai-19",
+  "lv": "vdc",
+  "q": "Dẫn xuất monochloro X của alkane có phần trăm khối lượng chlorine là 38,38%.",
+  "st": [
+   {
+    "s": "X có công thức phân tử C₄H₉Cl.",
+    "v": true
+   },
+   {
+    "s": "X có 4 đồng phân cấu tạo.",
+    "v": true
+   },
+   {
+    "s": "Nếu X là dẫn xuất bậc III thì X có tên là 2-chloro-2-methylpropane.",
+    "v": true
+   },
+   {
+    "s": "Đun X bậc III với KOH trong ethanol thu được hai alkene là đồng phân cấu tạo của nhau.",
+    "v": false
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "2",
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "ClCH₂–CH₂Cl, mạch ethane có 2 C.",
+  "id": "bq_1790722199329_ygq95",
+  "lessonId": "bai-19",
+  "lv": "nb",
+  "num": 2,
+  "q": "Phân tử 1,2-dichloroethane có bao nhiêu nguyên tử carbon?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 0,
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "n(C₄H₉Cl) = 9,25 : 92,5 = 0,1 mol → 0,1 mol NaCl → 0,1 mol AgCl = 14,35 gam. Phải acid hoá trước để NaOH dư không tạo kết tủa Ag₂O.",
+  "id": "bq_1790722199329_yix6v",
+  "lessonId": "bai-19",
+  "lv": "vdc",
+  "o": [
+   "14,35 gam",
+   "18,8 gam",
+   "28,7 gam",
+   "7,175 gam"
+  ],
+  "q": "Đun nóng 9,25 gam 1-chlorobutane với dung dịch NaOH loãng dư (hiệu suất 100%). Acid hoá dung dịch sau phản ứng bằng HNO₃ rồi thêm AgNO₃ dư. Khối lượng kết tủa thu được là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 2,
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "(CH₃)₂CBr–CH₂–CH₃: Br tách cùng H ở C3 (bậc II) theo Zaitsev → (CH₃)₂C=CH–CH₃ (2-methylbut-2-ene).",
+  "id": "bq_1790722199329_yuyhg",
+  "lessonId": "bai-19",
+  "lv": "vd",
+  "o": [
+   "2-methylbut-1-ene",
+   "3-methylbut-1-ene",
+   "2-methylbut-2-ene",
+   "2-methylbutan-2-ol"
+  ],
+  "q": "Đun 2-bromo-2-methylbutane với KOH trong ethanol, sản phẩm chính là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "Phân tử dẫn xuất halogen phân cực nên sôi cao hơn hydrocarbon tương đương. Một số chất như CH₃Cl, CH₃F là chất khí.",
+  "id": "bq_1790722199329_zncq6",
+  "lessonId": "bai-19",
+  "lv": "nb",
+  "q": "Xét tính chất vật lí của dẫn xuất halogen.",
+  "st": [
+   {
+    "s": "Dẫn xuất halogen hầu như không tan trong nước.",
+    "v": true
+   },
+   {
+    "s": "Dẫn xuất halogen tan tốt trong các dung môi hữu cơ.",
+    "v": true
+   },
+   {
+    "s": "Dẫn xuất halogen có nhiệt độ sôi thấp hơn hydrocarbon có phân tử khối tương đương.",
+    "v": false
+   },
+   {
+    "s": "Ở điều kiện thường, tất cả dẫn xuất halogen đều là chất lỏng.",
+    "v": false
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 0,
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "CHCl₃: chloroform; CHI₃: iodoform; CHBr₃: bromoform; CCl₄: carbon tetrachloride.",
+  "id": "bq_1790722199329_zrxur",
+  "lessonId": "bai-19",
+  "lv": "nb",
+  "o": [
+   "chloroform",
+   "iodoform",
+   "carbon tetrachloride",
+   "bromoform"
+  ],
+  "q": "Tên thông thường của CHCl₃ là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "46",
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "C₂H₅OH: 2 × 12 + 6 × 1 + 16 = 46.",
+  "id": "bq_1790722255305_12nuo",
+  "lessonId": "bai-20",
+  "lv": "nb",
+  "num": 46,
+  "q": "Phân tử khối của ethanol là bao nhiêu?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 2,
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "Mạch chính 3 C, nhóm OH ở C2: propan-2-ol.",
+  "id": "bq_1790722255305_1iadn",
+  "lessonId": "bai-20",
+  "lv": "nb",
+  "o": [
+   "propan-1-ol",
+   "propanal",
+   "propan-2-ol",
+   "propane-1,2-diol"
+  ],
+  "q": "Tên theo danh pháp thay thế của CH₃–CH(OH)–CH₃ là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "n(H₂) = 0,15 mol → n(X) = 0,3 mol. x + y = 0,3; 46x + 60y = 15,2 → x = 0,2; y = 0,1. %m(C₃H₇OH) = 6 : 15,2 = 39,5%. Hai alcohol đều bậc I nên tạo CH₃CHO và C₂H₅CHO.",
+  "id": "bq_1790722255305_1obwd",
+  "lessonId": "bai-20",
+  "lv": "vdc",
+  "q": "Cho 15,2 gam hỗn hợp X gồm ethanol và propan-1-ol tác dụng với Na dư, thu được 3,7185 lít H₂ (đkc).",
+  "st": [
+   {
+    "s": "Tổng số mol alcohol trong X là 0,3 mol.",
+    "v": true
+   },
+   {
+    "s": "Số mol ethanol trong X là 0,2 mol.",
+    "v": true
+   },
+   {
+    "s": "Phần trăm khối lượng propan-1-ol trong X lớn hơn 50%.",
+    "v": false
+   },
+   {
+    "s": "Oxi hoá X bằng CuO dư, đun nóng thu được hỗn hợp hai aldehyde.",
+    "v": true
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "200",
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "Rượu 40° chứa 40 mL ethanol trong 100 mL dung dịch → 500 × 40 : 100 = 200 mL.",
+  "id": "bq_1790722255305_2cq6i",
+  "lessonId": "bai-20",
+  "lv": "th",
+  "num": 200,
+  "q": "Trong 500 mL rượu 40° có bao nhiêu mL ethanol nguyên chất?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "mL"
+ },
+ {
+  "ansText": "3",
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "Glycerol: HOCH₂–CH(OH)–CH₂OH (propane-1,2,3-triol).",
+  "id": "bq_1790722255305_3jp8a",
+  "lessonId": "bai-20",
+  "lv": "nb",
+  "num": 3,
+  "q": "Phân tử glycerol có bao nhiêu nhóm –OH?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "Chỉ alcohol có từ hai nhóm OH liền kề (ethylene glycol, glycerol) mới hoà tan Cu(OH)₂; alcohol đơn chức thì không.",
+  "id": "bq_1790722255305_3ufxv",
+  "lessonId": "bai-20",
+  "lv": "vd",
+  "q": "Xét phản ứng của alcohol đa chức với Cu(OH)₂ ở nhiệt độ thường.",
+  "st": [
+   {
+    "s": "Glycerol hoà tan Cu(OH)₂ tạo dung dịch màu xanh lam.",
+    "v": true
+   },
+   {
+    "s": "Ethanol cũng hoà tan được Cu(OH)₂.",
+    "v": false
+   },
+   {
+    "s": "Ethylene glycol cũng hoà tan được Cu(OH)₂.",
+    "v": true
+   },
+   {
+    "s": "Có thể dùng Cu(OH)₂ để phân biệt glycerol và propan-1-ol.",
+    "v": true
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "2",
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "Propan-1-ol và propan-2-ol.",
+  "id": "bq_1790722255305_44r7d",
+  "lessonId": "bai-20",
+  "lv": "th",
+  "num": 2,
+  "q": "Có bao nhiêu alcohol là đồng phân cấu tạo có công thức phân tử C₃H₈O?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "4,6",
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "n(C₂H₅OH) = 0,2 mol; 2C₂H₅OH + 2Na → 2C₂H₅ONa + H₂ → n(Na) = 0,2 mol → 4,6 gam.",
+  "id": "bq_1790722255305_4qta7",
+  "lessonId": "bai-20",
+  "lv": "vd",
+  "num": 4.6,
+  "q": "Khối lượng Na (gam) phản ứng vừa đủ với 9,2 gam ethanol là bao nhiêu?",
+  "t": "tn",
+  "tol": 0.05,
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "gam"
+ },
+ {
+  "a": 2,
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "Từ n alcohol thu được n(n + 1)/2 ether; n = 2 → 3 ether: CH₃OCH₃, C₂H₅OC₂H₅, CH₃OC₂H₅.",
+  "id": "bq_1790722255305_ex0g8",
+  "lessonId": "bai-20",
+  "lv": "vd",
+  "o": [
+   "1",
+   "2",
+   "3",
+   "4"
+  ],
+  "q": "Đun hỗn hợp methanol và ethanol với H₂SO₄ đặc ở 140 °C, số ether tối đa thu được là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "Nhóm OH tách cùng H ở carbon bên cạnh có bậc cao hơn (C3) → CH₃–CH=CH–CH₃ là sản phẩm chính.",
+  "id": "bq_1790722255305_gpgqr",
+  "lessonId": "bai-20",
+  "lv": "vd",
+  "q": "Xét phản ứng tách nước của butan-2-ol (H₂SO₄ đặc, 170 °C).",
+  "st": [
+   {
+    "s": "Sản phẩm chính là but-2-ene.",
+    "v": true
+   },
+   {
+    "s": "Phản ứng tuân theo quy tắc Zaitsev.",
+    "v": true
+   },
+   {
+    "s": "Sản phẩm phụ là but-1-ene.",
+    "v": true
+   },
+   {
+    "s": "Sản phẩm chính là but-1-ene.",
+    "v": false
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "7,2",
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "C₃H₈O → 4H₂O: n(H₂O) = 0,4 mol → 7,2 gam.",
+  "id": "bq_1790722255305_h7qzg",
+  "lessonId": "bai-20",
+  "lv": "vd",
+  "num": 7.2,
+  "q": "Đốt cháy hoàn toàn 0,1 mol propan-1-ol. Khối lượng H₂O thu được là bao nhiêu gam?",
+  "t": "tn",
+  "tol": 0.05,
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "gam"
+ },
+ {
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "Alcohol tạo liên kết hydrogen giữa các phân tử nên sôi cao hơn hydrocarbon tương đương; gốc hydrocarbon càng lớn thì càng kém tan.",
+  "id": "bq_1790722255305_hk1sa",
+  "lessonId": "bai-20",
+  "lv": "nb",
+  "q": "Xét tính chất vật lí của alcohol.",
+  "st": [
+   {
+    "s": "Methanol và ethanol tan vô hạn trong nước.",
+    "v": true
+   },
+   {
+    "s": "Alcohol có nhiệt độ sôi thấp hơn hydrocarbon có phân tử khối tương đương.",
+    "v": false
+   },
+   {
+    "s": "Độ tan trong nước của alcohol giảm khi số nguyên tử carbon tăng.",
+    "v": true
+   },
+   {
+    "s": "Glycerol là chất lỏng sánh, có vị ngọt.",
+    "v": true
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "3,2",
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "C₂H₅OH + CuO → CH₃CHO + Cu + H₂O. n(ethanol) = 0,2 mol → CuO mất 0,2 mol O → khối lượng rắn giảm 0,2 × 16 = 3,2 gam.",
+  "id": "bq_1790722255305_j6wh6",
+  "lessonId": "bai-20",
+  "lv": "vdc",
+  "num": 3.2,
+  "q": "Cho hơi của 9,2 gam ethanol đi qua ống đựng CuO dư, nung nóng (hiệu suất 100%). Khối lượng chất rắn trong ống giảm bao nhiêu gam?",
+  "t": "tn",
+  "tol": 0.05,
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "gam"
+ },
+ {
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "Ethanol không có tính acid đáng kể: không tác dụng với NaOH, không làm đổi màu quỳ tím; chỉ phản ứng với kim loại mạnh như Na, K.",
+  "id": "bq_1790722255305_l8kz7",
+  "lessonId": "bai-20",
+  "lv": "th",
+  "q": "Xét tính chất hoá học của ethanol.",
+  "st": [
+   {
+    "s": "Ethanol tác dụng với Na giải phóng khí H₂.",
+    "v": true
+   },
+   {
+    "s": "Ethanol tác dụng với dung dịch NaOH tạo C₂H₅ONa.",
+    "v": false
+   },
+   {
+    "s": "Đun ethanol với H₂SO₄ đặc ở 140 °C thu được diethyl ether.",
+    "v": true
+   },
+   {
+    "s": "Dung dịch ethanol làm quỳ tím hoá đỏ.",
+    "v": false
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "9,7",
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "n(CH₃OH) = 0,1; n(C₂H₅OH) = 0,2 → m(alcohol) = 3,2 + 9,2 = 12,4 g. Cứ 2 alcohol tách 1 H₂O: n(H₂O) = 0,15 mol = 2,7 g → m(ether) = 12,4 − 2,7 = 9,7 gam.",
+  "id": "bq_1790722255305_mpgu2",
+  "lessonId": "bai-20",
+  "lv": "vdc",
+  "num": 9.7,
+  "q": "Đun 0,3 mol hỗn hợp methanol và ethanol (tỉ lệ mol 1 : 2) với H₂SO₄ đặc ở 140 °C, các alcohol phản ứng hoàn toàn tạo ether. Tổng khối lượng ether thu được là bao nhiêu gam?",
+  "t": "tn",
+  "tol": 0.05,
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "gam"
+ },
+ {
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "Glycerol C₃H₅(OH)₃ có 3 nhóm OH nên là alcohol đa chức (polyalcohol).",
+  "id": "bq_1790722255305_obi1l",
+  "lessonId": "bai-20",
+  "lv": "nb",
+  "q": "Xét khái niệm và phân loại alcohol.",
+  "st": [
+   {
+    "s": "Alcohol có nhóm –OH liên kết với nguyên tử carbon no.",
+    "v": true
+   },
+   {
+    "s": "Alcohol no, đơn chức, mạch hở có công thức chung CₙH₂ₙ₊₁OH (n ≥ 1).",
+    "v": true
+   },
+   {
+    "s": "Glycerol là alcohol đơn chức.",
+    "v": false
+   },
+   {
+    "s": "Bậc của alcohol là bậc của nguyên tử carbon liên kết với nhóm –OH.",
+    "v": true
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "Methanol rất độc, uống một lượng nhỏ có thể gây mù loà hoặc tử vong.",
+  "id": "bq_1790722255305_onnk5",
+  "lessonId": "bai-20",
+  "lv": "vd",
+  "q": "Xét ethanol trong đời sống và sản xuất.",
+  "st": [
+   {
+    "s": "Trong công nghiệp, ethanol được điều chế bằng phản ứng hydrate hoá ethylene.",
+    "v": true
+   },
+   {
+    "s": "Lên men tinh bột thu được ethanol.",
+    "v": true
+   },
+   {
+    "s": "Xăng E5 chứa 5% thể tích ethanol.",
+    "v": true
+   },
+   {
+    "s": "Có thể dùng methanol thay ethanol để pha đồ uống vì methanol ít độc hơn.",
+    "v": false
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "Alcohol bậc I → aldehyde, bậc II → ketone; alcohol bậc III khó bị oxi hoá trong điều kiện này.",
+  "id": "bq_1790722255305_s74pk",
+  "lessonId": "bai-20",
+  "lv": "th",
+  "q": "Xét phản ứng oxi hoá không hoàn toàn alcohol bằng CuO, đun nóng.",
+  "st": [
+   {
+    "s": "Propan-1-ol bị oxi hoá thành propanal.",
+    "v": true
+   },
+   {
+    "s": "Propan-2-ol bị oxi hoá thành acetone.",
+    "v": true
+   },
+   {
+    "s": "2-Methylpropan-2-ol bị oxi hoá thành aldehyde.",
+    "v": false
+   },
+   {
+    "s": "Trong phản ứng, CuO màu đen chuyển thành Cu màu đỏ.",
+    "v": true
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "2",
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "Butan-1-ol và 2-methylpropan-1-ol.",
+  "id": "bq_1790722255305_t3uow",
+  "lessonId": "bai-20",
+  "lv": "th",
+  "num": 2,
+  "q": "Có bao nhiêu alcohol bậc I là đồng phân cấu tạo có công thức phân tử C₄H₁₀O?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "73,6",
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "C₆H₁₂O₆ → 2C₂H₅OH + 2CO₂. n(glucose) = 1 mol → n(ethanol) = 2 × 0,8 = 1,6 mol → 73,6 gam.",
+  "id": "bq_1790722255305_tlat2",
+  "lessonId": "bai-20",
+  "lv": "vd",
+  "num": 73.6,
+  "q": "Lên men 180 gam glucose thành ethanol với hiệu suất 80%. Khối lượng ethanol thu được là bao nhiêu gam?",
+  "t": "tn",
+  "tol": 0.05,
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "gam"
+ },
+ {
+  "ansText": "108",
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "(C₆H₁₀O₅)ₙ → nC₆H₁₂O₆ → 2nC₂H₅OH. 81 kg ứng với 0,5 kmol mắt xích → n(C₂H₅OH) = 1 × 0,75 = 0,75 kmol = 34,5 kg → V(ethanol) = 34,5 : 0,8 = 43,125 L → V(rượu 40°) = 43,125 : 0,4 = 107,8 ≈ 108 lít.",
+  "id": "bq_1790722255305_wp0oq",
+  "lessonId": "bai-20",
+  "lv": "vdc",
+  "num": 108,
+  "q": "Từ 81 kg tinh bột sản xuất rượu 40° (hiệu suất cả quá trình 75%, khối lượng riêng của ethanol là 0,8 g/mL). Thể tích rượu 40° thu được là bao nhiêu lít? (Làm tròn đến hàng đơn vị.)",
+  "t": "tn",
+  "tol": 0.5,
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "lít"
+ },
+ {
+  "ansText": "3",
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "M = 16 : 0,2667 = 60 → 14n + 18 = 60 → n = 3 (C₃H₇OH).",
+  "id": "bq_1790722255305_xa1am",
+  "lessonId": "bai-20",
+  "lv": "vd",
+  "num": 3,
+  "q": "Alcohol no, đơn chức, mạch hở X có phần trăm khối lượng oxygen là 26,67%. Phân tử X có bao nhiêu nguyên tử carbon?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 3,
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "Trong (CH₃)₃C–OH, C gắn nhóm OH liên kết với 3 C nên là alcohol bậc III.",
+  "id": "bq_1790722255305_yy07e",
+  "lessonId": "bai-20",
+  "lv": "th",
+  "o": [
+   "Butan-1-ol",
+   "Butan-2-ol",
+   "2-Methylpropan-1-ol",
+   "2-Methylpropan-2-ol"
+  ],
+  "q": "Alcohol nào sau đây là alcohol bậc III?",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 1,
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "n(C₆H₅OH) = 0,1 mol → n(H₂) = 0,05 mol → V = 0,05 × 24,79 = 1,2395 lít.",
+  "id": "bq_1790722321858_0jwxx",
+  "lessonId": "bai-21",
+  "lv": "vd",
+  "o": [
+   "2,479 lít",
+   "1,2395 lít",
+   "4,958 lít",
+   "0,61975 lít"
+  ],
+  "q": "Cho 9,4 gam phenol tác dụng với Na dư. Thể tích H₂ thu được (đkc) là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "n(phenol) = 0,15 mol; C₆H₅OH + 3Br₂ → C₆H₂Br₃OH↓ + 3HBr. Kết tủa 0,15 × 331 = 49,65 g; n(Br₂) = 0,45 mol = 72 g; HBr tạo ra làm quỳ hoá đỏ.",
+  "id": "bq_1790722321858_14z88",
+  "lessonId": "bai-21",
+  "lv": "vdc",
+  "q": "Cho 14,1 gam phenol tác dụng hoàn toàn với nước bromine dư.",
+  "st": [
+   {
+    "s": "Khối lượng kết tủa thu được là 49,65 gam.",
+    "v": true
+   },
+   {
+    "s": "Số mol Br₂ đã phản ứng là 0,15 mol.",
+    "v": false
+   },
+   {
+    "s": "Dung dịch sau phản ứng làm quỳ tím hoá đỏ.",
+    "v": true
+   },
+   {
+    "s": "Khối lượng Br₂ đã phản ứng là 72 gam.",
+    "v": true
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "Chỉ phenol tác dụng với NaOH: n = 0,1 mol. n(H₂) = 0,15 → tổng n = 0,3 → n(ethanol) = 0,2. m = 9,4 + 9,2 = 18,6 g. Kết tủa 0,1 × 331 = 33,1 g. %m(ethanol) = 9,2 : 18,6 = 49,5%.",
+  "id": "bq_1790722321858_1owdi",
+  "lessonId": "bai-21",
+  "lv": "vdc",
+  "q": "Hỗn hợp X gồm phenol và ethanol. Cho m gam X tác dụng với Na dư thu được 3,7185 lít H₂ (đkc). Cũng m gam X tác dụng vừa đủ với 100 mL dung dịch NaOH 1 M.",
+  "st": [
+   {
+    "s": "Số mol phenol trong X là 0,1 mol.",
+    "v": true
+   },
+   {
+    "s": "Giá trị của m là 18,6.",
+    "v": true
+   },
+   {
+    "s": "Cho m gam X tác dụng với nước bromine dư thu được 33,1 gam kết tủa.",
+    "v": true
+   },
+   {
+    "s": "Phần trăm khối lượng ethanol trong X lớn hơn 50%.",
+    "v": false
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 1,
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "Trong o-cresol nhóm OH gắn trực tiếp vào vòng benzene. C₆H₅CH₂OH là alcohol thơm (OH gắn C no), C₆H₅OCH₃ là ether.",
+  "id": "bq_1790722321858_23mtj",
+  "lessonId": "bai-21",
+  "lv": "nb",
+  "o": [
+   "C₆H₅CH₂OH",
+   "CH₃–C₆H₄–OH (o-cresol)",
+   "C₂H₅OH",
+   "C₆H₅–O–CH₃"
+  ],
+  "q": "Chất nào sau đây thuộc loại phenol?",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "24",
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "n(phenol) = 0,05 mol → n(Br₂) = 3 × 0,05 = 0,15 mol → 24 gam.",
+  "id": "bq_1790722321858_2sk9b",
+  "lessonId": "bai-21",
+  "lv": "vd",
+  "num": 24,
+  "q": "Cho 4,7 gam phenol tác dụng hoàn toàn với nước bromine dư. Khối lượng Br₂ đã phản ứng là bao nhiêu gam?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "gam"
+ },
+ {
+  "ansText": "3",
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "Sản phẩm là 2,4,6-tribromophenol C₆H₂Br₃OH.",
+  "id": "bq_1790722321858_9a3e8",
+  "lessonId": "bai-21",
+  "lv": "th",
+  "num": 3,
+  "q": "Cho phenol tác dụng với nước bromine dư. Phân tử sản phẩm kết tủa có bao nhiêu nguyên tử bromine?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "Phương pháp cumene cho phenol và acetone, không phải ethanol.",
+  "id": "bq_1790722321858_bh37m",
+  "lessonId": "bai-21",
+  "lv": "vd",
+  "q": "Xét ứng dụng và điều chế phenol.",
+  "st": [
+   {
+    "s": "Phần lớn phenol được sản xuất từ cumene.",
+    "v": true
+   },
+   {
+    "s": "Phenol được dùng để sản xuất nhựa phenol formaldehyde.",
+    "v": true
+   },
+   {
+    "s": "Phenol còn được thu từ nhựa than đá.",
+    "v": true
+   },
+   {
+    "s": "Oxi hoá cumene rồi thuỷ phân trong acid thu được phenol và ethanol.",
+    "v": false
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 1,
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "Định nghĩa phenol: nhóm –OH gắn trực tiếp vào C của vòng benzene. Nếu gắn vào C no thì là alcohol.",
+  "id": "bq_1790722321858_dezlt",
+  "lessonId": "bai-21",
+  "lv": "nb",
+  "o": [
+   "nguyên tử carbon no",
+   "nguyên tử carbon của vòng benzene",
+   "nhóm carbonyl C=O",
+   "nguyên tử carbon mang liên kết đôi mạch hở"
+  ],
+  "q": "Phenol là những hợp chất hữu cơ có nhóm –OH liên kết trực tiếp với",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "Nhóm –OH định hướng thế vào vị trí 2, 4, 6 (ortho và para).",
+  "id": "bq_1790722321858_f84bc",
+  "lessonId": "bai-21",
+  "lv": "vd",
+  "q": "So sánh phản ứng thế ở vòng benzene của phenol và benzene.",
+  "st": [
+   {
+    "s": "Cả hai đều tham gia phản ứng thế nguyên tử H ở vòng benzene.",
+    "v": true
+   },
+   {
+    "s": "Phenol tham gia phản ứng thế bromine dễ hơn benzene.",
+    "v": true
+   },
+   {
+    "s": "Nhóm –OH định hướng phản ứng thế vào vị trí meta.",
+    "v": false
+   },
+   {
+    "s": "Nitro hoá phenol bằng HNO₃ đặc (xúc tác H₂SO₄ đặc) thu được picric acid.",
+    "v": true
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 0,
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "n(H₂) = 0,1 → tổng n = 0,2 mol. 94x + 46y = 14; x + y = 0,2 → x = 0,1 → m(phenol) = 9,4 g → 9,4 : 14 = 67,14%.",
+  "id": "bq_1790722321858_g0b2a",
+  "lessonId": "bai-21",
+  "lv": "vdc",
+  "o": [
+   "67,14%",
+   "32,86%",
+   "50,00%",
+   "57,14%"
+  ],
+  "q": "Cho 14 gam hỗn hợp phenol và ethanol tác dụng với Na dư thu được 2,479 lít H₂ (đkc). Phần trăm khối lượng phenol trong hỗn hợp là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 0,
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "n(C₆H₅OH) = 0,05 mol → n(C₆H₅ONa) = 0,05 mol × 116 = 5,8 gam.",
+  "id": "bq_1790722321858_g6i4g",
+  "lessonId": "bai-21",
+  "lv": "vd",
+  "o": [
+   "5,8 gam",
+   "11,6 gam",
+   "4,7 gam",
+   "7,2 gam"
+  ],
+  "q": "Cho 4,7 gam phenol tác dụng vừa đủ với dung dịch NaOH. Khối lượng muối thu được là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "Benzene không phản ứng với nước bromine; phenol phản ứng ngay nhờ nhóm OH hoạt hoá vòng.",
+  "id": "bq_1790722321858_g7u5x",
+  "lessonId": "bai-21",
+  "lv": "th",
+  "q": "Xét phản ứng của phenol với nước bromine.",
+  "st": [
+   {
+    "s": "Phản ứng tạo kết tủa màu trắng.",
+    "v": true
+   },
+   {
+    "s": "Sản phẩm kết tủa là 2,4,6-tribromophenol.",
+    "v": true
+   },
+   {
+    "s": "Benzene cũng tạo kết tủa trắng với nước bromine.",
+    "v": false
+   },
+   {
+    "s": "Phản ứng này dùng để nhận biết phenol.",
+    "v": true
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "6",
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "5 H ở vòng và 1 H ở nhóm OH.",
+  "id": "bq_1790722321858_gaxcb",
+  "lessonId": "bai-21",
+  "lv": "nb",
+  "num": 6,
+  "q": "Phân tử phenol (C₆H₅OH) có bao nhiêu nguyên tử hydrogen?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "4",
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "Ba cresol (o-, m-, p-) và benzyl alcohol C₆H₅CH₂OH; ether C₆H₅OCH₃ không phản ứng với Na.",
+  "id": "bq_1790722321858_gio2x",
+  "lessonId": "bai-21",
+  "lv": "vd",
+  "num": 4,
+  "q": "Có bao nhiêu hợp chất chứa vòng benzene có công thức phân tử C₇H₈O tác dụng được với Na?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 2,
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "n(phenol) = 0,2 mol → n(C₆H₂(NO₂)₃OH) = 0,2 mol × 229 = 45,8 gam.",
+  "id": "bq_1790722321858_i03lg",
+  "lessonId": "bai-21",
+  "lv": "vd",
+  "o": [
+   "22,9 gam",
+   "33,1 gam",
+   "45,8 gam",
+   "91,6 gam"
+  ],
+  "q": "Nitro hoá hoàn toàn 18,8 gam phenol thành picric acid (hiệu suất 100%). Khối lượng picric acid thu được là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 3,
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "Nhóm OH hoạt hoá vòng, thế ưu tiên vào vị trí 2, 4, 6 → 2,4,6-trinitrophenol (picric acid).",
+  "id": "bq_1790722321858_j5vji",
+  "lessonId": "bai-21",
+  "lv": "th",
+  "o": [
+   "2-nitrophenol",
+   "nitrobenzene",
+   "3-nitrophenol",
+   "2,4,6-trinitrophenol"
+  ],
+  "q": "Cho phenol tác dụng với HNO₃ đặc (xúc tác H₂SO₄ đặc) dư, sản phẩm hữu cơ là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "Phenol là chất rắn (nóng chảy ở 43 °C), tan tốt trong ethanol, ether, acetone.",
+  "id": "bq_1790722321858_kiu8o",
+  "lessonId": "bai-21",
+  "lv": "nb",
+  "q": "Xét cấu tạo và tính chất vật lí của phenol C₆H₅OH.",
+  "st": [
+   {
+    "s": "Nhóm –OH liên kết trực tiếp với vòng benzene.",
+    "v": true
+   },
+   {
+    "s": "Phenol là chất lỏng ở điều kiện thường.",
+    "v": false
+   },
+   {
+    "s": "Phenol độc, có thể gây bỏng khi tiếp xúc với da.",
+    "v": true
+   },
+   {
+    "s": "Phenol tan tốt trong ethanol.",
+    "v": true
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 1,
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "C₆H₅OH + Na₂CO₃ ⇌ C₆H₅ONa + NaHCO₃; phenol không đủ mạnh để giải phóng CO₂.",
+  "id": "bq_1790722321858_l9fxi",
+  "lessonId": "bai-21",
+  "lv": "th",
+  "o": [
+   "C₆H₅ONa, CO₂ và H₂O",
+   "C₆H₅ONa và NaHCO₃",
+   "không xảy ra phản ứng",
+   "C₆H₅COONa và NaOH"
+  ],
+  "q": "Cho phenol tác dụng với dung dịch Na₂CO₃, sản phẩm thu được là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 2,
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "Oxi hoá cumene (isopropylbenzene) bằng oxygen rồi thuỷ phân trong acid thu được phenol và acetone.",
+  "id": "bq_1790722321858_limqd",
+  "lessonId": "bai-21",
+  "lv": "th",
+  "o": [
+   "toluene",
+   "ethanol",
+   "cumene",
+   "benzene và nước"
+  ],
+  "q": "Phần lớn phenol hiện nay được sản xuất trong công nghiệp từ",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 1,
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "Phenol ít tan trong nước lạnh, tan nhiều khi đun nóng.",
+  "id": "bq_1790722321858_losct",
+  "lessonId": "bai-21",
+  "lv": "nb",
+  "o": [
+   "làm lạnh",
+   "đun nóng",
+   "thêm NaCl",
+   "để lâu ngoài không khí"
+  ],
+  "q": "Phenol ít tan trong nước ở điều kiện thường nhưng tan nhiều khi",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "37,6",
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "n(cumene) = 60 : 120 = 0,5 kmol → n(phenol) = 0,5 × 0,8 = 0,4 kmol × 94 = 37,6 kg.",
+  "id": "bq_1790722321858_mxf0a",
+  "lessonId": "bai-21",
+  "lv": "vdc",
+  "num": 37.6,
+  "q": "Từ 60 kg cumene (C₉H₁₂) sản xuất phenol với hiệu suất cả quá trình 80%. Khối lượng phenol thu được là bao nhiêu kg?",
+  "t": "tn",
+  "tol": 0.05,
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "kg"
+ },
+ {
+  "a": 1,
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "Phương pháp cumene cho hai sản phẩm: phenol và acetone.",
+  "id": "bq_1790722321858_mxlaj",
+  "lessonId": "bai-21",
+  "lv": "th",
+  "o": [
+   "ethanol",
+   "acetone",
+   "acetic acid",
+   "methanol"
+  ],
+  "q": "Trong phương pháp sản xuất phenol từ cumene, sản phẩm thu được đồng thời với phenol là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 0,
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "Phenol có tính acid yếu: C₆H₅OH + NaOH → C₆H₅ONa + H₂O.",
+  "id": "bq_1790722321858_n7ex9",
+  "lessonId": "bai-21",
+  "lv": "th",
+  "o": [
+   "C₆H₅ONa và H₂O",
+   "C₆H₅Na và H₂O",
+   "C₆H₅OH và NaCl",
+   "C₆H₅ONa và H₂"
+  ],
+  "q": "Cho phenol tác dụng với dung dịch NaOH, sản phẩm thu được là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 1,
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "Do ảnh hưởng của nhóm –OH, phenol thế ở vòng dễ hơn benzene (ví dụ phản ứng ngay với nước bromine).",
+  "id": "bq_1790722321858_o2jn7",
+  "lessonId": "bai-21",
+  "lv": "th",
+  "o": [
+   "khó xảy ra hơn",
+   "dễ xảy ra hơn",
+   "xảy ra như nhau",
+   "không xảy ra"
+  ],
+  "q": "So với benzene, phản ứng thế nguyên tử hydrogen ở vòng benzene của phenol",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "94",
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "C₆H₆O: 72 + 6 + 16 = 94.",
+  "id": "bq_1790722321858_qe8vq",
+  "lessonId": "bai-21",
+  "lv": "nb",
+  "num": 94,
+  "q": "Phân tử khối của phenol là bao nhiêu?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "124",
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "n(phenol) = 0,01 mol → n(H₂) = 0,005 mol → V = 0,005 × 24 790 = 123,95 ≈ 124 mL.",
+  "id": "bq_1790722321858_rfb1j",
+  "lessonId": "bai-21",
+  "lv": "vd",
+  "num": 124,
+  "q": "Cho 0,94 gam phenol tác dụng với Na dư. Thể tích H₂ thu được là bao nhiêu mL (đkc)? (Làm tròn đến hàng đơn vị.)",
+  "t": "tn",
+  "tol": 0.5,
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "mL"
+ },
+ {
+  "a": 2,
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "Phenol là chất rắn không màu, nóng chảy ở 43 °C.",
+  "id": "bq_1790722321858_sbr42",
+  "lessonId": "bai-21",
+  "lv": "nb",
+  "o": [
+   "chất khí không màu",
+   "chất lỏng màu vàng",
+   "chất rắn không màu",
+   "chất lỏng không màu"
+  ],
+  "q": "Ở điều kiện thường, phenol là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "3",
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "o-cresol, m-cresol, p-cresol (CH₃–C₆H₄–OH).",
+  "id": "bq_1790722321858_ttojc",
+  "lessonId": "bai-21",
+  "lv": "th",
+  "num": 3,
+  "q": "Có bao nhiêu hợp chất thuộc loại phenol có công thức phân tử C₇H₈O?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "91,6",
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "n(phenol) = 0,5 kmol → n(picric acid) = 0,5 × 0,8 = 0,4 kmol × 229 = 91,6 kg.",
+  "id": "bq_1790722321858_tuq76",
+  "lessonId": "bai-21",
+  "lv": "vdc",
+  "num": 91.6,
+  "q": "Từ 47 kg phenol sản xuất picric acid với hiệu suất 80%. Khối lượng picric acid thu được là bao nhiêu kg?",
+  "t": "tn",
+  "tol": 0.05,
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "kg"
+ },
+ {
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "Ảnh hưởng của vòng benzene làm liên kết O–H phân cực mạnh hơn nên phenol có tính acid yếu, tác dụng được với NaOH nhưng quá yếu để làm đổi màu quỳ tím.",
+  "id": "bq_1790722321858_u6hlh",
+  "lessonId": "bai-21",
+  "lv": "th",
+  "q": "Xét tính acid của phenol.",
+  "st": [
+   {
+    "s": "Phenol là acid yếu.",
+    "v": true
+   },
+   {
+    "s": "Dung dịch phenol làm quỳ tím hoá đỏ.",
+    "v": false
+   },
+   {
+    "s": "Liên kết O–H trong phenol phân cực mạnh hơn trong ethanol.",
+    "v": true
+   },
+   {
+    "s": "Phenol không tác dụng với dung dịch NaOH.",
+    "v": false
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "23,2",
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "n(kết tủa) = 0,1 → n(phenol) = 0,1. n(H₂) = 0,2 → tổng n = 0,4 → n(ethanol) = 0,3. m = 9,4 + 13,8 = 23,2 gam.",
+  "id": "bq_1790722321858_xlctn",
+  "lessonId": "bai-21",
+  "lv": "vdc",
+  "num": 23.2,
+  "q": "Hỗn hợp X gồm phenol và ethanol. Cho m gam X tác dụng với Na dư thu được 4,958 lít H₂ (đkc). Cũng m gam X tác dụng với nước bromine dư thu được 33,1 gam kết tủa. Giá trị của m là bao nhiêu?",
+  "t": "tn",
+  "tol": 0.05,
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "gam"
+ },
+ {
+  "ansText": "6",
+  "ch": 5,
+  "chapterId": "chuong-5",
+  "e": "n(C₆H₅OH) = 0,15 mol → n(NaOH) = 0,15 mol → 6 gam.",
+  "id": "bq_1790722321858_zly88",
+  "lessonId": "bai-21",
+  "lv": "vd",
+  "num": 6,
+  "q": "Khối lượng NaOH (gam) phản ứng vừa đủ với 14,1 gam phenol là bao nhiêu?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "gam"
+ },
+ {
+  "a": 2,
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "n(Ag) = 0,2 mol. Nếu Y là HCHO thì n(X) = 0,05 → M = 6 : 0,05 = 120, không khớp CH₃OH (M = 32), loại. Vậy n(Y) = 0,1 → M(X) = 60 → C₃H₇OH, bậc I là propan-1-ol.",
+  "id": "bq_1790722383664_1q9dz",
+  "lessonId": "bai-23",
+  "lv": "vdc",
+  "o": [
+   "methanol",
+   "ethanol",
+   "propan-1-ol",
+   "butan-1-ol"
+  ],
+  "q": "Oxi hoá không hoàn toàn 6 gam alcohol no, đơn chức, bậc I X bằng CuO (hiệu suất 100%) thu được aldehyde Y. Cho toàn bộ Y tác dụng với dung dịch AgNO₃/NH₃ dư thu được 21,6 gam Ag. X là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 1,
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "Aldehyde 2 C: ethane → ethanal (tên thông thường acetaldehyde).",
+  "id": "bq_1790722383664_7oh6k",
+  "lessonId": "bai-23",
+  "lv": "nb",
+  "o": [
+   "methanal",
+   "ethanal",
+   "propanal",
+   "ethanol"
+  ],
+  "q": "Tên theo danh pháp thay thế của CH₃CHO là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 2,
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "Ketone 3 C: propane → propanone.",
+  "id": "bq_1790722383664_ckfpu",
+  "lessonId": "bai-23",
+  "lv": "nb",
+  "o": [
+   "propanal",
+   "propan-2-ol",
+   "propanone",
+   "propenal"
+  ],
+  "q": "Tên theo danh pháp thay thế của acetone (CH₃COCH₃) là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 1,
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "Formalin có tính sát trùng, dùng ngâm mẫu động vật; formaldehyde độc nên không dùng cho thực phẩm.",
+  "id": "bq_1790722383664_f777t",
+  "lessonId": "bai-23",
+  "lv": "nb",
+  "o": [
+   "làm nhiên liệu",
+   "ngâm mẫu động vật làm tiêu bản",
+   "làm chất tạo vị ngọt",
+   "pha nước giải khát"
+  ],
+  "q": "Dung dịch formaldehyde trong nước (formalin) được dùng để",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 0,
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "n(C₂H₅CHO) = 2,9 : 58 = 0,05 mol → n(Ag) = 0,1 mol → 10,8 gam.",
+  "id": "bq_1790722383664_h29zw",
+  "lessonId": "bai-23",
+  "lv": "vd",
+  "o": [
+   "10,8 gam",
+   "5,4 gam",
+   "21,6 gam",
+   "16,2 gam"
+  ],
+  "q": "Cho 2,9 gam propanal tác dụng hoàn toàn với dung dịch AgNO₃ trong NH₃ dư. Khối lượng Ag thu được là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "CH₃COCH₃ có nhóm C=O liên kết với hai gốc hydrocarbon nên là ketone.",
+  "id": "bq_1790722383664_kdy95",
+  "lessonId": "bai-23",
+  "lv": "nb",
+  "q": "Xét khái niệm và danh pháp hợp chất carbonyl.",
+  "st": [
+   {
+    "s": "Hợp chất carbonyl có chứa nhóm >C=O.",
+    "v": true
+   },
+   {
+    "s": "Aldehyde có nhóm chức –CHO.",
+    "v": true
+   },
+   {
+    "s": "CH₃COCH₃ là một aldehyde.",
+    "v": false
+   },
+   {
+    "s": "HCHO có tên thay thế là methanal.",
+    "v": true
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "Chỉ hợp chất có nhóm methyl ketone CH₃–CO– mới tạo iodoform; HCHO không có nhóm này.",
+  "id": "bq_1790722383664_m35ju",
+  "lessonId": "bai-23",
+  "lv": "vd",
+  "q": "Xét phản ứng tạo iodoform (I₂ trong NaOH).",
+  "st": [
+   {
+    "s": "Acetone phản ứng tạo kết tủa vàng CHI₃.",
+    "v": true
+   },
+   {
+    "s": "Acetaldehyde có phản ứng tạo iodoform.",
+    "v": true
+   },
+   {
+    "s": "Formaldehyde có phản ứng tạo iodoform.",
+    "v": false
+   },
+   {
+    "s": "Phản ứng dùng để nhận biết hợp chất có nhóm CH₃CO–.",
+    "v": true
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "Aldehyde, ketone không có H linh động (O–H) nên không tạo liên kết hydrogen giữa các phân tử, vì vậy sôi thấp hơn alcohol tương đương.",
+  "id": "bq_1790722383664_nzabo",
+  "lessonId": "bai-23",
+  "lv": "nb",
+  "q": "Xét tính chất vật lí của hợp chất carbonyl.",
+  "st": [
+   {
+    "s": "Ở điều kiện thường, formaldehyde là chất khí.",
+    "v": true
+   },
+   {
+    "s": "Acetone tan vô hạn trong nước.",
+    "v": true
+   },
+   {
+    "s": "Aldehyde có nhiệt độ sôi cao hơn alcohol có phân tử khối tương đương.",
+    "v": false
+   },
+   {
+    "s": "Các phân tử aldehyde tạo được liên kết hydrogen với nhau.",
+    "v": false
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "Khử acetone thu được propan-2-ol. Hợp chất carbonyl nhận hydrogen (bị khử) nên là chất oxi hoá.",
+  "id": "bq_1790722383664_p61iz",
+  "lessonId": "bai-23",
+  "lv": "th",
+  "q": "Xét phản ứng khử hợp chất carbonyl bằng NaBH₄.",
+  "st": [
+   {
+    "s": "Aldehyde bị khử thành alcohol bậc I.",
+    "v": true
+   },
+   {
+    "s": "Ketone bị khử thành alcohol bậc II.",
+    "v": true
+   },
+   {
+    "s": "Khử acetone thu được propan-1-ol.",
+    "v": false
+   },
+   {
+    "s": "Trong phản ứng này, hợp chất carbonyl đóng vai trò chất oxi hoá.",
+    "v": true
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 1,
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "Butanal và 2-methylpropanal.",
+  "id": "bq_1790722383664_pfg45",
+  "lessonId": "bai-23",
+  "lv": "th",
+  "o": [
+   "1",
+   "2",
+   "3",
+   "4"
+  ],
+  "q": "Số aldehyde là đồng phân cấu tạo có công thức phân tử C₄H₈O là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "Ketone không tráng bạc. HCHO bị oxi hoá đến tận (NH₄)₂CO₃ nên 1 mol HCHO tạo tối đa 4 mol Ag.",
+  "id": "bq_1790722383664_qydyq",
+  "lessonId": "bai-23",
+  "lv": "th",
+  "q": "Xét phản ứng của hợp chất carbonyl với thuốc thử Tollens (dung dịch AgNO₃ trong NH₃).",
+  "st": [
+   {
+    "s": "Acetaldehyde tham gia phản ứng tráng bạc.",
+    "v": true
+   },
+   {
+    "s": "Acetone tham gia phản ứng tráng bạc.",
+    "v": false
+   },
+   {
+    "s": "Trong phản ứng, aldehyde bị oxi hoá.",
+    "v": true
+   },
+   {
+    "s": "1 mol HCHO tạo tối đa 2 mol Ag.",
+    "v": false
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 3,
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "R–CO–R' + 2[H] → R–CH(OH)–R' là alcohol bậc II; aldehyde bị khử thành alcohol bậc I.",
+  "id": "bq_1790722383664_tzwcf",
+  "lessonId": "bai-23",
+  "lv": "th",
+  "o": [
+   "aldehyde",
+   "alcohol bậc I",
+   "alcohol bậc III",
+   "alcohol bậc II"
+  ],
+  "q": "Khử ketone bằng NaBH₄ thu được",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 0,
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "HCN cộng vào liên kết C=O: H gắn vào O, nhóm CN gắn vào C → CH₃CH(OH)CN (cyanohydrin).",
+  "id": "bq_1790722383664_wdjxp",
+  "lessonId": "bai-23",
+  "lv": "th",
+  "o": [
+   "CH₃CH(OH)CN",
+   "CH₃CH₂CN",
+   "CH₃COCN",
+   "CH₃CH(CN)₂"
+  ],
+  "q": "Cho acetaldehyde tác dụng với HCN, sản phẩm thu được là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 2,
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "Aldehyde bị nước bromine oxi hoá thành carboxylic acid; ketone không phản ứng.",
+  "id": "bq_1790722383664_wxawa",
+  "lessonId": "bai-23",
+  "lv": "th",
+  "o": [
+   "Acetone",
+   "Ethanol",
+   "Acetaldehyde",
+   "Acetic acid"
+  ],
+  "q": "Chất nào sau đây làm mất màu nước bromine?",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "3",
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "Pentan-2-one, pentan-3-one, 3-methylbutan-2-one.",
+  "id": "bq_1790722383665_1l0y4",
+  "lessonId": "bai-23",
+  "lv": "th",
+  "num": 3,
+  "q": "Có bao nhiêu ketone là đồng phân cấu tạo có công thức phân tử C₅H₁₀O?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "2",
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "Propanal (CH₃CH₂CHO) và propanone (CH₃COCH₃).",
+  "id": "bq_1790722383665_2ttrr",
+  "lessonId": "bai-23",
+  "lv": "th",
+  "num": 2,
+  "q": "Có bao nhiêu hợp chất carbonyl là đồng phân cấu tạo có công thức phân tử C₃H₆O?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "6",
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "n(acetone) = 0,1 mol → 0,1 mol propan-2-ol × 60 = 6 gam.",
+  "id": "bq_1790722383665_3ayuq",
+  "lessonId": "bai-23",
+  "lv": "vd",
+  "num": 6,
+  "q": "Khử hoàn toàn 5,8 gam acetone bằng NaBH₄. Khối lượng alcohol thu được là bao nhiêu gam?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "gam"
+ },
+ {
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "Butanal, 2-methylpropanal (aldehyde) và butanone (ketone). Butanone CH₃COCH₂CH₃ có nhóm CH₃CO– nên tạo iodoform nhưng không tráng bạc.",
+  "id": "bq_1790722383665_4tn3b",
+  "lessonId": "bai-23",
+  "lv": "vd",
+  "q": "Xét các hợp chất carbonyl có công thức phân tử C₄H₈O.",
+  "st": [
+   {
+    "s": "Có 3 hợp chất carbonyl là đồng phân cấu tạo.",
+    "v": true
+   },
+   {
+    "s": "Có 2 đồng phân là aldehyde.",
+    "v": true
+   },
+   {
+    "s": "Butanone tham gia phản ứng tráng bạc.",
+    "v": false
+   },
+   {
+    "s": "Butanone tham gia phản ứng tạo iodoform.",
+    "v": true
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "44",
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "CH₃CHO: 24 + 4 + 16 = 44.",
+  "id": "bq_1790722383665_53ced",
+  "lessonId": "bai-23",
+  "lv": "nb",
+  "num": 44,
+  "q": "Phân tử khối của acetaldehyde là bao nhiêu?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "43,2",
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "n(HCHO) = 0,1 mol → n(Ag) = 0,4 mol → 43,2 gam.",
+  "id": "bq_1790722383665_an8tw",
+  "lessonId": "bai-23",
+  "lv": "vd",
+  "num": 43.2,
+  "q": "Cho 3 gam formaldehyde tác dụng với dung dịch AgNO₃ trong NH₃ dư. Khối lượng Ag thu được là bao nhiêu gam?",
+  "t": "tn",
+  "tol": 0.05,
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "gam"
+ },
+ {
+  "ansText": "3",
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "Acetone là CH₃–CO–CH₃ (propanone), có 3 nguyên tử C.",
+  "id": "bq_1790722383665_bng05",
+  "lessonId": "bai-23",
+  "lv": "nb",
+  "num": 3,
+  "q": "Phân tử acetone có bao nhiêu nguyên tử carbon?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "n(Ag) = 0,3 → n(CH₃CHO) = 0,15 mol; n(ethanol) = 0,2 → H = 75%. Rắn giảm 0,15 × 16 = 2,4 g. Với methanol: 0,15 mol HCHO → 0,6 mol Ag, gấp đôi.",
+  "id": "bq_1790722383665_eywcu",
+  "lessonId": "bai-23",
+  "lv": "vdc",
+  "q": "Oxi hoá 9,2 gam ethanol bằng CuO dư, đun nóng, thu được hỗn hợp X gồm acetaldehyde, ethanol dư và nước. Cho X tác dụng với dung dịch AgNO₃/NH₃ dư thu được 32,4 gam Ag.",
+  "st": [
+   {
+    "s": "Hiệu suất oxi hoá ethanol là 75%.",
+    "v": true
+   },
+   {
+    "s": "Số mol acetaldehyde tạo thành là 0,3 mol.",
+    "v": false
+   },
+   {
+    "s": "Khối lượng chất rắn trong ống đựng CuO giảm 2,4 gam.",
+    "v": true
+   },
+   {
+    "s": "Nếu thay ethanol bằng methanol cùng số mol, cùng hiệu suất thì khối lượng Ag thu được gấp đôi.",
+    "v": true
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "3",
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "n(Ag) = 0,06. Nếu X là HCHO thì m = 0,015 × 30 = 0,45 g (vô lí). Vậy n(X) = 0,03 → M = 58 → C₂H₅CHO, có 3 C.",
+  "id": "bq_1790722383665_h2tmj",
+  "lessonId": "bai-23",
+  "lv": "vdc",
+  "num": 3,
+  "q": "Cho 1,74 gam aldehyde no, đơn chức, mạch hở X tác dụng với dung dịch AgNO₃/NH₃ dư thu được 6,48 gam Ag. Phân tử X có bao nhiêu nguyên tử carbon?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "4",
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "HCHO → (NH₄)₂CO₃, giải phóng 4Ag.",
+  "id": "bq_1790722383665_jhbyd",
+  "lessonId": "bai-23",
+  "lv": "th",
+  "num": 4,
+  "q": "1 mol formaldehyde tác dụng với dung dịch AgNO₃ trong NH₃ dư tạo ra tối đa bao nhiêu mol Ag?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "mol"
+ },
+ {
+  "ansText": "3,7",
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "x + y = 0,1; 4x + 2y = 0,3 → x = y = 0,05. m = 0,05 × 30 + 0,05 × 44 = 3,7 gam.",
+  "id": "bq_1790722383665_ooxhr",
+  "lessonId": "bai-23",
+  "lv": "vdc",
+  "num": 3.7,
+  "q": "Cho 0,1 mol hỗn hợp X gồm formaldehyde và acetaldehyde tác dụng với dung dịch AgNO₃/NH₃ dư thu được 0,3 mol Ag. Khối lượng của X là bao nhiêu gam?",
+  "t": "tn",
+  "tol": 0.05,
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "gam"
+ },
+ {
+  "ansText": "7",
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "4 aldehyde (pentanal, 2-methylbutanal, 3-methylbutanal, 2,2-dimethylpropanal) và 3 ketone (pentan-2-one, pentan-3-one, 3-methylbutan-2-one).",
+  "id": "bq_1790722383665_sovrv",
+  "lessonId": "bai-23",
+  "lv": "vd",
+  "num": 7,
+  "q": "Có bao nhiêu hợp chất carbonyl là đồng phân cấu tạo có công thức phân tử C₅H₁₀O?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "60",
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "x + y = 0,1; 2x + 3y = 0,26 → y = 0,06 → 60%.",
+  "id": "bq_1790722383665_up6ov",
+  "lessonId": "bai-23",
+  "lv": "vdc",
+  "num": 60,
+  "q": "Đốt cháy hoàn toàn 0,1 mol hỗn hợp acetaldehyde và acetone thu được 0,26 mol CO₂. Phần trăm số mol acetone trong hỗn hợp là bao nhiêu?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "%"
+ },
+ {
+  "ansText": "36,4",
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "16 : 44 × 100% = 36,36% ≈ 36,4%.",
+  "id": "bq_1790722383665_zwlhs",
+  "lessonId": "bai-23",
+  "lv": "vd",
+  "num": 36.4,
+  "q": "Phần trăm khối lượng oxygen trong acetaldehyde là bao nhiêu? (Làm tròn đến hàng phần mười.)",
+  "t": "tn",
+  "tol": 0.05,
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "%"
+ },
+ {
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "Formaldehyde độc, bị cấm dùng trong thực phẩm.",
+  "id": "bq_1790722383665_zzfcr",
+  "lessonId": "bai-23",
+  "lv": "vd",
+  "q": "Xét ứng dụng của hợp chất carbonyl.",
+  "st": [
+   {
+    "s": "Dung dịch formaldehyde (formalin) được dùng để ngâm mẫu động vật.",
+    "v": true
+   },
+   {
+    "s": "Acetone được dùng làm dung môi, ví dụ trong nước tẩy sơn móng tay.",
+    "v": true
+   },
+   {
+    "s": "Formaldehyde được dùng để sản xuất nhựa phenol formaldehyde.",
+    "v": true
+   },
+   {
+    "s": "Formaldehyde không độc nên được dùng để bảo quản thực phẩm.",
+    "v": false
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 1,
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "CH₃OH + CO → CH₃COOH (xúc tác, t°, p). Lên men giấm chủ yếu dùng để sản xuất giấm ăn.",
+  "id": "bq_1790722440899_0wkfy",
+  "lessonId": "bai-24",
+  "lv": "th",
+  "o": [
+   "lên men giấm",
+   "carbonyl hoá methanol (CH₃OH + CO)",
+   "oxi hoá ethylene",
+   "thuỷ phân ester"
+  ],
+  "q": "Phương pháp hiện đại chủ yếu để sản xuất acetic acid trong công nghiệp là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "8,2",
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "n = 0,1 mol → 0,1 mol CH₃COONa × 82 = 8,2 gam.",
+  "id": "bq_1790722440899_10oz5",
+  "lessonId": "bai-24",
+  "lv": "vd",
+  "num": 8.2,
+  "q": "Cho 6 gam acetic acid tác dụng vừa đủ với dung dịch NaOH. Khối lượng muối thu được là bao nhiêu gam?",
+  "t": "tn",
+  "tol": 0.05,
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "gam"
+ },
+ {
+  "ansText": "0,8",
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "n(NaOH) = 0,008 mol = n(CH₃COOH) → C = 0,008 : 0,01 = 0,8 M.",
+  "id": "bq_1790722440899_18ctv",
+  "lessonId": "bai-24",
+  "lv": "vd",
+  "num": 0.8,
+  "q": "Trung hoà 10 mL giấm ăn cần vừa đủ 20 mL dung dịch NaOH 0,4 M. Nồng độ mol của acetic acid trong giấm là bao nhiêu M?",
+  "t": "tn",
+  "tol": 0.005,
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "M"
+ },
+ {
+  "ansText": "60",
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "CH₃COOH: 24 + 4 + 32 = 60.",
+  "id": "bq_1790722440899_2p83h",
+  "lessonId": "bai-24",
+  "lv": "nb",
+  "num": 60,
+  "q": "Phân tử khối của acetic acid là bao nhiêu?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "2",
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "Mỗi nhóm –COOH có một liên kết đôi C=O, tức một liên kết π.",
+  "id": "bq_1790722440899_3i5g0",
+  "lessonId": "bai-24",
+  "lv": "th",
+  "num": 2,
+  "q": "Phân tử oxalic acid (HOOC–COOH) có bao nhiêu liên kết π?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "HOOC–COOH (oxalic acid) có hai nhóm –COOH nên là acid hai chức.",
+  "id": "bq_1790722440899_6yfkp",
+  "lessonId": "bai-24",
+  "lv": "nb",
+  "q": "Xét khái niệm và danh pháp carboxylic acid.",
+  "st": [
+   {
+    "s": "Nhóm chức của carboxylic acid là nhóm carboxyl –COOH.",
+    "v": true
+   },
+   {
+    "s": "CH₃COOH có tên thay thế là ethanoic acid.",
+    "v": true
+   },
+   {
+    "s": "HOOC–COOH là carboxylic acid đơn chức.",
+    "v": false
+   },
+   {
+    "s": "Carboxylic acid no, đơn chức, mạch hở có công thức chung CₙH₂ₙO₂ (n ≥ 1).",
+    "v": true
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "4",
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "Pentanoic acid, 2-methylbutanoic acid, 3-methylbutanoic acid, 2,2-dimethylpropanoic acid.",
+  "id": "bq_1790722440899_dz56m",
+  "lessonId": "bai-24",
+  "lv": "th",
+  "num": 4,
+  "q": "Có bao nhiêu carboxylic acid là đồng phân cấu tạo có công thức phân tử C₅H₁₀O₂?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "96",
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "V(C₂H₅OH) = 115 mL → m = 92 g → 2 mol. C₂H₅OH + O₂ → CH₃COOH + H₂O: n(acid) = 2 × 0,8 = 1,6 mol → 96 gam.",
+  "id": "bq_1790722440899_fed45",
+  "lessonId": "bai-24",
+  "lv": "vdc",
+  "num": 96,
+  "q": "Lên men giấm 1 lít dung dịch ethanol 11,5° (khối lượng riêng của ethanol là 0,8 g/mL) với hiệu suất 80%. Khối lượng acetic acid thu được là bao nhiêu gam?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "gam"
+ },
+ {
+  "a": 2,
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "2CH₃COOH + CaCO₃ → (CH₃COO)₂Ca + CO₂ + H₂O → n(CO₂) = 0,05 mol → V = 1,2395 lít.",
+  "id": "bq_1790722440899_fo2tb",
+  "lessonId": "bai-24",
+  "lv": "vd",
+  "o": [
+   "2,479 lít",
+   "4,958 lít",
+   "1,2395 lít",
+   "0,61975 lít"
+  ],
+  "q": "Cho 0,1 mol acetic acid tác dụng với CaCO₃ dư. Thể tích CO₂ thu được (đkc) là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "2",
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "Một nhóm –COOH chứa 2 nguyên tử O.",
+  "id": "bq_1790722440899_iltfy",
+  "lessonId": "bai-24",
+  "lv": "nb",
+  "num": 2,
+  "q": "Phân tử carboxylic acid đơn chức có bao nhiêu nguyên tử oxygen?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 0,
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "Acid 1 C: methane → methanoic acid (tên thông thường formic acid).",
+  "id": "bq_1790722440899_l8xas",
+  "lessonId": "bai-24",
+  "lv": "nb",
+  "o": [
+   "methanoic acid",
+   "ethanoic acid",
+   "methanal",
+   "methanol"
+  ],
+  "q": "Tên theo danh pháp thay thế của HCOOH là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "n(acid) = n(NaOH) = 0,2; n(H₂) = 0,2 → tổng n = 0,4 → n(ethanol) = 0,2. m = 12 + 9,2 = 21,2 g. Ester: 0,2 × 0,6 × 88 = 10,56 g. n(CO₂) = 0,2 mol → 4,958 lít.",
+  "id": "bq_1790722440899_lio7s",
+  "lessonId": "bai-24",
+  "lv": "vdc",
+  "q": "Hỗn hợp X gồm acetic acid và ethanol. Cho m gam X tác dụng với Na dư thu được 4,958 lít H₂ (đkc). Cũng m gam X tác dụng vừa đủ với 200 mL dung dịch NaOH 1 M.",
+  "st": [
+   {
+    "s": "Số mol acetic acid trong X là 0,2 mol.",
+    "v": true
+   },
+   {
+    "s": "Giá trị của m là 21,2.",
+    "v": true
+   },
+   {
+    "s": "Đun m gam X với H₂SO₄ đặc (hiệu suất 60%) thu được 10,56 gam ester.",
+    "v": true
+   },
+   {
+    "s": "Cho m gam X tác dụng với NaHCO₃ dư thu được 9,916 lít CO₂ (đkc).",
+    "v": false
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 2,
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "Acetic acid phân li ra H⁺ đủ để làm quỳ hoá đỏ; phenol có tính acid quá yếu.",
+  "id": "bq_1790722440899_n5ppk",
+  "lessonId": "bai-24",
+  "lv": "th",
+  "o": [
+   "Ethanol",
+   "Phenol",
+   "Acetic acid",
+   "Acetaldehyde"
+  ],
+  "q": "Chất nào sau đây làm quỳ tím hoá đỏ?",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "10",
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "n(CH₃COOH) = 0,2 mol → n(CaCO₃) = 0,1 mol → 10 gam.",
+  "id": "bq_1790722440899_ne411",
+  "lessonId": "bai-24",
+  "lv": "vd",
+  "num": 10,
+  "q": "Khối lượng CaCO₃ (gam) phản ứng vừa đủ với 12 gam acetic acid là bao nhiêu?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "gam"
+ },
+ {
+  "ansText": "3",
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "M = 32 : 0,4324 = 74 → C₂H₅COOH (propanoic acid), có 3 C.",
+  "id": "bq_1790722440899_nj5vj",
+  "lessonId": "bai-24",
+  "lv": "vd",
+  "num": 3,
+  "q": "Carboxylic acid no, đơn chức, mạch hở X có phần trăm khối lượng oxygen là 43,24%. Phân tử X có bao nhiêu nguyên tử carbon?",
+  "t": "tn",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "62,5",
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "Ethanol thiếu nên tính hiệu suất theo ethanol: n(ester) = 11 : 88 = 0,125 mol → H = 0,125 : 0,2 = 62,5%.",
+  "id": "bq_1790722440899_notzu",
+  "lessonId": "bai-24",
+  "lv": "vdc",
+  "num": 62.5,
+  "q": "Đun 0,3 mol acetic acid với 0,2 mol ethanol (xúc tác H₂SO₄ đặc) thu được 11 gam ethyl acetate. Hiệu suất phản ứng ester hoá là bao nhiêu phần trăm?",
+  "t": "tn",
+  "tol": 0.05,
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "%"
+ },
+ {
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "Carboxylic acid tạo liên kết hydrogen bền (dạng dimer) nên sôi cao; acetic acid là chất lỏng.",
+  "id": "bq_1790722440899_o7mmm",
+  "lessonId": "bai-24",
+  "lv": "nb",
+  "q": "Xét tính chất vật lí của carboxylic acid.",
+  "st": [
+   {
+    "s": "Formic acid và acetic acid tan vô hạn trong nước.",
+    "v": true
+   },
+   {
+    "s": "Carboxylic acid có nhiệt độ sôi cao hơn alcohol có phân tử khối tương đương.",
+    "v": true
+   },
+   {
+    "s": "Các phân tử carboxylic acid không tạo được liên kết hydrogen với nhau.",
+    "v": false
+   },
+   {
+    "s": "Acetic acid là chất khí ở điều kiện thường.",
+    "v": false
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 1,
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "Gốc alkyl (hoặc H khi n = 0) gắn với một nhóm –COOH: CₙH₂ₙ₊₁COOH, tương đương CₘH₂ₘO₂ (m ≥ 1).",
+  "id": "bq_1790722440899_q06wv",
+  "lessonId": "bai-24",
+  "lv": "nb",
+  "o": [
+   "CₙH₂ₙ₊₁CHO (n ≥ 0)",
+   "CₙH₂ₙ₊₁COOH (n ≥ 0)",
+   "CₙH₂ₙ₊₁OH (n ≥ 1)",
+   "CₙH₂ₙ₋₁COOH (n ≥ 2)"
+  ],
+  "q": "Công thức chung của carboxylic acid no, đơn chức, mạch hở là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "a": 1,
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "Butanoic acid và 2-methylpropanoic acid.",
+  "id": "bq_1790722440899_q502z",
+  "lessonId": "bai-24",
+  "lv": "vd",
+  "o": [
+   "1",
+   "2",
+   "3",
+   "4"
+  ],
+  "q": "Số carboxylic acid là đồng phân cấu tạo có công thức phân tử C₄H₈O₂ là",
+  "t": "mc",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "Cu đứng sau H trong dãy hoạt động hoá học nên không phản ứng với acid giải phóng H₂.",
+  "id": "bq_1790722440899_qxbml",
+  "lessonId": "bai-24",
+  "lv": "th",
+  "q": "Xét tính acid của acetic acid.",
+  "st": [
+   {
+    "s": "Acetic acid là acid yếu, phân li không hoàn toàn trong nước.",
+    "v": true
+   },
+   {
+    "s": "Acetic acid tác dụng với Mg giải phóng H₂.",
+    "v": true
+   },
+   {
+    "s": "Acetic acid tác dụng với Cu giải phóng H₂.",
+    "v": false
+   },
+   {
+    "s": "Acetic acid tác dụng với CaCO₃ giải phóng CO₂.",
+    "v": true
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ansText": "43,4",
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "n(CO₂) = 0,2 = x + y; 46x + 60y = 10,6 → x = 0,1 → m(HCOOH) = 4,6 g → 4,6 : 10,6 = 43,40%.",
+  "id": "bq_1790722440899_r5pxt",
+  "lessonId": "bai-24",
+  "lv": "vdc",
+  "num": 43.4,
+  "q": "Cho 10,6 gam hỗn hợp formic acid và acetic acid tác dụng với NaHCO₃ dư thu được 4,958 lít CO₂ (đkc). Phần trăm khối lượng formic acid trong hỗn hợp là bao nhiêu? (Làm tròn đến hàng phần mười.)",
+  "t": "tn",
+  "tol": 0.05,
+  "topic": "Bổ sung 30/09/2026 – Claude soạn",
+  "unit": "%"
+ },
+ {
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "H₂SO₄ đặc làm xúc tác và hút nước, giúp cân bằng chuyển dịch về phía tạo ester.",
+  "id": "bq_1790722440899_te8p0",
+  "lessonId": "bai-24",
+  "lv": "th",
+  "q": "Xét phản ứng ester hoá giữa CH₃COOH và C₂H₅OH (xúc tác H₂SO₄ đặc, đun nóng).",
+  "st": [
+   {
+    "s": "Sản phẩm hữu cơ là ethyl acetate.",
+    "v": true
+   },
+   {
+    "s": "Phản ứng ester hoá là phản ứng thuận nghịch.",
+    "v": true
+   },
+   {
+    "s": "H₂SO₄ đặc chỉ đóng vai trò chất oxi hoá.",
+    "v": false
+   },
+   {
+    "s": "Ethyl acetate có công thức CH₃COOC₂H₅.",
+    "v": true
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "Tính acid: C₂H₅OH < C₆H₅OH < CH₃COOH. Ethanol không phản ứng với NaOH; phenol không đẩy được CO₂ khỏi NaHCO₃.",
+  "id": "bq_1790722440899_y0980",
+  "lessonId": "bai-24",
+  "lv": "vd",
+  "q": "So sánh C₂H₅OH, C₆H₅OH và CH₃COOH.",
+  "st": [
+   {
+    "s": "CH₃COOH có tính acid mạnh nhất trong ba chất.",
+    "v": true
+   },
+   {
+    "s": "C₂H₅OH tác dụng được với dung dịch NaOH.",
+    "v": false
+   },
+   {
+    "s": "Cả ba chất đều tác dụng với Na giải phóng H₂.",
+    "v": true
+   },
+   {
+    "s": "Trong ba chất, chỉ CH₃COOH tác dụng với NaHCO₃ giải phóng CO₂.",
+    "v": true
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
+ },
+ {
+  "ch": 6,
+  "chapterId": "chuong-6",
+  "e": "Formic acid có trong nọc kiến, ong.",
+  "id": "bq_1790722440899_y174f",
+  "lessonId": "bai-24",
+  "lv": "vd",
+  "q": "Xét điều chế và ứng dụng của carboxylic acid.",
+  "st": [
+   {
+    "s": "Giấm ăn được sản xuất bằng phương pháp lên men giấm từ dung dịch ethanol loãng.",
+    "v": true
+   },
+   {
+    "s": "Acetic acid được dùng để sản xuất ester làm dung môi, hương liệu.",
+    "v": true
+   },
+   {
+    "s": "Citric acid có nhiều trong quả chanh.",
+    "v": true
+   },
+   {
+    "s": "Formic acid không có trong tự nhiên.",
+    "v": false
+   }
+  ],
+  "t": "tf",
+  "topic": "Bổ sung 30/09/2026 – Claude soạn"
  }
 ]

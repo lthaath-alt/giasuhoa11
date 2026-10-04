@@ -171,6 +171,48 @@ Phép canh: `kiem-tra:de-giao` (logic thuần — trạng thái đề, mã bài,
 
 
 
+### Đề kiểm tra chấm Đúng/Sai từng ý và trả lời ngắn bằng so số (02/10/2026)
+
+Bổ sung sau đợt rà soát 02/10/2026; kế hoạch và số đo ở
+`docs/superpowers/plans/2026-10-02-sua-loi-sau-ra-soat.md`.
+
+- `toLegacy` nay GIỮ các ý của câu Đúng/Sai nhiều ý (`Question.yDungSai`, `content`
+  là đề dẫn) và mang đáp số câu trả lời ngắn sang (`Question.dapSo`). Hai trường
+  này nằm TRONG từng câu hỏi, nên không đụng tới `hasOnly` của `bai_nop`.
+- Phần chấm là logic thuần ở `src/features/quiz/chamDiem.ts`: Đúng/Sai theo bảng
+  `DIEM_DUNG_SAI` của Luyện tập; trả lời ngắn đúng thì trọn điểm, sai thì 0. Câu
+  cũ chỉ có một ý nhãn "Đáp án" cũng được chấm theo số. `kiem-tra:de-giao` canh.
+- `QuizPage` lưu tạm đáp án vào `Quiz.answers` (localStorage) sau mỗi lần chọn.
+- Đề GIÁO VIÊN GIAO hết giờ thì tự nộp phần đã làm; đề tự ôn vẫn hết hạn sau 24
+  giờ như cũ.
+- **Khoá bài tuần tự: gỡ rồi đặt lại với luật mới, cùng trong ngày 04/10/2026**
+  (chủ dự án chốt cả hai lần). Luật nằm ở MỘT hàm thuần
+  `src/features/lessons/khoaBai.ts` (`xetKhoaBai`), bốn nơi cùng gọi: `QuizPage`
+  (chặn đề đang làm), `LessonSidebar`, ô tìm kiếm ở `DashboardHeader`, và nhánh
+  phát đề theo bài của `addMessage` trong `AppContext` (bài đang khoá thì Chemai
+  không tạo đề, nói rõ cần đạt bài nào trước). Đừng viết lại điều kiện ở nơi thứ
+  năm — bản khoá cũ hỏng đúng vì mỗi nơi tự viết một bản.
+  - Một bài mở khi **bài chặn** của nó có `bestScore ≥ 7` (thang 10, do `nopBai`
+    ghi). Xem hết slide KHÔNG tính, dù nó vẫn đặt `basicCompleted`.
+  - **Bài ôn tập / hệ thống hoá (3, 9, 14, 18, 22, 25) KHÔNG chặn bài sau**: bài
+    chặn là bài học gần nhất phía trước không phải ôn tập (Bài 10 và Bài 9 cùng
+    mở khi Bài 8 đạt). Lý do đo được: ngân hàng 1.780 câu không có câu nào gắn
+    riêng cho các bài 9, 14, 18, 22, 25 và chỉ có 1 câu cho bài 3 — không có đề
+    thì không ai "đạt đề" được, chuỗi sẽ kẹt vĩnh viễn ở Bài 10.
+  - Chỉ vai `student` bị khoá. Đề cả chương (mã chương) và đề giáo viên giao
+    (`de-giao:…`) không phải bài nào nên không khoá — câu ở điều 3 mục "Đề giáo
+    viên GIAO" bên trên vẫn đúng. Bài đã nộp luôn xem lại được.
+  - `kiem-tra:chuong-trinh` canh luật, và canh thêm điều kiện dữ liệu: bài nào
+    đứng ra chặn bài khác thì bản chụp ngân hàng phải có từ 5 câu cho nó.
+- **Phần "Nâng cao" đã bỏ ngày 04/10/2026**: hai hộp thoại sau khi nộp đề, nhãn
+  CB/NC (nay là nhãn "Đạt"), chip "HS Nâng cao", `hasAdvancedStudentTitle`. Ba
+  trường `advancedUnlocked` / `advancedCompleted` / `skippedAdvanced` CÒN trong
+  kiểu `LessonProgress` và trong hồ sơ cũ, nhưng không nơi nào đọc hay ghi nữa.
+  Chưa đạt 70% thì trang kết quả có nút "Làm lại đề khác" (`createRetryQuiz`).
+- Khách không được phát link đề; dòng link đề do mô hình tự chép lại bị bỏ
+  (`src/features/quiz/linkDe.ts`).
+
+
 ### `npm run gan:so-thu-tu` — gán số báo danh từ danh sách lớp
 
 Thêm 23/09/2026. Danh sách lớp của nhà trường có một thứ tự do người xếp,

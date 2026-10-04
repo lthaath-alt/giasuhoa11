@@ -44,6 +44,11 @@ export function coPhuongAnNeo(noiDung: (string | undefined)[]): boolean {
   return noiDung.some(s => MAU_NEO.test(String(s ?? '')));
 }
 
+/** Đáp án của câu Đúng/Sai nhiều ý, viết ra cho người đọc: "a) Đúng · b) Sai · …" */
+export function chuoiDapAnDungSai(y: { v: boolean }[]): string {
+  return y.map((ynay, i) => `${String.fromCharCode(97 + i)}) ${ynay.v ? 'Đúng' : 'Sai'}`).join(' · ');
+}
+
 /** Fisher–Yates: mọi hoán vị có xác suất bằng nhau. */
 function hoanVi(n: number): number[] {
   const idx = Array.from({ length: n }, (_, i) => i);
@@ -83,6 +88,12 @@ export function xaoPhuongAnBank(cau: BankQuestion): BankQuestion {
  * ra sẽ có thứ tự B, D, A, C.
  */
 export function xaoPhuongAnWeb(cau: Question): Question {
+  /* Câu Đúng/Sai nhiều ý: xáo thứ tự các ý, và chuỗi đáp án đi theo — màn giáo
+     viên đọc thẳng `correctAnswer`, để nguyên thì nó hiện đáp án của thứ tự cũ. */
+  if (cau.type === 'Đúng/Sai' && cau.yDungSai && cau.yDungSai.length > 1) {
+    const y = hoanVi(cau.yDungSai.length).map(k => cau.yDungSai![k]);
+    return { ...cau, yDungSai: y, correctAnswer: chuoiDapAnDungSai(y) };
+  }
   if (cau.type !== 'Trắc nghiệm' || !cau.options || cau.options.length < 2) return cau;
   if (coPhuongAnNeo(cau.options.map(o => o.text))) return cau;
   const viTriDung = cau.options.findIndex(o => o.key === cau.correctAnswer);

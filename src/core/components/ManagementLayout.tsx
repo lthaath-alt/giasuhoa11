@@ -151,7 +151,7 @@ const PlaceholderContent: React.FC<{ title: string }> = ({ title }) => (
       {title}
     </Typography>
     <Typography variant="body2" color="text.secondary">
-      🔧 Đang xây dựng — sẽ hoàn thiện ở Prompt tiếp theo
+      Mục này đang được hoàn thiện.
     </Typography>
   </Box>
 );
@@ -204,7 +204,21 @@ export const ManagementLayout: React.FC<ManagementLayoutProps> = ({
   progressContent,
 }) => {
   const [activeItem, setActiveItem] = useState(progressContent ? 'progress' : 'accounts');
-  const menu = SIDEBAR_ITEMS.filter((i) => i.id !== 'progress' || progressContent);
+  /* Mục nào trang gọi KHÔNG truyền nội dung thì ẩn khỏi menu. Trước 04/10/2026
+     chỉ riêng "Theo dõi học sinh" được ẩn kiểu này; "Cài đặt hệ thống" vẫn hiện
+     với giáo viên và quản trị trường dù hai vai đó không có gì để cài, bấm vào
+     chỉ ra tấm biển "Mục này đang được hoàn thiện". */
+  const noiDungTheoMuc: Record<string, ReactNode> = {
+    progress: progressContent,
+    accounts: accountContent,
+    classes: classContent,
+    library: libraryContent,
+    databank: databankContent,
+    password: passwordContent,
+    errors: errorContent,
+    settings: settingsContent,
+  };
+  const menu = SIDEBAR_ITEMS.filter((i) => Boolean(noiDungTheoMuc[i.id]));
   const [mobileOpen, setMobileOpen] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -332,7 +346,9 @@ export const ManagementLayout: React.FC<ManagementLayoutProps> = ({
         <StatCard
           topLabel="QUYỀN TRUY CẬP"
           mainContent={roleName}
-          description="Nhấp để đổi mật khẩu bảo mật"
+          /* Mục đích đến không có chỗ nào "đổi mật khẩu": nó là trang hướng dẫn
+             đặt lại mật khẩu qua thư — xem PasswordManagement.tsx. */
+          description="Nhấp để xem cách đặt lại mật khẩu"
           accentColor="var(--tin-hieu)"
           icon={<Shield size={20} color="var(--chu-dam)" />}
           onClick={() => handleStatClick('password')}
@@ -355,8 +371,16 @@ export const ManagementLayout: React.FC<ManagementLayoutProps> = ({
         />
         <StatCard
           topLabel="NGÂN HÀNG DỮ LIỆU"
-          mainContent={`${questionCount} Câu hỏi, ${examCount} Đề`}
-          description="Nhấp để đi nhanh tới ngân hàng dữ liệu"
+          /* `questionCount`/`examCount` đếm KHO BÀI TẬP CŨ (`libraryQuestions`,
+             `exams`), không phải ngân hàng `bank_questions`. Kho cũ rỗng thì thẻ
+             ghi "0 Câu hỏi, 0 Đề" ngay trên một ngân hàng có 1.780 câu (đo
+             02/10/2026). Không đếm ngân hàng ở đây: `getCount()` trên dự án này
+             tốn một lượt đọc cho MỖI câu — xem docs/claude-reference/data.md.
+             Kho cũ có gì thì ghi đúng tên nó; không có thì đừng ghi con số 0. */
+          mainContent={questionCount + examCount > 0
+            ? `Kho cũ: ${questionCount} câu, ${examCount} đề`
+            : 'Ngân hàng câu hỏi'}
+          description="Nhấp để mở ngân hàng và xem số câu"
           accentColor="var(--vang)"
           icon={<Database size={20} color="var(--vang)" />}
           onClick={() => handleStatClick('databank')}
