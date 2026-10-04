@@ -81,7 +81,7 @@ Chuỗi kỹ năng sẵn có trong repo đã đủ làm "quy trình liên kết"
 4. Máy chủ: kiểu, JWT, D1, adapter, chuỗi, route, toml, migration, `_routes.json`.
 5. T2 + dính phiên + `sinhLai` theo đúng tầng + xoay model ở T3.
 6. Đánh giá từng model, chốt `CHUOI_MAY_CHU`, ghi `docs/danh-gia-nha-cung-cap.md`.
-7. Cập nhật tài liệu (sau khi tệp đã tồn tại, vì `kiem-tra:tai-lieu`): `CLAUDE.md:41`, `docs/claude-reference/project.md`, `deployment.md`, `security.md`, `data.md`, `.specify/memory/constitution.md` (lên 1.1.0 + lý do), `PRODUCT.md`, `docs/bao-cao-nckh-gia-su-hoa-11.md:225` (công khai model dự phòng, tỉ lệ lượt dự phòng theo nhánh, phân tích chỉ-T0).
+7. Cập nhật tài liệu (sau khi tệp đã tồn tại, vì `kiem-tra:tai-lieu`): `CLAUDE.md:41`, `docs/claude-reference/project.md`, `deployment.md`, `security.md`, `data.md`, `.specify/memory/constitution.md` (lên 1.1.0 + lý do), `PRODUCT.md`, báo cáo NCKH (dòng 225; từ 04/10/2026 báo cáo không còn trong repo) (công khai model dự phòng, tỉ lệ lượt dự phòng theo nhánh, phân tích chỉ-T0).
 8. Chủ dự án deploy và nghiệm thu.
 
 ## Phép kiểm (thêm vào bộ sẵn có, không thêm khung test)
