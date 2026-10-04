@@ -349,7 +349,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                       </Typography>
                       <Typography variant="caption" color="text.secondary" noWrap sx={{ width: '100%' }}>
                         {khoa
-                          ? `Đang khóa — đạt từ ${DIEM_MO_BAI_SAU} điểm đề kiểm tra ${xet.baiTruoc?.title.split(':')[0] ?? 'bài trước'} để mở`
+                          ? `Đang khóa — xin Chemai đề kiểm tra ${xet.baiTruoc?.title.split(':')[0] ?? 'bài trước'}, đạt từ ${DIEM_MO_BAI_SAU} điểm để mở`
                           : l.summary}
                       </Typography>
                     </Box>

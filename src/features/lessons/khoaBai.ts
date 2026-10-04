@@ -103,6 +103,20 @@ export function baiLamDuocNgay(
 }
 
 /**
+ * Câu trả lời của gia sư đã TỰ nói bài chưa mở / đang khoá hay chưa.
+ *
+ * Web vốn nối thêm một dòng "(Đề của Bài N chưa mở: …)" mỗi khi mô hình phát nhãn
+ * ra đề cho bài đang khoá. Từ khi gia sư nhận lời dặn khoá bài (xem
+ * `chiDanKhoaChoGiaSu`), chính nó đã giải thích điều đó — đo 04/10/2026: câu trả
+ * lời ra HAI đoạn liền nhau cùng nói "bài chưa mở, làm Bài 2 trước". Dòng của
+ * web chỉ còn là lưới đỡ cho lúc mô hình quên giải thích.
+ */
+export function daNoiBaiChuaMo(traLoi: string): boolean {
+  /* "khoá" và "khóa" là hai cách đặt dấu của cùng một chữ. */
+  return /chưa mở|đang khoá|đang khóa|bị khoá|bị khóa|mở khoá|mở khóa/iu.test(traLoi.normalize('NFC'));
+}
+
+/**
  * Lời dặn KHOÁ BÀI gửi kèm cho gia sư ở mỗi lượt, hoặc `undefined` nếu không có
  * gì để dặn (khách, thầy cô, hay học sinh đã mở hết mọi bài).
  *

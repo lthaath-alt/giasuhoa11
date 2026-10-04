@@ -110,7 +110,7 @@ export const LessonSidebar: React.FC<LessonSidebarProps> = ({
       <Divider sx={{ mb: 2 }} />
 
       {displayCurriculum.length === 0 ? (
-        <Box sx={{ py: 3, textStyle: 'center' }}>
+        <Box sx={{ py: 3, textAlign: 'center' }}>
           <Typography variant="body2" color="text.secondary" align="center">
             Chưa có bài học nào trong chương trình.
           </Typography>
@@ -177,7 +177,9 @@ export const LessonSidebar: React.FC<LessonSidebarProps> = ({
                   return (
                     <Tooltip
                       key={les.id}
-                      title={isLocked ? `Đạt từ ${DIEM_MO_BAI_SAU} điểm đề kiểm tra ${tenBaiChan} để mở khóa` : ''}
+                      /* Nói luôn CÁCH mở: đề kiểm tra của một bài chỉ có khi em xin Chemai,
+                         không có nút nào trên trang để tự bấm. */
+                      title={isLocked ? `Xin Chemai đề kiểm tra ${tenBaiChan} và đạt từ ${DIEM_MO_BAI_SAU} điểm để mở khóa` : ''}
                       placement="right"
                     >
                       <ListItem

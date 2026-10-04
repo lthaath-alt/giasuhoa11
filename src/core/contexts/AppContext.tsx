@@ -14,7 +14,7 @@ import { QuizService } from '../../features/quiz/quizService';
 import { BankFirestore } from '../../features/bank/bankStore';
 import { toLegacy, toChapter } from '../../features/bank/convert';
 import { boDongLinkDe } from '../../features/quiz/linkDe';
-import { xetKhoaBai, baiLamDuocNgay, chiDanKhoaChoGiaSu, DIEM_MO_BAI_SAU } from '../../features/lessons/khoaBai';
+import { xetKhoaBai, baiLamDuocNgay, chiDanKhoaChoGiaSu, daNoiBaiChuaMo, DIEM_MO_BAI_SAU } from '../../features/lessons/khoaBai';
 import { dayBaiCuLen, docBaiNop, ghiDiemChamLai } from '../../features/quiz/baiNopService';
 import { loginWithFirestore, createAccountWithFirestore, resetPasswordWithFirestore } from '../services/firestoreAuth';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
@@ -1431,8 +1431,13 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         const viecCanLam = baiChan && baiNgay && baiNgay.id !== baiChan.id
           ? `${baiChan.title}, mà bài đó cũng chưa mở. Bài em làm được ngay là ${baiNgay.title} — em xin đề của bài đó trước nhé`
           : `${baiChan?.title ?? 'bài trước'} đã. Em xin đề của bài đó để làm trước nhé`;
-        finalAiResponse += `\n\n_(Đề của ${tenBai} chưa mở: em cần đạt từ ${DIEM_MO_BAI_SAU}/10 điểm ở đề kiểm tra `
-          + `${viecCanLam}.)_`;
+        /* Gia sư đã tự nói bài chưa mở (nhờ lời dặn khoá bài) thì KHÔNG nối thêm:
+           đo 04/10/2026, câu trả lời ra hai đoạn liền nhau nói cùng một ý. Dòng
+           dưới chỉ còn đỡ cho lúc mô hình quên giải thích. */
+        if (!daNoiBaiChuaMo(finalAiResponse)) {
+          finalAiResponse += `\n\n_(Đề của ${tenBai} chưa mở: em cần đạt từ ${DIEM_MO_BAI_SAU}/10 điểm ở đề kiểm tra `
+            + `${viecCanLam}.)_`;
+        }
       } else {
         const deBai = await QuizService.createQuiz(
           chuongCuaBai.id, maBai, userEmail, libraryQuestions,

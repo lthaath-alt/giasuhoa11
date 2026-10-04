@@ -11,7 +11,7 @@ import { dirname, join } from 'path';
 
 import { CHEMISTRY_11_CURRICULUM } from '../src/features/lessons/constants';
 import { buildLessonContext, buildProgramContext } from '../src/features/tutor/services/lessonContext';
-import { xetKhoaBai, baiLamDuocNgay, chiDanKhoaChoGiaSu, laBaiOnTap, DIEM_MO_BAI_SAU } from '../src/features/lessons/khoaBai';
+import { xetKhoaBai, baiLamDuocNgay, chiDanKhoaChoGiaSu, daNoiBaiChuaMo, laBaiOnTap, DIEM_MO_BAI_SAU } from '../src/features/lessons/khoaBai';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 
@@ -280,6 +280,15 @@ console.log('\n== Khoá bài tuần tự ==');
     ok(/vẫn hướng dẫn/.test(dan), 'lời dặn KHÔNG cấm giải thích lý thuyết hay bài tập em tự mang tới');
     ok(dan.startsWith('TRẠNG THÁI'), 'lời dặn mở đầu bằng "TRẠNG THÁI" — mục mà câu lệnh gốc dặn ưu tiên');
   }
+
+  /* Web chỉ nối dòng "(Đề của Bài N chưa mở…)" khi gia sư CHƯA tự nói điều đó.
+     Câu đầu là nguyên văn Chemai trả lời tài khoản thử ngày 04/10/2026. */
+  ok(daNoiBaiChuaMo('Bài Bài 5: Ammonia và muối ammonium hiện tại chưa mở với em. Để mở khóa bài này, em cần đạt từ 7/10 điểm ở đề kiểm tra của Bài 2 trước nhé!'),
+    'gia sư đã nói "chưa mở" → web không nối thêm đoạn lặp');
+  ok(daNoiBaiChuaMo('Bài này đang bị khoá em nhé') && daNoiBaiChuaMo('Em cần mở khoá bài trước đã'),
+    'nhận cả hai cách đặt dấu "khoá" / "khóa"');
+  ok(!daNoiBaiChuaMo('Thầy gửi em đề luyện tập ngắn gồm 2 câu hỏi về Bài 5: Ammonia và muối ammonium nhé: Câu 1 (Lý thuyết)…'),
+    'gia sư quên giải thích (cứ thế ra câu luyện) → web VẪN nối dòng báo bài chưa mở');
 
   /* Chiều ngược lại, đo trên DỮ LIỆU: bài nào đứng ra chặn bài khác thì ngân
      hàng phải đủ câu để ra đề (`createQuiz` cần ít nhất 5 câu cho một đề đủ),
