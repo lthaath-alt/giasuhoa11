@@ -16,11 +16,11 @@ Hằng ngày:
 |---|---|
 | `npm run dev` | Máy chủ phát triển, cổng 3000 |
 | `npm run lint` | `tsc --noEmit` — hàng rào chính, chạy MỘT LẦN trước khi báo xong |
-| `npm run kiem-tra` | Chạy cả 13 bộ kiểm, 361 mục trên máy thiếu Java (thêm 26 mục nữa trên CI, khi `kiem-tra:luat` chạy thật). Chạy trước khi commit |
+| `npm run kiem-tra` | Chạy cả 17 bộ kiểm. Đo 03/10/2026 trên máy có Java 21, Gemini CLI và khoá: 848 mục OK, trong đó 83 phép của `kiem-tra:luat`; máy thiếu Java 21 thì bộ luật BỎ QUA, còn 765 mục. Số mục của `kiem-tra:gemini` và `kiem-tra:dong-bo` đổi theo máy (có CLI, có khoá, có mạng hay không). Chạy trước khi commit |
 | `npm run build` | **Chỉ khi user yêu cầu** |
 
 Bộ kiểm chạy riêng khi cần: `kiem-tra:su-pham` (máy trạng thái sư phạm, chuẩn
-hoá + dựng công thức KaTeX, telemetry), `kiem-tra:chuong-trinh` (dữ liệu 25 bài),
+hoá + dựng công thức KaTeX, telemetry, gom tin chat theo phiên), `kiem-tra:chuong-trinh` (dữ liệu 25 bài),
 `kiem-tra:ngan-hang`, `kiem-tra:de-chuong`, `kiem-tra:het-luot`, `kiem-tra:mau`
 (biến màu + tương phản), `kiem-tra:thuc-nghiem`, `kiem-tra:ran-thang`,
 `kiem-tra:dong-bo` (cần mạng, mất mạng thì tự bỏ qua), `kiem-tra:luyen-tap`,
@@ -28,9 +28,11 @@ hoá + dựng công thức KaTeX, telemetry), `kiem-tra:chuong-trinh` (dữ li�
 (mọi đường dẫn và lệnh npm mà CLAUDE.md / hiến chương nhắc tới đều phải có thật),
 `kiem-tra:an-ninh` (những hàng rào an ninh không được phép biến mất — xem mục
 "An ninh dự án" bên dưới),
-`kiem-tra:luat` (19 phép thử luật Firestore trên emulator; cần Java 11+ nên
-máy nào thiếu thì tự bỏ qua — phép này chạy thật trên GitHub Actions, xem
-`.github/workflows/kiem-luat.yml`).
+`kiem-tra:luat` (83 phép thử luật Firestore trên emulator, nhóm 1–23; cần Java 21+ vì
+firebase-tools 15 đòi vậy, nên máy nào thiếu thì tự bỏ qua — phép này chạy thật
+trên GitHub Actions, xem `.github/workflows/kiem-luat.yml`. Lần chạy đầu trên
+một máy, firebase tải emulator Firestore về thư mục .cache/firebase/emulators
+trong thư mục người dùng).
 
 
 ## Kiểm thử đầu-cuối bằng trình duyệt (`npm run kiem-tra:e2e`)

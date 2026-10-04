@@ -239,12 +239,26 @@ export interface ChatMessage {
   /** Loại ngoài môn: hai loại đầu do mô hình gắn nhãn, hai loại sau do mã phát hiện */
   ngoai_mon?: 'CAM_XUC_TIEU_CUC' | 'LAC_DE' | 'SPAM_ATTACK' | 'GIAN_LAN';
   model_name?: string;
-  /** Thời gian gọi mô hình thật (ms), KHÔNG gồm độ trễ giả lập */
+  /** Thời gian học sinh chờ (ms), gồm cả lúc gõ cửa model đã hết lượt (từ 01/10/2026); KHÔNG gồm độ trễ giả lập */
   latency_ms?: number;
   /** Bộ chặn rò đáp số (P0-2) đã can thiệp vào lượt này */
   chan_ro?: boolean;
   /** Mô hình quên nhãn ẩn hoặc viết sai định dạng (P0-6) — đếm để biết nhãn hụt bao nhiêu */
   nhan_hong?: boolean;
+  /** Nguồn đã trả lời (01/10/2026): 'gemini-firebase' | 'gemini-khoa-rieng'. Lượt không gọi mô hình thì trống */
+  nha_cung_cap?: string;
+  /** Đường đã đi: 'chinh' | 'xoay-gemini' | 'khoa-rieng'. Lọc 'chinh' để phân tích riêng model gốc.
+      Trống ở các dòng TRƯỚC 01/10/2026 (trường này chưa tồn tại — lượt đó chỉ có thể là model
+      chính hoặc khoá riêng của em) và ở lượt KHÔNG gọi model nào (gian lận phát hiện sớm, câu trả
+      lời dựng sẵn); phân tích "chỉ model chính" trên dữ liệu cũ phải xử trống đúng theo hai ca
+      trên, không coi trống là thiếu dữ liệu. */
+  duong?: string;
+  /** Ý định tin của EM do bộ phân loại logistic nhóm tự huấn luyện đoán (chạy bóng, 02/10/2026) — không đổi hành vi gia sư */
+  y_dinh?: string;
+  /** Xác suất của nhãn đoán (0–1, 3 chữ số) */
+  y_dinh_xs?: number;
+  /** Phiên bản tệp mô hình đã đoán — huấn luyện lại thì so theo phiên bản */
+  y_dinh_phien_ban?: string;
 }
 
 export interface QuizAttempt {

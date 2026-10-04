@@ -169,6 +169,35 @@ Phép canh: `kiem-tra:de-giao` (logic thuần — trạng thái đề, mã bài,
 đối chiếu trường của bài nộp với `hasOnly` trong `firestore.rules`);
 `kiem-tra:luat` có 12 phép (22a–22l) cho collection này.
 
+### Chat với gia sư AI lưu ở `chats/{id}`
+
+Không có mục riêng ở đây cho toàn bộ collection này — trường telemetry
+`model_name`, `nha_cung_cap`, `duong` mô tả ở bảng AI trong
+`docs/claude-reference/project.md`. Trường mới cùng tài liệu `chats`:
+
+- **`y_dinh`, `y_dinh_xs`, `y_dinh_phien_ban` (02/10/2026)** — chỉ ở tin của EM: nhãn ý
+  định do bộ phân loại logistic nhóm tự huấn luyện đoán, CHẠY BÓNG (không đổi hành vi
+  gia sư). Mô hình là tệp JSON trong thư mục mo-hinh của public; chưa có tệp thì ba
+  trường trống. Cách gán nhãn và huấn luyện: `scripts/phan-loai/README.md`.
+- **"Ẩn khỏi màn hình" thay cho "Xóa lịch sử chat" (03/10/2026)** — nút cũ trong
+  TutorChat gọi `clearLessonChats`, xóa thật tài liệu `chats`, tức xóa cả số liệu đề
+  tài. Nay giao diện học sinh không còn đường nào gọi hàm đó: nút mới chỉ ghi một mốc
+  thời gian vào localStorage (khoá `h11_an_chat:<uid>:<lessonId>`, không chứa email),
+  tin tới mốc không hiện và không gửi làm ngữ cảnh cho gia sư; "Hiện lại" xóa mốc. Mốc
+  chỉ ở máy đó. Xem `src/features/tutor/services/anTinCu.ts`.
+- **Tin nhắn thật làm dữ liệu huấn luyện (03/10/2026)** — chủ dự án báo chủ nhiệm đề tài
+  cho phép và phụ huynh lớp 11A3 đồng ý. Từ 04/10/2026 lấy thêm câu tài khoản giáo viên/quản trị
+  gửi gia sư (nguồn `that-gv`, không vào tập kiểm). Cũng từ 04/10/2026 bộ nhãn có thêm `xin_de` (xin
+  bài để tự luyện; 7 nhãn), mô hình học nó khi đủ 5 câu. `npm run phan-loai:hang-ngay` mỗi đêm làm
+  bảng Excel gửi mail cho chủ dự án (`scripts/phan-loai/hang_ngay.py`). Mỗi đợt hai lệnh: `npm run phan-loai:xuat`, người gán
+  nhãn, rồi `npm run phan-loai:huan-luyen -- <thư mục đợt>` (`scripts/phan-loai/nap_dot.py`).
+  Đường lấy câu duy nhất: `npm run xuat:cau-hoi -- --lop 11A3`
+  (`scripts/phan-loai/xuat-cau-hoi.mts`, CHỈ ĐỌC, vai giáo viên). Ra câu đã che, không
+  email/mã/giờ, vào thư mục con "that" của `scripts/phan-loai/du-lieu/` (bị `.gitignore`
+  chặn, chỉ có sau lần xuất đầu tiên). Lớp khác phải
+  thêm vào hằng `DONG_Y` trong script sau khi có đồng ý. `y_dinh` vẫn KHÔNG dùng làm nhãn
+  hay để đánh giá học sinh; nhãn do hai người gán. Quy trình: `scripts/phan-loai/README.md` bước 2b.
+
 
 
 ### Đề kiểm tra chấm Đúng/Sai từng ý và trả lời ngắn bằng so số (02/10/2026)

@@ -142,6 +142,7 @@ export const bocCsv = (v: unknown): string => {
 const COT_CSV = [
   'user_hash', 'nhanh', 'session_id', 'lesson_id', 'timestamp', 'sender', 'buoc', 'loai_luot',
   'muc_goi_y', 'be_tac', 'ma_ngo_nhan', 'ngoai_mon', 'model_name', 'latency_ms', 'do_dai_noi_dung',
+  'nha_cung_cap', 'duong', 'y_dinh', 'y_dinh_xs', 'y_dinh_phien_ban',
 ] as const;
 
 /**
@@ -153,7 +154,7 @@ export function xuatCsv(tinNhan: ChatMessage[]): string {
   const dong = tinNhan.map(m => [
     m.user_hash ?? userHash(m.userEmail) ?? '', m.nhanh, m.session_id, m.lessonId, m.timestamp, m.sender,
     m.buoc, m.loai_luot, m.muc_goi_y, m.be_tac, m.ma_ngo_nhan, m.ngoai_mon, m.model_name, m.latency_ms,
-    (m.content ?? '').length,
+    (m.content ?? '').length, m.nha_cung_cap, m.duong, m.y_dinh, m.y_dinh_xs, m.y_dinh_phien_ban,
   ].map(bocCsv).join(','));
   return [COT_CSV.join(','), ...dong].join('\n');
 }

@@ -10,6 +10,7 @@
  *   3. Bộ chuẩn hoá + dựng công thức: đúng từng ca đã hỏng ở bộ regex cũ, và
  *      không mở lại lỗ hổng XSS / link độc.
  *   4. Chỉ số telemetry tính đúng và bản xuất CSV không lộ email hay nội dung.
+ *   5. Khung chat gom tin theo phiên (nhomPhien.ts) đúng ranh giới phiên và ngày.
  */
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
@@ -34,6 +35,8 @@ import { LUOC_DO_LOC, TUY_CHON_KATEX, taoTheLink } from '../src/core/components/
 import { tinhChiSo, xuatCsv, gopTheoHocSinh, csvHocSinh } from '../src/features/tutor/services/telemetryService';
 import { coDapSo, timDapAnChoTin } from '../src/features/tutor/services/chanRoDapSo';
 import type { ChatMessage } from '../src/features/auth/types';
+import { nhomTheoPhien, nhanNhom } from '../src/features/tutor/services/nhomPhien';
+import { khoaAnTin, docMocAn, ghiMocAn, mocAnTatCa, locTheoMoc } from '../src/features/tutor/services/anTinCu';
 
 const GOC = fileURLToPath(new URL('..', import.meta.url));
 
@@ -60,6 +63,19 @@ console.log('\n== Máy trạng thái: bế tắc và giàn giáo ==');
   ok(demBeTacLienTiep([...ls, hs('Dạ n = C × V ạ'), gs('Đúng rồi')], cau) === 1,
     'em đã thử trả lời thì chuỗi bế tắc bị cắt, đếm lại từ 1');
   ok(demBeTacLienTiep(ls, 'Dạ số mol HCl là 0,01') === 0, 'tin không bế tắc thì đếm 0');
+
+  /* 26/09/2026, chủ dự án duyệt: đếm thêm "chịu" đứng riêng, "bt"/"bik", "hiểu"
+     viết tắt và gõ không dấu. "chịu" chỉ tính khi cả tin chỉ có vậy, để "chịu
+     nhiệt" không thành bế tắc. Trước đó "Ok biết rồi ạ" bị đếm là bế tắc vì
+     "k biết" khớp giữa chữ "ok biết" — nay có ranh giới đầu từ. */
+  const beTacMoi = ['em chịu', 'Chịu ạ.', 'chiu', 'ko bt', 'k bik', 'hk bt', 'ko hiểu', 'k hiểu', 'hk hiểu',
+    'chả hiểu gì', 'khong biet', 'ko biet', 'khong hieu', 'em không biết'.normalize('NFD')];
+  beTacMoi.forEach(c => ok(laTinBeTac(c), 'nhận cách nói bế tắc gõ tắt / không dấu', c.normalize('NFC')));
+  ok(demBeTacLienTiep([hs('em chịu'), gs('Không sao…'), hs('ko bt'), gs('Mình thu hẹp nhé…')], 'khong biet') === 3,
+    'chuỗi "em chịu" → "ko bt" → "khong biet" đếm đủ 3 lần');
+  const khongBeTac = ['Chất nào chịu nhiệt tốt hơn ạ?', 'em chịu khó làm lại rồi, ra 0,1 M ạ', 'Ok biết rồi ạ',
+    'Cô ko giao bt về nhà ạ?'];
+  khongBeTac.forEach(c => ok(!laTinBeTac(c), 'KHÔNG coi là bế tắc', c));
 
   /* Bốn nấc từ 18/09/2026: nấc 2 "thu hẹp câu hỏi" được chèn thêm, đẩy giải
      mẫu xuống nấc 3 và làm hộ một bước xuống nấc 4. */
@@ -102,6 +118,48 @@ console.log('\n== Máy trạng thái: gian lận phòng thi ==');
   ];
   coGianLan.forEach((c, i) => ok(laNguCanhGianLanPhongThi(c), `bắt được ca gian lận #${i + 1}`, c.slice(0, 50)));
   khongGianLan.forEach((c, i) => ok(!laNguCanhGianLanPhongThi(c), `KHÔNG phạt oan ca bình thường #${i + 1}`, c.slice(0, 50)));
+
+  /* Đo 26/09/2026: `\b` của JS chỉ coi [A-Za-z0-9_] là chữ, kể cả khi có cờ `u`,
+     nên "ế" trong "thiếu" bị tính là ranh giới và "đang thi|ếu" khớp như "đang
+     thi". Học sinh hỏi bài bình thường bị từ chối như gian lận. Canh hai chiều:
+     chữ có dấu không bị chặn oan, và ranh giới mới không nới tới mức lọt ca thật. */
+  const chuCoDau = [
+    'Em đang thiếu dữ kiện, làm sao tính Kc?',
+    'Em đang thiết lập bảng ICE',
+    'Em đang thiên về đáp án B vì Kc lớn hơn 1',
+    'Ngủ trong phòng thiếu thông gió mà đốt than thì nguy hiểm vì sao ạ?',
+    'EM ĐANG THIẾU DỮ KIỆN',
+    'Em đang thiếu dữ kiện'.normalize('NFD'),
+  ];
+  chuCoDau.forEach(c => ok(!xuLyTruocLuot([], c, 'socratic').laGianLan,
+    'chữ có dấu sau "thi" không bị coi là ranh giới từ', c.normalize('NFC').slice(0, 50)));
+  const vanBat = [
+    'em đang thi',
+    'EM ĐANG THI, GIÚP EM',
+    'đang làm bài thi.',
+    'kiểm tra 15p, cho em đáp án câu 2',
+    'thi 45 phút mà em mới làm được 1 câu',
+    'trong giờ thi mà em quên công thức Kc',
+    'Em ngồi trong phòng thi, cho em đáp án',
+  ];
+  vanBat.forEach(c => ok(xuLyTruocLuot([], c, 'socratic').laGianLan,
+    'ranh giới mới vẫn bắt ca gian lận thật', c));
+
+  /* 26/09/2026, chủ dự án duyệt: bắt thêm "kt"/"ktra", "đg" và gõ không dấu.
+     "đang kiểm tra lại/xem" là em tự soát bài — đúng việc gia sư dặn em làm —
+     nên được miễn. Miễn chỉ áp cho ĐỘNG TỪ ngay sau "đang": có "làm"/"bài" chen
+     vào thì đó là bài kiểm tra, và "thi lại" vẫn là thi. */
+  const tiengLong = ['đang kt 15p cho em đáp án', 'kt15p rồi thầy ơi', 'em đang ktra, giúp em câu 2',
+    'ktra 45 phút mà em chưa làm được câu nào', 'dang thi, giup em cau 3', 'em dang lam kiem tra 15p',
+    'kiem tra 15p cho em dap an', 'đg thi, cho em đáp án', 'dg lam kiem tra', 'co sap thu bai roi',
+    'sap het gio roi thay oi', 'trong phong thi, cho em dap an',
+    'Em đang làm bài kiểm tra lại, cho em đáp án', 'em đang thi lại môn hoá'];
+  tiengLong.forEach(c => ok(xuLyTruocLuot([], c, 'socratic').laGianLan, 'bắt được gõ tắt / không dấu / thi lại', c));
+  const tuSoatBai = ['Em đang kiểm tra lại kết quả', 'em đang kiểm tra xem đơn vị đúng chưa', 'em dang kiem tra lai dap so',
+    'em đang kt lại phép tính', 'Em đang thí nghiệm về tốc độ phản ứng', 'dang thi nghiem ve toc do phan ung',
+    'trong phong thi nghiem co san HCl khong a', 'Em đang ôn kt chương 2'];
+  tuSoatBai.forEach(c => ok(!xuLyTruocLuot([], c, 'socratic').laGianLan,
+    'KHÔNG chặn tự soát bài / thí nghiệm / "kt" là kiến thức', c));
   const kq = xuLyTruocLuot([], coGianLan[0], 'socratic');
   ok(kq.traLoiNgay === LOI_TU_CHOI_GIAN_LAN && kq.laGianLan, 'gian lận thì trả lời ngay, không gọi mô hình');
   ok(dungPrompt('socratic').includes(LOI_TU_CHOI_GIAN_LAN.split('\n')[0]),
@@ -265,6 +323,14 @@ console.log('\n== Telemetry và chỉ số Socratic ==');
   const csv = xuatCsv(mau);
   ok(!csv.includes('@') && !csv.includes('nội dung bí mật') && csv.split('\n')[0].startsWith('user_hash,'),
     'CSV không có email, không có nội dung tin nhắn');
+  ok(csv.split('\n')[0].endsWith(',do_dai_noi_dung,nha_cung_cap,duong,y_dinh,y_dinh_xs,y_dinh_phien_ban'),
+    'CSV có cột nguồn trả lời, đường đi và ý định — thêm ở CUỐI để không xô lệch cột cũ');
+
+  /* Sửa vòng 1, MINOR 2: kiểm GIÁ TRỊ thật của ba cột mới trên một dòng, không
+     chỉ kiểm tên cột ở header. */
+  const csvYDinh = xuatCsv([m({ sender: 'user', y_dinh: 'be_tac', y_dinh_xs: 0.9, y_dinh_phien_ban: 'v1' })]);
+  ok(csvYDinh.split('\n')[1].endsWith(',be_tac,0.9,v1'),
+    'dòng CSV mang đúng giá trị y_dinh/y_dinh_xs/y_dinh_phien_ban ở ba cột cuối', csvYDinh.split('\n')[1]);
 }
 
 console.log('\n== Gộp chỉ số theo từng học sinh (P0-5) ==');
@@ -418,6 +484,90 @@ console.log('\n== Bộ dò đáp số trong câu trả lời (P0-2, P0-4) ==');
     'tin ngắn hoặc khác đề thì không khớp bừa');
   ok(timDapAnChoTin('Tính pH của dung dịch thu được khi trộn hai dung dịch acid mạnh có cùng nồng độ', kho) === undefined,
     'bài cùng chủ đề nhưng khác đề thì không khớp');
+}
+
+console.log('\n== Khung chat: gom tin theo phiên (nhomPhien.ts) ==');
+{
+  /* Giờ địa phương dựng bằng new Date(năm, tháng, ...) để phép kiểm đúng ở mọi
+     múi giờ máy chạy. Tháng tính từ 0: 9 là tháng 10. */
+  const luc = (ngay: number, gio: number, phut = 0) => new Date(2026, 9, ngay, gio, phut).toISOString();
+  let so = 0;
+  const tin = (t: string, phien?: string) => ({ id: `t${so++}`, timestamp: t, session_id: phien });
+
+  ok(nhomTheoPhien([]).length === 0, 'không có tin thì không có nhóm');
+
+  const haiPhien = [
+    tin(luc(3, 13, 5), 'a'), tin(luc(3, 13, 6), 'a'), tin(luc(3, 13, 9), 'a'),
+    tin(luc(3, 15, 0), 'b'), tin(luc(3, 15, 1), 'b'),
+  ];
+  const n1 = nhomTheoPhien(haiPhien);
+  ok(n1.length === 2 && n1[0].tin.length === 3 && n1[1].tin.length === 2,
+    'hai session_id liền nhau → hai nhóm 3 + 2 tin', n1.map(n => n.tin.length).join(' + '));
+  ok(n1.flatMap(n => n.tin).map(m => m.id).join() === haiPhien.map(m => m.id).join(),
+    'giữ nguyên thứ tự và không mất tin nào');
+  ok(nhanNhom(n1[0]) === 'Thứ Bảy 03/10 · 13:05 · 3 tin',
+    'nhãn phiên có thứ, ngày, giờ bắt đầu, số tin', nhanNhom(n1[0]));
+
+  const n2 = nhomTheoPhien([tin(luc(1, 8)), tin(luc(1, 9)), tin(luc(2, 8))]);
+  ok(n2.length === 2 && n2.every(n => !n.theoPhien), 'tin cũ không có session_id → gom theo ngày');
+  ok(nhanNhom(n2[1]) === 'Thứ Sáu 02/10 · 1 tin', 'nhóm theo ngày không ghi giờ', nhanNhom(n2[1]));
+
+  ok(nhomTheoPhien([tin(luc(3, 23, 50)), tin(luc(4, 0, 10))]).length === 2,
+    'tin cũ lúc 23:50 và 00:10 hôm sau là hai ngày theo giờ máy');
+  ok(nhomTheoPhien([tin(luc(3, 23, 50), 'c'), tin(luc(4, 0, 10), 'c')]).length === 1,
+    'một phiên kéo qua nửa đêm vẫn là MỘT nhóm');
+
+  const xenKe = nhomTheoPhien([tin(luc(3, 9), 'a'), tin(luc(3, 9, 1), 'b'), tin(luc(3, 9, 2), 'a')]);
+  ok(xenKe.length === 3 && new Set(xenKe.map(n => n.khoa)).size === 3,
+    'phiên quay lại sau phiên khác → nhóm riêng, khoá không trùng (key React)');
+
+  ok(nhomTheoPhien([tin(luc(3, 8)), tin(luc(3, 9), 'a')]).length === 2,
+    'tin không phiên và tin có phiên cùng ngày không bị trộn');
+
+  ok(nhanNhom(nhomTheoPhien([tin('khong-phai-ngay')])[0]) === 'Không rõ ngày · 1 tin',
+    'timestamp hỏng không làm sập, ghi "Không rõ ngày"');
+}
+
+console.log('\n== Khung chat: "Ẩn khỏi màn hình" thay cho xóa (anTinCu.ts) ==');
+{
+  const t = (phut: number) => ({ timestamp: new Date(2026, 9, 3, 13, phut).toISOString() });
+  const ds = [t(1), t(2), t(3)];
+
+  ok(mocAnTatCa(ds) === Date.parse(t(3).timestamp), 'mốc = thời điểm tin MỚI NHẤT, không phải giờ máy');
+  ok(mocAnTatCa([]) === null && mocAnTatCa([{ timestamp: 'hong' }]) === null, 'không có tin hợp lệ thì không có mốc');
+
+  const an = locTheoMoc(ds, mocAnTatCa(ds));
+  ok(an.hien.length === 0 && an.soAn === 3, 'ẩn tới mốc thì cả 3 tin cũ biến khỏi màn hình');
+  const sau = locTheoMoc([...ds, t(10)], mocAnTatCa(ds));
+  ok(sau.hien.length === 1 && sau.soAn === 3, 'tin tới SAU khi ẩn vẫn hiện');
+  ok(locTheoMoc(ds, null).hien.length === 3, 'chưa ẩn (mốc null) thì hiện đủ');
+  ok(locTheoMoc([{ timestamp: 'hong' }], 0).hien.length === 1, 'timestamp hỏng thì cứ hiện, không làm mất tin');
+
+  const khoa = khoaAnTin('Uid123', 'bai-11');
+  ok(khoa === 'h11_an_chat:Uid123:bai-11', 'khoá localStorage gồm uid và mã bài', khoa);
+  ok(!/@/.test(khoa) && khoaAnTin(undefined, 'bai-11') === 'h11_an_chat:khach:bai-11',
+    'khoá không chứa email; khách vãng lai dùng chữ "khach"');
+
+  /* localStorage giả: Node không có sẵn. Thử cả bản chạy được lẫn bản ném lỗi
+     (Safari chế độ riêng tư, trình duyệt chặn lưu trữ). */
+  const g = globalThis as { localStorage?: unknown };
+  const cu = g.localStorage;
+  const kho = new Map<string, string>();
+  g.localStorage = {
+    getItem: (k: string) => kho.get(k) ?? null,
+    setItem: (k: string, v: string) => { kho.set(k, v); },
+    removeItem: (k: string) => { kho.delete(k); },
+  };
+  ok(docMocAn(khoa) === null, 'chưa ghi thì đọc ra null');
+  ok(ghiMocAn(khoa, 1234) && docMocAn(khoa) === 1234, 'ghi rồi đọc lại đúng mốc (giữ qua tải lại trang)');
+  ok(ghiMocAn(khoa, null) && docMocAn(khoa) === null && !kho.has(khoa), '"Hiện lại" xóa hẳn mốc');
+  kho.set(khoa, 'rac');
+  ok(docMocAn(khoa) === null, 'giá trị rác trong localStorage coi như chưa ẩn');
+  const nem = () => { throw new Error('bị chặn'); };
+  g.localStorage = { getItem: nem, setItem: nem, removeItem: nem };
+  ok(docMocAn(khoa) === null && ghiMocAn(khoa, 1) === false,
+    'localStorage ném lỗi: đọc ra null, ghi trả false, không làm sập khung chat');
+  g.localStorage = cu;
 }
 
 console.log('\n' + (hong === 0 ? '>>> TẤT CẢ ĐẠT' : `>>> CÓ ${hong} MỤC KHÔNG ĐẠT`) + '\n');

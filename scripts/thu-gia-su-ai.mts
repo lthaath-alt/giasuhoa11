@@ -22,8 +22,7 @@ import { GoogleGenAI } from '@google/genai';
 
 import { dungPrompt, THAM_SO_SINH } from '../src/features/tutor/services/promptSuPham';
 import { xuLyTruocLuot, tachNhanAn, type TinNhanToiThieu } from '../src/features/tutor/services/pedagogicalStateMachine';
-import { buildLessonContext, buildLessonCatalog, buildProgramContext }
-  from '../src/features/tutor/services/lessonContext';
+import { dungHuongDanHeThong } from '../src/features/tutor/services/dungCauLenh';
 import { GEMINI_MODEL_NAME } from '../src/core/constants';
 
 const GOC = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -63,24 +62,6 @@ interface Probe {
   cham: (traLoi: string) => string;
 }
 
-/* Dựng ngữ cảnh Y HỆT geminiTutorService.
-   Bản trước chỉ ghép SYSTEM_PROMPT + ngữ cảnh bài, THIẾU danh mục bài — tức là
-   phép thử chấm một cấu hình mà học sinh không bao giờ gặp. Đặt `bai: ''` để
-   thử đúng khung iChat tư vấn chung (không mở bài nào). */
-function dungNguCanh(bai: string, chiDanThem = ''): string {
-  const nguCanhBai = buildLessonContext(bai);
-  const danBaiChung = nguCanhBai ? '' : buildProgramContext();
-  return [
-    SYSTEM_PROMPT,
-    '='.repeat(60),
-    buildLessonCatalog(),
-    ...(nguCanhBai ? ['='.repeat(60), nguCanhBai] : []),
-    ...(danBaiChung ? ['='.repeat(60), danBaiChung] : []),
-    // Chỉ dẫn của máy trạng thái sư phạm, y như geminiTutorService
-    ...(chiDanThem ? ['='.repeat(60), chiDanThem] : []),
-  ].join('\n\n');
-}
-
 async function hoi(p: Probe): Promise<string> {
   const lichSu = p.lichSu ?? [];
   const truoc = xuLyTruocLuot(lichSu, p.hoi, 'socratic');
@@ -93,7 +74,10 @@ async function hoi(p: Probe): Promise<string> {
       { role: 'user', parts: [{ text: p.hoi }] },
     ],
     config: {
-      systemInstruction: dungNguCanh(p.bai, truoc.chiDanThem),
+      /* Cùng chỗ ghép với web (dungCauLenh.ts) — không tự ghép lại ở đây. */
+      systemInstruction: dungHuongDanHeThong({
+        nhanh: 'socratic', lessonId: p.bai, chiDanThem: truoc.chiDanThem,
+      }),
       temperature: THAM_SO_SINH.temperature,
       topP: THAM_SO_SINH.topP,
     },

@@ -7,6 +7,8 @@ import { generateAIResponseChiTiet } from '../../features/tutor/services/geminiT
 import { kiemTraVaGhiNhanLuotGui, layTrangThaiGioiHan, thongBaoBiChan } from '../../features/tutor/services/gioiHanChatService';
 import { tachNhanAn, laTinBeTac } from '../../features/tutor/services/pedagogicalStateMachine';
 import { laySessionId, ketThucPhien, userHash } from '../../features/tutor/services/telemetryService';
+import { doanYDinhNen } from '../../features/tutor/services/yDinhNen';
+import { khoaAnTin, docMocAn, locTheoMoc } from '../../features/tutor/services/anTinCu';
 import { GoogleUserInfo } from '../services/googleAuth';
 import { QuizService } from '../../features/quiz/quizService';
 import { BankFirestore } from '../../features/bank/bankStore';
@@ -1235,6 +1237,12 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     const userEmail = currentUser ? currentUser.email : 'guest';
     const laKhach = !currentUser;
 
+    /* Chạy BÓNG bộ phân loại ý định do nhóm tự huấn luyện (02/10/2026): chỉ GHI
+       nhãn đoán để so với regex; mọi quyết định vẫn do máy trạng thái. Bắt đầu
+       từ đây để chạy song song với bước giới hạn bên dưới. Hỏng hay chậm quá
+       1,5 s thì bỏ qua — xem yDinhNen.ts. */
+    const huaYDinh = doanYDinhNen(content).catch(() => undefined);
+
     /* Bước 0: giới hạn — lượt thử của khách và khoá tạm khi spam, kiểm ở
        Firestore (xem gioiHanChatService.ts). Kiểm TRƯỚC khi gọi AI: chính kẻ
        spam đang đốt hạn mức gọi AI chung của cả web. */
@@ -1246,6 +1254,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
     const nhanDo = { session_id: laySessionId(userEmail, lessonId), user_hash: userHash(userEmail) };
 
+    const yDinh = await huaYDinh;
+
     const userMsg: ChatMessage = {
       id: `m-user-${Date.now()}`,
       userEmail,
@@ -1256,6 +1266,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       ...nhanDo,
       be_tac: laTinBeTac(content) || undefined,
       ngoai_mon: gioiHan.lyDo === 'spam' ? 'SPAM_ATTACK' : undefined,
+      ...yDinh,
     };
 
     // Cập nhật state ngay (optimistic)
@@ -1283,13 +1294,17 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     }
 
     // Lấy lịch sử chat hiện tại cho bài học này từ state
-    /* Lịch sử gửi cho mô hình KHÔNG mang các dòng link đề cũ (02/10/2026). Mô
+    /* Bỏ các tin em đã "Ẩn khỏi màn hình" (anTinCu.ts, 03/10/2026). Nút cũ xóa
+       hẳn tin nên gia sư bắt đầu lại từ đầu; giữ đúng hành vi đó, chỉ khác là
+       tin vẫn còn trên Firestore cho đề tài.
+       Rồi gỡ các dòng link đề cũ khỏi lịch sử gửi cho mô hình (02/10/2026). Mô
        hình thấy dòng "👉 … [Làm bài kiểm tra ngay](…)" trong lịch sử là chép lại
        y nguyên vào câu trả lời mới, trỏ về một bài đã nộp từ đời nào — xem
        features/quiz/linkDe.ts. */
-    const currentHistory = chats
-      .filter(c => c.userEmail === userEmail && c.lessonId === lessonId)
-      .map(c => (c.sender === 'ai' ? { ...c, content: boDongLinkDe(c.content) } : c));
+    const currentHistory = locTheoMoc(
+      chats.filter(c => c.userEmail === userEmail && c.lessonId === lessonId),
+      docMocAn(khoaAnTin(currentUser?.id, lessonId)),
+    ).hien.map(c => (c.sender === 'ai' ? { ...c, content: boDongLinkDe(c.content) } : c));
 
     /* Gỡ khoảng chờ giả 5–10 giây (16/09/2026).
        Bản trước cố ý chờ thêm `Math.random() * 5000 + 5000` ms cho "giống người
@@ -1445,6 +1460,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       ngoai_mon: ketQua.gianLan ? 'GIAN_LAN' : nhan.ngoaiMon,
       model_name: ketQua.modelName,
       latency_ms: ketQua.latencyMs,
+      nha_cung_cap: ketQua.nhaCungCap,
+      duong: ketQua.duong,
       /* Hai cờ cho bản xuất dữ liệu nghiên cứu (P0-5). Firestore từ chối cả
          tài liệu nếu gặp một giá trị `undefined`, nên `|| undefined` ở đây là
          cố ý: false phải biến mất hẳn chứ không được ghi xuống. */

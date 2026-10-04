@@ -12,7 +12,7 @@
 import { GoogleGenAI } from '@google/genai';
 import type { YeuCauGiaSu } from './giaSuFirebaseAI';
 
-export async function hoiGeminiBangKeyRieng(y: YeuCauGiaSu, key: string): Promise<string> {
+export async function hoiGeminiBangKeyRieng(y: YeuCauGiaSu, key: string, hanChoMs?: number): Promise<string> {
   const ai = new GoogleGenAI({ apiKey: key });
   const r = await ai.models.generateContent({
     model: y.model,
@@ -21,6 +21,8 @@ export async function hoiGeminiBangKeyRieng(y: YeuCauGiaSu, key: string): Promis
       systemInstruction: y.systemInstruction,
       temperature: y.temperature,
       topP: y.topP,
+      /* Cùng hạn với đường chính: chuỗi dự phòng chia một hạn chung 90 giây. */
+      ...(hanChoMs ? { abortSignal: AbortSignal.timeout(hanChoMs) } : {}),
     },
   });
   return r.text ?? '';

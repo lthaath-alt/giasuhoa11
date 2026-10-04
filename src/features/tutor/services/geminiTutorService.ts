@@ -1,28 +1,29 @@
 import { ChatMessage } from '../../auth/types';
 import { ErrorLogService } from '../../../core/services/errorLog';
 import { GEMINI_MODEL_NAME } from '../../../core/constants';
-import { buildLessonContext, buildLessonCatalog, buildProgramContext } from './lessonContext';
-import { dungPrompt, THAM_SO_SINH } from './promptSuPham';
+import { THAM_SO_SINH } from './promptSuPham';
+import { dungHuongDanHeThong } from './dungCauLenh';
 import { nhanhCuaHocSinh } from '../../research/thucNghiem';
 import { RECAPTCHA_ENTERPRISE_SITE_KEY } from '../../../core/services/firebaseCongKhai';
 import { loiThanhChuoi } from './loiGemini';
 import { xuLyTruocLuot } from './pedagogicalStateMachine';
 import { docKey, coKeyRieng } from './keyRieng';
 import { locTraLoi, timDapAnChoTin, type CauCoDapSo } from './chanRoDapSo';
+import { GEMINI_XOAY, type Duong, type NhaCungCap } from './danhSachMoHinh';
+import { taoKhoHet } from './hetLuotMoHinh';
+import { goiTheoChuoi, HAN_CHO_MS, type BuocGoi, type MoiTruongChuoi } from './chuoiDuPhong';
 
-/* ── Hai đường gọi AI, và thứ tự giữa chúng ──────────────────────────────────
-   Đường CHÍNH: Firebase AI Logic (`giaSuFirebaseAI.ts`) — không mang khoá nào
-   trong gói JS, chặn lạm dụng bằng App Check.
-   Đường DỰ PHÒNG: khoá riêng của học sinh (`giaSuKeyRieng.ts`), CHỈ dùng khi
-   đường chính báo hết hạn mức theo NGÀY. Hết theo PHÚT thì chờ vài chục giây
-   là xong, không tiêu lượt của em.
-
-   Đường dự phòng này từng bị bỏ ngày 14/09/2026 vì key nằm trần trong
-   localStorage (`gemini_api_key_user`) và vì điều khoản Gemini API đòi người
-   tạo khoá từ 18 tuổi. Chủ dự án cho quay lại ngày 20/09/2026, với ba ràng
-   buộc: chỉ mời khi thật sự bị chặn, hướng dẫn nói rõ phải nhờ bố mẹ hoặc thầy
-   cô tạo giúp, và khoá không bao giờ rời khỏi máy em. Khoá cũ còn sót vẫn bị
-   xoá trong `donDepLuuTruCu()`; khoá mới dùng tên khác (`keyRieng.ts`). */
+/* ── Các đường gọi AI, và thứ tự giữa chúng (01/10/2026) ─────────────────────
+   1. Model chính `GEMINI_MODEL_NAME` qua Firebase AI Logic — ngày thường chỉ
+      đi đường này, y như trước.
+   2. Hết lượt: các model trong `GEMINI_XOAY`, cùng đường Firebase. Hạn mức
+      tính theo TỪNG model nên mỗi cái còn lượt riêng.
+   3. Mọi model chung hết lượt NGÀY mà em đã dán khoá riêng: đi bằng khoá của
+      em (`giaSuKeyRieng.ts`). Khoá cũ còn sót vẫn bị xoá trong
+      `donDepLuuTruCu()`; khoá mới dùng tên khác (`keyRieng.ts`).
+   4. Hết sạch: câu "hết lượt trong ngày" như cũ.
+   Học sinh không thấy việc chuyển. `chats` thấy: `model_name`, `nha_cung_cap`,
+   `duong`. Thứ tự và lý do: `chuoiDuPhong.ts`, `danhSachMoHinh.ts`. */
 
 /* Gia sư có gọi được AI thật không. Bản build luôn có khoá reCAPTCHA của App
    Check; thiếu (máy dev chưa cấu hình) thì rơi về kịch bản mẫu. */
@@ -136,9 +137,13 @@ export const thongBaoLoiKetNoi = (chuoiLoi: string): string => {
 export interface KetQuaGiaSu {
   text: string;
   nhanh: 'socratic' | 'truc-tiep';
-  /** Thời gian gọi mô hình thật (ms); không có khi không gọi mô hình */
+  /** Thời gian học sinh chờ (ms), gồm cả lúc gõ cửa model đã hết lượt; không có khi không gọi mô hình */
   latencyMs?: number;
   modelName?: string;
+  /** Ai đã trả lời — học sinh không thấy, dữ liệu nghiên cứu thấy (01/10/2026) */
+  nhaCungCap?: NhaCungCap;
+  /** Đường đã đi: 'chinh' | 'xoay-gemini' | 'khoa-rieng' */
+  duong?: Duong;
   /** Nấc giàn giáo đã áp (0 = không bế tắc; 3 = từ lần 3 trở lên) */
   mucGoiY: 0 | 1 | 2 | 3;
   beTac: boolean;
@@ -184,6 +189,28 @@ async function layCauCoDapSo(lessonId: string): Promise<CauCoDapSo[]> {
   }
 }
 
+/* Model đang nghỉ vì hết lượt PHÚT — sống theo phiên trang, không cần lưu. */
+const NGHI_PHUT = new Map<string, number>();
+
+/** `typeof localStorage` không bắt hết: ở một số trình duyệt chặn lưu trữ
+    (chế độ riêng tư nghiêm ngặt, …), chính việc ĐỌC thuộc tính `localStorage`
+    đã ném `SecurityError`, xảy ra trước khi `typeof` kịp gán giá trị — phải
+    bọc try/catch mới an toàn thật (soát cuối nhánh A). */
+const localStorageAnToan = (): Pick<Storage, 'getItem' | 'setItem'> | null => {
+  try {
+    return typeof localStorage === 'undefined' ? null : localStorage;
+  } catch {
+    return null;
+  }
+};
+
+const moiTruongChuoi = (): MoiTruongChuoi => ({
+  kho: taoKhoHet(localStorageAnToan()),
+  bayGio: () => Date.now(),
+  nghiPhut: NGHI_PHUT,
+  tongHanMs: HAN_CHO_MS,
+});
+
 /**
  * Gọi gia sư cho một lượt: chạy máy trạng thái sư phạm trước, rồi mới gọi mô hình.
  */
@@ -208,52 +235,39 @@ export const generateAIResponseChiTiet = async (
   }
 
   try {
-    const formattedHistory = buildGeminiHistory(history, userQuestion);
-    const latestMessage = formattedHistory.pop()?.parts[0].text || '';
-
-    /* Nội dung bài đang mở; không mở bài nào (khung iChat chung) thì rỗng. */
-    const nguCanhBai = buildLessonContext(lessonId);
-    /* Danh mục mã bài LUÔN đính kèm, để nhãn ra đề mang đúng mã bài. */
-    const danhMucBai = buildLessonCatalog();
-    /* Không mở bài nào thì đưa dàn bài cả chương trình vào chỗ trống. */
-    const danBaiChung = nguCanhBai ? '' : buildProgramContext();
-
-    const dungYeuCau = (chiThiChan?: string) => ({
-      model: GEMINI_MODEL_NAME,
-      contents: formattedHistory.concat({ role: 'user' as const, parts: [{ text: latestMessage }] }),
-      systemInstruction: [
-        dungPrompt(nhanh),
-        '='.repeat(60),
-        danhMucBai,
-        ...(nguCanhBai ? ['='.repeat(60), nguCanhBai] : []),
-        ...(danBaiChung ? ['='.repeat(60), danBaiChung] : []),
-        /* Chỉ dẫn của máy trạng thái đặt CUỐI CÙNG: gần lượt hỏi nhất, và câu
-           lệnh đã dặn mục "TRẠNG THÁI" được ưu tiên hơn quy tắc bước. */
-        ...(truoc.chiDanThem ? ['='.repeat(60), truoc.chiDanThem] : []),
-        /* Chỉ thị của bộ chặn rò đứng sau cùng, chỉ có ở lượt sinh lại. */
-        ...(chiThiChan ? ['='.repeat(60), chiThiChan] : []),
-      ].join('\n\n'),
+    const noiDung = buildGeminiHistory(history, userQuestion);
+    const yeuCau = (moHinh: string, chiThiChan?: string) => ({
+      model: moHinh,
+      contents: noiDung,
+      systemInstruction: dungHuongDanHeThong({
+        nhanh, lessonId, chiDanThem: truoc.chiDanThem, chiThiChan,
+      }),
       temperature: THAM_SO_SINH.temperature,
       topP: THAM_SO_SINH.topP,
     });
 
-    const goiMoHinh = async (chiThiChan?: string): Promise<string> => {
-      try {
-        return await (await import('./giaSuFirebaseAI')).hoiGeminiQuaFirebase(dungYeuCau(chiThiChan));
-      } catch (loiChung) {
-        /* Hạn mức chung hết theo NGÀY mà em đã tự lấy khoá riêng thì đi tiếp
-           bằng khoá của em. Hết theo PHÚT thì KHÔNG đụng tới khoá riêng: chờ
-           vài chục giây là hỏi được, tiêu lượt của em làm gì. */
-        const s = loiThanhChuoi(loiChung).toLowerCase();
-        const key = s.includes('perday') ? docKey() : null;
-        if (!key) throw loiChung;
-        return await (await import('./giaSuKeyRieng')).hoiGeminiBangKeyRieng(dungYeuCau(chiThiChan), key);
-      }
-    };
+    const quaFirebase = (moHinh: string, duong: Duong): BuocGoi => ({
+      duong, nhaCungCap: 'gemini-firebase', maMoHinh: moHinh, vung: 'firebase',
+      goi: async (chiThi, han) =>
+        (await import('./giaSuFirebaseAI')).hoiGeminiQuaFirebase(yeuCau(moHinh, chiThi), han),
+    });
+    const khoaCuaEm = docKey();
+    const cacBuoc: BuocGoi[] = [
+      quaFirebase(GEMINI_MODEL_NAME, 'chinh'),
+      ...GEMINI_XOAY.map(m => quaFirebase(m, 'xoay-gemini')),
+      ...(khoaCuaEm ? [GEMINI_MODEL_NAME, ...GEMINI_XOAY].map((m): BuocGoi => ({
+        duong: 'khoa-rieng', nhaCungCap: 'gemini-khoa-rieng', maMoHinh: m, vung: 'khoa',
+        chiKhiChungHetNgay: true,
+        goi: async (chiThi, han) =>
+          (await import('./giaSuKeyRieng')).hoiGeminiBangKeyRieng(yeuCau(m, chiThi), khoaCuaEm, han),
+      })) : []),
+    ];
 
     const batDau = performance.now();
-    let traLoi = await goiMoHinh();
+    const ket = await goiTheoChuoi(cacBuoc, moiTruongChuoi());
+    let traLoi = ket.text;
     const latencyMs = Math.round(performance.now() - batDau);
+    const nguon = { modelName: ket.maMoHinh, nhaCungCap: ket.nhaCungCap, duong: ket.duong };
 
     /* ── P0-2: chặn rò đáp số (22/09/2026) ─────────────────────────────────
        Đặt Ở ĐÂY chứ không ở component: cả ba đường gọi (Firebase AI Logic,
@@ -278,7 +292,18 @@ export const generateAIResponseChiTiet = async (
       const loc = await locTraLoi({
         traLoi: tachNhanAn(traLoi).noiDung,
         dapAn,
-        sinhLai: async (chiThi) => tachNhanAn(await goiMoHinh(chiThi)).noiDung,
+        /* Lượt sinh lại gọi THÊM một lượt model — hỏng giữa chừng (vd hết lượt
+           đúng lúc này) thì KHÔNG được để lỗi hạn mức đó văng lên nuốt mất cả
+           lượt: trả '' để `locTraLoi` coi là không rò (coDapSo('') luôn false)
+           và nhánh `if (traLoi)` ở dưới tự rơi về câu "sự cố kỹ thuật" — còn
+           hơn để nguyên đáp số (bản chưa lọc) lọt ra khi ném lỗi lên trên. */
+        sinhLai: async (chiThi) => {
+          try {
+            return tachNhanAn(await ket.goiLai(chiThi)).noiDung;
+          } catch {
+            return '';
+          }
+        },
       });
       if (loc.daChan) {
         daChanRo = true;
@@ -290,9 +315,9 @@ export const generateAIResponseChiTiet = async (
       }
     }
 
-    if (traLoi) return { ...coBan, text: traLoi, latencyMs, modelName: GEMINI_MODEL_NAME, daChanRo };
+    if (traLoi) return { ...coBan, text: traLoi, latencyMs, ...nguon, daChanRo };
     return {
-      ...coBan, latencyMs, modelName: GEMINI_MODEL_NAME,
+      ...coBan, latencyMs, ...nguon,
       text: 'Xin lỗi em, thầy/cô đang gặp chút sự cố kỹ thuật. Em có thể nhắc lại câu hỏi được không?',
     };
   } catch (error: unknown) {

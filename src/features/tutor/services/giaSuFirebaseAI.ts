@@ -2,6 +2,7 @@ import { initializeAppCheck, ReCaptchaEnterpriseProvider } from 'firebase/app-ch
 import { getAI, getGenerativeModel, GoogleAIBackend, ThinkingLevel } from 'firebase/ai';
 import { app } from '../../../core/services/firebase';
 import { RECAPTCHA_ENTERPRISE_SITE_KEY } from '../../../core/services/firebaseCongKhai';
+import { HAN_CHO_MS } from './chuoiDuPhong';
 
 /* Gọi Gemini qua Firebase AI Logic — đường MẶC ĐỊNH của bản build.
 
@@ -53,10 +54,10 @@ function batAppCheck(): void {
    mấy, nên chậm là ở phía mô hình chứ không phải do câu lệnh dài). Đặt 45
    giây thì cắt mất những lượt lẽ ra sắp có câu trả lời; đặt 180 giây như mặc
    định thì học sinh ngồi nhìn "đang viết" tới ba phút. Khung chat có thêm
-   dòng nhắc sau 15 giây để em biết là thầy vẫn đang nghĩ, không phải treo. */
-const HAN_CHO_MS = 90_000;
+   dòng nhắc sau 15 giây để em biết là thầy vẫn đang nghĩ, không phải treo.
+   Hằng số nằm ở chuoiDuPhong.ts từ 01/10/2026: cả chuỗi dùng chung một hạn. */
 
-export async function hoiGeminiQuaFirebase(y: YeuCauGiaSu): Promise<string> {
+export async function hoiGeminiQuaFirebase(y: YeuCauGiaSu, hanChoMs: number = HAN_CHO_MS): Promise<string> {
   batAppCheck();
   const ai = getAI(app, { backend: new GoogleAIBackend() });
   const model = getGenerativeModel(ai, {
@@ -71,7 +72,7 @@ export async function hoiGeminiQuaFirebase(y: YeuCauGiaSu): Promise<string> {
          `npm run kiem-tra:su-pham` vẫn canh chất lượng câu hỏi. */
       thinkingConfig: { thinkingLevel: ThinkingLevel.LOW },
     },
-  }, { timeout: HAN_CHO_MS });
+  }, { timeout: hanChoMs });
   const { response } = await model.generateContent({ contents: y.contents });
   // text() đã bỏ các phần "suy nghĩ" (thought) — giống response.text của @google/genai.
   return response.text();

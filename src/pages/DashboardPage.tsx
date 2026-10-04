@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { LINK_ZALO } from '../core/constants';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -64,6 +64,9 @@ import { TRAN_LUOT_KHACH } from '../features/tutor/services/gioiHanChatService';
 import { coKeyRieng } from '../features/tutor/services/keyRieng';
 import { KeyRiengDialog } from '../features/tutor/components/KeyRiengDialog';
 import { useGiayDaCho, chuDangCho } from '../features/tutor/components/useGiayDaCho';
+import { useCuonDay } from '../features/tutor/components/useCuonDay';
+import { DanhSachTinTheoPhien, NutTinMoiNhat } from '../features/tutor/components/DanhSachTinTheoPhien';
+import type { ChatMessage } from '../features/auth/types';
 
 export const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
@@ -184,20 +187,14 @@ export const DashboardPage: React.FC = () => {
   // Lấy lịch sử iChat toàn cục (chúng ta dùng lessonId là 'global-advisor' cho cuộc chat tư vấn chung)
   const userEmail = currentUser ? currentUser.email : 'guest';
   const globalChats = chats.filter(c => c.userEmail === userEmail && c.lessonId === 'global-advisor');
+  /* Bản cũ không cuộn gì cả: mở tab là đứng ở tin CŨ NHẤT, câu trả lời mới
+     cũng không tự hiện ra. Khoá theo tab để mỗi lần mở lại đều xuống đáy. */
+  const ichatCuon = useCuonDay(globalChats.length, isIchatSending, activeTab);
 
   /* Lượt vừa rồi có bị chặn vì CẢ WEB hết hạn mức trong ngày không — bám vào
      đúng cụm chữ mà `thongBaoHetLuot` sinh ra cho trường hợp đó. */
   const ichatVuaHetHanMuc = /hết lượt trả lời trong ngày của toàn hệ thống/
     .test(globalChats[globalChats.length - 1]?.content || '');
-
-  /* iChat tự cuộn tới tin mới — cuộn chính hộp tin, không cuộn trang (cùng lối
-     với TutorChat). Trước đó hộp đứng yên ở đầu: câu trả lời và link đề nằm dưới
-     mép hộp, em phải tự kéo xuống mới thấy. */
-  const hopIchatRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const hop = hopIchatRef.current;
-    if (hop) hop.scrollTo({ top: hop.scrollHeight, behavior: 'smooth' });
-  }, [globalChats.length, isIchatSending, activeTab]);
 
   const handleSendGlobalIchat = async (textToSend?: string) => {
     const text = (textToSend || ichatInput).trim();
@@ -734,6 +731,10 @@ export const DashboardPage: React.FC = () => {
                 {/* PANEL PHẢI (70%): KHUNG CHAT RIÊNG BIỆT */}
                 <Paper
                   sx={{
+                    /* Màn hẹp: khung chat lên TRƯỚC thẻ giới thiệu và gợi ý.
+                       Đo 03/10/2026 ở 375×812: khung chat bắt đầu ở y=1135 px,
+                       tức em phải cuộn qua hơn một màn mới tới chỗ hỏi. */
+                    order: { xs: -1, md: 0 },
                     height: 'calc(100vh - 240px)',
                     minHeight: 520,
                     display: 'flex',
@@ -779,7 +780,11 @@ export const DashboardPage: React.FC = () => {
                   )}
 
                   {/* Vùng Tin Nhắn */}
-                  <Box ref={hopIchatRef} sx={{ flex: 1, p: 3, overflowY: 'auto', bgcolor: 'var(--nen-the)', display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  <Box
+                    ref={ichatCuon.khungRef}
+                    onScroll={ichatCuon.khiCuon}
+                    sx={{ flex: 1, p: 3, overflowY: 'auto', bgcolor: 'var(--nen-the)', display: 'flex', flexDirection: 'column', gap: 2 }}
+                  >
                     {globalChats.length === 0 ? (
                       <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', textAlign: 'center', gap: 2, p: 4 }}>
                         <Avatar sx={{ width: 64, height: 64, bgcolor: 'var(--nen-xanh-nhat2)', color: 'var(--xanh)' }}>
@@ -791,45 +796,50 @@ export const DashboardPage: React.FC = () => {
                         </Typography>
                       </Box>
                     ) : (
-                      globalChats.map((msg) => {
-                        const isAi = msg.sender === 'ai';
-                        return (
-                          <Box
-                            key={msg.id}
-                            sx={{
-                              display: 'flex',
-                              gap: 1.5,
-                              alignSelf: isAi ? 'flex-start' : 'flex-end',
-                              maxWidth: '85%',
-                            }}
-                          >
-                            {isAi && (
-                              <Avatar sx={{ bgcolor: 'var(--nen-xanh-nhat2)', color: 'var(--xanh)', width: 32, height: 32 }}>
-                                <Sparkles size={16} />
-                              </Avatar>
-                            )}
-                            <Box>
-                              <Paper
-                                sx={{
-                                  p: 2,
-                                  borderRadius: 0,
-                                  backgroundColor: isAi ? 'var(--nen-nhat)' : 'var(--xanh-nen)',
-                                  color: isAi ? 'text.primary' : 'var(--chu-nguoc)',
-                                  boxShadow: 'none',
-                                  border: isAi ? '1px solid var(--vien)' : 'none',
-                                }}
-                              >
-                                <Typography component="div" variant="body2" sx={{ lineHeight: 1.6, fontSize: '0.9rem' }}>
-                                  <MathMarkdownRenderer text={msg.content} linkColor={isAi ? 'var(--xanh)' : 'var(--chu-nguoc)'} />
+                      <DanhSachTinTheoPhien
+                        tin={globalChats}
+                        khungRef={ichatCuon.khungRef}
+                        khoa="global-advisor"
+                        veTin={(msg: ChatMessage) => {
+                          const isAi = msg.sender === 'ai';
+                          return (
+                            <Box
+                              key={msg.id}
+                              sx={{
+                                display: 'flex',
+                                gap: 1.5,
+                                alignSelf: isAi ? 'flex-start' : 'flex-end',
+                                maxWidth: '85%',
+                              }}
+                            >
+                              {isAi && (
+                                <Avatar sx={{ bgcolor: 'var(--nen-xanh-nhat2)', color: 'var(--xanh)', width: 32, height: 32 }}>
+                                  <Sparkles size={16} />
+                                </Avatar>
+                              )}
+                              <Box>
+                                <Paper
+                                  sx={{
+                                    p: 2,
+                                    borderRadius: 0,
+                                    backgroundColor: isAi ? 'var(--nen-nhat)' : 'var(--xanh-nen)',
+                                    color: isAi ? 'text.primary' : 'var(--chu-nguoc)',
+                                    boxShadow: 'none',
+                                    border: isAi ? '1px solid var(--vien)' : 'none',
+                                  }}
+                                >
+                                  <Typography component="div" variant="body2" sx={{ lineHeight: 1.6, fontSize: '0.9rem' }}>
+                                    <MathMarkdownRenderer text={msg.content} linkColor={isAi ? 'var(--xanh)' : 'var(--chu-nguoc)'} />
+                                  </Typography>
+                                </Paper>
+                                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5, textAlign: isAi ? 'left' : 'right' }}>
+                                  {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                 </Typography>
-                              </Paper>
-                              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5, textAlign: isAi ? 'left' : 'right' }}>
-                                {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                              </Typography>
+                              </Box>
                             </Box>
-                          </Box>
-                        );
-                      })
+                          );
+                        }}
+                      />
                     )}
 
                     {isIchatSending && (
@@ -843,6 +853,8 @@ export const DashboardPage: React.FC = () => {
                         </Paper>
                       </Box>
                     )}
+
+                    {ichatCuon.xaDay && <NutTinMoiNhat onClick={() => ichatCuon.cuonXuong()} />}
                   </Box>
 
                   {ichatError && (

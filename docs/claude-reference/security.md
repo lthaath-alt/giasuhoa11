@@ -114,7 +114,7 @@ và không được tự deploy. Nên khi sửa luật: đưa NGUYÊN TỆP cho 
 trích đoạn trong chat), kèm bảng phép thử Playground. Sau khi chủ dự án báo đã
 publish, đo lại bằng REST không đăng nhập — đó là tư cách mà đồng bộ đêm dùng.
 
-Từ 13/09/2026 có `npm run kiem-tra:luat` — 19 phép chạy trên emulator, đọc
+Từ 13/09/2026 có `npm run kiem-tra:luat` — nay 83 phép (nhóm 1–23; 03/10/2026 thêm nhóm 23 cho `quan_tri`, `classes`, kho nội dung, cấu hình, `progress`, `chats`) chạy trên emulator, đọc
 thẳng `firestore.rules`. Nó bắt được thứ Playground không bắt được: `list`, và
 lỗi gõ nhầm tên trường. Nhưng nó CHỈ chứng minh tệp trong git đúng; luật đang
 chạy trên Firebase thì vẫn phải đo bằng REST sau khi publish. Hai việc khác
@@ -125,14 +125,16 @@ nó đã publish chưa (CHỈ ĐỌC, cần `.env.local`). Tệp `firestore.rule
 chỉ là bản thảo, nên `kiem-tra:luat` xanh **không** có nghĩa là luật đang chạy đã
 đúng — hai việc khác nhau. Xem `do-luat-dang-chay.mts`.
 
-Máy chủ dự án KHÔNG chạy được bộ kiểm đó, và đã đo kỹ ngày 16/09/2026 — đừng
-đi dò lại. Máy có đúng hai bản Java, cả hai đều là 8: Zulu 8 JRE 32-bit (chỗ
-`JAVA_HOME` đang trỏ tới) và AdoptOpenJDK 8 64-bit. `winget install` bản JDK
-mới không chạy được. Antigravity chạy ngay trên chính máy Windows này, không
-container không WSL, nên bên đó cũng in BỎ QUA y hệt. Cổng 8080 trống, không
-cần `firebase login` — hai thứ đó không phải vấn đề. Vấn đề chỉ là Java.
-Đường chưa thử, nếu sau này thấy phiền: tải JDK dạng `.zip` giải nén vào thư
-mục người dùng (không cần quyền quản trị) rồi đặt `JAVA_HOME` cho riêng phiên.
+Máy mới của chủ dự án (từ 03/10/2026) CHẠY ĐƯỢC bộ kiểm đó tại chỗ: có Temurin
+21 ở `C:\Program Files\Eclipse Adoptium\jdk-21.0.12.101-hotspot\bin`. Đo
+03/10/2026: `npm run kiem-tra:luat` ra 83/83 OK, mã thoát 0. firebase-tools 15
+đòi Java 21+ (không phải 11+ như kế hoạch ban đầu); shell mở từ trước khi cài
+Java thì nối thư mục `bin` trên vào đầu PATH của riêng shell đó. Không cần
+`firebase login`, emulator chạy với projectId `demo-giasuhoa11`.
+
+Máy cũ (đo 16/09/2026) KHÔNG chạy được: chỉ có hai bản Java 8 (Zulu 8 JRE
+32-bit và AdoptOpenJDK 8 64-bit), `winget install` JDK mới không chạy được, nên
+ở đó bộ luật in BỎ QUA. Máy nào thiếu Java 21 cũng vậy; CI vẫn là chốt chặn.
 
 Một cái bẫy của Playground, đã mất nửa buổi vì nó: ô "Build document" ghi thừa
 một dấu cách vào tên trường (`role␣`) là tạo ra một trường KHÁC, và luật đọc
@@ -245,6 +247,10 @@ Hai điều phải giữ:
 - **Chỉ AI Logic bật App Check.** Đừng bấm Enforce cho Firestore/Auth/Storage
   trong Firebase Console khi app chưa khởi tạo App Check ở mọi màn — học sinh sẽ
   không đăng nhập được. (Từ 02/11/2026 Firebase bắt buộc App Check cho AI Logic.)
+- **Xoay vòng model (01/10/2026).** Mọi model trong chuỗi đi CÙNG đường AI Logic,
+  cùng thẻ App Check — không thêm khoá, không thêm tên miền CSP. `localStorage`
+  khoá `h11_mo_hinh_het` chỉ chứa tên model và ngày, không có gì của học sinh.
+  Khoá riêng của em vẫn chỉ dùng khi mọi model chung đã hết lượt NGÀY.
 - **CSP phải cho phép reCAPTCHA** (`https://www.google.com/recaptcha/`,
   `https://www.gstatic.com/recaptcha/`, `https://recaptcha.google.com/recaptcha/`) — thiếu thì
   gia sư chết trên web thật mà máy dev vẫn chạy.

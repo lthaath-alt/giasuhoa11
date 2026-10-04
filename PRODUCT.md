@@ -93,7 +93,8 @@ giữ nó, nên nhận diện màu được phép thay khi dựng thế giới t
 - 25 bài giảng thật, sinh từ tệp `.docx` của chính giáo viên → `src/features/lessons/constants.ts`.
 - 1.554 câu hỏi thật, do giáo viên soạn và duyệt → `public/bank/ngan-hang.json`.
 - Bốn trò chơi chạy được → `public/games/`.
-- Báo cáo nghiên cứu khoa học → `docs/bao-cao-nckh-gia-su-hoa-11.md` (bản Word: `docs/Bao-cao-NCKH-Gia-su-Hoa-11.docx`).
+- Báo cáo nghiên cứu khoa học: có (bản Markdown, bản Word và hình), nhưng KHÔNG nằm trong repo từ
+  04/10/2026 (repo đã công khai). Chủ dự án giữ ngoài repo; hỏi chủ dự án khi cần.
 
 **Chưa có, và không được bịa ra:** con số học sinh đang dùng, lời chứng thực của người
 dùng, kết quả thực nghiệm (đợt thực nghiệm chưa chạy), giải thưởng, đối tác, bảng giá.
