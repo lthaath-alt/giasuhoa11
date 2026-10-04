@@ -19,7 +19,7 @@ import { chuanHoaYDinh, tachTuYDinh, duDoanYDinh, laMoHinhHopLe, type MoHinhYDin
 import { doanYDinhNen, datLaiYDinhNenChoKiemTra } from '../src/features/tutor/services/yDinhNen';
 import {
   cheThongTin, cumTenCanChe, chonCauHoi, xao, docCsv, docDanhSachDongY, cotTinNhan, csvChuaGan, danhSachTen,
-  csvChoNguoiGan, ghiDot, cauDaCo, NGUON_HS, NGUON_GV,
+  csvChoNguoiGan, ghiDot, cauDaCo, NGUON_HS, NGUON_GV, COT_NGU_CANH, NGU_CANH_TOI_DA, tinGiaSuNgayTruoc,
   CHE_EMAIL, CHE_SDT, CHE_TEN,
 } from './phan-loai/loc-cau-that.mts';
 
@@ -255,6 +255,55 @@ console.log('\n== Xuất câu hỏi thật: che thông tin, lọc lớp, bỏ tr
     ok(readFileSync(join(that, 'ten-hoc-sinh.txt'), 'utf8') === 'Trần Bảo Ân\r\n', 'ghi danh sách tên (chỉ tên) vào that/');
     ok(cauDaCo(tam).sort().join() === ['cau a', 'cau a', 'cau a', 'cau b', 'cau b', 'cau b', 'cau c', 'cau c', 'cau c', 'cau cu'].join(),
       'câu đã có đọc cả du-lieu/ lẫn mọi đợt trong that/ (đợt sau không xuất lại)');
+    rmSync(tam, { recursive: true, force: true });
+  }
+  {
+    /* Ngữ cảnh cho người gán (cột chemai_vua_noi). Dữ liệu GIẢ. */
+    const dai = 'x'.repeat(NGU_CANH_TOI_DA) + ' Vậy số mol HCl là bao nhiêu?';
+    const chat = [
+      { sender: 'ai', userEmail: 'a@hs.vn', lessonId: 'b1', content: 'Trần Bảo Ân ơi, có bao nhiêu mol HCl?', timestamp: '2026-10-02T08:00:05Z' },
+      { sender: 'user', userEmail: 'a@hs.vn', lessonId: 'b1', content: 'dạ 0,1 mol ạ', timestamp: '2026-10-02T08:00:09Z' },
+      { sender: 'user', userEmail: 'a@hs.vn', lessonId: 'b1', content: 'mà sao lại thế ạ', timestamp: '2026-10-02T08:00:12Z' },
+      { sender: 'user', userEmail: 'a@hs.vn', lessonId: 'b1', content: 'kc la gi vay', timestamp: '2026-10-02T07:00:00Z' },
+      { sender: 'ai', userEmail: 'a@hs.vn', lessonId: 'b2', content: 'Tin ở BÀI KHÁC', timestamp: '2026-10-02T08:00:08Z' },
+      { sender: 'ai', userEmail: 'b@hs.vn', lessonId: 'b1', content: 'Tin gia sư nói với EM KHÁC', timestamp: '2026-10-02T08:00:08Z' },
+      { sender: 'ai', userEmail: 'b@hs.vn', lessonId: 'b1', session_id: 's1', content: 'Phiên cũ', timestamp: '2026-10-03T08:00:00Z' },
+      { sender: 'user', userEmail: 'b@hs.vn', lessonId: 'b1', session_id: 's2', content: 'bài mới nè thầy', timestamp: '2026-10-03T09:00:00Z' },
+      { sender: 'ai', userEmail: 'b@hs.vn', lessonId: 'b1', session_id: 's2', content: dai, timestamp: '2026-10-03T09:00:05Z' },
+      { sender: 'user', userEmail: 'b@hs.vn', lessonId: 'b1', session_id: 's2', content: 'em ra 0,2', timestamp: '2026-10-03T09:00:09Z' },
+    ];
+    const truoc = tinGiaSuNgayTruoc(chat);
+    ok(truoc.get(chat[1]) === chat[0].content, 'tin gia sư ngay trước tin của em: cùng em, cùng bài (không lấy tin bài khác hay em khác dù giờ sát hơn)');
+    ok(!truoc.has(chat[2]) && !truoc.has(chat[3]), 'tin trước là tin của chính em, hoặc em mở đầu cuộc chat → không có ngữ cảnh');
+    ok(!truoc.has(chat[7]), 'tin gia sư thuộc phiên (session_id) khác → không lấy làm ngữ cảnh');
+    const kq2 = chonCauHoi(chat, { emailDuocLay: ['a@hs.vn', 'b@hs.vn'], hoTenCanChe: ['Trần Bảo Ân'], daCo: [], hat: 42 });
+    const theoCau = new Map(kq2.cau.map((c, i) => [c, kq2.nguCanh[i]]));
+    ok(kq2.nguCanh.length === kq2.cau.length && kq2.cau.length === 5, 'nguCanh cùng độ dài với cau', JSON.stringify(kq2.dem));
+    ok(theoCau.get('dạ 0,1 mol ạ') === `${CHE_TEN} ơi, có bao nhiêu mol HCl?`,
+      'ngữ cảnh đi đúng câu sau khi xáo; tên trong tin gia sư cũng bị che', theoCau.get('dạ 0,1 mol ạ'));
+    ok(theoCau.get('mà sao lại thế ạ') === '' && theoCau.get('bài mới nè thầy') === '', 'câu không có ngữ cảnh thì ô trống');
+    const cat = theoCau.get('em ra 0,2') ?? '';
+    ok(cat.length === NGU_CANH_TOI_DA + 1 && cat.startsWith('…') && cat.endsWith('là bao nhiêu?'),
+      `tin gia sư dài: giữ ${NGU_CANH_TOI_DA} ký tự CUỐI (chỗ gia sư hỏi), đánh dấu … ở đầu`);
+    ok(JSON.stringify(kq2.cau) === JSON.stringify(xao(chat.filter(m => m.sender === 'user').map(m => m.content), 42)),
+      'thêm ngữ cảnh không đổi thứ tự xáo của câu');
+    ok(!JSON.stringify(kq2).includes('@'), 'kết quả kèm ngữ cảnh vẫn không chứa email nào');
+
+    ok(csvChoNguoiGan(['dạ 0,1 mol ạ'], ['Có bao nhiêu mol HCl?'])
+      === `﻿${COT_NGU_CANH},tin_nhan,nhan,nguoi_gan\r\nCó bao nhiêu mol HCl?,"dạ 0,1 mol ạ",,\r\n`,
+      'a.csv/b.csv có ngữ cảnh: cột chemai_vua_noi đứng trước tin_nhan, vẫn không có cột nguon');
+    ok(csvChuaGan(['a', 'b'], [NGUON_HS, NGUON_GV], ['hỏi "x", y', ''])
+      === `﻿${COT_NGU_CANH},tin_nhan,nhan,nguoi_gan,nguon\r\n"hỏi ""x"", y",a,,,that\r\n,b,,,that-gv\r\n`,
+      'chua-gan.csv có ngữ cảnh: bọc ngoặc kép đúng, ô trống khi không có');
+    const tam = mkdtempSync(join(tmpdir(), 'dot-'));
+    const that = join(tam, 'that');
+    mkdirSync(that);
+    const d = ghiDot(that, '2026-10-04', ['dạ 0,1 mol ạ', 'kc la gi'], ['Nguồn: giả'], [], NGUON_HS, ['Gia sư hỏi mol HCl', '']);
+    ok(['a.csv', 'b.csv', 'chua-gan.csv'].every(t => docCsv(readFileSync(join(d, t), 'utf8'))[0][0] === COT_NGU_CANH),
+      'đợt có ngữ cảnh: a.csv, b.csv, chua-gan.csv đều có cột chemai_vua_noi');
+    ok(cotTinNhan(readFileSync(join(d, 'a.csv'), 'utf8')).join('|') === 'dạ 0,1 mol ạ|kc la gi',
+      'cột tin_nhan vẫn đọc đúng theo tên khi có cột ngữ cảnh đứng trước');
+    ok(cauDaCo(tam).every(c => c !== 'Gia sư hỏi mol HCl'), 'tin gia sư trong cột ngữ cảnh KHÔNG bị tính là câu đã xuất');
     rmSync(tam, { recursive: true, force: true });
   }
   const csv = csvChuaGan(['a, "b"', 'em chịu']);

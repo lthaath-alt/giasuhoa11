@@ -12,6 +12,10 @@
  *   4. xáo thứ tự bằng hạt giống cố định, để thứ tự dòng không lộ ai hỏi lúc nào.
  * Ra CHỈ có nội dung đã che. Email chỉ dùng để lọc, không đi vào kết quả.
  *
+ * Ngữ cảnh cho người gán (04/10/2026, nhãn tra_loi_gia_su): mỗi câu kèm `chemai_vua_noi`, tin
+ * của gia sư ngay trước tin của em trong cùng cuộc chat (xem tinGiaSuNgayTruoc), che y như tin
+ * của em. Cột này CHỈ để người gán đọc: mô hình và mọi tệp lên git chỉ lấy cột tin_nhan.
+ *
  * Giới hạn của bước che tên: chỉ che họ tên ĐẦY ĐỦ và cụm "tên đệm + tên" của các
  * em có hồ sơ học sinh. Tên gọi một chữ ("An", "Anh"), biệt danh, tên bạn ngoài
  * danh sách, tên trường, địa chỉ đều KHÔNG che được bằng máy. Người gán nhãn vẫn
@@ -26,6 +30,8 @@ export interface TinTho {
   userEmail?: string;
   content?: string;
   timestamp?: string;
+  lessonId?: string;
+  session_id?: string;
 }
 
 export interface NguoiDongY {
@@ -157,8 +163,41 @@ export interface TuyChon {
 
 export interface KetQua {
   cau: string[];
+  /** Cùng độ dài, cùng thứ tự với `cau`: tin gia sư ngay trước (đã che), '' nếu không có */
+  nguCanh: string[];
   dem: { tinEm: number; ngoaiLop: number; ngoaiNgay: number; rong: number; trungNhau: number; trungDaCo: number };
 }
+
+/** Giữ tối đa chừng này ký tự CUỐI của tin gia sư: câu gia sư hỏi em thường nằm ở cuối tin. */
+export const NGU_CANH_TOI_DA = 500;
+
+/**
+ * Tin gia sư đứng NGAY TRƯỚC mỗi tin của em trong cùng cuộc chat. Cuộc chat = cùng email và
+ * cùng bài (`lessonId`), xếp theo giờ gửi. Tin đứng trước là tin của chính em, hoặc thuộc phiên
+ * khác (`session_id` hai bên đều có mà khác nhau: em đã sang vấn đề mới), thì không có ngữ cảnh.
+ */
+export function tinGiaSuNgayTruoc(tin: readonly TinTho[]): Map<TinTho, string> {
+  const nhom = new Map<string, TinTho[]>();
+  for (const m of tin) {
+    const khoa = `${(m.userEmail ?? '').trim().toLowerCase()}|${m.lessonId ?? ''}`;
+    if (!nhom.has(khoa)) nhom.set(khoa, []);
+    nhom.get(khoa)!.push(m);
+  }
+  const ra = new Map<TinTho, string>();
+  for (const ds of nhom.values()) {
+    /* sort của JS giữ nguyên thứ tự gốc khi hai tin cùng giờ gửi */
+    const xep = [...ds].sort((a, b) => (a.timestamp ?? '').localeCompare(b.timestamp ?? ''));
+    for (let i = 1; i < xep.length; i++) {
+      const m = xep[i], truoc = xep[i - 1];
+      if (m.sender !== 'user' || truoc.sender !== 'ai') continue;
+      if (m.session_id && truoc.session_id && m.session_id !== truoc.session_id) continue;
+      ra.set(m, (truoc.content ?? '').trim());
+    }
+  }
+  return ra;
+}
+
+const rutNguCanh = (s: string) => s.length > NGU_CANH_TOI_DA ? '…' + s.slice(-NGU_CANH_TOI_DA) : s;
 
 export function chonCauHoi(tin: readonly TinTho[], tc: TuyChon): KetQua {
   const duocLay = new Set(tc.emailDuocLay.map(e => e.trim().toLowerCase()).filter(Boolean));
@@ -166,7 +205,8 @@ export function chonCauHoi(tin: readonly TinTho[], tc: TuyChon): KetQua {
   const daCo = new Set(tc.daCo.map(chuanHoaYDinh));
   const dem = { tinEm: 0, ngoaiLop: 0, ngoaiNgay: 0, rong: 0, trungNhau: 0, trungDaCo: 0 };
   const thay = new Set<string>();
-  const cau: string[] = [];
+  const giaSuTruoc = tinGiaSuNgayTruoc(tin);
+  const cau: [string, string][] = [];   // [tin của em, tin gia sư ngay trước], cả hai đã che
   for (const m of tin) {
     if (m.sender !== 'user') continue;
     dem.tinEm++;
@@ -179,9 +219,11 @@ export function chonCauHoi(tin: readonly TinTho[], tc: TuyChon): KetQua {
     if (daCo.has(khoa)) { dem.trungDaCo++; continue; }
     if (thay.has(khoa)) { dem.trungNhau++; continue; }
     thay.add(khoa);
-    cau.push(da);
+    /* Che TRƯỚC rồi mới cắt, để không cắt ngang một cái tên làm nó thoát bước che. */
+    cau.push([da, rutNguCanh(cheThongTin(giaSuTruoc.get(m) ?? '', cumTen))]);
   }
-  return { cau: xao(cau, tc.hat), dem };
+  const xep = xao(cau, tc.hat);
+  return { cau: xep.map(c => c[0]), nguCanh: xep.map(c => c[1]), dem };
 }
 
 // ── CSV ─────────────────────────────────────────────────────────────────────
@@ -242,16 +284,31 @@ const bocO = (s: string) => /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : 
 export const NGUON_HS = 'that';
 export const NGUON_GV = 'that-gv';
 
+/** Cột ngữ cảnh cho người gán. Đứng TRƯỚC tin_nhan để đọc theo đúng thứ tự cuộc chat; các
+    script Python đọc cột theo TÊN nên vị trí cột không ảnh hưởng. */
+export const COT_NGU_CANH = 'chemai_vua_noi';
+
+/** Phần đầu dòng tiêu đề và đầu từng dòng câu khi có cột ngữ cảnh; không có thì rỗng. */
+const oNguCanh = (nguCanh: readonly string[] | undefined) => ({
+  dau: nguCanh ? `${COT_NGU_CANH},` : '',
+  o: (i: number) => (nguCanh ? `${bocO(nguCanh[i] ?? '')},` : ''),
+});
+
 /** CSV cho người gán: cùng bốn cột với nhan.csv, nhãn để trống. `nguon` là một chuỗi cho
-    mọi dòng, hoặc mảng cùng độ dài với `cau` (câu học sinh "that", câu giáo viên "that-gv"). */
-export function csvChuaGan(cau: readonly string[], nguon: string | readonly string[] = NGUON_HS): string {
+    mọi dòng, hoặc mảng cùng độ dài với `cau` (câu học sinh "that", câu giáo viên "that-gv").
+    Có `nguCanh` (cùng độ dài với `cau`) thì thêm cột chemai_vua_noi ở đầu. */
+export function csvChuaGan(cau: readonly string[], nguon: string | readonly string[] = NGUON_HS,
+  nguCanh?: readonly string[]): string {
   const n = (i: number) => (typeof nguon === 'string' ? nguon : nguon[i] ?? NGUON_HS);
-  return '﻿' + ['tin_nhan,nhan,nguoi_gan,nguon', ...cau.map((c, i) => `${bocO(c)},,,${n(i)}`)].join('\r\n') + '\r\n';
+  const g = oNguCanh(nguCanh);
+  return '﻿' + [`${g.dau}tin_nhan,nhan,nguoi_gan,nguon`, ...cau.map((c, i) => `${g.o(i)}${bocO(c)},,,${n(i)}`)].join('\r\n') + '\r\n';
 }
 
-/** Tệp cho MỘT người gán: tin_nhan, nhan, nguoi_gan. Cố ý KHÔNG có cột nguon (lộ gợi ý). */
-export function csvChoNguoiGan(cau: readonly string[]): string {
-  return '﻿' + ['tin_nhan,nhan,nguoi_gan', ...cau.map(c => `${bocO(c)},,`)].join('\r\n') + '\r\n';
+/** Tệp cho MỘT người gán: tin_nhan, nhan, nguoi_gan. Cố ý KHÔNG có cột nguon (lộ gợi ý).
+    Có `nguCanh` thì thêm cột chemai_vua_noi ở đầu. */
+export function csvChoNguoiGan(cau: readonly string[], nguCanh?: readonly string[]): string {
+  const g = oNguCanh(nguCanh);
+  return '﻿' + [`${g.dau}tin_nhan,nhan,nguoi_gan`, ...cau.map((c, i) => `${g.o(i)}${bocO(c)},,`)].join('\r\n') + '\r\n';
 }
 
 // ── Đợt xuất: một thư mục that/dot-<ngày>/ cho mỗi lần chạy ────────────────
@@ -278,16 +335,18 @@ export function cauDaCo(thuMucDuLieu: string): string[] {
  *   chua-gan.meta.txt
  *   a.csv, b.csv   hai bản cho hai người gán ĐỘC LẬP, không cột nguon
  * và `<thuMucThat>/ten-hoc-sinh.txt` (chỉ tên) để dò từ vựng. Trả đường dẫn thư mục đợt.
+ * Có `nguCanh` thì cả ba tệp CSV thêm cột chemai_vua_noi (chỉ để người gán đọc).
  */
 export function ghiDot(thuMucThat: string, ngay: string, cau: readonly string[],
-  meta: readonly string[], dsTen: readonly string[], nguon: string | readonly string[] = NGUON_HS): string {
+  meta: readonly string[], dsTen: readonly string[], nguon: string | readonly string[] = NGUON_HS,
+  nguCanh?: readonly string[]): string {
   let dot = join(thuMucThat, `dot-${ngay}`);
   for (let i = 2; existsSync(dot); i++) dot = join(thuMucThat, `dot-${ngay}-${i}`);
   mkdirSync(dot, { recursive: true });
-  writeFileSync(join(dot, 'chua-gan.csv'), csvChuaGan(cau, nguon), 'utf8');
+  writeFileSync(join(dot, 'chua-gan.csv'), csvChuaGan(cau, nguon, nguCanh), 'utf8');
   writeFileSync(join(dot, 'chua-gan.meta.txt'), [...meta, ''].join('\r\n'), 'utf8');
-  writeFileSync(join(dot, 'a.csv'), csvChoNguoiGan(cau), 'utf8');
-  writeFileSync(join(dot, 'b.csv'), csvChoNguoiGan(cau), 'utf8');
+  writeFileSync(join(dot, 'a.csv'), csvChoNguoiGan(cau, nguCanh), 'utf8');
+  writeFileSync(join(dot, 'b.csv'), csvChoNguoiGan(cau, nguCanh), 'utf8');
   writeFileSync(join(thuMucThat, 'ten-hoc-sinh.txt'), dsTen.join('\r\n') + '\r\n', 'utf8');
   return dot;
 }

@@ -20,9 +20,10 @@ Các bước, dừng ngay ở bước nào hỏng và nói cách sửa:
      tập kiểm cố định và ngưỡng chốt chỉ tính câu học sinh.
   4. Dựng that/hoc.csv (câu thật + bộ cũ, câu thật thắng khi trùng), huan-luyen.py với tập
      kiểm cố định that/tap-kiem-co-dinh.csv và phép dò tên. Tập kiểm chỉ chốt khi đủ câu thật
-     (du_cau_chot_tap_kiem, --nguong-tap-kiem); trước đó chia 80/20 cũ và ghi rõ chưa dùng cho báo cáo.
+     (du_cau_chot_tap_kiem, --nguong-tap-kiem) VÀ mọi câu học sinh tích luỹ đã qua hai người gán
+     (cau_chua_hai_nguoi_gan); trước đó chia 80/20 cũ và ghi rõ chưa dùng cho báo cáo.
   5. npm run kiem-tra:phan-loai, npm run danh-gia:phan-loai --tap-kiem, ve-bieu-do.py.
-  6. In bảng tóm tắt, ghi một dòng vào that/lich-su.csv.
+  6. In bảng tóm tắt (kèm kappa gộp trên mọi đợt hai người gán), ghi một dòng vào that/lich-su.csv.
 KHÔNG gán nhãn bằng máy, KHÔNG dùng y_dinh làm nhãn. Không build, không deploy.
 """
 import argparse
@@ -47,7 +48,9 @@ TEP_MO_HINH = GOC / 'public' / 'mo-hinh' / 'phan-loai-y-dinh.json'
 COT = ['tin_nhan', 'nhan', 'nguoi_gan', 'nguon']
 COT_LICH_SU = ['ngay', 'dot', 'so_cau_moi', 'kappa', 'so_cau_that', 'so_cau_hoc', 'so_cau_kiem',
                'do_chinh_xac', 'f1_trung_binh', 'phien_ban_mo_hinh', 'ghi_chu']
-NGUONG_TAP_KIEM = 100   # số câu thật tối thiểu trước khi chốt tập kiểm cố định
+# Số câu học sinh thật tối thiểu trước khi chốt tập kiểm cố định. 250 câu cho tập kiểm khoảng 50 câu;
+# với 100 câu thì tập kiểm chỉ 20 câu, mỗi câu đổi 5 điểm % (quyết định Q3, 04/10/2026).
+NGUONG_TAP_KIEM = 250
 GHI_CHU_CO_DINH = 'tap-kiem-co-dinh'
 GHI_CHU_CHUA_DU = 'chua-du-cau-that-chua-dua-bao-cao'
 GHI_CHU_MOT_NGUOI = 'mot-nguoi-gan'
@@ -99,16 +102,52 @@ def kiem_cung_danh_sach(a, b):
                    'Che tay tên thì phải sửa y hệt ở cả hai tệp.')
 
 
-def kappa(a, b):
-    from sklearn.metrics import cohen_kappa_score
+def cap_nhan(a, b):
+    """Hai dãy nhãn của hai người, xếp theo cùng thứ tự câu."""
     na = {d['tin_nhan'].strip(): d['nhan'].strip() for d in a}
     nb = {d['tin_nhan'].strip(): d['nhan'].strip() for d in b}
     chung = sorted(na)
+    return [na[t] for t in chung], [nb[t] for t in chung]
+
+
+def kappa_hai_day(la, lb):
+    from sklearn.metrics import cohen_kappa_score
     import warnings
     with warnings.catch_warnings():   # trường hợp một nhãn đã xử lý ngay dưới, khỏi in cảnh báo sklearn
         warnings.simplefilter('ignore')
-        k = cohen_kappa_score([na[t] for t in chung], [nb[t] for t in chung], labels=NHAN)
+        k = cohen_kappa_score(la, lb, labels=NHAN)
     return None if k != k else float(k)   # NaN: cả hai người chỉ dùng đúng một nhãn
+
+
+def kappa(a, b):
+    return kappa_hai_day(*cap_nhan(a, b))
+
+
+def kappa_gop(thu_muc_that=THU_MUC_THAT):
+    """Kappa trên MỌI câu hai người đã gán, dồn các đợt dot-* thành một dãy (nhãn TRƯỚC khi thống
+    nhất, lấy thẳng từ a.csv và b.csv). Đợt nào a.csv/b.csv chưa gán đủ, có nhãn lạ hay lệch danh
+    sách thì bỏ qua, không dừng. Trả (kappa hoặc None, số câu, số đợt tính, [tên đợt bỏ qua])."""
+    la, lb, so_dot, bo = [], [], 0, []
+    for dot in sorted(Path(thu_muc_that).glob('dot-*')):
+        if not ((dot / 'a.csv').exists() and (dot / 'b.csv').exists()):
+            continue
+        try:
+            da, db = kiem_tep_gan(dot / 'a.csv'), kiem_tep_gan(dot / 'b.csv')
+            kiem_cung_danh_sach(da, db)
+        except Dung:
+            bo.append(dot.name)
+            continue
+        xa, xb = cap_nhan(da, db)
+        la, lb, so_dot = la + xa, lb + xb, so_dot + 1
+    return (kappa_hai_day(la, lb) if la else None), len(la), so_dot, bo
+
+
+def chu_kappa_gop(kg):
+    k, so_cau, so_dot, bo = kg
+    con = f'; bỏ qua {len(bo)} đợt chưa gán đủ a.csv/b.csv' if bo else ''
+    if not so_dot:
+        return f'chưa có đợt nào hai người gán đủ{con}'
+    return f'{chu_kappa(k)} ({so_cau} câu, {so_dot} đợt hai người gán{con})'
 
 
 def chu_kappa(k):
@@ -155,6 +194,28 @@ def du_cau_chot_tap_kiem(that, nguong=NGUONG_TAP_KIEM):
     if it:
         return False, f'nhãn chỉ có 1 câu: {", ".join(it)}'
     return True, ''
+
+
+def cau_chua_hai_nguoi_gan(that, thu_muc_that=THU_MUC_THAT):
+    """Câu HỌC SINH tích luỹ chưa qua hai người gán, đếm theo đợt: {tên đợt: số câu}.
+
+    cong_don ghi nguồn "that:<đợt>". Đợt hai người gán để lại <đợt>/nhan-dot.csv (gop-nhan.py);
+    đợt nạp bằng bảng Excel một người chỉ có mot-nguoi.csv. Câu không nằm trong nhan-dot.csv của
+    đợt nó (hoặc nguồn không ghi đợt) tính là chưa kiểm chứng. Tập kiểm cố định rút ngẫu nhiên từ
+    câu học sinh tích luỹ, nên còn câu như vậy thì chưa được chốt (quyết định Q2, 04/10/2026)."""
+    khoa_dot, dem = {}, {}
+    for d in that:
+        nguon = (d.get('nguon') or 'that').strip()
+        if not la_cau_hoc_sinh(nguon):
+            continue
+        dot = nguon.partition(':')[2]
+        if dot not in khoa_dot:
+            tep = Path(thu_muc_that) / dot / 'nhan-dot.csv'
+            khoa_dot[dot] = {chuan_hoa(r.get('tin_nhan') or '') for r in doc_dong(tep)} if dot and tep.exists() else set()
+        if chuan_hoa(d['tin_nhan']) not in khoa_dot[dot]:
+            ten = dot or '(không rõ đợt)'
+            dem[ten] = dem.get(ten, 0) + 1
+    return dem
 
 
 def dung_tep_hoc(that, cu, chi_that):
@@ -294,6 +355,7 @@ def main():
         kiem_cung_danh_sach(da, db)
         k = kappa(da, db)
         print(f'Hai tệp gán đủ: {len(da)} câu. Cohen\'s kappa (TRƯỚC khi thống nhất, ghi vào báo cáo): {chu_kappa(k)}')
+        print(f'Kappa gộp mọi đợt hai người gán (ghi vào báo cáo): {chu_kappa_gop(kappa_gop())}')
 
         bat_dong = dot / 'bat-dong.csv'
         if not bat_dong.exists():
@@ -323,12 +385,24 @@ def main():
           f'{f" (bỏ {bo} câu cũ trùng câu thật)" if bo else ""} → that/hoc.csv')
 
     # Tập kiểm cố định chỉ chốt khi đủ câu thật: chốt sớm với 13 câu là tập kiểm 3 câu bị khoá vĩnh viễn.
-    co_dinh, du = TEP_TAP_KIEM.exists(), False
+    # Và chỉ chốt khi mọi câu học sinh tích luỹ đã qua hai người gán: câu một người gán lọt vào tập
+    # kiểm thì đáp án chuẩn của phép đo không có kiểm chứng.
+    co_dinh, du, mot_nguoi = TEP_TAP_KIEM.exists(), False, {}
     if not co_dinh:
         du, ly_do = du_cau_chot_tap_kiem(tich_luy, a.nguong_tap_kiem)
+        mot_nguoi = cau_chua_hai_nguoi_gan(tich_luy)
+        if mot_nguoi:
+            cac_dot = ', '.join(f'{ten}: {so} câu' for ten, so in sorted(mot_nguoi.items()))
+            ly_do = '; '.join(x for x in [ly_do, f'{sum(mot_nguoi.values())} câu học sinh mới MỘT người gán ({cac_dot})'] if x)
+            du = False
         if not du:
-            print(f'\nCHƯA đủ câu thật để chốt tập kiểm ({ly_do}) — số đo đợt này chưa đưa vào báo cáo.\n'
+            print(f'\nCHƯA chốt tập kiểm ({ly_do}) — số đo đợt này chưa đưa vào báo cáo.\n'
                   f'Lần này học và kiểm theo kiểu chia 80/20 cũ (tập kiểm lẫn câu bộ cũ, đổi mỗi đợt).')
+        if mot_nguoi:
+            print('Tập kiểm rút ngẫu nhiên từ câu học sinh tích luỹ, nên mọi câu trong đó phải qua hai người gán.\n'
+                  'Cách gỡ: hai bạn gán độc lập a.csv, b.csv của (các) đợt nêu trên rồi chạy\n'
+                  '  npm run phan-loai:huan-luyen -- scripts/phan-loai/du-lieu/that/<đợt>\n'
+                  '(câu đã cộng dồn không cộng lần hai; đợt đó có kappa và được tính là hai người gán).')
     tap_kiem = co_dinh or du
     ten_buoc = 'Huấn luyện (tập kiểm cố định, dò tên trong từ vựng)' if tap_kiem \
         else 'Huấn luyện (CHƯA chốt tập kiểm, dò tên trong từ vựng)'
@@ -361,12 +435,16 @@ def main():
     print('\n================ TÓM TẮT ================')
     print(f'Đợt              : {dot.name} ({them} câu mới, '
           f'{"một người gán, chưa có kappa" if bang else "kappa " + chu_kappa(k)})')
+    print(f'Kappa gộp        : {chu_kappa_gop(kappa_gop())}')
     print(f'Câu thật tích luỹ: {len(tich_luy)} ({so_hs} học sinh, {len(tich_luy) - so_hs} giáo viên/quản trị)')
     if tap_kiem:
         print(f'Học / kiểm       : {sd.get("so_cau_hoc")} / {sd.get("so_cau_kiem")} câu (tập kiểm cố định, toàn câu thật)')
     else:
         print(f'Học / kiểm       : {sd.get("so_cau_hoc")} / {sd.get("so_cau_kiem")} câu (chia 80/20, CHƯA chốt tập kiểm)')
-        print(f'                   Cần ≥ {a.nguong_tap_kiem} câu thật, mỗi nhãn đã có ≥ 2 câu, mới chốt.')
+        print(f'                   Cần ≥ {a.nguong_tap_kiem} câu học sinh, mỗi nhãn đã có ≥ 2 câu, mọi câu qua hai người gán, mới chốt.')
+        if mot_nguoi:
+            print(f'                   Còn {sum(mot_nguoi.values())} câu học sinh mới một người gán: '
+                  + ', '.join(f'{ten} ({so})' for ten, so in sorted(mot_nguoi.items())))
     print(f'Độ chính xác     : {sd.get("do_chinh_xac")}{chenh(sd.get("do_chinh_xac"), cu.get("do_chinh_xac"))}')
     print(f'Macro-F1         : {sd.get("f1_trung_binh")}{chenh(sd.get("f1_trung_binh"), cu.get("f1_trung_binh"))}')
     if cu:

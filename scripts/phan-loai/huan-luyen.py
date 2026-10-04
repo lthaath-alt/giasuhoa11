@@ -52,6 +52,29 @@ def softmax(z):
     return e / e.sum(axis=1, keepdims=True)
 
 
+def khoang_tin_cay(y_that, y_doan, so_lan=1000, hat=42):
+    """Khoảng tin cậy 95 % bằng bootstrap: lấy mẫu lại CÓ hoàn lại tập kiểm `so_lan` lần, mỗi lần
+    tính lại độ chính xác và F1 macro, rồi lấy phân vị 2,5 và 97,5. Mô hình không học lại, nên
+    khoảng này chỉ nói độ dao động do tập kiểm nhỏ. F1 macro mỗi lần tính trên các nhãn có mặt
+    trong mẫu lần đó, đúng cách tính con số chính. Trả ((thấp, cao) độ chính xác, (thấp, cao) F1)."""
+    rng = np.random.default_rng(hat)
+    yt, yd = np.asarray(y_that), np.asarray(y_doan)
+    accs, f1s = [], []
+    for _ in range(so_lan):
+        i = rng.integers(0, len(yt), len(yt))
+        accs.append(accuracy_score(yt[i], yd[i]))
+        f1s.append(f1_score(yt[i], yd[i], average='macro', zero_division=0))
+    return tuple(np.percentile(accs, [2.5, 97.5])), tuple(np.percentile(f1s, [2.5, 97.5]))
+
+
+def moc_nhan_dong_nhat(y_hoc, y_kiem):
+    """Mốc so: "mô hình" luôn đoán nhãn đông nhất của PHẦN HỌC. Trả (nhãn, độ chính xác, F1 macro)
+    trên tập kiểm; F1 macro tính trên các nhãn có trong tập kiểm và nhãn được đoán."""
+    nhan = Counter(y_hoc).most_common(1)[0][0]
+    du = [nhan] * len(y_kiem)
+    return nhan, accuracy_score(y_kiem, du), f1_score(y_kiem, du, average='macro', zero_division=0)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--vao', default=str(THU_MUC / 'du-lieu' / 'nhan.csv'))
@@ -105,7 +128,13 @@ def main():
         sys.exit('predict_proba khác softmax(decision_function) — bản scikit-learn này không dùng đa thức.')
     du = clf.predict(Xv)
     acc, f1 = accuracy_score(y_te, du), f1_score(y_te, du, average='macro')
-    print(f'\nTẬP KIỂM ({len(X_te)} câu): độ chính xác {acc:.3f}, F1 trung bình {f1:.3f}\n')
+    print(f'\nTẬP KIỂM ({len(X_te)} câu): độ chính xác {acc:.3f}, F1 trung bình {f1:.3f}')
+    (acc_lo, acc_hi), (f1_lo, f1_hi) = khoang_tin_cay(y_te, du)
+    print(f'Khoảng tin cậy 95 % (bootstrap 1.000 lần lấy mẫu lại tập kiểm, hạt 42): '
+          f'độ chính xác {acc_lo:.3f}–{acc_hi:.3f}, F1 macro {f1_lo:.3f}–{f1_hi:.3f}')
+    nhan_dong, acc_moc, f1_moc = moc_nhan_dong_nhat(y_tr, y_te)
+    print(f'Mốc so "luôn đoán nhãn đông nhất của phần học" ({nhan_dong}): '
+          f'độ chính xác {acc_moc:.3f}, F1 macro {f1_moc:.3f}\n')
     print(classification_report(y_te, du, labels=NHAN, zero_division=0))
     print('Ma trận nhầm lẫn (hàng = thật, cột = đoán), thứ tự:', ', '.join(NHAN))
     print(confusion_matrix(y_te, du, labels=NHAN))
