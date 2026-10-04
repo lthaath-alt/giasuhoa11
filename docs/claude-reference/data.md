@@ -188,7 +188,8 @@ Không có mục riêng ở đây cho toàn bộ collection này — trường t
 - **Tin nhắn thật làm dữ liệu huấn luyện (03/10/2026)** — chủ dự án báo chủ nhiệm đề tài
   cho phép và phụ huynh lớp 11A3 đồng ý. Từ 04/10/2026 lấy thêm câu tài khoản giáo viên/quản trị
   gửi gia sư (nguồn `that-gv`, không vào tập kiểm). Cũng từ 04/10/2026 bộ nhãn có thêm `xin_de` (xin
-  bài để tự luyện; 7 nhãn), mô hình học nó khi đủ 5 câu. `npm run phan-loai:hang-ngay` mỗi đêm làm
+  bài để tự luyện; 7 nhãn), và từ 05/10/2026 thêm `tra_loi_gia_su` (em trả lời câu ChemAI vừa hỏi;
+  8 nhãn); mô hình học mỗi nhãn mới khi nhãn đó đủ 5 câu. `npm run phan-loai:hang-ngay` mỗi đêm làm
   bảng Excel gửi mail cho chủ dự án (`scripts/phan-loai/hang_ngay.py`). Mỗi đợt hai lệnh: `npm run phan-loai:xuat`, người gán
   nhãn, rồi `npm run phan-loai:huan-luyen -- <thư mục đợt>` (`scripts/phan-loai/nap_dot.py`).
   Đường lấy câu duy nhất: `npm run xuat:cau-hoi -- --lop 11A3`

@@ -55,6 +55,7 @@ TEN_NHAN = {
     'nop_bai_lam': 'Nộp bài làm',
     'gian_lan_phong_thi': 'Gian lận phòng thi',
     'xin_de': 'Xin đề',
+    'tra_loi_gia_su': 'Trả lời ChemAI',
     'ngoai_mon': 'Ngoài môn',
 }
 # Thấy một trong các tên này ở cột nguoi_gan thì coi dòng đó do AI gán nhãn.

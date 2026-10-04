@@ -68,8 +68,9 @@ const so = (nhan: string, luat: (s: string) => boolean) => {
 so('be_tac', laTinBeTac);
 so('gian_lan_phong_thi', laNguCanhGianLanPhongThi);
 /* Mọi nhãn mô hình có, trừ hai nhãn regex cũng làm (đã so ở trên). Đọc từ mô hình: bộ nhãn từ
-   04/10/2026 có thêm xin_de, và nhãn chưa đủ câu thì mô hình chưa học. */
-const THU_TU = ['hoi_khai_niem', 'xin_dap_an', 'nop_bai_lam', 'xin_de', 'ngoai_mon'];
+   04/10/2026 có thêm xin_de, từ 05/10/2026 thêm tra_loi_gia_su, và nhãn chưa đủ câu thì mô hình
+   chưa học. */
+const THU_TU = ['hoi_khai_niem', 'xin_dap_an', 'nop_bai_lam', 'xin_de', 'tra_loi_gia_su', 'ngoai_mon'];
 const chiMoHinh = [...THU_TU.filter(n => m.nhan.includes(n)),
   ...m.nhan.filter(n => !THU_TU.includes(n) && n !== 'be_tac' && n !== 'gian_lan_phong_thi')];
 dong.push('', `## ${chiMoHinh.length === 4 ? 'Bốn' : 'Các'} nhãn chỉ mô hình làm được`, '', '| Nhãn | Precision | Recall | F1 |', '|---|---|---|---|');

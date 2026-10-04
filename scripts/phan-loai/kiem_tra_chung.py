@@ -13,10 +13,10 @@ from chung import (  # noqa: E402
 )
 import os  # noqa: E402
 from bang_xlsx import doc_bang, ghi_bang, ma_nhan  # noqa: E402
-from hang_ngay import doc_bien_gmail, gui_thu, kiem_dang_nhap, lam_bang, soan_thu  # noqa: E402
+from hang_ngay import doc_bien_gmail, doc_ngu_canh, gui_thu, kiem_dang_nhap, lam_bang, soan_thu  # noqa: E402
 from nap_dot import (  # noqa: E402
-    Dung, chenh, chu_kappa, chuyen_bang, cong_don, doc_lich_su, du_cau_chot_tap_kiem, dung_tep_hoc, ghi_dong, kappa,
-    kiem_cung_danh_sach, kiem_tep_gan,
+    NGUONG_TAP_KIEM, Dung, cau_chua_hai_nguoi_gan, chenh, chu_kappa, chu_kappa_gop, chuyen_bang, cong_don, doc_lich_su,
+    du_cau_chot_tap_kiem, dung_tep_hoc, ghi_dong, kappa, kappa_gop, kiem_cung_danh_sach, kiem_tep_gan,
     them_lich_su,
 )
 
@@ -186,10 +186,16 @@ with tempfile.TemporaryDirectory() as tmp:
 
     cau = lambda n, nhan: [{'tin_nhan': f'c{i}', 'nhan': nhan} for i in range(n)]  # noqa: E731
     ok(du_cau_chot_tap_kiem(cau(13, 'be_tac'))[0] is False, 'mới 13 câu thật (như đợt 03/10) → CHƯA chốt tập kiểm')
-    ok(du_cau_chot_tap_kiem(cau(99, 'be_tac') + cau(1, 'ngoai_mon')) == (False, 'nhãn chỉ có 1 câu: ngoai_mon'),
-       'đủ 100 câu mà có nhãn chỉ 1 câu → chưa chốt (không chia giữ tỉ lệ được)')
-    ok(du_cau_chot_tap_kiem(cau(98, 'be_tac') + cau(2, 'ngoai_mon')) == (True, ''),
-       'đủ 100 câu, mọi nhãn đã có đều ≥ 2 câu → chốt; nhãn chưa từng gặp không chặn')
+    # Ngưỡng mặc định lên 250 từ 04/10/2026 (quyết định Q3): phép kiểm bám theo hằng số, không ghi cứng số.
+    N = NGUONG_TAP_KIEM
+    ok(N == 250, 'ngưỡng chốt tập kiểm mặc định là 250 câu học sinh')
+    ok(du_cau_chot_tap_kiem(cau(N - 1, 'be_tac')) == (False, f'mới {N - 1}/{N} câu học sinh'),
+       'thiếu một câu so với ngưỡng → chưa chốt, lý do ghi số câu đang có / ngưỡng')
+    ok(du_cau_chot_tap_kiem(cau(100, 'be_tac'))[0] is False, '100 câu (ngưỡng cũ) nay CHƯA đủ để chốt')
+    ok(du_cau_chot_tap_kiem(cau(N - 1, 'be_tac') + cau(1, 'ngoai_mon')) == (False, 'nhãn chỉ có 1 câu: ngoai_mon'),
+       'đủ ngưỡng mà có nhãn chỉ 1 câu → chưa chốt (không chia giữ tỉ lệ được)')
+    ok(du_cau_chot_tap_kiem(cau(N - 2, 'be_tac') + cau(2, 'ngoai_mon')) == (True, ''),
+       'đủ ngưỡng, mọi nhãn đã có đều ≥ 2 câu → chốt; nhãn chưa từng gặp không chặn')
     ok(du_cau_chot_tap_kiem(cau(20, 'be_tac'), nguong=20)[0], '--nguong-tap-kiem hạ ngưỡng được')
 
     hai = [{'tin_nhan': 'x', 'nhan': 'be_tac'}, {'tin_nhan': 'y', 'nhan': 'be_tac'}]
@@ -240,8 +246,9 @@ with tempfile.TemporaryDirectory() as tmp:
     ok('lặp' in dung_ra(chuyen_bang, bang_gia(['be_tac'] * 4, stt=('1', '2', '2', '4')), cg), 'STT lặp (sắp xếp lại) → dừng')
     ok('không có trong danh sách' in dung_ra(chuyen_bang, bang_gia(['be_tac', 'abc', 'bo', 'bo']), cg), 'nhãn gõ tay sai → dừng')
 
-    hs_gv = [{'tin_nhan': f'c{i}', 'nhan': 'be_tac', 'nguon': 'that-gv:d'} for i in range(100)]
-    ok(du_cau_chot_tap_kiem(hs_gv)[0] is False, 'câu giáo viên không tính vào ngưỡng chốt tập kiểm')
+    hs_gv = [{'tin_nhan': f'c{i}', 'nhan': 'be_tac', 'nguon': 'that-gv:d'} for i in range(NGUONG_TAP_KIEM)]
+    ok(du_cau_chot_tap_kiem(hs_gv) == (False, f'mới 0/{NGUONG_TAP_KIEM} câu học sinh'),
+       'câu giáo viên không tính vào ngưỡng chốt tập kiểm')
     ok(la_cau_hoc_sinh('that:dot-1') and la_cau_hoc_sinh('that') and not la_cau_hoc_sinh('that-gv:dot-1'),
        'tập kiểm chỉ lấy câu học sinh, không lấy câu giáo viên')
     ok(cong_don([], [{'tin_nhan': 'a', 'nhan': 'be_tac', 'nguon': 'that-gv'}], 'dot-9')[0][0]['nguon'] == 'that-gv:dot-9',
@@ -249,7 +256,8 @@ with tempfile.TemporaryDirectory() as tmp:
 
 print('\n== Nhãn thứ 7 "xin_de" (04/10/2026) ==')
 from chung import NHAN, loc_nhan_it_cau  # noqa: E402
-ok(NHAN[-2:] == ['xin_de', 'ngoai_mon'] and len(NHAN) == 7, 'bộ nhãn có 7 nhãn, xin_de đứng trước ngoai_mon')
+ok(NHAN[-3:] == ['xin_de', 'tra_loi_gia_su', 'ngoai_mon'] and len(NHAN) == 8,
+   'bộ nhãn có 8 nhãn, xin_de và tra_loi_gia_su đứng trước ngoai_mon')
 ok(ma_nhan('Xin đề') == 'xin_de' and ma_nhan('xin_de') == 'xin_de', 'bảng Excel hiểu "Xin đề"')
 Xg = [f'c{i}' for i in range(13)]
 yg = ['be_tac'] * 10 + ['xin_de'] * 3
@@ -264,6 +272,146 @@ with tempfile.TemporaryDirectory() as tmp:
     b = doc_bang(tep)
     ok([d['nhan'] for d in b['dong']] == ['xin_de', 'bo', ''] and b['dong'][0]['ghi_chu'] == 'xin đề' and b['nguoi_gan'] == 'Khải',
        'dựng lại bảng giữ nhãn, ghi chú, người gán đã có')
+
+print('\n== Nhãn thứ 8 "tra_loi_gia_su" (05/10/2026) ==')
+from chung import NHAN_BAT_BUOC  # noqa: E402
+from bang_xlsx import GIAI_THICH, NHAN_HIEN  # noqa: E402
+ok(ma_nhan('Trả lời ChemAI') == 'tra_loi_gia_su' and ma_nhan('tra_loi_gia_su') == 'tra_loi_gia_su',
+   'bảng Excel hiểu "Trả lời ChemAI"')
+ok(list(NHAN_HIEN) == NHAN, 'ô thả xuống của bảng Excel có đủ và đúng thứ tự mọi nhãn')
+ok([g[0] for g in GIAI_THICH[:-1]] == list(NHAN_HIEN.values()), 'sheet "Giải thích nhãn" giải thích đủ mọi nhãn')
+ok('tra_loi_gia_su' not in NHAN_BAT_BUOC and 'xin_de' not in NHAN_BAT_BUOC and len(NHAN_BAT_BUOC) == 6,
+   'hai nhãn thêm sau không bắt buộc đủ câu: bộ cũ chưa có câu nào của chúng vẫn học được')
+ok(loc_nhan_it_cau(Xg, ['be_tac'] * 10 + ['tra_loi_gia_su'] * 3)[2] == {'tra_loi_gia_su': 3},
+   'tra_loi_gia_su mới 3 câu: tạm gác khi học')
+with tempfile.TemporaryDirectory() as tmp:
+    tep = Path(tmp) / 'b.xlsx'
+    ghi_bang(tep, ['a', 'b'], 'dot-x', da_gan=[{'nhan': 'tra_loi_gia_su'}, {}], nguoi_gan_chung='Khải')
+    ok([d['nhan'] for d in doc_bang(tep)['dong']] == ['tra_loi_gia_su', ''], 'ghi rồi đọc lại bảng giữ nhãn tra_loi_gia_su')
+
+print('\n== Cột "ChemAI vừa nói" trên bảng Excel (05/10/2026). Dữ liệu GIẢ ==')
+with tempfile.TemporaryDirectory() as tmp:
+    import zipfile
+    tm = Path(tmp)
+    cau_nc = ['dạ tăng ạ', 'cho em đáp án', 'em chịu']
+    nc = ['Thêm HCl thì nồng độ H+ thay đổi thế nào?\nEm thử đoán xem.', '', 'Bước đầu tiên em làm gì <b>&"x"</b>?']
+    tep = tm / 'co-ngu-canh.xlsx'
+    ghi_bang(tep, cau_nc, 'dot-x', 3, 0, da_gan=[{'nhan': 'tra_loi_gia_su', 'ghi_chu': 'gc'}, {'nhan': 'bo'}, {}],
+             nguoi_gan_chung='Khải', ngu_canh=nc)
+    with zipfile.ZipFile(tep) as z:
+        s1 = z.read('xl/worksheets/sheet1.xml').decode()
+        s3 = z.read('xl/worksheets/sheet3.xml').decode()
+    ok('ChemAI vừa nói' in s1 and s1.index('ChemAI vừa nói') < s1.index('Câu hỏi'),
+       'có ngữ cảnh: cột "ChemAI vừa nói" đứng trước cột Câu hỏi')
+    ok('sqref="D2:D4"' in s1 and 'sqref="C2:C4"' not in s1 and 'activeCell="D2"' in s1,
+       'có ngữ cảnh: ô thả xuống chọn nhãn lùi sang cột D')
+    ok('ChemAI vừa nói' in s3 and '[tên]' in s3, 'sheet Thông tin dặn cột ngữ cảnh chỉ để đọc và phải che tên')
+    b = doc_bang(tep)
+    ok([d['tin_nhan'] for d in b['dong']] == cau_nc and [d['stt'] for d in b['dong']] == ['1', '2', '3'],
+       'đọc lại bảng có ngữ cảnh: STT và câu hỏi đúng cột, không lẫn sang tin của ChemAI')
+    ok([d['nhan'] for d in b['dong']] == ['tra_loi_gia_su', 'bo', ''] and b['dong'][0]['ghi_chu'] == 'gc'
+       and b['nguoi_gan'] == 'Khải', 'đọc lại bảng có ngữ cảnh: nhãn, ghi chú, người gán đúng cột')
+    ok([d['chemai_vua_noi'] for d in b['dong']] == nc, 'tin ChemAI giữ nguyên (xuống dòng, ký tự đặc biệt, ô trống)')
+    cg3 = [{'tin_nhan': c, 'nguon': 'that'} for c in cau_nc]
+    ra3, bo3 = chuyen_bang({**b, 'dong': [{**d, 'nhan': d['nhan'] or 'be_tac'} for d in b['dong']]}, cg3)
+    ok([d['tin_nhan'] for d in ra3] == ['dạ tăng ạ', 'em chịu'] and bo3 == 1 and all('chemai_vua_noi' not in d for d in ra3),
+       'nạp bảng có ngữ cảnh: chỉ câu hỏi và nhãn đi tiếp, tin ChemAI KHÔNG vào dữ liệu học')
+
+    tep_cu = tm / 'khong-ngu-canh.xlsx'
+    ghi_bang(tep_cu, cau_nc, 'dot-x')
+    with zipfile.ZipFile(tep_cu) as z:
+        s1 = z.read('xl/worksheets/sheet1.xml').decode()
+    b = doc_bang(tep_cu)
+    ok('ChemAI vừa nói' not in s1 and 'sqref="C2:C4"' in s1 and [d['tin_nhan'] for d in b['dong']] == cau_nc
+       and all(d['chemai_vua_noi'] == '' for d in b['dong']), 'không có ngữ cảnh: bảng 5 cột như cũ, vẫn đọc được')
+    try:
+        ghi_bang(tm / 'lech.xlsx', cau_nc, 'dot-x', ngu_canh=nc[:2])
+        ok(False, 'ngữ cảnh lệch số dòng → dừng')
+    except ValueError:
+        ok(True, 'ngữ cảnh lệch số dòng → dừng, không ghi bảng lệch câu')
+
+    dot = tm / 'dot-2026-10-05'
+    dot.mkdir()
+    ghi_dong(dot / 'chua-gan.csv', [{'chemai_vua_noi': nc[i], 'tin_nhan': c, 'nhan': '', 'nguoi_gan': '', 'nguon': 'that'}
+                                    for i, c in enumerate(cau_nc)], cot=['chemai_vua_noi', 'tin_nhan', 'nhan', 'nguoi_gan', 'nguon'])
+    tep, n, hs, gv = lam_bang(dot, tm / 'ra')
+    ok([d['chemai_vua_noi'] for d in doc_bang(tep)['dong']] == nc and (n, hs, gv) == (3, 3, 0),
+       'bảng gửi hằng đêm lấy cột chemai_vua_noi từ chua-gan.csv')
+    ok(doc_ngu_canh(dot) == nc, 'doc_ngu_canh đọc đúng thứ tự câu')
+    dot_cu = tm / 'dot-2026-10-03'
+    dot_cu.mkdir()
+    ghi_dong(dot_cu / 'chua-gan.csv', [{'tin_nhan': 'em chịu', 'nhan': '', 'nguoi_gan': '', 'nguon': 'that'}])
+    ok(doc_ngu_canh(dot_cu) is None, 'đợt xuất trước khi có cột chemai_vua_noi: không có ngữ cảnh, bảng giữ 5 cột')
+
+print('\n== Tập kiểm chỉ chốt khi mọi câu học sinh đã qua hai người gán (cau_chua_hai_nguoi_gan) ==')
+with tempfile.TemporaryDirectory() as tmp:
+    tm = Path(tmp)
+    (tm / 'dot-1').mkdir()
+    ghi_dong(tm / 'dot-1' / 'nhan-dot.csv', [{'tin_nhan': 'Em chịu!', 'nhan': 'be_tac'}, {'tin_nhan': 'pH là gì', 'nhan': 'hoi_khai_niem'}])
+    (tm / 'dot-2').mkdir()
+    ghi_dong(tm / 'dot-2' / 'mot-nguoi.csv', [{'tin_nhan': 'cho em đáp án', 'nhan': 'xin_dap_an'}])
+    tl = [{'tin_nhan': 'em chiu', 'nhan': 'be_tac', 'nguon': 'that:dot-1'},
+          {'tin_nhan': 'pH là gì', 'nhan': 'hoi_khai_niem', 'nguon': 'that:dot-1'}]
+    ok(cau_chua_hai_nguoi_gan(tl, tm) == {}, 'mọi câu nằm trong nhan-dot.csv của đợt nó (so sau chuẩn hoá) → không còn câu nào')
+    ok(cau_chua_hai_nguoi_gan(tl + [{'tin_nhan': 'câu lạ', 'nhan': 'be_tac', 'nguon': 'that:dot-1'}], tm) == {'dot-1': 1},
+       'câu không có trong nhan-dot.csv của đợt → tính là chưa qua hai người')
+    mot = [{'tin_nhan': 'cho em đáp án', 'nhan': 'xin_dap_an', 'nguon': 'that:dot-2'},
+           {'tin_nhan': 'chào thầy', 'nhan': 'ngoai_mon', 'nguon': 'that:dot-2'}]
+    ok(cau_chua_hai_nguoi_gan(tl + mot, tm) == {'dot-2': 2}, 'đợt nạp bằng bảng Excel một người (chỉ có mot-nguoi.csv) → cả đợt chưa qua hai người')
+    ok(cau_chua_hai_nguoi_gan([{'tin_nhan': 'x', 'nhan': 'be_tac', 'nguon': 'that'},
+                               {'tin_nhan': 'y', 'nhan': 'be_tac'}], tm) == {'(không rõ đợt)': 2},
+       'nguồn không ghi đợt (hoặc thiếu nguồn) → chưa kiểm chứng')
+    ok(cau_chua_hai_nguoi_gan([{'tin_nhan': 'test', 'nhan': 'ngoai_mon', 'nguon': 'that-gv:dot-2'}], tm) == {},
+       'câu giáo viên không vào tập kiểm nên không bị đếm')
+    ok(cau_chua_hai_nguoi_gan([{'tin_nhan': 'x', 'nhan': 'be_tac', 'nguon': 'that:dot-9'}], tm) == {'dot-9': 1},
+       'đợt không còn thư mục → chưa kiểm chứng, không văng lỗi')
+
+print('\n== Kappa gộp mọi đợt hai người gán (kappa_gop) ==')
+with tempfile.TemporaryDirectory() as tmp:
+    from sklearn.metrics import cohen_kappa_score
+    tm = Path(tmp)
+    COT_GAN = ['tin_nhan', 'nhan', 'nguoi_gan']
+
+    def dot_gia(ten, nhan_a, nhan_b, tep_b=True):
+        d = tm / ten
+        d.mkdir()
+        ghi_dong(d / 'a.csv', [{'tin_nhan': f'{ten} c{i}', 'nhan': n, 'nguoi_gan': 'A'} for i, n in enumerate(nhan_a)], cot=COT_GAN)
+        if tep_b:
+            ghi_dong(d / 'b.csv', [{'tin_nhan': f'{ten} c{i}', 'nhan': n, 'nguoi_gan': 'B'} for i, n in enumerate(nhan_b)], cot=COT_GAN)
+
+    ok(kappa_gop(tm) == (None, 0, 0, []) and 'chưa có đợt nào' in chu_kappa_gop(kappa_gop(tm)), 'chưa có đợt nào → không có kappa, không văng lỗi')
+    a1, b1 = ['be_tac', 'be_tac', 'xin_dap_an', 'ngoai_mon'], ['be_tac', 'xin_dap_an', 'xin_dap_an', 'ngoai_mon']
+    a2, b2 = ['hoi_khai_niem', 'be_tac', 'ngoai_mon'], ['hoi_khai_niem', 'be_tac', 'be_tac']
+    dot_gia('dot-1', a1, b1)
+    dot_gia('dot-2', a2, b2)
+    dot_gia('dot-3', ['be_tac'], [], tep_b=False)            # một người gán: không tính, không coi là lỗi
+    dot_gia('dot-4', ['be_tac', ''], ['be_tac', 'be_tac'])   # a.csv chưa gán đủ: bỏ qua, có ghi tên
+    k, so_cau, so_dot, bo = kappa_gop(tm)
+    ok((so_cau, so_dot, bo) == (7, 2, ['dot-4']), 'dồn câu của các đợt hai người gán đủ; đợt chưa gán đủ bị bỏ qua và nêu tên')
+    mong = cohen_kappa_score(a1 + a2, b1 + b2)
+    ok(k is not None and abs(k - mong) < 1e-9, 'kappa gộp = kappa của MỘT dãy dồn mọi đợt (không phải trung bình từng đợt)')
+    tb = (cohen_kappa_score(a1, b1) + cohen_kappa_score(a2, b2)) / 2
+    ok(abs(mong - tb) > 1e-6, 'bộ thử phân biệt được kappa gộp với trung bình kappa từng đợt')
+    chu = chu_kappa_gop((k, so_cau, so_dot, bo))
+    ok('7 câu' in chu and '2 đợt' in chu and 'bỏ qua 1 đợt' in chu, 'dòng in ra có số câu, số đợt và số đợt bỏ qua')
+
+print('\n== Khoảng tin cậy 95 % bằng bootstrap (huan-luyen.py: khoang_tin_cay) ==')
+import importlib.util  # noqa: E402
+_spec = importlib.util.spec_from_file_location('huan_luyen', Path(__file__).parent / 'huan-luyen.py')
+_hl = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(_hl)
+yt = ['be_tac'] * 20 + ['xin_dap_an'] * 20
+(a_lo, a_hi), (f_lo, f_hi) = _hl.khoang_tin_cay(yt, yt)
+ok((a_lo, a_hi, f_lo, f_hi) == (1.0, 1.0, 1.0, 1.0), 'đoán đúng hết → khoảng là [1; 1]')
+yd = ['be_tac'] * 15 + ['xin_dap_an'] * 5 + ['xin_dap_an'] * 16 + ['be_tac'] * 4   # đúng 31/40 = 0,775
+(a_lo, a_hi), (f_lo, f_hi) = _hl.khoang_tin_cay(yt, yd)
+ok(0 <= a_lo < 0.775 < a_hi <= 1 and 0 <= f_lo < f_hi <= 1, 'khoảng nằm trong [0; 1] và chứa độ chính xác của chính tập kiểm')
+ok(_hl.khoang_tin_cay(yt, yd) == ((a_lo, a_hi), (f_lo, f_hi)), 'cùng hạt giống → cùng khoảng (báo cáo chạy lại ra đúng số cũ)')
+rong_40 = a_hi - a_lo
+(b_lo, b_hi), _ = _hl.khoang_tin_cay(yt * 10, yd * 10)
+ok(b_hi - b_lo < rong_40 / 2, 'tập kiểm lớn gấp 10 → khoảng hẹp đi rõ')
+(c_lo, c_hi), _ = _hl.khoang_tin_cay(yt, yd, so_lan=200, hat=7)
+ok(c_lo < 0.775 < c_hi, 'đổi số lần lấy mẫu và hạt giống vẫn chạy')
 
 print('\n== Chạy hằng đêm (hang_ngay.py): biến Gmail, soạn thư, gửi (máy gửi GIẢ) ==')
 with tempfile.TemporaryDirectory() as tmp:

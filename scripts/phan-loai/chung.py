@@ -28,10 +28,14 @@ PHIEN_BAN_CHUAN_HOA = 1
 # Sáu nhãn — thứ tự cố định, dùng cho báo cáo và ma trận nhầm lẫn.
 # "xin_de" (xin bài tập / đề để tự luyện) thêm 04/10/2026 theo quyết định của chủ dự án: bộ nhãn
 # của đề tài từ 6 thành 7 kể từ ngày đó. Mô hình chỉ học một nhãn khi nó có ≥ SO_CAU_TOI_THIEU câu.
-NHAN = ['hoi_khai_niem', 'be_tac', 'xin_dap_an', 'nop_bai_lam', 'gian_lan_phong_thi', 'xin_de', 'ngoai_mon']
-# Sáu nhãn gốc BẮT BUỘC đủ câu (thiếu là dữ liệu hỏng, dừng). Nhãn thêm sau (xin_de) chưa đủ thì
-# tạm gác, mô hình học 6 nhãn như cũ cho tới khi đủ.
-NHAN_BAT_BUOC = [n for n in NHAN if n != 'xin_de']
+# "tra_loi_gia_su" (em trả lời câu ChemAI vừa hỏi) thêm 05/10/2026, cũng theo quyết định của chủ dự
+# án: bộ nhãn từ 7 thành 8 kể từ ngày đó.
+NHAN = ['hoi_khai_niem', 'be_tac', 'xin_dap_an', 'nop_bai_lam', 'gian_lan_phong_thi', 'xin_de', 'tra_loi_gia_su',
+        'ngoai_mon']
+# Sáu nhãn gốc BẮT BUỘC đủ câu (thiếu là dữ liệu hỏng, dừng). Nhãn thêm sau chưa đủ thì tạm gác,
+# mô hình học các nhãn còn lại như cũ cho tới khi đủ.
+NHAN_THEM_SAU = ['xin_de', 'tra_loi_gia_su']
+NHAN_BAT_BUOC = [n for n in NHAN if n not in NHAN_THEM_SAU]
 SO_CAU_TOI_THIEU = 5
 
 

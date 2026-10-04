@@ -24,12 +24,25 @@
       kiểm hai tệp gán đủ → đo đồng thuận (in kappa; lần đầu ghi `bat-dong.csv`) → còn câu bất đồng
       chưa có `nhan_chot` thì DỪNG, bàn xong điền rồi chạy lại đúng lệnh này → gộp nhãn, cộng dồn
       vào `that/nhan-that.csv` → học trên câu thật + bộ cũ (`--chi-cau-that` để bỏ bộ cũ) với tập
-      kiểm CỐ ĐỊNH `that/tap-kiem-co-dinh.csv` (20 % câu thật, chỉ chốt khi đã có ≥ 100 câu thật và
-      mỗi nhãn đã gặp có ≥ 2 câu — đổi bằng `--nguong-tap-kiem`; trước mốc đó máy vẫn học, chia
-      80/20 như cũ, in "CHƯA đủ câu thật để chốt tập kiểm" và số đo các đợt đó CHƯA đưa vào báo cáo)
-      và phép dò tên trong từ vựng → `kiem-tra:phan-loai` → so với regex → vẽ biểu đồ
+      kiểm CỐ ĐỊNH `that/tap-kiem-co-dinh.csv` (20 % câu học sinh thật). Tập kiểm chỉ chốt khi đủ BA
+      điều: có ≥ 250 câu học sinh (đổi bằng `--nguong-tap-kiem`; với 100 câu thì tập kiểm chỉ 20 câu,
+      mỗi câu đổi 5 điểm %), mỗi nhãn đã gặp có ≥ 2 câu, và MỌI câu học sinh tích luỹ đã qua hai
+      người gán (câu nằm trong `nhan-dot.csv` của đợt nó; đợt nạp bằng bảng Excel một người thì chưa).
+      Trước mốc đó máy vẫn học, chia 80/20 như cũ, in "CHƯA chốt tập kiểm (lý do)" kèm tên đợt còn
+      một người gán và cách gỡ; số đo các đợt đó CHƯA đưa vào báo cáo. Bước học
+      có kèm phép dò tên trong từ vựng → `kiem-tra:phan-loai` → so với regex → vẽ biểu đồ
       (`--bo-bieu-do` để bỏ) → bảng tóm tắt so với đợt trước, ghi `that/lich-su.csv`. Dừng ở bước
       nào thì in cách sửa; sửa xong chạy lại cùng lệnh, không cộng câu hai lần.
+   - Số cho báo cáo, máy in sẵn: **kappa gộp** (dòng "Kappa gộp" trong TÓM TẮT) là Cohen's kappa
+     tính trên MỘT dãy dồn mọi câu của các đợt hai người gán đủ `a.csv`/`b.csv`, lấy nhãn TRƯỚC khi
+     thống nhất; đợt chưa gán đủ bị bỏ qua và được đếm trong dòng in. **Khoảng tin cậy 95 %** của
+     độ chính xác và F1 macro in ngay dưới dòng "TẬP KIỂM": bootstrap 1.000 lần lấy mẫu lại tập
+     kiểm (hạt 42), mô hình không học lại, nên khoảng này chỉ nói độ dao động do tập kiểm nhỏ.
+   - Cột `chemai_vua_noi` (đợt xuất từ 04/10/2026): tin ChemAI ngay trước tin của em trong cùng
+     cuộc chat, giữ 500 ký tự cuối, đứng trước cột `tin_nhan` trong `a.csv`, `b.csv`, `chua-gan.csv`.
+     Chỉ để người gán đọc cho hiểu câu (cần cho nhãn `tra_loi_gia_su`); nhãn vẫn gán cho `tin_nhan`,
+     mô hình không học cột này. Máy đã che như tin của em nhưng vẫn có thể sót tên: che tay cả cột
+     này, sửa y hệt ở cả ba tệp.
    - Mô hình mới ghi vào `public/mo-hinh/`, web chỉ dùng sau khi chủ dự án build và deploy.
    - Câu thật không rời `du-lieu/that/` (bị `.gitignore` chặn). Các script tự nhận câu thật (tệp
      nằm trong đó, hoặc có dòng nguồn `that`) và dừng nếu `--ra`/`--kiem`/`--tap-kiem` trỏ ra ngoài.
@@ -52,14 +65,20 @@
      và gửi mail qua Gmail (biến `GMAIL_GUI`, `GMAIL_MAT_KHAU_UNG_DUNG`, `GMAIL_NHAN` trong
      `.env.local`, xem `.env.example`). Thử không gửi: `-- --khong-gui`; thử không đọc Firestore:
      `-- --thu <thư mục đợt>`. Nhật ký: `<Tài liệu>\gan-nhan-gia-su\nhat-ky\`.
-   - Bảng: sheet "Gán nhãn" (cột Nhãn bấm mũi tên chọn 1 trong 7 nhãn hoặc "(Bỏ câu này)"; nhãn thứ 7 "Xin đề" thêm 04/10/2026), sheet
+   - Bảng: sheet "Gán nhãn" (cột Nhãn bấm mũi tên chọn 1 trong 8 nhãn hoặc "(Bỏ câu này)"; nhãn thứ 7 "Xin đề" thêm 04/10/2026, nhãn thứ 8
+     "Trả lời ChemAI" thêm 05/10/2026; bảng gửi trước ngày đó chưa có nhãn mới trong ô chọn), sheet
      "Giải thích nhãn", sheet "Thông tin" (tên đợt, người gán). Không thêm, xoá, sắp xếp lại dòng.
+     Đợt có cột `chemai_vua_noi` thì bảng thêm cột "ChemAI vừa nói" trước cột Câu hỏi (cột Nhãn lùi
+     sang D): chỉ để đọc, thấy tên người trong cột này cũng sửa thành [tên]. Bảng cũ 5 cột vẫn nạp được.
    - Nạp bảng đã gán: `npm run phan-loai:nap-xlsx -- "<tệp .xlsx>"` — chạy cùng chuỗi như bước 2b
-     nhưng không có kappa (lịch sử ghi `mot-nguoi-gan`); báo cáo nên cho một bạn khác gán lại ~20 %.
+     nhưng không có kappa (lịch sử ghi `mot-nguoi-gan`); muốn chốt tập kiểm thì bạn thứ hai phải gán lại CẢ đợt (xem dưới).
    - Hẹn giờ 0:00: `powershell -ExecutionPolicy Bypass -File scripts\phan-loai\dang-ky-hen-gio.ps1`
      (huỷ: thêm `-Huy`). Máy phải bật và đăng nhập Windows; lỡ giờ thì chạy bù khi bật lại.
    - Câu giáo viên/quản trị được học nhưng KHÔNG vào tập kiểm cố định và không tính vào ngưỡng
-     100 câu: số đo báo cáo là trên câu học sinh.
+     250 câu: số đo báo cáo là trên câu học sinh.
+   - Đợt nạp bằng bảng một người gán thì CHƯA chốt được tập kiểm cố định: hai bạn gán độc lập
+     `a.csv`, `b.csv` của đợt đó rồi chạy `npm run phan-loai:huan-luyen -- <thư mục đợt>` (câu đã
+     cộng dồn không cộng lần hai; đợt khi đó có kappa và được tính là hai người gán).
    - Trợ lý AI khác (AntiGravity…) huấn luyện thay: đọc `HUONG-DAN-CHO-AI.md`.
 3. Huấn luyện: `python scripts/phan-loai/huan-luyen.py` → ghi `public/mo-hinh/phan-loai-y-dinh.json`
    và `scripts/phan-loai/ket-qua/`.

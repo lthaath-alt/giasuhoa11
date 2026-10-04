@@ -7,9 +7,10 @@ Sau đó Claude Code sẽ kiểm lại theo mục cuối.
 
 ## Bộ phân loại là gì
 
-Hồi quy logistic đa lớp (scikit-learn) trên TF-IDF 1–2 từ của câu đã bỏ dấu, đoán MỘT trong 7
+Hồi quy logistic đa lớp (scikit-learn) trên TF-IDF 1–2 từ của câu đã bỏ dấu, đoán MỘT trong 8
 nhãn cho mỗi tin học sinh gửi gia sư AI: `hoi_khai_niem`, `be_tac`, `xin_dap_an`, `nop_bai_lam`,
-`gian_lan_phong_thi`, `xin_de`, `ngoai_mon`. `xin_de` (xin bài để tự luyện) thêm 04/10/2026; nhãn
+`gian_lan_phong_thi`, `xin_de`, `tra_loi_gia_su`, `ngoai_mon`. `xin_de` (xin bài để tự luyện) thêm
+04/10/2026, `tra_loi_gia_su` (em trả lời câu ChemAI vừa hỏi) thêm 05/10/2026; nhãn
 nào chưa có đủ 5 câu thì mô hình tạm chưa học, đầu ra in "TẠM CHƯA HỌC" — bình thường, không phải
 lỗi. Mô hình ra là tệp JSON `public/mo-hinh/phan-loai-y-dinh.json`;
 trình duyệt tự tính lại bằng TypeScript. Nó CHẠY BÓNG: chỉ ghi nhãn đoán, không đổi cách gia sư
@@ -62,8 +63,9 @@ Nếu dừng ở "câu bất đồng": mở `dot-<ngày>/bat-dong.csv`, nhờ HA
 2. Cộng dồn câu vào `that/nhan-that.csv` (chạy lại cùng đợt không cộng hai lần). Nguồn
    `that:<đợt>` là câu học sinh, `that-gv:<đợt>` là câu giáo viên/quản trị.
 3. Học trên câu thật + bộ cũ `du-lieu/nhan.csv` (do AI gán, chỉ để đủ câu). Tập kiểm CỐ ĐỊNH chỉ
-   được chốt khi có ≥ 100 câu học sinh và mỗi nhãn đã gặp có ≥ 2 câu; trước đó máy in
-   "CHƯA đủ câu thật để chốt tập kiểm" và số đo đợt đó KHÔNG dùng cho báo cáo.
+   được chốt khi có ≥ 250 câu học sinh, mỗi nhãn đã gặp có ≥ 2 câu, VÀ mọi câu học sinh tích luỹ đã
+   qua hai người gán (Cách A một người gán thì chưa); trước đó máy in "CHƯA chốt tập kiểm (lý do)"
+   và số đo đợt đó KHÔNG dùng cho báo cáo. Không hạ `--nguong-tap-kiem` để chốt sớm.
 4. Dò tên học sinh trong từ vựng trước khi ghi mô hình web. Dừng với "trùng tên học sinh" thì
    KHÔNG dùng `--cho-phep-cum`; báo Khải các cụm in ra để Khải che tay trong bảng rồi chạy lại.
 5. `kiem-tra:phan-loai` (TypeScript tính đúng như Python), so với luật regex, vẽ biểu đồ.
@@ -73,7 +75,20 @@ Nếu dừng ở "câu bất đồng": mở `dot-<ngày>/bat-dong.csv`, nhờ HA
 - `Độ chính xác`, `Macro-F1`: trên tập kiểm. Chỉ trích vào báo cáo khi dòng "Học / kiểm" ghi
   "tập kiểm cố định, toàn câu thật".
 - `(+x điểm %)`: so với đợt trước cùng tập kiểm cố định.
-- `một người gán, chưa có kappa`: báo cáo cần thêm một bạn gán lại khoảng 20 % số câu.
+- `một người gán, chưa có kappa`: đợt này chưa tính là hai người gán, nên tập kiểm chưa chốt được
+  cho tới khi hai bạn gán `a.csv`, `b.csv` của đợt và chạy Cách B.
+- `Kappa gộp`: Cohen's kappa trên một dãy dồn mọi đợt hai người gán đủ (nhãn trước khi thống
+  nhất), kèm số câu, số đợt, số đợt bị bỏ qua. Đây là số kappa cho báo cáo.
+- Dòng `Khoảng tin cậy 95 %` (ngay dưới "TẬP KIỂM" trong đầu ra bước học): bootstrap 1.000 lần lấy
+  mẫu lại tập kiểm, cho độ chính xác và F1 macro. Chép nguyên cùng số câu tập kiểm.
+
+## Cột `chemai_vua_noi`
+
+Đợt xuất từ 04/10/2026 có cột `chemai_vua_noi` trong `a.csv`, `b.csv`, `chua-gan.csv` (trên bảng
+Excel: cột "ChemAI vừa nói", đứng trước cột Câu hỏi): tin ChemAI ngay trước tin của em, để người
+gán đọc. Mô hình không học cột này và nó không đi vào `nhan-that.csv`. Đây vẫn là dữ liệu riêng tư
+như câu của học sinh: không dán vào chat hay công cụ ngoài. Việc che tay tên trong cột này là của
+người gán; bạn không tự sửa nội dung cột.
 
 ## Khi lệnh dừng
 

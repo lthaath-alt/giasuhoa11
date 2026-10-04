@@ -100,13 +100,24 @@ def dem_nguon(dot):
     return [d['tin_nhan'] for d in dong], len(dong) - gv, gv
 
 
+def doc_ngu_canh(dot):
+    """Cột chemai_vua_noi của chua-gan.csv (tin ChemAI ngay trước từng câu), đúng thứ tự câu.
+    Đợt xuất trước khi có cột này thì trả None: bảng giữ 5 cột như cũ."""
+    with open(dot / 'chua-gan.csv', encoding='utf-8-sig', newline='') as f:
+        doc = csv.DictReader(f)
+        if 'chemai_vua_noi' not in (doc.fieldnames or []):
+            return None
+        return [(d.get('chemai_vua_noi') or '') for d in doc]
+
+
 def lam_bang(dot, thu_muc_ra):
     """Bảng cho đợt: một bản ở thư mục ra (để gửi / mở), một bản trong thư mục đợt."""
     cau, hs, gv = dem_nguon(dot)
+    ngu_canh = doc_ngu_canh(dot)
     thu_muc_ra.mkdir(parents=True, exist_ok=True)
     tep = thu_muc_ra / f'cau-hoi-{dot.name}.xlsx'
-    ghi_bang(tep, cau, dot.name, hs, gv)
-    ghi_bang(dot / 'bang-gan-nhan.xlsx', cau, dot.name, hs, gv)
+    ghi_bang(tep, cau, dot.name, hs, gv, ngu_canh=ngu_canh)
+    ghi_bang(dot / 'bang-gan-nhan.xlsx', cau, dot.name, hs, gv, ngu_canh=ngu_canh)
     return tep, len(cau), hs, gv
 
 
