@@ -238,9 +238,15 @@ export function danhSachTen(hoTen: readonly string[]): string[] {
 
 const bocO = (s: string) => /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 
-/** CSV cho người gán: cùng bốn cột với nhan.csv, nhãn để trống, nguồn "that". */
-export function csvChuaGan(cau: readonly string[]): string {
-  return '﻿' + ['tin_nhan,nhan,nguoi_gan,nguon', ...cau.map(c => `${bocO(c)},,,that`)].join('\r\n') + '\r\n';
+/** Nguồn của câu học sinh và câu giáo viên/quản trị. Báo cáo chính chỉ dựa trên NGUON_HS. */
+export const NGUON_HS = 'that';
+export const NGUON_GV = 'that-gv';
+
+/** CSV cho người gán: cùng bốn cột với nhan.csv, nhãn để trống. `nguon` là một chuỗi cho
+    mọi dòng, hoặc mảng cùng độ dài với `cau` (câu học sinh "that", câu giáo viên "that-gv"). */
+export function csvChuaGan(cau: readonly string[], nguon: string | readonly string[] = NGUON_HS): string {
+  const n = (i: number) => (typeof nguon === 'string' ? nguon : nguon[i] ?? NGUON_HS);
+  return '﻿' + ['tin_nhan,nhan,nguoi_gan,nguon', ...cau.map((c, i) => `${bocO(c)},,,${n(i)}`)].join('\r\n') + '\r\n';
 }
 
 /** Tệp cho MỘT người gán: tin_nhan, nhan, nguoi_gan. Cố ý KHÔNG có cột nguon (lộ gợi ý). */
@@ -274,11 +280,11 @@ export function cauDaCo(thuMucDuLieu: string): string[] {
  * và `<thuMucThat>/ten-hoc-sinh.txt` (chỉ tên) để dò từ vựng. Trả đường dẫn thư mục đợt.
  */
 export function ghiDot(thuMucThat: string, ngay: string, cau: readonly string[],
-  meta: readonly string[], dsTen: readonly string[]): string {
+  meta: readonly string[], dsTen: readonly string[], nguon: string | readonly string[] = NGUON_HS): string {
   let dot = join(thuMucThat, `dot-${ngay}`);
   for (let i = 2; existsSync(dot); i++) dot = join(thuMucThat, `dot-${ngay}-${i}`);
   mkdirSync(dot, { recursive: true });
-  writeFileSync(join(dot, 'chua-gan.csv'), csvChuaGan(cau), 'utf8');
+  writeFileSync(join(dot, 'chua-gan.csv'), csvChuaGan(cau, nguon), 'utf8');
   writeFileSync(join(dot, 'chua-gan.meta.txt'), [...meta, ''].join('\r\n'), 'utf8');
   writeFileSync(join(dot, 'a.csv'), csvChoNguoiGan(cau), 'utf8');
   writeFileSync(join(dot, 'b.csv'), csvChoNguoiGan(cau), 'utf8');

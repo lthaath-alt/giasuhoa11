@@ -55,7 +55,7 @@ const dong: string[] = [];
 const dung = doan.filter((d, i) => d === cau[i].nhan).length;
 dong.push(`# So sánh bộ phân loại tự huấn luyện với luật regex`, '',
   `Mô hình \`${m.phien_ban}\`, tập kiểm ${cau.length} câu (máy không thấy lúc học).`, '',
-  `Độ chính xác 6 nhãn của mô hình: **${pct(dung / cau.length)}** (${dung}/${cau.length}).`, '',
+  `Độ chính xác ${m.nhan.length} nhãn của mô hình: **${pct(dung / cau.length)}** (${dung}/${cau.length}).`, '',
   '| Nhãn | Cách | Precision | Recall | F1 | Bắt đúng | Báo nhầm | Bỏ sót |',
   '|---|---|---|---|---|---|---|---|');
 const so = (nhan: string, luat: (s: string) => boolean) => {
@@ -67,8 +67,13 @@ const so = (nhan: string, luat: (s: string) => boolean) => {
 };
 so('be_tac', laTinBeTac);
 so('gian_lan_phong_thi', laNguCanhGianLanPhongThi);
-dong.push('', '## Bốn nhãn chỉ mô hình làm được', '', '| Nhãn | Precision | Recall | F1 |', '|---|---|---|---|');
-for (const nhan of ['hoi_khai_niem', 'xin_dap_an', 'nop_bai_lam', 'ngoai_mon']) {
+/* Mọi nhãn mô hình có, trừ hai nhãn regex cũng làm (đã so ở trên). Đọc từ mô hình: bộ nhãn từ
+   04/10/2026 có thêm xin_de, và nhãn chưa đủ câu thì mô hình chưa học. */
+const THU_TU = ['hoi_khai_niem', 'xin_dap_an', 'nop_bai_lam', 'xin_de', 'ngoai_mon'];
+const chiMoHinh = [...THU_TU.filter(n => m.nhan.includes(n)),
+  ...m.nhan.filter(n => !THU_TU.includes(n) && n !== 'be_tac' && n !== 'gian_lan_phong_thi')];
+dong.push('', `## ${chiMoHinh.length === 4 ? 'Bốn' : 'Các'} nhãn chỉ mô hình làm được`, '', '| Nhãn | Precision | Recall | F1 |', '|---|---|---|---|');
+for (const nhan of chiMoHinh) {
   const k = prf(cau.map(c => c.nhan === nhan), doan.map(d => d === nhan));
   dong.push(`| ${nhan} | ${pct(k.p)} | ${pct(k.r)} | ${pct(k.f1)} |`);
 }

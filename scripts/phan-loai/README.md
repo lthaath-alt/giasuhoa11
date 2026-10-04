@@ -24,7 +24,9 @@
       kiểm hai tệp gán đủ → đo đồng thuận (in kappa; lần đầu ghi `bat-dong.csv`) → còn câu bất đồng
       chưa có `nhan_chot` thì DỪNG, bàn xong điền rồi chạy lại đúng lệnh này → gộp nhãn, cộng dồn
       vào `that/nhan-that.csv` → học trên câu thật + bộ cũ (`--chi-cau-that` để bỏ bộ cũ) với tập
-      kiểm CỐ ĐỊNH `that/tap-kiem-co-dinh.csv` (20 % câu thật, tạo ở đợt đầu, giữ nguyên về sau)
+      kiểm CỐ ĐỊNH `that/tap-kiem-co-dinh.csv` (20 % câu thật, chỉ chốt khi đã có ≥ 100 câu thật và
+      mỗi nhãn đã gặp có ≥ 2 câu — đổi bằng `--nguong-tap-kiem`; trước mốc đó máy vẫn học, chia
+      80/20 như cũ, in "CHƯA đủ câu thật để chốt tập kiểm" và số đo các đợt đó CHƯA đưa vào báo cáo)
       và phép dò tên trong từ vựng → `kiem-tra:phan-loai` → so với regex → vẽ biểu đồ
       (`--bo-bieu-do` để bỏ) → bảng tóm tắt so với đợt trước, ghi `that/lich-su.csv`. Dừng ở bước
       nào thì in cách sửa; sửa xong chạy lại cùng lệnh, không cộng câu hai lần.
@@ -43,6 +45,22 @@
      câu trở lên vẫn có thể vào từ vựng web; đọc kỹ CSV trước khi gán là chốt cuối.
    - Từng script chạy riêng được (`do-dong-thuan.py`, `gop-nhan.py`, `huan-luyen.py --tap-kiem`,
      `danh-gia:phan-loai -- --tap-kiem`, `ve-bieu-do.py --tap-kiem`); xem đầu mỗi tệp.
+2c. **Mỗi đêm tự gửi bảng Excel, một người gán** (04/10/2026):
+   - `npm run phan-loai:hang-ngay` (`hang_ngay.py`): chạy `phan-loai:xuat` (câu học sinh 11A3 +
+     câu tài khoản giáo viên/quản trị, nguồn `that-gv`, chỉ câu chưa có ở đợt nào). Không có câu
+     mới thì thôi, KHÔNG gửi mail. Có thì làm bảng `<Tài liệu>\gan-nhan-gia-su\cau-hoi-<đợt>.xlsx`
+     và gửi mail qua Gmail (biến `GMAIL_GUI`, `GMAIL_MAT_KHAU_UNG_DUNG`, `GMAIL_NHAN` trong
+     `.env.local`, xem `.env.example`). Thử không gửi: `-- --khong-gui`; thử không đọc Firestore:
+     `-- --thu <thư mục đợt>`. Nhật ký: `<Tài liệu>\gan-nhan-gia-su\nhat-ky\`.
+   - Bảng: sheet "Gán nhãn" (cột Nhãn bấm mũi tên chọn 1 trong 7 nhãn hoặc "(Bỏ câu này)"; nhãn thứ 7 "Xin đề" thêm 04/10/2026), sheet
+     "Giải thích nhãn", sheet "Thông tin" (tên đợt, người gán). Không thêm, xoá, sắp xếp lại dòng.
+   - Nạp bảng đã gán: `npm run phan-loai:nap-xlsx -- "<tệp .xlsx>"` — chạy cùng chuỗi như bước 2b
+     nhưng không có kappa (lịch sử ghi `mot-nguoi-gan`); báo cáo nên cho một bạn khác gán lại ~20 %.
+   - Hẹn giờ 0:00: `powershell -ExecutionPolicy Bypass -File scripts\phan-loai\dang-ky-hen-gio.ps1`
+     (huỷ: thêm `-Huy`). Máy phải bật và đăng nhập Windows; lỡ giờ thì chạy bù khi bật lại.
+   - Câu giáo viên/quản trị được học nhưng KHÔNG vào tập kiểm cố định và không tính vào ngưỡng
+     100 câu: số đo báo cáo là trên câu học sinh.
+   - Trợ lý AI khác (AntiGravity…) huấn luyện thay: đọc `HUONG-DAN-CHO-AI.md`.
 3. Huấn luyện: `python scripts/phan-loai/huan-luyen.py` → ghi `public/mo-hinh/phan-loai-y-dinh.json`
    và `scripts/phan-loai/ket-qua/`.
    - **Chốt tập kiểm sau lần huấn luyện THẬT đầu tiên**: `train_test_split` chia theo

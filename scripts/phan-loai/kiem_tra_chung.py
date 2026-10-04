@@ -8,11 +8,16 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 from chung import (  # noqa: E402
-    bat_buoc_trong, chia_tap, chia_theo_tuy_chon, chuan_hoa, co_cau_that, do_ten_trong_tu_vung, doc_csv_nhan,
+    bat_buoc_trong, chia_tap, la_cau_hoc_sinh, chia_theo_tuy_chon, chuan_hoa, co_cau_that, do_ten_trong_tu_vung, doc_csv_nhan,
     doc_ten_hoc_sinh, gop_trung, tach_tu,
 )
+import os  # noqa: E402
+from bang_xlsx import doc_bang, ghi_bang, ma_nhan  # noqa: E402
+from hang_ngay import doc_bien_gmail, gui_thu, kiem_dang_nhap, lam_bang, soan_thu  # noqa: E402
 from nap_dot import (  # noqa: E402
-    Dung, chenh, cong_don, doc_lich_su, dung_tep_hoc, ghi_dong, kiem_cung_danh_sach, kiem_tep_gan, them_lich_su,
+    Dung, chenh, chu_kappa, chuyen_bang, cong_don, doc_lich_su, du_cau_chot_tap_kiem, dung_tep_hoc, ghi_dong, kappa,
+    kiem_cung_danh_sach, kiem_tep_gan,
+    them_lich_su,
 )
 
 hong = 0
@@ -179,6 +184,19 @@ with tempfile.TemporaryDirectory() as tmp:
     ok([d['nhan'] for d in hoc if chuan_hoa(d['tin_nhan']) == 'em chiu'] == ['be_tac'], 'trùng câu thì giữ nhãn câu THẬT')
     ok(dung_tep_hoc(tl, cu, True) == (tl, 0), '--chi-cau-that: chỉ câu thật')
 
+    cau = lambda n, nhan: [{'tin_nhan': f'c{i}', 'nhan': nhan} for i in range(n)]  # noqa: E731
+    ok(du_cau_chot_tap_kiem(cau(13, 'be_tac'))[0] is False, 'mới 13 câu thật (như đợt 03/10) → CHƯA chốt tập kiểm')
+    ok(du_cau_chot_tap_kiem(cau(99, 'be_tac') + cau(1, 'ngoai_mon')) == (False, 'nhãn chỉ có 1 câu: ngoai_mon'),
+       'đủ 100 câu mà có nhãn chỉ 1 câu → chưa chốt (không chia giữ tỉ lệ được)')
+    ok(du_cau_chot_tap_kiem(cau(98, 'be_tac') + cau(2, 'ngoai_mon')) == (True, ''),
+       'đủ 100 câu, mọi nhãn đã có đều ≥ 2 câu → chốt; nhãn chưa từng gặp không chặn')
+    ok(du_cau_chot_tap_kiem(cau(20, 'be_tac'), nguong=20)[0], '--nguong-tap-kiem hạ ngưỡng được')
+
+    hai = [{'tin_nhan': 'x', 'nhan': 'be_tac'}, {'tin_nhan': 'y', 'nhan': 'be_tac'}]
+    ok(kappa(hai, hai) is None and 'không tính được' in chu_kappa(None),
+       'cả hai người chỉ dùng một nhãn: kappa "không tính được", không in "nan"')
+    ok(chu_kappa(kappa(hai, [hai[0], {'tin_nhan': 'y', 'nhan': 'ngoai_mon'}])) == '0.000', 'kappa thường vẫn in 3 chữ số')
+
     ls = tm / 'lich-su.csv'
     them_lich_su({'ngay': '2026-10-03', 'dot': 'dot-1', 'do_chinh_xac': 0.8}, ls)
     them_lich_su({'ngay': '2026-10-10', 'dot': 'dot-2', 'do_chinh_xac': 0.85}, ls)
@@ -187,6 +205,110 @@ with tempfile.TemporaryDirectory() as tmp:
     ok([(d['dot'], d['do_chinh_xac']) for d in doc_lich_su(ls)] == [('dot-1', '0.8'), ('dot-2', '0.86')],
        'chạy lại cùng đợt thì thay dòng của đợt đó, không thêm dòng trùng')
     ok(chenh(0.85, '0.8') == ' (+5,0 điểm %)', f'so với đợt trước ra điểm phần trăm ({chenh(0.85, "0.8")})')
+
+print('\n== Bảng Excel một người gán (bang_xlsx.py) và nạp lại (nap_dot.chuyen_bang) ==')
+with tempfile.TemporaryDirectory() as tmp:
+    import zipfile
+    tm = Path(tmp)
+    cau_gia = ['em chịu bài này', 'cho em đáp án <b>&"x"</b>\nxuống dòng', 'x' * 8328, 'ký tự lạ \x01 ở đây']
+    tep = tm / 'bang.xlsx'
+    ghi_bang(tep, cau_gia, 'dot-2026-10-04', 3, 1)
+    with zipfile.ZipFile(tep) as z:
+        s1 = z.read('xl/worksheets/sheet1.xml').decode()
+    ok('type="list"' in s1 and 'sqref="C2:C5"' in s1 and 'showErrorMessage="1"' in s1,
+       'cột Nhãn có ô thả xuống (data validation dạng danh sách), gõ chữ khác thì báo lỗi')
+    ok('Bế tắc' in s1 and '(Bỏ câu này)' in s1 and 'state="frozen"' in s1,
+       'danh sách có tên nhãn tiếng Việt + "(Bỏ câu này)"; dòng tiêu đề đứng yên')
+    b = doc_bang(tep)
+    ok(b['dot'] == 'dot-2026-10-04' and [d['tin_nhan'] for d in b['dong']][:3] == cau_gia[:3],
+       'đọc lại: đúng tên đợt, câu giữ nguyên (cả ký tự đặc biệt, xuống dòng, câu 8328 ký tự)')
+    ok(b['dong'][3]['tin_nhan'] == 'ký tự lạ  ở đây', 'ký tự điều khiển (XML không chứa được) bị bỏ, không làm hỏng tệp')
+    ok([ma_nhan(x) for x in ['Bế tắc', 'be_tac', ' xin đáp án ', '(Bỏ câu này)', '', 'linh tinh']]
+       == ['be_tac', 'be_tac', 'xin_dap_an', 'bo', '', 'linh tinh'], 'tên nhãn trên bảng đổi về mã nhãn')
+
+    def bang_gia(nhan, nguoi=('',) * 4, stt=('1', '2', '3', '4'), chung='Khải'):
+        return {'dot': 'dot-2026-10-04', 'nguoi_gan': chung,
+                'dong': [{'stt': s, 'tin_nhan': f'cau {s}', 'nhan': n, 'nguoi_gan': g, 'ghi_chu': ''}
+                         for s, n, g in zip(stt, nhan, nguoi)]}
+    cg = [{'tin_nhan': 'c', 'nguon': n} for n in ('that', 'that-gv', 'that', 'that')]
+    ra, bo = chuyen_bang(bang_gia(['be_tac', 'ngoai_mon', 'bo', 'xin_dap_an'], ('', '', '', 'Binh')), cg)
+    ok(bo == 1 and len(ra) == 3, '"(Bỏ câu này)" không đưa vào học')
+    ok([d['nguon'] for d in ra] == ['that', 'that-gv', 'that'], 'nguồn lấy theo STT từ chua-gan.csv (học sinh / giáo viên)')
+    ok([d['nguoi_gan'] for d in ra] == ['Khải', 'Khải', 'Binh'], 'ô Người gán trống thì lấy tên ở sheet Thông tin')
+    ok('chưa chọn nhãn' in dung_ra(chuyen_bang, bang_gia(['be_tac', '', 'bo', '']), cg), 'còn câu chưa chọn nhãn → dừng, nói STT')
+    ok('thiếu' in dung_ra(chuyen_bang, bang_gia(['be_tac'] * 3, stt=('1', '2', '3')), cg), 'xoá mất dòng → dừng')
+    ok('lặp' in dung_ra(chuyen_bang, bang_gia(['be_tac'] * 4, stt=('1', '2', '2', '4')), cg), 'STT lặp (sắp xếp lại) → dừng')
+    ok('không có trong danh sách' in dung_ra(chuyen_bang, bang_gia(['be_tac', 'abc', 'bo', 'bo']), cg), 'nhãn gõ tay sai → dừng')
+
+    hs_gv = [{'tin_nhan': f'c{i}', 'nhan': 'be_tac', 'nguon': 'that-gv:d'} for i in range(100)]
+    ok(du_cau_chot_tap_kiem(hs_gv)[0] is False, 'câu giáo viên không tính vào ngưỡng chốt tập kiểm')
+    ok(la_cau_hoc_sinh('that:dot-1') and la_cau_hoc_sinh('that') and not la_cau_hoc_sinh('that-gv:dot-1'),
+       'tập kiểm chỉ lấy câu học sinh, không lấy câu giáo viên')
+    ok(cong_don([], [{'tin_nhan': 'a', 'nhan': 'be_tac', 'nguon': 'that-gv'}], 'dot-9')[0][0]['nguon'] == 'that-gv:dot-9',
+       'cộng dồn giữ nguồn giáo viên')
+
+print('\n== Nhãn thứ 7 "xin_de" (04/10/2026) ==')
+from chung import NHAN, loc_nhan_it_cau  # noqa: E402
+ok(NHAN[-2:] == ['xin_de', 'ngoai_mon'] and len(NHAN) == 7, 'bộ nhãn có 7 nhãn, xin_de đứng trước ngoai_mon')
+ok(ma_nhan('Xin đề') == 'xin_de' and ma_nhan('xin_de') == 'xin_de', 'bảng Excel hiểu "Xin đề"')
+Xg = [f'c{i}' for i in range(13)]
+yg = ['be_tac'] * 10 + ['xin_de'] * 3
+X2, y2, gac = loc_nhan_it_cau(Xg, yg)
+ok(gac == {'xin_de': 3} and len(X2) == 10 and 'xin_de' not in y2,
+   'xin_de mới 3 câu: tạm gác khi học (câu vẫn trong CSV), không làm dừng cả lần học')
+ok(loc_nhan_it_cau(Xg, ['be_tac'] * 8 + ['xin_de'] * 5)[2] == {}, 'đủ 5 câu thì học bình thường')
+with tempfile.TemporaryDirectory() as tmp:
+    tep = Path(tmp) / 'b.xlsx'
+    ghi_bang(tep, ['a', 'b', 'c'], 'dot-x', da_gan=[{'nhan': 'xin_de', 'ghi_chu': 'xin đề'}, {'nhan': 'bo'}, {}],
+             nguoi_gan_chung='Khải')
+    b = doc_bang(tep)
+    ok([d['nhan'] for d in b['dong']] == ['xin_de', 'bo', ''] and b['dong'][0]['ghi_chu'] == 'xin đề' and b['nguoi_gan'] == 'Khải',
+       'dựng lại bảng giữ nhãn, ghi chú, người gán đã có')
+
+print('\n== Chạy hằng đêm (hang_ngay.py): biến Gmail, soạn thư, gửi (máy gửi GIẢ) ==')
+with tempfile.TemporaryDirectory() as tmp:
+    tm = Path(tmp)
+    env = tm / '.env.local'
+    env.write_text('KHAC=1\nGMAIL_GUI=gui@gmail.com\nGMAIL_MAT_KHAU_UNG_DUNG="abcd efgh ijkl mnop"\n', encoding='utf-8')
+    for k in ('GMAIL_GUI', 'GMAIL_MAT_KHAU_UNG_DUNG', 'GMAIL_NHAN'):
+        os.environ.pop(k, None)
+    bien = doc_bien_gmail(env)
+    ok(bien == {'GMAIL_GUI': 'gui@gmail.com', 'GMAIL_MAT_KHAU_UNG_DUNG': 'abcdefghijklmnop', 'GMAIL_NHAN': 'gui@gmail.com'},
+       'đọc đúng ba biến GMAIL_*, bỏ dấu cách trong mật khẩu ứng dụng, thiếu GMAIL_NHAN thì gửi cho chính mình')
+    dot = tm / 'dot-2026-10-04'
+    dot.mkdir()
+    ghi_dong(dot / 'chua-gan.csv', [{'tin_nhan': 'em chịu', 'nhan': '', 'nguoi_gan': '', 'nguon': 'that'},
+                                    {'tin_nhan': 'test gia su', 'nhan': '', 'nguoi_gan': '', 'nguon': 'that-gv'}])
+    tep, n, hs, gv = lam_bang(dot, tm / 'ra')
+    ok(tep.exists() and (dot / 'bang-gan-nhan.xlsx').exists() and (n, hs, gv) == (2, 1, 1),
+       'làm bảng ở thư mục ra và trong thư mục đợt, đếm đúng học sinh / giáo viên')
+    thu = soan_thu(tep, dot, n, hs, gv, 'gui@gmail.com', 'nguoi-nhan@gmail.com')
+    dinh_kem = [p for p in thu.iter_attachments()]
+    ok(thu['To'] == 'nguoi-nhan@gmail.com' and '2 câu' in thu['Subject'] and len(dinh_kem) == 1
+       and dinh_kem[0].get_filename() == tep.name, 'thư có tiêu đề kèm số câu, đúng người nhận, đính kèm bảng')
+
+    class SmtpGia:
+        gui = []
+
+        def __init__(self, may, cong, **_):
+            self.may, self.cong = may, cong
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_):
+            return False
+
+        def login(self, u, p):
+            self.u = u
+
+        def send_message(self, m):
+            SmtpGia.gui.append((self.may, self.cong, self.u, m['To']))
+    kiem_dang_nhap('gui@gmail.com', 'x', smtp=SmtpGia)
+    ok(SmtpGia.gui == [], '--kiem-mail chỉ đăng nhập, không gửi thư nào')
+    gui_thu(thu, 'gui@gmail.com', 'x', smtp=SmtpGia)
+    ok(SmtpGia.gui == [('smtp.gmail.com', 465, 'gui@gmail.com', 'nguoi-nhan@gmail.com')],
+       'gửi qua smtp.gmail.com cổng 465 bằng tài khoản GMAIL_GUI (máy gửi giả, không gửi thật)')
 
 print('>>> TẤT CẢ ĐẠT' if hong == 0 else f'>>> CÓ {hong} MỤC KHÔNG ĐẠT')
 sys.exit(0 if hong == 0 else 1)

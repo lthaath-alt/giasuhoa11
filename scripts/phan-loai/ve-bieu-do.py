@@ -44,7 +44,7 @@ THU_MUC = Path(__file__).resolve().parent
 GOC = THU_MUC.parents[1]
 sys.path.insert(0, str(THU_MUC))
 from chung import (  # noqa: E402
-    CAC_C, NHAN, THU_MUC_THAT, bat_buoc_trong, chia_theo_tuy_chon, chon_C, co_cau_that, doc_csv_nhan,
+    CAC_C, NHAN, THU_MUC_THAT, bat_buoc_trong, chia_theo_tuy_chon, chon_C, co_cau_that, doc_csv_nhan, kiem_so_cau,
     gop_trung, tao_ong,
 )
 
@@ -54,6 +54,7 @@ TEN_NHAN = {
     'xin_dap_an': 'Xin đáp án',
     'nop_bai_lam': 'Nộp bài làm',
     'gian_lan_phong_thi': 'Gian lận phòng thi',
+    'xin_de': 'Xin đề',
     'ngoai_mon': 'Ngoài môn',
 }
 # Thấy một trong các tên này ở cột nguoi_gan thì coi dòng đó do AI gán nhãn.
@@ -257,7 +258,7 @@ def ve_hoc(kq, f1_rieng, n_hoc, n_kiem, so_gap):
     a.set_ylim(max(0, thap - 8), 102)
     a.yaxis.set_major_formatter(FuncFormatter(lambda v, _: f'{v:.0f} %'))
     a.set_xlabel('Số câu dùng để học')
-    a.set_ylabel('F1 trung bình 6 nhãn')
+    a.set_ylabel('F1 trung bình các nhãn')
     a.set_title('Đường cong học: điểm theo số câu dùng để học')
     a.legend(frameon=False, loc='lower right', fontsize=9)
     an_vien(a)
@@ -284,7 +285,7 @@ def ve_chon_C(bang, C, so_gap, n_hoc):
     a.yaxis.set_major_formatter(FuncFormatter(lambda v, _: f'{v:.0f} %'))
     a.set_xlabel('C (thang log). Nhỏ: phạt trọng số mạnh, mô hình đơn giản.\n'
                  'Lớn: phạt nhẹ, mô hình bám sát câu đã học.')
-    a.set_ylabel('F1 trung bình 6 nhãn')
+    a.set_ylabel('F1 trung bình các nhãn')
     a.set_title(f'Chọn C bằng kiểm chéo trên {n_hoc} câu học')
     a.legend(frameon=False, loc='lower right', fontsize=9)
     an_vien(a)
@@ -312,11 +313,12 @@ def ve_nham_lan(ma_tran, n, dung):
 def ve_cum_tu(clf, vec, so_tu=8):
     ten_dt = vec.get_feature_names_out()
     so_cot = 3
-    so_hang = math.ceil(len(NHAN) / so_cot)
+    co = [n for n in NHAN if n in list(clf.classes_)]   # nhãn chưa đủ câu thì mô hình chưa học
+    so_hang = math.ceil(len(co) / so_cot)
     fig, cac_o = plt.subplots(so_hang, so_cot, figsize=(12, 3.6 * so_hang))
     cac_o = np.atleast_1d(cac_o).ravel()
     cum = {}
-    for o, nhan in zip(cac_o, NHAN):
+    for o, nhan in zip(cac_o, co):
         k = list(clf.classes_).index(nhan)
         top = np.argsort(clf.coef_[k])[::-1][:so_tu]
         tu = [str(ten_dt[i]) for i in top]
@@ -328,7 +330,7 @@ def ve_cum_tu(clf, vec, so_tu=8):
         o.set_title(TEN_NHAN.get(nhan, nhan))
         o.set_xlabel('hệ số trong mô hình', fontsize=9)
         an_vien(o)
-    for o in cac_o[len(NHAN):]:
+    for o in cac_o[len(co):]:
         o.set_visible(False)
     fig.suptitle('Cụm từ đẩy mạnh nhất về từng nhãn (chữ đã bỏ dấu, đúng như mô hình đọc)', fontweight='bold')
     return fig, cum
@@ -381,10 +383,8 @@ def main():
     so_dong = len(X)
     ai_viet, ai_gan = dem_nguon(vao)
     X, y, so_gop = gop_trung(X, y)
+    X, y, _ = kiem_so_cau(X, y)
     dem = Counter(y)
-    thieu = [n for n in NHAN if dem[n] < 5]
-    if thieu:
-        sys.exit(f'Mỗi nhãn cần ít nhất 5 câu. Đang thiếu: {", ".join(f"{n} ({dem[n]})" for n in thieu)}')
     X_hoc, X_kiem, y_hoc, y_kiem = chia_theo_tuy_chon(X, y, vao, a.tap_kiem)
     luoi = chon_C(X_hoc, y_hoc, a.min_df)
     tot = luoi.best_estimator_

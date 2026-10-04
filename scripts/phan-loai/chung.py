@@ -5,6 +5,7 @@
 một đằng, trình duyệt đoán một nẻo. Hai bên cùng chạy du-lieu/vecto-chuan-hoa.json.
 """
 import csv
+import os
 import re
 import sys
 import unicodedata
@@ -25,7 +26,27 @@ for _luong in (sys.stdout, sys.stderr):
 PHIEN_BAN_CHUAN_HOA = 1
 
 # Sáu nhãn — thứ tự cố định, dùng cho báo cáo và ma trận nhầm lẫn.
-NHAN = ['hoi_khai_niem', 'be_tac', 'xin_dap_an', 'nop_bai_lam', 'gian_lan_phong_thi', 'ngoai_mon']
+# "xin_de" (xin bài tập / đề để tự luyện) thêm 04/10/2026 theo quyết định của chủ dự án: bộ nhãn
+# của đề tài từ 6 thành 7 kể từ ngày đó. Mô hình chỉ học một nhãn khi nó có ≥ SO_CAU_TOI_THIEU câu.
+NHAN = ['hoi_khai_niem', 'be_tac', 'xin_dap_an', 'nop_bai_lam', 'gian_lan_phong_thi', 'xin_de', 'ngoai_mon']
+# Sáu nhãn gốc BẮT BUỘC đủ câu (thiếu là dữ liệu hỏng, dừng). Nhãn thêm sau (xin_de) chưa đủ thì
+# tạm gác, mô hình học 6 nhãn như cũ cho tới khi đủ.
+NHAN_BAT_BUOC = [n for n in NHAN if n != 'xin_de']
+SO_CAU_TOI_THIEU = 5
+
+
+def kiem_so_cau(X, y):
+    """Dừng nếu một nhãn bắt buộc thiếu câu; gác nhãn thêm sau còn ít câu. Trả (X, y, {nhãn gác: số câu})."""
+    dem = Counter(y)
+    thieu = [n for n in NHAN_BAT_BUOC if dem[n] < SO_CAU_TOI_THIEU]
+    if thieu:
+        sys.exit(f'Mỗi nhãn cần ít nhất {SO_CAU_TOI_THIEU} câu. Đang thiếu: '
+                 + ', '.join(f'{n} ({dem[n]})' for n in thieu))
+    X, y, gac = loc_nhan_it_cau(X, y)
+    for n, s in gac.items():
+        print(f'Nhãn {n} mới có {s}/{SO_CAU_TOI_THIEU} câu: TẠM CHƯA HỌC nhãn này (câu vẫn giữ trong dữ liệu, '
+              f'đủ {SO_CAU_TOI_THIEU} câu thì tự được học).')
+    return X, y, gac
 
 _NGOAI_CHU_SO = re.compile(r'[^a-z0-9]+')
 
@@ -104,6 +125,18 @@ def gop_trung(X, y):
     return X2, y2, so_gop
 
 
+def loc_nhan_it_cau(X, y, toi_thieu=SO_CAU_TOI_THIEU):
+    """Tạm gác các câu của nhãn có 1..toi_thieu-1 câu (vd. nhãn mới thêm, mới gặp vài câu): quá ít
+    để chia học/kiểm và kiểm chéo. Câu vẫn nằm nguyên trong CSV; đủ câu thì tự được học.
+    Nhãn 0 câu thì thôi. Trả (X, y, {nhãn: số câu bị gác})."""
+    dem = Counter(y)
+    gac = {n: s for n, s in dem.items() if 0 < s < toi_thieu}
+    if not gac:
+        return X, y, {}
+    giu = [(t, n) for t, n in zip(X, y) if n not in gac]
+    return [t for t, _ in giu], [n for _, n in giu], gac
+
+
 # ─── Ống học: TF-IDF + hồi quy logistic ──────────────────────────────────────
 # huan-luyen.py và ve-bieu-do.py cùng gọi ba hàm dưới đây, để biểu đồ vẽ đúng mô
 # hình đang chạy trên web. Đổi tham số ở đây là đổi cả hai.
@@ -122,7 +155,8 @@ def chia_tap(X, y):
 # đó; trỏ ra ngoài thì dừng. Mô hình web chỉ mang từ vựng, nhưng từ vựng vẫn có
 # thể chứa tên chưa che, nên phải qua do_ten_trong_tu_vung trước khi ghi.
 
-THU_MUC_THAT = Path(__file__).resolve().parent / 'du-lieu' / 'that'
+# Biến môi trường CHỈ để chạy thử đầu-cuối trên dữ liệu giả mà không đụng đợt thật đang gán dở.
+THU_MUC_THAT = Path(os.environ.get('PHAN_LOAI_THU_MUC_THAT') or Path(__file__).resolve().parent / 'du-lieu' / 'that')
 TEP_TEN_HOC_SINH = THU_MUC_THAT / 'ten-hoc-sinh.txt'   # do `npm run xuat:cau-hoi -- --that` ghi
 
 
@@ -185,9 +219,15 @@ def nguon_theo_khoa(tep):
     return ket
 
 
+def la_cau_hoc_sinh(nguon):
+    """Câu THẬT của học sinh: "that" hoặc "that:<đợt>". Câu giáo viên/quản trị ("that-gv...")
+    vẫn là dữ liệu riêng tư nhưng KHÔNG vào tập kiểm: số đo báo cáo là trên câu học sinh."""
+    return nguon == 'that' or nguon.startswith('that:')
+
+
 def tao_tap_kiem(y, nguon, ti_le=0.2, hat=42):
-    """Chỉ số các câu nguồn "that" được chọn làm tập kiểm cố định (giữ tỉ lệ nhãn khi được)."""
-    idx = [i for i, n in enumerate(nguon) if n.startswith('that')]
+    """Chỉ số các câu học sinh thật được chọn làm tập kiểm cố định (giữ tỉ lệ nhãn khi được)."""
+    idx = [i for i, n in enumerate(nguon) if la_cau_hoc_sinh(n)]
     if len(idx) < 10:
         sys.exit(f'Mới có {len(idx)} câu nguồn "that" — cần ít nhất 10 câu thật đã gán nhãn mới tạo tập kiểm cố định.')
     yy = [y[i] for i in idx]

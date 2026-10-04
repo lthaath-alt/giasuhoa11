@@ -25,6 +25,7 @@ mở tệp của vùng đó.
 | Deploy, biến môi trường, trắng trang | `docs/claude-reference/deployment.md` |
 | Cấu trúc thư mục, thêm trang mới | `docs/claude-reference/project.md` |
 | Quy trình làm việc, kỹ năng, bài học | `docs/claude-reference/workflow.md` |
+| Huấn luyện lại bộ phân loại ý định từ bảng đã gán nhãn | `scripts/phan-loai/HUONG-DAN-CHO-AI.md` |
 | Hạn mức khách, trò chơi mở khoá, PWA | `docs/claude-reference/product-decisions.md` |
 
 ## Ba điều CẤM, không có ngoại lệ

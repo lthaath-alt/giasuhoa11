@@ -37,7 +37,9 @@ import { getAuth, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { getFirestore, collection, getDocs, doc, getDoc } from 'firebase/firestore';
 import { GOC, docEnv, cauHinh, thieuCauHinh } from '../ngan-hang-chung.mts';
 import { hoi, hoiKin } from '../hoi-ban-phim.mts';
-import { cauDaCo, chonCauHoi, danhSachTen, docDanhSachDongY, ghiDot, laThanhVienLop, type TinTho } from './loc-cau-that.mts';
+import {
+  NGUON_GV, NGUON_HS, cauDaCo, chonCauHoi, danhSachTen, docDanhSachDongY, ghiDot, laThanhVienLop, xao, type TinTho,
+} from './loc-cau-that.mts';
 import type { SchoolClass, User } from '../../src/features/auth/types';
 
 /** Lớp được phép xuất → ghi chú đồng ý đi vào tệp .meta.txt. */
@@ -53,6 +55,9 @@ const layCo = (ten: string): string | undefined => {
   return i >= 0 ? co[i + 1] : undefined;
 };
 const ghiThat = co.includes('--that');
+/* Lấy thêm câu của tài khoản giáo viên / quản trị gửi gia sư (nguồn "that-gv", tách khỏi câu
+   học sinh khi báo cáo). Người lớn, dùng hệ thống để soạn bài và thử gia sư. */
+const kemGiaoVien = co.includes('--kem-giao-vien');
 const hienMatKhau = co.includes('--hien');
 const tenLop = layCo('--lop');
 const tepDongY = layCo('--dong-y');
@@ -152,7 +157,8 @@ if (lop.length !== 1) {
     : `Không có lớp nào tên "${tenLop}".`);
   await thoat(1);
 }
-const hocSinh = (await docHet<User>('users')).filter(u => u.role === 'student');
+const nguoiDung = await docHet<User>('users');
+const hocSinh = nguoiDung.filter(u => u.role === 'student');
 const thanhVien = hocSinh.filter(u => laThanhVienLop(u, lop[0]));
 let emailDuocLay = thanhVien.map(u => (u.email ?? '').toLowerCase()).filter(Boolean);
 console.log(`Lớp ${tenLop}: ${thanhVien.length} học sinh.`);
@@ -163,18 +169,26 @@ if (emailTrongTep) {
 }
 const tin = await docHet<TinTho>('chats');
 
-const { cau, dem } = chonCauHoi(tin, {
-  emailDuocLay,
-  hoTenCanChe: hocSinh.map(u => u.name ?? ''),
-  daCo, tuNgay, denNgay, hat,
-});
-console.log(`\nTin của học sinh (mọi lớp): ${dem.tinEm}`);
+const hoTenCanChe = nguoiDung.map(u => u.name ?? '');   // che cả tên giáo viên
+const { cau: cauHs, dem } = chonCauHoi(tin, { emailDuocLay, hoTenCanChe, daCo, tuNgay, denNgay, hat });
+let cauGv: string[] = [];
+if (kemGiaoVien) {
+  const emailGv = nguoiDung.filter(u => u.role === 'teacher' || u.role === 'admin' || u.role === 'school_admin')
+    .map(u => (u.email ?? '').toLowerCase()).filter(Boolean);
+  cauGv = chonCauHoi(tin, { emailDuocLay: emailGv, hoTenCanChe, daCo: [...daCo, ...cauHs], tuNgay, denNgay, hat }).cau;
+  console.log(`Tài khoản giáo viên / quản trị: ${emailGv.length}; câu mới của họ: ${cauGv.length} (nguồn ${NGUON_GV}).`);
+}
+/* Xáo chung hai nguồn để thứ tự dòng không lộ nguồn; cột nguon trong chua-gan.csv vẫn giữ. */
+const cap = xao([...cauHs.map(c => [c, NGUON_HS] as const), ...cauGv.map(c => [c, NGUON_GV] as const)], hat);
+const cau = cap.map(([c]) => c);
+const nguonCau = cap.map(([, n]) => n);
+console.log(`\nTin người dùng gửi gia sư (mọi lớp, mọi vai): ${dem.tinEm}`);
 console.log(`  ngoài lớp ${tenLop}${emailTrongTep ? ' / ngoài tệp đồng ý' : ''}: ${dem.ngoaiLop}`);
 console.log(`  ngoài khoảng ngày: ${dem.ngoaiNgay}`);
 console.log(`  rỗng sau khi che: ${dem.rong}`);
 console.log(`  trùng câu đã gán / đã xuất: ${dem.trungDaCo}`);
 console.log(`  trùng nhau trong đợt này: ${dem.trungNhau}`);
-console.log(`Câu mới để gán nhãn: ${cau.length}`);
+console.log(`Câu mới để gán nhãn: ${cau.length}${kemGiaoVien ? ` (${cauHs.length} học sinh + ${cauGv.length} giáo viên/quản trị)` : ''}`);
 
 if (!ghiThat) {
   console.log('\nChạy thử. Ba câu đầu (đã che):');
@@ -190,7 +204,8 @@ if (!cau.length) {
 const ngay = new Date().toISOString().slice(0, 10);
 const dsTen = danhSachTen(hocSinh.map(u => u.name ?? ''));
 const dot = ghiDot(RA, ngay, cau, [
-  `Nguồn   : collection chats, tin học sinh gửi gia sư, lớp ${tenLop}`,
+  `Nguồn   : collection chats, tin học sinh lớp ${tenLop} gửi gia sư (${cauHs.length} câu, nguồn ${NGUON_HS})`
+    + (kemGiaoVien ? ` + tài khoản giáo viên/quản trị (${cauGv.length} câu, nguồn ${NGUON_GV})` : ''),
   `Đồng ý  : ${ghiChuDongY}`,
   `Lọc thêm: ${emailTrongTep ? `tệp --dong-y, ${emailDuocLay.length} em` : 'không'}`,
   `Khoảng  : ${tuNgay ?? 'đầu'} → ${denNgay ?? 'nay'}`,
@@ -199,7 +214,7 @@ const dot = ghiDot(RA, ngay, cau, [
   'Ẩn danh : bỏ email, mã học sinh, bài, giờ gửi; xáo thứ tự; che email, số điện thoại,',
   '          họ tên học sinh có trong hồ sơ. Tên một chữ, biệt danh, tên trường KHÔNG che được:',
   '          người gán nhãn đọc lại và che tay.',
-], dsTen);
+], dsTen, nguonCau);
 const dotRel = relative(GOC, dot).replace(/\\/g, '/');
 console.log(`\nĐã tạo đợt ${cau.length} câu: ${dotRel}/`);
 console.log(`  a.csv, b.csv  hai bản cho hai người gán (không có cột nguồn)`);
@@ -209,4 +224,5 @@ console.log('\nBước tiếp:');
 console.log('  1. Đọc lại a.csv, che tay tên, biệt danh, tên trường máy còn sót; sửa y hệt trong b.csv và chua-gan.csv.');
 console.log('  2. Hai bạn gán ĐỘC LẬP: một bạn điền cột nhan + nguoi_gan trong a.csv, bạn kia trong b.csv.');
 console.log(`  3. npm run phan-loai:huan-luyen -- ${dotRel}`);
+console.log(`DOT_MOI=${dot}`);   // hang_ngay.py đọc dòng này
 await thoat(0);

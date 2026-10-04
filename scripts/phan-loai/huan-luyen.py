@@ -29,7 +29,7 @@ THU_MUC = Path(__file__).resolve().parent
 GOC = THU_MUC.parents[1]
 sys.path.insert(0, str(THU_MUC))
 from chung import (  # noqa: E402
-    NHAN, PHIEN_BAN_CHUAN_HOA, TEP_TEN_HOC_SINH, THU_MUC_THAT, bat_buoc_trong, chia_theo_tuy_chon, chon_C,
+    NHAN, PHIEN_BAN_CHUAN_HOA, TEP_TEN_HOC_SINH, THU_MUC_THAT, bat_buoc_trong, chia_theo_tuy_chon, chon_C, kiem_so_cau,
     co_cau_that, doc_csv_nhan, doc_ten_hoc_sinh, do_ten_trong_tu_vung, gop_trung,
 )
 
@@ -89,10 +89,8 @@ def main():
     X, y, so_gop = gop_trung(X, y)
     print(f'Gộp {so_gop} câu trùng sau chuẩn hoá — ghi số này vào báo cáo.')
     dem = Counter(y)
-    thieu = [n for n in NHAN if dem[n] < 5]
-    if thieu:
-        sys.exit(f'Mỗi nhãn cần ít nhất 5 câu. Đang thiếu: {", ".join(f"{n} ({dem[n]})" for n in thieu)}')
     print(f'Đọc {len(X)} câu từ {vao}: ' + ', '.join(f'{n}={dem[n]}' for n in NHAN))
+    X, y, _ = kiem_so_cau(X, y)
 
     # Cách chia, ống học và lưới C nằm ở chung.py — ve-bieu-do.py dùng đúng các hàm này.
     X_tr, X_te, y_tr, y_te = chia_theo_tuy_chon(X, y, vao, a.tap_kiem, a.tao_tap_kiem)

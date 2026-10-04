@@ -19,7 +19,7 @@ import { chuanHoaYDinh, tachTuYDinh, duDoanYDinh, laMoHinhHopLe, type MoHinhYDin
 import { doanYDinhNen, datLaiYDinhNenChoKiemTra } from '../src/features/tutor/services/yDinhNen';
 import {
   cheThongTin, cumTenCanChe, chonCauHoi, xao, docCsv, docDanhSachDongY, cotTinNhan, csvChuaGan, danhSachTen,
-  csvChoNguoiGan, ghiDot, cauDaCo,
+  csvChoNguoiGan, ghiDot, cauDaCo, NGUON_HS, NGUON_GV,
   CHE_EMAIL, CHE_SDT, CHE_TEN,
 } from './phan-loai/loc-cau-that.mts';
 
@@ -238,6 +238,8 @@ console.log('\n== Xuất câu hỏi thật: che thông tin, lọc lớp, bỏ tr
   ok(/email/.test(loi), 'tệp đồng ý thiếu cột email thì báo lỗi rõ');
   ok(JSON.stringify(danhSachTen(['  Trần  Bảo Ân ', '', 'An Nguyễn', 'Trần Bảo Ân'])) === '["An Nguyễn","Trần Bảo Ân"]',
     'danh sách tên để dò từ vựng: gọn khoảng trắng, bỏ rỗng, bỏ trùng, không có email');
+  ok(csvChuaGan(['a', 'b'], [NGUON_HS, NGUON_GV]) === '﻿tin_nhan,nhan,nguoi_gan,nguon\r\na,,,that\r\nb,,,that-gv\r\n',
+    'chua-gan.csv ghi nguồn từng câu: học sinh "that", giáo viên/quản trị "that-gv"');
   ok(csvChoNguoiGan(['em chịu']) === '﻿tin_nhan,nhan,nguoi_gan\r\nem chịu,,\r\n',
     'tệp cho người gán KHÔNG có cột nguon (không lộ gợi ý)');
   {
