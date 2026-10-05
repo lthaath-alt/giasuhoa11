@@ -450,7 +450,7 @@ def main():
     if cu:
         print(f'(so với đợt {cu.get("dot")} ngày {cu.get("ngay")})')
     if not tap_kiem:
-        print('CHƯA đưa số đo đợt này vào báo cáo: tập kiểm chưa chốt, còn lẫn câu bộ cũ do AI gán.')
+        print('CHƯA đưa số đo đợt này vào báo cáo: tập kiểm chưa chốt, còn lẫn câu bộ cũ do AI viết.')
     print(f'Lịch sử          : scripts/phan-loai/du-lieu/that/lich-su.csv ({len(truoc) + 1} đợt)')
     print('\nMô hình mới đã ghi vào public/mo-hinh/ nhưng web CHỈ dùng nó sau khi chủ dự án build và deploy.')
     print('Trước khi commit: git status không được có tệp nào trong du-lieu/that/ (đã bị .gitignore chặn).')

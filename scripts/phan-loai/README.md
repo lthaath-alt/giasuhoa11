@@ -134,9 +134,11 @@ phiên bản mô hình và ngày vẽ. Cắt ảnh đưa vào báo cáo thì ch�
   dấu thì regex càng thua (xem `du-lieu/GHI-CHU-DU-LIEU-AI.md`).
 
 Cột `nguoi_gan` có tên một AI (claude, gemini, gpt...) thì mọi ảnh mang chữ chìm "BẢN THỬ /
-NHÃN DO AI GÁN". Bộ dữ liệu hiện tại do AI gán nhãn hết nên ảnh nào cũng có chữ này: dùng để
-tập đọc biểu đồ, chưa đưa vào báo cáo được. Nhóm gán nhãn lại rồi chạy bước 3, 5, 6 thì chữ
-chìm tự mất.
+NHÃN DO AI GÁN". Tới 04/10/2026 bộ cũ `du-lieu/nhan.csv` do AI gán nhãn hết nên ảnh nào cũng
+có chữ này. Từ 05/10/2026 một thành viên nhóm đã gán lại cả 438 câu (câu vẫn do AI viết, xem
+`du-lieu/GHI-CHU-DU-LIEU-AI.md`), nên chữ chìm đã mất; dòng chân ảnh vẫn ghi số câu AI viết.
+Hết chữ chìm KHÔNG có nghĩa số đo đã dùng được cho báo cáo: còn phải chốt tập kiểm cố định
+(bước 2b) và bộ cũ mới có một người gán.
 
 ## `y_dinh` không phải điểm đánh giá học sinh
 

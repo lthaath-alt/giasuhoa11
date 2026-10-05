@@ -62,7 +62,8 @@ Nếu dừng ở "câu bất đồng": mở `dot-<ngày>/bat-dong.csv`, nhờ HA
    Cohen's kappa giữa hai người, ghi lại số này — đó là số cho báo cáo.)
 2. Cộng dồn câu vào `that/nhan-that.csv` (chạy lại cùng đợt không cộng hai lần). Nguồn
    `that:<đợt>` là câu học sinh, `that-gv:<đợt>` là câu giáo viên/quản trị.
-3. Học trên câu thật + bộ cũ `du-lieu/nhan.csv` (do AI gán, chỉ để đủ câu). Tập kiểm CỐ ĐỊNH chỉ
+3. Học trên câu thật + bộ cũ `du-lieu/nhan.csv` (câu do AI viết, nhãn do một
+   thành viên nhóm gán lại ngày 05/10/2026, xem `du-lieu/GHI-CHU-DU-LIEU-AI.md`; chỉ để đủ câu). Tập kiểm CỐ ĐỊNH chỉ
    được chốt khi có ≥ 250 câu học sinh, mỗi nhãn đã gặp có ≥ 2 câu, VÀ mọi câu học sinh tích luỹ đã
    qua hai người gán (Cách A một người gán thì chưa); trước đó máy in "CHƯA chốt tập kiểm (lý do)"
    và số đo đợt đó KHÔNG dùng cho báo cáo. Không hạ `--nguong-tap-kiem` để chốt sớm.

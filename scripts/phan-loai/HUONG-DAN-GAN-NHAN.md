@@ -78,6 +78,16 @@ TRƯỚC khi gán. Đổi quy tắc khi đang gán dở thì phải gán lại c
 | "sao acid này lại mạnh hơn vậy thầy" | `hoi_khai_niem` | Chỉ hỏi, không có câu đáp nào của em |
 | "dạ tăng ạ, thầy cho em thêm bài để luyện" | `tra_loi_gia_su` | Có câu đáp: ưu tiên 5 thắng Xin đề (ưu tiên 7) |
 | "dạ", "vâng ạ", "ok thầy" | `ngoai_mon` | Chỉ là lời đáp xã giao, không có nội dung Hoá |
+| "cảm ơn thầy", "chào thầy", "good night thầy", "web này ai làm vậy" | `ngoai_mon` | Chào hỏi, cảm ơn, hỏi về gia sư là Ngoài môn; không chọn "(Bỏ câu này)". Cách ChemAI nên đáp thì ghi vào ghi chú, không quyết nhãn |
+| "chả hiểu gì, thầy cho đáp án cuối luôn" | `xin_dap_an` | Hai ý: Xin đáp án (ưu tiên 2) thắng Bế tắc (ưu tiên 4) |
+| "dun 12g acid vs 9,2g ethanol h=60% thi dc bn gam ester" | `xin_dap_an` | Hỏi thẳng con số của một bài là đòi đáp số, không phải hỏi khái niệm |
+| "em chọn đáp án B cho câu này", "bước 2 em tính được 0,04 mol" | `nop_bai_lam` | Đáp án đã chọn, bước làm hay kết quả của một bài |
+| "em ra 8,8 gam, thầy cho em số đúng / viết lại lời giải chuẩn" | `xin_dap_an` | Có bài làm nhưng đòi số đúng hay lời giải: ưu tiên 2 thắng 3 |
+| "em ra pH = 1,40, em làm đúng chưa ạ?" | `nop_bai_lam` | Chỉ nhờ xem đúng sai, không đòi số |
+| "em nghĩ phenol tan ít vì vòng benzen kị nước" (không có cột "ChemAI vừa nói") | `tra_loi_gia_su` | Nêu ý có lý do, không nhờ xem, không gắn với đáp án của bài nào; có cột "ChemAI vừa nói" thì đọc cột đó trước |
+| "em ra 0,1 mol nhưng chịu bước sau" | `nop_bai_lam` | Có đưa ý nên không phải Bế tắc (ưu tiên 3 thắng 4) |
+
+Tám dòng cuối chốt ngày 05/10/2026 khi rà bảng gán lại 438 câu bộ cũ (`du-lieu/GHI-CHU-DU-LIEU-AI.md`).
 
 ## Đo đồng thuận và xử lý câu bất đồng
 1. Một người soạn danh sách câu (cột `tin_nhan`, `nguon`), chép thành hai tệp. Mỗi người
@@ -101,7 +111,8 @@ TRƯỚC khi gán. Đổi quy tắc khi đang gán dở thì phải gán lại c
    `python scripts/phan-loai/gop-nhan.py a.csv b.csv scripts/phan-loai/du-lieu/bat-dong.csv --ghi-de`.
    Câu hai người trùng giữ nguyên nhãn; câu bất đồng lấy `nhan_chot` và có `nguoi_gan`
    bắt đầu bằng `thong-nhat:`. Còn câu chưa điền `nhan_chot` thì script dừng. `nhan.csv`
-   hiện là bản AI gán; sao lưu trước khi ghi đè nếu còn cần.
+   hiện là 438 câu AI viết do một thành viên nhóm gán lại ngày 05/10/2026
+   (`du-lieu/GHI-CHU-DU-LIEU-AI.md`); sao lưu trước khi ghi đè.
 6. Ghi vào báo cáo: số câu, kappa trước thống nhất, số câu phải bàn, và số câu trùng sau
    chuẩn hoá mà `huan-luyen.py` in ra.
 
