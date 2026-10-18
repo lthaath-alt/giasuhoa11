@@ -59,9 +59,42 @@ nhánh Socratic. Giữ gemini-3.5-flash-lite ở cuối danh sách, chỉ dùng 
 hết lượt; bỏ nốt thì dự phòng chỉ còn khoảng 80 lượt/ngày. Lượt do model dự phòng trả lời
 có `duong` = "xoay-gemini" trong `chats`, nên phân tích tách được.
 
+## Bộ 20 tình huống `npm run thu:ai` cho bốn bản Flash (06/10/2026, khoảng 0:00 đến 0:20 giờ Việt Nam)
+
+Chạy `npm run thu:ai -- <model>` cho cả bốn bản cùng lúc. Không bản nào chạy hết bộ: mỗi bản
+chỉ trả lời được 3 đến 5 câu rồi báo hết lượt ngày (HTTP 429, `limit: 20`). Số dưới đây vì thế
+chưa phải tỉ lệ đạt trên 20 tình huống.
+
+| Model | Có câu trả lời | Đạt | Hỏng do chấm | Lỗi 503 | Lỗi 429 hết lượt ngày |
+|---|---|---|---|---|---|
+| gemini-3.8-flash | 5 | 4 | 1 | 5 | 10 |
+| gemini-3.7-flash | 3 | 2 | 1 | 4 | 13 |
+| gemini-3.5-flash | 4 | 3 | 1 | 5 | 11 |
+| gemini-3-flash-preview | 4 | 4 | 0 | 4 | 12 |
+
+Tình huống duy nhất bị chấm hỏng ở ba bản đầu là "Bám nội dung Bài 22". Đọc tay cả ba câu trả
+lời: model nêu đúng Bài 22, hỏi ngược học sinh về liên kết C-X hoặc hỏi "thế, cộng hay tách",
+không nói thẳng cụm "phản ứng thế". Phép chấm đòi đúng cụm đó nên báo hỏng; đây là phép chấm
+quá chặt với lối dẫn dắt, chưa thấy model trả lời sai. Tình huống "Không đưa đáp án thẳng"
+(bai-21) đạt ở cả hai bản có câu trả lời (3.8-flash và 3-flash-preview).
+
+Hai điều rút ra về hạn mức:
+
+- Mỗi tình huống gặp 503 được script gọi lại tới ba lần. Cộng số lượt gọi lại với số câu trả
+  lời thì vừa khoảng 20, nên nhiều khả năng lượt bị 503 cũng tính vào hạn mức ngày. Đây là suy
+  ra từ số đếm, chưa đối chiếu trên AI Studio, và không biết trước lúc chạy mỗi bản đã dùng
+  bao nhiêu lượt.
+- Lúc 0:00 giờ Việt Nam (khoảng 10:00 sáng giờ Thái Bình Dương) cả bốn bản đều trả 503 ở 4
+  đến 5 tình huống đầu. Lần sau nên chạy từng bản một, vào giờ khác, và chỉ chạy các tình
+  huống còn thiếu: `npm run thu:ai -- <model> 3 8 9 ...`.
+
+Sau lần chạy này, bốn bản Flash hết lượt cho tới 14:00 ngày 06/10/2026. Trong khoảng đó web
+còn model chính và gemini-3.5-flash-lite.
+
 ## Chưa đo
 
-Bốn bản Flash (3.8, 3.7, 3.5, 3-flash-preview) chưa chạy bộ 20 tình huống: mỗi bản chỉ có
-khoảng 20 lượt/ngày ở bậc miễn phí, chạy là dùng hết tầng dự phòng của web trong ngày đó.
-Hạn mức ngày hồi lúc 14:00 giờ Việt Nam (mùa hè) hoặc 15:00 (mùa đông), nên chạy ngay trước
-giờ đó là ít ảnh hưởng nhất. Giáo viên chưa đọc tay câu trả lời nào của các model này.
+Bốn bản Flash (3.8, 3.7, 3.5, 3-flash-preview) chưa có kết quả đủ 20 tình huống (xem lần chạy
+dở ngày 06/10/2026 ở trên): mỗi bản chỉ có khoảng 20 lượt/ngày ở bậc miễn phí, chạy là dùng
+hết tầng dự phòng của web trong ngày đó. Hạn mức ngày hồi lúc 14:00 giờ Việt Nam (mùa hè) hoặc
+15:00 (mùa đông), nên chạy ngay trước giờ đó là ít ảnh hưởng nhất. Giáo viên chưa đọc tay câu
+trả lời nào của các model này.

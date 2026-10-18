@@ -81,7 +81,7 @@ export const thongBaoHetLuot = (loi: string, coKeyRieng = false): string => {
 
 /**
  * Diễn giải lỗi KẾT NỐI của lượt gọi gia sư thành câu nói cho học sinh.
- * Trả '' nếu không nhận ra loại lỗi — khi đó đường gọi rơi về kịch bản mẫu.
+ * Trả '' nếu không nhận ra loại lỗi — khi đó đường gọi trả câu `LOI_LA`.
  *
  * Tách thành hàm thuần để `kiem-tra:het-luot` kiểm được từng loại lỗi mà không
  * cần trình duyệt, không cần mạng, không tốn lượt API.
@@ -132,6 +132,11 @@ export const thongBaoLoiKetNoi = (chuoiLoi: string): string => {
 
   return '';
 };
+
+/** Câu trả về khi lượt gọi hỏng vì một lỗi mà hai hàm trên không nhận ra. */
+export const LOI_LA = 'Chemai gặp một lỗi chưa rõ nguyên nhân nên chưa trả lời được câu này. '
+  + 'Em bấm gửi lại câu hỏi giúp thầy nhé; nếu vẫn không được thì em tải lại trang (phím F5) '
+  + 'và báo cho thầy cô biết.';
 
 /** Kết quả một lượt, kèm số đo cho telemetry. */
 export interface KetQuaGiaSu {
@@ -350,8 +355,12 @@ export const generateAIResponseChiTiet = async (
     const loiKetNoi = thongBaoLoiKetNoi(chuoiLoi);
     if (loiKetNoi) return { ...coBan, text: loiKetNoi };
 
-    const { generateAIResponse: mockGenerate } = await import('./aiMockService');
-    return { ...coBan, text: await mockGenerate(lessonId, userQuestion, history, userEmail) };
+    /* Lỗi lạ (400 tham số sai, nội dung bị chặn, lỗi mã, …) cũng BÁO THẬT
+       (05/10/2026). Trước đây ca này rơi sang kịch bản mẫu: em nhận một câu
+       trông như Chemai trả lời, `chats` ghi lượt đó không có `model_name`, và
+       không ai biết là hỏng. Kịch bản mẫu chỉ còn dùng khi bản build chưa cấu
+       hình AI (nhánh `!coGiaSuAI()` ở trên), nơi giao diện đã ghi rõ điều đó. */
+    return { ...coBan, text: LOI_LA };
   }
 };
 

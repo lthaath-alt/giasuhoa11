@@ -186,7 +186,7 @@ console.log('\n== App Check bị khoá thì bảo TẢI LẠI TRANG ==');
   ok(/máy chủ/i.test(t5xx), 'lỗi 5xx: nói rõ là lỗi phía máy chủ');
 
   ok(thongBaoLoiKetNoi('TypeError: x is not a function') === '',
-     'lỗi lạ thì trả chuỗi rỗng để rơi về đường dự phòng như cũ');
+     'lỗi lạ thì trả chuỗi rỗng, nơi gọi tự trả câu LOI_LA');
 }
 
 console.log('\n' + (hong === 0 ? '>>> TẤT CẢ ĐẠT' : `>>> CÓ ${hong} MỤC HỎNG`) + '\n');
