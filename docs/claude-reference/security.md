@@ -114,7 +114,7 @@ và không được tự deploy. Nên khi sửa luật: đưa NGUYÊN TỆP cho 
 trích đoạn trong chat), kèm bảng phép thử Playground. Sau khi chủ dự án báo đã
 publish, đo lại bằng REST không đăng nhập — đó là tư cách mà đồng bộ đêm dùng.
 
-Từ 13/09/2026 có `npm run kiem-tra:luat` — nay 83 phép (nhóm 1–23; 03/10/2026 thêm nhóm 23 cho `quan_tri`, `classes`, kho nội dung, cấu hình, `progress`, `chats`) chạy trên emulator, đọc
+Từ 13/09/2026 có `npm run kiem-tra:luat` — nay 90 phép (nhóm 1–24; 03/10/2026 thêm nhóm 23 cho `quan_tri`, `classes`, kho nội dung, cấu hình, `progress`, `chats`; 18/10/2026 thêm nhóm 24: học sinh chỉ TẠO tin `chats`, không sửa/xoá, trần 20.000 ký tự và 40 trường) chạy trên emulator, đọc
 thẳng `firestore.rules`. Nó bắt được thứ Playground không bắt được: `list`, và
 lỗi gõ nhầm tên trường. Nhưng nó CHỈ chứng minh tệp trong git đúng; luật đang
 chạy trên Firebase thì vẫn phải đo bằng REST sau khi publish. Hai việc khác

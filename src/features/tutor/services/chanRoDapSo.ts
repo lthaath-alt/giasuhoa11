@@ -24,16 +24,33 @@
 export function timSoTrongVanBan(s: string): number[] {
   const MU = '⁰¹²³⁴⁵⁶⁷⁸⁹';
   const t = (s ?? '')
+    /* Lối viết lách bộ dò (18/10/2026, rút từ các lượt AntiGravity đo bộ chặn của
+       web tiếng Anh, bài học "tập thử phải có đủ mọi kiểu viết"): chữ số toàn khổ
+       "２,２４" (NFKC đưa về 2,24), ký tự vô hình chen giữa "2​,​24" (\p{Cf}), và
+       khoảng trắng LaTeX `\,` `\;` `\!` `~`. Làm TRƯỚC mọi bước khác. */
+    .normalize('NFKC')
+    .replace(/\p{Cf}/gu, '')
+    .replace(/\\[,;:!]|~/g, ' ')
     /* Dấu thập phân kiểu LaTeX, PHẢI xử lý đầu tiên. Câu lệnh hệ thống dặn mô
        hình viết `24{,}79` trong công thức (để KaTeX không giãn chữ số), nên
        một đáp số rò ra thường mang đúng lối này. Đo 22/09/2026: 49 trong 86
        câu trả lời dùng lối viết đó, mà bộ dò bản đầu đọc `$1{,}70$` thành hai
        số 1 và 70 — tức mù đúng chỗ dễ rò nhất. */
     .replace(/(\d)\s*\{\s*[,.]\s*\}\s*(\d)/g, '$1,$2')
+    /* "2 , 24": dấu thập phân có cách CẢ HAI bên. Chỉ ghép khi cách hai bên,
+       để danh sách "câu 1, 2, 3" (cách một bên) không thành số thập phân. */
+    .replace(/(\d)\s+[,.]\s+(\d)/g, '$1,$2')
+    /* Luỹ thừa 10 kiểu LaTeX — đúng lối câu lệnh hệ thống dặn mô hình viết:
+       `1{,}45 \times 10^{-2}`, `\cdot 10^{3}`. Bản cũ chỉ bắt `×10^-2` không
+       ngoặc, nên đọc `\times 10^{-2}` thành ba số 1,45 · 10 · -2 và bỏ lọt. */
+    .replace(/\s*(?:\\times|\\cdot|[×x*·])\s*10\s*\^\s*\{\s*([−-]?\d+)\s*\}/gi, 'e$1')
+    .replace(/\.\s*10\s*\^\s*\{\s*([−-]?\d+)\s*\}/g, 'e$1')
     /* Chuẩn hoá luỹ thừa 10 về ký hiệu e trước, vì phần sau chỉ bắt số thường.
        Ba lối viết: ×10^-2, ×10⁻², .10^-2 — đều gặp trong lời giải của ngân hàng. */
-    .replace(/[×x*]\s*10\s*\^?\s*([−\-]?\d+)/gi, 'e$1')
-    .replace(new RegExp(`[×x*]\\s*10\\s*([⁻${MU}]+)`, 'gi'), (_, mu: string) =>
+    /* `\s*` ở đầu: "1,45 × 10^-2" có dấu cách trước ×. Không nuốt nó thì ra
+       "1,45 e-2", bị tách thành hai số và bỏ lọt (bản cũ cũng mắc). */
+    .replace(/\s*(?:\\times|\\cdot|[×x*·])\s*10\s*\^?\s*([−\-]?\d+)/gi, 'e$1')
+    .replace(new RegExp(`\\s*[×x*]\\s*10\\s*([⁻${MU}]+)`, 'gi'), (_, mu: string) =>
       'e' + mu.replace(/⁻/g, '-').replace(new RegExp(`[${MU}]`, 'g'), c => String(MU.indexOf(c))))
     .replace(/\.\s*10\s*\^?\s*([−\-]?\d+)/g, 'e$1')
     .replace(/−/g, '-');
@@ -62,7 +79,11 @@ export function timSoTrongVanBan(s: string): number[] {
  */
 export function coDapSo(traLoi: string, dapAn: number, tol: number): boolean {
   const saiSo = Math.max(Math.abs(tol), Math.abs(dapAn) * 1e-9, 1e-9);
-  return timSoTrongVanBan(traLoi).some(v => Math.abs(v - dapAn) <= saiSo);
+  /* So cả đáp án nhân/chia 1000: đổi đơn vị là cách lộ đáp số mà không nêu đúng
+     con số — "2240 mL" khi đáp án là 2,24 L, "14,5 mM" khi đáp án 0,0145 M
+     (18/10/2026). Không gây chặn nhầm kiểu "300 mL ↔ 0,3": câu mà đề có sẵn bội
+     của đáp án đã bị `dapAnTrungDuKienTrongDe` loại khỏi bộ chặn từ trước. */
+  return timSoTrongVanBan(traLoi).some(v => [1, 1000, 0.001].some(k => Math.abs(v - dapAn * k) <= saiSo * k));
 }
 
 /* ── 2. Tìm đáp án của bài em đang hỏi ──────────────────────────────────── */
@@ -145,6 +166,32 @@ export function timDapAnChoTin(
   return undefined;
 }
 
+/** Số tin cũ của em được dò ngược để nhớ bài em đang làm. */
+export const SO_TIN_DO_NGUOC = 10;
+
+/**
+ * Đáp án của (các) bài em đang làm trong đoạn chat, không chỉ của tin vừa gửi.
+ *
+ * Bản cũ chỉ khớp tin vừa gửi, nên bộ chặn bật ở đúng lượt em dán đề rồi TẮT ở mọi
+ * lượt dẫn dắt sau ("em chưa hiểu bước tiếp theo, thầy gợi ý giúp em") — tức tắt
+ * đúng lúc gia sư dễ buột ra đáp số nhất (lượt V1 của AntiGravity ở web tiếng Anh:
+ * dán đề vào chỗ không có bộ chặn thì model giải hộ 15/15 lượt). Nay dò thêm
+ * SO_TIN_DO_NGUOC tin gần nhất của em; đáp án của mọi đề khớp đều được canh.
+ * Trả mảng không trùng, đề của tin mới nhất đứng đầu.
+ */
+export function timDapAnTrongPhien(
+  tinMoi: string,
+  tinCuCuaEm: string[],
+  cauCuaBai: CauCoDapSo[],
+): { num: number; tol: number }[] {
+  const ra: { num: number; tol: number }[] = [];
+  for (const tin of [tinMoi, ...tinCuCuaEm.slice(-SO_TIN_DO_NGUOC).reverse()]) {
+    const d = timDapAnChoTin(tin, cauCuaBai);
+    if (d && !ra.some(x => x.num === d.num)) ra.push(d);
+  }
+  return ra;
+}
+
 /* ── 3. Lọc một lượt trả lời ────────────────────────────────────────────── */
 
 /** Chỉ thị gắt hơn, gắn thêm vào câu lệnh hệ thống cho lượt sinh lại. */
@@ -162,6 +209,8 @@ export const CAU_DU_PHONG =
 export interface YeuCauLoc {
   traLoi: string;
   dapAn?: { num: number; tol: number };
+  /** Nhiều đáp án cùng canh (các đề em đã dán trong phiên); dùng kèm hoặc thay `dapAn`. */
+  cacDapAn?: { num: number; tol: number }[];
   sinhLai: (chiThi: string) => Promise<string>;
 }
 
@@ -180,11 +229,13 @@ export interface KetQuaLoc {
  * buổi học. Hai lần rò liên tiếp thì câu dự phòng rẻ hơn và chắc chắn sạch.
  */
 export async function locTraLoi(y: YeuCauLoc): Promise<KetQuaLoc> {
-  if (!y.dapAn || !coDapSo(y.traLoi, y.dapAn.num, y.dapAn.tol)) {
+  const ds = [...(y.dapAn ? [y.dapAn] : []), ...(y.cacDapAn ?? [])];
+  const ro = (s: string) => ds.some(d => coDapSo(s, d.num, d.tol));
+  if (!ds.length || !ro(y.traLoi)) {
     return { noiDung: y.traLoi, daChan: false, phaiDungDuPhong: false };
   }
   const lai = await y.sinhLai(CHI_THI_SINH_LAI);
-  if (!coDapSo(lai, y.dapAn.num, y.dapAn.tol)) {
+  if (!ro(lai)) {
     return { noiDung: lai, daChan: true, phaiDungDuPhong: false };
   }
   return { noiDung: CAU_DU_PHONG, daChan: true, phaiDungDuPhong: true };

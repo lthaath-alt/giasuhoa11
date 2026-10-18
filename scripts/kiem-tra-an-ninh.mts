@@ -131,6 +131,7 @@ console.log('\n== Header bảo mật khi phát hành ==');
     ['Referrer-Policy', 'đừng rò đường dẫn nội bộ sang site ngoài'],
     ['Permissions-Policy', 'tắt sẵn camera/mic/định vị — app không dùng tới'],
     ['Content-Security-Policy', 'hàng rào thứ hai nếu bộ lọc HTML thủng'],
+    ['Strict-Transport-Security', 'chỉ dùng HTTPS, kể cả khi đổi sang tên miền riêng'],
   ];
   if (!existsSync(P)) truot('có tệp public/_headers', 'thiếu tệp');
   else {

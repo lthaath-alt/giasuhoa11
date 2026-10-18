@@ -8,7 +8,7 @@ import { RECAPTCHA_ENTERPRISE_SITE_KEY } from '../../../core/services/firebaseCo
 import { loiThanhChuoi } from './loiGemini';
 import { xuLyTruocLuot } from './pedagogicalStateMachine';
 import { docKey, coKeyRieng } from './keyRieng';
-import { locTraLoi, timDapAnChoTin, type CauCoDapSo } from './chanRoDapSo';
+import { locTraLoi, timDapAnTrongPhien, type CauCoDapSo } from './chanRoDapSo';
 import { GEMINI_XOAY, type Duong, type NhaCungCap } from './danhSachMoHinh';
 import { taoKhoHet } from './hetLuotMoHinh';
 import { goiTheoChuoi, HAN_CHO_MS, type BuocGoi, type MoiTruongChuoi } from './chuoiDuPhong';
@@ -176,20 +176,29 @@ const loaiLoi = (msg: string): string => {
    lại mỗi lượt là vừa chậm vừa tốn. Bộ chặn khi đó không có đáp án để so —
    đúng giới hạn đã ghi trong báo cáo. */
 const dapAnTheoBai = new Map<string, CauCoDapSo[]>();
+/* Lần đọc ngân hàng hỏng thì chỉ nhớ "hỏng" trong 60 giây rồi thử lại. Bản cũ
+   nhớ mảng rỗng tới hết phiên: mạng chập đúng lúc mở bài là cả buổi không có bộ
+   chặn mà không ai biết (18/10/2026). */
+const docHongLuc = new Map<string, number>();
+const THU_LAI_SAU_MS = 60_000;
 
 async function layCauCoDapSo(lessonId: string): Promise<CauCoDapSo[]> {
   if (!lessonId || lessonId === 'global-advisor') return [];
   const daNho = dapAnTheoBai.get(lessonId);
   if (daNho) return daNho;
+  const hong = docHongLuc.get(lessonId);
+  if (hong !== undefined && Date.now() - hong < THU_LAI_SAU_MS) return [];
   try {
     const { BankFirestore } = await import('../../bank/bankStore');
     const cau = (await BankFirestore.getByLesson(lessonId))
       .filter(c => typeof c.num === 'number')
       .map(c => ({ q: c.q, num: c.num, tol: c.tol }));
     dapAnTheoBai.set(lessonId, cau);
+    docHongLuc.delete(lessonId);
     return cau;
   } catch {
-    dapAnTheoBai.set(lessonId, []);
+    docHongLuc.set(lessonId, Date.now());
+    console.warn('[chanRoDapSo] không đọc được ngân hàng của bài, bộ chặn tạm tắt, thử lại sau 60 giây', { lessonId });
     return [];
   }
 }
@@ -298,14 +307,20 @@ export const generateAIResponseChiTiet = async (
        mất đúng biến mà đề tài đang đo, và `kiem-tra:thuc-nghiem` sinh ra để
        canh cho hai nhánh chỉ khác nhau ở cách dạy. */
     let daChanRo = false;
-    const dapAn = nhanh === 'socratic'
-      ? timDapAnChoTin(userQuestion, await layCauCoDapSo(lessonId))
-      : undefined;
-    if (dapAn && traLoi) {
+    /* Canh đáp án của mọi đề em đã dán gần đây trong bài, không chỉ đề trong tin
+       vừa gửi (18/10/2026) — xem `timDapAnTrongPhien`. */
+    const cacDapAn = nhanh === 'socratic'
+      ? timDapAnTrongPhien(
+          userQuestion,
+          history.filter(m => m.sender === 'user').map(m => m.content),
+          await layCauCoDapSo(lessonId),
+        )
+      : [];
+    if (cacDapAn.length && traLoi) {
       const { tachNhanAn } = await import('./pedagogicalStateMachine');
       const loc = await locTraLoi({
         traLoi: tachNhanAn(traLoi).noiDung,
-        dapAn,
+        cacDapAn,
         /* Lượt sinh lại gọi THÊM một lượt model — hỏng giữa chừng (vd hết lượt
            đúng lúc này) thì KHÔNG được để lỗi hạn mức đó văng lên nuốt mất cả
            lượt: trả '' để `locTraLoi` coi là không rò (coDapSo('') luôn false)
@@ -322,8 +337,10 @@ export const generateAIResponseChiTiet = async (
       if (loc.daChan) {
         daChanRo = true;
         traLoi = loc.noiDung;
+        /* KHÔNG ghi giá trị đáp án: console là của chính máy em, mở DevTools là
+           thấy đáp số kèm xác nhận lượt vừa rồi đã chạm đúng nó (18/10/2026). */
         console.warn('[chanRoDapSo] đã chặn một lượt rò đáp số', {
-          lessonId, dapAn: dapAn.num, mucGoiY, phaiDungDuPhong: loc.phaiDungDuPhong,
+          lessonId, soDapAnCanh: cacDapAn.length, mucGoiY, phaiDungDuPhong: loc.phaiDungDuPhong,
           luc: new Date().toISOString(),
         });
       }

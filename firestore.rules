@@ -294,10 +294,21 @@ service cloud.firestore {
        tức truy vấn CÓ RÀNG BUỘC trên đúng trường luật kiểm — điều kiện bắt buộc
        để Firestore cho phép một truy vấn. Xem `getChatsByUserLesson` trong
        firestoreService.ts. */
+    /* 18/10/2026, rút từ lượt soát bảo mật web tiếng Anh: chats là dữ liệu đề tài.
+       - Học sinh chỉ TẠO tin, không sửa, không xoá: app chỉ ghi mỗi tin một lần
+         (`addChatMessage`), "Ẩn khỏi màn hình" là mốc trong localStorage, không
+         xoá trên Firestore. Bản cũ cho em sửa/xoá cả tin của gia sư, tức sửa được
+         dữ liệu thực nghiệm và trang theo dõi của giáo viên.
+       - Có trần cỡ: nội dung ≤ 20.000 ký tự, ≤ 40 trường (ChatMessage có 24).
+       - Không `get()` ở `create`/`read` của học sinh (điều 2 trong security.md):
+         `laGiaoVien()` chỉ chạy ở update/delete, việc hiếm của giáo viên. */
     match /chats/{id} {
       allow read:   if dangNhap() && (email() == resource.data.userEmail || laGiaoVien());
-      allow create: if dangNhap() && email() == request.resource.data.userEmail;
-      allow update, delete: if dangNhap() && (email() == resource.data.userEmail || laGiaoVien());
+      allow create: if dangNhap() && email() == request.resource.data.userEmail
+        && request.resource.data.content is string
+        && request.resource.data.content.size() <= 20000
+        && request.resource.data.keys().size() <= 40;
+      allow update, delete: if laGiaoVien();
     }
 
     /* Đọc rộng cho người đã đăng nhập, CÓ CHỦ Ý. Học sinh tự đăng ký vào lớp

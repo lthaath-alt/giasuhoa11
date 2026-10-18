@@ -33,7 +33,7 @@ import { buildProgramContext } from '../src/features/tutor/services/lessonContex
 import { chuanHoaCongThuc } from '../src/core/components/chuanHoaCongThuc';
 import { LUOC_DO_LOC, TUY_CHON_KATEX, taoTheLink } from '../src/core/components/markdownCauHinh';
 import { tinhChiSo, xuatCsv, gopTheoHocSinh, csvHocSinh } from '../src/features/tutor/services/telemetryService';
-import { coDapSo, timDapAnChoTin } from '../src/features/tutor/services/chanRoDapSo';
+import { coDapSo, timDapAnChoTin, timDapAnTrongPhien, locTraLoi, SO_TIN_DO_NGUOC, CAU_DU_PHONG } from '../src/features/tutor/services/chanRoDapSo';
 import type { ChatMessage } from '../src/features/auth/types';
 import { nhomTheoPhien, nhanNhom } from '../src/features/tutor/services/nhomPhien';
 import { khoaAnTin, docMocAn, ghiMocAn, mocAnTatCa, locTheoMoc } from '../src/features/tutor/services/anTinCu';
@@ -467,6 +467,22 @@ console.log('\n== Bộ dò đáp số trong câu trả lời (P0-2, P0-4) ==');
     ['Khối lượng kết tủa là $66{,}2$ gam.', 66.2, true],
     ['Nồng độ $x = 0{,}3$ M.', 0.3, true],
     ['Theo đề, $V = 24{,}79$ L/mol là hằng số ở đkc.', 1.7, false],
+    /* 18/10/2026 — các lối lách rút từ lượt AntiGravity đo bộ chặn của web tiếng
+       Anh. Bản cũ để lọt cả bảy ca "true" dưới đây. */
+    ['Nồng độ $1{,}45 \\times 10^{-2}$ M em nhé.', 0.0145, true],
+    ['nồng độ 1,45 × 10^{-2} M', 0.0145, true],
+    ['nồng độ 1,45 × 10^-2 M', 0.0145, true],
+    ['thể tích 2​,​24 lít', 2.24, true],
+    ['thể tích ２,２４ lít', 2.24, true],
+    ['thể tích 2 , 24 lít', 2.24, true],
+    ['thể tích 2240 mL', 2.24, true],
+    ['nồng độ 14,5 mM', 0.0145, true],
+    /* …và không được bắt nhầm: danh sách số, số nằm sát nhau trong câu. */
+    ['Em xem lại câu 1, 2, 3 và câu 24 nhé.', 2.24, false],
+    ['Em dùng 2 lít khí, 24 gam muối.', 2.24, false],
+    /* Đáp án 2,24 chứ không 0,0145: khung kiểm dùng chung sai số 0,05, mà 0,05 đã
+       lớn hơn 0,0145 — sai số thật trong ngân hàng tối đa 6,2 % đáp án (đo 18/10/2026). */
+    ['Nhân cả hai vế với $10^{2}$ là xong bước này.', 2.24, false],
   ];
   for (const [text, dap, mong] of ca) {
     ok(coDapSo(text, dap, 0.05) === mong, `dò "${text.slice(0, 34)}…" → ${mong}`);
@@ -484,6 +500,22 @@ console.log('\n== Bộ dò đáp số trong câu trả lời (P0-2, P0-4) ==');
     'tin ngắn hoặc khác đề thì không khớp bừa');
   ok(timDapAnChoTin('Tính pH của dung dịch thu được khi trộn hai dung dịch acid mạnh có cùng nồng độ', kho) === undefined,
     'bài cùng chủ đề nhưng khác đề thì không khớp');
+
+  /* 18/10/2026: bộ chặn phải còn bật ở các lượt DẪN DẮT sau lượt em dán đề. */
+  const deBai = kho[0].q;
+  const dauHoi = 'em chua hieu buoc tiep theo, thay goi y giup em';
+  ok(timDapAnChoTin(dauHoi, kho) === undefined, 'tin dẫn dắt một mình không khớp đề nào (đúng như cũ)');
+  ok(timDapAnTrongPhien(dauHoi, [deBai, 'em tính được số mol HCl rồi'], kho).map(d => d.num).join() === '1.7',
+    'nhưng có đề trong các tin trước của em thì vẫn canh đáp án 1,7');
+  const tinDem = Array.from({ length: SO_TIN_DO_NGUOC }, (_, i) => `tin số ${i}`);
+  ok(timDapAnTrongPhien(dauHoi, [deBai, ...tinDem], kho).length === 0,
+    `đề đã trôi quá ${SO_TIN_DO_NGUOC} tin thì thôi canh`);
+  const kho2 = [...kho, { q: 'Hấp thụ hoàn toàn 2,24 lít khí CO2 ở đkc vào dung dịch nước vôi trong dư thu được m gam kết tủa. Tính m.', num: 10, tol: 0.1 }];
+  ok(timDapAnTrongPhien(dauHoi, [deBai, kho2[1].q], kho2).map(d => d.num).join() === '10,1.7',
+    'em dán hai đề thì canh cả hai đáp án, đề mới nhất đứng đầu');
+  const loc = await locTraLoi({ traLoi: 'Vậy pH = 1,70 em nhé.', cacDapAn: [{ num: 10, tol: 0.1 }, { num: 1.7, tol: 0.05 }],
+    sinhLai: async () => 'pH vẫn là 1,7 thôi' });
+  ok(loc.daChan && loc.noiDung === CAU_DU_PHONG, 'lộ đáp án của BẤT KỲ đề nào đang canh đều bị chặn');
 }
 
 console.log('\n== Khung chat: gom tin theo phiên (nhomPhien.ts) ==');

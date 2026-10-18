@@ -379,6 +379,17 @@ async function chayCacPhep(): Promise<number> {
   await chan(setDoc(doc(hs3, 'chats', 'chat_gia'), { userEmail: NGUOI.hs.email, noiDung: 'giả' }),
     '23s. học sinh tạo chat đứng tên bạn');
   await chan(deleteDoc(doc(hs3, 'chats', 'chat_1')), '23t. học sinh xoá chat của bạn');
+  // 24a-g (18/10/2026): học sinh chỉ tạo tin, có trần cỡ; sửa/xoá chỉ giáo viên
+  const tinHs = { userEmail: NGUOI.hs.email, lessonId: 'bai-1', sender: 'user', content: 'em chiu', timestamp: '2026-10-18' };
+  await duoc(setDoc(doc(hs, 'chats', 'chat_moi'), tinHs), '24a. học sinh tạo tin của mình (đối chứng)');
+  await chan(setDoc(doc(hs, 'chats', 'chat_moi'), { ...tinHs, content: 'đã sửa' }), '24b. học sinh sửa tin của chính mình');
+  await chan(setDoc(doc(hs, 'chats', 'chat_1'), { userEmail: NGUOI.hs.email, sender: 'ai', content: 'giả lời gia sư' }),
+    '24c. học sinh ghi đè tin cũ của mình (kể cả tin gia sư)');
+  await chan(deleteDoc(doc(hs, 'chats', 'chat_1')), '24d. học sinh xoá tin của chính mình');
+  await chan(setDoc(doc(hs, 'chats', 'chat_to'), { ...tinHs, content: 'x'.repeat(20001) }), '24e. học sinh tạo tin dài quá 20.000 ký tự');
+  await chan(setDoc(doc(hs, 'chats', 'chat_ruong'), { ...tinHs, ...Object.fromEntries(Array.from({ length: 40 }, (_, i) => [`t${i}`, i])) }),
+    '24f. học sinh tạo tin có quá 40 trường');
+  await duoc(deleteDoc(doc(gv, 'chats', 'chat_moi')), '24g. giáo viên xoá một tin (đối chứng)');
   // 23u: collection không có trong luật thì chặn hết, kể cả quản trị
   await chan(setDoc(doc(chu, 'la_lung', 'x'), { a: 1 }), '23u. ghi vào collection không có trong luật');
 

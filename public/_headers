@@ -17,6 +17,12 @@
   # tải lên bị đoán nhầm thành HTML là chạy được mã trong đó.
   X-Content-Type-Options: nosniff
 
+  # Chỉ dùng HTTPS cho tên miền này trong một năm (18/10/2026, rút từ soát bảo mật
+  # web tiếng Anh). Tên `.dev` vốn đã bị trình duyệt ép HTTPS sẵn, nên dòng này
+  # chủ yếu để dành khi web chuyển sang tên miền riêng. KHÔNG thêm `preload`:
+  # gỡ khỏi danh sách preload mất nhiều tháng.
+  Strict-Transport-Security: max-age=31536000
+
   # Không cho site KHÁC nhúng trang này vào iframe rồi phủ lớp trong suốt lên
   # để lừa bấm — nguy nhất là ở màn đăng nhập.
   #
