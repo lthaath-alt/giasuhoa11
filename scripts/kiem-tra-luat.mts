@@ -282,6 +282,15 @@ async function chayCacPhep(): Promise<number> {
     '20g. học sinh đọc bộ đếm của người khác');
   await chan(getDoc(doc(khach, 'gioi_han_chat', 'uid_khach_an_danh')),
     '20h. chưa đăng nhập đọc bộ đếm');
+  // 20i–20k: token ẩn danh ai cũng xin được bằng khoá web công khai, nên nó
+  //     không được đọc email học sinh trong `classes` hay đáp án trong `de_giao`
+  //     (lỗ có thật tới 18/10/2026: luật chỉ hỏi `request.auth != null`).
+  await chan(getDoc(doc(anDanh, 'classes', 'lop_1')),
+    '20i. khách ẩn danh đọc một lớp');
+  await chan(getDocs(collection(anDanh, 'classes')),
+    '20j. khách ẩn danh liệt kê `classes`');
+  await chan(getDoc(doc(anDanh, 'de_giao', 'de_1')),
+    '20k. khách ẩn danh đọc đề giao kèm đáp án');
 
   // 21: bài kiểm tra đã nộp (18/09/2026)
   const hs2 = nhu(moi, NGUOI.hs2);

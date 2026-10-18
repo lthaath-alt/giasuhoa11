@@ -35683,6 +35683,24 @@ function hoiCau(soDi) {
   hien('phu-hoi', true);
 }
 
+// Lời giải `c.q.e` đến từ ngân hàng câu hỏi trên Firestore. Trước đây nối thẳng
+// vào innerHTML: một câu chứa `<img src=x onerror=…>` là chạy mã trong máy học
+// sinh — đúng lỗi đã vá ở giai-cuu-phong-thi-nghiem.html. Dựng bằng nút DOM,
+// lời giải vào làm text node. Không mất gì: 0/1780 câu trong ngân hàng có thẻ
+// HTML ở trường `e`, chỉ số hoá học viết bằng ký tự Unicode (H₂, Na⁺).
+function ghiLoiGiai(dam, phu, loiGiai) {
+  var o = $('hoi-giai');
+  o.textContent = '';
+  var b = document.createElement('b');
+  b.textContent = dam;
+  o.appendChild(b);
+  if (phu) o.appendChild(document.createTextNode(' ' + phu));
+  if (loiGiai) {
+    o.appendChild(document.createElement('br'));
+    o.appendChild(document.createTextNode(loiGiai));
+  }
+}
+
 function chonDap(i, nut) {
   var c = cauHienTai;
   var dung = (i === c.q.a);
@@ -35694,9 +35712,8 @@ function chonDap(i, nut) {
     var thuong = (c.lan === 0) ? THUONG : 0;
     G.doi[G.luot].dung++;
     $('hoi-giai').className = 'giai';
-    $('hoi-giai').innerHTML = '<b>Đúng rồi!</b> '
-      + (thuong ? 'Đúng ngay lần đầu — được thưởng thêm ' + thuong + ' ô. ' : '')
-      + (c.q.e ? '<br>' + c.q.e : '');
+    ghiLoiGiai('Đúng rồi!',
+      thuong ? 'Đúng ngay lần đầu — được thưởng thêm ' + thuong + ' ô.' : '', c.q.e);
     hien('hoi-tiep', true);
     $('hoi-tiep').onclick = function () {
       hien('phu-hoi', false);
@@ -35726,8 +35743,7 @@ function chonDap(i, nut) {
     if (j === c.q.a) b.className = 'dung';
   });
   $('hoi-giai').className = 'giai';
-  $('hoi-giai').innerHTML = '<b>Đáp án đúng: ' + String.fromCharCode(65 + c.q.a) + '.</b>'
-    + (c.q.e ? '<br>' + c.q.e : '');
+  ghiLoiGiai('Đáp án đúng: ' + String.fromCharCode(65 + c.q.a) + '.', '', c.q.e);
   hien('hoi-tiep', true);
   $('hoi-tiep').onclick = function () {
     hien('phu-hoi', false);

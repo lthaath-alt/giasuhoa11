@@ -68,6 +68,39 @@ console.log('\n== Mọi chỗ ghi HTML thô đều phải qua bộ lọc ==');
   else dat(`cả ${soCho} chỗ ghi HTML đều qua locHtml()`);
 }
 
+console.log('\n== Trò chơi không nối dữ liệu ngân hàng vào HTML thô ==');
+{
+  /* Trò chơi ở `public/games/` là HTML thuần, không đi qua React hay `locHtml`.
+     Đợt rà soát 10/09/2026 chỉ quét `src/` nên bỏ sót hai lần: `giai-cuu-…`
+     (vá 10/09) và `ran-va-thang.html` (vá 18/10/2026, tìm ra khi so với dự án
+     tiếng Anh) — cả hai nối lời giải `q.e` thẳng vào `innerHTML`.
+     Phép kiểm: mỗi câu lệnh gán `innerHTML` / gọi `insertAdjacentHTML` /
+     `document.write` mà nhắc tới trường câu hỏi (`q.q`, `q.e`, `q.o`, `ansText`,
+     `st[`) thì trường đó phải nằm trong `esc(` (bộ thoát của hoa11-boardgame).
+     Muốn hiện chữ của ngân hàng thì dùng `textContent` hoặc `createTextNode`. */
+  const TRUONG = /\b(?:\w+\.)?q\.(?:q|e|o)\b|\.ansText\b|\.st\[/g;
+  const LENH = /(?:\.innerHTML\s*\+?=|\.outerHTML\s*=|insertAdjacentHTML\s*\(|document\.write\s*\()([^;]*)/g;
+  const thuMuc = join(GOC, 'public/games');
+  const pham: string[] = [];
+  let soTep = 0;
+  for (const f of existsSync(thuMuc) ? moiTep(thuMuc, ['.html']) : []) {
+    soTep++;
+    const n = doc(f);
+    for (const m of n.matchAll(LENH)) {
+      for (const t of m[1].matchAll(TRUONG)) {
+        /* `esc(q.ansText)`: phần khớp là `.ansText`, nên nhìn lùi qua cả tên biến. */
+        const truoc = m[1].slice(Math.max(0, t.index! - 30), t.index!);
+        if (/\besc\(\s*[\w.]*$/.test(truoc)) continue;
+        const dong = n.slice(0, m.index!).split('\n').length;
+        pham.push(`${ten(f)}:${dong} (${t[0]})`);
+      }
+    }
+  }
+  if (soTep === 0) truot('quét được thư mục trò chơi', 'không thấy tệp .html nào trong public/games/');
+  else if (pham.length) truot('trò chơi không đưa trường câu hỏi vào HTML thô', pham.join(' | '));
+  else dat(`cả ${soTep} trò chơi không đưa trường câu hỏi vào HTML thô`);
+}
+
 console.log('\n== Bộ lọc phải dùng danh sách CHO PHÉP ==');
 {
   const P = join(GOC, 'src/core/services/locHtml.ts');

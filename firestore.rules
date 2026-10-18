@@ -50,6 +50,17 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    /* Đăng nhập bằng tài khoản THẬT, không phải phiên ẩn danh. Chế độ khách
+       (`gioiHanChatService.ts`) xin token ẩn danh để đếm lượt thử, và ai trên
+       Internet cũng xin được token đó bằng khoá web công khai. `dangNhap()`
+       cho token ẩn danh qua, nên trước 18/10/2026 khách ẩn danh đọc được
+       `classes` (email học sinh trong `studentIdentifiers`) và `de_giao` (kèm
+       đáp án). Chỗ nào chỉ cần "đã đăng nhập" mà không kiểm email/uid thì dùng
+       hàm này. Đọc nhà cung cấp trong token, KHÔNG tốn lượt đọc nào. */
+    function taiKhoanThat() {
+      return dangNhap() && request.auth.token.firebase.sign_in_provider != 'anonymous';
+    }
+
     /* Email nằm sẵn trong token, đọc nó KHÔNG tốn lượt đọc nào. Đây là lý do
        mọi phép kiểm quyền sở hữu bên dưới đều dùng email chứ không dùng uid. */
     function email() {
@@ -279,7 +290,7 @@ service cloud.firestore {
        theo trường: giáo viên sửa lại đề của mình là việc bình thường, khác
        hẳn `bai_nop` nơi bài đã nộp phải đứng yên. */
     match /de_giao/{id} {
-      allow read:   if dangNhap();
+      allow read:   if taiKhoanThat();
       allow create: if laGiaoVien()
         && request.resource.data.id == id
         && request.resource.data.teacherEmail == email()
@@ -318,7 +329,7 @@ service cloud.firestore {
        Hệ quả đã biết và chấp nhận: học sinh đã đăng nhập thấy được email bạn
        cùng trường. Muốn kín hơn thì tách mã mời ra một collection riêng. */
     match /classes/{id} {
-      allow read:  if dangNhap();
+      allow read:  if taiKhoanThat();
       allow write: if laGiaoVien();
     }
 

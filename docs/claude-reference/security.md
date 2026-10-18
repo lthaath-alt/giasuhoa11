@@ -47,9 +47,19 @@ có câu đó đều chạy mã của hắn. Lúc đó `users` còn lưu mật k
 4. **Kiểm `e.origin`** ở mọi handler `postMessage` — trò chơi chạy trong iframe
    và nói chuyện với web qua đó.
 5. **Trò chơi cũng phải sạch.** `giai-cuu-phong-thi-nghiem.html` từng nối thẳng
-   `q.e` vào `innerHTML`. Nay dựng bằng nút DOM. Bốn game còn lại dùng
-   `textContent`. Đợt rà soát đầu chỉ quét `src/` nên bỏ sót cả `public/games/` —
-   lần sau quét cả hai.
+   `q.e` vào `innerHTML`. Nay dựng bằng nút DOM. Câu cũ "các game còn lại dùng
+   `textContent`" là SAI: `ran-va-thang.html` cũng nối `c.q.e` vào `innerHTML`
+   ở hai chỗ, tới 18/10/2026 mới vá (hàm `ghiLoiGiai`, dựng bằng nút DOM).
+   Đợt rà soát đầu chỉ quét `src/` nên bỏ sót `public/games/`. Từ 18/10/2026
+   `kiem-tra:an-ninh` có phép "Trò chơi không nối dữ liệu ngân hàng vào HTML
+   thô": quét mọi `public/games/*.html`, trường câu hỏi chỉ được vào HTML thô
+   khi bọc `esc(`.
+6. **Tài khoản ẩn danh không phải "đã đăng nhập".** Chế độ khách xin token ẩn
+   danh để đếm lượt thử; ai cũng xin được token đó bằng khoá web công khai.
+   `dangNhap()` cho token ẩn danh qua, nên tới 18/10/2026 khách ẩn danh đọc
+   được `classes` (email học sinh) và `de_giao` (kèm đáp án). Nay hai chỗ đó
+   dùng `taiKhoanThat()`. Phép 20i–20k của `kiem-tra:luat` canh. Còn hở:
+   người tự đăng ký bằng email vẫn là "tài khoản thật", nên vẫn đọc được.
 
 ### Ba cái bẫy của `_headers`, đã trả giá bằng production
 
